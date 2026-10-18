@@ -65,3 +65,20 @@ class LearningTests(unittest.TestCase):
         self.matcher.match(heard)
         self.learning.forget_all()
         self.assertIsNone(self.learning.learned(heard))
+
+
+class SafetyTests(unittest.TestCase):
+    def test_weak_matches_are_not_learned(self):
+        m = Matcher(learning=VoiceLearning(Path(tempfile.mkdtemp()) / "l.json"))
+        hit = m.match("close the fss overlay")        # a real mis-match from a user's log: close to galnet, but not it
+        if hit is not None and hit.score < 0.90:
+            m.match("close the fss overlay")
+            self.assertEqual(m.learning.seen, {})
+
+    def test_new_overlay_words_and_close_all(self):
+        m = Matcher()
+        for said, command in (("close all overlays", "vc_hide_all"), ("show gallonet overlay", "vc_galnet_ticker"),
+                              ("close colonisation overlay", "vc_colony_needs")):
+            hit = m.match(said)
+            self.assertIsNotNone(hit, said)
+            self.assertEqual(hit.command.id, command, said)

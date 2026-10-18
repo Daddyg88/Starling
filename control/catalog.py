@@ -327,7 +327,7 @@ def _overlay_commands():
     commands = [overlay_command(*row) for row in OVERLAYS]
     commands.append(C(
         "vc_hide_all", "", "the overlays",
-        press=["(hide|clear|remove|dismiss|get rid of|turn off|switch off|disable|kill) [every|all] overlays",
+        press=["(hide|clear|remove|dismiss|close|get rid of|turn off|switch off|disable|kill) [every|all] overlays",
                "overlays (off|away|hidden|out of the way)", "(hide|clear) [the] screen"],
         doing={"press": "Hiding the overlays"}, service=("voidcompass", HIDE_ALL)))
     commands.append(C(

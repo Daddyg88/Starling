@@ -20,6 +20,7 @@ from typing import List, Optional
 from control.catalog import CATALOG, MACROS
 
 FUZZY_NORMAL = 0.84
+LEARN_MIN_SCORE = 0.90        # only a near-certain match is remembered as "one of your phrases"
 FUZZY_STRICT = 0.97          # commands that do something big (jump, supercruise)
 
 # ---- tidying ----
@@ -169,7 +170,8 @@ class Matcher:
             if known in self.index:
                 return Match(self.index[known][0], self.index[known][1], known, 1.0)
         found = self._fuzzy(clean)
-        if found is not None and self.learning is not None and not found.command.strict:
+        if (found is not None and self.learning is not None and not found.command.strict
+                and found.score >= LEARN_MIN_SCORE):
             self.learning.note(clean, found.phrase)
         return found
 
