@@ -38,6 +38,18 @@ PYTHON_URL = "https://www.python.org/ftp/python/%s/python-%s-amd64.exe" % (PYTHO
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
+# PyInstaller sets these so the exe finds ITS OWN copy of Tcl/Tk (in a temporary folder). Programs we start would
+# inherit them and look for Tcl in that temporary folder instead of in their own Python: "Tcl wasn't installed properly".
+POISON = ("TCL_LIBRARY", "TK_LIBRARY", "TCLLIBPATH", "TIX_LIBRARY", "PYTHONHOME", "PYTHONPATH", "_MEIPASS2",
+          "_PYI_APPLICATION_HOME_DIR", "_PYI_ARCHIVE_FILE", "_PYI_PARENT_PROCESS_LEVEL")
+
+
+def clean_env(extra=None):
+    env = {k: v for k, v in os.environ.items() if k not in POISON}
+    env.update(extra or {})
+    return env
+
+
 def install_home():
     override = os.environ.get("STARLING_HOME")
     if override:
@@ -77,7 +89,7 @@ def find_system_python():
             continue
         try:
             out = subprocess.run(command + ["-c", "import sys;print('%d.%d'%sys.version_info[:2]);print(sys.executable)"],
-                                 capture_output=True, text=True, timeout=20, creationflags=NO_WINDOW)
+                                 capture_output=True, text=True, timeout=20, creationflags=NO_WINDOW, env=clean_env())
             lines = out.stdout.split()
             if out.returncode == 0 and lines:
                 major, minor = (int(x) for x in lines[0].split("."))
@@ -107,7 +119,7 @@ class Launcher:
             return True                      # no environment yet: nothing to test with; it is tested after setup
         self.install_requirements(folder)    # a new version may need new add-ons before it can start
         done = self.run([str(self.l.python), "main.py", "--check"], cwd=str(folder), capture_output=True, text=True,
-                        timeout=180, creationflags=NO_WINDOW)
+                        timeout=180, creationflags=NO_WINDOW, env=clean_env())
         self.log("startup test exit %s %s" % (done.returncode, (done.stdout + done.stderr)[-400:].replace("\n", " | ")))
         return done.returncode == 0
 
@@ -164,7 +176,7 @@ class Launcher:
         with urllib.request.urlopen(PYTHON_URL, timeout=60) as answer, open(installer, "wb") as out:
             shutil.copyfileobj(answer, out)
         done = self.run([str(installer), "/quiet", "InstallAllUsers=0", "PrependPath=0", "Include_test=0",
-                         "Include_launcher=0", "Shortcuts=0"], timeout=900)
+                         "Include_launcher=0", "Shortcuts=0"], timeout=900, env=clean_env())
         installer.unlink(missing_ok=True)
         found = find_system_python()
         if done.returncode != 0 or not found:
@@ -176,7 +188,7 @@ class Launcher:
             self.ensure_python()
             self.say("Creating Starling's private environment...")
             done = self.run([self._base_python, "-m", "venv", str(self.l.venv)], capture_output=True, text=True,
-                            creationflags=NO_WINDOW)
+                            creationflags=NO_WINDOW, env=clean_env())
             if done.returncode != 0:
                 self.log(done.stdout + done.stderr)
                 raise RuntimeError("Could not create the environment. See launcher.log.")
@@ -190,9 +202,9 @@ class Launcher:
         if wanted and wanted != have:
             self.say("Installing Starling's add-ons (the first time takes several minutes)...")
             self.run([str(self.l.python), "-m", "pip", "install", "--upgrade", "pip"], capture_output=True, text=True,
-                     creationflags=NO_WINDOW)
+                     creationflags=NO_WINDOW, env=clean_env())
             process = self.popen([str(self.l.python), "-m", "pip", "install", "-r", str(folder / "requirements.txt")],
-                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, creationflags=NO_WINDOW)
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, creationflags=NO_WINDOW, env=clean_env())
             tail = []
             for line in process.stdout:
                 tail = (tail + [line.rstrip()])[-30:]
@@ -209,11 +221,10 @@ class Launcher:
         silently showing nothing, which is what a hidden window does)."""
         self.say("Starting Starling...")
         exe = self.l.pythonw if self.l.pythonw.exists() else self.l.python
-        env = dict(os.environ)
+        extra = {"STARLING_LAUNCHER": "1", "PYTHONUTF8": "1"}
         if self.repo:
-            env["STARLING_REPO"] = self.repo                 # so the dashboard's update page knows where to look
-        env["STARLING_LAUNCHER"] = "1"
-        env["PYTHONUTF8"] = "1"
+            extra["STARLING_REPO"] = self.repo               # so the dashboard's update page knows where to look
+        env = clean_env(extra)
         errors = self.l.home / "dashboard_output.txt"
         with open(errors, "w", encoding="utf-8", errors="replace") as out:
             process = self.popen([str(exe), "main.py", "--dashboard"], cwd=str(self.l.app), env=env,

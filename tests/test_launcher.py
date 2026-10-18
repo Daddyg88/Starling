@@ -88,6 +88,7 @@ class LauncherTests(unittest.TestCase):
         self.launcher.popen = popen
         self.launcher.start_dashboard(watch_seconds=0)
         self.assertEqual(seen["kw"]["env"]["STARLING_REPO"], "Ben/Starling")
+        self.assertNotIn("TCL_LIBRARY", seen["kw"]["env"])
         self.assertIn("--dashboard", seen["args"][0])
 
     def test_a_dashboard_that_dies_is_explained(self):
@@ -148,3 +149,15 @@ class UpdateServiceTests(unittest.TestCase):
             import os
             os.environ.pop("STARLING_REPO", None)
             self.assertIsNone(UpdateService(self.settings, home=self.tmp.name).check_in_background())
+
+
+class CleanEnvTests(unittest.TestCase):
+    def test_pyinstaller_tcl_paths_are_not_passed_on(self):
+        bad = {"TCL_LIBRARY": r"C:\Temp\_MEI123\_tcl_data", "TK_LIBRARY": "x", "PYTHONPATH": "y", "KEEP": "1"}
+        with mock.patch.dict("os.environ", bad):
+            env = L.clean_env({"STARLING_LAUNCHER": "1"})
+        self.assertNotIn("TCL_LIBRARY", env)
+        self.assertNotIn("TK_LIBRARY", env)
+        self.assertNotIn("PYTHONPATH", env)
+        self.assertEqual(env["KEEP"], "1")
+        self.assertEqual(env["STARLING_LAUNCHER"], "1")
