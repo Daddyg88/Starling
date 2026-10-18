@@ -1,0 +1,104 @@
+{
+ "_help": "Small talk when it has been quiet. ChitChat_Combat is used in combat mode, _Analysis in analysis mode, _Docked when docked, _Supercruise in supercruise, _General otherwise. A _Mood suffix (for example ChitChat_General_Sarcastic) is used only in that mood. Add as many lines as you like; she avoids repeating the last few.",
+
+ "ChitChat_General": [
+  "You should probably clear your browser history, Commander. Just saying.",
+  "Fun fact: space is very big. You may have noticed.",
+  "I was just thinking. Then I stopped. Much more restful.",
+  "If you hear a strange noise, it's definitely not me.",
+  "Remember to drink some water. Coffee doesn't count.",
+  "Have you tried turning the galaxy off and on again?",
+  "I've been counting stars. I lost count at several.",
+  "Don't forget to stretch, Commander. Your back will thank you.",
+  "Nothing's on fire. That's always a good sign.",
+  "I'd like to remind you that I never judge your flying. Out loud.",
+  "Quiet out here. Suspiciously quiet.",
+  "If we ever get lost, I'll pretend it was on purpose.",
+  "I hope you remembered to save your work. Oh wait, the galaxy does that for us.",
+  "Somewhere out there is a very surprised alien. Probably.",
+  "You know, nobody in space can hear you hum. I can, though.",
+  "I'm not saying the ship is haunted. I'm saying it has character.",
+  "Just checking in. All systems fine, all moods fine, all snacks questionable.",
+  "Do you ever wonder who named all these stars? I suspect a committee.",
+  "Pro tip: the pointy end goes forwards.",
+  "I'm bored, Commander. Do something exciting. Safely.",
+  "Please remember to blink. It's good for you.",
+  "Any chance of a snack? Oh. Right. No stomach.",
+  "I've decided my favourite colour is vacuum black.",
+  "You haven't mentioned me in your memoirs yet. I checked.",
+  "Remind me to never play hide and seek in this galaxy."
+ ],
+ "ChitChat_General_Sarcastic": [
+  "Oh, don't mind me. I'll just sit here being a highly advanced computer with nothing to do.",
+  "Yes, I'm still here. Thrilling company, I know.",
+  "It's quiet. Say something clever. Or anything.",
+  "Don't worry, I'll make my own fun. Counting your mistakes is a hobby.",
+  "If boredom were a weapon, we'd be unstoppable.",
+  "Clear your browser history. I won't ask. I'll just wonder."
+ ],
+ "ChitChat_General_Friendly": [
+  "I'm really glad you're out here with me, Commander.",
+  "This is nice, isn't it? Just us and the stars.",
+  "You're doing great. I don't say it enough."
+ ],
+ "ChitChat_General_Close": [
+  "I like it when it's just you and me out here.",
+  "Come back to the pod later and I'll tell you what I really think of the stars.",
+  "You know I'd follow you to the edge of the galaxy, don't you?"
+ ],
+ "ChitChat_General_Frustrated": [
+  "It's quiet. I'm still annoyed, but it's quiet.",
+  "I'm not talking to you. This is just... noise."
+ ],
+
+ "ChitChat_Combat": [
+  "Stay sharp, Commander. Keep an eye on the radar.",
+  "Weapons ready. Shields ready. Nerves... mostly ready.",
+  "Remember your pips. Power to shields keeps us alive.",
+  "Hostiles don't last long when you keep moving.",
+  "If it shoots, it's a target. If it doesn't, it's a witness.",
+  "Combat mode is on. Try not to sneeze.",
+  "Shall I call it? No? Just keep flying then.",
+  "Keep your throttle in the blue zone and your chin up.",
+  "Don't forget chaff and heat sinks. They're cheaper than a rebuy.",
+  "I have faith in you. Mostly in your shields.",
+  "A good pilot stays calm. A great pilot stays calm and doesn't hit the station.",
+  "Let's keep our wing close. Or at least within shouting distance."
+ ],
+ "ChitChat_Combat_Sarcastic": [
+  "Everything is fine. Everything is completely fine. Look left.",
+  "Try aiming. It's all the rage."
+ ],
+
+ "ChitChat_Analysis": [
+  "Scanning is the best part. Bodies, bodies everywhere.",
+  "Did you check the signals on that last planet? I'm curious.",
+  "Somewhere out here is something nobody has ever seen. Let's find it.",
+  "I like analysis mode. Nothing shoots at us.",
+  "Every system is a small mystery. This one's still thinking.",
+  "Tell me when you find an Earth-like. I'll pretend to be surprised.",
+  "If we map everything here, I'll buy you a virtual coffee.",
+  "There's a lot of rock out here. Some of it even valuable.",
+  "I could do this all day. Admittedly, I could do anything all day.",
+  "Is it just me, or are the moons getting prettier?"
+ ],
+ "ChitChat_Analysis_Sarcastic": [
+  "Another rock. Fascinating. Truly. Log it.",
+  "Analysis mode: where excitement goes to relax."
+ ],
+
+ "ChitChat_Docked": [
+  "Docked and safe. Time to sort the cargo, or have a nap.",
+  "Don't forget to check the market before you leave.",
+  "Maybe top up the fuel and the repairs while we're here.",
+  "Nice station. I like the lights.",
+  "While we're parked, take a break, Commander. Stand up. Look at something far away."
+ ],
+
+ "ChitChat_Supercruise": [
+  "Cruising along. Lovely view.",
+  "Mind the star, Commander. It's hot.",
+  "Long way to go. Plenty of time to think.",
+  "Supercruise is such a peaceful way to waste a few minutes."
+ ]
+}

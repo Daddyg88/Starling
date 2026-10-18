@@ -24,3 +24,9 @@ These press the key YOU bound in Elite. If one is not bound she tells you which 
 - I can't run Elite from here. The on-foot "being shot at" line only fires if the game writes an attack event on foot; if it doesn't, you still get low-health, kills and death lines.
 - The game doesn't tell her when a wingman dies, so she can't comment on that.
 - The Elite control names for fighter orders and on-foot weapons are from memory of the game's bindings file; use "Check my Elite keys" on the Controls page to see which are missing.
+
+# Small talk (0.14.0)
+When it has been quiet she says something small and silly. She only does it when you are in the game, nothing has been spoken for a while, she hasn't chatted recently, and nothing alarming happened in the last minute. Real warnings always win: chatter is the lowest priority and is dropped if she is busy.
+- Combat mode: lines about the fight. Analysis mode: exploring. Docked and supercruise have their own. Otherwise general jokes ("clear your browser history...").
+- Dashboard > Personality > "Small talk when it is quiet", and "How often she chats" (Rarely about every 25+ min, Normal about every 12 to 20 min, Often about every 6 to 10 min).
+- Add your own lines in `voicepacks/default/chitchat.json`.

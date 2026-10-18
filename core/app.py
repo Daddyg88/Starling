@@ -59,6 +59,7 @@ class App:
         self.memory_store = None
         self.memory_keeper = None
         self.memory_recall = None
+        self.chitchat = None
         self._record_events = True
         self.voice_replies = None
         self.manners = None
@@ -174,7 +175,24 @@ class App:
         self.greeter = LoginGreeter(self.bus, self.speech, self.dialogue, self.settings,
                                     state_provider=lambda: self.state, flavour=flavour, memory=self.memory_recall)
         self.greeter.attach()
+
+        # Small talk when it has been quiet (only while Status.json shows the game is running).
+        from personality.chitchat import ChitChat
+        self.chitchat = ChitChat(self.bus, self.speech, self.dialogue, self.settings, state_provider=lambda: self.state,
+                                 active_provider=self.game_is_active)
+        self.chitchat.attach()
+        self.chitchat.start()
         return True
+
+    def game_is_active(self):
+        """True while you are in the cockpit or on foot and Elite is still writing Status.json."""
+        import time as _time
+        try:
+            if not (self.state and self.state.status_seen) or self.monitor is None:
+                return False
+            return _time.time() - self.monitor.status.path.stat().st_mtime < 600
+        except (OSError, AttributeError):
+            return False
 
     def start_listening(self):
         """
@@ -399,6 +417,9 @@ class App:
 
     # ---- shutting down ----
     def stop(self):
+        if self.chitchat is not None:
+            self.chitchat.stop()
+            self.chitchat = None
         if getattr(self, "watcher", None) is not None:
             self.watcher.detach()
             self.watcher = None
