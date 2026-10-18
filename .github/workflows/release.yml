@@ -15,9 +15,9 @@ jobs:
   release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -53,5 +53,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" dist/Starling.exe dist/Starling-app.zip dist/Starling-app.zip.sha256 \
-            --title "Starling ${GITHUB_REF_NAME}" --generate-notes
+          files="dist/Starling.exe dist/Starling-app.zip dist/Starling-app.zip.sha256"
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" $files --clobber     # you already made the release by hand: add the files
+          else
+            gh release create "${GITHUB_REF_NAME}" $files --title "Starling ${GITHUB_REF_NAME}" --generate-notes
+          fi
