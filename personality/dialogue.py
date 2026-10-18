@@ -94,6 +94,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "watcher.json"))       # her answers to the Watcher (Void Compass)
             self._merge(_read_json(self.pack_dir / "manners.json"))       # "you're welcome"
             self._merge(_read_json(self.pack_dir / "talk.json"))          # longer, chattier versions of everyday lines
+            self._merge(_read_json(self.pack_dir / "lore.json"))          # her back story (East Orion Company)
             self._merge(_read_json(self.pack_dir / "smalltalk.json"))     # answers when you chat to her
             self._merge(_read_json(self.pack_dir / "chitchat.json"))      # small talk when it is quiet
             self._merge(_read_json(self.pack_dir / "combat.json"))        # ship changes, wings, fighting (space and on foot)

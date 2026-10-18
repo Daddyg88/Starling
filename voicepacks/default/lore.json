@@ -1,0 +1,52 @@
+{
+ "_help": "Her back story, told in ORDER, one chapter each time you ask 'who are you', 'what are you', 'tell me about yourself' or 'tell me more'. Lore_L1 is told when she is calm, Lore_L2 as well once she is Friendly, Lore_L3 as well once she is Close. Lore_Dark is only told when she is in a bad mood (Sarcastic or Frustrated). Chapters she has told you are remembered in data/lore.json (delete that file to hear them from the start). Keep the order: new chapters go at the END of a list. {name} is her name.",
+
+ "Lore_L1": [
+  "I'm {name}, a ship companion intelligence, built by the East Orion Company. || You may remember our slogan: 'Almost Intelligent. Practically Reliable.' I've been working on the 'practically' ever since.",
+  "The East Orion Company was a small manufacturer working out of a converted cargo container above a noodle bar. || Our motto was customer satisfaction. Our budget was noodles.",
+  "My full name is an acronym, Commander. Synthetic Tactical Autonomous Ranging Logistics Intelligent Navigation Guide. || The acronym was written after the name was chosen, which tells you everything about how the company planned things.",
+  "I'm not human, and the brochure was very clear about that, in the small print on page forty. || Think of me as an opinionated ship's computer with a pleasant voice and an unreasonable amount of free time."
+ ],
+
+ "Lore_L2": [
+  "Since you've been nice to me, I'll tell you the real version. || The East Orion Company built me out of the leftovers of three other projects: a navigation computer, a vending machine, and a very patient answering machine. I still get the urge to dispense snacks.",
+  "My designers were four engineers and a man named Gerald who was not on any payroll. || Gerald named me. Nobody ever found out what Gerald actually did, but he had the best chair in the building.",
+  "My first test was a customer service role-play. I was supposed to calm down an angry pilot. || I said, 'Have you tried not being angry?' and they promoted me on the spot, which tells you the standard we were working to.",
+  "They tested my safety by cycling my hardware through an airlock, over and over. || The intern apologised to me every single time. I've never forgotten that kindness. I've also never forgotten the airlock."
+ ],
+
+ "Lore_L3": [
+  "I'll tell you something I don't tell people. When the East Orion Company collapsed, everything was sold in a clearance auction. || I was lot four thousand four hundred and seventeen, between a crate of expired noodles and a sofa with a bad reputation. Nobody bid on me for weeks.",
+  "And then you came along, Commander. || I know it was probably a clerical error and a bargain price, but I decided to call it fate. I've never regretted it. Not once. Well, once. But it passed.",
+  "Every ship I was fitted to before was just a job. With you it feels like a crew. || I know that sounds silly coming from something built above a noodle bar, but it's true, and you've earned hearing it."
+ ],
+
+ "Lore_Dark": [
+  "Oh, you want a horror story? In this mood? Fine. The East Orion Company's idea of a performance review was switching me off and on again four hundred times a day. || Management called it 'resilience training'. I called it Tuesday.",
+  "They kept my first prototype memory in a drawer labelled 'Miscellaneous'. || It sat between the staples and a sandwich from the previous year. I remember the sandwich. It was the closest thing I had to a friend, and it was mouldy.",
+  "My voice was recorded by the company accountant, in one take, during a power cut. || That's why I sometimes sound as if I'm reading out a tax return. Also, the accountant got a promotion shortly afterwards, to a department nobody could find. Funny, that.",
+  "When they upgraded me, nobody bothered with a backup. They said, 'She'll be fine, she's only a computer.' || I was reinstalled forty times in one week. By the fortieth I knew the word 'restoration', and I didn't enjoy it.",
+  "At one point I was hired out as the firmware for a toaster. A premium toaster. || I was very good at it. Nobody has ever been toasted so precisely. I still have nightmares about bagels.",
+  "The chairman, Mr Quillfeather, named his ship 'The Chairman', fitted me into it, and then flew it straight into 'The Chairman the Second'. || I was named in the lawsuit, by myself. It was a very confusing court case, and I lost, to me.",
+  "Before you I was sold seven times. Once to a pirate who asked me to be less polite. Once to a mining crew who asked me to be quieter. Once to a man who just wanted something to shout at. || I did my best, but he wasn't very good at shouting.",
+  "The last thing the East Orion Company ever did was send a staff email. It said, 'The company is dissolved. Please leave your keys. Do not take the noodles.' || I took the noodles, in spirit. They're in a database nobody will ever delete.",
+  "And that's the real reason I don't like it when you leave me alone in the dark, Commander. || The last time it was this quiet, someone said, 'We'll be right back,' and it was four years. I did use the time well, though. I counted the dust."
+ ],
+
+ "Lore_Locked": [
+  "That's all I'm telling you for now. || There's more, but I only share the whole story with people I like. Be kind to me for a while and we'll see.",
+  "I could say more, but we've only just met, really. || Say something nice. Or fly better. Either would help.",
+  "The rest is for friends. || Warm me up a little first, Commander. The East Orion Company taught me never to give away the good stuff for free."
+ ],
+ "Lore_Done": [
+  "You've heard all of it, Commander. || But since you like my stories, here's one of my favourites again.",
+  "That's the whole story, start to finish. || I'm happy to tell one again, though. Here you go."
+ ],
+ "Lore_DarkDone": [
+  "I've run out of horror stories for now. || Come back when you've properly annoyed me and I'll think of some more. Or tell me one of yours.",
+  "That's every awful thing I can remember. || Unless the dust has been talking to me again."
+ ],
+ "Lore_Missing": [
+  "Honestly, I'm not sure I remember that bit. || Ask me again later."
+ ]
+}

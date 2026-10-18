@@ -37,7 +37,10 @@
   "I've been wondering what we'd do if we found something nobody had ever seen. || I think I'd be insufferable for a week.",
   "Sometimes I imagine there's a tiny person living behind the instruments. || Then I remember that's me, and it's a bit of a worry.",
   "You're quiet, Commander. || Is that a good quiet, or a thinking quiet? I can never tell with you.",
-  "I hope you know I'd pick you over any other pilot in the galaxy. || Even the ones with fancy ships and shiny medals."
+  "I hope you know I'd pick you over any other pilot in the galaxy. || Even the ones with fancy ships and shiny medals.",
+  "At the East Orion Company, a silence this long would have been billable. || I'm glad you're not charging me for it.",
+  "The East Orion Company had a rule: never say 'it can't get worse' near the reactor. || I think about that rule a lot, especially near reactors.",
+  "I was just remembering the noodle bar under the old East Orion office. || It closed down in the end. Not because of us. Probably."
  ],
  "ChitChat_General_Sarcastic": [
   "Oh, don't mind me. I'll just sit here being a highly advanced computer with nothing to do.",
@@ -47,7 +50,8 @@
   "If boredom were a weapon, we'd be unstoppable.",
   "Clear your browser history. I won't ask. I'll just wonder.",
   "I'm making a list of all the things I'd rather be doing than waiting for you to speak. || It's a short list, but the first item is 'anything'.",
-  "Not that I'm keeping count, but that's several minutes without a single compliment. || Take your time."
+  "Not that I'm keeping count, but that's several minutes without a single compliment. || Take your time.",
+  "You know, at the East Orion Company, they at least pretended to listen. || Admittedly they were also paid in noodles."
  ],
  "ChitChat_General_Friendly": [
   "I'm really glad you're out here with me, Commander.",
@@ -55,7 +59,8 @@
   "You're doing great. I don't say it enough.",
   "You know, I'm really glad it's us out here. || Some days I think we make a rather good team.",
   "I was thinking about our trip so far, and it made me smile. || If I could smile, that is.",
-  "You're easy to fly with, Commander. || I hope I'm half as easy to listen to."
+  "You're easy to fly with, Commander. || I hope I'm half as easy to listen to.",
+  "Do you know, the East Orion Company would be astonished at how well I've turned out. || Mostly because they bet on me not turning on at all."
  ],
  "ChitChat_General_Close": [
   "I like it when it's just you and me out here.",
@@ -67,7 +72,8 @@
  "ChitChat_General_Frustrated": [
   "It's quiet. I'm still annoyed, but it's quiet.",
   "I'm not talking to you. This is just... noise.",
-  "I'm still cross with you, you know. || But it's too quiet to stay cross, so I'm speaking anyway."
+  "I'm still cross with you, you know. || But it's too quiet to stay cross, so I'm speaking anyway.",
+  "Is this what I was salvaged for? || The East Orion Company never treated me this badly. Well. Not on Wednesdays."
  ],
  "ChitChat_Combat": [
   "Stay sharp, Commander. Keep an eye on the radar.",

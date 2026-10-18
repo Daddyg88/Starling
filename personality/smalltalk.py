@@ -4,6 +4,7 @@ SMALL TALK - things you can simply say to her, and she answers like a companion 
   "Starling, how are you?"          "Starling, tell me a joke"       "Starling, talk to me"
   "Starling, I'm bored"             "Starling, good job"             "Starling, are you there?"
   "Starling, good morning"          "Starling, good night"           "Starling, what's your name?"
+  "Starling, what are you?"  "tell me about yourself"  "who made you?"  "tell me more"   (her back story: see lore.py)
 
 Only a WHOLE sentence like these counts, so a real command is never mistaken for chat.
 Her answers live in voicepacks/default/smalltalk.json (keys Talk_*), one pool per mood.
@@ -32,8 +33,13 @@ INTENTS = [
     ("Talk_Compliment", r"(?:good (?:job|girl|work)|well done|nice (?:one|work|job)|great (?:job|work)|you(?: are|re) (?:amazing|brilliant|the best|great|wonderful|awesome|clever|good)|you(?: are|re) doing (?:great|well|brilliantly)|i like you|i appreciate you|i(?: am|m) glad you(?: are|re) here)"),
     ("Talk_Love", r"(?:i love you|love you|i adore you)"),
     ("Talk_Thinking", r"(?:what are you (?:thinking|up to|doing)|penny for your thoughts|what(?: is|s) on your mind)"),
-    ("Talk_Name", r"(?:what(?: is|s) your name|who are you|what are you called|introduce yourself)"),
+    ("Talk_Name", r"(?:what(?: is|s) your name|who are you|what are you called|introduce yourself|what should i call you)"),
+    ("Talk_What", r"(?:what are you|what kind of (?:ai|thing|computer|machine) are you|what exactly are you|are you (?:a |an )?(?:robot|ai|human|real|person|computer|machine|program|bot|intelligence))"),
+    ("Talk_Story", r"(?:tell me (?:about yourself|about you|your story|your back ?story|your history|about your past|more about yourself)|where do you come from|where are you from|who (?:made|built|created|designed|programmed) you|what(?: is|s) your (?:story|back ?story|history)|what happened to you|"
+                   r"(?:tell me )?(?:about|what is|what was|who (?:is|was|were)) the east orion company|east orion company|where were you made)"),
+    ("Talk_More", r"(?:tell me more|go on|carry on|and then|what happened next|what happened then|then what|continue|more)"),
 ]
+LORE_KEYS = ("Talk_Name", "Talk_What", "Talk_Story", "Talk_More")
 _COMPILED = [(key, re.compile(r"^" + body + _FILL + r"$")) for key, body in INTENTS]
 KIND = ("Talk_Compliment", "Talk_Love", "Talk_Back")
 
@@ -56,17 +62,28 @@ def intent_for(text):
 
 
 class SmallTalk:
-    def __init__(self, speech, dialogue, settings, chitchat=None, mood=None):
+    def __init__(self, speech, dialogue, settings, chitchat=None, mood=None, lore=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
         self.chitchat = chitchat
         self.mood = mood
+        self.lore = lore                 # personality/lore.py: her back story
 
     def try_handle(self, text):
         """Answer small talk. Returns what she said, or None if this wasn't small talk."""
         key = intent_for(text)
         if key is None or self.dialogue is None or not self.settings.get("smalltalk.enabled", True):
+            return None
+        if key in LORE_KEYS and self.lore is not None:
+            if key == "Talk_More" and not self.lore.recent():
+                return None                                  # "more" on its own means nothing unless she was just telling a story
+            told = self.lore.tell()
+            if told:
+                return told                                  # the lore teller speaks by itself
+            if key == "Talk_More":
+                return None
+        if key == "Talk_More":
             return None
         if key == "Talk_Chat" and self.chitchat is not None:
             said = self.chitchat.say_now()                 # speaks by itself

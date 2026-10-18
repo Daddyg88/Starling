@@ -61,6 +61,7 @@ class App:
         self.memory_recall = None
         self.chitchat = None
         self.smalltalk = None
+        self.lore = None
         self._record_events = True
         self.voice_replies = None
         self.manners = None
@@ -184,7 +185,9 @@ class App:
         self.chitchat.attach()
         self.chitchat.start()
         from personality.smalltalk import SmallTalk
-        self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood)
+        from personality.lore import LoreTeller
+        self.lore = LoreTeller(self.speech, self.dialogue, self.settings, path=paths.DATA_DIR / "lore.json")
+        self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore)
         return True
 
     def game_is_active(self):
