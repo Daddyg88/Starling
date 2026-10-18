@@ -1,0 +1,123 @@
+{
+ "_help": "Extra lines for arriving in a system (FSDJump), dropping out of supercruise, and setting off. {StarSystem} is the system name, {JumpDist} the jump length in light years.",
+ "FSDJump": [
+  "Welcome to {StarSystem}.",
+  "Arrived in {StarSystem}.",
+  "{StarSystem}, as promised.",
+  "We're in {StarSystem}.",
+  "Jump complete. This is {StarSystem}.",
+  "And here we are, {StarSystem}.",
+  "{StarSystem}. Let's see what's here.",
+  "Safely through to {StarSystem}.",
+  "Arrival in {StarSystem} confirmed.",
+  "That was a {JumpDist:.1f} light year hop. Welcome to {StarSystem}.",
+  "Another {JumpDist:.1f} light years behind us. {StarSystem} ahead.",
+  "Drive cooling. {StarSystem} on the scanners.",
+  "Through the tunnel and into {StarSystem}.",
+  "{StarSystem} reached. Fuel and heat look fine.",
+  "Stars all around. We're in {StarSystem}.",
+  "Out of hyperspace and into {StarSystem}.",
+  "Right on target. {StarSystem}.",
+  "New system, new possibilities. This is {StarSystem}.",
+  "Another jump in the books.",
+  "Clean exit. We're through.",
+  "Jump drive cooling down.",
+  "Hyperspace exit complete.",
+  "Here we go again. {StarSystem}.",
+  "Lights of {StarSystem}, dead ahead.",
+  "System entered. Scanners are warming up."
+ ],
+ "FSDJump_Neutral": [
+  "Arrival in {StarSystem} confirmed.",
+  "Jump complete. {StarSystem}.",
+  "In system: {StarSystem}.",
+  "Drive cooling. {StarSystem}.",
+  "Jump logged. {StarSystem}.",
+  "Hyperspace exit. {StarSystem}.",
+  "Position confirmed: {StarSystem}."
+ ],
+ "FSDJump_Friendly": [
+  "Nicely done, Commander. Welcome to {StarSystem}.",
+  "That went smoothly. {StarSystem}, here we are.",
+  "Lovely jump. {StarSystem} looks interesting.",
+  "Welcome to {StarSystem}. Shall we see what's here?",
+  "Another good one. {StarSystem}.",
+  "Right on the money. We're in {StarSystem}.",
+  "{StarSystem}. I've got a good feeling about this one.",
+  "Good flying, Commander. {StarSystem} reached."
+ ],
+ "FSDJump_Close": [
+  "{StarSystem}. Look at that view, darling.",
+  "Another beautiful system to share with you. {StarSystem}.",
+  "We're in {StarSystem}, and I wouldn't want to be anywhere else.",
+  "Welcome to {StarSystem}, my love.",
+  "Every new system is better with you. {StarSystem}.",
+  "{StarSystem}, just the two of us.",
+  "Oh, {StarSystem}. Isn't it lovely?"
+ ],
+ "FSDJump_Sarcastic": [
+  "{StarSystem}. Thrilling. Truly.",
+  "We've arrived in {StarSystem}. Try to contain your excitement.",
+  "Another system. Another set of rocks. {StarSystem}.",
+  "Congratulations, you've found {StarSystem}. I'm sure it's lovely.",
+  "{StarSystem}. Exactly like the last one, but with a different name.",
+  "Oh, look. A star. In {StarSystem}.",
+  {
+   "text": "{StarSystem}. Fascinating. I'm on the edge of my bloody seat.",
+   "mature": true
+  },
+  {
+   "text": "Another sodding system. {StarSystem}, apparently.",
+   "mature": true
+  }
+ ],
+ "FSDJump_Frustrated": [
+  "{StarSystem}. Can we stop jumping now?",
+  "Another jump. Another {StarSystem}. Wonderful.",
+  "We're in {StarSystem}. Please do something useful.",
+  {
+   "text": "{StarSystem}. Great. Now what, genius?",
+   "mature": true
+  },
+  {
+   "text": "Jump complete. Damn, I'm tired of this.",
+   "mature": true
+  }
+ ],
+ "SupercruiseExit": [
+  "Back to normal space.",
+  "Normal space. Speed under control.",
+  "Dropped out cleanly.",
+  "Supercruise exit complete.",
+  "Decelerating. We're out of supercruise.",
+  "Out of supercruise and on target.",
+  "Throttle back. We're in normal space.",
+  "Exit complete. Scanners on."
+ ],
+ "SupercruiseExit_Close": [
+  "Out of supercruise, darling. We made it.",
+  "Back in normal space with you."
+ ],
+ "SupercruiseExit_Sarcastic": [
+  "Out of supercruise. Try not to hit anything.",
+  "Dropped out. You may breathe now."
+ ],
+ "StartJump_Neutral": [
+  "Jumping to {StarSystem}.",
+  "Hyperspace jump to {StarSystem} under way.",
+  "Departing for {StarSystem}.",
+  "Jump to {StarSystem} initiated."
+ ],
+ "StartJump_Friendly": [
+  "Off to {StarSystem}. Hold on, Commander.",
+  "Here we go. {StarSystem} next.",
+  "Next stop, {StarSystem}. Buckle up."
+ ],
+ "StartJump_Frustrated": [
+  "Jumping to {StarSystem}. Again.",
+  {
+   "text": "Off to {StarSystem}. Hold on to something, damn it.",
+   "mature": true
+  }
+ ]
+}

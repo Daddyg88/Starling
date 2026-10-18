@@ -1,0 +1,106 @@
+{
+  "_help": "Biology (exobiology) lines. First sample: what it is worth (and excitement for the ten most valuable species). Second sample: what it is ({About} comes from config/bio_info.json). Analysis: the total you are carrying. Fields: {Species_Localised} {worth} {distance} {carried} {About}.",
+  "ScanOrganic_Log": [
+    "First sample collected: {Species_Localised}.||It's worth about {worth} credits.||The next sample needs to be at least {distance} metres away.",
+    "Sample one of three: {Species_Localised}.||That's worth about {worth} credits.||Move at least {distance} metres before the next one.",
+    "First sample logged. {Species_Localised}.||Worth roughly {worth} credits.||Walk {distance} metres away for the second sample.",
+    "Got the first sample of {Species_Localised}.||About {worth} credits.||Keep the next one at least {distance} metres from here."
+  ],
+  "ScanOrganic_LogNoDistance": [
+    "First sample collected: {Species_Localised}.||It's worth about {worth} credits.",
+    "Sample one of three: {Species_Localised}.||That's worth about {worth} credits.",
+    "First sample logged. {Species_Localised}.||Worth roughly {worth} credits.",
+    "Got the first sample of {Species_Localised}.||About {worth} credits."
+  ],
+  "ScanOrganic_LogFootfall": [
+    "First sample collected: {Species_Localised}.||And it's a first footfall! Worth about {worth} credits with the bonus.||The next sample needs to be at least {distance} metres away.",
+    "Sample one of three: {Species_Localised}.||First footfall bonus included, that's about {worth} credits.||Move at least {distance} metres before the next one.",
+    "First sample logged. {Species_Localised}.||With the first footfall bonus it's worth roughly {worth} credits.||Walk {distance} metres away for the second sample."
+  ],
+  "ScanOrganic_LogFootfallNoDistance": [
+    "First sample collected: {Species_Localised}.||And it's a first footfall! Worth about {worth} credits with the bonus.",
+    "Sample one of three: {Species_Localised}.||First footfall bonus included, that's about {worth} credits.",
+    "First sample logged. {Species_Localised}.||With the first footfall bonus it's worth roughly {worth} credits."
+  ],
+  "ScanOrganic_LogNoValue": [
+    "First sample collected: {Species_Localised}.||I don't have a price for that one yet.||The next sample needs to be at least {distance} metres away.",
+    "Sample one of three: {Species_Localised}.||I can't value that one yet. I'll learn its price when you sell it.||Move at least {distance} metres before the next one.",
+    "First sample logged. {Species_Localised}.||No price on file for that species yet.||Walk {distance} metres away for the second sample."
+  ],
+  "ScanOrganic_LogNoValueNoDistance": [
+    "First sample collected: {Species_Localised}.||I don't have a price for that one yet.",
+    "Sample one of three: {Species_Localised}.||I can't value that one yet. I'll learn its price when you sell it.",
+    "First sample logged. {Species_Localised}.||No price on file for that species yet."
+  ],
+  "ScanOrganic_LogTop10": [
+    "{Species_Localised}! That's one of the ten most valuable species out there.||Worth about {worth} credits.||We should look for more of these.||Then move at least {distance} metres for the next sample.",
+    "Commander, that's a top ten species: {Species_Localised}.||About {worth} credits.||Let's find more of them.||Then move at least {distance} metres for the next sample.",
+    "First sample of {Species_Localised}, and it's one of the very best.||Worth around {worth} credits.||Keep your eyes open for more.||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10NoDistance": [
+    "{Species_Localised}! That's one of the ten most valuable species out there.||Worth about {worth} credits.||We should look for more of these.",
+    "Commander, that's a top ten species: {Species_Localised}.||About {worth} credits.||Let's find more of them.",
+    "First sample of {Species_Localised}, and it's one of the very best.||Worth around {worth} credits.||Keep your eyes open for more."
+  ],
+  "ScanOrganic_LogTop10_Friendly": [
+    "Oh, this is a good one, Commander. {Species_Localised} is a top ten species, worth about {worth} credits.||I'd love to find more.||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10NoDistance_Friendly": [
+    "Oh, this is a good one, Commander. {Species_Localised} is a top ten species, worth about {worth} credits.||I'd love to find more."
+  ],
+  "ScanOrganic_LogTop10_Close": [
+    "Commander! {Species_Localised}! That's a top ten species, worth {worth} credits.||I'm so excited. Let's find more of these!||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10NoDistance_Close": [
+    "Commander! {Species_Localised}! That's a top ten species, worth {worth} credits.||I'm so excited. Let's find more of these!"
+  ],
+  "ScanOrganic_LogTop10_Sarcastic": [
+    "Well, look at that. {Species_Localised}, a top ten species worth about {worth} credits.||Try not to look too pleased with yourself. But yes, find more of them.||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10NoDistance_Sarcastic": [
+    "Well, look at that. {Species_Localised}, a top ten species worth about {worth} credits.||Try not to look too pleased with yourself. But yes, find more of them."
+  ],
+  "ScanOrganic_LogTop10Footfall": [
+    "{Species_Localised}! One of the ten most valuable species, and it's a first footfall!||With the bonus it's worth about {worth} credits.||We have to find more of these.||Then move at least {distance} metres for the next sample.",
+    "Commander, a top ten species and a first footfall: {Species_Localised}.||That's about {worth} credits with the bonus.||Let's find more.||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10FootfallNoDistance": [
+    "{Species_Localised}! One of the ten most valuable species, and it's a first footfall!||With the bonus it's worth about {worth} credits.||We have to find more of these.",
+    "Commander, a top ten species and a first footfall: {Species_Localised}.||That's about {worth} credits with the bonus.||Let's find more."
+  ],
+  "ScanOrganic_LogTop10Footfall_Friendly": [
+    "This is a lovely find, Commander. {Species_Localised}, a top ten species and a first footfall, about {worth} credits.||Let's find more.||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10FootfallNoDistance_Friendly": [
+    "This is a lovely find, Commander. {Species_Localised}, a top ten species and a first footfall, about {worth} credits.||Let's find more."
+  ],
+  "ScanOrganic_LogTop10Footfall_Close": [
+    "Commander! A top ten species AND a first footfall! {Species_Localised}, about {worth} credits!||I could not be happier. Let's find more!||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10FootfallNoDistance_Close": [
+    "Commander! A top ten species AND a first footfall! {Species_Localised}, about {worth} credits!||I could not be happier. Let's find more!"
+  ],
+  "ScanOrganic_LogTop10Footfall_Sarcastic": [
+    "A top ten species and a first footfall. {Species_Localised}, about {worth} credits.||Fine. I'm impressed. Find more.||Then move at least {distance} metres for the next sample."
+  ],
+  "ScanOrganic_LogTop10FootfallNoDistance_Sarcastic": [
+    "A top ten species and a first footfall. {Species_Localised}, about {worth} credits.||Fine. I'm impressed. Find more."
+  ],
+  "ScanOrganic_SampleAbout": [
+    "Second sample collected: {Species_Localised}.||{About}",
+    "Sample two of three: {Species_Localised}.||{About}",
+    "Two down, one to go. {Species_Localised}.||{About}",
+    "Second sample logged. {Species_Localised}.||Here's what I know about it.||{About}"
+  ],
+  "ScanOrganic_Analyse": [
+    "Analysis complete: {Species_Localised}.||You're carrying {carried} credits of exobiology data.",
+    "{Species_Localised} fully analysed.||Exobiology data on board: {carried} credits.",
+    "Species logged: {Species_Localised}.||Total unsold exobiology: {carried} credits.",
+    "Analysis finished, Commander. {Species_Localised}.||You now hold {carried} credits of exobiology data."
+  ],
+  "ScanOrganic_AnalyseFootfall": [
+    "Analysis complete: {Species_Localised}.||That first footfall bonus is banked.||You're carrying {carried} credits of exobiology data.",
+    "{Species_Localised} fully analysed.||First footfall secured. Exobiology data on board: {carried} credits.",
+    "Species logged: {Species_Localised}.||First footfall bonus included in the {carried} credits you're carrying."
+  ]
+}

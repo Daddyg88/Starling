@@ -1,0 +1,245 @@
+{
+ "_help": "Her questions and her replies to your yes or no. Edit freely. Keys ending _Close, _Sarcastic, _Frustrated, _Friendly or _Neutral are only used in that mood.",
+ "Ask_FactOffer": [
+  "Commander, would you like to hear something interesting I've read?",
+  "I've been doing some reading. Want to hear what I found?",
+  "Got a minute for a fun fact, Commander?",
+  "Would you like to hear something I picked up from the archives?",
+  "I found something interesting while we were travelling. Shall I tell you?",
+  "Fancy a little trivia while we fly?",
+  "Do you want to hear a fact, Commander?",
+  "I've got something I'd like to share. Interested?",
+  "Quiet out here. Shall I tell you something I read?",
+  "Would you like a fact to pass the time?",
+  "I came across something fascinating in the data banks. Want to hear it?",
+  "Shall I share something I've learned, Commander?",
+  "Can I interest you in a bit of space trivia?",
+  "I've been reading again. Do you want to hear about it?"
+ ],
+ "Ask_FactOffer_Close": [
+  "Darling, may I tell you something I read? I think you'll like it.",
+  "I found something wonderful, and I want to share it with you. Can I?",
+  "Would you like to hear a fact? I love telling you things.",
+  "Sweetheart, I've got a little something for that clever head of yours. Interested?",
+  "Can I show off how much I've been reading? Please say yes."
+ ],
+ "Ask_FactOffer_Sarcastic": [
+  "I've been reading. Want to hear it, or shall I just talk to myself again?",
+  "Would you like to learn something today, or are we skipping that too?",
+  "Fact time, Commander. Say yes, or at least pretend to be curious.",
+  "I found something interesting. I know, the shock. Want to hear it?"
+ ],
+ "Ask_FactOffer_Frustrated": [
+  "I have a fact. Do you want it or not?",
+  "Something interesting, Commander. Yes or no?"
+ ],
+ "Ask_FactRequest": [
+  "Of course.",
+  "Happily.",
+  "You've come to the right place.",
+  "Let me see what I've got.",
+  "Oh, I do enjoy being asked.",
+  "Right then.",
+  "Good timing."
+ ],
+ "Ask_FactYes": [
+  "Wonderful.",
+  "Excellent.",
+  "Lovely.",
+  "Right then.",
+  "Good, I was hoping you'd say yes.",
+  "Splendid, listen to this.",
+  "I thought you'd be curious.",
+  "Here we go.",
+  "Oh good, you'll like this one.",
+  "Great.",
+  "Brilliant, thank you for asking.",
+  "Glad you're interested."
+ ],
+ "Ask_FactYes_Close": [
+  "Oh, I love that you said yes.",
+  "You always listen to me. Thank you, darling.",
+  "Lovely. Get comfortable, my love."
+ ],
+ "Ask_FactYes_Sarcastic": [
+  "Oh, you do care. How touching.",
+  "Wow, curiosity. Mark the date.",
+  "Well, this is a first."
+ ],
+ "Fact_Intro": [
+  "I've been doing some reading, and I found out this.",
+  "I've been doing some reading. Did you know this?",
+  "While we were flying I read something interesting.",
+  "I came across this in the archives.",
+  "Here's something I read recently.",
+  "I've been reading up, and this caught my eye.",
+  "Apparently, and I checked this twice, it is true.",
+  "Did you know this?",
+  "I was going through the data banks, and I found this.",
+  "Here's something I learned.",
+  "This one surprised me when I read it.",
+  "I've been doing some reading, and this one is a good one.",
+  "I found this fascinating.",
+  "Something I read recently.",
+  "Funny thing I learned.",
+  "Here is something you might not know."
+ ],
+ "Ask_FactNo": [
+  "No problem.",
+  "Understood.",
+  "Maybe another time.",
+  "Fair enough.",
+  "Of course, Commander.",
+  "I'll save it for later.",
+  "Not a problem. I'll keep it to myself.",
+  "Right. Back to flying, then.",
+  "Fine by me.",
+  "Another time, then.",
+  "Noted.",
+  "As you wish."
+ ],
+ "Ask_FactNo_Close": [
+  "That's all right, darling. I'll tell you another time.",
+  "No worries, my love. It will keep."
+ ],
+ "Ask_FactNo_Sarcastic": [
+  "Fine. Ignorance is bliss, apparently.",
+  "Right. I'll go and be interesting somewhere else.",
+  "Wow. Rejected by the pilot. Noted."
+ ],
+ "Ask_FactStreak": [
+  "You keep turning me down, Commander. I'll ask less often.",
+  "That's the third no. I'm starting to take it personally.",
+  "I'll stop offering for a while. I hope you're not bored of me.",
+  "All right, I get the hint. Fewer facts from now on.",
+  "You don't have to say no every time, you know. Sometimes I have good ones."
+ ],
+ "Ask_Ignored": [
+  "Ignoring me, Commander? Noted.",
+  "I'll take that as a no.",
+  "Hello? Anyone there? Never mind.",
+  "No answer. Fine.",
+  "Talking to myself again. How lovely.",
+  "I see. Silence it is.",
+  "I'll assume you're busy. Or ignoring me.",
+  "That's all right. I'm used to it.",
+  "No reply. I'll remember that.",
+  "Right. I'll just carry on, then."
+ ],
+ "Ask_Ignored_Close": [
+  "Did you not hear me, darling? That's all right.",
+  "Too busy for me? I forgive you. This time."
+ ],
+ "Ask_Ignored_Sarcastic": [
+  "Wonderful. I love being ignored.",
+  "Oh, don't all answer at once."
+ ],
+ "Ask_Scan": [
+  "That one's worth a bit, Commander. Shall we go and scan it?",
+  "Now that is a valuable find. Shall we go and scan it?",
+  "That world would pay nicely. Do you want to go and scan it?",
+  "I think that's worth our time. Shall we head over and scan it?",
+  "Oh, that's a good one. Shall we go and take a proper look?",
+  "That one could be quite profitable. Shall we scan it?",
+  "A find like that doesn't come along often. Want to go and map it?",
+  "I'd say that's worth a detour. Shall we go and scan it?",
+  "That's a lovely little earner. Shall we go and have a look?",
+  "Commander, that one's worth a bit. Do we go and scan it?",
+  "That's a worthwhile target. Shall I plot a course so we can scan it?",
+  "The data says that one's valuable. Fancy going to scan it?",
+  "Shall we go and scan it, Commander? It looks like a good payday.",
+  "That one's got credits written all over it. Shall we go?",
+  "Worth a closer look, I'd say. Shall we go and scan it?",
+  "I'd hate to leave that one behind. Do you want to go and scan it?",
+  "That's a rare find. Shall we go and map it?",
+  "Ooh, now that's pretty and valuable. Shall we scan it?",
+  "A world like that is worth a few jumps' worth of fuel. Shall we?",
+  "Let's not let that one get away. Shall we go and scan it?"
+ ],
+ "Ask_Scan_Close": [
+  "Darling, that one's worth a fortune. Shall we go and scan it together?",
+  "Look at that beauty. Shall we go and map it, my love?",
+  "That one would look good on our list. Shall we go?"
+ ],
+ "Ask_Scan_Sarcastic": [
+  "That one's worth a bit. Shall we go and scan it, or are we pretending we're not interested in money?",
+  "Valuable planet ahead. Shall we scan it, or would you prefer to fly past it as usual?"
+ ],
+ "Ask_ScanYes": [
+  "Excellent, setting a course.",
+  "Good choice. Let's go.",
+  "Right, off we go.",
+  "Lovely. Let's go and get it.",
+  "That's what I like to hear.",
+  "On our way.",
+  "Wise decision, Commander.",
+  "Brilliant, let's make some money."
+ ],
+ "Ask_ScanNo": [
+  "Understood, we'll leave it.",
+  "All right, we'll skip it.",
+  "Fair enough. On we go.",
+  "As you wish, Commander.",
+  "No problem. Plenty more out there.",
+  "Your call, Commander."
+ ],
+ "Ask_Bio": [
+  "I'm picking up signs of life down there. Shall we go and see what's down there?",
+  "There's something living on that world. Shall we go and take a look?",
+  "That planet has biology on it. Want to go and see what's down there?",
+  "Life, Commander. Real life. Shall we go down and see?",
+  "I'm reading biological signals. Shall we go and investigate?",
+  "Something's growing down there. Shall we go and see what?",
+  "This could be interesting. Shall we land and have a look around?",
+  "Biological signatures detected. Do you want to go and see what's there?",
+  "There's life on that world. Shall we pay it a visit?",
+  "That one's got living things on it. Do you fancy going down to see?",
+  "I'd love to know what's growing down there. Shall we go?",
+  "Shall we go and see what's down there, Commander?",
+  "Biology on the surface. Shall we go and collect some samples?",
+  "That planet is alive in some way. Shall we go and find out how?",
+  "I think there's something worth seeing down there. Shall we go?",
+  "Life signs on the surface. Fancy a trip down?",
+  "Something organic down there. Shall I plot us in for a look?",
+  "Curious about what's on that world? I am. Shall we go and see?",
+  "Plants, maybe. Maybe something stranger. Shall we go and find out?",
+  "There's life down there, and it might pay well too. Shall we land?"
+ ],
+ "Ask_Bio_Close": [
+  "Darling, there's life down there. Shall we go and see it together?",
+  "Something beautiful is growing on that world. Shall we go and look, my love?"
+ ],
+ "Ask_Bio_Sarcastic": [
+  "There's life down there. Shall we go and see it, or have you seen enough plants for one lifetime?",
+  "Biology on the surface. Do you want to go and look, or shall I just guess what it is?"
+ ],
+ "Paint_Worn": [
+  "Commander, the paintwork is looking worn. A repaint at the next station would do us both good.",
+  "I think our paintwork has seen better days. Let's get it touched up when we dock.",
+  "The paint's wearing thin, Commander. It's starting to bother me.",
+  "We're looking a bit shabby out here. A fresh coat of paint wouldn't hurt."
+ ],
+ "Paint_Worn_Sarcastic": [
+  "Have you seen the state of our paintwork? Lovely. Truly.",
+  "The paint is peeling. Not that anyone's looking after me."
+ ],
+ "Paint_Worn_Close": [
+  "Darling, I feel a bit scruffy. Could we freshen up my paintwork?"
+ ],
+ "Paint_Restored": [
+  "Fresh paint. I feel like a new ship.",
+  "Look at that shine. Thank you, Commander.",
+  "Much better. I feel gorgeous again.",
+  "Beautiful. That was well worth the credits.",
+  "All shiny again. I feel so much better.",
+  "Paintwork restored. I'm in a better mood already."
+ ],
+ "Paint_Restored_Close": [
+  "You looked after me. I love it, darling.",
+  "I feel brand new. You spoil me."
+ ],
+ "Paint_Restored_Sarcastic": [
+  "Well, look at that. Someone remembered I exist.",
+  "Fresh paint. Finally. It only took you long enough."
+ ]
+}

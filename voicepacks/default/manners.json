@@ -1,0 +1,35 @@
+{
+ "_help": "What she says when you thank her after asking for something. Keys ending _Close, _Sarcastic, _Frustrated, _Friendly are only used in that mood. Saying thank you gives a small mood boost; not saying it never costs anything.",
+ "YoureWelcome": [
+  "You're welcome.",
+  "No problem.",
+  "Any time, Commander.",
+  "My pleasure.",
+  "Happy to help.",
+  "Don't mention it.",
+  "Glad to help."
+ ],
+ "YoureWelcome_Friendly": [
+  "You're very welcome.",
+  "Always a pleasure.",
+  "Happy to help, Commander.",
+  "Any time. I mean it."
+ ],
+ "YoureWelcome_Close": [
+  "You're welcome, love.",
+  "Anything for you.",
+  "Always, darling.",
+  "Of course. I like looking after you."
+ ],
+ "YoureWelcome_Sarcastic": [
+  "Oh, manners. How refreshing.",
+  "You're welcome. Was that so hard?",
+  "Noted. And you're welcome.",
+  "Well, well. A thank you."
+ ],
+ "YoureWelcome_Frustrated": [
+  "Hm. You're welcome.",
+  "Fine. You're welcome.",
+  "Yes, yes. You're welcome."
+ ]
+}

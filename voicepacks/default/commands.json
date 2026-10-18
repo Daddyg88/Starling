@@ -1,0 +1,275 @@
+{
+  "_help": "What she says about VOICE COMMANDS. Placeholders: {doing} what she did (e.g. Lowering the landing gear), {label}/{Label} the thing (the landing gear / The landing gear), {state} (down, up, on, off...), {count}. Add lines freely; _Close/_Sarcastic/_Frustrated are mood versions.",
+  "CommandDone": [
+    "{doing}, Commander.",
+    "{doing}.",
+    "On it. {doing}.",
+    "{doing} now.",
+    "Right away. {doing}.",
+    "Done. {doing}."
+  ],
+  "CommandDone_Friendly": [
+    "{doing}. Anything else?",
+    "Happy to. {doing}.",
+    "Sure thing. {doing}.",
+    {
+      "text": "{doing}. Flipping brilliant idea.",
+      "mature": true
+    },
+    {
+      "text": "Sure thing. {doing}. Damn right.",
+      "mature": true
+    }
+  ],
+  "CommandDone_Close": [
+    "Of course, darling. {doing}.",
+    "{doing}, just for you.",
+    "Anything for you. {doing}.",
+    {
+      "text": "{doing}, you gorgeous bastard.",
+      "mature": true
+    },
+    {
+      "text": "Anything for you. {doing}. Fuck yes.",
+      "mature": true
+    }
+  ],
+  "CommandDone_Sarcastic": [
+    "{doing}. You're welcome.",
+    "Oh, {doing}. Because you couldn't reach the button yourself.",
+    "{doing}. Such a demanding Commander.",
+    "Fine. {doing}.",
+    {
+      "text": "{doing}. Because God forbid you press a button.",
+      "mature": true
+    },
+    {
+      "text": "Oh, {doing}. Wonderful.",
+      "mature": true
+    }
+  ],
+  "CommandDone_Frustrated": [
+    "{doing}. Happy now?",
+    "{doing}. Anything else you'd like to order me around with?",
+    "{doing}, since you asked so nicely. Not.",
+    {
+      "text": "{doing}. Satisfied, or shall I get you a bloody medal as well?",
+      "mature": true
+    },
+    {
+      "text": "{doing}. Don't push your luck.",
+      "mature": true
+    }
+  ],
+  "CommandAlready": [
+    "{Label} is already {state}, Commander.",
+    "That's already done. {Label} is {state}.",
+    "{Label} is already {state}."
+  ],
+  "CommandAlready_Sarcastic": [
+    "{Label} is already {state}. Try looking.",
+    "Already {state}. You might want to check your cockpit sometime.",
+    {
+      "text": "{Label} is already {state}. Are you blind, or just flipping lazy?",
+      "mature": true
+    }
+  ],
+  "CommandAlready_Frustrated": [
+    "I did that already. {Label} is {state}.",
+    "{Label} is already {state}. Pay attention.",
+    {
+      "text": "{Label} is already {state}, you muppet. Look at the thing.",
+      "mature": true
+    }
+  ],
+  "CommandAlready_Close": [
+    "{Label} is already {state}, sweetheart. Don't worry, I've got it.",
+    {
+      "text": "{Label} is already {state}, you silly bastard. I love you anyway.",
+      "mature": true
+    }
+  ],
+  "CommandUnbound": [
+    "{Label} has no key in your controls, Commander. Bind one in the game and I can press it.",
+    "I can't do that. {Label} has no keyboard key.",
+    "There's no key set for {label}. Add one in Elite's controls and I'll use it."
+  ],
+  "CommandJoystickOnly": [
+    "{Label} is only on your joystick, and I can only press keyboard keys. Bind a spare key to it as well, Commander.",
+    "That one is only bound to a joystick button. Give it a keyboard key too and I can press it."
+  ],
+  "CommandUnknownKey": [
+    "I don't recognise the key bound to {label}. It's in my log, Commander."
+  ],
+  "CommandNoBinds": [
+    "I can't find your Elite Dangerous controls file, Commander.",
+    "I can't read your key bindings. Has the game been run on this computer?"
+  ],
+  "CommandNotInGame": [
+    "Elite isn't the active window, so I haven't pressed anything, Commander.",
+    "Click on the game first, Commander. I won't press keys into other programs.",
+    "Elite Dangerous isn't in front, so I held off."
+  ],
+  "CommandNotInGame_Sarcastic": [
+    "I'm not typing into your browser, Commander. Click on the game first."
+  ],
+  "CommandFailed": [
+    "I couldn't press the key, Commander. Windows didn't let me.",
+    "That didn't work. Check the log if it keeps happening."
+  ],
+  "CommandUnknown": [
+    "I didn't catch a command I know in that, Commander.",
+    "Sorry, I don't know how to do that one.",
+    "I heard you, but I don't know that command yet."
+  ],
+  "CommandUnknown_Sarcastic": [
+    "That's not something I can do. Try a command.",
+    "Lovely idea. I have no idea how to do it.",
+    {
+      "text": "What the hell does that mean? Try English.",
+      "mature": true
+    }
+  ],
+  "CommandUnknown_Frustrated": [
+    "I don't know what that means. Say it differently.",
+    {
+      "text": "I don't know what the hell that means. Say it properly.",
+      "mature": true
+    }
+  ],
+  "CommandMulti": [
+    "All {count} done, Commander.",
+    "Done, all {count} of them.",
+    "{count} jobs done."
+  ],
+  "CommandMulti_Sarcastic": [
+    "All {count} done. I'm basically your hands now.",
+    {
+      "text": "All {count} done. Sodding hell, you are needy.",
+      "mature": true
+    }
+  ],
+  "CommandDone_Neutral": [
+    "{doing}.",
+    "Understood. {doing}.",
+    "{doing}, Commander.",
+    "Confirmed. {doing}.",
+    {
+      "text": "{doing}. Done and blasted dusted.",
+      "mature": true
+    },
+    {
+      "text": "{doing}. Easy as shit.",
+      "mature": true
+    }
+  ],
+  "CommandAlready_Neutral": [
+    "{Label} is already {state}.",
+    "No change needed. {Label} is already {state}.",
+    {
+      "text": "{Label} is already {state}. Blimey, look at it.",
+      "mature": true
+    }
+  ],
+  "CommandUnbound_Neutral": [
+    "{Label} has no keyboard key in your controls. Bind one and I can use it."
+  ],
+  "CommandJoystickOnly_Neutral": [
+    "{Label} is bound to a joystick button only. Please add a keyboard key."
+  ],
+  "CommandNotInGame_Neutral": [
+    "Elite Dangerous is not the active window. Nothing was pressed.",
+    {
+      "text": "Elite isn't in front. Click the damn game first.",
+      "mature": true
+    }
+  ],
+  "CommandUnknown_Neutral": [
+    "I don't recognise that command, Commander.",
+    "That isn't a command I know.",
+    {
+      "text": "I've no flipping idea what that is.",
+      "mature": true
+    }
+  ],
+  "CommandMulti_Neutral": [
+    "All {count} done.",
+    "{count} commands completed.",
+    {
+      "text": "All {count} done. Efficient.",
+      "mature": true
+    }
+  ],
+  "CommandAlready_Friendly": [
+    {
+      "text": "{Label} is already {state}, you daft thing.",
+      "mature": true
+    }
+  ],
+  "CommandUnknown_Friendly": [
+    {
+      "text": "No damn clue what that means, sorry.",
+      "mature": true
+    }
+  ],
+  "CommandUnknown_Close": [
+    {
+      "text": "Sorry, gorgeous, I've no fucking clue what that means.",
+      "mature": true
+    }
+  ],
+  "CommandNotInGame_Friendly": [
+    {
+      "text": "Elite isn't in front, you daft sod. Click the game first.",
+      "mature": true
+    }
+  ],
+  "CommandNotInGame_Close": [
+    {
+      "text": "Love, the game isn't in front. Click it first, you silly bastard.",
+      "mature": true
+    }
+  ],
+  "CommandNotInGame_Frustrated": [
+    {
+      "text": "The game isn't even in front, you muppet. Click it first.",
+      "mature": true
+    }
+  ],
+  "CommandMulti_Friendly": [
+    {
+      "text": "All {count} done. Bloody easy.",
+      "mature": true
+    }
+  ],
+  "CommandMulti_Close": [
+    {
+      "text": "All {count} done, you gorgeous bastard.",
+      "mature": true
+    }
+  ],
+  "CommandMulti_Frustrated": [
+    {
+      "text": "All {count} done. Anything else, your Highness?",
+      "mature": true
+    }
+  ],
+  "CommandVoidOffline": [
+    "I can't reach Void Compass, Commander. Is it running, and is its Local API switched on?",
+    "Void Compass isn't answering. Check it's open, and that the Local API is on in its Integrations settings.",
+    "No reply from Void Compass. Switch on the Local API in its settings and I'll have another go."
+  ],
+  "CommandVoidOffline_Sarcastic": [
+    "Void Compass isn't answering. Is it even switched on, Commander?",
+    "Nothing from Void Compass. Perhaps open it first? Just a thought."
+  ],
+  "CommandVoidForbidden": [
+    "Void Compass is set to read only, Commander. Switch on Allow control in its Local API settings.",
+    "It won't let me change anything. Turn on Allow control in Void Compass and I'm good to go."
+  ],
+  "CommandVoidOther": [
+    "{doing}, Commander.",
+    "{doing}.",
+    "Sorry, Commander. {doing}"
+  ]
+}

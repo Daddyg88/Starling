@@ -1,0 +1,113 @@
+{
+ "_help": "What she says about a species on the SECOND sample. 'genus' holds a few short descriptions per genus (she picks one, and does not repeat the same one twice in a row); 'species' holds an extra sentence for particular species. The facts were checked against the Elite Dangerous Wiki (elite-dangerous.fandom.com), Canonn (canonn.science) and the Frontier forums exobiology guide, and written in my own words. Only things I could confirm are in here: there is nothing yet for Anemone. To add or change one, edit this file in Notepad. Do not use curly brackets { } in the text.",
+ "sources": [
+  "https://elite-dangerous.fandom.com",
+  "https://canonn.science/codex",
+  "https://forums.frontier.co.uk/threads/exobiology-a-2023-updated-guide.615722"
+ ],
+ "genus": {
+  "Aleoida": [
+   "Aleoida are tough plants with thick, waxy leaves that thrive in arid places. Their pointed leaves channel liquid down to the roots, and they can close up completely to hibernate.",
+   "Aleoida grow on rocky or metal-rich worlds with carbon dioxide or ammonia atmospheres, and only where the gravity is low. Colonies are at least 150 metres apart."
+  ],
+  "Amphora": [
+   "Amphora are named after a container shape from the Neolithic. They look like a fungal growth, and they live on airless planets and moons."
+  ],
+  "Bacterium": [
+   "Bacterium are colonies of tiny cells that show up in a kaleidoscope of patterns and colours. They manage almost any temperature and atmosphere, getting their energy from light, chemicals or heat.",
+   "Bacterium turn up on worlds with thin atmospheres, and often alongside other life, so they may well be the ancestors of many other forms."
+  ],
+  "Bark Mound": [
+   "Bark Mounds are tall, cone-shaped spires covered in a fungal growth like other fungal life. They've been studied for what they might offer organic structures and meta-alloys."
+  ],
+  "Brain Tree": [
+   "Brain Trees are tree-like fungi, with a brain-shaped structure on the tip of each branch. They only grow on worlds with some kind of volcanism, mostly in fields of dozens, in ejecta craters near Guardian ruins.",
+   "Nobody knows what Brain Trees are for, but the way they grow close to Guardian ruins hints at a connection."
+  ],
+  "Cactoida": [
+   "Cactoida get their name from cacti. From a distance they look like small round pebbles, up close some are squat and others are tall clusters of cylinders, and the biggest are over three metres high.",
+   "Cactoida grow on rocky or metal-rich worlds with thin carbon dioxide, ammonia or water atmospheres and very low gravity. They spread by seed, and some species fire it out explosively."
+  ],
+  "Clypeus": [
+   "Clypeus grow a hard shield, and its shape and colour depend on the minerals they build it from, and on the colour of the star above. It also collects trace moisture from the air, so they survive in very dry places.",
+   "Clypeus grow on rocky or metal-rich worlds with thin carbon dioxide or water atmospheres, and clone themselves, with colonies about 150 metres apart."
+  ],
+  "Concha": [
+   "Concha are very small, and shaped like mollusc shells. They grow on hills and rocky ground on worlds with thin atmospheres, and spread by cloning, with samples at least 150 metres apart."
+  ],
+  "Crystalline Shards": [
+   "Crystalline Shards are crystal structures built by huge colonies of microorganisms, on airless planets and moons with volcanic activity. Shoot the clusters in them from an SRV and they give high grade raw materials.",
+   "Crystalline Shards sit a very long way from their star, at least twelve thousand light seconds out, and samples need to be 100 metres apart."
+  ],
+  "Electricae": [
+   "Electricae poke up out of the ice as tips, often beside fissures where the ice is thinnest, and the body runs down through it, maybe for kilometres. It glows with a bioluminescent display.",
+   "Electricae are found only near frozen lakes on extremely cold ice worlds, and seem to need noble gas atmospheres, probably because of the electrochemistry they use."
+  ],
+  "Fonticulua": [
+   "Fonticulua are photosynthetic colonies with hard, see-through shells of refrozen liquid, and flat, frond-like growths that spread out to catch the light.",
+   "Fonticulua are described as living on ice worlds, and they seem to reproduce by splitting, when a fragment breaks off and starts a new colony. Samples need to be 500 metres apart."
+  ],
+  "Frutexa": [
+   "Frutexa are tough, woody bushes. Their deep roots gather liquid and hold them steady on unstable ground, and their small leaves cut water loss in the heat and help them survive extreme cold.",
+   "Frutexa are photosynthetic, with special photoreceptors that work even in low light."
+  ],
+  "Fumerola": [
+   "Fumerola grow on fumaroles, usually on top of rocks in small flat patches. They live off volcanic heat and chemistry, so they can survive where it would otherwise be too cold.",
+   "The colour of a Fumerola is set by a rare material on its planet, which can make it look strangely coloured, almost inorganic. Samples must be 100 metres apart."
+  ],
+  "Fungoida": [
+   "Fungoida are fungus-like. Most of the organism lives deep in the ground, and only the parts used for reproduction show above it. They mainly spread by ejecting spores.",
+   "Fungoida feed on chemistry and heat from the ground, and some species are bioluminescent while they break down built-up toxins."
+  ],
+  "Osseus": [
+   "Osseus grow a single thick stalk, topped with a wide, round, pitted skeleton. All those pits give it more surface to catch chemicals for energy.",
+   "Osseus grow on rocky parts of big flat plains, and they're easy to mistake for rocks."
+  ],
+  "Recepta": [
+   "Recepta build a protective shell from inorganic and hydrocarbon materials, which makes a little isolated biome with its own temperature and chemistry.",
+   "Recepta grow slowly, so the big ones are old. They reproduce by budding off a small copy of themselves, which rolls with the wind and gravity until it anchors itself."
+  ],
+  "Sinuous Tubers": [
+   "Sinuous Tubers are called tube worms by explorers, because they look like Earth tube worms: tubular and vividly coloured. They grow on airless planets and moons.",
+   "Four kinds of Sinuous Tuber are known: Albidum, Caeruleum, Prasinum and Roseus."
+  ],
+  "Stratum": [
+   "Stratum are low, photosynthetic growths that bond tightly to rock, partly buried, with tough little leaves showing. Their colour comes from the minerals in the rock and the light of the star.",
+   "Stratum clone themselves, with colonies spread over 500 metres, on worlds with thin atmospheres."
+  ],
+  "Tubus": [
+   "Tubus are tall, thin tubes, made of wrapped, leaf-like sections around a central chimney that holds its own atmosphere. Some have rings on the outside that show how old they are.",
+   "Tubus grow on rocky or metal-rich worlds with thin carbon dioxide or ammonia atmospheres and very low gravity, and a colony spreads across 800 metres."
+  ],
+  "Tussock": [
+   "Tussock are tough, photosynthetic plants that look like clump grasses. Their shallow but complicated roots need solid ground, and some have sugary cells that stop them freezing.",
+   "Tussock make new clumps by tillering, or spread further with a range of seeding tricks. Samples need to be at least 200 metres apart."
+  ]
+ },
+ "species": {
+  "Aleoida Arcus": "Aleoida Arcus grows upright clumps of long, serrated leaves, and scatters tiny round seeds. It likes carbon dioxide air at around 175 to 180 kelvin.",
+  "Aleoida Coronamus": "Aleoida Coronamus forms a crown of mottled leaves up to head height, with explosive seed pods on stalks.",
+  "Aleoida Gravis": "Aleoida Gravis has wide, flat leaves on a heavy bark base, and it can grow very large.",
+  "Aleoida Laminiae": "Aleoida Laminiae forms a ring of upturned, patterned leaves around a fleshy pod, and it prefers ammonia atmospheres.",
+  "Aleoida Spica": "Aleoida Spica has long, spiky leaves, over two metres high, around a central stalk. It lives in ammonia atmospheres, often on near mountainous ground.",
+  "Cactoida Cortexum": "Cactoida Cortexum lives in thin carbon dioxide air, at a temperature of roughly 180 to 195 kelvin.",
+  "Cactoida Pullulanta": "Cactoida Pullulanta lives in thin carbon dioxide air, at a temperature of roughly 180 to 195 kelvin.",
+  "Cactoida Lapis": "Cactoida Lapis is one of the Cactoida that lives in ammonia atmospheres.",
+  "Cactoida Peperatis": "Cactoida Peperatis is one of the Cactoida that lives in ammonia atmospheres.",
+  "Cactoida Vermis": "Cactoida Vermis is the one that lives in water atmospheres.",
+  "Clypeus Lacrimam": "Clypeus Lacrimam has a broad, tear-shaped shield, with ridges that channel water droplets into the soil.",
+  "Clypeus Margaritus": "Clypeus Margaritus has a curved, pearl-like shield, sheltering up to three organisms on a bed of leaves.",
+  "Clypeus Speculumi": "Clypeus Speculumi has an angular shield with a mirrored outside, protecting the spiky organisms inside. It's only found a long way from its star.",
+  "Concha Labiata": "Concha Labiata has a lip-like opening on top, which cracks apart to let spiky leaves and bright seeds grow out. It thrives in carbon dioxide rich air.",
+  "Fumerola Aquatis": "Fumerola Aquatis is a cluster of small, dark, ridged folds, found on icy worlds with water volcanism.",
+  "Fumerola Carbosis": "Fumerola Carbosis is a thin upright tube with a smaller organism poking out of the top, found on icy worlds with carbon or methane volcanism.",
+  "Fumerola Extremus": "Fumerola Extremus has long, upright stalks with smaller fronds, and grows on rocky or metal-rich worlds with silicate, iron or rock volcanism.",
+  "Fumerola Nitris": "Fumerola Nitris is an egg-shaped organism with dotted markings on a thin stalk, found on icy worlds with nitrogen or ammonia volcanism.",
+  "Recepta Conditivus": "Recepta Conditivus is an extremophile that lives only on planets with sulphur dioxide atmospheres.",
+  "Stratum Laminamus": "Stratum Laminamus is a low growth that bonds tightly to the rock, and takes its colour from it.",
+  "Tubus Compagibus": "Tubus Compagibus grows spores on the undersides of leaves in a crown at the top.",
+  "Tubus Conifer": "Tubus Conifer has a downturned crown that lets the wind carry its seeds.",
+  "Tubus Rosarium": "Tubus Rosarium grows explosive seed pods on its upper sections.",
+  "Tubus Sororibus": "Tubus Sororibus caps its stalks with flowers that make the seeds."
+ }
+}

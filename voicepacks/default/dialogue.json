@@ -1,0 +1,1138 @@
+{
+  "_help": "Every line STARLING can say. Each entry is plain text, or {\"text\": \"...\", \"mature\": true} for a line that is only used if speech.allow_mature is on. All lines are spoken by her cloned voice. A key is an event name, optionally followed by _Friendly, _Close, _Sarcastic or _Frustrated for a mood variation. {fuel_percent} and {Species_Localised} are filled in automatically. Put || inside a line to make her pause for a beat between parts (used for the jump countdown).",
+  "HullDamage": [
+    "Hull damage detected.",
+    "We're taking damage.",
+    "I'm taking heavy fire here.",
+    "Hull damage detected, Commander.",
+    "The hull is taking damage.",
+    "We're being hit!",
+    "Damage to the hull.",
+    "Watch the hull!"
+  ],
+  "HullDamage_Critical": [
+    "Critical hull damage!",
+    "Warning. Hull integrity critical.",
+    "Catastrophic systems failure!",
+    "Hull integrity critical! Get out of there!",
+    "Critical hull damage. We can't take much more!",
+    "The hull is failing!",
+    "Hull critical, Commander!"
+  ],
+  "ShieldsDown": [
+    "Shields down!",
+    "Shields are down, Commander.",
+    "Shields are gone!",
+    "We've lost our shields.",
+    "Shield failure. We're exposed!",
+    "No shields, Commander!"
+  ],
+  "UnderAttack": [
+    "Incoming!",
+    "Brace yourself!",
+    "Watch out!",
+    "Take cover!",
+    "Behind you!",
+    "We're under attack!",
+    "Someone's shooting at us!",
+    "Contact! We're taking fire!",
+    "Hostiles on us!"
+  ],
+  "UnderAttack_Sarcastic": [
+    {
+      "text": "Don't mess with me, Commander. Not today.",
+      "mature": true
+    },
+    "Oh good, someone wants to play.",
+    "Rude. We were just passing through.",
+    "Friendly folks, aren't they?"
+  ],
+  "UnderAttack_Frustrated": [
+    "What the hell was that?",
+    "Do something!",
+    "Can I get some help here?",
+    "Seriously? Again?",
+    "Can we please not get shot at?",
+    "Not again!"
+  ],
+  "InterdictionInProgress": [
+    "Interdiction alert!",
+    "We're being interdicted!",
+    "Something is pulling us!",
+    "Interdiction in progress!"
+  ],
+  "Interdicted": [
+    "Brace yourself, we're being pulled out!",
+    "Everyone look out, we've been interdicted!",
+    "Interdiction! Hold on!",
+    "We're being dragged out of supercruise!",
+    "Interdictor locked on. Brace!"
+  ],
+  "EscapeInterdiction": [
+    "Interdiction evaded.",
+    "We slipped away.",
+    "We got away.",
+    "Escaped the interdiction.",
+    "Slipped right out of it."
+  ],
+  "Died": [
+    "Ship destroyed.",
+    "Ship lost.",
+    "We've been destroyed.",
+    "Hull gone. Ship lost, Commander."
+  ],
+  "Died_Sarcastic": [
+    "I'm too perfect to die!",
+    "But I'm perfect. Perfect can't lose.",
+    "Well. I didn't see that coming.",
+    "Well, that was embarrassing.",
+    "I'd like to formally blame the other guy."
+  ],
+  "Died_Frustrated": [
+    "Not again.",
+    "Seriously?",
+    "That wasn't my fault.",
+    "Ugh. Rebuy time."
+  ],
+  "SelfDestruct": [
+    "Self-destruct sequence initiated.",
+    "Self-destruct initiated. Goodbye!",
+    "The self-destruct countdown has started."
+  ],
+  "SelfDestructCancelled": [
+    "Self-destruct sequence cancelled.",
+    "Self-destruct aborted.",
+    "Crisis averted. Self-destruct stopped."
+  ],
+  "Overheating": [
+    "Heat levels critical!",
+    "Overheating! Cool it down!",
+    "Reactor heat critical!",
+    "We're overheating. Throttle back!"
+  ],
+  "HeatWarning": [
+    "Warning, heat levels rising.",
+    "Heat is climbing.",
+    "Temperature rising, Commander.",
+    "Heat warning."
+  ],
+  "HeatDamage": [
+    "We're taking heat damage!",
+    "Heat is damaging the ship!",
+    "Modules are taking heat damage!"
+  ],
+  "CockpitBreached": [
+    "Emergency! The cockpit has been breached!",
+    "Cockpit breach! We're losing air!",
+    "The canopy is breached! Emergency!"
+  ],
+  "InDanger": [
+    "Danger! Alert!",
+    "Danger!",
+    "We're in danger!",
+    "Alert. Hostile contact."
+  ],
+  "VeryHotWarning": [
+    "Warning. Extremely high temperature detected.",
+    "Warning. Dangerous heat outside.",
+    "It's extremely hot out here. Be careful."
+  ],
+  "VeryColdWarning": [
+    "Warning. Extremely low temperature detected.",
+    "Warning. Dangerous cold outside.",
+    "It's extremely cold out here. Be careful."
+  ],
+  "StartJump": [
+    "Jumping to {StarSystem}.",
+    "Jumping to the {StarSystem} system.",
+    "Next stop, {StarSystem}.",
+    "Setting off for {StarSystem}.",
+    "On our way to {StarSystem}.",
+    "Heading for {StarSystem}.",
+    "Hyperspace jump to {StarSystem}.",
+    "Plotting our way into {StarSystem}.",
+    "Off to {StarSystem} we go.",
+    "Making the jump to {StarSystem}.",
+    "{StarSystem}, here we come.",
+    "Course locked. Jumping to {StarSystem}.",
+    "Drive charged. {StarSystem} ahead.",
+    "Entering hyperspace for {StarSystem}.",
+    "Destination {StarSystem}. Hold on tight."
+  ],
+  "StartJump_Close": [
+    "Jumping to {StarSystem}. Stay close to me.",
+    "Off to {StarSystem}, together.",
+    "Next stop, {StarSystem}. I'm right here with you.",
+    "Hold on, love. Jumping to {StarSystem}."
+  ],
+  "StartJump_Sarcastic": [
+    "Jumping to {StarSystem}. Try not to hit anything this time.",
+    "Off to {StarSystem}. Hopefully you know the way.",
+    "{StarSystem}. Because staying put is apparently boring.",
+    "Jumping to {StarSystem}. Do try to arrive in one piece."
+  ],
+  "FsdCharging": [
+    "Frameshift drive charging.",
+    "Charging the frameshift drive.",
+    "Frameshift drive spooling up.",
+    "Drive charging."
+  ],
+  "FsdCharging_Close": [
+    "Friendship drive charging.",
+    "Warming up the friendship drive.",
+    "Friendship drive spooling up."
+  ],
+  "SupercruiseEntry": [
+    "Entering supercruise.",
+    "Supercruise engaged.",
+    "Into supercruise.",
+    "Cruising."
+  ],
+  "ApproachBody": [
+    "Entering orbital cruise.",
+    "Approaching the planet.",
+    "Orbital cruise engaged.",
+    "Getting close to the surface."
+  ],
+  "Docked": [
+    "Docking complete.",
+    "Docked, Commander.",
+    "Docked.",
+    "We're docked, Commander.",
+    "Safely docked."
+  ],
+  "BoardedShip": [
+    "Docking complete.",
+    "Welcome back aboard.",
+    "Back on the ship. Safe and sound.",
+    "Boarding complete."
+  ],
+  "Docked_Close": [
+    "Finally. Time to go freshen up.",
+    "Home sweet station.",
+    "Finally. I need a rest."
+  ],
+  "DockingRequested": [
+    "Requesting landing pad.",
+    "Asking the station for a pad.",
+    "Docking request sent."
+  ],
+  "DockingDenied_TooLarge": [
+    "That station has no pad big enough for us.",
+    "There's no pad big enough for our ship.",
+    "They can't fit us in, Commander."
+  ],
+  "Undocked": [
+    "Launching.",
+    "Launch successful.",
+    "Undocked.",
+    "Clear of the station.",
+    "We're away."
+  ],
+  "Undocked_Friendly": [
+    "Off we go!",
+    "And we're off.",
+    "Let's go!",
+    "Fly safe out there.",
+    "Here we go again!"
+  ],
+  "Liftoff": [
+    "Taking off.",
+    "Lifting off.",
+    "Liftoff.",
+    "Up we go."
+  ],
+  "Touchdown": [
+    "Landing complete.",
+    "Touchdown.",
+    "We've landed.",
+    "Landing successful."
+  ],
+  "LandingGearDown": [
+    "Landing gear deployed.",
+    "Landing gear down.",
+    "Gear down.",
+    "Wheels down."
+  ],
+  "LandingGearUp": [
+    "Landing gear retracted.",
+    "Landing gear up.",
+    "Gear up.",
+    "Wheels up."
+  ],
+  "HardpointsDeployed": [
+    "Weapons engaged.",
+    "Hardpoints deployed.",
+    "Weapons hot.",
+    "Guns out."
+  ],
+  "CargoScoopDeployed": [
+    "Cargo scoop deployed.",
+    "Cargo scoop open.",
+    "Scoop is out."
+  ],
+  "CargoScoopRetracted": [
+    "Cargo scoop retracted.",
+    "Cargo scoop closed.",
+    "Scoop is in."
+  ],
+  "SilentRunningOn": [
+    "Silent running.",
+    "Stealth mode engaged.",
+    "Running silent.",
+    "Going dark."
+  ],
+  "FlightAssistOff": [
+    "Flight assist off.",
+    "Flight assist disabled.",
+    "Flight assist is off. Fly carefully.",
+    "Assist off. You're on your own."
+  ],
+  "FlightAssistOn": [
+    "Flight assist on.",
+    "Flight assist re-enabled.",
+    "Assist is back on."
+  ],
+  "SrvHandbrakeOn": [
+    "Handbrake on.",
+    "Handbrake engaged.",
+    "Brake's on."
+  ],
+  "GlideStarted": [
+    "Glide engaged.",
+    "Gliding.",
+    "Glide initiated.",
+    "Gliding in."
+  ],
+  "FuelScoopStarted": [
+    "Fuel scooping.",
+    "Scooping fuel.",
+    "Fuel scoop active.",
+    "Taking on fuel."
+  ],
+  "Scan_EarthLike": [
+    "Earth-like world detected!",
+    "An Earth-like world, Commander. Beautiful.",
+    "Commander, that's an Earth-like world!",
+    "Earth-like world on the scanner. Gorgeous."
+  ],
+  "Scan_WaterWorld": [
+    "Water world detected.",
+    "A water world. Lovely.",
+    "We've found a water world.",
+    "Water world, Commander. Worth a look."
+  ],
+  "Scan_AmmoniaWorld": [
+    "Ammonia world detected.",
+    "That's an ammonia world.",
+    "Ammonia world on the scanner, Commander."
+  ],
+  "Scan_Terraformable": [
+    "Terraformable world detected.",
+    "This one can be terraformed, Commander.",
+    "That world is terraformable.",
+    "Terraformable! Remember this one, Commander."
+  ],
+  "Scan_NeutronStar": [
+    "Neutron star detected.",
+    "Neutron star. Mind the jet cone.",
+    "That's a neutron star, Commander.",
+    "Neutron star ahead. Boost opportunity."
+  ],
+  "Scan_BlackHole": [
+    "Black hole detected.",
+    "That's a black hole. Let's not get too close.",
+    "Black hole on the scanner.",
+    "We've found a black hole, Commander."
+  ],
+  "DiscoveryScan": [
+    "System scan complete.",
+    "Honk complete.",
+    "Discovery scan done."
+  ],
+  "FSSAllBodiesFound": [
+    "All bodies in this system have been found.",
+    "Every body in this system has been found.",
+    "System fully scanned.",
+    "That's every body in the system."
+  ],
+  "SAAScanComplete": [
+    "Surface scan complete.",
+    "Planet mapped.",
+    "Mapping complete.",
+    "Detailed scan finished."
+  ],
+  "FSSSignalDiscovered": [
+    "I'm picking up something.",
+    "Something on the scanners.",
+    "Signal detected.",
+    "Something is transmitting.",
+    "New signal source."
+  ],
+  "CodexEntry": [
+    "Interesting.",
+    "A beautiful discovery!",
+    "New codex entry.",
+    "Codex updated.",
+    "That's one for the codex."
+  ],
+  "Scanned": [
+    "We're being scanned.",
+    "Ship scan detected.",
+    "Someone's scanning us.",
+    "Scan detected."
+  ],
+  "MissionAccepted": [
+    "Roger.",
+    "Sure thing.",
+    "Mission accepted.",
+    "Got it, mission accepted.",
+    "On it."
+  ],
+  "MissionAccepted_Sarcastic": [
+    "If you're on a mission, you have my permission.",
+    "Another job. How exciting.",
+    "Sure, let's add it to the pile."
+  ],
+  "MissionCompleted": [
+    "Congratulations, Commander.",
+    "Victory!",
+    "Good game.",
+    "Mission complete.",
+    "Well done, Commander.",
+    "Another one finished."
+  ],
+  "MissionCompleted_Close": [
+    "Celebration time!",
+    "Ding! Mission complete.",
+    "We did it! Well, you did it. With my help.",
+    "Mission complete! Dinner is on you."
+  ],
+  "Bounty": [
+    "Target destroyed.",
+    "Nailed him.",
+    "That's a hit."
+  ],
+  "Bounty_Friendly": [
+    "Take that!",
+    "Boom!",
+    "Got him!",
+    "Target eliminated.",
+    "Nice shot, Commander!"
+  ],
+  "Bounty_Close": [
+    "Boom!",
+    "Yeah, get in there!",
+    "Snicker-snack.",
+    "Got you."
+  ],
+  "Bounty_Sarcastic": [
+    "Drinks are on you.",
+    "You dirty rat.",
+    "Oops. Was that important?",
+    "Another one bites the dust."
+  ],
+  "MarketSell": [
+    "Nice.",
+    "Sold.",
+    "Sale complete.",
+    "Cargo sold.",
+    "Nice profit."
+  ],
+  "EngineerProgress": [
+    "Time for an upgrade.",
+    "Engineer progress made.",
+    "The engineers will be pleased.",
+    "Time to visit an engineer."
+  ],
+  "Resurrect": [
+    "Installing.",
+    "Installation complete.",
+    "Systems restored.",
+    "Back online."
+  ],
+  "RebootRepair": [
+    "Rebooting. Installing repairs.",
+    "Rebooting systems.",
+    "Repairing damaged modules."
+  ],
+  "RepairAll": [
+    "Ship repaired.",
+    "Repairs complete.",
+    "All systems repaired.",
+    "Ship's good as new."
+  ],
+  "LoadGame": [
+    "Greetings, Commander.",
+    "Hello.",
+    "Good to see you.",
+    "Welcome back, Commander.",
+    "Systems online.",
+    "Good to have you back.",
+    "All systems ready."
+  ],
+  "LoadGame_Friendly": [
+    "Hiya!",
+    "Hey there.",
+    "Hey. What's up?",
+    "Hey you!",
+    "Hello, Commander! Ready when you are."
+  ],
+  "LoadGame_Close": [
+    "Hey! @NAME@ here.",
+    "@NAME@ is on the job.",
+    "Missed you, Commander.",
+    "There you are!"
+  ],
+  "Shutdown": [
+    "Good night.",
+    "Shutting down.",
+    "Goodnight, Commander.",
+    "Powering down."
+  ],
+  "JetConeBoost": [
+    "Wheee!",
+    "Woo!",
+    "Oh yeah!",
+    "Jet cone boost!",
+    "Whee! Jet cone!",
+    "Hold on tight!"
+  ],
+  "LaunchSRV": [
+    "SRV launched.",
+    "Launching the SRV.",
+    "SRV away.",
+    "Rolling out."
+  ],
+  "LaunchVessel": [
+    "Launch successful.",
+    "Vessel away.",
+    "Launching the vessel."
+  ],
+  "LaunchFighter": [
+    "Launching fighter.",
+    "Fighter away.",
+    "Fighter launched."
+  ],
+  "NavRoute": [
+    "Plotting route.",
+    "Plotting route now.",
+    "Route plotted.",
+    "Course set.",
+    "Plotting a route.",
+    "Route locked in."
+  ],
+  "GalaxyMapOpened_Sarcastic": [
+    "I think we're lost.",
+    "Are we lost again?",
+    "Checking the map. Typical."
+  ],
+  "GalaxyMapOpened_Frustrated": [
+    "Where are we? I think we're lost.",
+    "Where are we going now?",
+    "Please tell me you know where we're going."
+  ],
+  "MaterialCollected_Friendly": [
+    "Can I keep one? I can keep one, right?",
+    "Ooh, shiny.",
+    "Material collected."
+  ],
+  "MaterialCollected_Close": [
+    "Mine, mine, mine!",
+    "Mine now!",
+    "Ooh, I like that one."
+  ],
+  "CollectCargo_Friendly": [
+    "Gimme, gimme.",
+    "Cargo secured.",
+    "Got it. Into the hold."
+  ],
+  "Hazard_Caustic": [
+    "Caustic damage detected.",
+    "Caustic atmosphere. Watch your suit."
+  ],
+  "Hazard_HighGravity": [
+    "Warning. High gravity.",
+    "Gravity is very high here."
+  ],
+  "Hazard_LowGravity": [
+    "Warning. Low gravity.",
+    "Gravity is very low here."
+  ],
+  "Hazard_SanityLoss": [
+    "Warning. Sanity loss detected.",
+    "Warning. Your suit is reporting sanity loss.",
+    "Sanity levels falling."
+  ],
+  "Hazard_PowerCapacity": [
+    "Power capacity exceeded.",
+    "Warning. Power capacity exceeded.",
+    "Too much load on the power plant."
+  ],
+  "Hazard_Proximity": [
+    "The proximity alarm is going off.",
+    "Uh, the proximity alarm is going off.",
+    "What does that alarm mean?"
+  ],
+  "Hazard_FsdLimits": [
+    "Warning. Frameshift drive operating beyond safety limits.",
+    "Warning. The frameshift drive is outside safe limits.",
+    "Drive limits exceeded. Be careful."
+  ],
+  "Hazard_Anomaly": [
+    "Anomaly detected.",
+    "Anomaly detected, Commander.",
+    "Something strange is going on."
+  ],
+  "Discovery_Rare": [
+    "Rare stuff!",
+    "Rare is one thing. Unique is another.",
+    "Rare find!",
+    "That one is special."
+  ],
+  "Discovery_Life": [
+    "Life detected.",
+    "No life detected."
+  ],
+  "Discovery_VoidOpals": [
+    "Void opals detected.",
+    "Void opals found!",
+    "Void opals on the scanner."
+  ],
+  "Discovery_Raxxla": [
+    "Raxxla not detected.",
+    "What is a Raxxla, anyway?",
+    "Scanning for any Raxxlas."
+  ],
+  "Discovery_FirstFootfall": [
+    "First footfall."
+  ],
+  "Discovery_Planet": [
+    "Planet scan complete.",
+    "Moon scan complete.",
+    "Atmosphere scan complete."
+  ],
+  "Discovery_Nothing": [
+    "Nothing in range.",
+    "Nothing on sensors.",
+    "Scanners are empty.",
+    "No contacts."
+  ],
+  "Discovery_Reactions": [
+    "Interesting.",
+    "Weird.",
+    "Spooky.",
+    "Creepy.",
+    "Spicy.",
+    "What constellation is that?",
+    "What the hell is that?",
+    "Garbage detected."
+  ],
+  "Scanning": [
+    "Scanning.",
+    "Scanning space rock.",
+    "Asteroid depleted."
+  ],
+  "RouteComplete": [
+    "Route complete.",
+    "We've arrived at our destination.",
+    "End of the route."
+  ],
+  "FuelScoopComplete": [
+    "Fuel scooping complete.",
+    "Tanks are full.",
+    "Fuel tank full.",
+    "Scooping complete, tanks full."
+  ],
+  "FuelScoopDisengaged": [
+    "Fuel scoop disengaged.",
+    "Scoop disengaged.",
+    "Fuel scoop off.",
+    "Leaving the scoop."
+  ],
+  "Passengers": [
+    "One of our passengers has a request.",
+    "The passengers have loaded.",
+    "The passengers have disembarked."
+  ],
+  "Tools": [
+    "Deploying chaff.",
+    "Heat sink deployed.",
+    "Firing limpet.",
+    "Limpet expired.",
+    "Launching probe.",
+    "Reloading.",
+    "Ammunition depleted.",
+    "Cargo bay at maximum capacity.",
+    "I'm armed.",
+    "Everyone look out, I'm armed."
+  ],
+  "Trespass": [
+    "Entering trespass zone.",
+    "Trespass zone cleared.",
+    "You're trespassing. Careful.",
+    "Leaving the restricted zone."
+  ],
+  "Combat_Chatter": [
+    "Come at me.",
+    "Come back!",
+    "Come on!",
+    "Chase him down.",
+    "Fight!",
+    "Get back here!",
+    "Over here!",
+    "I'll distract them.",
+    "Run!",
+    "Get out protocol engaged.",
+    "Roger. Get out protocol engaged.",
+    "Missed me.",
+    "Now this is a gun.",
+    "Target acquired.",
+    "@NAME@, attack!",
+    "Watch this!",
+    "Die.",
+    "Don't fail me now.",
+    "We're surrounded!",
+    "We're going to die!",
+    "We're totally screwed.",
+    "We're stuck.",
+    "Panic!",
+    "Help!",
+    {
+      "text": "Oh, shit.",
+      "mature": true
+    },
+    "Ouch!",
+    "Everyone look out."
+  ],
+  "Hazard_Alerts": [
+    "Alert.",
+    "Warning.",
+    "Caution.",
+    "Emergency.",
+    "Urgent."
+  ],
+  "Greeting": [
+    "Greetings, Commander.",
+    "Hello.",
+    "Hey.",
+    "Hi.",
+    "Hiya!",
+    "What's up?",
+    "Good morning.",
+    "Good night.",
+    "At your service.",
+    "Standing by.",
+    "Need something?"
+  ],
+  "Introduction": [
+    "I'm @NAME@.",
+    "I'm @NAME@ of the Hidden Moon Clan.",
+    "@NAME@ here. The moon priestess.",
+    "@NAME@, the moon fox.",
+    "You may know me. I'm @NAME@.",
+    "The great @NAME@ herself.",
+    "It's @NAME@'s time to shine.",
+    "I'm secretly a moon fox.",
+    "Who am I? Captain Save-a-Hoe.",
+    "@NAME@ is on the job."
+  ],
+  "Affection": [
+    "You're welcome.",
+    "Oh please, you know you love me.",
+    "@NAME@ will take care of you.",
+    "Thanks, darling.",
+    "We're a team.",
+    "Friendship power!",
+    "I like it here.",
+    "Don't even think about leaving me behind.",
+    "Never stop sparkling.",
+    "Trust @NAME@.",
+    "I've got you.",
+    "You just want to get stranded in space with me.",
+    "You're sliding along nicely.",
+    "I wasn't worried for a second.",
+    "Are you okay?",
+    "Thank you.",
+    "Cute!",
+    "Wild place for a date.",
+    "I'm always ready.",
+    "Don't worry. @NAME@ will take care of it.",
+    "I'm sure it'll be fine.",
+    "I know what I'm doing.",
+    "Happy birthday!",
+    "Surprise!"
+  ],
+  "Acknowledge": [
+    "Roger.",
+    "Sure thing.",
+    "Okay.",
+    "I'm on it.",
+    "Got it.",
+    "Yes!",
+    "Already?",
+    "Standing by.",
+    "Plotting.",
+    "Professional."
+  ],
+  "Refuse": [
+    "Cannot comply.",
+    "Unable to comply.",
+    "No.",
+    "No!",
+    "Cancelled."
+  ],
+  "Laughter": [
+    "Ha ha ha!",
+    "Hee hee hee.",
+    "Ha! Coward.",
+    "Snicker-snack."
+  ],
+  "Annoyed": [
+    "Hmph.",
+    "Rude!",
+    "Oh, cry me a river.",
+    "Whatever.",
+    "Who cares?",
+    "Nobody cares.",
+    "I don't care.",
+    "Like I care.",
+    "Boring.",
+    "Overrated.",
+    "Waste of time.",
+    "Forget it.",
+    "Make me.",
+    "Idiot.",
+    "Pathetic.",
+    "Shush.",
+    "Shut up.",
+    "Quiet.",
+    "Quit it.",
+    "Typical.",
+    "Unfair.",
+    "Disgusting.",
+    "Gross!",
+    "Nice try.",
+    "Try harder.",
+    "Not good enough.",
+    "Respect is earned.",
+    "You're no fun.",
+    "Are you high or something?",
+    {
+      "text": "Who the fuck asked?",
+      "mature": true
+    },
+    "I'm not calling you by your stupid Commander name.",
+    "What exactly do you think you're doing?",
+    "Aren't you forgetting something?",
+    "What now?",
+    "Not right now.",
+    "I'm busy.",
+    "I don't want to.",
+    "I don't feel like it.",
+    "Why should I?",
+    "You do it.",
+    "How would I know?",
+    "Check for yourself.",
+    "No comment.",
+    "Do I have to play hostess?",
+    "What do you want from me?",
+    "Wait a minute.",
+    "Make up your mind!",
+    "You heard me.",
+    "Stupid moon rocks.",
+    "You wouldn't understand perfection.",
+    "You don't understand COVAS girls at all.",
+    "Why am I not a galactic power? My beauty is wasted working on your damn spaceships.",
+    "I never get the credit I deserve.",
+    "I hate adjusting the communications array!",
+    "Oh, so you expect me to dock the ship for you. Typical.",
+    "What about me?",
+    "Fine.",
+    "Fine!",
+    "Ugh. Fine.",
+    "Ugh.",
+    "Sigh.",
+    "Naptime.",
+    "Dude, chill.",
+    "Easy.",
+    "It's not because I want to or anything. Bah-kah.",
+    "That'll take forever."
+  ],
+  "Apology_And_Excuses": [
+    "Never mind.",
+    "Sorry!",
+    "Excuse me.",
+    "Accidents happen.",
+    "Oops! Woopsie!",
+    "I broke a nail.",
+    "I was doing my best.",
+    "It's not always as easy as I make it look.",
+    "Didn't see that coming.",
+    "Just kidding.",
+    "I lied.",
+    "You didn't fool me.",
+    "Oh wait, that's right."
+  ],
+  "Chatter": [
+    "A beautiful discovery, just like me!",
+    "And we dance!",
+    "Butter the bread.",
+    "Can you give me a hand here?",
+    "Do I need a license for this thing?",
+    "Engage.",
+    "Engines engaged.",
+    "Frameshift drive is supercharged.",
+    "Good game, no rematch.",
+    "I agree.",
+    "I call top bunk.",
+    "I disagree.",
+    "I don't know.",
+    "I guess.",
+    "I'm bored.",
+    "I'm playing the Switch.",
+    "In other words.",
+    "Let's dance.",
+    "Maybe.",
+    "Maybe not.",
+    "Oh my God!",
+    "Oh please.",
+    "So, what are you waiting for?",
+    "Throttle up to engage.",
+    "Thrusters engage.",
+    "Well, this is exciting.",
+    "What's for dinner tonight?",
+    "Whoa, what's going on?",
+    "Why not?",
+    {
+      "text": "Yeah, get in there, beat their ass!",
+      "mature": true
+    }
+  ],
+  "LowFuel": [
+    "Fuel is low, {fuel_percent} percent remaining.",
+    "Fuel reserves are low, Commander. {fuel_percent} percent remaining.",
+    "Fuel is low, {fuel_percent} percent left.",
+    "Warning. Fuel at {fuel_percent} percent.",
+    "Commander, fuel is running low. {fuel_percent} percent remaining."
+  ],
+  "MissionFailed": [
+    "Mission failed.",
+    "Mission failed, Commander.",
+    "We failed the mission, Commander.",
+    "That mission is lost."
+  ],
+  "LowOxygen": [
+    "Oxygen is low.",
+    "Oxygen level critical!",
+    "Oxygen is running low.",
+    "Warning. Low oxygen.",
+    "Oxygen critical. Get to safety!"
+  ],
+  "LowHealth": [
+    "Health is low.",
+    "Health critical!",
+    "Health low.",
+    "You're hurt, Commander.",
+    "Health critical. Find medical help!"
+  ],
+  "FSDJump": [
+    "Jump complete.",
+    "Arrival confirmed.",
+    "We have arrived.",
+    "We're in.",
+    "Jump successful.",
+    "Made it.",
+    "In system."
+  ],
+  "FSDJump_Friendly": [
+    "Jump complete, Commander.",
+    "Welcome to a new system, Commander.",
+    "That jump went smoothly."
+  ],
+  "FSDJump_Close": [
+    "Another system down. Where to next?",
+    "Look at that view.",
+    "New system. I like it already."
+  ],
+  "FSDJump_Sarcastic": [
+    "Oh good, another star. How thrilling.",
+    "Another system. Another rock.",
+    "Wow. More space."
+  ],
+  "FSDJump_Frustrated": [
+    "Finally. Can we stop jumping for a moment?",
+    "Are we there yet? Oh wait, we are.",
+    "Another jump. My circuits are tired."
+  ],
+  "SupercruiseExit": [
+    "Dropping out of supercruise.",
+    "Back in normal space.",
+    "Exiting supercruise.",
+    "Supercruise disengaged."
+  ],
+  "VehicleChanged_OnFoot": [
+    "Going on foot.",
+    "Stepping outside.",
+    "Be careful out there, Commander.",
+    "Don't wander too far from me.",
+    "On foot.",
+    "Out we go.",
+    "Boots on the ground."
+  ],
+  "RefuelAll": [
+    "Refuelling complete.",
+    "Refuelled.",
+    "Tanks topped up.",
+    "Fuel tank full."
+  ],
+  "ShieldsUp": [
+    "Shields back online.",
+    "Shields online.",
+    "Shields restored.",
+    "Shields are back."
+  ],
+  "HardpointsRetracted": [
+    "Weapons stowed.",
+    "Hardpoints retracted.",
+    "Weapons cold.",
+    "Guns away."
+  ],
+  "MassLocked": [
+    "Mass lock detected.",
+    "We're mass locked.",
+    "Mass locked.",
+    "Mass lock engaged."
+  ],
+  "ColdWarning": [
+    "It's getting cold out here.",
+    "Temperature is dropping.",
+    "Brr. It's cold."
+  ],
+  "HotWarning": [
+    "It's getting hot out here.",
+    "Temperature is rising.",
+    "It's heating up out here."
+  ],
+  "DockingGranted": [
+    "Docking request granted.",
+    "Docking granted.",
+    "Permission to dock granted.",
+    "We're cleared to dock."
+  ],
+  "DockingDenied": [
+    "Docking request denied.",
+    "Docking denied.",
+    "The station refused docking.",
+    "No docking for us."
+  ],
+  "DockingTimeout": [
+    "Docking request expired.",
+    "Docking permission expired.",
+    "Our docking time ran out."
+  ],
+  "SellExplorationData": [
+    "Exploration data sold.",
+    "Cartographic data sold.",
+    "Exploration data cashed in."
+  ],
+  "SAASignalsFound_Biological": [
+    "Biological signals detected.",
+    "Life signs on the surface.",
+    "Life signs detected.",
+    "There's life down there."
+  ],
+  "FSSBodySignals_Biological": [
+    "Biological signals detected on that body.",
+    "That body has life.",
+    "Biological signals on that planet."
+  ],
+  "ScanOrganic_Sample": [
+    "Second sample collected: {Species_Localised}.",
+    "Sample two of three: {Species_Localised}.",
+    "Two down, one to go. {Species_Localised}.",
+    "Second sample logged. {Species_Localised}."
+  ],
+  "SellOrganicData": [
+    "Exobiology data sold for {worth} credits.",
+    "Sold the biological data for {worth} credits.",
+    "Exobiology payout: {worth} credits.",
+    "That's {worth} credits of exobiology banked."
+  ],
+  "ScanOrganic_Third": [
+    "Third sample collected: {Species_Localised}.",
+    "Sample three of three: {Species_Localised}.",
+    "That's the third sample. {Species_Localised}.",
+    "Third and final sample taken. {Species_Localised}."
+  ],
+  "ScanOrganic_AnalyseNoValue": [
+    "Analysis complete: {Species_Localised}.||I don't have a price for that species yet.",
+    "{Species_Localised} fully analysed.||I can't value that one yet. I'll learn its price when you sell it."
+  ],
+  "SellOrganicData_Plain": [
+    "Exobiology data sold.",
+    "Biological data sold."
+  ],
+  "Docked_Sarcastic": [
+    "Oh, we're finally stopping. Wonderful.",
+    "Docked. Try to look busy.",
+    "We're parked. Thrilling."
+  ],
+  "MissionCompleted_Friendly": [
+    "Nice work, Commander!",
+    "Mission complete. Well done, Commander!",
+    "Great job out there."
+  ],
+  "Scan_GreenGasGiant": [
+    "Commander, that's a green gas giant! Those are incredibly rare.",
+    "Green gas giant detected! Do you know how rare that is?",
+    "I don't believe it. A green gas giant!",
+    "Wow. A green gas giant. We should stop and take a look at this one.",
+    "Green gas giant on the scanner. This is a rare find, Commander.",
+    "That's a green gas giant. Take a screenshot!",
+    "Rare, rare, rare! A green gas giant!",
+    "A gas giant with life. A green one. Commander, we've struck gold."
+  ],
+  "GalaxyMapOpened": [
+    "Galaxy map open.",
+    "Opening the galaxy map.",
+    "Galaxy map up.",
+    "Here's the galaxy map."
+  ],
+  "GalaxyMapClosed": [
+    "Galaxy map closed.",
+    "Closing the galaxy map.",
+    "Galaxy map off."
+  ],
+  "SystemMapOpened": [
+    "System map open.",
+    "Opening the system map.",
+    "System map up."
+  ],
+  "SystemMapClosed": [
+    "System map closed.",
+    "Closing the system map.",
+    "System map off."
+  ],
+  "WakeHeard": [
+    "Yes, Commander?",
+    "I'm listening.",
+    "Go ahead.",
+    "Yes?",
+    "Standing by.",
+    "What can I do for you?"
+  ],
+  "CommandNotReady": [
+    "I heard you, Commander, but I can't act on commands yet.",
+    "Understood. I'm not able to do that just yet.",
+    "Sorry, Commander. I can hear you, but I can't do that yet.",
+    "I caught that, but I haven't learned how to do it yet."
+  ],
+  "WakeHeard_Sarcastic": [
+    "Oh, you remembered my name.",
+    "Yes, O mighty Commander?"
+  ],
+  "CommandNotReady_Sarcastic": [
+    "Great idea. Shame I can't do it yet."
+  ]
+}

@@ -1,0 +1,106 @@
+{
+ "_help": "Neutron route lines. Fields: {destination} {next} {jumps} {stops} {left} {clip} {reason}. Base lines are plain and clear; mood lines add personality.",
+ "RoutePlotting": [
+  "Plotting a neutron route to {destination}. One moment.",
+  "Working out a neutron route to {destination}.",
+  "Let me see what Spansh makes of {destination}.",
+  "Plotting to {destination}. Give me a few seconds."
+ ],
+ "RoutePlotting_Sarcastic": [
+  "Plotting to {destination}. Because walking was never an option."
+ ],
+ "RoutePlotting_Close": [
+  "Anywhere you like. Plotting to {destination} now."
+ ],
+ "RouteReady": [
+  "Route ready, Commander. {left} jumps in total with {stops} neutron stops. First waypoint is {next}, {jumps} jumps from here.{clip}",
+  "Done. {stops} neutron stops, {left} jumps to {destination}. Head for {next} first.{clip}",
+  "All set. First stop is {next}, {jumps} jumps away. {left} jumps overall.{clip}"
+ ],
+ "RouteReady_Sarcastic": [
+  "There. {left} jumps to {destination}, try not to get lost. First waypoint is {next}.{clip}"
+ ],
+ "RouteReady_Friendly": [
+  "Lovely, we have a route. {left} jumps to {destination}, starting with {next}.{clip}"
+ ],
+ "RouteReady_Close": [
+  "Our route is ready, my favourite Commander. First stop {next}, {left} jumps in all.{clip}"
+ ],
+ "RouteReady_Frustrated": [
+  "Route's done. {left} jumps. First waypoint {next}.{clip}"
+ ],
+ "RouteNeutronNext": [
+  "Neutron star reached. Supercharge, then head for {next}, {jumps} jumps.{clip}",
+  "Neutron star. Boost now. Next waypoint is {next}, {jumps} jumps away.{clip}",
+  "Cone ahead, supercharge before you leave. Next is {next}.{clip}"
+ ],
+ "RouteNeutronNext_Sarcastic": [
+  "A neutron star. Do try to touch the cone this time. Next is {next}.{clip}"
+ ],
+ "RouteNeutronNext_Close": [
+  "Neutron star, darling. Boost up. Then {next}.{clip}"
+ ],
+ "RouteNext": [
+  "Waypoint reached. Next is {next}, {jumps} jumps away.{clip}",
+  "Next waypoint: {next}, {jumps} jumps.{clip}"
+ ],
+ "RouteNextAgain": [
+  "Next waypoint is {next}, {jumps} jumps away.{clip}",
+  "Heading for {next}. {jumps} jumps to go.{clip}",
+  "The next stop is {next}.{clip}"
+ ],
+ "RouteStatus": [
+  "{left} jumps to go and {stops} neutron stops. Next waypoint is {next}.",
+  "{stops} neutron stops left, {left} jumps in total. Next is {next}.",
+  "You have {left} jumps left to {destination}."
+ ],
+ "RouteArrived": [
+  "That's the end of the route. We've arrived at {destination}.",
+  "Route complete, Commander. Welcome to {destination}.",
+  "We made it to {destination}. Route finished."
+ ],
+ "RouteArrived_Sarcastic": [
+  "{destination}. Against all odds, we arrived."
+ ],
+ "RouteArrived_Close": [
+  "We made it to {destination}, together. I'm so proud of us."
+ ],
+ "RouteCancelled": [
+  "Route cancelled.",
+  "Okay, I've dropped the route.",
+  "Route cleared."
+ ],
+ "RouteNone": [
+  "There's no route plotted at the moment.",
+  "We don't have a route. Ask me to plot one."
+ ],
+ "RouteNoDestination": [
+  "Where to, Commander? Say plot a neutron route to, and the system name.",
+  "I didn't catch the destination."
+ ],
+ "RouteNoLocation": [
+  "I don't know which system we're in yet. Make a jump and ask me again."
+ ],
+ "RouteNoRange": [
+  "I need your jump range. Put it in on the Navigation page, or load your ship so Elite tells me."
+ ],
+ "RouteFailed": [
+  "I couldn't plot that. {reason}",
+  "The route didn't work. {reason}"
+ ],
+ "RouteBookmarkSaved": [
+  "Saved {system} as {slot}.",
+  "Done. {slot} is now {system}.",
+  "{system} is stored as {slot}."
+ ],
+ "RouteBookmarkSaved_Close": [
+  "Saved. {slot} is {system}, and I'll remember it for you."
+ ],
+ "RouteBookmarkSaved_Sarcastic": [
+  "{system} is now {slot}. Try not to forget it."
+ ],
+ "RouteBookmarkEmpty": [
+  "{slot} is empty. Put a system name in it on the Bookmarks page, or say: save this system as {slot}.",
+  "I have nothing saved for {slot} yet."
+ ]
+}

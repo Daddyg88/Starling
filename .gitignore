@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+data/
+logs/
+recordings/
+config/settings.json
+dist/
+build/
+updates/
+*.previous

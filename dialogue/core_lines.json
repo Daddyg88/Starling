@@ -1,0 +1,3 @@
+{
+  "_help": "Text-only back-up lines, spoken with the Windows voice. They are only used when the voice pack has nothing for that event. Same format as a voice pack's dialogue.json. Add lines here if you want her to say something about an event that has no recording."
+}

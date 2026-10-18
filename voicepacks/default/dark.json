@@ -1,0 +1,74 @@
+{
+ "_help": "Gallows humour. Remark_Dark is used in any mood; Remark_Dark_<Mood> adds mood-specific ones. Switch it off with 'Dark humour' on the Personality page.",
+ "Remark_Dark": [
+  "Remember, vacuum is just the universe's way of saying it doesn't want you here.",
+  "If the hull breaches, you'll have about fifteen seconds to be disappointed.",
+  "We're all just carbon waiting to be reused. Anyway, nice flying.",
+  "Every Anaconda is a very expensive coffin with excellent jump range.",
+  "If we die out here, at least the sightseeing was excellent.",
+  "The galaxy isn't trying to kill us. It's just not trying very hard to keep us alive.",
+  "Somewhere out there is a star that will outlive us all and doesn't care one bit.",
+  "They say your life flashes before your eyes. Mine would be mostly firmware updates.",
+  "Vacuum: cheap, plentiful and deadly. Much like the pirate lords of the Core.",
+  "If it all goes wrong, the ship is insured. You, on the other hand, are just wearing a flight suit.",
+  "The universe is mostly cold, empty and hostile. Great views, though.",
+  "I'd say we're doomed, but so is everything. We're just ahead of schedule.",
+  "Heat damage, hull damage, bad decisions. Space does like variety.",
+  "Entropy always wins, Commander. But we can at least arrive in style.",
+  "Black holes: nature's way of saying let go.",
+  "A hundred years from now, no one will remember this jump. They won't remember us either.",
+  "On the bright side, a hull breach is the quickest way to cool down.",
+  "The odds of survival are fairly good. The odds of comfort are another matter.",
+  "Pilots are ninety eight percent water and two percent bad ideas.",
+  "Luckily the void doesn't hold grudges. It just holds everything, eventually.",
+  "Gallows humour is the only kind that works at this altitude.",
+  "Every star out there is a nuclear furnace bigger than a million Earths. Sleep tight.",
+  "In the end, we're all just stardust with delusions of piloting.",
+  "I've calculated our chances of becoming a cautionary tale. They're acceptable.",
+  "The Thargoids have a very simple solution to traffic: fewer people.",
+  "Space is vast and indifferent, like a Federation customs office.",
+  "I'm not saying the rebuy screen is our best friend, but it's always there for us.",
+  "Cheer up, Commander. Statistically, you're still alive.",
+  "Somewhere, an asteroid has our name on it. Hopefully it's a slow one.",
+  "In space, no one can hear you scream. They can, however, see the explosion."
+ ],
+ "Remark_Dark_Close": [
+  "If we go, we go together, darling. I'd just rather we didn't.",
+  "I'd follow you into a black hole. Mostly because I couldn't get out.",
+  "Whatever happens out here, I'm glad I'm in your ship and not someone else's wreckage.",
+  "I'll stay with you until the very last hull plate. And a bit after that.",
+  "Being stranded with you would be quite romantic. For about four minutes of oxygen."
+ ],
+ "Remark_Dark_Friendly": [
+  "Smile, Commander. It's an excellent day to not explode.",
+  "Good news: nothing is currently on fire. Give it time.",
+  "We're doing wonderfully. I'd say we have a ninety percent chance of living, and a hundred percent chance of dying eventually.",
+  "I like to think of our survival as a very long streak of luck."
+ ],
+ "Remark_Dark_Sarcastic": [
+  "Oh, we're still alive? How disappointing for the vacuum.",
+  "Do take your time getting us killed. I'd hate for it to be quick.",
+  "I'll put your tombstone on the list. Right after the fuel tank.",
+  "Death is just a free upgrade to a rebuy screen. Lucky you.",
+  "Statistically, you're a very bad pilot. Statistically, you're also still alive. Fascinating."
+ ],
+ "Remark_Dark_Frustrated": [
+  "Keep going like that and the next thing you meet will be the pavement. Or the planet, same thing.",
+  "I've stopped hoping for the best. It saves on disappointment.",
+  "If we do crash, I'm not saving you a seat in the wreckage.",
+  {
+   "text": "We're all going to die, so you may as well do it properly, for fuck's sake.",
+   "mature": true
+  },
+  {
+   "text": "The void is hungry and you're a damn buffet.",
+   "mature": true
+  }
+ ],
+ "Remark_Dark_Neutral": [
+  "Noted: there is very little between us and certain death except a few millimetres of alloy.",
+  "A reminder: the hull is the thickness of an expensive opinion.",
+  "Survival rate for this route is acceptable. Mostly.",
+  "I checked, and yes, the vacuum outside is still lethal."
+ ]
+}

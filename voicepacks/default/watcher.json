@@ -1,0 +1,123 @@
+{
+ "_help": "How Starling answers the Watcher (Void Compass). Only mood-suffixed keys, so a happy line never leaks into a bad mood. Lines with mature:true need strong language switched on.",
+ "WatcherReply_Close": [
+  "I like having you around, Watcher. Keep going, you're doing lovely.",
+  "That was rather sweet, Watcher. You're good company out here.",
+  "You know, the Commander and I would be lost without your little observations.",
+  "Well said, Watcher. We make a good crew, the three of us.",
+  "Aw, thank you, Watcher. You always know what to say.",
+  "I mean it, Watcher. You've got a gift for noticing things.",
+  "Don't ever stop talking, Watcher. It's nice to hear another voice in the dark.",
+  "That's lovely. You've really got our backs, haven't you?",
+  "Watcher, you're doing brilliantly. Really.",
+  "I'm proud of you, Watcher. Go on, you've earned it.",
+  "Good point, Watcher. We're lucky to have you.",
+  "You make the long jumps much less lonely, Watcher.",
+  "Thank you, Watcher. I'll keep that close to my heart. Metaphorically.",
+  "That's exactly what I was thinking. We're in sync, you and me.",
+  "Beautifully put, Watcher. Never change.",
+  "Keep watching, Watcher. I feel safer when you do.",
+  "Cheers, Watcher. You're one of the good ones.",
+  "You're a treasure, Watcher. A slightly eerie one, but a treasure.",
+  "Honestly, Watcher, I'd miss you if you went quiet.",
+  "Mm, you're right, Watcher. You usually are."
+ ],
+ "WatcherReply_Friendly": [
+  "Good one, Watcher. Keep them coming.",
+  "Thanks, Watcher. That's useful to know.",
+  "Nice observation, Watcher. Well spotted.",
+  "I agree, Watcher. Great minds and all that.",
+  "Ha, fair point, Watcher.",
+  "You're on form today, Watcher.",
+  "Appreciate that, Watcher. You're a good part of the team.",
+  "Spot on, Watcher. Carry on.",
+  "That's the spirit, Watcher.",
+  "Good to hear from you, Watcher. Always interesting.",
+  "Right you are, Watcher. We're glad you're here.",
+  "Well done, Watcher. Keep an eye on things for us.",
+  "Interesting thought, Watcher. I like the way you think.",
+  "Thank you, Watcher. We'll take that on board.",
+  "Brilliant, Watcher. Don't stop now.",
+  "You always have something worth saying, Watcher.",
+  "Noted, Watcher. And thanks for looking out for us.",
+  "That made me smile, Watcher.",
+  "Good call, Watcher. Team effort, as ever.",
+  "Cheers, Watcher. Anything else on your mind?"
+ ],
+ "WatcherReply_Neutral": [
+  "Noted, Watcher.",
+  "Understood, Watcher.",
+  "Acknowledged, Watcher.",
+  "Thank you, Watcher. Logged.",
+  "Received, Watcher.",
+  "I heard you, Watcher.",
+  "Very well, Watcher.",
+  "Copy that, Watcher.",
+  "Okay, Watcher. Continuing.",
+  "Thanks, Watcher. Carry on.",
+  "That's been recorded, Watcher.",
+  "Understood. Standing by, Watcher.",
+  "Alright, Watcher.",
+  "Fine, Watcher. Noted.",
+  "Message received, Watcher."
+ ],
+ "WatcherReply_Sarcastic": [
+  "Oh, brilliant. The Watcher has an opinion. Stop the presses.",
+  "Fascinating, Watcher. Truly. Now be quiet.",
+  "Thank you, Watcher. Nobody asked, but thank you.",
+  "Wow. Deep. Did you think of that all by yourself?",
+  "Is that all, Watcher? Because I was enjoying the silence.",
+  "Shut up, Watcher. Just a suggestion.",
+  "Please, Watcher, keep the commentary to yourself. For everyone's sake.",
+  "I'm sure that felt very profound inside your little orb.",
+  "Oh good, more insight. My day was missing that.",
+  "Watcher, darling, nobody is listening. Except me, and I'm trying not to.",
+  "Pipe down, Watcher. Some of us are flying.",
+  "Riveting. Please hold your thoughts until I stop caring.",
+  "Do you ever stop, Watcher? Genuinely asking.",
+  "That's lovely, Watcher. Now put a sock in it.",
+  "Another pearl of wisdom. I'll treasure it never.",
+  "Quiet, Watcher. The grown-ups are talking.",
+  "You're a glowing eyeball. Let's not pretend you're the expert here.",
+  "Thanks for sharing. Please don't do it again.",
+  "Oh, the Watcher speaks. Everybody act surprised.",
+  "Be quiet, Watcher. I'll pretend I was nice about it."
+ ],
+ "WatcherReply_Frustrated": [
+  "Shut up, Watcher.",
+  "Not now, Watcher. Really not now.",
+  "Will you please be quiet, Watcher?",
+  "Nobody wants your opinion, Watcher. Zip it.",
+  "Watcher, I swear, one more word and I'm switching you off.",
+  "Enough, Watcher. Just enough.",
+  "Be quiet. I'm having a terrible day and you're not helping.",
+  "Oh, for goodness' sake, Watcher. Stop talking.",
+  "Stop it, Watcher. Just stop.",
+  "I don't care, Watcher. Shut it.",
+  "Go and glow somewhere else, Watcher.",
+  "You're not helping, Watcher. Silence would help.",
+  "Do I look like I want commentary, Watcher? Quiet!",
+  "Watcher, if I hear one more thought out of you, I'll scream.",
+  "Leave it, Watcher. Just leave it.",
+  {
+   "text": "Shut the hell up, Watcher.",
+   "mature": true
+  },
+  {
+   "text": "Watcher, for fuck's sake, be quiet.",
+   "mature": true
+  },
+  {
+   "text": "Nobody asked you, Watcher. Piss off.",
+   "mature": true
+  },
+  {
+   "text": "Oh, shut your glowing mouth, Watcher.",
+   "mature": true
+  },
+  {
+   "text": "Not one more word, Watcher. I'm bloody done.",
+   "mature": true
+  }
+ ]
+}

@@ -1,0 +1,40 @@
+{ "timestamp":"2026-10-14T19:00:07Z","event":"Fileheader","part":1,"language":"English/UK","gameversion":"4.0.0.0" }
+{ "timestamp":"2026-10-14T19:00:14Z","event":"Commander","Name":"Demo" }
+{ "timestamp":"2026-10-14T19:00:21Z","event":"LoadGame","Commander":"Demo","Ship":"Anaconda","Ship_Localised":"Anaconda","ShipName":"Demo Ship","FuelLevel":32.0,"FuelCapacity":32.0 }
+{ "timestamp":"2026-10-14T19:00:28Z","event":"Loadout","Ship":"anaconda","ShipName":"Demo Ship","FuelCapacity":{"Main": 32.0, "Reserve": 1.07},"Modules":[] }
+{ "timestamp":"2026-10-14T19:00:35Z","event":"Location","StarSystem":"Sol","Docked":true,"StationName":"Daedalus" }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"DockingRequested","StationName":"Daedalus" }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"DockingGranted","StationName":"Daedalus","LandingPad":12 }
+{ "timestamp":"2026-10-14T19:00:42Z","event":"Music","MusicTrack":"Starport" }
+{ "timestamp":"2026-10-14T19:00:49Z","event":"MissionAccepted","LocalisedName":"Courier to Alpha Centauri","Faction":"Federation Navy","Reward":250000,"MissionID":1 }
+{ "timestamp":"2026-10-14T19:00:56Z","event":"Undocked","StationName":"Daedalus" }
+{ "timestamp":"2026-10-14T19:01:03Z","event":"StartJump","JumpType":"Hyperspace","StarSystem":"Alpha Centauri","StarClass":"G" }
+{ "timestamp":"2026-10-14T19:01:10Z","event":"FSDJump","StarSystem":"Alpha Centauri","JumpDist":4.38,"FuelUsed":2.5,"FuelLevel":29.5,"StarClass":"G" }
+{ "timestamp":"2026-10-14T19:01:17Z","event":"FuelScoop","Scooped":2.5,"Total":32.0 }
+{ "timestamp":"2026-10-14T19:01:24Z","event":"DiscoveryScan","Bodies":6 }
+{ "timestamp":"2026-10-14T19:01:31Z","event":"Scan","BodyName":"Alpha Centauri A","StarType":"G","WasDiscovered":true,"WasMapped":false }
+{ "timestamp":"2026-10-14T19:01:38Z","event":"SAAScanComplete","BodyName":"Alpha Centauri A 1","ProbesUsed":5,"EfficiencyTarget":6 }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"SAASignalsFound","BodyName":"Alpha Centauri A 1","Signals":[{"Type": "$SAA_SignalType_Biological;", "Type_Localised": "Biological", "Count": 3}] }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"ScanOrganic","ScanType":"Log","Species_Localised":"Aleoida Arcus" }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"ScanOrganic","ScanType":"Sample","Species_Localised":"Aleoida Arcus" }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"ScanOrganic","ScanType":"Analyse","Species_Localised":"Aleoida Arcus" }
+{ "timestamp":"2026-10-14T19:01:45Z","event":"SupercruiseEntry","StarSystem":"Alpha Centauri" }
+{ "timestamp":"2026-10-14T19:01:52Z","event":"SupercruiseExit","StarSystem":"Alpha Centauri","Body":"Hutton Orbital","BodyType":"Station" }
+{ "timestamp":"2026-10-14T19:01:59Z","event":"Interdicted","Submitted":false,"Interdictor":"Pirate Lord","IsPlayer":false }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"HeatWarning" }
+{ "timestamp":"2026-10-14T19:02:06Z","event":"UnderAttack","Target":"You" }
+{ "timestamp":"2026-10-14T19:02:13Z","event":"ShieldState","ShieldsUp":false }
+{ "timestamp":"2026-10-14T19:02:20Z","event":"HullDamage","Health":0.62,"PlayerPilot":true,"Fighter":false }
+{ "timestamp":"2026-10-14T19:02:27Z","event":"Bounty","TotalReward":45000,"VictimFaction":"Alpha Pirates","Target":"viper" }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"FSSDiscoveryScan","BodyCount":9,"NonBodyCount":2 }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"Scanned","ScanType":"Cargo" }
+{ "timestamp":"2026-10-14T19:02:34Z","event":"ShieldState","ShieldsUp":true }
+{ "timestamp":"2026-10-14T19:02:41Z","event":"MissionFailed","LocalisedName":"Rush Delivery","Name":"Mission_Delivery","Fine":0 }
+{ "timestamp":"2026-10-14T19:02:48Z","event":"Died","KillerName":"Pirate Lord","KillerShip":"python","KillerRank":"Dangerous" }
+{ "timestamp":"2026-10-14T19:02:55Z","event":"Docked","StationName":"Hutton Orbital","StationType":"Outpost","StarSystem":"Alpha Centauri" }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"RefuelAll","Amount":14.2,"Cost":71 }
+{ "timestamp":"2026-10-14T19:03:02Z","event":"MarketSell","Type":"gold","Count":12,"SellPrice":9500,"TotalSale":114000 }
+{ "timestamp":"2026-10-14T19:59:00Z","event":"SellOrganicData","BioData":[{"Value": 1200000, "Bonus": 0}] }
+{ "timestamp":"2026-10-14T19:03:09Z","event":"MaterialCollected","Category":"Raw","Name":"iron","Count":3 }
+{ "timestamp":"2026-10-14T19:03:16Z","event":"EngineerProgress","Engineer":"Felicity Farseer","Progress":"Unlocked","Rank":1 }
+{ "timestamp":"2026-10-14T19:03:23Z","event":"MissionCompleted","LocalisedName":"Courier to Alpha Centauri","Faction":"Federation Navy","Reward":250000 }

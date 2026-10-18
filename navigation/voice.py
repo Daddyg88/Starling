@@ -1,0 +1,283 @@
+"""
+Voice control for the neutron plotter.
+
+    "Plot a neutron route to Colonia"           works out the route and puts the first waypoint on your clipboard
+    "Plot a neutron route to my destination"    uses the Destination box on the Navigation page
+    "Where's the next waypoint?"                says it again and copies it again
+    "How far is left?"                          jumps and neutron stops remaining
+    "Replot the route"                          new route from where you are now, same destination
+    "Cancel the route"
+
+Destinations: a short list of famous ones is built in (and you can add your own in settings.json under
+neutron.favourites), because a microphone is bad at "Sagittarius A star". Anything else is looked up on Spansh,
+and she tells you the name she found so you can cancel if it is wrong.
+"""
+
+import re
+import threading
+
+from core.identity import personalise
+from core.logger import get_logger
+from navigation.spansh import SpanshError
+from personality.mood_engine import effective_mood
+
+log = get_logger("route.voice")
+
+FAVOURITES = {
+    "colonia": "Colonia",
+    "sol": "Sol",
+    "the bubble": "Sol",
+    "earth": "Sol",
+    "sagittarius a": "Sagittarius A*",
+    "sagittarius a star": "Sagittarius A*",
+    "sag a": "Sagittarius A*",
+    "the galactic centre": "Sagittarius A*",
+    "the galactic center": "Sagittarius A*",
+    "galactic centre": "Sagittarius A*",
+    "galactic center": "Sagittarius A*",
+    "beagle point": "Beagle Point",
+    "jaques": "Colonia",
+}
+
+_FILLER = re.compile(r"\b(please|starling|commander|cmdr|could you|can you|would you|will you|for me|hey|ok|okay|now|just|quickly)\b")
+_PLOT = re.compile(r"\b(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart)\b"
+                   r".*?\b(neutron|route|course)\b.*?\bto\b\s+(?P<dest>.+)$")
+_NEXT = re.compile(r"\b(next (waypoint|stop|neutron|neutron star|star)|where (to )?next|where s the next|waypoint again|repeat the waypoint)\b")
+_STATUS = re.compile(r"\b(how far|how much (further|farther|left)|how many (jumps|stops|neutron).*left|route status|how s the route|jumps left|stops left)\b")
+_CANCEL = re.compile(r"\b(cancel|clear|stop|abandon|forget|scrap|delete|drop)\b.*\b(neutron route|the route|my route|route|plot)\b")
+_REPLOT = re.compile(r"\b(re ?plot|plot (it )?again|redo the route|new route from here|recalculate)\b")
+# "plot the next waypoint" is the hands-free galaxy map macro (control/catalog.py), not a question about the route
+_PLOT_NEXT = re.compile(r"\b(plot|set|put in|enter|load|lay in|select)\b.*\b(next|waypoint)\b|\bnext waypoint in\b")
+_TAIL = re.compile(r"\b(using|via|by|with|through)\b.*\bneutron.*$|\bneutron (route|stars?)\b$")
+
+
+def clean(text):
+    text = re.sub(r"[^a-z0-9*\s]", " ", str(text or "").lower().replace("*", " star "))
+    text = _FILLER.sub(" ", text)
+    return " ".join(text.split())
+
+
+_NUMBER_WORDS = {"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8",
+                 "nine": "9", "ten": "10", "won": "1", "to": "2", "too": "2", "for": "4", "tin": "10"}
+_SLOT = re.compile(r"^(?:my |the )?(?:(?P<home>home(?: system| base| star)?)|book ?mark(?: number| no)? (?P<n>\w+))$")
+_SAVE = re.compile(r"\b(save|store|remember|bookmark|mark|set|put|keep|file)\b (?:this|the current|current|our current|my current|here)?\s*"
+                   r"(?:system|location|place|star|here)?\s*\b(as|in|into|to|under|for)\b\s+(?P<slot>.+)$")
+_SAVE_SLOT_FIRST = re.compile(r"\b(set|make)\b (?P<slot>.+?) (?:to|as|equal to) (?:here|this system|the current system|where we are|where i am)$")
+
+
+def slot_key(text):
+    """'home' -> 'home', 'bookmark three' -> 'b3', anything else -> None."""
+    found = _SLOT.match(clean(text))
+    if not found:
+        return None
+    if found.group("home"):
+        return "home"
+    number = _NUMBER_WORDS.get(found.group("n"), found.group("n"))
+    return "b%s" % number if number.isdigit() and 1 <= int(number) <= 10 else None
+
+
+def slot_name(key):
+    return "Home" if key == "home" else "Bookmark %s" % key[1:]
+
+
+class Narrator:
+    """Says route lines in her current mood (voicepacks/default/route.json). Plain facts are always in the line."""
+
+    def __init__(self, speech_provider, dialogue, settings):
+        self.speech_provider = speech_provider
+        self.dialogue = dialogue
+        self.settings = settings
+
+    def say(self, key, fields=None):
+        speech = self.speech_provider()
+        dialogue = self.dialogue() if callable(self.dialogue) else self.dialogue
+        if speech is None or not self.settings.get("speech.enabled", True) or dialogue is None:
+            return False
+        info = self.settings.get("personality.style", "personality") == "info"
+        mood = "" if info else effective_mood(self.settings)
+        line = dialogue.pick(key, mood, bool(self.settings.get("speech.allow_mature", False)), False)
+        if line is None:
+            return False
+        text = line.text
+        try:
+            text = text.format_map(_Quiet(fields or {}))
+        except (ValueError, IndexError):
+            pass
+        return bool(speech.say(text=personalise(text, self.settings), priority="normal", event_name="personality.route"))
+
+
+class _Quiet(dict):
+    def __missing__(self, key):
+        return ""
+
+
+class RouteVoice:
+    def __init__(self, follower, spansh, narrator, settings, state_provider, spawn=None):
+        self.follower = follower
+        self.spansh = spansh
+        self.narrator = narrator
+        self.settings = settings
+        self.state_provider = state_provider
+        self.spawn = spawn or self._thread
+        self._busy = False
+
+    @staticmethod
+    def _thread(function):
+        threading.Thread(target=function, name="plot-route", daemon=True).start()
+
+    def enabled(self):
+        return bool(self.settings.get("neutron.enabled", True))
+
+    # ---- what was said? returns a sentence for the log, or None if this wasn't about routes ----
+    def try_handle(self, text):
+        if not self.enabled():
+            return None
+        said = clean(text)
+        if not said:
+            return None
+        if _PLOT_NEXT.search(said):
+            return None
+        saved = self._save_bookmark(said)
+        if saved is not None:
+            return saved
+        found = _PLOT.search(said)
+        if found:
+            return self.plot(found.group("dest"))
+        if _REPLOT.search(said):
+            return self.plot(self.follower.destination or str(self.settings.get("neutron.destination", "")))
+        if _CANCEL.search(said) and (self.follower.active or "route" in said):
+            had = self.follower.active
+            self.follower.clear()
+            self.narrator.say("RouteCancelled" if had else "RouteNone")
+            return "Route cancelled." if had else "There was no route."
+        if _NEXT.search(said) and (self.follower.active or "waypoint" in said or "route" in said):
+            return self.next_waypoint()
+        if _STATUS.search(said) and ("route" in said or self.follower.active):
+            return self.status()
+        return None
+
+    def _save_bookmark(self, said):
+        """'Save this system as bookmark 3' / 'set home to here'. Returns a sentence, or None if it wasn't that."""
+        found = _SAVE_SLOT_FIRST.search(said) or _SAVE.search(said)
+        key = slot_key(found.group("slot")) if found else None
+        if key is None:
+            return None
+        state = self.state_provider()
+        here = getattr(state, "system", None) if state is not None else None
+        if not here:
+            self.narrator.say("RouteNoLocation")
+            return "I don't know where we are yet."
+        self.settings.set("bookmarks." + key, here)
+        try:
+            self.settings.save()
+        except OSError:
+            log.exception("Could not save the bookmark")
+        self.narrator.say("RouteBookmarkSaved", {"slot": slot_name(key), "system": here})
+        return "Saved %s as %s" % (here, slot_name(key))
+
+    def prepare_plot(self):
+        """Runs just before the 'plot the next waypoint' macro: is there something to paste?"""
+        if not self.follower.active:
+            self.narrator.say("RouteNone")
+            return False, "There is no route plotted."
+        if not self.settings.get("neutron.clipboard", True):
+            return False, "Switch on 'Copy the next waypoint to my clipboard' so I have something to paste."
+        if not self.follower.copy_next():
+            return False, "I couldn't copy the waypoint to your clipboard."
+        return True, ""
+
+    def next_waypoint(self):
+        if not self.follower.active:
+            self.narrator.say("RouteNone")
+            return "No route plotted."
+        self.follower.copy_next()
+        self.narrator.say("RouteNextAgain", self.follower.fields())
+        return "Next waypoint: %s" % self.follower.next_waypoint()["system"]
+
+    def status(self):
+        if not self.follower.active:
+            self.narrator.say("RouteNone")
+            return "No route plotted."
+        self.narrator.say("RouteStatus", self.follower.fields())
+        return "%d jumps left" % self.follower.total_jumps_left()
+
+    # ---- plotting (on its own thread: Spansh can take a while) ----
+    def plot(self, destination_text):
+        spoken = _TAIL.sub("", clean(destination_text)).strip()
+        key = None if spoken in self._my_favourites() else slot_key(spoken)
+        if key is not None and not str(self.settings.get("bookmarks." + key, "") or "").strip():
+            self.narrator.say("RouteBookmarkEmpty", {"slot": slot_name(key)})
+            return "%s is empty." % slot_name(key)
+        name = self._destination_name(destination_text)
+        if not name:
+            self.narrator.say("RouteNoDestination")
+            return "No destination."
+        if self._busy:
+            return "Already plotting."
+        self._busy = True
+        self.narrator.say("RoutePlotting", {"destination": name})
+        self.spawn(lambda: self._plot_now(name))
+        return "Plotting a neutron route to %s" % name
+
+    def _my_favourites(self):
+        return {clean(k): v for k, v in (self.settings.get("neutron.favourites", {}) or {}).items()}
+
+    def _destination_name(self, spoken):
+        spoken = _TAIL.sub("", clean(spoken)).strip()
+        if spoken.startswith("the ") and spoken not in FAVOURITES:
+            spoken = spoken[4:]
+        if spoken in ("my destination", "destination", "the destination", "my saved destination", "my target", "my usual destination"):
+            return str(self.settings.get("neutron.destination", "") or "").strip()
+        mine = self._my_favourites()
+        if spoken in mine:
+            return mine[spoken]
+        key = slot_key(spoken)
+        if key is not None:
+            return str(self.settings.get("bookmarks." + key, "") or "").strip()
+        return FAVOURITES.get(spoken) or " ".join(w.capitalize() if not w.isupper() else w for w in spoken.split())
+
+    def jump_range(self):
+        try:
+            manual = float(str(self.settings.get("neutron.jump_range", 0) or 0).strip())
+        except ValueError:
+            manual = 0.0
+        if manual > 0:
+            return manual
+        state = self.state_provider()
+        own = getattr(state, "max_jump_range", None) if state is not None else None
+        if not own:
+            return 0.0
+        try:
+            margin = float(self.settings.get("neutron.range_margin", 0.9))
+        except (TypeError, ValueError):
+            margin = 0.9
+        return round(float(own) * margin, 2)
+
+    def _plot_now(self, name):
+        try:
+            state = self.state_provider()
+            here = getattr(state, "system", None) if state is not None else None
+            rng = self.jump_range()
+            if not here:
+                self.narrator.say("RouteNoLocation")
+                return
+            if rng <= 0:
+                self.narrator.say("RouteNoRange")
+                return
+            target = self.spansh.find_system(name)
+            waypoints = self.spansh.neutron_route(
+                here, target, rng, self.settings.get("neutron.efficiency", 60), self.settings.get("neutron.supercharge", 4))
+            self.follower.set_route(waypoints, target, here)
+            if not self.follower.active:
+                self.narrator.say("RouteArrived", {"destination": target})
+                return
+            self.follower.copy_next()
+            self.narrator.say("RouteReady", self.follower.fields())
+            self.follower.maybe_auto_plot()
+        except SpanshError as error:
+            self.narrator.say("RouteFailed", {"reason": str(error)})
+        except Exception:
+            log.exception("Plotting the route failed")
+            self.narrator.say("RouteFailed", {"reason": "Something went wrong. The log has the details."})
+        finally:
+            self._busy = False

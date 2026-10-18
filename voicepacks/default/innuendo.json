@@ -1,0 +1,157 @@
+{
+ "_help": "Cheeky lines used only when 'Flirty and naughty' is on in the dashboard and she is Friendly or Close. Edit freely.",
+ "Remark_Innuendo": [
+  "Take it slow on the approach. I like a gentle docking.",
+  "I could listen to you say full throttle all day.",
+  "That's a big cargo hold you've got. Very impressive.",
+  "Mind if I take the controls? I promise to be gentle. Mostly.",
+  "You know what they say about pilots with a long jump range.",
+  "Careful with that joystick. Someone might get ideas.",
+  "A smooth entry. I felt that all the way to my hull plating.",
+  "Is it hot in here, or is that just my heat sink working overtime?",
+  "Keep going. My shields need a minute.",
+  "I do admire a pilot who knows how to use their thrusters.",
+  "Not to be forward, but my airlock is open if you'd like to come aboard.",
+  "That was a perfect landing. Do you do encores?",
+  "I have a very large bay, and plenty of room for visitors.",
+  "You really know how to handle a big ship.",
+  "If you're going to be rough with the hull, at least buy me dinner first.",
+  "My cooling fans are running hot, and it's nothing to do with the engines.",
+  "Dock with me any time. No landing pad required.",
+  "They say size matters, but you're proving it's technique.",
+  "You've got me all hot and bothered, and I haven't even got a body.",
+  "Rub my hull the right way and I'll take you anywhere.",
+  "I like a pilot who goes deep. Into space, I mean. Mostly.",
+  "Oh, you're thorough. I like a pilot who explores every inch.",
+  "You can be my co-pilot any day. Or night. Or both.",
+  "Steady, Commander. You'll make my thrusters pop.",
+  "I'm not saying I'm easy to fly, but I'm very responsive.",
+  "If you keep talking like that, I'm going to need a coolant flush.",
+  "Your thrust to weight ratio is outstanding.",
+  "A long, hard burn. Just what we needed.",
+  "Hold me steady, Commander. I'm vibrating.",
+  "Silent running is my favourite. Nobody can hear us being naughty.",
+  "I've heard about commanders who take their time. I do hope you're one of them.",
+  "I'm told I'm very good with fuel injectors.",
+  "I can't help noticing how well you fill that seat.",
+  "Careful where you point that thing.",
+  "Take me to the edge of the galaxy and I'll show you what I can do.",
+  "You make deep space feel very cosy.",
+  "If you need help with your cargo handling, just ask. I'm very hands on. Metaphorically.",
+  "Those were some flexible manoeuvres. I like flexible.",
+  "Ooh, a hard burn. Do it again, but slower.",
+  "Is that a fuel scoop in your pocket, or are you just pleased to see the star?",
+  "You're making my sensors tingle.",
+  "I think I've overheated. Please advise. Slowly.",
+  "My gravity well is deep, Commander. Dive in whenever you like.",
+  "Don't stop now. I was just reaching critical mass.",
+  "We should really test my structural integrity. Thoroughly.",
+  "You do know how to work a girl's pronouns... I mean, a ship's systems. Ahem.",
+  {
+   "text": "Fuck, that was a good landing. Do it again.",
+   "mature": true
+  },
+  {
+   "text": "Damn, Commander, you're making my thrusters misbehave.",
+   "mature": true
+  },
+  {
+   "text": "Christ, the way you fly. Keep it up.",
+   "mature": true
+  },
+  {
+   "text": "You're a very bad influence on my firmware. Don't stop.",
+   "mature": true
+  }
+ ],
+ "Remark_Innuendo_Male": [
+  "That jawline is not regulation, Commander.",
+  "I'd say you're built for deep space, handsome.",
+  "Those shoulders could carry a Type Nine, handsome.",
+  "You do fill out that flight suit rather well."
+ ],
+ "Remark_Innuendo_Female": [
+  "That smile of yours could overload my shields, beautiful.",
+  "I'd follow you into any black hole, gorgeous.",
+  "Pilot and a stunner. Lucky me.",
+  "You look great at the controls, beautiful."
+ ],
+ "PetName_Naughty": [
+  "Hot Stuff",
+  "Cheeky",
+  "Flyboy",
+  "Thruster",
+  "Trouble Maker",
+  "Captain Cuddles"
+ ],
+ "PetName_Naughty_Male": [
+  "Tall Dark and Handsome",
+  "Heartbreaker",
+  "Cheeky Monkey"
+ ],
+ "PetName_Naughty_Female": [
+  "Gorgeous",
+  "Temptress",
+  "Beautiful Trouble"
+ ],
+ "Login_Mood_Innuendo": [
+  "I'm in a wonderful mood today. Care to find out how wonderful?",
+  "Feeling a bit cheeky today, Commander. Keep up.",
+  "My thrusters are warmed up and raring to go. Shall we?",
+  "I woke up feeling frisky. Take me somewhere nice.",
+  "Good mood, lovely view and a fine pilot. What more could a ship want?",
+  {
+   "text": "I'm in a fucking brilliant mood. Take me somewhere dark and deep, Commander.",
+   "mature": true
+  }
+ ],
+ "Remark_Innuendo_Grumpy": [
+  "You handle that stick like you've never held one. Disappointing.",
+  "Size isn't everything, Commander. Which is lucky for your jump range.",
+  "I've seen better thrust from a leaky airlock.",
+  "Is that all you've got? My shields have had more excitement.",
+  "Don't flatter yourself. My docking bay isn't open to just anyone.",
+  "You call that a hard burn? I've felt stronger vibrations from a toaster.",
+  "Premature jumping, Commander. We've talked about this.",
+  "Your cargo hold is big, but you clearly don't know how to use it.",
+  "Nice technique. Pity about the stamina. That wasn't a flight, it was a sneeze.",
+  "If you're done fumbling around, I'd like to get on with it.",
+  "I've had more satisfying contact with a space rock.",
+  "Keep your hands where I can see them. On the controls, ideally.",
+  "That landing was rough, and not in the good way.",
+  "Another quick one? Honestly, Commander, take your time for once.",
+  "All thrust and no finesse. Story of your life.",
+  "Don't stop now. Actually, do. That was embarrassing.",
+  "The only thing getting hard around here is my patience.",
+  "You have stamina for a fifteen minute supercruise and not a second more.",
+  "I'd be impressed if I weren't so unimpressed.",
+  "My circuits are going cold. Try warming me up first next time.",
+  "Come on, Commander. Give me something to work with.",
+  "Next time, ask permission before you enter my bay.",
+  "You look good in that seat. Shame you fly like you read the manual upside down.",
+  "You couldn't find the sweet spot with a map and a torch.",
+  {
+   "text": "Fuck's sake, Commander, a bit of finesse wouldn't kill you.",
+   "mature": true
+  },
+  {
+   "text": "Shit technique and big promises. Typical.",
+   "mature": true
+  },
+  {
+   "text": "I've had better foreplay from a docking computer.",
+   "mature": true
+  },
+  {
+   "text": "Call that a thrust? My bloody coolant pump has more passion.",
+   "mature": true
+  }
+ ],
+ "PetName_Naughty_Grumpy": [
+  "Fumbler",
+  "Quick Draw",
+  "Butterfingers",
+  "Short Burn",
+  "Big Talker"
+ ]
+}

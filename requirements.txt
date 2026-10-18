@@ -1,0 +1,18 @@
+# STARLING - add-on packages installed by setup.bat
+#
+# The cloned voice (offline, no internet needed after the first download):
+#   kokoro       the voice engine
+#   inno-kokoro  learns a voice from your recording
+#   torch        the maths library both of them run on (large download)
+#   sounddevice  plays the sound through your speakers
+#   soundfile    reads your mp3 recording
+#   numpy        sound maths
+kokoro>=0.9.4
+inno-kokoro
+torch
+sounddevice
+soundfile>=0.12.1
+numpy
+faster-whisper
+customtkinter>=5.2.2
+pillow>=10.0.0

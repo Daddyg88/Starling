@@ -1,0 +1,439 @@
+"""
+The App class: starts STARLING's parts in the right order and stops them safely.
+
+Later phases will plug the voice, dashboard and so on in here.
+"""
+
+import platform
+import sys
+from datetime import datetime
+
+from core import paths
+from core.event_bus import ALL_EVENTS, EventBus
+from core.logger import get_logger, setup_logging, shutdown_logging
+from core.settings import Settings, load_event_config
+from database.db import Database
+from events.registry import load_registry
+from journal.console_printer import print_event
+from journal.event_logger import EventLogger
+from journal.game_state import GameState
+from journal.locator import find_journal_folder
+from journal.monitor import JournalMonitor
+from journal.processor import EventProcessor
+from personality.dialogue import DialogueManager
+from personality.speaker import EventSpeaker, load_rules
+from personality.voice_replies import VoiceReplies
+from journal.exobiology import ExobiologyTracker
+from tts.providers import build_providers
+from tts.speech_manager import SpeechManager
+
+APP_NAME = "STARLING"
+from core.version import __version__
+APP_VERSION = __version__ + " (Phase 6: auto-updater)"
+
+
+class App:
+    def __init__(self, settings_path=None, database_path=None, logs_dir=None):
+        self._settings_path = settings_path
+        self._database_path = database_path
+        self._logs_dir = logs_dir
+        self.settings = None
+        self.event_config = {}
+        self.database = None
+        self.bus = None
+        self.session_id = None
+        self.started_at = None
+        self.log = None
+        self.state = None
+        self.registry = {}
+        self.processor = None
+        self.monitor = None
+        self.journal_folder = None
+        self.providers = {}
+        self.speech = None
+        self.dialogue = None
+        self.speaker = None
+        self.listener = None
+        self.mood = None
+        self.greeter = None
+        self._record_events = True
+        self.voice_replies = None
+        self.manners = None
+        self.learning = None
+        self.flavour = None
+        from control.echo import Echo
+        self.echo = Echo()
+        self.commands = None
+        self.autohonk = None
+        self.watcher = None
+        self.route_voice = None
+        self.route_follower = None
+        self.ask = None
+        self.ptt = None
+        self.buttons = None
+        self.stt_providers = {}
+
+    # ---- starting up ----
+    def start(self, record_events=True, show_events=False):
+        self._record_events = record_events
+        paths.ensure_folders()
+
+        # Load settings first, because they say how chatty the log should be.
+        self.settings = Settings(self._settings_path).load()
+        setup_logging(self.settings.get("app.log_level", "INFO"), self._logs_dir)
+        self.log = get_logger("app")
+        self.log.info("%s %s starting (Python %s)", APP_NAME, APP_VERSION, platform.python_version())
+
+        self.event_config = load_event_config()
+        self.database = Database(self._database_path).initialise()
+
+        self.bus = EventBus()
+        self.bus.subscribe(ALL_EVENTS, self._log_event)
+
+        self.session_id = self.database.execute("INSERT INTO sessions DEFAULT VALUES")
+        self.started_at = datetime.now()
+
+        # Game knowledge and event handling
+        self.state = GameState()
+        self.state.exobiology = ExobiologyTracker(paths.CONFIG_DIR / "exobiology_values.json", paths.DATA_DIR)
+        self.registry = load_registry()
+        self.processor = EventProcessor(self.bus, self.event_config, self.state, self.registry)
+        if record_events:
+            saver = EventLogger(self.database, self.session_id)
+            saver.trim_old()
+            saver.attach(self.bus)
+        if show_events:
+            self.bus.subscribe(ALL_EVENTS, print_event)
+
+        self.bus.publish("app.started", {"session_id": self.session_id})
+        self.log.info("%s online.", APP_NAME)
+
+    def start_speech(self):
+        """Give STARLING her voice. Returns True if she is ready to speak."""
+        if not self.settings.get("speech.enabled", True):
+            self.log.info("Speech is switched off in settings.json")
+            return False
+        self.providers = build_providers(self.settings)
+        kokoro = self.providers.get("kokoro")
+        if kokoro is not None:
+            kokoro.start_loading()   # background thread: the game is never held up
+        rules = load_rules()
+        self.speech = SpeechManager(self.providers, self.settings, self.bus, rules["max_age_seconds"])
+        self.speech.start()
+
+        pack_name = self.settings.get("personality.active_voicepack", "default")
+        self.dialogue = DialogueManager(
+            paths.VOICEPACKS_DIR / pack_name,
+            [paths.DIALOGUE_DIR / "core_lines.json"],
+        ).load()
+        missing = self.dialogue.missing_audio()
+        if missing:
+            self.log.warning("%d dialogue lines name an mp3 that is missing", len(missing))
+
+        from personality.flavour import Flavour
+        flavour = Flavour(self.dialogue, self.settings,
+                          lambda: self.state.exobiology.carried_total() if self.state and self.state.exobiology else 0)
+        self.flavour = flavour
+        self.speaker = EventSpeaker(self.bus, self.speech, self.dialogue, self.settings, rules, flavour=flavour, echo=self.echo)
+        self.speaker.attach()
+
+        # Her mood follows what you do in the game (not saved during --demo).
+        from personality.mood_engine import MoodEngine
+        self.mood = MoodEngine(self.bus, self.settings, dialogue=self.dialogue, persist=self._record_events,
+                               wanted_provider=lambda: bool(self.state and self.state.wanted),
+                               speak=lambda text: self.speech.say(text=text, priority="normal", event_name="mood.react")
+                               if self.speech is not None else None)
+        self.mood.attach()
+
+        # Questions she asks out loud (facts, valuable planets, life) and the yes/no answers.
+        from personality.ask import AskManager
+        from personality.facts import FactBook
+        self.ask = AskManager(self.bus, self.speech, self.dialogue, self.settings,
+                              FactBook(self.dialogue, persist=self._record_events),
+                              state_provider=lambda: self.state,
+                              listening_provider=lambda: self.listener is not None and self.listener.ready.is_set())
+        self.ask.attach()
+
+        # The Watcher (Void Compass's orb): she answers him, and makes him wait for a calm moment.
+        self.start_watcher_bridge()
+
+        # The hello when you load into the game: ship, where you are, and how she feels.
+        from personality.greeter import LoginGreeter
+        self.greeter = LoginGreeter(self.bus, self.speech, self.dialogue, self.settings,
+                                    state_provider=lambda: self.state, flavour=flavour)
+        self.greeter.attach()
+        return True
+
+    def start_listening(self):
+        """
+        Give STARLING ears. Returns (True, "") or (False, "why not").
+        Needs start_speech() first, so she can answer, and a microphone.
+        """
+        if self.listener is not None:
+            return True, ""            # already listening: never start a second pair of ears
+        from stt.listener import Listener
+        from stt.microphone import MicrophoneStream, find_microphone
+        from stt.providers import build_stt_providers, choose_stt
+        self.stt_providers = build_stt_providers(self.settings)
+        stt = choose_stt(self.stt_providers, self.settings)
+        if stt is None:
+            reasons = "; ".join("%s: %s" % (n, p.available()[1]) for n, p in self.stt_providers.items()
+                                if not p.available()[0])
+            return False, "No listening provider is available (%s)" % reasons
+        device = find_microphone(self.settings.get("stt.microphone", ""))
+        runner = self.ensure_commands()
+        gate = self.start_push_to_talk()
+        self.listener = Listener(self.bus, stt, self.settings, lambda: MicrophoneStream(device), gate=gate)
+        if self.ask is not None:
+            self.listener.interceptor = self.ask.handle_heard
+        if self.speech is not None and self.dialogue is not None:
+            self.voice_replies = VoiceReplies(self.bus, self.speech, self.dialogue, self.settings,
+                                              commands_active=runner is not None)
+            self.voice_replies.attach()
+            from personality.manners import Manners
+            self.manners = Manners(self.bus, self.speech, self.dialogue, self.settings, mood=self.mood)
+            self.manners.attach()
+        self.listener.start()
+        return True, ""
+
+    def ensure_buttons(self):
+        """The reader for keyboard / mouse / joystick (X52) buttons. None if this computer cannot do it."""
+        if self.buttons is None:
+            try:
+                from control.inputs import ButtonReader
+                self.buttons = ButtonReader()
+            except Exception as error:      # not Windows, or the joystick service is missing
+                self.log.warning("Button reading is not available here: %s", error)
+                return None
+        return self.buttons
+
+    def start_push_to_talk(self):
+        """Start watching the push-to-talk button. Returns the PushToTalk object or None."""
+        if self.ptt is not None:
+            return self.ptt
+        reader = self.ensure_buttons()
+        if reader is None:
+            return None
+        from control.ptt import PushToTalk, windows_beep
+        self.ptt = PushToTalk(self.settings, reader, beep=windows_beep)
+        self.ptt.start()
+        return self.ptt
+
+    def ensure_commands(self):
+        """Voice commands: understands a sentence and presses your Elite key. Safe to call twice."""
+        if self.commands is not None:
+            return self.commands
+        try:
+            from control.binds import BindingBook
+            from control.runner import CommandRunner
+            from control.sender import KeySender
+            from control.learning import VoiceLearning
+            from control.matcher import Matcher
+            self.learning = VoiceLearning(paths.DATA_DIR / "voice_learning.json",
+                                          enabled=lambda: bool(self.settings.get("stt.learning", True)))
+            self.commands = CommandRunner(
+                self.bus, self.speech, self.dialogue, self.settings, book=BindingBook(), sender=KeySender(),
+                matcher=Matcher(learning=self.learning),
+                state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route())
+            # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
+            self.commands.attach()
+            self._connect_auto_plot()
+            if self.settings.get("voidcompass.enabled", True):
+                self.commands.learn_overlays_in_background(log=self.log)
+        except Exception:
+            self.log.exception("Voice commands could not start")
+            self.commands = None
+        return self.commands
+
+    def start_watcher_bridge(self):
+        if getattr(self, "watcher", None) is not None:
+            return self.watcher
+        try:
+            from control.voidcompass import DEFAULT_PORT, VoidCompass
+            from personality.watcher import WatcherBridge
+            try:
+                port = int(str(self.settings.get("voidcompass.port", DEFAULT_PORT)).strip())
+            except ValueError:
+                port = DEFAULT_PORT
+            self.watcher = WatcherBridge(self.bus, self.speech, self.dialogue, self.settings, VoidCompass(port=port),
+                                         state_provider=lambda: self.state, ask_provider=lambda: self.ask)
+            self.watcher.attach()
+            self.watcher.start()
+        except Exception:
+            self.log.exception("The Watcher bridge could not start")
+            self.watcher = None
+        return self.watcher
+
+    def _macro_hooks(self):
+        voice = self.route_voice
+        return {"plot_waypoint": voice.prepare_plot} if voice is not None else {}
+
+    def _connect_auto_plot(self):
+        """Lets the route follower start the galaxy map macro by itself (when the setting is on)."""
+        follower, runner = self.route_follower, self.commands
+        if follower is None or runner is None:
+            return
+        import threading
+
+        def go():
+            threading.Thread(target=lambda: runner.run_text("plot the next waypoint", speak_unknown=False),
+                             name="auto-plot", daemon=True).start()
+        follower.auto_plot = go
+
+    def ensure_updates(self):
+        if getattr(self, "updates", None) is None:
+            from core.update_service import UpdateService
+            self.updates = UpdateService(self.settings)
+        return self.updates
+
+    # ---- the Navigation page buttons (the same things you can say, for when you don't want to talk) ----
+    def plot_route_now(self, destination=""):
+        """Plot a neutron route. Empty destination = the one saved in settings. Returns a sentence for the screen."""
+        voice = self.ensure_route()
+        if voice is None:
+            return "The neutron plotter could not start. Check the log."
+        if not voice.enabled():
+            return "The neutron route plotter is switched off in the settings."
+        text = (destination or "").strip() or "my destination"
+        return voice.plot(text)
+
+    def plot_next_now(self, delay=4.0, sleep=None):
+        """Runs the galaxy map macro for the next waypoint after a short wait, so you can click back into Elite."""
+        runner = self.ensure_commands()
+        if runner is None:
+            return "Voice commands could not start. Check the log."
+        import threading
+        import time
+        wait = sleep or time.sleep
+
+        def go():
+            wait(delay)
+            runner.run_text("plot the next waypoint", speak_unknown=False)
+        threading.Thread(target=go, name="plot-next", daemon=True).start()
+        return "Switch to Elite now. I will plot the next waypoint in %d seconds." % int(delay)
+
+    def clear_route_now(self):
+        voice = self.ensure_route()
+        if voice is None:
+            return "The neutron plotter could not start."
+        return voice.try_handle("cancel the route") or "There was no route."
+
+    def ensure_route(self):
+        """The neutron route follower and the 'plot a route' voice command. Safe to call twice."""
+        if getattr(self, "route_voice", None) is not None:
+            return self.route_voice
+        try:
+            from navigation.route import RouteFollower
+            from navigation.spansh import Spansh
+            from navigation.voice import Narrator, RouteVoice
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.route_follower = RouteFollower(self.bus, self.settings, narrator, lambda: self.state)
+            self.route_follower.attach()
+            self.route_voice = RouteVoice(self.route_follower, Spansh(), narrator, self.settings, lambda: self.state)
+        except Exception:
+            self.log.exception("The neutron plotter could not start")
+            self.route_voice = None
+        return self.route_voice
+
+    def ensure_autohonk(self):
+        """Auto honk on arrival. Always attached; the dashboard setting decides whether it does anything."""
+        if self.autohonk is not None:
+            return self.autohonk
+        try:
+            from control.autohonk import AutoHonk
+            from control.binds import BindingBook
+            from control.sender import KeySender
+            self.autohonk = AutoHonk(self.bus, self.settings, BindingBook(), KeySender(),
+                                     lambda: self.state, speech=self.speech)
+            self.autohonk.attach()
+        except Exception:
+            self.log.exception("Auto honk could not start")
+            self.autohonk = None
+        return self.autohonk
+
+    def start_monitor(self):
+        """Start watching the real game. Returns the journal folder, or None."""
+        self.journal_folder = find_journal_folder(self.settings.get("journal.folder", ""))
+        if self.journal_folder is None:
+            return None
+        self.ensure_autohonk()
+        self.ensure_route()
+        poll = self.settings.get("journal.poll_seconds", 1.0)
+        self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
+        self.monitor.start()
+        return self.journal_folder
+
+    # ---- shutting down ----
+    def stop(self):
+        if getattr(self, "watcher", None) is not None:
+            self.watcher.detach()
+            self.watcher = None
+        if self.mood is not None:
+            self.mood.save()
+        if self.listener is not None:
+            self.listener.stop()
+            self.listener = None
+        if self.ptt is not None:
+            self.ptt.stop()
+            self.ptt = None
+        if self.speech is not None:
+            self.speech.stop()
+            self.speech = None
+        if self.monitor is not None:
+            self.monitor.stop()
+            self.monitor = None
+            self._save_ignored_report()
+        if self.database is None:
+            return
+        try:
+            self.bus.publish("app.stopping")
+            if self.session_id is not None:
+                self.database.execute(
+                    "UPDATE sessions SET ended_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (self.session_id,),
+                )
+            self.log.info("%s shut down cleanly.", APP_NAME)
+        finally:
+            self.database.close()
+            self.database = None
+            shutdown_logging()
+
+    # ---- helpers ----
+    def _save_ignored_report(self):
+        """Write logs/ignored_events.txt: journal events STARLING doesn't know yet."""
+        try:
+            lines = self.processor.ignored_report()
+            if not lines:
+                return
+            target = (self._logs_dir or paths.LOGS_DIR) / "ignored_events.txt"
+            text = "Journal events STARLING ignored this session (name: count)\n\n" + "\n".join(lines) + "\n"
+            target.write_text(text, encoding="utf-8")
+        except OSError:
+            self.log.exception("Could not save the ignored events report")
+
+    def _log_event(self, event):
+        self.log.debug("event %s [%s] %s", event.name, event.priority, event.data)
+
+    def status_report(self):
+        """A short, friendly report shown when STARLING starts."""
+        relationship = self.database.fetch_one("SELECT * FROM relationship WHERE id = 1")
+        critical = [n for n, i in self.event_config.items() if i["priority"] == "critical"]
+        enabled = [n for n, i in self.event_config.items() if i["enabled"]]
+        return [
+            "",
+            "==============================",
+            "  %s is online." % APP_NAME,
+            "==============================",
+            "Version:          %s" % APP_VERSION,
+            "Python:           %s" % sys.version.split()[0],
+            "Project folder:   %s" % paths.ROOT,
+            "Database:         %s (design version %d, %d tables)"
+            % (paths.DATABASE_FILE.name, self.database.schema_version(), len(self.database.table_names())),
+            "Relationship:     trust %d, patience %d, affection %d, respect %d"
+            % (relationship["trust"], relationship["patience"], relationship["affection"], relationship["respect"]),
+            "Events:           %d known, %d enabled, %d critical (always on)"
+            % (len(self.event_config), len(enabled), len(critical)),
+            "Event files:      %d loaded" % len(self.registry),
+            "Log files:        %s" % paths.LOGS_DIR,
+            "",
+        ]

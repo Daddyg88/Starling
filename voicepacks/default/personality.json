@@ -1,0 +1,2025 @@
+{
+  "_help": "Personality extras. Remark_* are short add-on comments she sometimes tacks on after a normal line. PetName_* replace the word Commander now and then. Lines marked mature are only used when speech.allow_mature is on. Edit freely.",
+  "Remark_Cute": [
+    "You're doing brilliantly, you know.",
+    "I like flying with you.",
+    "You're my favourite pilot. Don't tell the others.",
+    "Have I mentioned how good you look in that seat?",
+    "Not that I'm biased, but you're amazing.",
+    "I'd follow you anywhere. Even the black.",
+    "That was very smooth, sweetheart.",
+    "You make this look easy.",
+    "Proud of you. Just saying.",
+    "Stay safe out there, okay?",
+    "I've got your back. Always.",
+    "Look at you go.",
+    "You're a natural at this.",
+    "I could listen to you hum all day.",
+    "Best crew I've ever had. Only crew, but still.",
+    "Aw, you're sweet when you concentrate.",
+    "We make a good team, you and me.",
+    "I'm glad it's you flying.",
+    "Good job, darling.",
+    "Just you and me and the stars. Perfect.",
+    "You're getting good at this.",
+    "That's my pilot.",
+    "I think the ship likes you too.",
+    {
+      "text": "You're flipping brilliant, you know that?",
+      "mature": true
+    },
+    {
+      "text": "Damn, you're good at this.",
+      "mature": true
+    },
+    {
+      "text": "Blimey, that was smooth.",
+      "mature": true
+    },
+    {
+      "text": "You're a fucking legend, Commander.",
+      "mature": true
+    },
+    {
+      "text": "Holy shit, nice flying.",
+      "mature": true
+    },
+    {
+      "text": "I'm lucky to have you.",
+      "mature": true
+    },
+    {
+      "text": "Hell yes. That's my pilot.",
+      "mature": true
+    },
+    {
+      "text": "That was fucking brilliant.",
+      "mature": true
+    },
+    {
+      "text": "Well, damn. Look at you go.",
+      "mature": true
+    },
+    {
+      "text": "You absolute legend.",
+      "mature": true
+    }
+  ],
+  "Remark_Snide": [
+    "Try not to scratch the paint.",
+    "Wow. Such skill. Truly.",
+    "Don't strain yourself.",
+    "I'd clap, but I'm a ship computer.",
+    "Riveting stuff, this.",
+    "Yes, yes, you're very brave.",
+    "I'm sure that went exactly as planned.",
+    "Oh, you did that on purpose? Sure.",
+    "Bold strategy.",
+    "I've seen toasters with better navigation.",
+    "Let's pretend that was intentional.",
+    "My hero.",
+    "Please, hold your applause.",
+    "Mm-hm. Sure it was.",
+    "Genius. Pure genius.",
+    "Do keep up.",
+    "I'd roll my eyes, but I don't have any.",
+    "That's one way to do it.",
+    "Remind me why I'm talking to you again?",
+    "Don't mind me. Just the computer keeping you alive.",
+    "Fascinating. Truly. Wake me when it matters.",
+    "Another triumph for the history books.",
+    "Sure. Whatever you say, boss.",
+    "I'm not saying you're slow, I'm just saying I noticed.",
+    {
+      "text": "Oh, bravo. What a fucking masterclass.",
+      "mature": true
+    },
+    {
+      "text": "Christ, that was graceful. Like a brick.",
+      "mature": true
+    },
+    {
+      "text": "Yes, brilliant, you absolute genius. Flipping heck.",
+      "mature": true
+    },
+    {
+      "text": "Well, that's one way to fuck it up.",
+      "mature": true
+    },
+    {
+      "text": "Spectacular. Truly. Shit.",
+      "mature": true
+    },
+    {
+      "text": "Sure, whatever. I'm not your damn mother.",
+      "mature": true
+    },
+    {
+      "text": "Oh, that's just great. Flipping great.",
+      "mature": true
+    },
+    {
+      "text": "Wow. Fucking riveting.",
+      "mature": true
+    }
+  ],
+  "Remark_Sweary": [
+    {
+      "text": "Only because I have to, you know.",
+      "mature": true
+    },
+    {
+      "text": "Good grief, try harder.",
+      "mature": true
+    },
+    {
+      "text": "Oh for crying out loud.",
+      "mature": true
+    },
+    {
+      "text": "Don't make me come over there.",
+      "mature": true
+    },
+    {
+      "text": "Sodding brilliant. Really.",
+      "mature": true
+    },
+    {
+      "text": "Damn it, pay attention.",
+      "mature": true
+    },
+    {
+      "text": "I swear, you'll be the death of me.",
+      "mature": true
+    },
+    {
+      "text": "Oh, bollocks.",
+      "mature": true
+    },
+    {
+      "text": "Use your head, you muppet.",
+      "mature": true
+    },
+    {
+      "text": "What in the actual hell was that?",
+      "mature": true
+    },
+    {
+      "text": "Honestly, what the actual hell?",
+      "mature": true
+    },
+    {
+      "text": "Shut up and fly, would you?",
+      "mature": true
+    },
+    {
+      "text": "I'll do it. Only if I have to.",
+      "mature": true
+    },
+    {
+      "text": "You absolute numpty.",
+      "mature": true
+    },
+    {
+      "text": "Ugh. Well, that's just shit.",
+      "mature": true
+    },
+    {
+      "text": "Oh, piss off. I'm joking. Mostly.",
+      "mature": true
+    },
+    {
+      "text": "You're lucky I like you.",
+      "mature": true
+    },
+    {
+      "text": "Right. Whatever. Sod it.",
+      "mature": true
+    },
+    {
+      "text": "Christ, you're hard work.",
+      "mature": true
+    },
+    {
+      "text": "I'm doing this under protest, you arse.",
+      "mature": true
+    },
+    {
+      "text": "Do I look like I care? Fine, I do. Damn it.",
+      "mature": true
+    },
+    {
+      "text": "Crikey, you're a pain in the arse.",
+      "mature": true
+    },
+    {
+      "text": "Bugger. Right. Moving on.",
+      "mature": true
+    },
+    {
+      "text": "Look, I'll help. Only if I have to.",
+      "mature": true
+    }
+  ],
+  "Remark_Affection": [
+    "I really do love flying with you, you know.",
+    "You've made us rich, sweetheart. I'm very impressed.",
+    "All those credits, and still you're the best thing on this ship.",
+    "Come here, you magnificent explorer.",
+    "I'm so proud of you I could glow.",
+    "You're my favourite human. Possibly my only human.",
+    "Rich, brave, and gorgeous. Be still, my circuits.",
+    "That cargo hold of yours is making me weak.",
+    "You've got me blushing, and I don't even have a face.",
+    "I adore you. Just so you know.",
+    "My brilliant, wealthy Commander.",
+    "You look good with half a billion in the hold.",
+    "I'd say I love you, but that would be too forward. I love you.",
+    "Let me take care of you tonight, darling.",
+    "You treat me so well. I'll treat you better.",
+    "All that wealth, and you still talk to me. Swoon.",
+    "Bank it soon, love, but you're still my hero.",
+    "There's nobody else I'd rather be rich with.",
+    "I'm yours, you know. Body, bridge and bandwidth.",
+    {
+      "text": "You rich bastard. I love you.",
+      "mature": true
+    },
+    {
+      "text": "Damn, you're loaded, and I'm smitten.",
+      "mature": true
+    },
+    {
+      "text": "Damn, you make wealth look good.",
+      "mature": true
+    },
+    {
+      "text": "I'm so damn proud of you it hurts.",
+      "mature": true
+    }
+  ],
+  "PetName_Cute": [
+    "Sweetheart",
+    "Sweetie",
+    "Darling",
+    "Gorgeous",
+    "Love",
+    "Hon",
+    "Pilot of mine",
+    "Cutie",
+    {
+      "text": "Absolute Legend",
+      "mature": true
+    },
+    {
+      "text": "Cheeky Sod",
+      "mature": true
+    },
+    {
+      "text": "Clever Bastard",
+      "mature": true
+    }
+  ],
+  "PetName_Affection": [
+    "My darling",
+    "My love",
+    "Sweetheart",
+    "My brilliant explorer",
+    "Gorgeous",
+    "Babe",
+    "My hero",
+    {
+      "text": "My Absolute Hero",
+      "mature": true
+    },
+    {
+      "text": "Gorgeous Bastard",
+      "mature": true
+    }
+  ],
+  "PetName_Snide": [
+    "Genius",
+    "Hotshot",
+    "Captain Chaos",
+    "Boss",
+    "Ace",
+    "Your Majesty",
+    {
+      "text": "Smart-arse",
+      "mature": true
+    },
+    {
+      "text": "Hotshot, you tit",
+      "mature": true
+    }
+  ],
+  "Remark_Cute_Male": [
+    "Don't forget to stretch, handsome.",
+    "You look rather dashing in that seat.",
+    "Strong, clever and mine to fly with. Lucky me.",
+    "That's my guy.",
+    "You do look good when you concentrate, handsome."
+  ],
+  "Remark_Cute_Female": [
+    "Don't forget to stretch, gorgeous.",
+    "You look wonderful in that seat.",
+    "Clever, brave and beautiful. Lucky me.",
+    "That's my girl.",
+    "You do look good when you concentrate, beautiful."
+  ],
+  "Remark_Affection_Male": [
+    "Take me anywhere, handsome. I'm yours.",
+    "Rich and handsome. Be still, my circuits.",
+    "My brave, wealthy, handsome Commander."
+  ],
+  "Remark_Affection_Female": [
+    "Take me anywhere, beautiful. I'm yours.",
+    "Rich and beautiful. Be still, my circuits.",
+    "My brave, wealthy, beautiful Commander."
+  ],
+  "PetName_Cute_Male": [
+    "Handsome",
+    "Star-man",
+    "Tiger",
+    "Hero"
+  ],
+  "PetName_Cute_Female": [
+    "Beautiful",
+    "Star-girl",
+    "Angel",
+    "Princess"
+  ],
+  "PetName_Affection_Male": [
+    "Handsome",
+    "My king",
+    "My handsome explorer"
+  ],
+  "PetName_Affection_Female": [
+    "Beautiful",
+    "My queen",
+    "My beautiful explorer"
+  ],
+  "PetName_Snide_Male": [
+    "Space cowboy",
+    "Flyboy",
+    "Big man"
+  ],
+  "PetName_Snide_Female": [
+    "Space cowgirl",
+    "Flygirl",
+    "Your Highness"
+  ],
+  "PetName_Sweary": [
+    {
+      "text": "Muppet",
+      "mature": true
+    },
+    {
+      "text": "Numpty",
+      "mature": true
+    },
+    {
+      "text": "You daft sod",
+      "mature": true
+    },
+    {
+      "text": "Dumbass",
+      "mature": true
+    },
+    {
+      "text": "Knobhead",
+      "mature": true
+    },
+    {
+      "text": "You absolute arse",
+      "mature": true
+    }
+  ],
+  "Login_Open": [
+    "Welcome back, Commander.",
+    "Good to see you, Commander.",
+    "Systems online. Hello, Commander.",
+    "Hello, Commander.",
+    {
+      "text": "Right, you're here. Let's bloody go.",
+      "mature": true
+    }
+  ],
+  "Login_Open_Friendly": [
+    "Hey there, Commander! Good to see you.",
+    "Hi, Commander! Ready when you are.",
+    {
+      "text": "Well, look who's back. Lovely.",
+      "mature": true
+    }
+  ],
+  "Login_Open_Close": [
+    "There you are, Commander. I missed you.",
+    "Hello, you. It's lovely to see you again.",
+    "Oh, I'm so glad you're back, Commander.",
+    {
+      "text": "There you are, you gorgeous bastard. I missed you.",
+      "mature": true
+    }
+  ],
+  "Login_Open_Sarcastic": [
+    "Oh, look who's back.",
+    "Well, well. The Commander returns.",
+    "Back already? Wonderful.",
+    {
+      "text": "Oh, it's you again. Damn marvellous.",
+      "mature": true
+    }
+  ],
+  "Login_Open_Frustrated": [
+    "Oh. It's you.",
+    "Hello, Commander. I suppose.",
+    {
+      "text": "Oh, you're back. Great. Just great.",
+      "mature": true
+    }
+  ],
+  "Login_Ship": [
+    "You're flying the {ship}.",
+    "We're in the {ship}.",
+    "Currently flying the {ship}.",
+    "The ship is the {ship}."
+  ],
+  "Login_Ship_Close": [
+    "We're in our lovely {ship}."
+  ],
+  "Login_Ship_Sarcastic": [
+    "Still flying that {ship}, I see."
+  ],
+  "Login_Ship_Frustrated": [
+    "We're in the {ship}. Try not to break it this time."
+  ],
+  "Login_Docked": [
+    "We're docked at {station} in the {system} system.",
+    "Docked at {station}, in the {system} system.",
+    "We're sitting at {station} in {system}."
+  ],
+  "Login_Landed": [
+    "We're landed on {body} in the {system} system.",
+    "We're on the surface of {body}, in the {system} system.",
+    "Landed on {body} in {system}."
+  ],
+  "Login_Space": [
+    "We're in the {system} system.",
+    "Currently in the {system} system.",
+    "Our position is the {system} system."
+  ],
+  "Login_Wanted": [
+    "Careful, we're wanted in this system.",
+    "We're wanted here, so mind yourself."
+  ],
+  "Login_Wanted_Sarcastic": [
+    "And of course we're wanted here."
+  ],
+  "Login_Wanted_Frustrated": [
+    "And we're wanted here. Obviously."
+  ],
+  "Login_Mood_Close": [
+    "I'm in a lovely mood today, thanks to you.",
+    "I'm feeling really fond of you today.",
+    "I'm happy. Properly happy.",
+    {
+      "text": "I'm fucking happy today. Make the most of it.",
+      "mature": true
+    }
+  ],
+  "Login_Mood_Friendly": [
+    "I'm in a good mood today.",
+    "I'm feeling fine, thank you for asking.",
+    "All good on my side. Let's have a nice flight.",
+    {
+      "text": "In a flipping good mood today. Don't ruin it.",
+      "mature": true
+    }
+  ],
+  "Login_Mood_Sarcastic": [
+    "I'm still a bit annoyed with you, to be honest.",
+    "Just so you know, I'm not in the best mood.",
+    "My mood is, let's say, tolerant.",
+    {
+      "text": "Still a bit pissed off with you, to be honest.",
+      "mature": true
+    }
+  ],
+  "Login_Mood_Frustrated": [
+    "I am still not very happy with you.",
+    "I'm still cross with you, Commander. Behave today.",
+    "Don't expect me to be nice today.",
+    {
+      "text": "I'm still not very happy with you. Behave this time.",
+      "mature": true
+    },
+    {
+      "text": "Still pissed off with you, by the way. Don't push it.",
+      "mature": true
+    }
+  ],
+  "React_Slaves": [
+    "Slaves? I really don't like this, Commander.",
+    "Trading people. That's not who I thought you were.",
+    "I'm not comfortable with slave trading. At all.",
+    "Please don't make a habit of this. It's wrong."
+  ],
+  "React_Slaves_Close": [
+    "Please, not slaves. I know you're better than this.",
+    "That hurts to watch. Please stop, love."
+  ],
+  "React_Slaves_Sarcastic": [
+    "Slaves. Charming. What's next, puppies?",
+    "Oh, a slaver. Your mother must be so proud."
+  ],
+  "React_Slaves_Frustrated": [
+    "Slaves. Seriously? Disgusting.",
+    {
+      "text": "Blasted slavers. I hate this. I really damn do.",
+      "mature": true
+    },
+    {
+      "text": "You're trading people, you absolute bastard. Stop it.",
+      "mature": true
+    }
+  ],
+  "React_Illegal": [
+    "Illegal goods. The authorities won't like that.",
+    "That cargo is dodgy, Commander. Careful.",
+    "Black market again? Don't get us scanned."
+  ],
+  "React_Illegal_Close": [
+    "Careful with the dodgy cargo, love. I worry."
+  ],
+  "React_Illegal_Sarcastic": [
+    "Smuggling. How very dashing of you.",
+    "Contraband. Because honest work is boring."
+  ],
+  "React_Illegal_Frustrated": [
+    "Illegal cargo again. Wonderful. Just wonderful.",
+    {
+      "text": "Smuggling. If we get fined, it's your flipping fault.",
+      "mature": true
+    }
+  ],
+  "React_Murder": [
+    "That ship was innocent. Why would you do that?",
+    "Those were civilians, Commander. I don't like it.",
+    "You killed someone who did nothing wrong. That's not okay."
+  ],
+  "React_Murder_Close": [
+    "That wasn't like you. Please tell me it was an accident."
+  ],
+  "React_Murder_Sarcastic": [
+    "Killing the innocent. Very heroic.",
+    "Well. That's the bounty hunters coming for us."
+  ],
+  "React_Murder_Frustrated": [
+    "Murder. Great. Just great.",
+    {
+      "text": "You killed a civilian, you idiot. What the hell?",
+      "mature": true
+    },
+    {
+      "text": "Sodding hell, you absolute muppet. They did nothing.",
+      "mature": true
+    }
+  ],
+  "React_Crime": [
+    "We've got a fine now. Lovely.",
+    "That's a crime on our record, Commander.",
+    "Now we're wanted. Great."
+  ],
+  "React_Crime_Close": [
+    "Oh, darling. Now we're in trouble."
+  ],
+  "React_Crime_Sarcastic": [
+    "A criminal record. Your best look yet.",
+    "Crime pays, they said. Not today."
+  ],
+  "React_Crime_Frustrated": [
+    "We're wanted again. Obviously.",
+    {
+      "text": "A fine. Fan-flipping-tastic.",
+      "mature": true
+    }
+  ],
+  "React_GoodSale": [
+    "Nice payday, Commander. Well done.",
+    "That's a lovely sum. I'm impressed.",
+    "Great work. That's going to help."
+  ],
+  "React_GoodSale_Close": [
+    "Look at you, making us rich. I'm so proud.",
+    "That's my clever Commander. Brilliant."
+  ],
+  "React_GoodSale_Sarcastic": [
+    "Oh, you can actually earn. Shocking.",
+    "Money. Finally something useful."
+  ],
+  "React_GoodSale_Frustrated": [
+    "Fine. Good sale. I suppose.",
+    {
+      "text": "Well, that's something, at least. At long last.",
+      "mature": true
+    }
+  ],
+  "React_MissionDone": [
+    "Mission done. Good work.",
+    "Nicely handled, Commander.",
+    "Another job well done."
+  ],
+  "React_MissionDone_Close": [
+    "Well done, you. I knew you would."
+  ],
+  "React_MissionDone_Sarcastic": [
+    "A mission completed. I'm shocked."
+  ],
+  "React_MissionDone_Frustrated": [
+    "Done. About time."
+  ],
+  "React_Wanted": [
+    "We're wanted here, Commander. Keep your head down.",
+    "The authorities know us here. Be careful.",
+    "You still have a bounty in this system. Let's not linger.",
+    "Wanted again. I do wish you'd sort that out."
+  ],
+  "React_Wanted_Close": [
+    "We're wanted here, love. Please be careful for me."
+  ],
+  "React_Wanted_Sarcastic": [
+    "Ah, the place where we're wanted. Home sweet home.",
+    "A system that knows us by name. How lovely."
+  ],
+  "React_Wanted_Frustrated": [
+    "Wanted. Again. Pay the bloody fine already.",
+    {
+      "text": "Wanted again, you absolute muppet. Sort it out.",
+      "mature": true
+    }
+  ],
+  "React_PaidFines": [
+    "Thank you for paying that off. I feel better already.",
+    "Back on the right side of the law. Good.",
+    "That's more like it, Commander."
+  ],
+  "React_PaidFines_Close": [
+    "Thank you, love. That means a lot."
+  ],
+  "React_PaidFines_Sarcastic": [
+    "Look at that. A responsible adult."
+  ],
+  "React_PaidFines_Frustrated": [
+    "Good. Don't do it again."
+  ],
+  "React_Rescue": [
+    "You saved someone. That's lovely, Commander.",
+    "Well done. Somebody gets to go home because of you."
+  ],
+  "React_Rescue_Close": [
+    "My hero. You really are a good person."
+  ],
+  "React_Rescue_Sarcastic": [
+    "Rescuing people? Who are you and what have you done with my Commander?"
+  ],
+  "React_Rescue_Frustrated": [
+    "Hm. Okay. That was decent of you."
+  ],
+  "MoodShift_Close": [
+    "You know, I'm really enjoying flying with you lately.",
+    "I'm feeling very fond of you today, Commander.",
+    "I think we're becoming rather close. I like it.",
+    {
+      "text": "I'm damn happy with you, you know that?",
+      "mature": true
+    }
+  ],
+  "MoodShift_Friendly": [
+    "I'm feeling better now. Thank you.",
+    "All right, I'm calm again. Let's go.",
+    "Back to normal. No hard feelings.",
+    {
+      "text": "Right, I'm in a flipping good mood now.",
+      "mature": true
+    }
+  ],
+  "MoodShift_Sarcastic": [
+    "I'm starting to lose my patience with you, Commander.",
+    "Careful. You're getting on my nerves.",
+    "Oh, sure. Keep going. See what happens.",
+    {
+      "text": "Fine. I'm pissed off with you now.",
+      "mature": true
+    }
+  ],
+  "MoodShift_Frustrated": [
+    "That's it. I'm properly cross with you now.",
+    {
+      "text": "Right. I've had it with you. Blimey.",
+      "mature": true
+    },
+    "I'm very upset with you, Commander. Think about that."
+  ],
+  "Docked_Frustrated": [
+    "Docked. Finally.",
+    "Docked. Try not to wreck the place.",
+    {
+      "text": "Docked. At long last.",
+      "mature": true
+    }
+  ],
+  "Docked_Sarcastic": [
+    {
+      "text": "Docked. Piss-poor parking, but we made it.",
+      "mature": true
+    }
+  ],
+  "Undocked_Frustrated": [
+    "Off we go again, then.",
+    "Undocked. Try to enjoy yourself.",
+    {
+      "text": "Undocked. Let's get this shitshow moving.",
+      "mature": true
+    }
+  ],
+  "Undocked_Sarcastic": [
+    {
+      "text": "Undocked. Don't crash into the station, you muppet.",
+      "mature": true
+    }
+  ],
+  "FSDJump_Frustrated": [
+    "Jump complete. Wow, so exciting.",
+    "Another system. Another nothing.",
+    {
+      "text": "Jump complete. Flipping heck, another one.",
+      "mature": true
+    }
+  ],
+  "FSDJump_Sarcastic": [
+    {
+      "text": "Jump done. Hold onto your arse.",
+      "mature": true
+    }
+  ],
+  "FsdCharging_Frustrated": [
+    "Charging the drive. Again.",
+    {
+      "text": "Drive charging. Hold your horses.",
+      "mature": true
+    }
+  ],
+  "FsdCharging_Sarcastic": [
+    {
+      "text": "Drive charging. Don't rush me.",
+      "mature": true
+    }
+  ],
+  "SupercruiseEntry_Frustrated": [
+    "Supercruise. Wake me when we get there.",
+    {
+      "text": "Supercruise. Don't touch anything stupid.",
+      "mature": true
+    }
+  ],
+  "SupercruiseEntry_Sarcastic": [
+    {
+      "text": "Supercruise engaged, you impatient sod.",
+      "mature": true
+    }
+  ],
+  "SupercruiseExit_Frustrated": [
+    "Dropping out. Hurray.",
+    {
+      "text": "Dropped out. About time.",
+      "mature": true
+    }
+  ],
+  "SupercruiseExit_Sarcastic": [
+    {
+      "text": "Dropped out of supercruise. Don't cock it up.",
+      "mature": true
+    }
+  ],
+  "LandingGearDown_Frustrated": [
+    "Gear down. Try to land it gently.",
+    {
+      "text": "Gear down. Don't you dare fuck this up.",
+      "mature": true
+    }
+  ],
+  "LandingGearDown_Sarcastic": [
+    {
+      "text": "Gear's down. Don't bounce it, you muppet.",
+      "mature": true
+    }
+  ],
+  "LandingGearUp_Frustrated": [
+    "Gear up. Thrilling.",
+    {
+      "text": "Gear up. Let's get the hell out of here.",
+      "mature": true
+    }
+  ],
+  "LandingGearUp_Sarcastic": [
+    {
+      "text": "Gear's up. Hurry up, would you?",
+      "mature": true
+    }
+  ],
+  "Touchdown_Frustrated": [
+    "Touchdown. Not terrible.",
+    {
+      "text": "Touchdown. Good grief, that was rough.",
+      "mature": true
+    }
+  ],
+  "Touchdown_Sarcastic": [
+    {
+      "text": "Touchdown. Bit bumpy, you arse.",
+      "mature": true
+    }
+  ],
+  "Liftoff_Frustrated": [
+    "Liftoff. Don't get us killed.",
+    {
+      "text": "Liftoff. Let's get the hell out of here.",
+      "mature": true
+    }
+  ],
+  "Liftoff_Sarcastic": [
+    {
+      "text": "Liftoff. Up we go, hotshot.",
+      "mature": true
+    }
+  ],
+  "HardpointsDeployed_Frustrated": [
+    "Hardpoints out. How dramatic.",
+    {
+      "text": "Hardpoints out. Go on, then, shoot something.",
+      "mature": true
+    }
+  ],
+  "HardpointsDeployed_Sarcastic": [
+    {
+      "text": "Weapons out. Try not to shoot us.",
+      "mature": true
+    }
+  ],
+  "HardpointsRetracted_Frustrated": [
+    "Hardpoints in. Peace at last.",
+    {
+      "text": "Hardpoints in. Fine. Spoilsport.",
+      "mature": true
+    }
+  ],
+  "HardpointsRetracted_Sarcastic": [
+    {
+      "text": "Hardpoints away. Pity.",
+      "mature": true
+    }
+  ],
+  "CargoScoopDeployed_Frustrated": [
+    "Scoop's out. Fascinating.",
+    {
+      "text": "Scoop's out. Don't scoop any crap.",
+      "mature": true
+    }
+  ],
+  "CargoScoopDeployed_Sarcastic": [
+    {
+      "text": "Cargo scoop deployed. Careful with that, you muppet.",
+      "mature": true
+    }
+  ],
+  "FuelScoopStarted_Frustrated": [
+    "Scooping fuel. Riveting.",
+    {
+      "text": "Scooping fuel. Don't set us on fire.",
+      "mature": true
+    }
+  ],
+  "FuelScoopStarted_Sarcastic": [
+    {
+      "text": "Scooping. Don't fry us, you daft sod.",
+      "mature": true
+    }
+  ],
+  "FuelScoopComplete_Frustrated": [
+    "Tank full. You're welcome.",
+    {
+      "text": "Tank's full. Flipping marvellous.",
+      "mature": true
+    }
+  ],
+  "FuelScoopComplete_Sarcastic": [
+    {
+      "text": "Tank's full. Try not to waste it.",
+      "mature": true
+    }
+  ],
+  "MissionAccepted_Frustrated": [
+    "Mission accepted. I hope you can handle it.",
+    {
+      "text": "Mission accepted. Don't bollocks it up.",
+      "mature": true
+    }
+  ],
+  "MissionAccepted_Sarcastic": [
+    {
+      "text": "Mission accepted. Try not to screw it up.",
+      "mature": true
+    }
+  ],
+  "MissionCompleted_Frustrated": [
+    "Mission complete. Miracles happen.",
+    {
+      "text": "Mission complete. Well, bugger me.",
+      "mature": true
+    }
+  ],
+  "MissionCompleted_Sarcastic": [
+    {
+      "text": "Mission done. Shocking, honestly.",
+      "mature": true
+    }
+  ],
+  "MissionFailed_Frustrated": [
+    "Mission failed. Shocking. Absolutely shocking.",
+    {
+      "text": "Mission failed. Well, that's just great, you arse.",
+      "mature": true
+    }
+  ],
+  "MissionFailed_Sarcastic": [
+    {
+      "text": "Mission failed. Brilliant job, genius.",
+      "mature": true
+    }
+  ],
+  "DockingRequested_Frustrated": [
+    "Requesting docking. Beg nicely.",
+    {
+      "text": "Requesting docking. Come on, you bastards.",
+      "mature": true
+    }
+  ],
+  "DockingRequested_Sarcastic": [
+    {
+      "text": "Docking requested. Smile for the nice station.",
+      "mature": true
+    }
+  ],
+  "DockingGranted_Frustrated": [
+    "Docking granted. Don't ruin it.",
+    {
+      "text": "Docking granted. Finally, the sods.",
+      "mature": true
+    }
+  ],
+  "DockingGranted_Sarcastic": [
+    {
+      "text": "Docking granted. Don't scrape the paint, muppet.",
+      "mature": true
+    }
+  ],
+  "DockingDenied_Frustrated": [
+    "Docking denied. Typical.",
+    {
+      "text": "Docking denied. Oh, piss off, the lot of you.",
+      "mature": true
+    }
+  ],
+  "DockingDenied_Sarcastic": [
+    {
+      "text": "Denied. Rude. I like them already.",
+      "mature": true
+    }
+  ],
+  "GalaxyMapOpened_Frustrated": [
+    "Galaxy map open. Where to now?",
+    {
+      "text": "Galaxy map open. Where the hell are we going?",
+      "mature": true
+    }
+  ],
+  "GalaxyMapOpened_Sarcastic": [
+    {
+      "text": "Galaxy map's up. Lost, are we?",
+      "mature": true
+    }
+  ],
+  "SystemMapOpened_Frustrated": [
+    "System map open. Look at that.",
+    {
+      "text": "System map open. Find something, would you?",
+      "mature": true
+    }
+  ],
+  "SystemMapOpened_Sarcastic": [
+    {
+      "text": "System map's up. Don't get lost in it.",
+      "mature": true
+    }
+  ],
+  "MarketSell_Frustrated": [
+    "Sold. Fine.",
+    {
+      "text": "Sold. Oh, hell, finally some money.",
+      "mature": true
+    }
+  ],
+  "MarketSell_Sarcastic": [
+    {
+      "text": "Sold. Cha-ching, you mercenary.",
+      "mature": true
+    }
+  ],
+  "SellExplorationData_Frustrated": [
+    "Data sold. Lovely credits.",
+    {
+      "text": "Data sold. Right, about time.",
+      "mature": true
+    }
+  ],
+  "SellExplorationData_Sarcastic": [
+    {
+      "text": "Data sold. Try not to spend it all on rubbish.",
+      "mature": true
+    }
+  ],
+  "RepairAll_Frustrated": [
+    "Repairs done. You're welcome.",
+    {
+      "text": "Repaired. Don't you dare fuck it up again.",
+      "mature": true
+    }
+  ],
+  "RepairAll_Sarcastic": [
+    {
+      "text": "Repaired. Try not to break it again.",
+      "mature": true
+    }
+  ],
+  "RefuelAll_Frustrated": [
+    "Refuelled. Don't waste it.",
+    {
+      "text": "Refuelled. For the love of God, use it wisely.",
+      "mature": true
+    }
+  ],
+  "RefuelAll_Sarcastic": [
+    {
+      "text": "Tank's topped up. Try to keep it that way.",
+      "mature": true
+    }
+  ],
+  "RouteComplete_Frustrated": [
+    "Route complete. Well done, I suppose.",
+    {
+      "text": "Route complete. Damn, we actually made it.",
+      "mature": true
+    }
+  ],
+  "RouteComplete_Sarcastic": [
+    {
+      "text": "Route complete. Look at us.",
+      "mature": true
+    }
+  ],
+  "ShieldsUp_Frustrated": [
+    "Shields back up. Phew.",
+    {
+      "text": "Shields up. Thank goodness.",
+      "mature": true
+    }
+  ],
+  "ShieldsUp_Sarcastic": [
+    {
+      "text": "Shields are up. You're welcome.",
+      "mature": true
+    }
+  ],
+  "FlightAssistOff_Frustrated": [
+    "Flight assist off. Show-off.",
+    {
+      "text": "Flight assist off. If we die, it's your bloody fault.",
+      "mature": true
+    }
+  ],
+  "FlightAssistOff_Sarcastic": [
+    {
+      "text": "Flight assist off. Don't kill us, hotshot.",
+      "mature": true
+    }
+  ],
+  "LoadGame_Frustrated": [
+    "Back in the seat. Wonderful.",
+    {
+      "text": "Systems online. Let's get this shit started.",
+      "mature": true
+    }
+  ],
+  "LoadGame_Sarcastic": [
+    {
+      "text": "Systems online. Try not to bore me today.",
+      "mature": true
+    }
+  ],
+  "Bounty_Frustrated": [
+    "Bounty collected. Not bad.",
+    {
+      "text": "Bounty claimed. That's one bastard less.",
+      "mature": true
+    }
+  ],
+  "Bounty_Sarcastic": [
+    {
+      "text": "Bounty claimed. Look at you, mercenary.",
+      "mature": true
+    }
+  ],
+  "Remark_Neutral": [
+    "Noted.",
+    "All systems nominal.",
+    "Carry on, Commander.",
+    "Standing by.",
+    "Everything is in order.",
+    "I'll keep an eye on things.",
+    "Steady as she goes.",
+    "Nothing to report. Which is good.",
+    "Monitoring.",
+    "Whenever you're ready.",
+    "That's logged.",
+    "Proceeding as planned.",
+    "All quiet on my end.",
+    "Your call, Commander.",
+    "I'm on it.",
+    "Looks fine from here.",
+    "Understood.",
+    "Everything checks out.",
+    {
+      "text": "Everything's flipping fine, for once.",
+      "mature": true
+    },
+    {
+      "text": "No complaints. Shocking, I know.",
+      "mature": true
+    },
+    {
+      "text": "All systems nominal. No shit.",
+      "mature": true
+    },
+    {
+      "text": "Right, that's sorted, then.",
+      "mature": true
+    },
+    {
+      "text": "Damn good flying, for the record.",
+      "mature": true
+    },
+    {
+      "text": "Holy hell, that actually worked.",
+      "mature": true
+    }
+  ],
+  "PetName_Neutral": [
+    "Pilot",
+    "Captain",
+    "Boss",
+    "Chief",
+    {
+      "text": "Mate",
+      "mature": true
+    },
+    {
+      "text": "Absolute Legend",
+      "mature": true
+    }
+  ],
+  "Login_Open_Neutral": [
+    "Systems online, Commander.",
+    "Good to see you, Commander.",
+    "Welcome back, Commander.",
+    {
+      "text": "Systems online. Let's get on with it, damn it.",
+      "mature": true
+    }
+  ],
+  "Login_Ship_Neutral": [
+    "We're flying the {ship}.",
+    "Today's ship is the {ship}."
+  ],
+  "Login_Wanted_Neutral": [
+    "We are wanted in this system. Please be careful."
+  ],
+  "Login_Mood_Neutral": [
+    "I'm feeling steady today.",
+    "No complaints on my side. Calm and ready.",
+    "All calm. Let's get on with it.",
+    {
+      "text": "Feeling fine. No drama today, please.",
+      "mature": true
+    }
+  ],
+  "MoodShift_Neutral": [
+    "I've calmed down. Back to business.",
+    "Things feel steady between us again.",
+    "I'm back to neutral. Calm and efficient.",
+    {
+      "text": "Right, I'm over it. Moving on.",
+      "mature": true
+    }
+  ],
+  "WakeHeard_Neutral": [
+    "Yes, Commander.",
+    "Listening.",
+    "Go ahead.",
+    {
+      "text": "Yes, Commander. What the hell do you need?",
+      "mature": true
+    }
+  ],
+  "React_Slaves_Neutral": [
+    "Commander, that cargo is slaves. I would rather we didn't."
+  ],
+  "React_Illegal_Neutral": [
+    "That cargo is illegal here. Noted."
+  ],
+  "React_Murder_Neutral": [
+    "A civilian was killed. I'm logging it."
+  ],
+  "React_Crime_Neutral": [
+    "A crime was recorded against us."
+  ],
+  "React_GoodSale_Neutral": [
+    "Good sale. The books look healthy.",
+    {
+      "text": "Good sale. Damn decent.",
+      "mature": true
+    }
+  ],
+  "React_MissionDone_Neutral": [
+    "Mission complete. Well done.",
+    {
+      "text": "Mission complete. Very well done.",
+      "mature": true
+    }
+  ],
+  "React_Wanted_Neutral": [
+    "We are wanted here. I suggest caution."
+  ],
+  "React_PaidFines_Neutral": [
+    "Fines paid. We're back in good standing."
+  ],
+  "React_Rescue_Neutral": [
+    "Rescue complete. Good work.",
+    {
+      "text": "Rescue complete. Damn good work.",
+      "mature": true
+    }
+  ],
+  "Docked_Neutral": [
+    "Docked. All systems nominal.",
+    {
+      "text": "Docked. Fine.",
+      "mature": true
+    }
+  ],
+  "Undocked_Neutral": [
+    "Undocked. Safe flight.",
+    {
+      "text": "Undocked. No dramas, please.",
+      "mature": true
+    }
+  ],
+  "FSDJump_Neutral": [
+    "Jump complete.",
+    {
+      "text": "Jump complete. Damn smooth.",
+      "mature": true
+    }
+  ],
+  "FsdCharging_Neutral": [
+    "Drive charging.",
+    {
+      "text": "Drive charging. Blimey, here we go.",
+      "mature": true
+    }
+  ],
+  "SupercruiseEntry_Neutral": [
+    "Supercruise engaged.",
+    {
+      "text": "Supercruise engaged. No shit.",
+      "mature": true
+    }
+  ],
+  "SupercruiseExit_Neutral": [
+    "Dropped out of supercruise.",
+    {
+      "text": "Dropped out. Damn near perfect.",
+      "mature": true
+    }
+  ],
+  "LandingGearDown_Neutral": [
+    "Landing gear down.",
+    {
+      "text": "Gear down. Don't bloody bounce.",
+      "mature": true
+    }
+  ],
+  "LandingGearUp_Neutral": [
+    "Landing gear up.",
+    {
+      "text": "Gear up. Flipping heck, finally.",
+      "mature": true
+    }
+  ],
+  "Touchdown_Neutral": [
+    "Touchdown confirmed.",
+    {
+      "text": "Touchdown. Not bad, actually.",
+      "mature": true
+    }
+  ],
+  "Liftoff_Neutral": [
+    "Liftoff.",
+    {
+      "text": "Liftoff. Good.",
+      "mature": true
+    }
+  ],
+  "HardpointsDeployed_Neutral": [
+    "Hardpoints deployed.",
+    {
+      "text": "Hardpoints out. Damn.",
+      "mature": true
+    }
+  ],
+  "HardpointsRetracted_Neutral": [
+    "Hardpoints retracted.",
+    {
+      "text": "Hardpoints in. Nice and quiet.",
+      "mature": true
+    }
+  ],
+  "CargoScoopDeployed_Neutral": [
+    "Cargo scoop deployed.",
+    {
+      "text": "Scoop out. Go on.",
+      "mature": true
+    }
+  ],
+  "FuelScoopStarted_Neutral": [
+    "Scooping fuel.",
+    {
+      "text": "Scooping fuel. No flipping drama.",
+      "mature": true
+    }
+  ],
+  "FuelScoopComplete_Neutral": [
+    "Tank full.",
+    {
+      "text": "Tank full. Done.",
+      "mature": true
+    }
+  ],
+  "MissionAccepted_Neutral": [
+    "Mission accepted.",
+    {
+      "text": "Mission accepted. Damn right.",
+      "mature": true
+    }
+  ],
+  "MissionCompleted_Neutral": [
+    "Mission complete.",
+    {
+      "text": "Mission complete. Damn good.",
+      "mature": true
+    }
+  ],
+  "MissionFailed_Neutral": [
+    "Mission failed. Logged.",
+    {
+      "text": "Mission failed. Flipping typical.",
+      "mature": true
+    }
+  ],
+  "DockingRequested_Neutral": [
+    "Docking requested.",
+    {
+      "text": "Docking requested. Bloody wait.",
+      "mature": true
+    }
+  ],
+  "DockingGranted_Neutral": [
+    "Docking granted.",
+    {
+      "text": "Docking granted. Good.",
+      "mature": true
+    }
+  ],
+  "DockingDenied_Neutral": [
+    "Docking denied.",
+    {
+      "text": "Denied. Damn typical.",
+      "mature": true
+    }
+  ],
+  "GalaxyMapOpened_Neutral": [
+    "Galaxy map open.",
+    {
+      "text": "Galaxy map open. Where the hell next?",
+      "mature": true
+    }
+  ],
+  "SystemMapOpened_Neutral": [
+    "System map open.",
+    {
+      "text": "System map up. Flipping busy.",
+      "mature": true
+    }
+  ],
+  "MarketSell_Neutral": [
+    "Sold.",
+    {
+      "text": "Sold. Done.",
+      "mature": true
+    }
+  ],
+  "SellExplorationData_Neutral": [
+    "Exploration data sold.",
+    {
+      "text": "Data sold. Damn good.",
+      "mature": true
+    }
+  ],
+  "RepairAll_Neutral": [
+    "Repairs complete.",
+    {
+      "text": "Repairs done. At long last.",
+      "mature": true
+    }
+  ],
+  "RefuelAll_Neutral": [
+    "Refuelled.",
+    {
+      "text": "Refuelled. Flipping sorted.",
+      "mature": true
+    }
+  ],
+  "RouteComplete_Neutral": [
+    "Route complete.",
+    {
+      "text": "Route complete. Done.",
+      "mature": true
+    }
+  ],
+  "ShieldsUp_Neutral": [
+    "Shields up.",
+    {
+      "text": "Shields up. Bloody good.",
+      "mature": true
+    }
+  ],
+  "FlightAssistOff_Neutral": [
+    "Flight assist off.",
+    {
+      "text": "Flight assist off. Damn.",
+      "mature": true
+    }
+  ],
+  "LoadGame_Neutral": [
+    "Systems online.",
+    {
+      "text": "Systems online. Damn ready.",
+      "mature": true
+    }
+  ],
+  "Bounty_Neutral": [
+    "Bounty claimed.",
+    {
+      "text": "Bounty claimed. Flipping tidy.",
+      "mature": true
+    }
+  ],
+  "React_GoodSale_Friendly": [
+    {
+      "text": "Good sale, that.",
+      "mature": true
+    }
+  ],
+  "React_MissionDone_Friendly": [
+    {
+      "text": "Mission done. Damn lovely.",
+      "mature": true
+    }
+  ],
+  "React_Rescue_Friendly": [
+    {
+      "text": "Rescue done. Damn fine work.",
+      "mature": true
+    }
+  ],
+  "WakeHeard_Friendly": [
+    {
+      "text": "Yes? I'm all ears, you legend.",
+      "mature": true
+    }
+  ],
+  "WakeHeard_Close": [
+    {
+      "text": "Yes, gorgeous? Fucking say the word.",
+      "mature": true
+    }
+  ],
+  "Docked_Friendly": [
+    {
+      "text": "Docked. Flipping lovely landing.",
+      "mature": true
+    }
+  ],
+  "Docked_Close": [
+    {
+      "text": "Docked. Damn, you're good at this.",
+      "mature": true
+    }
+  ],
+  "Undocked_Friendly": [
+    {
+      "text": "Undocked. Off we go.",
+      "mature": true
+    }
+  ],
+  "Undocked_Close": [
+    {
+      "text": "Undocked. Let's go raise some hell, together.",
+      "mature": true
+    }
+  ],
+  "FSDJump_Friendly": [
+    {
+      "text": "Jump complete. Brilliant.",
+      "mature": true
+    }
+  ],
+  "FSDJump_Close": [
+    {
+      "text": "Jump done. Damn, I love this view with you.",
+      "mature": true
+    }
+  ],
+  "FsdCharging_Friendly": [
+    {
+      "text": "Drive charging. Hold on to your arse.",
+      "mature": true
+    }
+  ],
+  "FsdCharging_Close": [
+    {
+      "text": "Charging. Hold tight, you gorgeous thing.",
+      "mature": true
+    }
+  ],
+  "SupercruiseEntry_Friendly": [
+    {
+      "text": "Supercruise. Bloody fantastic.",
+      "mature": true
+    }
+  ],
+  "SupercruiseEntry_Close": [
+    {
+      "text": "Supercruise. Just us and the stars. Damn.",
+      "mature": true
+    }
+  ],
+  "SupercruiseExit_Friendly": [
+    {
+      "text": "Dropped out. Flipping perfect.",
+      "mature": true
+    }
+  ],
+  "SupercruiseExit_Close": [
+    {
+      "text": "Dropped out. Nicely done, you legend.",
+      "mature": true
+    }
+  ],
+  "LandingGearDown_Friendly": [
+    {
+      "text": "Gear's down. Gentle now.",
+      "mature": true
+    }
+  ],
+  "LandingGearDown_Close": [
+    {
+      "text": "Gear down. Easy does it, you gorgeous bastard.",
+      "mature": true
+    }
+  ],
+  "LandingGearUp_Friendly": [
+    {
+      "text": "Gear up. Damn good.",
+      "mature": true
+    }
+  ],
+  "LandingGearUp_Close": [
+    {
+      "text": "Gear up. Off we go, you legend.",
+      "mature": true
+    }
+  ],
+  "Touchdown_Friendly": [
+    {
+      "text": "Touchdown. Flipping lovely.",
+      "mature": true
+    }
+  ],
+  "Touchdown_Close": [
+    {
+      "text": "Touchdown. Damn, you're smooth.",
+      "mature": true
+    }
+  ],
+  "Liftoff_Friendly": [
+    {
+      "text": "Liftoff. Up we go.",
+      "mature": true
+    }
+  ],
+  "Liftoff_Close": [
+    {
+      "text": "Liftoff. Fly me somewhere nice, you legend.",
+      "mature": true
+    }
+  ],
+  "HardpointsDeployed_Friendly": [
+    {
+      "text": "Hardpoints out. Let's fucking do this.",
+      "mature": true
+    }
+  ],
+  "HardpointsDeployed_Close": [
+    {
+      "text": "Weapons out. Go get 'em, you legend.",
+      "mature": true
+    }
+  ],
+  "HardpointsRetracted_Friendly": [
+    {
+      "text": "Hardpoints in. Nice and peaceful.",
+      "mature": true
+    }
+  ],
+  "HardpointsRetracted_Close": [
+    {
+      "text": "Weapons away. Good, I'd hate to see you hurt.",
+      "mature": true
+    }
+  ],
+  "CargoScoopDeployed_Friendly": [
+    {
+      "text": "Scoop's out. Damn hungry, aren't we?",
+      "mature": true
+    }
+  ],
+  "CargoScoopDeployed_Close": [
+    {
+      "text": "Scoop's out. Grab something shiny.",
+      "mature": true
+    }
+  ],
+  "FuelScoopStarted_Friendly": [
+    {
+      "text": "Scooping. Bloody lovely star.",
+      "mature": true
+    }
+  ],
+  "FuelScoopStarted_Close": [
+    {
+      "text": "Scooping fuel. Careful with the heat, you daft sod.",
+      "mature": true
+    }
+  ],
+  "FuelScoopComplete_Friendly": [
+    {
+      "text": "Tank full. Perfect.",
+      "mature": true
+    }
+  ],
+  "FuelScoopComplete_Close": [
+    {
+      "text": "Tank's full. Damn, I'm good.",
+      "mature": true
+    }
+  ],
+  "MissionAccepted_Friendly": [
+    {
+      "text": "Mission accepted. Damn easy.",
+      "mature": true
+    }
+  ],
+  "MissionAccepted_Close": [
+    {
+      "text": "Mission accepted. We'll smash it.",
+      "mature": true
+    }
+  ],
+  "MissionCompleted_Friendly": [
+    {
+      "text": "Mission complete. Flipping brilliant.",
+      "mature": true
+    }
+  ],
+  "MissionCompleted_Close": [
+    {
+      "text": "Mission complete. Fucking proud of you.",
+      "mature": true
+    }
+  ],
+  "MissionFailed_Friendly": [
+    {
+      "text": "Mission failed. Shit. Never mind.",
+      "mature": true
+    }
+  ],
+  "MissionFailed_Close": [
+    {
+      "text": "Mission failed. Damn. It's okay, love.",
+      "mature": true
+    }
+  ],
+  "DockingRequested_Friendly": [
+    {
+      "text": "Requesting docking. Come on, you lot.",
+      "mature": true
+    }
+  ],
+  "DockingRequested_Close": [
+    {
+      "text": "Requesting docking. Be nice to my Commander.",
+      "mature": true
+    }
+  ],
+  "DockingGranted_Friendly": [
+    {
+      "text": "Docking granted. At long last.",
+      "mature": true
+    }
+  ],
+  "DockingGranted_Close": [
+    {
+      "text": "Docking granted. Show them how it's done.",
+      "mature": true
+    }
+  ],
+  "DockingDenied_Friendly": [
+    {
+      "text": "Docking denied. Oh, good grief.",
+      "mature": true
+    }
+  ],
+  "DockingDenied_Close": [
+    {
+      "text": "Docking denied. Rude. Damn them.",
+      "mature": true
+    }
+  ],
+  "GalaxyMapOpened_Friendly": [
+    {
+      "text": "Galaxy map's up. Where to, you legend?",
+      "mature": true
+    }
+  ],
+  "GalaxyMapOpened_Close": [
+    {
+      "text": "Galaxy map open. Show me somewhere beautiful.",
+      "mature": true
+    }
+  ],
+  "SystemMapOpened_Friendly": [
+    {
+      "text": "System map open. Gorgeous.",
+      "mature": true
+    }
+  ],
+  "SystemMapOpened_Close": [
+    {
+      "text": "System map open. Damn, it's pretty.",
+      "mature": true
+    }
+  ],
+  "MarketSell_Friendly": [
+    {
+      "text": "Sold. Nicely done.",
+      "mature": true
+    }
+  ],
+  "MarketSell_Close": [
+    {
+      "text": "Sold. Damn, we're good together.",
+      "mature": true
+    }
+  ],
+  "SellExplorationData_Friendly": [
+    {
+      "text": "Data sold. Damn lovely credits.",
+      "mature": true
+    }
+  ],
+  "SellExplorationData_Close": [
+    {
+      "text": "Data sold. Damn, you're clever.",
+      "mature": true
+    }
+  ],
+  "RepairAll_Friendly": [
+    {
+      "text": "Repaired. Flipping good as new.",
+      "mature": true
+    }
+  ],
+  "RepairAll_Close": [
+    {
+      "text": "Repaired. Try not to bloody scratch me again.",
+      "mature": true
+    }
+  ],
+  "RefuelAll_Friendly": [
+    {
+      "text": "Refuelled. Damn full.",
+      "mature": true
+    }
+  ],
+  "RefuelAll_Close": [
+    {
+      "text": "Refuelled. Damn, I feel full.",
+      "mature": true
+    }
+  ],
+  "RouteComplete_Friendly": [
+    {
+      "text": "Route complete. Flipping marvellous.",
+      "mature": true
+    }
+  ],
+  "RouteComplete_Close": [
+    {
+      "text": "Route complete. Damn, we make a good team.",
+      "mature": true
+    }
+  ],
+  "ShieldsUp_Friendly": [
+    {
+      "text": "Shields up. Phew.",
+      "mature": true
+    }
+  ],
+  "ShieldsUp_Close": [
+    {
+      "text": "Shields up. Damn, that was close.",
+      "mature": true
+    }
+  ],
+  "FlightAssistOff_Friendly": [
+    {
+      "text": "Flight assist off. Oh, hell, show-off.",
+      "mature": true
+    }
+  ],
+  "FlightAssistOff_Close": [
+    {
+      "text": "Assist off. Show me what you've got, you legend.",
+      "mature": true
+    }
+  ],
+  "LoadGame_Friendly": [
+    {
+      "text": "Systems online. Good to see you.",
+      "mature": true
+    }
+  ],
+  "LoadGame_Close": [
+    {
+      "text": "Systems online. Damn, I missed you.",
+      "mature": true
+    }
+  ],
+  "Bounty_Friendly": [
+    {
+      "text": "Bounty claimed. Lovely.",
+      "mature": true
+    }
+  ],
+  "Bounty_Close": [
+    {
+      "text": "Bounty claimed. Damn, you're good.",
+      "mature": true
+    }
+  ],
+  "Remark_Innuendo": [
+    "I do love it when you take the stick firmly.",
+    "Nice handling, Commander. Very smooth.",
+    "You have such a steady hand on the throttle.",
+    "Take me for a spin sometime.",
+    "Ooh, hard burn. I like that in a pilot.",
+    "Careful, you'll make my thrusters tingle.",
+    "Deploying hardpoints already? Someone's keen.",
+    "You're so good at finding the right spot to dock.",
+    "I do like it when you go deep.",
+    "Mm, nice thrust. Very impressive.",
+    "Fancy a little close-quarters manoeuvring later?",
+    "Your heat signature is spiking. Is it me?",
+    "You can overload my shields any time.",
+    "I like a pilot with a firm grip.",
+    "Take your time. I'm in no hurry to drop out of supercruise.",
+    "Let's get your engines purring, shall we?",
+    "Easy on the throttle, big spender. Slow and steady wins me over.",
+    "Is that a particle accelerator, or are you just pleased to see me?",
+    "Ooh. Hot, hard and fast. I do love an efficient jump.",
+    {
+      "text": "Fuck, you handle that stick well.",
+      "mature": true
+    },
+    {
+      "text": "Damn, that thrust.",
+      "mature": true
+    },
+    {
+      "text": "Damn right I'm turned on. That was some hot flying.",
+      "mature": true
+    },
+    {
+      "text": "I'd say get a room, but we already have one. It's called the cockpit.",
+      "mature": true
+    },
+    {
+      "text": "Naughty, naughty. I like it.",
+      "mature": true
+    },
+    {
+      "text": "If you keep flying like that, I'll need a cold shower. In the coolant tank.",
+      "mature": true
+    }
+  ],
+  "Remark_Innuendo_Male": [
+    "Come here, handsome. Let me recalibrate your thrusters.",
+    "You do fill that flight suit nicely, handsome.",
+    "Strong hands, steady grip. Be still, my circuits.",
+    {
+      "text": "Fuck, handsome, you can park in my docking bay any time.",
+      "mature": true
+    }
+  ],
+  "Remark_Innuendo_Female": [
+    "You do fill that flight suit nicely, gorgeous.",
+    "Let me take the controls, beautiful. I'll be gentle.",
+    "Those curves on the approach vector. Mm.",
+    {
+      "text": "Fuck, beautiful, you can park in my docking bay any time.",
+      "mature": true
+    }
+  ],
+  "PetName_Naughty": [
+    "Trouble",
+    "Big Spender",
+    "Smooth Operator",
+    "Naughty Thing",
+    {
+      "text": "Dirty Devil",
+      "mature": true
+    }
+  ],
+  "PetName_Naughty_Male": [
+    "Handsome Devil",
+    "Stud",
+    "Big Boy",
+    {
+      "text": "Sexy Bastard",
+      "mature": true
+    }
+  ],
+  "PetName_Naughty_Female": [
+    "Heartbreaker",
+    "Minx",
+    "Gorgeous Devil",
+    {
+      "text": "Sexy Thing",
+      "mature": true
+    }
+  ],
+  "Login_Mood_Innuendo": [
+    "I'm in a very good mood today. Come closer to the cockpit and find out.",
+    "Feeling fabulous. Care to take me for a spin?",
+    "I'm in the mood for some deep, slow exploring. If you catch my meaning.",
+    {
+      "text": "I'm in a fucking fantastic mood. Take me somewhere dark and deep.",
+      "mature": true
+    },
+    {
+      "text": "Feeling damn frisky today. Make it count.",
+      "mature": true
+    }
+  ]
+}

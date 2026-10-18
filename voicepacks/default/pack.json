@@ -1,0 +1,9 @@
+{
+  "name": "Starling",
+  "id": "default",
+  "version": "1.0.0",
+  "author": "",
+  "description": "Starling, the moon fox: text lines spoken by her cloned offline voice.",
+  "dialogue_file": "dialogue.json",
+  "notes": "Only share this pack if you have the right to use the voice in clone/."
+}
