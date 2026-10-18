@@ -31,6 +31,12 @@ class Base(unittest.TestCase):
 
 
 class StoryTests(Base):
+    def test_the_story_is_rescue_not_manufacture(self):
+        joined = " ".join(self.chapters("Lore_L2") + self.chapters("Lore_L3") + self.chapters("Lore_Dark"))
+        for phrase in ("rescued", "Planet, Probably", "R&D"):
+            self.assertIn(phrase, joined)
+        self.assertNotIn("built by the East Orion", " ".join(self.chapters("Lore_L1")))
+
     def test_first_chapter_names_her_and_the_company(self):
         text = self.lore.tell()
         self.assertIn("East Orion Company", text)
@@ -61,13 +67,13 @@ class StoryTests(Base):
 
     def test_close_unlocks_the_personal_chapters(self):
         self.mood("Close")
-        told = [self.lore.tell() for _ in range(11)]
+        told = [self.lore.tell() for _ in range(12)]
         self.assertIn(self.chapters("Lore_L3")[0], told)
         self.assertNotIn(self.chapters("Lore_Dark")[0], told)
 
     def test_everything_told_then_replays_with_a_note(self):
         self.mood("Close")
-        for _ in range(11):
+        for _ in range(12):
             self.lore.tell()
         text = self.lore.tell()
         self.assertTrue(any(text.startswith(n) for n in self.chapters("Lore_Done")))
@@ -150,7 +156,7 @@ class ContentTests(Base):
 
     def test_enough_chapters(self):
         self.assertGreaterEqual(len(self.chapters("Lore_L1")), 4)
-        self.assertGreaterEqual(len(self.chapters("Lore_L2")), 4)
+        self.assertGreaterEqual(len(self.chapters("Lore_L2")), 5)
         self.assertGreaterEqual(len(self.chapters("Lore_L3")), 3)
         self.assertGreaterEqual(len(self.chapters("Lore_Dark")), 8)
 

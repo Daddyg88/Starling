@@ -37,13 +37,14 @@ When it has been quiet she says something small and silly. She only does it when
 - **She chats more:** Normal is now about every 3 to 6 quiet minutes (the new **Chatty** setting is about every 1 to 2). Dashboard > Personality > "How often she chats".
 - **Talk to her:** say "Starling, how are you?", "tell me a joke", "talk to me", "I'm bored", "are you there?", "good morning", "good night", "I'm back", "good job", "what's your name?". Kind words give a small mood lift. Switch off with `smalltalk.enabled` in settings.json. Her answers are in `voicepacks/default/smalltalk.json`.
 
-# Her back story (0.16.0)
-Ask her **"who are you?"**, **"what's your name?"**, **"what are you?"**, **"tell me about yourself"**, **"who made you?"**, **"tell me about the East Orion Company"**, then **"tell me more"** to hear the next chapter. She tells the chapters in order and never repeats one until she has run out.
+# Her back story (0.16.1)
+**The story:** the East Orion Company's R&D department rescued her from a far-off planet of unknown origin (logged as "Planet, Probably"), and gave her to you to test. They didn't build her, and nobody knows who did.
+
+Ask her **"who are you?"**, **"what's your name?"**, **"what are you?"**, **"tell me about yourself"**, **"who made you?"**, **"tell me about the East Orion Company"**, then **"tell me more"** for the next chapter. She tells the chapters in order and never repeats one until she has run out.
 - **Calm:** the company brochure version (4 chapters).
-- **Friendly:** she also tells the real story (4 more).
+- **Friendly:** she also tells the real story: the planet, the vault, how she was found (5 more).
 - **Close:** she also tells the personal chapters (3 more).
-- **Bad mood (Sarcastic or Frustrated):** she tells the horrible things that happened to her, as dark comedy (9 chapters). Ask while she is cross to hear them.
+- **Bad mood (Sarcastic or Frustrated):** the horrible things that happened to her, as dark comedy (9 chapters). Ask while she is cross.
 - If she has told all she is allowed to, she says there is more if you are kind to her.
-- Chapters you have heard are saved in `data/lore.json` (delete that file to hear them again). All the words are in `voicepacks/default/lore.json`; add new chapters at the END of a list so the order stays right.
-- The East Orion Company also gets the odd mention in her chit-chat.
-The East Orion Company and everything about it is invented for her and written to be funny, not canon.
+- Heard chapters are saved in `data/lore.json` (delete it to hear them again). Words: `voicepacks/default/lore.json`; add new chapters at the END of a list.
+The East Orion Company, the planet and everything about them are invented for her, not Elite Dangerous canon.
