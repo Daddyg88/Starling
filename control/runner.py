@@ -87,6 +87,7 @@ class CommandRunner:
         self.clock = clock
         self.sleep = sleep
         self._last = {}
+        self._clash_warned = set()
         self.last_outcomes: List[Outcome] = []
 
     # ---- wiring ----
@@ -307,6 +308,7 @@ class CommandRunner:
                     detail = "For %s I need a keyboard key for %s in your Elite controls." % (command.label, action)
                 return Outcome(status, text, command, intent, detail=detail)
             strokes[action] = stroke
+        clash = self._key_clashes(strokes)
         self.sender.require_game = bool(self.settings.get("commands.require_game_focus", True))
         pressed = []
         for step in steps:
@@ -333,7 +335,24 @@ class CommandRunner:
                 self.sleep(GAP_SECONDS)
         self._last[key] = now
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
-                       detail=command.do_text(intent) + ".")
+                       detail=command.do_text(intent) + "." + clash)
+
+    def _key_clashes(self, strokes):
+        """Warns (once per action) when a key a macro presses is also bound to another ship action."""
+        notes = []
+        for action in strokes:
+            try:
+                others = self.book.conflicts(action)
+            except Exception:
+                continue
+            if others:
+                text = "%s is on the same key as %s" % (action, ", ".join(others[:3]))
+                notes.append(text)
+                if action not in self._clash_warned:
+                    self._clash_warned.add(action)
+                    log.warning("Key clash: %s. Elite may do the wrong thing when the macro presses it. "
+                                "Give one of them a different key in Elite's controls.", text)
+        return (" Warning: " + "; ".join(notes) + ".") if notes else ""
 
     @staticmethod
     def _explain(status, command):

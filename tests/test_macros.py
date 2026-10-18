@@ -1,6 +1,8 @@
 """Macro tests: request docking, deploy Nomad, and the flicker-free Home page."""
 
+import tempfile
 import unittest
+from pathlib import Path
 
 from control.binds import Keystroke
 from control.macros import actions_in, parse_macro
@@ -154,3 +156,22 @@ class NewOverlayDiscoveryTests(unittest.TestCase):
     def test_known_overlays_are_not_added_twice(self):
         from control.vc_overlays import OVERLAYS, discover
         self.assertEqual(discover([{"id": o[0], "name": o[1]} for o in OVERLAYS]), [])
+
+
+class KeyClashTests(unittest.TestCase):
+    def book(self, xml):
+        from control.binds import BindingBook
+        d = Path(tempfile.mkdtemp())
+        (d / "A.4.0.binds").write_text(xml)
+        (d / "StartPreset.start").write_text("A\n")
+        return BindingBook(d)
+
+    def test_select_on_enter_clashes_with_quick_comms(self):
+        book = self.book('<?xml version="1.0"?><Root>'
+                         '<UI_Select><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></UI_Select>'
+                         '<QuickCommsPanel><Primary Device="Keyboard" Key="Key_Enter" /></QuickCommsPanel>'
+                         '<QuickCommsPanel_Humanoid><Primary Device="Keyboard" Key="Key_Enter" /></QuickCommsPanel_Humanoid>'
+                         '<UI_Back><Primary Device="Keyboard" Key="Key_Backspace" /></UI_Back></Root>')
+        self.assertEqual(book.conflicts("UI_Select"), ["QuickCommsPanel"])
+        self.assertEqual(book.conflicts("UI_Back"), [])
+        self.assertEqual(book.conflicts("Nothing"), [])

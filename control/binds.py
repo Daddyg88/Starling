@@ -206,6 +206,33 @@ class BindingBook:
             return Keystroke(slot.key, tuple(k for _d, k in slot.modifiers)), ""
         return None, problem
 
+    CONTEXT_VARIANTS = ("_Buggy", "_Humanoid", "_Fighter", "_MultiCrew")
+
+    def conflicts(self, action):
+        """Other ship actions that use the SAME keyboard key (and shift keys) as `action`.
+
+        Elite lets one key do several things. In menus that is fine, but when two actions are live at the same moment
+        (for example UI Select and the quick comms panel both on Enter) Elite may do the wrong one, and a macro
+        then goes wrong at that key press. Returns a list of action names (SRV / on-foot / fighter versions skipped).
+        """
+        if not self.refresh():
+            return []
+        stroke, _why = self.lookup(action)
+        if stroke is None:
+            return []
+        mine = (_norm_key(stroke.key), frozenset(_norm_key(m) for m in stroke.modifiers))
+        found = []
+        for other, slots in self._actions.items():
+            if other == action or other.endswith(self.CONTEXT_VARIANTS) or other.startswith(("Humanoid", "Vanity", "FreeCam", "HeadLook")):
+                continue
+            for slot in slots:
+                if slot.is_empty() or slot.device.lower() != "keyboard":
+                    continue
+                if (_norm_key(slot.key), frozenset(_norm_key(d_k[1]) for d_k in slot.modifiers)) == mine:
+                    found.append(other)
+                    break
+        return sorted(found)
+
     def has_action(self, action):
         return action in self._actions
 
