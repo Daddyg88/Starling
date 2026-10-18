@@ -1,0 +1,54 @@
+{
+ "_help": "What she says about her memories. {memory} is the remembered thing, {system} the place, {hours} and {count} are numbers. _Login lines are used in the login greeting, _Ask lines when you say 'what do you remember'. A _Mood suffix (for example Memory_Death_Login_Sarcastic) is used only in that mood.",
+ "Memory_Empty": [
+  "I haven't got much to remember yet, Commander. Give me time.",
+  "Not a lot yet. We've only just started."
+ ],
+ "Memory_Hours": [
+  "We've spent about {hours} hours together.",
+  "That's {hours} hours of flying with you so far."
+ ],
+ "Memory_Destroyed": [
+  "You've lost your ship {count} times. I counted.",
+  "I've watched you get destroyed {count} times."
+ ],
+ "Memory_ForgetHow": [
+  "If you want me to forget, open the Memory page on the dashboard. I won't wipe it by voice, in case it was a mistake."
+ ],
+ "Memory_Record_Login": [
+  "I was thinking about {memory}.",
+  "I still remember {memory}."
+ ],
+ "Memory_Record_Ask": [
+  "I remember {memory}.",
+  "There's {memory}. I'm proud of that one."
+ ],
+ "Memory_Death_Login": [
+  "Try to stay alive this time. I haven't forgotten: {memory}.",
+  "I remember when it went wrong. {memory}."
+ ],
+ "Memory_Death_Login_Sarcastic": [
+  "Let's not repeat the last time. {memory}.",
+  "Do try to avoid being destroyed again. {memory}."
+ ],
+ "Memory_Death_Ask": [
+  "I remember the bad ones too. {memory}.",
+  "{memory}. I try not to dwell on it."
+ ],
+ "Memory_Mission_Login": [
+  "I remember that big payday, {memory}.",
+  "That was a good one: {memory}."
+ ],
+ "Memory_Mission_Ask": [
+  "I remember {memory}.",
+  "{memory}. That paid well."
+ ],
+ "Memory_First_Login": [
+  "I remember {memory}.",
+  "I'm still fond of {memory}."
+ ],
+ "Memory_First_Ask": [
+  "I remember {memory}.",
+  "{memory}. That was a good day."
+ ]
+}

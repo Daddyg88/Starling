@@ -197,6 +197,11 @@ def build_pages(mic_lister=None, pack_folder=None):
                        "You can always say 'plot the next waypoint'. Needs the keys in Elite's controls (see the guide)"),
             Field("neutron.announce", "She tells me the next waypoint", "toggle"),
         ]),
+        Page("memory", "Memory", "What she remembers about you and your trips. It is kept only on this computer, in data/tetko.db.", [
+            Field("memory.enabled", "She remembers milestones", "toggle",
+                  help="Longest jump, biggest sales, times destroyed, big missions, hours together. Off = nothing new is saved"),
+            Field("memory.recall_at_login", "She mentions one memory when I log in", "toggle"),
+        ]),
         Page("updates", "Updates", "Starling.exe installs new versions from your GitHub releases by itself. This page lets you check by hand.", [
             Field("updates.repo", "GitHub repository", "text", placeholder="owner/name",
                   help="Filled in automatically when you start from Starling.exe"),

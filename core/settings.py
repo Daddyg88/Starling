@@ -36,6 +36,7 @@ DEFAULTS = {
     "watcher": {"enabled": True, "reply": "often", "wait_for_calm": True},
     "autohonk": {"mode": "off", "hold_seconds": 6.0, "delay_seconds": 2.0},
     "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "disabled": []},
+    "memory": {"enabled": True, "recall_at_login": True},
     "updates": {"repo": "", "auto_check": True, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},
     "ptt": {"mode": "off", "button": "", "beep": True, "skip_wake": True},

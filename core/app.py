@@ -29,7 +29,7 @@ from tts.speech_manager import SpeechManager
 
 APP_NAME = "STARLING"
 from core.version import __version__
-APP_VERSION = __version__ + " (Phase 6: auto-updater)"
+APP_VERSION = __version__ + " (Phase 7: memory)"
 
 
 class App:
@@ -56,6 +56,9 @@ class App:
         self.listener = None
         self.mood = None
         self.greeter = None
+        self.memory_store = None
+        self.memory_keeper = None
+        self.memory_recall = None
         self._record_events = True
         self.voice_replies = None
         self.manners = None
@@ -104,6 +107,13 @@ class App:
             saver.attach(self.bus)
         if show_events:
             self.bus.subscribe(ALL_EVENTS, print_event)
+
+        from memory.store import MemoryStore
+        self.memory_store = MemoryStore(self.database)
+        if record_events:                          # --demo never writes memories
+            from memory.keeper import MemoryKeeper
+            self.memory_keeper = MemoryKeeper(self.bus, self.memory_store, self.settings, state_provider=lambda: self.state)
+            self.memory_keeper.attach()
 
         self.bus.publish("app.started", {"session_id": self.session_id})
         self.log.info("%s online.", APP_NAME)
@@ -159,8 +169,10 @@ class App:
 
         # The hello when you load into the game: ship, where you are, and how she feels.
         from personality.greeter import LoginGreeter
+        from memory.recall import MemoryRecall
+        self.memory_recall = MemoryRecall(self.memory_store, self.dialogue, self.settings, speech=self.speech)
         self.greeter = LoginGreeter(self.bus, self.speech, self.dialogue, self.settings,
-                                    state_provider=lambda: self.state, flavour=flavour)
+                                    state_provider=lambda: self.state, flavour=flavour, memory=self.memory_recall)
         self.greeter.attach()
         return True
 
@@ -234,7 +246,8 @@ class App:
             self.commands = CommandRunner(
                 self.bus, self.speech, self.dialogue, self.settings, book=BindingBook(), sender=KeySender(),
                 matcher=Matcher(learning=self.learning),
-                state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route())
+                state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route(),
+                memory=self.memory_recall)
             # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
             self.commands.attach()
             self._connect_auto_plot()
@@ -279,6 +292,27 @@ class App:
             threading.Thread(target=lambda: runner.run_text("plot the next waypoint", speak_unknown=False),
                              name="auto-plot", daemon=True).start()
         follower.auto_plot = go
+
+    def memory_text(self):
+        """Everything she remembers, as plain text for the Memory page."""
+        store = self.memory_store
+        if store is None:
+            return "Memory is not running."
+        stats = store.stats()
+        lines = ["Hours together: %.1f   Jumps: %s   Missions: %s   Times destroyed: %s" % (
+            stats.get("hours_together", 0) or 0, stats.get("systems_visited", 0), stats.get("missions_completed", 0),
+            stats.get("times_destroyed", 0))]
+        for memory in store.all(30):
+            lines.append("- %s" % memory["summary"])
+        if len(lines) == 1:
+            lines.append("Nothing remembered yet.")
+        return "\n".join(lines)
+
+    def forget_memories(self):
+        if self.memory_store is None:
+            return "Memory is not running."
+        self.memory_store.forget_everything()
+        return "Done. She has forgotten everything."
 
     def ensure_updates(self):
         if getattr(self, "updates", None) is None:

@@ -70,7 +70,7 @@ class Outcome:
 
 class CommandRunner:
     def __init__(self, bus, speech, dialogue, settings, book=None, sender=None, state_provider=None,
-                 matcher=None, flavour=None, clock=time.monotonic, sleep=time.sleep, echo=None, voidcompass=None, route=None, macro_hooks=None):
+                 matcher=None, flavour=None, clock=time.monotonic, sleep=time.sleep, echo=None, voidcompass=None, route=None, macro_hooks=None, memory=None):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
@@ -82,6 +82,7 @@ class CommandRunner:
         self.flavour = flavour
         self.echo = echo                 # control/echo.py: tells the event speaker not to repeat what she just did
         self.macro_hooks = macro_hooks or {}     # command id -> function run before its macro; returns (ok, sentence)
+        self.memory = memory             # memory/recall.py: "what do you remember"
         self.route = route               # navigation/voice.py: 'plot a neutron route to Colonia'
         self.voidcompass = voidcompass   # control/voidcompass.py (made on first use if not given)
         self.clock = clock
@@ -152,15 +153,17 @@ class CommandRunner:
     # ---- doing ----
     def run_text(self, text, speak_unknown=True, speak=True):
         """Understand and carry out a sentence. Returns the list of Outcomes."""
-        if self.route is not None:
+        for helper in (self.memory, self.route):       # spoken questions and the route plotter answer for themselves
+            if helper is None:
+                continue
             try:
-                handled = self.route.try_handle(text)
+                handled = helper.try_handle(text)
             except Exception:
-                log.exception("Route command failed")
+                log.exception("A voice helper failed")
                 handled = None
             if handled is not None:
                 outcome = Outcome("route", text, None, "press", detail=handled)
-                self._finish([outcome], False, text)        # the route code speaks for itself
+                self._finish([outcome], False, text)
                 return [outcome]
         matches = []
         single = self.matcher.match(text)

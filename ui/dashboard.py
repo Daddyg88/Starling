@@ -304,6 +304,9 @@ class Dashboard:
             extra.append(("Reset her mood", self.reset_mood))
         if page.id == "listening":
             extra.append(("Refresh microphone list", lambda p=page: self.refresh_mics(p)))
+        if page.id == "memory":
+            extra += [("Show what she remembers", self.show_memories),
+                      ("Forget everything", self.forget_memories)]
         if page.id == "updates":
             extra += [("Check for updates now", self.check_updates)]
         if page.id == "navigation":
@@ -494,6 +497,15 @@ class Dashboard:
             return
         names = ", ".join(("%s [X52]" if d.is_x52() else "%s") % d.name for d in devices)
         self._controls_result("Found: " + names, T.GOOD)
+
+    def show_memories(self):
+        self._controls_result(self.app.memory_text(), T.GOOD)
+
+    def forget_memories(self):
+        from tkinter import messagebox
+        if not messagebox.askyesno("Forget everything", "Delete ALL of her memories and the hours-together count? This cannot be undone."):
+            return
+        self._controls_result(self.app.forget_memories(), T.WARN)
 
     def check_updates(self):
         """Updates page: look on GitHub (in the background) and say what was found."""

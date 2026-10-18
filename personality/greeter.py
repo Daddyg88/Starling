@@ -33,13 +33,14 @@ class _Safe(dict):
 
 class LoginGreeter:
     def __init__(self, bus, speech, dialogue, settings, state_provider=None, flavour=None,
-                 clock=time.monotonic, timer_factory=None):
+                 clock=time.monotonic, timer_factory=None, memory=None):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
         self.state_provider = state_provider or (lambda: None)
         self.flavour = flavour
+        self.memory = memory            # memory/recall.py (optional)
         self.clock = clock
         self.timer_factory = timer_factory or (lambda seconds, function: threading.Timer(seconds, function))
         self._pending = None          # LoadGame data waiting for its Location
@@ -133,6 +134,14 @@ class LoginGreeter:
             parts.append(self._say("Login_Wanted", mood, values))
 
         sentence = " ".join(p for p in parts if p)
+        if self.memory is not None and personality:
+            try:
+                remembered = self.memory.login_line()
+            except Exception:
+                log.exception("Could not recall a memory for the greeting")
+                remembered = None
+            if remembered:
+                sentence = "%s || %s" % (sentence, remembered)
         if personality:
             key = "Login_Mood_" + (mood or "Friendly")
             if (self.flavour is not None and self.flavour.innuendo_on(mood) and mood not in ("Sarcastic", "Frustrated")

@@ -1,1 +1,1 @@
-"""Phase 6: long-term memories and conversation analysis."""
+"""Phase 7: long-term memories (what she remembers about you and your trips)."""
