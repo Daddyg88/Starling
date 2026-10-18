@@ -7,5 +7,6 @@ from core.event_bus import NORMAL
 class FactionKillBond(BaseEvent):
     name = "FactionKillBond"
     priority = NORMAL
+    tag_on_foot = True
     keep = ("Reward", "VictimFaction",)
     summary = "Combat bond: {Reward:,} credits"

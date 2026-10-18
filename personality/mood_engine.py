@@ -410,7 +410,7 @@ class MoodEngine:
             self._ctx["hardpoints"] = True
         elif name == "HardpointsRetracted":
             self._ctx["hardpoints"] = False
-        elif name in ("UnderAttack", "Interdicted", "FactionKillBond", "Bounty"):
+        elif name in ("UnderAttack", "Interdicted", "FactionKillBond", "Bounty", "PVPKill", "CapShipBond"):
             self._last_attack = now
 
     def _ctx_flags(self, now):

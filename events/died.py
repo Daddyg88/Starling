@@ -7,7 +7,8 @@ from core.event_bus import CRITICAL
 class Died(BaseEvent):
     name = "Died"
     priority = CRITICAL
-    keep = ("KillerName", "KillerShip", "KillerRank",)
+    tag_on_foot = True
+    keep = ("KillerName", "KillerShip", "KillerRank", "Killers",)
 
     def describe(self, data):
         killer = data.get("KillerName")

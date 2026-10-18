@@ -7,5 +7,6 @@ from core.event_bus import NORMAL
 class Resurrect(BaseEvent):
     name = "Resurrect"
     priority = NORMAL
+    tag_on_foot = True
     keep = ("Option", "Cost",)
     summary = "Rebuy paid. Ship restored"

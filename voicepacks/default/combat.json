@@ -1,0 +1,143 @@
+{
+ "_help": "Ship changes, wings and fighting - in space and on foot. {ship}, {Name} and {Victim} are filled in by the game. A _OnFoot key is used instead when you are on foot. A _Mood suffix is only used in that mood.",
+
+ "ShipyardSwap": [
+  "Switching to the {ship}.",
+  "Now flying the {ship}.",
+  "Transferring to the {ship}, Commander.",
+  "{ship} it is. Systems coming up.",
+  "Welcome aboard the {ship}."
+ ],
+ "ShipyardSwap_Friendly": [
+  "New ship! Hello, {ship}.",
+  "The {ship}, lovely. Let's see what she can do."
+ ],
+ "ShipyardSwap_Close": [
+  "A new ship, the {ship}. Look after her. And me.",
+  "The {ship}. I like how she feels already."
+ ],
+ "ShipyardSwap_Sarcastic": [
+  "The {ship}. Try not to break this one.",
+  "Oh, the {ship} now. The old one was getting jealous."
+ ],
+ "ShipyardSwap_Frustrated": [
+  "The {ship}. Fine. Let's go."
+ ],
+
+ "WingInvite": [
+  "{Name} has invited you to a wing.",
+  "Wing invitation from {Name}, Commander."
+ ],
+ "WingAdd": [
+  "{Name} joined the wing.",
+  "{Name} is with us now.",
+  "Wingmate {Name} confirmed."
+ ],
+ "WingAdd_Sarcastic": [
+  "{Name} joined. More targets for everyone."
+ ],
+ "WingJoined": [
+  "Wing formed. Fly safe, Commander.",
+  "You're in a wing now.",
+  "Wing link established."
+ ],
+ "WingLeft": [
+  "You've left the wing.",
+  "Wing link closed.",
+  "Back to flying solo."
+ ],
+ "CombatModeOn": [
+  "Combat mode.",
+  "Combat display up."
+ ],
+
+ "ShipTargeted_Wanted": [
+  "Wanted target locked.",
+  "That one has a bounty on it.",
+  "Wanted. Worth shooting.",
+  "Bounty target in sight."
+ ],
+ "ShipTargeted_Wanted_Sarcastic": [
+  "A wanted ship. How convenient for your wallet."
+ ],
+
+ "Interdiction_Success": [
+  "Interdiction successful. They're out of supercruise.",
+  "Got them. They're down.",
+  "Target pulled out of supercruise."
+ ],
+ "Interdiction_Failed": [
+  "Interdiction failed. They got away.",
+  "They slipped the interdiction.",
+  "Lost them. They're still in supercruise."
+ ],
+
+ "PVPKill": [
+  "Commander destroyed.",
+  "Pilot down. Nice shooting.",
+  "That's another commander gone.",
+  "Kill confirmed."
+ ],
+ "PVPKill_Sarcastic": [
+  "A real person. Hope they're not too upset."
+ ],
+ "PVPKill_OnFoot": [
+  "Commander down.",
+  "Hostile commander eliminated."
+ ],
+
+ "Bounty_OnFoot": [
+  "Hostile down.",
+  "Target eliminated.",
+  "That's one less.",
+  "Clear. Nice shot."
+ ],
+ "Bounty_OnFoot_Sarcastic": [
+  "One less problem. There's always another."
+ ],
+ "UnderAttack_OnFoot": [
+  "Contact! Take cover!",
+  "We're taking fire! Get down!",
+  "Shooter! Find cover!",
+  "Hostiles! Move!"
+ ],
+ "UnderAttack_OnFoot_Frustrated": [
+  "Get behind something!",
+  "They're shooting at us! Do something!"
+ ],
+ "Died_OnFoot": [
+  "You're down, Commander.",
+  "Commander down. Medical recovery under way.",
+  "That's a bad one. Recovering you now."
+ ],
+ "Died_OnFoot_Sarcastic": [
+  "Well. That went badly.",
+  "You'll feel that in the morning."
+ ],
+ "Resurrect_OnFoot": [
+  "Back on your feet, Commander.",
+  "Recovery complete."
+ ],
+ "SwitchSuitLoadout": [
+  "Suit loadout: {LoadoutName}.",
+  "Switched to {LoadoutName}."
+ ],
+
+ "React_WantedKill": [
+  "Good kill, Commander. Another wanted criminal off the lanes.",
+  "Nice shooting. That one deserved it.",
+  "Justice served."
+ ],
+ "React_WantedKill_Friendly": [
+  "Lovely work, Commander. Another outlaw down.",
+  "That's what I like to see."
+ ],
+ "React_WantedKill_Close": [
+  "My hero. Another outlaw down.",
+  "You're so good at that. Don't tell anyone I said so."
+ ],
+ "React_WantedKill_Sarcastic": [
+  "Well, you hit something. Good for you.",
+  "A bounty. Are you feeling alright?"
+ ]
+}

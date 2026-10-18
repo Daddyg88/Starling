@@ -115,9 +115,9 @@ class CompletenessTests(unittest.TestCase):
     def test_ignored_events_are_counted_for_the_report(self):
         processor, _bus, _heard = make_processor()
         for _ in range(3):
-            processor.handle_line('{"event":"ShipTargeted","TargetLocked":false}')
+            processor.handle_line('{"event":"ModuleInfo","TargetLocked":false}')
         processor.handle_line('{"event":"Music"}')
-        self.assertEqual(processor.ignored_report(), ["ShipTargeted: 3", "Music: 1"])
+        self.assertEqual(processor.ignored_report(), ["ModuleInfo: 3", "Music: 1"])
 
     def test_exobiology_events(self):
         processor, _bus, heard = make_processor()

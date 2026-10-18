@@ -55,7 +55,10 @@ class EventProcessor:
         handler.update_state(entry, self.state)
         if silent or not handler.announce:
             return
-        self._announce(handler, handler.handle(entry))
+        data = handler.handle(entry)
+        if getattr(handler, "tag_on_foot", False):
+            data["OnFoot"] = bool(getattr(self.state, "status_flags2", 0) & 1)      # Status.json Flags2 bit 0
+        self._announce(handler, data)
 
     # ---- events made up from Status.json ----
     def emit(self, name, data):

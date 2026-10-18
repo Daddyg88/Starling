@@ -93,6 +93,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "route.json"))         # neutron route plotter
             self._merge(_read_json(self.pack_dir / "watcher.json"))       # her answers to the Watcher (Void Compass)
             self._merge(_read_json(self.pack_dir / "manners.json"))       # "you're welcome"
+            self._merge(_read_json(self.pack_dir / "combat.json"))        # ship changes, wings, fighting (space and on foot)
             self._merge(_read_json(self.pack_dir / "memory.json"))        # what she remembers about you
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
         elif self.pack_dir is not None:

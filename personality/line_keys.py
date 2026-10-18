@@ -10,6 +10,7 @@ ALIASES = {
     "FactionKillBond": "Bounty",
     "MultiSellExplorationData": "SellExplorationData",
     "RefuelPartial": "RefuelAll",
+    "CapShipBond": "Bounty",
 }
 
 
@@ -38,8 +39,23 @@ def scan_keys(data):
 
 
 def keys_for(event):
+    """The dialogue keys to try, most specific first. On foot, "<Event>_OnFoot" lines come before the ship ones."""
+    keys = _keys_for(event)
+    if (event.data or {}).get("OnFoot"):
+        keys = [ALIASES.get(event.name, event.name) + "_OnFoot"] + keys
+    return keys
+
+
+def _keys_for(event):
     name = event.name
     data = event.data
+
+    if name == "ShipTargeted":
+        # only a wanted ship is worth a word; everything else you lock stays quiet
+        return ["ShipTargeted_Wanted"] if "wanted" in str(data.get("LegalStatus", "")).lower() else []
+
+    if name == "Interdiction":
+        return ["Interdiction_Success" if data.get("Success") else "Interdiction_Failed"]
 
     if name == "HullDamage":
         percent = data.get("Percent")

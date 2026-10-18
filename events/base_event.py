@@ -25,6 +25,7 @@ class BaseEvent:
     announce = True
     keep = ()
     summary = ""
+    tag_on_foot = False     # True = add "OnFoot" to the data, so she can use on-foot wording
 
     def handle(self, entry):
         """Pick out the useful fields from the raw journal entry."""
