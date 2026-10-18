@@ -8,7 +8,9 @@ She only chats when ALL of these are true:
   * nothing alarming happened in the last minute (under attack, interdicted, low fuel, overheating...)
   * the speaker is free (chatter is "low" priority, so a real warning always wins and chatter is simply dropped)
 In combat mode the chat is about the fight, in analysis mode about exploring, docked about the station, and so on.
-Her words are in voicepacks/default/chitchat.json (keys ChitChat_General, _Combat, _Analysis, _Docked, _Supercruise).
+Her words are in voicepacks/default/chitchat.json (keys ChitChat_General, _Combat, _Analysis, _Docked, _Supercruise, _Flying).
+Lines in ChitChat_Flying can mention real things: {ship}, {system}, {station}, {jumps}, {distance}, {minutes}. A line is only used
+when she knows every value in it. She may also bring up a memory (memory/recall.py).
 """
 import random
 import threading
@@ -21,7 +23,7 @@ from personality.mood_engine import effective_mood
 log = get_logger("chitchat")
 
 # frequency -> (seconds of silence needed, minimum seconds between two chats)
-FREQUENCY = {"rarely": (600.0, 1500.0), "normal": (300.0, 720.0), "often": (150.0, 360.0)}
+FREQUENCY = {"rarely": (600.0, 1500.0), "normal": (150.0, 360.0), "often": (90.0, 210.0), "chatty": (50.0, 120.0)}
 ALARMS = ("UnderAttack", "Interdicted", "InterdictionInProgress", "LowFuel", "Overheating", "HeatWarning", "HeatDamage",
           "HullDamage", "InDanger", "LowHealth", "LowOxygen", "Died", "CockpitBreached", "ShieldState")
 ALARM_QUIET_SECONDS = 75.0
@@ -30,7 +32,7 @@ CHECK_EVERY_SECONDS = 15.0
 
 class ChitChat:
     def __init__(self, bus, speech, dialogue, settings, state_provider=None, active_provider=None,
-                 clock=time.monotonic, rng=None):
+                 clock=time.monotonic, rng=None, memory=None):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
@@ -39,6 +41,10 @@ class ChitChat:
         self.active_provider = active_provider or (lambda: True)
         self.clock = clock
         self.rng = rng or random.Random()
+        self.memory = memory             # memory/recall.py (optional): she sometimes brings up something she remembers
+        self.started = clock()
+        self.jumps = 0
+        self.distance = 0.0
         now = clock()
         self.last_spoke = now            # starting up counts as "just spoke"
         self.last_chat = now
@@ -57,6 +63,11 @@ class ChitChat:
         now = self.clock()
         if name in ("speech.started", "speech.finished"):
             self.last_spoke = now
+        elif name == "FSDJump":
+            self.jumps += 1
+            dist = (event.data or {}).get("JumpDist")
+            if isinstance(dist, (int, float)) and dist > 0:
+                self.distance += float(dist)
         elif name == "CombatModeOn":
             self.mode = "combat"
         elif name == "AnalysisModeOn":
@@ -88,19 +99,69 @@ class ChitChat:
             return False
         return True
 
-    def pool_key(self):
+    def candidate_keys(self):
+        """Which pools she may use right now, most fitting first. She picks one at random."""
         state = self.state_provider()
+        docked = bool(getattr(state, "docked", False))
         if self.mode == "combat":
-            return "ChitChat_Combat"
+            return ["ChitChat_Combat"]
+        if docked:
+            return ["ChitChat_Docked", "ChitChat_Flying"]
         if self.mode == "analysis":
-            if getattr(state, "docked", False):
-                return "ChitChat_Docked"
-            return "ChitChat_Analysis"
-        if getattr(state, "docked", False):
-            return "ChitChat_Docked"
+            return ["ChitChat_Analysis", "ChitChat_Flying"]
         if getattr(state, "in_supercruise", False):
-            return "ChitChat_Supercruise"
-        return "ChitChat_General"
+            return ["ChitChat_Supercruise", "ChitChat_Flying", "ChitChat_General"]
+        return ["ChitChat_General", "ChitChat_Flying"]
+
+    def pool_key(self):
+        return self.candidate_keys()[0]
+
+    def context(self, now=None):
+        """The real things she can mention. Missing ones are left out so a line that needs them is never used."""
+        now = self.clock() if now is None else now
+        state = self.state_provider()
+        values = {}
+        ship = getattr(state, "ship", None)
+        if ship:
+            ship = str(ship).replace("_", " ")
+            values["ship"] = ship.title() if ship.islower() else ship
+        if getattr(state, "system", None):
+            values["system"] = state.system
+        if getattr(state, "docked", False) and getattr(state, "station", None):
+            values["station"] = state.station
+        if self.jumps >= 3:
+            values["jumps"] = self.jumps
+        if self.distance >= 50:
+            values["distance"] = int(round(self.distance))
+        minutes = int((now - self.started) / 60)
+        if minutes >= 20:
+            values["minutes"] = minutes
+        return values
+
+    def _pick_text(self, now, mood, allow):
+        values = self.context(now)
+        keys = list(self.candidate_keys())
+        self.rng.shuffle(keys)
+        keys.append("ChitChat_General")
+        for key in keys:
+            for _ in range(6):
+                line = self.dialogue.pick(key, mood, allow, False)
+                if line is None:
+                    break
+                try:
+                    return line.text.format(**values)       # needs every value it mentions
+                except (KeyError, IndexError, ValueError):
+                    continue
+        return None
+
+    def _memory_text(self):
+        if self.memory is None or self.rng.random() > 0.2:
+            return None
+        try:
+            return self.memory.login_line()
+        except Exception:
+            log.exception("Chit-chat could not recall a memory")
+            return None
 
     def tick(self, now=None):
         """Called every few seconds. Says one small thing if it is time. Returns the text or None."""
@@ -110,13 +171,12 @@ class ChitChat:
                 return None
             mood = effective_mood(self.settings) or ""
             allow = bool(self.settings.get("speech.allow_mature", False))
-            key = self.pool_key()
-            line = self.dialogue.pick(key, mood, allow, False)
-            if line is None and key != "ChitChat_General":
-                line = self.dialogue.pick("ChitChat_General", mood, allow, False)
-            if line is None:
+            text = self._memory_text() if self.mode != "combat" else None
+            if not text:
+                text = self._pick_text(now, mood, allow)
+            if not text:
                 return None
-            text = personalise(line.text, self.settings)
+            text = personalise(text, self.settings)
             if not self.speech.say(text=text, priority="low", event_name="chitchat"):
                 return None                          # she was busy: try again at the next check
             self.last_chat = self.last_spoke = now
@@ -125,6 +185,19 @@ class ChitChat:
         except Exception:
             log.exception("Chit-chat problem")
             return None
+
+    def say_now(self):
+        """"Starling, talk to me": chat right away, ignoring the timers. Returns the text."""
+        now = self.clock()
+        mood = effective_mood(self.settings) or ""
+        allow = bool(self.settings.get("speech.allow_mature", False))
+        text = self._pick_text(now, mood, allow)
+        if not text:
+            return None
+        text = personalise(text, self.settings)
+        self.speech.say(text=text, priority="normal", event_name="chitchat")
+        self.last_chat = self.last_spoke = now
+        return text
 
     # ---- the little timer ----
     def start(self):

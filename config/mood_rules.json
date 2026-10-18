@@ -22,6 +22,7 @@
   },
 
   "rules": [
+    { "id": "compliment", "label": "You said something kind", "event": "Complimented", "delta": 1.0, "category": "manners" },
     { "id": "thanks", "label": "You said thank you", "event": "Thanked", "delta": 1.5, "category": "manners" },
     { "id": "slaves", "label": "Trading slaves", "event": "MarketSell", "delta": -4, "category": "illegal_trade", "react": "React_Slaves",
       "when": { "field": "Type", "contains": "slave" } },

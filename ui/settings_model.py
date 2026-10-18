@@ -56,7 +56,7 @@ SENSITIVITY = [("Automatic (recommended)", 0), ("Very sensitive (quiet room)", 0
                ("Normal", 0.025), ("Noisy room", 0.05)]
 LOG_DETAIL = [("Normal", "INFO"), ("Detailed (for fixing problems)", "DEBUG"), ("Errors only", "WARNING")]
 STYLES = [("Personality (banter, pet names, moods)", "personality"), ("Info only (plain and to the point)", "info")]
-CHITCHAT = [("Rarely", "rarely"), ("Normal", "normal"), ("Often", "often")]
+CHITCHAT = [("Rarely", "rarely"), ("Normal", "normal"), ("Often", "often"), ("Chatty", "chatty")]
 REMARKS = [("Never", "off"), ("Rarely", "rare"), ("Sometimes", "sometimes"), ("Often", "often")]
 AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million", 500000000),
              ("After 1 billion", 1000000000)]
@@ -232,7 +232,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.frequency", "How often she chats", "choice", CHITCHAT,
-                  help="Normal is roughly once every 10 to 20 quiet minutes"),
+                  help="Normal is about every 5 to 8 quiet minutes, Chatty about every 2 to 3"),
             Field("personality.pet_names", "Pet names", "toggle", help="Sweetheart, darling... or worse"),
             Field("personality.innuendo", "Flirty and naughty", "toggle",
                   help="Cheeky innuendo: flirty when she is Friendly or Close, grumpy-and-rude when she is Sarcastic or Frustrated"),

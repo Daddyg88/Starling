@@ -30,3 +30,9 @@ When it has been quiet she says something small and silly. She only does it when
 - Combat mode: lines about the fight. Analysis mode: exploring. Docked and supercruise have their own. Otherwise general jokes ("clear your browser history...").
 - Dashboard > Personality > "Small talk when it is quiet", and "How often she chats" (Rarely about every 25+ min, Normal about every 12 to 20 min, Often about every 6 to 10 min).
 - Add your own lines in `voicepacks/default/chitchat.json`.
+
+# More connection (0.15.0)
+- **Longer sentences:** jumps, docking, undocking, supercruise, landing, lift-off, fuel scooping, routes and weapons now have fuller, chattier lines (`voicepacks/default/talk.json`). They mix in with the short ones.
+- **She talks about your trip:** while flying she may mention your ship, the system, how many jumps and light years you've covered, how long you've been playing, or something she remembers (never during a fight).
+- **She chats more:** Normal is now about every 3 to 6 quiet minutes (the new **Chatty** setting is about every 1 to 2). Dashboard > Personality > "How often she chats".
+- **Talk to her:** say "Starling, how are you?", "tell me a joke", "talk to me", "I'm bored", "are you there?", "good morning", "good night", "I'm back", "good job", "what's your name?". Kind words give a small mood lift. Switch off with `smalltalk.enabled` in settings.json. Her answers are in `voicepacks/default/smalltalk.json`.

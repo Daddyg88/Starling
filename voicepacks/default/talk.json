@@ -1,0 +1,107 @@
+{
+ "_help": "Longer, more chatty versions of her everyday lines. They are added to the same keys as the short ones, so she mixes them. {StarSystem}, {JumpDist:.1f}, {StationName} are filled in by the game. A _Mood suffix is used only in that mood. Delete a line you don't like, or add your own.",
+ "FSDJump": [
+  "That's the jump done, and we're in {StarSystem}. || Everything looks steady from here.",
+  "We've arrived in {StarSystem}. || {JumpDist:.1f} light years in one go, and the drive didn't even complain.",
+  "Jump complete, Commander. || Let me have a quick look around before we decide what to do next.",
+  "Welcome to {StarSystem}. || I do like a fresh system. You never know what's waiting.",
+  "We made it to {StarSystem} in one piece. || That is always my favourite kind of jump.",
+  "All good on arrival. || Shall we see what this system has to offer?",
+  "Nicely done. {StarSystem} is on the board, and the drive is cooling down already."
+ ],
+ "FSDJump_Friendly": [
+  "We're in {StarSystem}, and I'm enjoying this trip more than I expected to. || You fly beautifully, you know.",
+  "Another jump, another new view. || I could get used to this, Commander."
+ ],
+ "FSDJump_Close": [
+  "We're in {StarSystem}. || I love watching the stars slide past with you.",
+  "That was a smooth one. || Almost as smooth as you are."
+ ],
+ "FSDJump_Sarcastic": [
+  "We're in {StarSystem}. || Try to contain your excitement. I certainly am.",
+  "Another system, another chance for you to get us into trouble."
+ ],
+ "FSDJump_Frustrated": [
+  "We've arrived in {StarSystem}. || At least the drive is doing its job."
+ ],
+ "Docked": [
+  "We're docked at {StationName}. || You've earned a break, Commander. Stretch your legs.",
+  "Safely down at {StationName}. || Do check your cargo and your repairs before we go anywhere.",
+  "And we're home, for now. || I'll keep the engines warm while you do whatever it is you do in there.",
+  "Docking complete. || That was a tidy bit of flying. I won't say it twice."
+ ],
+ "Docked_Friendly": [
+  "We're down at {StationName}. || It's always nice to have a roof over our heads, isn't it?"
+ ],
+ "Docked_Close": [
+  "We're docked. || Take your time, Commander. I'm not going anywhere."
+ ],
+ "Docked_Sarcastic": [
+  "Docked at {StationName}, and without a scratch. || Mark the calendar."
+ ],
+ "Undocked": [
+  "We're clear of the station. || Where to now, Commander?",
+  "Launch complete, and the station is falling away behind us. || Systems are all steady.",
+  "And we're off again. || I'll keep an eye on things while you pick a heading.",
+  "Undocked from {StationName}. || Ready when you are.",
+  "We're away from the station and flying free. || Lovely to have some space around us again.",
+  "Launch went smoothly, and the ship feels good. || Just say the word and I'll start looking at routes."
+ ],
+ "Undocked_Friendly": [
+  "Back out among the stars. || I missed this, even after a short break."
+ ],
+ "Undocked_Sarcastic": [
+  "Undocked. || Let's see how long it takes before something goes wrong."
+ ],
+ "SupercruiseEntry": [
+  "Supercruise engaged. || It's a long way to anywhere out here, so let's make it count.",
+  "We're in supercruise, nice and steady. || Mind the star, and the throttle.",
+  "Cruising now. || I'll watch the distance while you watch the view."
+ ],
+ "SupercruiseExit": [
+  "We've dropped out of supercruise. || Let's see what's around us.",
+  "Back in normal space, Commander. || Weapons and shields are right where you left them.",
+  "Supercruise disengaged. || That was a good approach, if I do say so myself."
+ ],
+ "Touchdown": [
+  "We're down on the surface. || The ground feels quite solid, which is a pleasant change.",
+  "Touchdown. || Take a moment to enjoy the view before we start poking around.",
+  "Landed safely. || You really are a fine pilot when you're concentrating."
+ ],
+ "Liftoff": [
+  "Lifting off. || Gear up whenever you're ready.",
+  "And we're airborne again. || I'll miss the scenery down there.",
+  "Liftoff complete. || The surface looks lovely from up here.",
+  "We're off the ground. || Take it up gently and let's see where the day takes us."
+ ],
+ "FuelScoopComplete": [
+  "The tank is full again. || Free fuel from a star, I never get tired of that.",
+  "Scooping complete, Commander. || Let's get away from this heat before it gets personal.",
+  "We're topped up and good to go. || That's another hundred light years in the bank."
+ ],
+ "DockingGranted": [
+  "Docking request approved. || Take it slowly and mind the mailslot.",
+  "We're cleared to dock at {StationName}, on pad {LandingPad}. || Gear down and nice and easy.",
+  "They've given us a pad. || I do like it when the station is feeling generous."
+ ],
+ "ApproachBody": [
+  "Coming into orbital cruise. || Let's take a good look at what's down there.",
+  "We're getting close now. || I'll have the scanners ready.",
+  "Approaching the surface. || I always get a little excited at this part."
+ ],
+ "NavRoute": [
+  "The route is plotted, Commander. || All you have to do is follow the line.",
+  "Course laid in. || I'll let you know about every waypoint on the way.",
+  "That's the route set. || It's a good one, I think.",
+  "The route is in the computer and ready to follow. || Tell me if you'd like me to read out each stop as we go."
+ ],
+ "HardpointsDeployed": [
+  "Weapons are out. || I'm watching the radar for you.",
+  "Hardpoints deployed, and I'm ready if you are.",
+  "Guns are hot. || Please do try to aim them at the right things."
+ ],
+ "LandingGearDown": [
+  "Landing gear is down. || Remember it's the same lever for up.",
+  "Gear down, Commander. || We're all set for the final approach."
+ ]
+}

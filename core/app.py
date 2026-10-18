@@ -60,6 +60,7 @@ class App:
         self.memory_keeper = None
         self.memory_recall = None
         self.chitchat = None
+        self.smalltalk = None
         self._record_events = True
         self.voice_replies = None
         self.manners = None
@@ -179,9 +180,11 @@ class App:
         # Small talk when it has been quiet (only while Status.json shows the game is running).
         from personality.chitchat import ChitChat
         self.chitchat = ChitChat(self.bus, self.speech, self.dialogue, self.settings, state_provider=lambda: self.state,
-                                 active_provider=self.game_is_active)
+                                 active_provider=self.game_is_active, memory=self.memory_recall)
         self.chitchat.attach()
         self.chitchat.start()
+        from personality.smalltalk import SmallTalk
+        self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood)
         return True
 
     def game_is_active(self):
@@ -265,7 +268,7 @@ class App:
                 self.bus, self.speech, self.dialogue, self.settings, book=BindingBook(), sender=KeySender(),
                 matcher=Matcher(learning=self.learning),
                 state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route(),
-                memory=self.memory_recall)
+                memory=self.memory_recall, smalltalk=self.smalltalk)
             # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
             self.commands.attach()
             self._connect_auto_plot()

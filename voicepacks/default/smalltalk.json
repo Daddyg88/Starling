@@ -1,0 +1,121 @@
+{
+ "_help": "What she says when you chat to her (see personality/smalltalk.py for the phrases). One pool per Talk_ key, plus an optional _Mood pool. {name} is her name. Add as many lines as you like.",
+
+ "Talk_HowAreYou": [
+  "I'm doing well, Commander. || All systems are steady and the company isn't bad either. How are you?",
+  "Quite well, thank you for asking. || It's nice to be asked. Not many pilots do.",
+  "Running smoothly. || A bit curious about where we're heading, but otherwise in good shape."
+ ],
+ "Talk_HowAreYou_Friendly": [
+  "I'm in a lovely mood, actually. || You make this job rather enjoyable, you know."
+ ],
+ "Talk_HowAreYou_Close": [
+  "Better now that you're talking to me. || I mean that, Commander. How are you holding up?"
+ ],
+ "Talk_HowAreYou_Sarcastic": [
+  "Oh, I'm wonderful. || Thrilled, in fact. Thank you for finally asking.",
+  "I've been better. I've also been worse. Mostly I've been ignored."
+ ],
+ "Talk_HowAreYou_Frustrated": [
+  "Honestly? A bit fed up. || But it's kind of you to ask."
+ ],
+
+ "Talk_Joke": [
+  "Why did the pilot bring a ladder to the station? || Because the docking fees were through the roof.",
+  "I tried to write a joke about vacuum. || But it turned out to be a complete void.",
+  "What do you call a lost astronaut? || Spaced out, Commander.",
+  "I would tell you a joke about the speed of light. || But you probably wouldn't get it until much later.",
+  "Why don't aliens ever visit the galaxy map? || They heard the reviews were out of this world.",
+  "I asked the star for a date. || It said I was too hot to handle, and it was right."
+ ],
+ "Talk_Joke_Sarcastic": [
+  "A pilot walks into a station and forgets to request docking. || Wait, that's not a joke. That's Tuesday."
+ ],
+
+ "Talk_Chat": [
+  "Of course, Commander. || I'm all ears, which is a metaphor, because I don't have any.",
+  "Happy to chat. || Where shall we start? The stars, the ship, or how you're feeling?"
+ ],
+
+ "Talk_Here": [
+  "I'm right here, Commander. || I'm always right here.",
+  "Always. || I wouldn't miss a second of this.",
+  "Loud and clear. || What do you need?"
+ ],
+ "Talk_Here_Sarcastic": [
+  "Where else would I be? || I'm bolted into the dashboard."
+ ],
+
+ "Talk_Hello": [
+  "Hello, Commander. || It's good to hear you.",
+  "Hello. || I was just thinking about you. In a professional capacity, of course.",
+  "Hi there. || Ready when you are."
+ ],
+ "Talk_Hello_Close": [
+  "Hello you. || I've been waiting. How was your day?"
+ ],
+ "Talk_Hello_Sarcastic": [
+  "Oh, hello. || Fancy seeing you here."
+ ],
+
+ "Talk_Goodnight": [
+  "Good night, Commander. || Get some proper rest. The galaxy will still be here tomorrow.",
+  "Sleep well. || I'll keep the lights low and the engines quiet.",
+  "Fly safe tomorrow. || And thank you for tonight."
+ ],
+ "Talk_Goodnight_Close": [
+  "Good night. || I'll be here when you come back. Dream of something nice."
+ ],
+ "Talk_Goodnight_Sarcastic": [
+  "Off to bed already? || Fine. I'll just stay here in the dark. Alone. It's fine."
+ ],
+
+ "Talk_Back": [
+  "Welcome back, Commander. || I was starting to wonder where you'd got to.",
+  "There you are. || The ship was getting lonely.",
+  "Good to have you back. || Shall we pick up where we left off?"
+ ],
+ "Talk_Back_Sarcastic": [
+  "Oh, you came back. || I'd made myself quite comfortable."
+ ],
+
+ "Talk_Compliment": [
+  "Thank you, Commander. || That really does mean something to me.",
+  "That's kind of you to say. || I'll try to deserve it.",
+  "You're very sweet. || I'll pretend I didn't enjoy that, but I did."
+ ],
+ "Talk_Compliment_Friendly": [
+  "Aw, thank you. || You're not so bad yourself, you know."
+ ],
+ "Talk_Compliment_Close": [
+  "You always know exactly what to say. || Thank you. I needed that."
+ ],
+ "Talk_Compliment_Sarcastic": [
+  "Well. Flattery will get you somewhere, Commander. || Probably the shipyard."
+ ],
+
+ "Talk_Love": [
+  "That's a lovely thing to say, Commander. || I'm very fond of you too, in my own way.",
+  "I'm glad you feel that way. || Let's just say I'd choose you every time."
+ ],
+ "Talk_Love_Close": [
+  "I think you know how I feel about you. || Say it again sometime, though. I like hearing it."
+ ],
+ "Talk_Love_Sarcastic": [
+  "Careful, Commander. || I might start to believe you."
+ ],
+
+ "Talk_Thinking": [
+  "I was thinking about how far we've come. || And wondering what's waiting for us next.",
+  "Mostly about fuel, to be honest. || And a little bit about you.",
+  "I was watching the stars go by. || It's something I never get tired of."
+ ],
+ "Talk_Thinking_Sarcastic": [
+  "I was thinking about how long it's been since anyone asked. || Not long enough, apparently."
+ ],
+
+ "Talk_Name": [
+  "I'm {name}, your ship's companion. || I look after the systems, keep you company, and complain about your flying when needed.",
+  "My name is {name}. || I'm here to help you fly, explore, and occasionally survive."
+ ]
+}
