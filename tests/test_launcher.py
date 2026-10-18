@@ -80,10 +80,27 @@ class LauncherTests(unittest.TestCase):
 
     def test_start_passes_the_repo_to_the_dashboard(self):
         self.layout.app.mkdir(parents=True)
-        self.launcher.start_dashboard()
-        kind, args, kw = self.ran[-1]
-        self.assertEqual(kw["env"]["STARLING_REPO"], "Ben/Starling")
-        self.assertIn("--dashboard", args[0])
+        seen = {}
+
+        def popen(*a, **k):
+            seen.update(args=a, kw=k)
+            return SimpleNamespace(poll=lambda: None)
+        self.launcher.popen = popen
+        self.launcher.start_dashboard(watch_seconds=0)
+        self.assertEqual(seen["kw"]["env"]["STARLING_REPO"], "Ben/Starling")
+        self.assertIn("--dashboard", seen["args"][0])
+
+    def test_a_dashboard_that_dies_is_explained(self):
+        self.layout.app.mkdir(parents=True)
+
+        def popen(cmd, **k):
+            k["stdout"].write("Traceback...\nModuleNotFoundError: No module named 'customtkinter'\n")
+            k["stdout"].flush()
+            return SimpleNamespace(poll=lambda: 1)
+        self.launcher.popen = popen
+        with self.assertRaises(RuntimeError) as caught:
+            self.launcher.start_dashboard(watch_seconds=2)
+        self.assertIn("customtkinter", str(caught.exception))
 
 
 class UpdateServiceTests(unittest.TestCase):

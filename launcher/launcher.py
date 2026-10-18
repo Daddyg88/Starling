@@ -204,14 +204,35 @@ class Launcher:
                                    "Details are in launcher.log.")
             self.l.req_mark.write_text(wanted)
 
-    def start_dashboard(self):
+    def start_dashboard(self, watch_seconds=25):
+        """Starts the dashboard and watches it for a few seconds. If it dies straight away, say why (instead of
+        silently showing nothing, which is what a hidden window does)."""
         self.say("Starting Starling...")
         exe = self.l.pythonw if self.l.pythonw.exists() else self.l.python
         env = dict(os.environ)
         if self.repo:
             env["STARLING_REPO"] = self.repo                 # so the dashboard's update page knows where to look
         env["STARLING_LAUNCHER"] = "1"
-        self.popen([str(exe), "main.py", "--dashboard"], cwd=str(self.l.app), env=env, creationflags=NO_WINDOW)
+        env["PYTHONUTF8"] = "1"
+        errors = self.l.home / "dashboard_output.txt"
+        with open(errors, "w", encoding="utf-8", errors="replace") as out:
+            process = self.popen([str(exe), "main.py", "--dashboard"], cwd=str(self.l.app), env=env,
+                                 stdout=out, stderr=subprocess.STDOUT, creationflags=NO_WINDOW)
+        deadline = time.time() + watch_seconds
+        while time.time() < deadline:
+            code = process.poll() if hasattr(process, "poll") else None
+            if code is not None:
+                tail = ""
+                try:
+                    tail = errors.read_text(encoding="utf-8", errors="replace")[-1500:]
+                except OSError:
+                    pass
+                self.log("Dashboard exited with code %s:\n%s" % (code, tail))
+                last = [line for line in tail.splitlines() if line.strip()][-6:]
+                raise RuntimeError("Starling started but closed straight away (code %s).\n\n%s\n\n"
+                                   "The full text is in %s" % (code, "\n".join(last), errors))
+            time.sleep(0.5)
+        self.log("Dashboard is running.")
 
     def run_all(self):
         self.l.home.mkdir(parents=True, exist_ok=True)
