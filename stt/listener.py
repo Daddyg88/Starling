@@ -30,7 +30,7 @@ from stt.wake import parse_wake
 log = get_logger("listener")
 
 HEARD = "voice.heard"
-TAIL_SECONDS = 0.5      # stay deaf this long after she stops talking
+TAIL_SECONDS = 0.35     # stay deaf this long after she stops talking
 SELF_ECHO_SECONDS = 8.0 # a sentence that matches what she just said is her own voice coming back, not you
 SELF_ECHO_RATIO = 0.85
 
@@ -44,7 +44,9 @@ class Listener:
         self.gate = gate                # push-to-talk (control/ptt.py), or None
         self._gate_was_open = False
         self.clock = clock
-        self.detector = UtteranceDetector(fixed_level=float(settings.get("stt.energy_threshold", 0) or 0))
+        self.detector = UtteranceDetector(fixed_level=float(settings.get("stt.energy_threshold", 0) or 0),
+                                          end_silence_ms=int(settings.get("stt.end_silence_ms", 550) or 550))
+        self.interrupt_speech = None    # optional: a function that makes her stop talking (used by the push-to-talk button)
         self._jobs = queue.Queue(maxsize=3)
         self._running = False
         self._threads = []
@@ -125,9 +127,18 @@ class Listener:
             frame = self._mic.read(0.5)
             if frame is None:
                 continue
+            ptt = self.gate is not None and self.gate.enabled()
+            if ptt and self.gate.is_open() and self.deaf() and self.interrupt_speech is not None:
+                # You pressed push-to-talk while she was chatting: she stops at once and listens (safety warnings are never cut).
+                try:
+                    if self.interrupt_speech():
+                        self._speaking = False
+                        self._deaf_until = 0.0
+                        self.detector.reset()
+                except Exception:
+                    log.exception("Could not interrupt her")
             if self.deaf():
                 continue
-            ptt = self.gate is not None and self.gate.enabled()
             try:
                 if ptt and not self.gate.is_open():
                     # Button not pressed: ignore the sound, but if it has just been let go, finish the sentence.
@@ -166,11 +177,14 @@ class Listener:
                 continue
             if self.deaf():
                 continue   # she started talking while we were queued: it was probably her
+            started = self.clock()
             try:
                 text = self.stt.transcribe(audio)
             except Exception:
                 log.exception("Transcription failed")
                 continue
+            took = self.clock() - started
+            (log.info if took > 1.5 else log.debug)("Understanding that took %.2f s", took)
             self.handle_text(text, ptt)
 
     def handle_text(self, text, ptt=False):

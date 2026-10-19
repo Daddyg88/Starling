@@ -300,6 +300,7 @@ class Dashboard:
         extra = []
         if page.id == "voice":
             extra.append(("Test her voice", self.test_voice))
+            extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
         if page.id == "listening":
@@ -624,6 +625,9 @@ class Dashboard:
             self.save_note.configure(text="Saved." + suffix, text_color=T.GOOD)
         else:
             self.save_note.configure(text=why, text_color=T.BAD)
+
+    def prepare_voice(self):
+        self._controls_result(self.app.prepare_voice_now(), T.GOOD)
 
     def test_voice(self):
         speech = self.app.speech

@@ -154,6 +154,13 @@ class CommandRunner:
     # ---- doing ----
     def run_text(self, text, speak_unknown=True, speak=True):
         """Understand and carry out a sentence. Returns the list of Outcomes."""
+        started = self.clock()
+        outcomes = self._run_text(text, speak_unknown, speak)
+        took = self.clock() - started
+        (log.info if took > 1.0 else log.debug)("Command %r took %.2f s", text, took)
+        return outcomes
+
+    def _run_text(self, text, speak_unknown=True, speak=True):
         for helper in (self.smalltalk, self.memory, self.route):       # spoken questions and the route plotter answer for themselves
             if helper is None:
                 continue

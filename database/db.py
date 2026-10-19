@@ -124,6 +124,7 @@ class Database:
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA foreign_keys = ON")
         self._conn.execute("PRAGMA journal_mode = WAL")  # safer if the app crashes
+        self._conn.execute("PRAGMA synchronous = NORMAL")  # with WAL this is still crash-safe, and far fewer slow disk waits
         return self
 
     def close(self):
@@ -166,6 +167,12 @@ class Database:
             cursor = self._conn.execute(sql, params)
             self._conn.commit()
             return cursor.lastrowid
+
+    def execute_many(self, sql, rows):
+        """Run the same change for many rows with ONE save to disk (much faster than one at a time)."""
+        with self._lock:
+            self._conn.executemany(sql, rows)
+            self._conn.commit()
 
     def fetch_one(self, sql, params=()):
         with self._lock:

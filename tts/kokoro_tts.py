@@ -31,6 +31,7 @@ PAUSE_MARK = "||"            # in a line: "Four.||Three." means 'one beat betwee
 BEAT_SECONDS = 0.95          # each part STARTS about this long after the previous one (just under 1 s)
 MIN_GAP_SECONDS = 0.15
 MAX_CACHED_CHARS = 200       # longer texts are not cached
+SLOW_START_SECONDS = 1.0       # a line that takes longer than this to start is logged as slow
 DEFAULT_WAIT_FOR_READY = 45  # seconds a line will wait for the engine to finish loading
 
 
@@ -86,6 +87,7 @@ class KokoroTTS(BaseTTS):
 
         self.pipeline = None
         self.voice_pack = None
+        self.last_start_delay = 0.0
         self.ready = threading.Event()
         self.failed_reason = ""
         self.status_message = "not started"
@@ -248,6 +250,11 @@ class KokoroTTS(BaseTTS):
         except OSError:
             log.warning("Could not save to the voice cache", exc_info=True)
 
+    def is_cached(self, text, speed=1.0):
+        """True if this exact sentence is already made (so it will play instantly)."""
+        path = self._cache_file(text, speed)
+        return path is not None and path.is_file()
+
     def render(self, text, speed=1.0):
         """Make the sound for `text` WITHOUT playing it (and cache it). Returns True on success."""
         parts = [part.strip() for part in text.split(PAUSE_MARK) if part.strip()]
@@ -265,6 +272,15 @@ class KokoroTTS(BaseTTS):
             return False
         self._cache_save(text, speed, np.concatenate(pieces))
         return True
+
+    def _note_start_delay(self, seconds, first_part):
+        """How long she took to START talking. Slow starts almost always mean the sentence was not in the voice cache."""
+        self.last_start_delay = seconds
+        if seconds >= SLOW_START_SECONDS:
+            log.info("Slow start: %.1f s before she began %r (%s). Say 'prepare her voice' or run run_build_voice_cache.bat.",
+                     seconds, first_part[:40], "made on the spot")
+        else:
+            log.debug("She started after %.2f s", seconds)
 
     # ------------------------------------------------------------------
     # Inside speak()
@@ -300,6 +316,7 @@ class KokoroTTS(BaseTTS):
         problem = []
 
         parts = [part.strip() for part in text.split(PAUSE_MARK) if part.strip()]
+        started_at = time.monotonic()
 
         def make_part(part):
             """Make (or load from the cache) one part. Returns how many samples were queued."""
@@ -355,6 +372,8 @@ class KokoroTTS(BaseTTS):
                         break
                     chunk = np.ascontiguousarray(piece[start:start + block], dtype=np.float32)
                     stream.write(chunk.reshape(-1, 1))
+                    if not played_any:
+                        self._note_start_delay(time.monotonic() - started_at, parts[0])
                     played_any = True
         finally:
             try:

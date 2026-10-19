@@ -56,6 +56,7 @@ SENSITIVITY = [("Automatic (recommended)", 0), ("Very sensitive (quiet room)", 0
                ("Normal", 0.025), ("Noisy room", 0.05)]
 LOG_DETAIL = [("Normal", "INFO"), ("Detailed (for fixing problems)", "DEBUG"), ("Errors only", "WARNING")]
 STYLES = [("Personality (banter, pet names, moods)", "personality"), ("Info only (plain and to the point)", "info")]
+WARM = [("When the CPU is free (recommended)", "idle"), ("Off", "off")]
 CHITCHAT = [("Rarely", "rarely"), ("Normal", "normal"), ("Often", "often"), ("Chatty", "chatty")]
 REMARKS = [("Never", "off"), ("Rarely", "rare"), ("Sometimes", "sometimes"), ("Often", "often")]
 AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million", 500000000),
@@ -124,6 +125,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("speech.enabled", "She speaks aloud", "toggle", help="Turn her voice on or off"),
             Field("tts.volume", "Volume", "choice", VOLUME),
             Field("tts.rate", "Speaking speed", "choice", SPEED),
+            Field("tts.warm_cache", "Get new lines ready in the background", "choice", WARM,
+                  help="Makes her new sentences ahead of time, only when you are docked or the game is off, so she answers faster"),
             Field("tts.voice", "Voice", "choice", VOICES,
                   help="All free and offline. A new voice downloads once (small) the first time you use it"),
         ]),

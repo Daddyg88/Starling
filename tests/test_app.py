@@ -42,6 +42,7 @@ class AppJournalWiringTests(unittest.TestCase):
             try:
                 self.assertGreater(len(app.registry), 20)
                 app.processor.handle_line('{"event":"Died","KillerName":"Test"}')
+                app.event_logger.flush()
                 rows = app.database.fetch_all("SELECT event_name, summary FROM event_log")
                 self.assertEqual([r["event_name"] for r in rows], ["Died"])
             finally:

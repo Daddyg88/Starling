@@ -57,9 +57,11 @@ class App:
         self.mood = None
         self.greeter = None
         self.memory_store = None
+        self.event_logger = None
         self.memory_keeper = None
         self.memory_recall = None
         self.chitchat = None
+        self.warmer = None
         self.smalltalk = None
         self.lore = None
         self._record_events = True
@@ -108,6 +110,7 @@ class App:
             saver = EventLogger(self.database, self.session_id)
             saver.trim_old()
             saver.attach(self.bus)
+            self.event_logger = saver
         if show_events:
             self.bus.subscribe(ALL_EVENTS, print_event)
 
@@ -178,6 +181,14 @@ class App:
                                     state_provider=lambda: self.state, flavour=flavour, memory=self.memory_recall)
         self.greeter.attach()
 
+        # Gets new lines ready in the background when the CPU is free (see tts/voice_warmer.py).
+        if kokoro is not None:
+            from tts.voice_warmer import VoiceWarmer
+            self.warmer = VoiceWarmer(kokoro, self.dialogue, self.settings, speech=self.speech,
+                                      free_provider=self.cpu_is_free)
+            if str(self.settings.get("tts.warm_cache", "idle")).lower() != "off":
+                self.warmer.start()
+
         # Small talk when it has been quiet (only while Status.json shows the game is running).
         from personality.chitchat import ChitChat
         self.chitchat = ChitChat(self.bus, self.speech, self.dialogue, self.settings, state_provider=lambda: self.state,
@@ -189,6 +200,22 @@ class App:
         self.lore = LoreTeller(self.speech, self.dialogue, self.settings, path=paths.DATA_DIR / "lore.json")
         self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore)
         return True
+
+    def cpu_is_free(self):
+        """True when the game is not running, you are in a menu, or you are docked: a good time to prepare her voice."""
+        try:
+            return (not self.game_is_active()) or bool(self.state and self.state.docked)
+        except Exception:
+            return False
+
+    def prepare_voice_now(self):
+        """Dashboard button. Returns a sentence for the screen."""
+        if self.warmer is None:
+            return "Her voice is not set up, so there is nothing to prepare."
+        if self.warmer.finished or self.warmer.force:
+            return self.warmer.status()
+        self.warmer.run_now()
+        return "Preparing her voice in the background. This can take a few minutes and uses some CPU. Press again to see progress.\n" + self.warmer.status()
 
     def game_is_active(self):
         """True while you are in the cockpit or on foot and Elite is still writing Status.json."""
@@ -222,6 +249,8 @@ class App:
         self.listener = Listener(self.bus, stt, self.settings, lambda: MicrophoneStream(device), gate=gate)
         if self.ask is not None:
             self.listener.interceptor = self.ask.handle_heard
+        if self.speech is not None:
+            self.listener.interrupt_speech = self.speech.interrupt
         if self.speech is not None and self.dialogue is not None:
             self.voice_replies = VoiceReplies(self.bus, self.speech, self.dialogue, self.settings,
                                               commands_active=runner is not None)
@@ -426,6 +455,9 @@ class App:
         if self.chitchat is not None:
             self.chitchat.stop()
             self.chitchat = None
+        if self.warmer is not None:
+            self.warmer.stop()
+            self.warmer = None
         if getattr(self, "watcher", None) is not None:
             self.watcher.detach()
             self.watcher = None
@@ -448,6 +480,9 @@ class App:
             return
         try:
             self.bus.publish("app.stopping")
+            if self.event_logger is not None:
+                self.event_logger.stop()          # write the last events before the database closes
+                self.event_logger = None
             if self.session_id is not None:
                 self.database.execute(
                     "UPDATE sessions SET ended_at = CURRENT_TIMESTAMP WHERE id = ?",

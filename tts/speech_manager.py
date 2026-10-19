@@ -109,6 +109,17 @@ class SpeechManager:
             self._cond.notify_all()
         return True
 
+    def interrupt(self):
+        """Stop talking now, unless she is saying a safety warning. Used when you press the push-to-talk button."""
+        with self._cond:
+            kept = [q for q in self._queue if q.priority == "critical"]
+            self.dropped += len(self._queue) - len(kept)
+            self._queue[:] = kept
+            if self._current is not None and self._current.priority != "critical":
+                self._cancel_current()
+                return True
+        return False
+
     def is_busy(self):
         with self._cond:
             return self._current is not None or bool(self._queue)
