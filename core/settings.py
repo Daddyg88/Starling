@@ -35,7 +35,7 @@ DEFAULTS = {
     "bookmarks": {"home": "", "b1": "", "b2": "", "b3": "", "b4": "", "b5": "", "b6": "", "b7": "", "b8": "", "b9": "", "b10": ""},
     "watcher": {"enabled": True, "reply": "often", "wait_for_calm": True},
     "autohonk": {"mode": "off", "hold_seconds": 6.0, "delay_seconds": 2.0},
-    "combat_assist": {"pips": True, "shield_cell": True, "heat_sink": True, "cell_hits": 5, "cell_hit_seconds": 10.0,
+    "combat_assist": {"pips": True, "heat_sink": True,
                       "pips_delay": 1.2, "fire_buttons": ""},
     "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "disabled": []},
     "smalltalk": {"enabled": True},

@@ -60,7 +60,6 @@ The East Orion Company, the planet and everything about them are invented for he
 ## Automatic helpers (Dashboard > Controls, all on by default)
 They only press keys YOU bound in Elite (Elite must be in front, and each action needs a KEYBOARD key as well as any joystick button; she tells you once if one is missing).
 - **Pips:** while hardpoints are out, holding a fire button puts 4 pips in weapons (`IncreaseWeaponsPower` x4). About 1.2 s after you let go: `ResetPowerDistribution`, `IncreaseSystemsPower`, `IncreaseEnginesPower`. She reads your Primary/Secondary fire buttons from Elite's controls file (keyboard keys, and X52 buttons 1 to 32). Extra buttons can be listed in settings.json: `combat_assist.fire_buttons` like `"joy:06A3:075C:1, key:F13"`. Change the steps with `combat_assist.pips_firing` and `combat_assist.pips_resting` (lists of Elite action names).
-- **Shield cell:** Elite does NOT tell programs the shield percentage, so "below 70%" is impossible to read. She fires a cell when the game says your shields went DOWN, and when you take `cell_hits` (5) hits within `cell_hit_seconds` (10), which is an estimate of "shields getting low". Set `cell_hits` to 0 for the first rule only. 12 s gap between cells.
 - **Heat sink:** Elite does NOT tell programs ship heat either. The game's overheat warning (about 100%) is the earliest signal, so she fires a heat sink then (8 s gap). Never while docked, landed or scooping fuel.
 - None of these has been tested against the real game (no Windows or Elite here). Please field test and tell me what feels wrong.
 

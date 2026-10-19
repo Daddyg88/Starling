@@ -182,17 +182,6 @@
    "mature": true
   }
  ],
- "CombatAssist_ShieldCell": [
-  "Shield cell in! Back to it!",
-  "Cell used. Keep shooting!",
-  "Fresh shields, Commander. Don't waste them."
- ],
- "CombatAssist_ShieldCell_Sarcastic": [
-  {
-   "text": "Shield cell in. Try not to fuck them up again.",
-   "mature": true
-  }
- ],
  "CombatAssist_HeatSink": [
   "Heat sink out. Cooling!",
   "Venting heat. Hold steady!",

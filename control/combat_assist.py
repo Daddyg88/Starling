@@ -1,5 +1,5 @@
 """
-Combat helpers: pips on fire, shield cells and heat sinks.
+Combat helpers: pips on fire and heat sinks.
 
 All three only press the keys YOU bound in Elite (same rules as voice commands: Elite must be the window in front,
 and the action needs a KEYBOARD key as well as any joystick button).
@@ -9,12 +9,6 @@ Auto pips
     When you let go (and stay off the button for a moment) she resets and sends pips to systems and engines.
     She finds your fire buttons from Elite's controls file (Primary fire and Secondary fire): keyboard keys, and
     joystick buttons on the X52. You can also list extra buttons in settings.json under combat_assist.fire_buttons.
-
-Shield cells
-    Elite does NOT tell programs the shield percentage, so "below 70%" cannot be read. She uses a cell:
-      * when the game says your shields went DOWN, and
-      * (optional) when you take a lot of hits very quickly - combat_assist.cell_hits hits in cell_hit_seconds.
-    Set cell_hits to 0 to switch the second rule off.
 
 Heat sinks
     Elite does not tell programs the heat percentage either. The game's own overheat warning (about 100%) is the
@@ -92,8 +86,6 @@ class CombatAssist:
         self._thread = None
         self._boosted = False
         self._released_at = None
-        self._hits = []
-        self._last_cell = -999.0
         self._last_sink = -999.0
         self._warned = set()
         self._specs = []
@@ -106,8 +98,6 @@ class CombatAssist:
 
     # ---- wiring ----
     def attach(self):
-        self.bus.subscribe("ShieldState", self.on_shield_state)
-        self.bus.subscribe("UnderAttack", self.on_under_attack)
         for name in ("Overheating", "HeatWarning", "HeatDamage"):
             self.bus.subscribe(name, self.on_heat)
         self._running = True
@@ -116,8 +106,7 @@ class CombatAssist:
 
     def detach(self):
         self._running = False
-        for name, handler in (("ShieldState", self.on_shield_state), ("UnderAttack", self.on_under_attack),
-                              ("Overheating", self.on_heat), ("HeatWarning", self.on_heat), ("HeatDamage", self.on_heat)):
+        for name, handler in (("Overheating", self.on_heat), ("HeatWarning", self.on_heat), ("HeatDamage", self.on_heat)):
             self.bus.unsubscribe(name, handler)
         if self._thread is not None:
             self._thread.join(timeout=2)
@@ -157,44 +146,6 @@ class CombatAssist:
         state = self.state_provider()
         return hardpoints_out(state) and not _flag(state, DOCKED_BIT) and not _flag(state, LANDED_BIT) \
             and not _flag(state, SUPERCRUISE_BIT)
-
-    def recently_attacked(self, seconds=45.0):
-        now = self.clock()
-        return any(now - t < seconds for t in self._hits)
-
-    # ---- shield cells ----
-    def on_shield_state(self, event):
-        if event.data.get("ShieldsUp") or not self.option("shield_cell", True):
-            return
-        if self.fighting() or self.recently_attacked():
-            self._use_cell("shields down")
-
-    def on_under_attack(self, _event):
-        now = self.clock()
-        window = float(self.option("cell_hit_seconds", 10.0))
-        self._hits = [t for t in self._hits if now - t < max(window, 45.0)]
-        self._hits.append(now)
-        need = int(self.option("cell_hits", 5) or 0)
-        if need and self.option("shield_cell", True) and self.fighting():
-            recent = [t for t in self._hits if now - t <= window]
-            if len(recent) >= need:
-                self._use_cell("%d hits in %.0f s" % (len(recent), window))
-
-    def _use_cell(self, why):
-        now = self.clock()
-        if now - self._last_cell < float(self.option("cell_gap_seconds", 12.0)):
-            return
-        self._last_cell = now
-        log.info("Using a shield cell (%s)", why)
-        self._hits = []
-        threading.Thread(target=self._cell_worker, name="shield-cell", daemon=True).start()
-
-    def _cell_worker(self):
-        try:
-            if self.press("UseShieldCell"):
-                self._say("CombatAssist_ShieldCell")
-        except Exception:
-            log.exception("Shield cell failed")
 
     # ---- heat sinks ----
     def on_heat(self, _event):

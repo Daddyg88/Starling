@@ -146,52 +146,6 @@ class PipTests(Base):
         self.assertEqual(DEFAULT_PIPS_DOWN[0], "ResetPowerDistribution")
 
 
-class ShieldCellTests(Base):
-    def setUp(self):
-        super().setUp()
-        self.assist.attach()
-        self.addCleanup(self.assist.detach)
-
-    def test_cell_when_shields_drop_in_a_fight(self):
-        self.bus.publish("ShieldState", {"ShieldsUp": False}, "critical")
-        self.assertEqual(self.keys(), "E")
-
-    def test_no_cell_when_shields_come_back(self):
-        self.bus.publish("ShieldState", {"ShieldsUp": True}, "critical")
-        self.assertEqual(self.keys(), "")
-
-    def test_no_cell_outside_a_fight(self):
-        self.state.status_flags = 0
-        self.bus.publish("ShieldState", {"ShieldsUp": False}, "critical")
-        self.assertEqual(self.keys(), "")
-
-    def test_cooldown(self):
-        self.bus.publish("ShieldState", {"ShieldsUp": False}, "critical")
-        self.bus.publish("ShieldState", {"ShieldsUp": False}, "critical")
-        self.assertEqual(self.keys(), "E")
-        self.clock.now += 20
-        self.bus.publish("ShieldState", {"ShieldsUp": False}, "critical")
-        self.assertEqual(self.keys(), "EE")
-
-    def test_many_quick_hits_use_a_cell_early(self):
-        for _ in range(4):
-            self.bus.publish("UnderAttack", {}, "normal")
-        self.assertEqual(self.keys(), "")
-        self.bus.publish("UnderAttack", {}, "normal")
-        self.assertEqual(self.keys(), "E")
-
-    def test_hits_rule_can_be_switched_off(self):
-        self.settings.values["combat_assist.cell_hits"] = 0
-        for _ in range(10):
-            self.bus.publish("UnderAttack", {}, "normal")
-        self.assertEqual(self.keys(), "")
-
-    def test_toggle(self):
-        self.settings.values["combat_assist.shield_cell"] = False
-        self.bus.publish("ShieldState", {"ShieldsUp": False}, "critical")
-        self.assertEqual(self.keys(), "")
-
-
 class HeatSinkTests(Base):
     def setUp(self):
         super().setUp()
@@ -281,7 +235,7 @@ class LinesTests(unittest.TestCase):
             for line in pool:
                 self.assertIn(needs, line.text, key)
                 line.text.format(Ship="X", BountyText="1")
-        for key in ("CombatAssist_ShieldCell", "CombatAssist_HeatSink", "UnderAttack", "Bounty"):
+        for key in ("CombatAssist_HeatSink", "UnderAttack", "Bounty"):
             self.assertIsNotNone(dialogue.pick(key, "Neutral", False, False), key)
 
 
