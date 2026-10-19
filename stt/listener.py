@@ -46,7 +46,6 @@ class Listener:
         self.clock = clock
         self.detector = UtteranceDetector(fixed_level=float(settings.get("stt.energy_threshold", 0) or 0),
                                           end_silence_ms=int(settings.get("stt.end_silence_ms", 550) or 550))
-        self.interrupt_speech = None    # optional: a function that makes her stop talking (used by the push-to-talk button)
         self._jobs = queue.Queue(maxsize=3)
         self._running = False
         self._threads = []
@@ -128,15 +127,6 @@ class Listener:
             if frame is None:
                 continue
             ptt = self.gate is not None and self.gate.enabled()
-            if ptt and self.gate.is_open() and self.deaf() and self.interrupt_speech is not None:
-                # You pressed push-to-talk while she was chatting: she stops at once and listens (safety warnings are never cut).
-                try:
-                    if self.interrupt_speech():
-                        self._speaking = False
-                        self._deaf_until = 0.0
-                        self.detector.reset()
-                except Exception:
-                    log.exception("Could not interrupt her")
             if self.deaf():
                 continue
             try:

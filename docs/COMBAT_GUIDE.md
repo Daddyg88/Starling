@@ -66,5 +66,5 @@ They only press keys YOU bound in Elite (Elite must be in front, and each action
 ## Speed
 - Saving events to the database no longer holds her up (written in the background).
 - **She prepares her voice in the background** while the computer is idle (Dashboard > Voice > "Prepare her voice"). New lines are slower the first time because they have to be made; after that they are instant. After an update, press **Prepare her voice now** (Voice page) or run `run_build_voice_cache.bat` once.
-- She stops listening 550 ms after you finish speaking (was 700), and push-to-talk now cuts off her chat when you press the button.
+- She stops listening 550 ms after you finish speaking (was 700).
 - Slow answers are written to `logs` as "Slow start", "Command ... took" and transcription times, so we can see exactly where time goes.

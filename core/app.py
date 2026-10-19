@@ -250,8 +250,6 @@ class App:
         self.listener = Listener(self.bus, stt, self.settings, lambda: MicrophoneStream(device), gate=gate)
         if self.ask is not None:
             self.listener.interceptor = self.ask.handle_heard
-        if self.speech is not None:
-            self.listener.interrupt_speech = self.speech.interrupt
         if self.speech is not None and self.dialogue is not None:
             self.voice_replies = VoiceReplies(self.bus, self.speech, self.dialogue, self.settings,
                                               commands_active=runner is not None)
