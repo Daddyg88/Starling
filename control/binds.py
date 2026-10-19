@@ -236,6 +236,11 @@ class BindingBook:
     def has_action(self, action):
         return action in self._actions
 
+    def slots(self, action):
+        """The raw Primary/Secondary slots for an action (empty list if unknown). Used to find joystick fire buttons."""
+        self.refresh()
+        return list(self._actions.get(action, []))
+
     def actions_for(self, device, key, held=(), names=()):
         """
         Which Elite actions use this control? (The opposite of lookup: used by the button recorder.)

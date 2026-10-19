@@ -63,11 +63,11 @@
   "{StarSystem}. Exactly like the last one, but with a different name.",
   "Oh, look. A star. In {StarSystem}.",
   {
-   "text": "{StarSystem}. Fascinating. I'm on the edge of my bloody seat.",
+   "text": "{StarSystem}. Fascinating. I'm on the edge of my fucking seat.",
    "mature": true
   },
   {
-   "text": "Another sodding system. {StarSystem}, apparently.",
+   "text": "Another fucking system. {StarSystem}, apparently.",
    "mature": true
   }
  ],
@@ -80,7 +80,7 @@
    "mature": true
   },
   {
-   "text": "Jump complete. Damn, I'm tired of this.",
+   "text": "Jump complete. Fuck, I'm tired of this.",
    "mature": true
   }
  ],
@@ -116,7 +116,7 @@
  "StartJump_Frustrated": [
   "Jumping to {StarSystem}. Again.",
   {
-   "text": "Off to {StarSystem}. Hold on to something, damn it.",
+   "text": "Off to {StarSystem}. Hold on to something, for fuck's sake.",
    "mature": true
   }
  ]

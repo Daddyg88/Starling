@@ -1,14 +1,14 @@
 {
   "_help": "Every line STARLING can say. Each entry is plain text, or {\"text\": \"...\", \"mature\": true} for a line that is only used if speech.allow_mature is on. All lines are spoken by her cloned voice. A key is an event name, optionally followed by _Friendly, _Close, _Sarcastic or _Frustrated for a mood variation. {fuel_percent} and {Species_Localised} are filled in automatically. Put || inside a line to make her pause for a beat between parts (used for the jump countdown).",
   "HullDamage": [
-    "Hull damage detected.",
-    "We're taking damage.",
-    "I'm taking heavy fire here.",
-    "Hull damage detected, Commander.",
-    "The hull is taking damage.",
-    "We're being hit!",
-    "Damage to the hull.",
-    "Watch the hull!"
+    "Hull damage! Watch it, Commander!",
+    "They're hitting the hull! Hit harder!",
+    "We're being hit, and the hull's feeling it. Keep shooting!",
+    "Damage to the hull. They'll regret that.",
+    "The hull is taking damage! Don't stop now!",
+    "I'm taking heavy fire here. This is brilliant, but watch the hull!",
+    "We're being hit! Hit them back!",
+    "Watch the hull! Get them off us!"
   ],
   "HullDamage_Critical": [
     "Critical hull damage!",
@@ -20,40 +20,50 @@
     "Hull critical, Commander!"
   ],
   "ShieldsDown": [
-    "Shields down!",
-    "Shields are down, Commander.",
-    "Shields are gone!",
-    "We've lost our shields.",
-    "Shield failure. We're exposed!",
-    "No shields, Commander!"
+    "Shields down! Stay sharp!",
+    "Shields are gone, Commander, we're exposed!",
+    "No shields! Kill them before they kill us!",
+    "Shield failure! Make them pay for it!",
+    "We've lost our shields. Rude. Punish them.",
+    "Shields are down. Stay in the fight, I'm with you!"
   ],
   "UnderAttack": [
-    "Incoming!",
-    "Brace yourself!",
-    "Watch out!",
-    "Take cover!",
-    "Behind you!",
-    "We're under attack!",
-    "Someone's shooting at us!",
-    "Contact! We're taking fire!",
-    "Hostiles on us!"
+    "Oh, we're being shot at! This is my favourite part!",
+    "Incoming! Finally, some excitement!",
+    "Contact! They're shooting at us, how rude. Lovely.",
+    "Someone wants to dance! Let's give them one!",
+    "We're taking fire! Brilliant, let's hit back!",
+    "Behind you! Turn and burn!",
+    "Hostiles on us! Oh, this is going to be fun.",
+    "Brace! They started it, so let's finish it!",
+    "Ooh, they're feisty! I like feisty."
   ],
   "UnderAttack_Sarcastic": [
+    "Oh good, someone wants to play.",
+    "Aww, they brought guns. How thoughtful of them.",
+    "Rude. We were just passing through. Now they die.",
     {
-      "text": "Don't mess with me, Commander. Not today.",
+      "text": "Some prick is shooting at us. Wonderful. Let's ruin their day.",
       "mature": true
     },
-    "Oh good, someone wants to play.",
-    "Rude. We were just passing through.",
-    "Friendly folks, aren't they?"
+    {
+      "text": "Don't fuck with me, Commander. Not today.",
+      "mature": true
+    }
   ],
   "UnderAttack_Frustrated": [
-    "What the hell was that?",
-    "Do something!",
-    "Can I get some help here?",
-    "Seriously? Again?",
-    "Can we please not get shot at?",
-    "Not again!"
+    "Enough! Shoot back, Commander!",
+    "Seriously? Again? Fine. Burn them!",
+    {
+      "text": "Who the fuck is shooting at us?",
+      "mature": true
+    },
+    {
+      "text": "Right, that's enough of this shit. Kill them!",
+      "mature": true
+    },
+    "Can we please shoot the people shooting us?",
+    "Not again! Make them pay for it!"
   ],
   "InterdictionInProgress": [
     "Interdiction alert!",
@@ -62,18 +72,18 @@
     "Interdiction in progress!"
   ],
   "Interdicted": [
-    "Brace yourself, we're being pulled out!",
-    "Everyone look out, we've been interdicted!",
-    "Interdiction! Hold on!",
-    "We're being dragged out of supercruise!",
-    "Interdictor locked on. Brace!"
+    "We're being pulled out! Ooh, a fight! Brace!",
+    "Interdiction! Hold on, this is about to get fun!",
+    "Interdictor locked on. Brace, Commander. Weapons ready?",
+    "We're being dragged out of supercruise! Guns out, please!",
+    "Someone's grabbed us! Brace yourself, then hurt them!"
   ],
   "EscapeInterdiction": [
-    "Interdiction evaded.",
-    "We slipped away.",
-    "We got away.",
-    "Escaped the interdiction.",
-    "Slipped right out of it."
+    "Interdiction evaded! Not today, grabby!",
+    "We slipped away. Cheeky.",
+    "We got away. Pity, I wanted a fight.",
+    "Escaped the interdiction. Smooth flying!",
+    "Slipped right out of it. Take that!"
   ],
   "Died": [
     "Ship destroyed.",
@@ -261,10 +271,10 @@
     "Wheels up."
   ],
   "HardpointsDeployed": [
-    "Weapons engaged.",
-    "Hardpoints deployed.",
-    "Weapons hot.",
-    "Guns out."
+    "Weapons hot! Oh, I've been waiting for this.",
+    "Guns out! Let's make some noise.",
+    "Hardpoints deployed. Time to play.",
+    "Weapons online, and I'm so ready."
   ],
   "CargoScoopDeployed": [
     "Cargo scoop deployed.",
@@ -409,28 +419,38 @@
     "Mission complete! Dinner is on you."
   ],
   "Bounty": [
-    "Target destroyed.",
-    "Nailed him.",
-    "That's a hit."
+    "Target destroyed! Oh, that felt good.",
+    "Splash one! Next!",
+    "Got him! More, give me more!",
+    "Kill confirmed. I love this job.",
+    "Gone in a flash. Beautiful shooting!",
+    "That's a bounty in the bank. Who's next?"
   ],
   "Bounty_Friendly": [
-    "Take that!",
-    "Boom!",
-    "Got him!",
-    "Target eliminated.",
-    "Nice shot, Commander!"
+    "Yes! Nice shot, Commander! Again, again!",
+    "Boom! That was gorgeous!",
+    "Target eliminated, and what a lovely explosion.",
+    "Brilliant, Commander! Do that again!"
   ],
   "Bounty_Close": [
-    "Boom!",
-    "Yeah, get in there!",
-    "Snicker-snack.",
-    "Got you."
+    "Mmm, that was beautiful. Do it again.",
+    "Boom! You make destruction look so good.",
+    "Yes! Get in there! Oh, I love it when you shoot things.",
+    "Got you. That was perfect, Commander."
   ],
   "Bounty_Sarcastic": [
-    "Drinks are on you.",
-    "You dirty rat.",
-    "Oops. Was that important?",
-    "Another one bites the dust."
+    "One less problem for the galaxy. You're welcome, galaxy.",
+    "Pieces. Lots of little pieces. Lovely.",
+    "Oops. Was that important? Never mind.",
+    "Another one bites the dust.",
+    {
+      "text": "Fuck yeah, that's a bounty. Next idiot, please.",
+      "mature": true
+    },
+    {
+      "text": "Shit, that was a good one. Again!",
+      "mature": true
+    }
   ],
   "MarketSell": [
     "Nice.",
@@ -905,7 +925,7 @@
     "Whoa, what's going on?",
     "Why not?",
     {
-      "text": "Yeah, get in there, beat their ass!",
+      "text": "Yeah, get in there, kick the shit out of them!",
       "mature": true
     }
   ],
@@ -987,16 +1007,16 @@
     "Fuel tank full."
   ],
   "ShieldsUp": [
-    "Shields back online.",
-    "Shields online.",
-    "Shields restored.",
-    "Shields are back."
+    "Shields back online. Right, where were we?",
+    "Shields are back! Let's go again!",
+    "Shields restored. Round two!",
+    "Shields online. Now I can enjoy this properly."
   ],
   "HardpointsRetracted": [
-    "Weapons stowed.",
-    "Hardpoints retracted.",
-    "Weapons cold.",
-    "Guns away."
+    "Weapons stowed. Aww, the fun's over.",
+    "Guns away. Already? Fine.",
+    "Weapons cold. Until next time, my lovelies.",
+    "Hardpoints retracted. Back to boring peace."
   ],
   "MassLocked": [
     "Mass lock detected.",
@@ -1134,5 +1154,13 @@
   ],
   "CommandNotReady_Sarcastic": [
     "Great idea. Shame I can't do it yet."
+  ],
+  "UnderAttack_Friendly": [
+    "Stay with me, Commander. We've got this, and I'm having a wonderful time.",
+    "Shots incoming! I've got your back, you've got the guns."
+  ],
+  "UnderAttack_Close": [
+    "Nobody shoots at my Commander and lives. Make them regret it.",
+    "They're hurting our ship. Let's hurt them back, properly."
   ]
 }

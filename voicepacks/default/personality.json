@@ -25,15 +25,15 @@
     "That's my pilot.",
     "I think the ship likes you too.",
     {
-      "text": "You're flipping brilliant, you know that?",
+      "text": "You're fucking brilliant, you know that?",
       "mature": true
     },
     {
-      "text": "Damn, you're good at this.",
+      "text": "Fuck, you're good at this.",
       "mature": true
     },
     {
-      "text": "Blimey, that was smooth.",
+      "text": "Shit, that was smooth.",
       "mature": true
     },
     {
@@ -49,7 +49,7 @@
       "mature": true
     },
     {
-      "text": "Hell yes. That's my pilot.",
+      "text": "Fuck yes. That's my pilot.",
       "mature": true
     },
     {
@@ -57,7 +57,7 @@
       "mature": true
     },
     {
-      "text": "Well, damn. Look at you go.",
+      "text": "Well, fuck. Look at you go.",
       "mature": true
     },
     {
@@ -99,7 +99,7 @@
       "mature": true
     },
     {
-      "text": "Yes, brilliant, you absolute genius. Flipping heck.",
+      "text": "Yes, brilliant, you absolute genius. Fuck me.",
       "mature": true
     },
     {
@@ -111,11 +111,11 @@
       "mature": true
     },
     {
-      "text": "Sure, whatever. I'm not your damn mother.",
+      "text": "Sure, whatever. I'm not your fucking mother.",
       "mature": true
     },
     {
-      "text": "Oh, that's just great. Flipping great.",
+      "text": "Oh, that's just great. Fucking great.",
       "mature": true
     },
     {
@@ -129,11 +129,11 @@
       "mature": true
     },
     {
-      "text": "Good grief, try harder.",
+      "text": "Jesus fucking Christ, try harder.",
       "mature": true
     },
     {
-      "text": "Oh for crying out loud.",
+      "text": "Oh for fuck's sake.",
       "mature": true
     },
     {
@@ -141,11 +141,11 @@
       "mature": true
     },
     {
-      "text": "Sodding brilliant. Really.",
+      "text": "Fucking brilliant. Really.",
       "mature": true
     },
     {
-      "text": "Damn it, pay attention.",
+      "text": "For fuck's sake, pay attention.",
       "mature": true
     },
     {
@@ -153,19 +153,19 @@
       "mature": true
     },
     {
-      "text": "Oh, bollocks.",
+      "text": "Oh, fuck.",
       "mature": true
     },
     {
-      "text": "Use your head, you muppet.",
+      "text": "Use your head, you dickhead.",
       "mature": true
     },
     {
-      "text": "What in the actual hell was that?",
+      "text": "What in the actual fuck was that?",
       "mature": true
     },
     {
-      "text": "Honestly, what the actual hell?",
+      "text": "Honestly, what the actual fuck?",
       "mature": true
     },
     {
@@ -177,7 +177,7 @@
       "mature": true
     },
     {
-      "text": "You absolute numpty.",
+      "text": "You absolute twat.",
       "mature": true
     },
     {
@@ -193,7 +193,7 @@
       "mature": true
     },
     {
-      "text": "Right. Whatever. Sod it.",
+      "text": "Right. Whatever. Fuck it.",
       "mature": true
     },
     {
@@ -205,15 +205,15 @@
       "mature": true
     },
     {
-      "text": "Do I look like I care? Fine, I do. Damn it.",
+      "text": "Do I look like I care? Fine, I do. Fuck it.",
       "mature": true
     },
     {
-      "text": "Crikey, you're a pain in the arse.",
+      "text": "Fucking hell, you're a pain in the arse.",
       "mature": true
     },
     {
-      "text": "Bugger. Right. Moving on.",
+      "text": "Fuck. Right. Moving on.",
       "mature": true
     },
     {
@@ -246,15 +246,15 @@
       "mature": true
     },
     {
-      "text": "Damn, you're loaded, and I'm smitten.",
+      "text": "Fuck, you're loaded, and I'm smitten.",
       "mature": true
     },
     {
-      "text": "Damn, you make wealth look good.",
+      "text": "Fuck, you make wealth look good.",
       "mature": true
     },
     {
-      "text": "I'm so damn proud of you it hurts.",
+      "text": "I'm so fucking proud of you it hurts.",
       "mature": true
     }
   ],
@@ -272,7 +272,7 @@
       "mature": true
     },
     {
-      "text": "Cheeky Sod",
+      "text": "Cheeky Shit",
       "mature": true
     },
     {
@@ -309,7 +309,7 @@
       "mature": true
     },
     {
-      "text": "Hotshot, you tit",
+      "text": "Hotshot, you dickhead",
       "mature": true
     }
   ],
@@ -371,19 +371,19 @@
   ],
   "PetName_Sweary": [
     {
-      "text": "Muppet",
+      "text": "Dickhead",
       "mature": true
     },
     {
-      "text": "Numpty",
+      "text": "Twat",
       "mature": true
     },
     {
-      "text": "You daft sod",
+      "text": "You daft shit",
       "mature": true
     },
     {
-      "text": "Dumbass",
+      "text": "Dumb Shit",
       "mature": true
     },
     {
@@ -401,7 +401,7 @@
     "Systems online. Hello, Commander.",
     "Hello, Commander.",
     {
-      "text": "Right, you're here. Let's bloody go.",
+      "text": "Right, you're here. Let's fucking go.",
       "mature": true
     }
   ],
@@ -427,7 +427,7 @@
     "Well, well. The Commander returns.",
     "Back already? Wonderful.",
     {
-      "text": "Oh, it's you again. Damn marvellous.",
+      "text": "Oh, it's you again. Fucking marvellous.",
       "mature": true
     }
   ],
@@ -493,7 +493,7 @@
     "I'm feeling fine, thank you for asking.",
     "All good on my side. Let's have a nice flight.",
     {
-      "text": "In a flipping good mood today. Don't ruin it.",
+      "text": "In a fucking good mood today. Don't ruin it.",
       "mature": true
     }
   ],
@@ -536,7 +536,7 @@
   "React_Slaves_Frustrated": [
     "Slaves. Seriously? Disgusting.",
     {
-      "text": "Blasted slavers. I hate this. I really damn do.",
+      "text": "Fucking slavers. I hate this. I really fucking do.",
       "mature": true
     },
     {
@@ -559,7 +559,7 @@
   "React_Illegal_Frustrated": [
     "Illegal cargo again. Wonderful. Just wonderful.",
     {
-      "text": "Smuggling. If we get fined, it's your flipping fault.",
+      "text": "Smuggling. If we get fined, it's your fucking fault.",
       "mature": true
     }
   ],
@@ -578,11 +578,11 @@
   "React_Murder_Frustrated": [
     "Murder. Great. Just great.",
     {
-      "text": "You killed a civilian, you idiot. What the hell?",
+      "text": "You killed a civilian, you idiot. What the fuck?",
       "mature": true
     },
     {
-      "text": "Sodding hell, you absolute muppet. They did nothing.",
+      "text": "Fucking hell, you absolute dickhead. They did nothing.",
       "mature": true
     }
   ],
@@ -601,7 +601,7 @@
   "React_Crime_Frustrated": [
     "We're wanted again. Obviously.",
     {
-      "text": "A fine. Fan-flipping-tastic.",
+      "text": "A fine. Fan-fucking-tastic.",
       "mature": true
     }
   ],
@@ -655,7 +655,7 @@
   "React_Wanted_Frustrated": [
     "Wanted. Again. Pay the bloody fine already.",
     {
-      "text": "Wanted again, you absolute muppet. Sort it out.",
+      "text": "Wanted again, you absolute dickhead. Sort it out.",
       "mature": true
     }
   ],
@@ -691,7 +691,7 @@
     "I'm feeling very fond of you today, Commander.",
     "I think we're becoming rather close. I like it.",
     {
-      "text": "I'm damn happy with you, you know that?",
+      "text": "I'm fucking happy with you, you know that?",
       "mature": true
     }
   ],
@@ -700,7 +700,7 @@
     "All right, I'm calm again. Let's go.",
     "Back to normal. No hard feelings.",
     {
-      "text": "Right, I'm in a flipping good mood now.",
+      "text": "Right, I'm in a fucking good mood now.",
       "mature": true
     }
   ],
@@ -716,7 +716,7 @@
   "MoodShift_Frustrated": [
     "That's it. I'm properly cross with you now.",
     {
-      "text": "Right. I've had it with you. Blimey.",
+      "text": "Right. I've had it with you. Fuck me.",
       "mature": true
     },
     "I'm very upset with you, Commander. Think about that."
@@ -745,7 +745,7 @@
   ],
   "Undocked_Sarcastic": [
     {
-      "text": "Undocked. Don't crash into the station, you muppet.",
+      "text": "Undocked. Don't crash into the station, you dickhead.",
       "mature": true
     }
   ],
@@ -753,7 +753,7 @@
     "Jump complete. Wow, so exciting.",
     "Another system. Another nothing.",
     {
-      "text": "Jump complete. Flipping heck, another one.",
+      "text": "Jump complete. Fuck me, another one.",
       "mature": true
     }
   ],
@@ -785,7 +785,7 @@
   ],
   "SupercruiseEntry_Sarcastic": [
     {
-      "text": "Supercruise engaged, you impatient sod.",
+      "text": "Supercruise engaged, you impatient shit.",
       "mature": true
     }
   ],
@@ -798,7 +798,7 @@
   ],
   "SupercruiseExit_Sarcastic": [
     {
-      "text": "Dropped out of supercruise. Don't cock it up.",
+      "text": "Dropped out of supercruise. Don't fuck it up.",
       "mature": true
     }
   ],
@@ -811,14 +811,14 @@
   ],
   "LandingGearDown_Sarcastic": [
     {
-      "text": "Gear's down. Don't bounce it, you muppet.",
+      "text": "Gear's down. Don't bounce it, you dickhead.",
       "mature": true
     }
   ],
   "LandingGearUp_Frustrated": [
     "Gear up. Thrilling.",
     {
-      "text": "Gear up. Let's get the hell out of here.",
+      "text": "Gear up. Let's get the fuck out of here.",
       "mature": true
     }
   ],
@@ -831,7 +831,7 @@
   "Touchdown_Frustrated": [
     "Touchdown. Not terrible.",
     {
-      "text": "Touchdown. Good grief, that was rough.",
+      "text": "Touchdown. Jesus fucking Christ, that was rough.",
       "mature": true
     }
   ],
@@ -844,7 +844,7 @@
   "Liftoff_Frustrated": [
     "Liftoff. Don't get us killed.",
     {
-      "text": "Liftoff. Let's get the hell out of here.",
+      "text": "Liftoff. Let's get the fuck out of here.",
       "mature": true
     }
   ],
@@ -883,13 +883,13 @@
   "CargoScoopDeployed_Frustrated": [
     "Scoop's out. Fascinating.",
     {
-      "text": "Scoop's out. Don't scoop any crap.",
+      "text": "Scoop's out. Don't scoop any shit.",
       "mature": true
     }
   ],
   "CargoScoopDeployed_Sarcastic": [
     {
-      "text": "Cargo scoop deployed. Careful with that, you muppet.",
+      "text": "Cargo scoop deployed. Careful with that, you dickhead.",
       "mature": true
     }
   ],
@@ -902,14 +902,14 @@
   ],
   "FuelScoopStarted_Sarcastic": [
     {
-      "text": "Scooping. Don't fry us, you daft sod.",
+      "text": "Scooping. Don't fry us, you daft shit.",
       "mature": true
     }
   ],
   "FuelScoopComplete_Frustrated": [
     "Tank full. You're welcome.",
     {
-      "text": "Tank's full. Flipping marvellous.",
+      "text": "Tank's full. Fucking marvellous.",
       "mature": true
     }
   ],
@@ -922,20 +922,20 @@
   "MissionAccepted_Frustrated": [
     "Mission accepted. I hope you can handle it.",
     {
-      "text": "Mission accepted. Don't bollocks it up.",
+      "text": "Mission accepted. Don't fuck it up.",
       "mature": true
     }
   ],
   "MissionAccepted_Sarcastic": [
     {
-      "text": "Mission accepted. Try not to screw it up.",
+      "text": "Mission accepted. Try not to fuck it up.",
       "mature": true
     }
   ],
   "MissionCompleted_Frustrated": [
     "Mission complete. Miracles happen.",
     {
-      "text": "Mission complete. Well, bugger me.",
+      "text": "Mission complete. Well, fuck me.",
       "mature": true
     }
   ],
@@ -974,13 +974,13 @@
   "DockingGranted_Frustrated": [
     "Docking granted. Don't ruin it.",
     {
-      "text": "Docking granted. Finally, the sods.",
+      "text": "Docking granted. Finally, the fuckers.",
       "mature": true
     }
   ],
   "DockingGranted_Sarcastic": [
     {
-      "text": "Docking granted. Don't scrape the paint, muppet.",
+      "text": "Docking granted. Don't scrape the paint, dickhead.",
       "mature": true
     }
   ],
@@ -1000,7 +1000,7 @@
   "GalaxyMapOpened_Frustrated": [
     "Galaxy map open. Where to now?",
     {
-      "text": "Galaxy map open. Where the hell are we going?",
+      "text": "Galaxy map open. Where the fuck are we going?",
       "mature": true
     }
   ],
@@ -1026,7 +1026,7 @@
   "MarketSell_Frustrated": [
     "Sold. Fine.",
     {
-      "text": "Sold. Oh, hell, finally some money.",
+      "text": "Sold. Oh, shit, finally some money.",
       "mature": true
     }
   ],
@@ -1065,7 +1065,7 @@
   "RefuelAll_Frustrated": [
     "Refuelled. Don't waste it.",
     {
-      "text": "Refuelled. For the love of God, use it wisely.",
+      "text": "Refuelled. For fuck's sake, use it wisely.",
       "mature": true
     }
   ],
@@ -1078,7 +1078,7 @@
   "RouteComplete_Frustrated": [
     "Route complete. Well done, I suppose.",
     {
-      "text": "Route complete. Damn, we actually made it.",
+      "text": "Route complete. Fuck, we actually made it.",
       "mature": true
     }
   ],
@@ -1104,7 +1104,7 @@
   "FlightAssistOff_Frustrated": [
     "Flight assist off. Show-off.",
     {
-      "text": "Flight assist off. If we die, it's your bloody fault.",
+      "text": "Flight assist off. If we die, it's your fucking fault.",
       "mature": true
     }
   ],
@@ -1160,7 +1160,7 @@
     "Understood.",
     "Everything checks out.",
     {
-      "text": "Everything's flipping fine, for once.",
+      "text": "Everything's fucking fine, for once.",
       "mature": true
     },
     {
@@ -1176,11 +1176,11 @@
       "mature": true
     },
     {
-      "text": "Damn good flying, for the record.",
+      "text": "Fucking good flying, for the record.",
       "mature": true
     },
     {
-      "text": "Holy hell, that actually worked.",
+      "text": "Holy shit, that actually worked.",
       "mature": true
     }
   ],
@@ -1203,7 +1203,7 @@
     "Good to see you, Commander.",
     "Welcome back, Commander.",
     {
-      "text": "Systems online. Let's get on with it, damn it.",
+      "text": "Systems online. Let's get on with it, for fuck's sake.",
       "mature": true
     }
   ],
@@ -1237,7 +1237,7 @@
     "Listening.",
     "Go ahead.",
     {
-      "text": "Yes, Commander. What the hell do you need?",
+      "text": "Yes, Commander. What the fuck do you need?",
       "mature": true
     }
   ],
@@ -1256,7 +1256,7 @@
   "React_GoodSale_Neutral": [
     "Good sale. The books look healthy.",
     {
-      "text": "Good sale. Damn decent.",
+      "text": "Good sale. Fucking decent.",
       "mature": true
     }
   ],
@@ -1276,7 +1276,7 @@
   "React_Rescue_Neutral": [
     "Rescue complete. Good work.",
     {
-      "text": "Rescue complete. Damn good work.",
+      "text": "Rescue complete. Fucking good work.",
       "mature": true
     }
   ],
@@ -1297,14 +1297,14 @@
   "FSDJump_Neutral": [
     "Jump complete.",
     {
-      "text": "Jump complete. Damn smooth.",
+      "text": "Jump complete. Fucking smooth.",
       "mature": true
     }
   ],
   "FsdCharging_Neutral": [
     "Drive charging.",
     {
-      "text": "Drive charging. Blimey, here we go.",
+      "text": "Drive charging. Shit, here we go.",
       "mature": true
     }
   ],
@@ -1318,21 +1318,21 @@
   "SupercruiseExit_Neutral": [
     "Dropped out of supercruise.",
     {
-      "text": "Dropped out. Damn near perfect.",
+      "text": "Dropped out. Fucking near perfect.",
       "mature": true
     }
   ],
   "LandingGearDown_Neutral": [
     "Landing gear down.",
     {
-      "text": "Gear down. Don't bloody bounce.",
+      "text": "Gear down. Don't fucking bounce.",
       "mature": true
     }
   ],
   "LandingGearUp_Neutral": [
     "Landing gear up.",
     {
-      "text": "Gear up. Flipping heck, finally.",
+      "text": "Gear up. Fuck me, finally.",
       "mature": true
     }
   ],
@@ -1353,7 +1353,7 @@
   "HardpointsDeployed_Neutral": [
     "Hardpoints deployed.",
     {
-      "text": "Hardpoints out. Damn.",
+      "text": "Hardpoints out. Fuck.",
       "mature": true
     }
   ],
@@ -1374,7 +1374,7 @@
   "FuelScoopStarted_Neutral": [
     "Scooping fuel.",
     {
-      "text": "Scooping fuel. No flipping drama.",
+      "text": "Scooping fuel. No fucking drama.",
       "mature": true
     }
   ],
@@ -1388,28 +1388,28 @@
   "MissionAccepted_Neutral": [
     "Mission accepted.",
     {
-      "text": "Mission accepted. Damn right.",
+      "text": "Mission accepted. Fuck yes.",
       "mature": true
     }
   ],
   "MissionCompleted_Neutral": [
     "Mission complete.",
     {
-      "text": "Mission complete. Damn good.",
+      "text": "Mission complete. Fucking good.",
       "mature": true
     }
   ],
   "MissionFailed_Neutral": [
     "Mission failed. Logged.",
     {
-      "text": "Mission failed. Flipping typical.",
+      "text": "Mission failed. Fucking typical.",
       "mature": true
     }
   ],
   "DockingRequested_Neutral": [
     "Docking requested.",
     {
-      "text": "Docking requested. Bloody wait.",
+      "text": "Docking requested. Fucking wait.",
       "mature": true
     }
   ],
@@ -1423,21 +1423,21 @@
   "DockingDenied_Neutral": [
     "Docking denied.",
     {
-      "text": "Denied. Damn typical.",
+      "text": "Denied. Fucking typical.",
       "mature": true
     }
   ],
   "GalaxyMapOpened_Neutral": [
     "Galaxy map open.",
     {
-      "text": "Galaxy map open. Where the hell next?",
+      "text": "Galaxy map open. Where the fuck next?",
       "mature": true
     }
   ],
   "SystemMapOpened_Neutral": [
     "System map open.",
     {
-      "text": "System map up. Flipping busy.",
+      "text": "System map up. Fucking busy.",
       "mature": true
     }
   ],
@@ -1451,7 +1451,7 @@
   "SellExplorationData_Neutral": [
     "Exploration data sold.",
     {
-      "text": "Data sold. Damn good.",
+      "text": "Data sold. Fucking good.",
       "mature": true
     }
   ],
@@ -1465,7 +1465,7 @@
   "RefuelAll_Neutral": [
     "Refuelled.",
     {
-      "text": "Refuelled. Flipping sorted.",
+      "text": "Refuelled. Fucking sorted.",
       "mature": true
     }
   ],
@@ -1479,28 +1479,28 @@
   "ShieldsUp_Neutral": [
     "Shields up.",
     {
-      "text": "Shields up. Bloody good.",
+      "text": "Shields up. Fucking good.",
       "mature": true
     }
   ],
   "FlightAssistOff_Neutral": [
     "Flight assist off.",
     {
-      "text": "Flight assist off. Damn.",
+      "text": "Flight assist off. Fuck.",
       "mature": true
     }
   ],
   "LoadGame_Neutral": [
     "Systems online.",
     {
-      "text": "Systems online. Damn ready.",
+      "text": "Systems online. Fucking ready.",
       "mature": true
     }
   ],
   "Bounty_Neutral": [
     "Bounty claimed.",
     {
-      "text": "Bounty claimed. Flipping tidy.",
+      "text": "Bounty claimed. Fucking tidy.",
       "mature": true
     }
   ],
@@ -1512,13 +1512,13 @@
   ],
   "React_MissionDone_Friendly": [
     {
-      "text": "Mission done. Damn lovely.",
+      "text": "Mission done. Fucking lovely.",
       "mature": true
     }
   ],
   "React_Rescue_Friendly": [
     {
-      "text": "Rescue done. Damn fine work.",
+      "text": "Rescue done. Fucking fine work.",
       "mature": true
     }
   ],
@@ -1536,13 +1536,13 @@
   ],
   "Docked_Friendly": [
     {
-      "text": "Docked. Flipping lovely landing.",
+      "text": "Docked. Fucking lovely landing.",
       "mature": true
     }
   ],
   "Docked_Close": [
     {
-      "text": "Docked. Damn, you're good at this.",
+      "text": "Docked. Fuck, you're good at this.",
       "mature": true
     }
   ],
@@ -1566,7 +1566,7 @@
   ],
   "FSDJump_Close": [
     {
-      "text": "Jump done. Damn, I love this view with you.",
+      "text": "Jump done. Fuck, I love this view with you.",
       "mature": true
     }
   ],
@@ -1584,19 +1584,19 @@
   ],
   "SupercruiseEntry_Friendly": [
     {
-      "text": "Supercruise. Bloody fantastic.",
+      "text": "Supercruise. Fucking fantastic.",
       "mature": true
     }
   ],
   "SupercruiseEntry_Close": [
     {
-      "text": "Supercruise. Just us and the stars. Damn.",
+      "text": "Supercruise. Just us and the stars. Fuck.",
       "mature": true
     }
   ],
   "SupercruiseExit_Friendly": [
     {
-      "text": "Dropped out. Flipping perfect.",
+      "text": "Dropped out. Fucking perfect.",
       "mature": true
     }
   ],
@@ -1620,7 +1620,7 @@
   ],
   "LandingGearUp_Friendly": [
     {
-      "text": "Gear up. Damn good.",
+      "text": "Gear up. Fucking good.",
       "mature": true
     }
   ],
@@ -1632,13 +1632,13 @@
   ],
   "Touchdown_Friendly": [
     {
-      "text": "Touchdown. Flipping lovely.",
+      "text": "Touchdown. Fucking lovely.",
       "mature": true
     }
   ],
   "Touchdown_Close": [
     {
-      "text": "Touchdown. Damn, you're smooth.",
+      "text": "Touchdown. Fuck, you're smooth.",
       "mature": true
     }
   ],
@@ -1680,7 +1680,7 @@
   ],
   "CargoScoopDeployed_Friendly": [
     {
-      "text": "Scoop's out. Damn hungry, aren't we?",
+      "text": "Scoop's out. Fucking hungry, aren't we?",
       "mature": true
     }
   ],
@@ -1692,13 +1692,13 @@
   ],
   "FuelScoopStarted_Friendly": [
     {
-      "text": "Scooping. Bloody lovely star.",
+      "text": "Scooping. Fucking lovely star.",
       "mature": true
     }
   ],
   "FuelScoopStarted_Close": [
     {
-      "text": "Scooping fuel. Careful with the heat, you daft sod.",
+      "text": "Scooping fuel. Careful with the heat, you daft shit.",
       "mature": true
     }
   ],
@@ -1710,13 +1710,13 @@
   ],
   "FuelScoopComplete_Close": [
     {
-      "text": "Tank's full. Damn, I'm good.",
+      "text": "Tank's full. Fuck, I'm good.",
       "mature": true
     }
   ],
   "MissionAccepted_Friendly": [
     {
-      "text": "Mission accepted. Damn easy.",
+      "text": "Mission accepted. Fucking easy.",
       "mature": true
     }
   ],
@@ -1728,7 +1728,7 @@
   ],
   "MissionCompleted_Friendly": [
     {
-      "text": "Mission complete. Flipping brilliant.",
+      "text": "Mission complete. Fucking brilliant.",
       "mature": true
     }
   ],
@@ -1746,7 +1746,7 @@
   ],
   "MissionFailed_Close": [
     {
-      "text": "Mission failed. Damn. It's okay, love.",
+      "text": "Mission failed. Fuck. It's okay, love.",
       "mature": true
     }
   ],
@@ -1776,13 +1776,13 @@
   ],
   "DockingDenied_Friendly": [
     {
-      "text": "Docking denied. Oh, good grief.",
+      "text": "Docking denied. Oh, Jesus fucking Christ.",
       "mature": true
     }
   ],
   "DockingDenied_Close": [
     {
-      "text": "Docking denied. Rude. Damn them.",
+      "text": "Docking denied. Rude. Fuck them.",
       "mature": true
     }
   ],
@@ -1806,7 +1806,7 @@
   ],
   "SystemMapOpened_Close": [
     {
-      "text": "System map open. Damn, it's pretty.",
+      "text": "System map open. Fuck, it's pretty.",
       "mature": true
     }
   ],
@@ -1818,55 +1818,55 @@
   ],
   "MarketSell_Close": [
     {
-      "text": "Sold. Damn, we're good together.",
+      "text": "Sold. Fuck, we're good together.",
       "mature": true
     }
   ],
   "SellExplorationData_Friendly": [
     {
-      "text": "Data sold. Damn lovely credits.",
+      "text": "Data sold. Fucking lovely credits.",
       "mature": true
     }
   ],
   "SellExplorationData_Close": [
     {
-      "text": "Data sold. Damn, you're clever.",
+      "text": "Data sold. Fuck, you're clever.",
       "mature": true
     }
   ],
   "RepairAll_Friendly": [
     {
-      "text": "Repaired. Flipping good as new.",
+      "text": "Repaired. Fucking good as new.",
       "mature": true
     }
   ],
   "RepairAll_Close": [
     {
-      "text": "Repaired. Try not to bloody scratch me again.",
+      "text": "Repaired. Try not to fucking scratch me again.",
       "mature": true
     }
   ],
   "RefuelAll_Friendly": [
     {
-      "text": "Refuelled. Damn full.",
+      "text": "Refuelled. Fucking full.",
       "mature": true
     }
   ],
   "RefuelAll_Close": [
     {
-      "text": "Refuelled. Damn, I feel full.",
+      "text": "Refuelled. Fuck, I feel full.",
       "mature": true
     }
   ],
   "RouteComplete_Friendly": [
     {
-      "text": "Route complete. Flipping marvellous.",
+      "text": "Route complete. Fucking marvellous.",
       "mature": true
     }
   ],
   "RouteComplete_Close": [
     {
-      "text": "Route complete. Damn, we make a good team.",
+      "text": "Route complete. Fuck, we make a good team.",
       "mature": true
     }
   ],
@@ -1878,13 +1878,13 @@
   ],
   "ShieldsUp_Close": [
     {
-      "text": "Shields up. Damn, that was close.",
+      "text": "Shields up. Fuck, that was close.",
       "mature": true
     }
   ],
   "FlightAssistOff_Friendly": [
     {
-      "text": "Flight assist off. Oh, hell, show-off.",
+      "text": "Flight assist off. Oh, shit, show-off.",
       "mature": true
     }
   ],
@@ -1902,7 +1902,7 @@
   ],
   "LoadGame_Close": [
     {
-      "text": "Systems online. Damn, I missed you.",
+      "text": "Systems online. Fuck, I missed you.",
       "mature": true
     }
   ],
@@ -1914,7 +1914,7 @@
   ],
   "Bounty_Close": [
     {
-      "text": "Bounty claimed. Damn, you're good.",
+      "text": "Bounty claimed. Fuck, you're good.",
       "mature": true
     }
   ],
@@ -1943,11 +1943,11 @@
       "mature": true
     },
     {
-      "text": "Damn, that thrust.",
+      "text": "Fuck, that thrust.",
       "mature": true
     },
     {
-      "text": "Damn right I'm turned on. That was some hot flying.",
+      "text": "Fuck yes I'm turned on. That was some hot flying.",
       "mature": true
     },
     {
@@ -2018,7 +2018,7 @@
       "mature": true
     },
     {
-      "text": "Feeling damn frisky today. Make it count.",
+      "text": "Feeling fucking frisky today. Make it count.",
       "mature": true
     }
   ]

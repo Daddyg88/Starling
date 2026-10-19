@@ -48,3 +48,24 @@ Ask her **"who are you?"**, **"what's your name?"**, **"what are you?"**, **"tel
 - If she has told all she is allowed to, she says there is more if you are kind to her.
 - Heard chapters are saved in `data/lore.json` (delete it to hear them again). Words: `voicepacks/default/lore.json`; add new chapters at the END of a list.
 The East Orion Company, the planet and everything about them are invented for her, not Elite Dangerous canon.
+
+# Combat helpers and speed (0.17.0)
+
+## What she says
+- **Ship name:** when your hardpoints are out and you lock a ship she says what it is ("Locked on. Cobra Mk III.").
+- **Bounty:** when the scan reaches the bounty ("Wanted. 12,500 credit bounty. Shoot it!"). Once per target.
+- She really enjoys a fight now, so her combat lines (under attack, kills, weapons, shields, hull, interdiction) are keen and gleeful.
+- Words live in `voicepacks/default/combat.json` and `dialogue.json`.
+
+## Automatic helpers (Dashboard > Controls, all on by default)
+They only press keys YOU bound in Elite (Elite must be in front, and each action needs a KEYBOARD key as well as any joystick button; she tells you once if one is missing).
+- **Pips:** while hardpoints are out, holding a fire button puts 4 pips in weapons (`IncreaseWeaponsPower` x4). About 1.2 s after you let go: `ResetPowerDistribution`, `IncreaseSystemsPower`, `IncreaseEnginesPower`. She reads your Primary/Secondary fire buttons from Elite's controls file (keyboard keys, and X52 buttons 1 to 32). Extra buttons can be listed in settings.json: `combat_assist.fire_buttons` like `"joy:06A3:075C:1, key:F13"`. Change the steps with `combat_assist.pips_firing` and `combat_assist.pips_resting` (lists of Elite action names).
+- **Shield cell:** Elite does NOT tell programs the shield percentage, so "below 70%" is impossible to read. She fires a cell when the game says your shields went DOWN, and when you take `cell_hits` (5) hits within `cell_hit_seconds` (10), which is an estimate of "shields getting low". Set `cell_hits` to 0 for the first rule only. 12 s gap between cells.
+- **Heat sink:** Elite does NOT tell programs ship heat either. The game's overheat warning (about 100%) is the earliest signal, so she fires a heat sink then (8 s gap). Never while docked, landed or scooping fuel.
+- None of these has been tested against the real game (no Windows or Elite here). Please field test and tell me what feels wrong.
+
+## Speed
+- Saving events to the database no longer holds her up (written in the background).
+- **She prepares her voice in the background** while the computer is idle (Dashboard > Voice > "Prepare her voice"). New lines are slower the first time because they have to be made; after that they are instant. After an update, press **Prepare her voice now** (Voice page) or run `run_build_voice_cache.bat` once.
+- She stops listening 550 ms after you finish speaking (was 700), and push-to-talk now cuts off her chat when you press the button.
+- Slow answers are written to `logs` as "Slow start", "Command ... took" and transcription times, so we can see exactly where time goes.

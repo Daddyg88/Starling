@@ -153,6 +153,12 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("autohonk.mode", "Auto honk when I arrive in a system", "choice", HONK_MODES,
                   help="She holds your fire button for a few seconds. Pick the fire button your Discovery Scanner is on "
                        "(it needs a keyboard key as well as any joystick button)"),
+            Field("combat_assist.pips", "Combat: pips to weapons while I fire", "toggle",
+                  help="While your hardpoints are out she puts the pips in weapons when you hold a fire button, and back to systems and engines when you let go. Uses your Primary/Secondary fire buttons from Elite"),
+            Field("combat_assist.shield_cell", "Combat: use a shield cell when shields drop", "toggle",
+                  help="Elite does not share the shield percentage, so she fires a cell when your shields go down (or you take lots of hits very fast)"),
+            Field("combat_assist.heat_sink", "Combat: deploy a heat sink when overheating", "toggle",
+                  help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
             Field("voidcompass.enabled", "Control Void Compass overlays by voice", "toggle",
                   help="'Show the cargo overlay', 'hide all overlays'. In Void Compass switch on Settings > Integrations > Local API and Allow control"),
             Field("voidcompass.port", "Void Compass Local API port", "text", placeholder="7380",

@@ -1,6 +1,5 @@
 {
  "_help": "Ship changes, wings and fighting - in space and on foot. {ship}, {Name} and {Victim} are filled in by the game. A _OnFoot key is used instead when you are on foot. A _Mood suffix is only used in that mood.",
-
  "ShipyardSwap": [
   "Switching to the {ship}.",
   "Now flying the {ship}.",
@@ -23,7 +22,6 @@
  "ShipyardSwap_Frustrated": [
   "The {ship}. Fine. Let's go."
  ],
-
  "WingInvite": [
   "{Name} has invited you to a wing.",
   "Wing invitation from {Name}, Commander."
@@ -47,20 +45,19 @@
   "Back to flying solo."
  ],
  "CombatModeOn": [
-  "Combat mode.",
-  "Combat display up."
+  "Combat mode! Let's go hunting.",
+  "Combat display up. Show me someone to shoot.",
+  "Combat mode. Oh, I'm ready."
  ],
-
  "ShipTargeted_Wanted": [
-  "Wanted target locked.",
-  "That one has a bounty on it.",
-  "Wanted. Worth shooting.",
-  "Bounty target in sight."
+  "Wanted target locked. Let's collect.",
+  "That one has a bounty on it. Shoot!",
+  "Wanted. Very much worth shooting.",
+  "Bounty target in sight. Oh, yes."
  ],
  "ShipTargeted_Wanted_Sarcastic": [
   "A wanted ship. How convenient for your wallet."
  ],
-
  "Interdiction_Success": [
   "Interdiction successful. They're out of supercruise.",
   "Got them. They're down.",
@@ -71,39 +68,44 @@
   "They slipped the interdiction.",
   "Lost them. They're still in supercruise."
  ],
-
  "PVPKill": [
-  "Commander destroyed.",
-  "Pilot down. Nice shooting.",
-  "That's another commander gone.",
-  "Kill confirmed."
+  "Commander destroyed! Oh, that was personal.",
+  "Pilot down. Gorgeous shooting!",
+  "That's another commander gone. Who's next?",
+  "Kill confirmed. Real people explode so nicely."
  ],
  "PVPKill_Sarcastic": [
-  "A real person. Hope they're not too upset."
+  "A real person. Hope they're not too upset.",
+  {
+   "text": "Fuck, they actually flew into that. Brilliant.",
+   "mature": true
+  }
  ],
  "PVPKill_OnFoot": [
   "Commander down.",
   "Hostile commander eliminated."
  ],
-
  "Bounty_OnFoot": [
-  "Hostile down.",
-  "Target eliminated.",
-  "That's one less.",
-  "Clear. Nice shot."
+  "Hostile down! Yes!",
+  "Target eliminated. More, please!",
+  "That's one less. Who's next?",
+  "Clear! Beautiful shot, Commander."
  ],
  "Bounty_OnFoot_Sarcastic": [
   "One less problem. There's always another."
  ],
  "UnderAttack_OnFoot": [
-  "Contact! Take cover!",
-  "We're taking fire! Get down!",
-  "Shooter! Find cover!",
-  "Hostiles! Move!"
+  "Contact! Take cover, then hit them back!",
+  "We're taking fire! Get down, then get stuck in!",
+  "Shooter! Find cover, and let's get them!",
+  "Hostiles! Move! This is fun!"
  ],
  "UnderAttack_OnFoot_Frustrated": [
-  "Get behind something!",
-  "They're shooting at us! Do something!"
+  "Get behind something, then shoot back!",
+  {
+   "text": "Who the fuck is shooting at us?",
+   "mature": true
+  }
  ],
  "Died_OnFoot": [
   "You're down, Commander.",
@@ -122,7 +124,6 @@
   "Suit loadout: {LoadoutName}.",
   "Switched to {LoadoutName}."
  ],
-
  "React_WantedKill": [
   "Good kill, Commander. Another wanted criminal off the lanes.",
   "Nice shooting. That one deserved it.",
@@ -139,5 +140,68 @@
  "React_WantedKill_Sarcastic": [
   "Well, you hit something. Good for you.",
   "A bounty. Are you feeling alright?"
+ ],
+ "ShipTargeted_Ship": [
+  "Locked on.||{Ship}.",
+  "Target acquired.||It's a {Ship}.",
+  "Contact.||{Ship}. Let's see what it's made of.",
+  "Ooh, a {Ship}. Come here, you."
+ ],
+ "ShipTargeted_Ship_Friendly": [
+  "Got it, Commander.||{Ship}. Let's have some fun."
+ ],
+ "ShipTargeted_Ship_Close": [
+  "Locked on.||A {Ship}. It doesn't stand a chance with you flying."
+ ],
+ "ShipTargeted_Ship_Sarcastic": [
+  "A {Ship}. Poor thing doesn't know what's coming.",
+  {
+   "text": "Locked on.||A {Ship}. Dead man flying.",
+   "mature": true
+  }
+ ],
+ "ShipTargeted_Ship_Frustrated": [
+  "Target locked.||{Ship}. Shoot it already."
+ ],
+ "ShipTargeted_Bounty": [
+  "That one's worth money.||{BountyText} credits on its head.",
+  "Bounty scan complete.||{BountyText} credits.",
+  "Wanted.||{BountyText} credit bounty. Shoot it!",
+  "{BountyText} credits in bounty.||I'd call that a present."
+ ],
+ "ShipTargeted_Bounty_Friendly": [
+  "Bounty scan done.||{BountyText} credits. Go get it, Commander!"
+ ],
+ "ShipTargeted_Bounty_Close": [
+  "Look at that.||{BountyText} credits. Shoot it for me."
+ ],
+ "ShipTargeted_Bounty_Sarcastic": [
+  "{BountyText} credits.||Somebody really pissed off the law.",
+  {
+   "text": "{BountyText} credits.||Fucking lovely. Pop it.",
+   "mature": true
+  }
+ ],
+ "CombatAssist_ShieldCell": [
+  "Shield cell in! Back to it!",
+  "Cell used. Keep shooting!",
+  "Fresh shields, Commander. Don't waste them."
+ ],
+ "CombatAssist_ShieldCell_Sarcastic": [
+  {
+   "text": "Shield cell in. Try not to fuck them up again.",
+   "mature": true
+  }
+ ],
+ "CombatAssist_HeatSink": [
+  "Heat sink out. Cooling!",
+  "Venting heat. Hold steady!",
+  "Heat sink deployed. Keep fighting!"
+ ],
+ "CombatAssist_HeatSink_Sarcastic": [
+  {
+   "text": "It's getting fucking hot in here. Heat sink out.",
+   "mature": true
+  }
  ]
 }

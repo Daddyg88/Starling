@@ -13,11 +13,11 @@
     "Happy to. {doing}.",
     "Sure thing. {doing}.",
     {
-      "text": "{doing}. Flipping brilliant idea.",
+      "text": "{doing}. Fucking brilliant idea.",
       "mature": true
     },
     {
-      "text": "Sure thing. {doing}. Damn right.",
+      "text": "Sure thing. {doing}. Fuck yes.",
       "mature": true
     }
   ],
@@ -53,7 +53,7 @@
     "{doing}. Anything else you'd like to order me around with?",
     "{doing}, since you asked so nicely. Not.",
     {
-      "text": "{doing}. Satisfied, or shall I get you a bloody medal as well?",
+      "text": "{doing}. Satisfied, or shall I get you a fucking medal as well?",
       "mature": true
     },
     {
@@ -70,7 +70,7 @@
     "{Label} is already {state}. Try looking.",
     "Already {state}. You might want to check your cockpit sometime.",
     {
-      "text": "{Label} is already {state}. Are you blind, or just flipping lazy?",
+      "text": "{Label} is already {state}. Are you blind, or just fucking lazy?",
       "mature": true
     }
   ],
@@ -78,7 +78,7 @@
     "I did that already. {Label} is {state}.",
     "{Label} is already {state}. Pay attention.",
     {
-      "text": "{Label} is already {state}, you muppet. Look at the thing.",
+      "text": "{Label} is already {state}, you dickhead. Look at the thing.",
       "mature": true
     }
   ],
@@ -126,14 +126,14 @@
     "That's not something I can do. Try a command.",
     "Lovely idea. I have no idea how to do it.",
     {
-      "text": "What the hell does that mean? Try English.",
+      "text": "What the fuck does that mean? Try English.",
       "mature": true
     }
   ],
   "CommandUnknown_Frustrated": [
     "I don't know what that means. Say it differently.",
     {
-      "text": "I don't know what the hell that means. Say it properly.",
+      "text": "I don't know what the fuck that means. Say it properly.",
       "mature": true
     }
   ],
@@ -145,7 +145,7 @@
   "CommandMulti_Sarcastic": [
     "All {count} done. I'm basically your hands now.",
     {
-      "text": "All {count} done. Sodding hell, you are needy.",
+      "text": "All {count} done. Fucking hell, you are needy.",
       "mature": true
     }
   ],
@@ -155,11 +155,11 @@
     "{doing}, Commander.",
     "Confirmed. {doing}.",
     {
-      "text": "{doing}. Done and blasted dusted.",
+      "text": "{doing}. Done and fucking dusted.",
       "mature": true
     },
     {
-      "text": "{doing}. Easy as shit.",
+      "text": "{doing}. Easy as fuck.",
       "mature": true
     }
   ],
@@ -167,7 +167,7 @@
     "{Label} is already {state}.",
     "No change needed. {Label} is already {state}.",
     {
-      "text": "{Label} is already {state}. Blimey, look at it.",
+      "text": "{Label} is already {state}. Shit, look at it.",
       "mature": true
     }
   ],
@@ -180,7 +180,7 @@
   "CommandNotInGame_Neutral": [
     "Elite Dangerous is not the active window. Nothing was pressed.",
     {
-      "text": "Elite isn't in front. Click the damn game first.",
+      "text": "Elite isn't in front. Click the fucking game first.",
       "mature": true
     }
   ],
@@ -188,7 +188,7 @@
     "I don't recognise that command, Commander.",
     "That isn't a command I know.",
     {
-      "text": "I've no flipping idea what that is.",
+      "text": "I've no fucking idea what that is.",
       "mature": true
     }
   ],
@@ -208,7 +208,7 @@
   ],
   "CommandUnknown_Friendly": [
     {
-      "text": "No damn clue what that means, sorry.",
+      "text": "No fucking clue what that means, sorry.",
       "mature": true
     }
   ],
@@ -220,7 +220,7 @@
   ],
   "CommandNotInGame_Friendly": [
     {
-      "text": "Elite isn't in front, you daft sod. Click the game first.",
+      "text": "Elite isn't in front, you daft shit. Click the game first.",
       "mature": true
     }
   ],
@@ -232,13 +232,13 @@
   ],
   "CommandNotInGame_Frustrated": [
     {
-      "text": "The game isn't even in front, you muppet. Click it first.",
+      "text": "The game isn't even in front, you dickhead. Click it first.",
       "mature": true
     }
   ],
   "CommandMulti_Friendly": [
     {
-      "text": "All {count} done. Bloody easy.",
+      "text": "All {count} done. Fucking easy.",
       "mature": true
     }
   ],

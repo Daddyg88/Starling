@@ -51,8 +51,11 @@ def _keys_for(event):
     data = event.data
 
     if name == "ShipTargeted":
-        # only a wanted ship is worth a word; everything else you lock stays quiet
-        return ["ShipTargeted_Wanted"] if "wanted" in str(data.get("LegalStatus", "")).lower() else []
+        said = data.get("Announce")
+        if said is None:                                  # older style data: only a wanted ship is worth a word
+            return ["ShipTargeted_Wanted"] if "wanted" in str(data.get("LegalStatus", "")).lower() else []
+        return {"ship": ["ShipTargeted_Ship"], "bounty": ["ShipTargeted_Bounty", "ShipTargeted_Wanted"],
+                "wanted": ["ShipTargeted_Wanted"]}.get(said, [])
 
     if name == "Interdiction":
         return ["Interdiction_Success" if data.get("Success") else "Interdiction_Failed"]

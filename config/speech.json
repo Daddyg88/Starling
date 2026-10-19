@@ -20,7 +20,7 @@
     "SystemMapOpened": 2,
     "ScreenClosed": 1.5,
     "Bounty": 4,
-    "ShipTargeted": 20,
+    "ShipTargeted": 1,
     "WingAdd": 3,
     "WingInvite": 5,
     "PVPKill": 3,

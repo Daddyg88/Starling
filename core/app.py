@@ -29,7 +29,7 @@ from tts.speech_manager import SpeechManager
 
 APP_NAME = "STARLING"
 from core.version import __version__
-APP_VERSION = __version__ + " (Phase 7: memory)"
+APP_VERSION = __version__ + " (Phase 7: memory, combat helpers)"
 
 
 class App:
@@ -73,6 +73,7 @@ class App:
         self.echo = Echo()
         self.commands = None
         self.autohonk = None
+        self.combat_assist = None
         self.watcher = None
         self.route_voice = None
         self.route_follower = None
@@ -438,12 +439,32 @@ class App:
             self.autohonk = None
         return self.autohonk
 
+    def ensure_combat_assist(self):
+        """Auto pips, shield cells and heat sinks in a fight. Always attached; the dashboard toggles decide."""
+        if self.combat_assist is not None:
+            return self.combat_assist
+        reader = self.ensure_buttons()
+        if reader is None:
+            return None
+        try:
+            from control.binds import BindingBook
+            from control.combat_assist import CombatAssist
+            from control.sender import KeySender
+            self.combat_assist = CombatAssist(self.bus, self.settings, BindingBook(), KeySender(), reader,
+                                              lambda: self.state, speech=self.speech, dialogue=self.dialogue)
+            self.combat_assist.attach()
+        except Exception:
+            self.log.exception("Combat assist could not start")
+            self.combat_assist = None
+        return self.combat_assist
+
     def start_monitor(self):
         """Start watching the real game. Returns the journal folder, or None."""
         self.journal_folder = find_journal_folder(self.settings.get("journal.folder", ""))
         if self.journal_folder is None:
             return None
         self.ensure_autohonk()
+        self.ensure_combat_assist()
         self.ensure_route()
         poll = self.settings.get("journal.poll_seconds", 1.0)
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
@@ -466,6 +487,9 @@ class App:
         if self.listener is not None:
             self.listener.stop()
             self.listener = None
+        if self.combat_assist is not None:
+            self.combat_assist.detach()
+            self.combat_assist = None
         if self.ptt is not None:
             self.ptt.stop()
             self.ptt = None
