@@ -70,7 +70,7 @@ class Outcome:
 
 class CommandRunner:
     def __init__(self, bus, speech, dialogue, settings, book=None, sender=None, state_provider=None,
-                 matcher=None, flavour=None, clock=time.monotonic, sleep=time.sleep, echo=None, voidcompass=None, route=None, macro_hooks=None, memory=None, smalltalk=None):
+                 matcher=None, flavour=None, clock=time.monotonic, sleep=time.sleep, echo=None, voidcompass=None, route=None, macro_hooks=None, memory=None, smalltalk=None, brain=None):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
@@ -82,6 +82,7 @@ class CommandRunner:
         self.flavour = flavour
         self.echo = echo                 # control/echo.py: tells the event speaker not to repeat what she just did
         self.macro_hooks = macro_hooks or {}     # command id -> function run before its macro; returns (ok, sentence)
+        self.brain = brain               # personality/brain.py: answers anything that is not a command
         self.smalltalk = smalltalk       # personality/smalltalk.py: "how are you?", "tell me a joke"
         self.memory = memory             # memory/recall.py: "what do you remember"
         self.route = route               # navigation/voice.py: 'plot a neutron route to Colonia'
@@ -179,6 +180,16 @@ class CommandRunner:
             matches = [single]
         else:
             matches = self.matcher.split(text)
+        if not matches and self.brain is not None:
+            try:
+                answer = self.brain.try_handle(text, deliberate=speak_unknown)
+            except Exception:
+                log.exception("Her brain failed")
+                answer = None
+            if answer is not None:
+                outcome = Outcome("route", text, None, "press", detail=answer)
+                self._finish([outcome], False, text)
+                return [outcome]
         if not matches:
             outcome = Outcome("unknown", text=text, detail="I didn't recognise that command.")
             self._finish([outcome], speak and speak_unknown, text)

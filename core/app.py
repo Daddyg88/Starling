@@ -29,7 +29,7 @@ from tts.speech_manager import SpeechManager
 
 APP_NAME = "STARLING"
 from core.version import __version__
-APP_VERSION = __version__ + " (Phase 7: memory, combat helpers)"
+APP_VERSION = __version__ + " (Phase 7: memory, combat helpers, brain)"
 
 
 class App:
@@ -63,6 +63,7 @@ class App:
         self.chitchat = None
         self.warmer = None
         self.smalltalk = None
+        self.brain = None
         self.lore = None
         self._record_events = True
         self.voice_replies = None
@@ -200,6 +201,9 @@ class App:
         from personality.lore import LoreTeller
         self.lore = LoreTeller(self.speech, self.dialogue, self.settings, path=paths.DATA_DIR / "lore.json")
         self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore)
+        from personality.brain import Brain
+        self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
+                           facts=getattr(self.ask, "facts", None))
         return True
 
     def cpu_is_free(self):
@@ -299,7 +303,7 @@ class App:
                 self.bus, self.speech, self.dialogue, self.settings, book=BindingBook(), sender=KeySender(),
                 matcher=Matcher(learning=self.learning),
                 state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route(),
-                memory=self.memory_recall, smalltalk=self.smalltalk)
+                memory=self.memory_recall, smalltalk=self.smalltalk, brain=self.brain)
             # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
             self.commands.attach()
             self._connect_auto_plot()

@@ -236,6 +236,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Only used when Mood control is Fixed"),
             Field("personality.remarks", "Extra comments", "choice", REMARKS,
                   help="How often she adds a comment after a line"),
+            Field("brain.enabled", "Her brain: answers to almost anything", "toggle",
+                  help="Ask her about herself, the game, jokes, riddles, advice, or say hello to chat. Needs her name or push-to-talk"),
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.frequency", "How often she chats", "choice", CHITCHAT,
