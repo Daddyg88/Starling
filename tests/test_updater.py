@@ -178,5 +178,27 @@ class StageAndApplyTests(unittest.TestCase):
         self.assertFalse(updater.roll_back(self.root / "nowhere"))
 
 
+
+
+class KeepVoiceTests(unittest.TestCase):
+    def test_the_tuned_voice_is_carried_over_by_updates(self):
+        from core.updater import KEEP
+        self.assertIn("custom_covas.pt", KEEP)
+
+    def test_the_tuned_voice_is_recovered_from_the_previous_version(self):
+        import tempfile
+        from pathlib import Path
+        from tts.providers import recover_pack
+        with tempfile.TemporaryDirectory() as tmp:
+            new, previous = Path(tmp) / "app", Path(tmp) / "app.previous"
+            new.mkdir()
+            previous.mkdir()
+            (previous / "custom_covas.pt").write_bytes(b"voice")
+            self.assertTrue(recover_pack(new / "custom_covas.pt", previous))
+            self.assertEqual((new / "custom_covas.pt").read_bytes(), b"voice")
+            self.assertFalse(recover_pack(new / "custom_covas.pt", previous))          # already there: nothing to do
+            self.assertFalse(recover_pack(new / "other.pt", previous))                 # nothing to recover
+
+
 if __name__ == "__main__":
     unittest.main()
