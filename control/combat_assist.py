@@ -5,7 +5,7 @@ All three only press the keys YOU bound in Elite (same rules as voice commands: 
 and the action needs a KEYBOARD key as well as any joystick button).
 
 Auto pips
-    While your hardpoints are out and you HOLD a fire button, she moves the power pips to weapons.
+    While your hardpoints are out (or you are in analysis mode, for mining lasers) and you HOLD a fire button, she moves the power pips to weapons.
     When you let go (and stay off the button for a moment) she resets and sends pips to systems and engines.
     She finds your fire buttons from Elite's controls file (Primary fire and Secondary fire): keyboard keys, and
     joystick buttons on the X52. You can also list extra buttons in settings.json under combat_assist.fire_buttons.
@@ -24,7 +24,7 @@ from core.logger import get_logger
 
 log = get_logger("combat_assist")
 
-DOCKED_BIT, LANDED_BIT, SUPERCRUISE_BIT, HARDPOINTS_BIT, SCOOP_BIT = 0, 1, 4, 6, 11
+DOCKED_BIT, LANDED_BIT, SUPERCRUISE_BIT, HARDPOINTS_BIT, SCOOP_BIT, ANALYSIS_BIT = 0, 1, 4, 6, 11, 27
 FIRE_ACTIONS = ("PrimaryFire", "SecondaryFire")
 POLL_SECONDS = 0.03
 IDLE_POLL_SECONDS = 0.4
@@ -143,9 +143,10 @@ class CombatAssist:
 
     # ---- is it a fight? ----
     def fighting(self):
+        """Weapons are in use: hardpoints out, or (mining, scanning, limpets) the cockpit is in analysis mode."""
         state = self.state_provider()
-        return hardpoints_out(state) and not _flag(state, DOCKED_BIT) and not _flag(state, LANDED_BIT) \
-            and not _flag(state, SUPERCRUISE_BIT)
+        armed = hardpoints_out(state) or (bool(self.option("pips_analysis", True)) and _flag(state, ANALYSIS_BIT))
+        return armed and not _flag(state, DOCKED_BIT) and not _flag(state, LANDED_BIT) and not _flag(state, SUPERCRUISE_BIT)
 
     # ---- heat sinks ----
     def on_heat(self, _event):

@@ -1,7 +1,7 @@
 """
 What is worth mining. One small table, easy to edit.
 
-Tiers:  top  = the big money (she gets properly excited)
+Tiers:  top  = your ten favourites (she gets properly excited). Choose them on the dashboard: Mining page.
         good = solid money (she is pleased)
         low  = everything else (she keeps quiet about it)
 
@@ -11,11 +11,46 @@ so ask her "where should I sell this" for real, current prices.
 """
 import re
 
-TOP = {
-    "platinum", "painite", "lowtemperaturediamond", "opal", "monazite", "musgravite",
-    "serendibite", "grandidierite", "alexandrite", "rhodplumsite",
-}
-GOOD = {"osmium", "palladium", "gold", "bromellite", "benitoite", "silver"}
+# The ten minerals she gets EXCITED about. You choose them on the dashboard (Mining page); these are the starting ten.
+DEFAULT_FAVOURITES = ["platinum", "painite", "opal", "lowtemperaturediamond", "monazite", "musgravite",
+                      "serendibite", "grandidierite", "alexandrite", "rhodplumsite"]
+FAVOURITE_BOXES = 10
+# Solid money: she is pleased but not excited. (Gold and silver are deliberately NOT here: she ignores them.)
+GOOD = {"osmium", "palladium", "bromellite", "benitoite"}
+
+_settings = None
+
+
+def bind(settings):
+    """Let the dashboard's ten boxes (settings mining.fav1 ... mining.fav10) decide what she gets excited about."""
+    global _settings
+    _settings = settings
+
+
+def option(name, default=None):
+    """A mining setting (settings.json: "mining" > name). Safe before the settings are bound."""
+    if _settings is None:
+        return default
+    try:
+        value = _settings.get("mining." + name, default)
+    except Exception:
+        return default
+    return default if value is None else value
+
+
+def favourites():
+    """The set of minerals (game names) she is excited about right now."""
+    if _settings is None:
+        return set(DEFAULT_FAVOURITES)
+    chosen = set()
+    for number in range(1, FAVOURITE_BOXES + 1):
+        try:
+            value = _settings.get("mining.fav%d" % number, None)
+        except Exception:
+            value = None
+        if value:
+            chosen.add(normal(value))
+    return chosen
 
 # The name Ardent (the price service) uses, when it is not just the spoken name in lower case.
 SPOKEN_NAMES = {
@@ -56,7 +91,7 @@ def normal(name):
 
 def tier(name):
     key = normal(name)
-    if key in TOP:
+    if key in favourites():
         return "top"
     if key in GOOD:
         return "good"

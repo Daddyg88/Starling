@@ -3,104 +3,274 @@
   "Motherlode!||{Material}!",
   "Motherlode, Commander!||It's {Material}!",
   "Oh, that's a motherlode.||{Material}. Crack it!",
-  "{Material} motherlode!||Get the charges ready."
+  "{Material} motherlode!||Get the charges ready.",
+  "Motherlode detected.||{Material}. This is the good one.",
+  "Jackpot rock.||{Material} motherlode.",
+  "Stop what you're doing.||That's a {Material} motherlode.",
+  "I can feel it from here.||{Material} motherlode!",
+  "A motherlode of {Material}.||Don't you dare miss it.",
+  "Look at this rock!||Motherlode, {Material}."
  ],
  "Prospected_Motherlode_Friendly": [
-  "A {Material} motherlode, Commander! Brilliant!"
+  "A {Material} motherlode, Commander! Brilliant!",
+  "Commander, it's a motherlode! {Material}!",
+  "Motherlode! {Material}! Well found."
  ],
  "Prospected_Motherlode_Close": [
-  "A motherlode of {Material}!||Oh, I could kiss you. Go on, crack it."
+  "A motherlode of {Material}!||Oh, I could kiss you. Go on, crack it.",
+  "{Material} motherlode! You've made my whole week.",
+  "Motherlode! I knew you'd find one for me."
  ],
  "Prospected_Motherlode_Sarcastic": [
   "A {Material} motherlode. Try not to waste it.",
   {
    "text": "Motherlode. {Material}. Fucking jackpot.",
    "mature": true
-  }
+  },
+  "Even you can't miss a {Material} motherlode."
  ],
  "Prospected_Motherlode_Frustrated": [
-  "Motherlode of {Material}. Do it properly, then."
+  "Motherlode of {Material}. Do it properly, then.",
+  "Motherlode. {Material}. Crack it before I lose patience."
  ],
  "Prospected_Top": [
   "{Material}!||{Percent} percent.",
   "Ooh, {Material}.||{Percent} percent. Lovely.",
   "This one has {Material}.||{Percent} percent. Get stuck in.",
   "Valuable one.||{Material}, {Percent} percent.",
-  "{Material}, {Percent} percent.||That's the good stuff."
+  "{Material}, {Percent} percent.||That's the good stuff.",
+  "Now we're talking.||{Material} at {Percent} percent.",
+  "Don't skip this one.||{Material}, {Percent} percent.",
+  "There's {Material} in there.||{Percent} percent of it.",
+  "Oh yes.||{Material}. {Percent} percent.",
+  "Mine this one.||{Material}, {Percent} percent.",
+  "I'd happily spend your money on that.||{Material}, {Percent} percent.",
+  "{Percent} percent {Material}.||Shiny."
  ],
  "Prospected_Top_Friendly": [
-  "{Material}, Commander!||{Percent} percent. Well spotted."
+  "{Material}, Commander!||{Percent} percent. Well spotted.",
+  "Lovely rock, Commander.||{Material}, {Percent} percent.",
+  "You've found {Material}.||{Percent} percent. Excellent."
  ],
  "Prospected_Top_Close": [
-  "{Material}! {Percent} percent.||Shiny, shiny credits."
+  "{Material}! {Percent} percent.||Shiny, shiny credits.",
+  "{Material} at {Percent} percent.||You do spoil me.",
+  "Look at that.||{Material}, {Percent} percent. I'm so happy."
  ],
  "Prospected_Top_Sarcastic": [
   "{Material}, {Percent} percent. Even you can't miss that.",
   {
    "text": "{Material}. {Percent} percent. Fucking finally.",
    "mature": true
-  }
+  },
+  "{Material} at {Percent} percent. Don't all cheer at once."
  ],
  "Prospected_Top_Frustrated": [
-  "{Material}, {Percent} percent. Mine it."
+  "{Material}, {Percent} percent. Mine it.",
+  "{Material}. {Percent} percent. Now stop faffing."
  ],
  "Prospected_Good": [
   "{Material}, {Percent} percent.",
   "Some {Material} in this one.||{Percent} percent.",
-  "Decent. {Material}, {Percent} percent."
+  "Decent. {Material}, {Percent} percent.",
+  "{Material} at {Percent} percent.||Worth a go.",
+  "This one has {Material}.||{Percent} percent.",
+  "Respectable. {Material}, {Percent} percent."
  ],
  "Prospected_Good_Friendly": [
-  "Some {Material}, Commander. {Percent} percent."
+  "Some {Material}, Commander. {Percent} percent.",
+  "{Material}, {Percent} percent. Not bad at all."
+ ],
+ "Prospected_Good_Close": [
+  "{Material}, {Percent} percent. Decent, but I know you can do better."
  ],
  "Prospected_Good_Sarcastic": [
-  "{Material}, {Percent} percent. Not exciting, but it pays."
+  "{Material}, {Percent} percent. Not exciting, but it pays.",
+  "{Material}. {Percent} percent. How thrilling."
  ],
  "Prospected_Poor": [
   "Low content. Not worth it.",
   "Nothing much in that one.",
   "Skip it.",
   "Poor rock. Try another.",
-  "Not worth the time."
+  "Not worth the time.",
+  "That one's all filler.",
+  "Nothing worth cracking in there.",
+  "Next rock, please.",
+  "Barely anything. Move on.",
+  "I wouldn't bother.",
+  "Meh. Try the next one.",
+  "Empty calories. Skip it."
+ ],
+ "Prospected_Poor_Friendly": [
+  "Not much in that one, Commander. Try another.",
+  "Low content. Let's find a better rock."
+ ],
+ "Prospected_Poor_Close": [
+  "Nothing in there for us. Next one."
  ],
  "Prospected_Poor_Sarcastic": [
-  "Nothing. Truly thrilling."
+  "Nothing. Truly thrilling.",
+  "Wow. A rock full of nothing."
  ],
- "Refined_Top": [
+ "Prospected_Poor_Frustrated": [
+  "Rubbish rock. Next."
+ ],
+ "Prospected_Depleted": [
+  "That rock is depleted.",
+  "Asteroid depleted, Commander.",
+  "That one's empty. Time for the next rock.",
+  "Nothing left in that one.",
+  "Depleted. Find another.",
+  "We've drained that rock dry.",
+  "That asteroid is done.",
+  "All gone. Pick another rock."
+ ],
+ "Prospected_Depleted_Friendly": [
+  "That asteroid is finished, Commander. On to the next."
+ ],
+ "Prospected_Depleted_Close": [
+  "We've emptied it. Good work. Next rock?"
+ ],
+ "Prospected_Depleted_Sarcastic": [
+  "Depleted. We broke it. Well done.",
+  "Empty. Nothing left to steal."
+ ],
+ "Prospected_Depleted_Frustrated": [
+  "It's empty. Move on."
+ ],
+ "Prospected_Dry": [
+  "That rock's nearly empty.",
+  "Not much left in that one.",
+  "Running dry. Think about a new rock.",
+  "Almost depleted, Commander.",
+  "That one's nearly gone."
+ ],
+ "Prospected_Dry_Sarcastic": [
+  "Nearly empty. Shall we scrape the bottom?"
+ ],
+ "Refined_FirstTop": [
+  "First {Material}!",
+  "There's the first {Material}.",
   "{Material} in the hold!",
   "Ooh, {Material}!",
   "That's {Material}. Lovely.",
+  "Got some {Material}!",
   "{Material}. Cha-ching.",
-  "Got some {Material}!"
+  "And there's our first {Material}.",
+  "{Material}, Commander. Finally.",
+  "The first {Material} of the session."
  ],
- "Refined_Top_Friendly": [
-  "{Material} in the hold, Commander!"
+ "Refined_FirstTop_Friendly": [
+  "{Material} in the hold, Commander!",
+  "First {Material} of the day. Well done."
  ],
- "Refined_Top_Close": [
-  "More {Material}. I love it when we find shiny things."
+ "Refined_FirstTop_Close": [
+  "More shiny things. {Material}!",
+  "{Material}. I love it when we find shiny things."
  ],
- "Refined_Top_Sarcastic": [
+ "Refined_FirstTop_Sarcastic": [
   "{Material}. Well, that's the good one.",
   {
    "text": "{Material}. Fucking yes.",
    "mature": true
-  }
+  },
+  "{Material}. Somebody call a parade."
  ],
- "Refined_Top_Frustrated": [
+ "Refined_FirstTop_Frustrated": [
   "{Material}. Good. Keep going."
  ],
- "Refined_Good": [
+ "Refined_FirstGood": [
   "Some {Material}.",
   "{Material} refined.",
-  "Another bit of {Material}."
+  "A bit of {Material}.",
+  "{Material} in the hold."
  ],
- "Refined_Good_Sarcastic": [
+ "Refined_FirstGood_Sarcastic": [
   "{Material}. Every little helps."
+ ],
+ "Refined_Milestone": [
+  "{Count} tonnes of {Material}.",
+  "That's {Count} of {Material} now.",
+  "{Count} tonnes of {Material} in the hold.",
+  "{Material}. {Count} tonnes and rising.",
+  "Another {Material}.||That makes {Count} tonnes.",
+  "The {Material} is piling up.||{Count} tonnes.",
+  "{Count} tonnes of {Material}, Commander. Lovely.",
+  "Ooh. {Count} {Material}.",
+  "Hold's looking good.||{Count} tonnes of {Material}.",
+  "{Material} count is {Count}."
+ ],
+ "Refined_Milestone_Friendly": [
+  "{Count} tonnes of {Material}, Commander. Nicely done."
+ ],
+ "Refined_Milestone_Close": [
+  "{Count} tonnes of {Material}. You're wonderful at this."
+ ],
+ "Refined_Milestone_Sarcastic": [
+  "{Count} tonnes of {Material}. Don't spend it all at once.",
+  "{Material}, {Count} tonnes. Not bad, for you."
+ ],
+ "Refined_Milestone_Frustrated": [
+  "{Count} tonnes of {Material}. Keep going."
+ ],
+ "Refined_MilestoneGood": [
+  "{Count} tonnes of {Material}.",
+  "{Material} count: {Count} tonnes.",
+  "That's {Count} of {Material}."
+ ],
+ "Refined_Cheer": [
+  "More {Material}!",
+  "Ooh, another {Material}.",
+  "{Material} again. I do love it.",
+  "Keep them coming. {Material}!",
+  "Yes. {Material}.",
+  "Beautiful. More {Material}.",
+  "That's the good stuff.||{Material}.",
+  "{Material}, going nicely."
+ ],
+ "Refined_Cheer_Friendly": [
+  "More {Material}. Lovely work, Commander."
+ ],
+ "Refined_Cheer_Close": [
+  "{Material} again! You're my favourite miner."
+ ],
+ "Refined_Cheer_Sarcastic": [
+  "More {Material}. Show off."
+ ],
+ "Refined_Total": [
+  "{Total} tonnes refined so far.",
+  "That's {Total} tonnes in the hold, give or take.",
+  "{Total} tonnes mined this session.",
+  "The refinery has made {Total} tonnes now.",
+  "{Total} tonnes. Not bad at all.",
+  "Total so far: {Total} tonnes."
+ ],
+ "Refined_Total_Friendly": [
+  "{Total} tonnes mined, Commander. Good session."
+ ],
+ "Refined_Total_Close": [
+  "{Total} tonnes already. You do work hard for me."
+ ],
+ "Refined_Total_Sarcastic": [
+  "{Total} tonnes. Fascinating. Every one a thrill."
  ],
  "AsteroidCracked": [
   "Core cracked. Let's see what comes out.",
   "Boom. Core's open.",
   "Cracked it. Grab what you can.",
-  "Core open, Commander."
+  "Core open, Commander.",
+  "Nice crack. Get collecting.",
+  "Chunks everywhere. Scoop them up.",
+  "The core's open. Quick, before they drift off.",
+  "That's the core split. Go on, collect.",
+  "There it is. Fragments everywhere."
+ ],
+ "AsteroidCracked_Friendly": [
+  "Core cracked, Commander. Well done."
+ ],
+ "AsteroidCracked_Close": [
+  "That was a lovely crack. Now collect."
  ],
  "AsteroidCracked_Sarcastic": [
   "Cracked. Try to collect it this time."
@@ -115,19 +285,42 @@
   "Every rock is a surprise. I do love a surprise.",
   "Ask me where to sell, Commander. I can find the best prices for you.",
   "Core mining is where the money is. Just saying.",
-  "Do you think the rocks know we're coming?"
+  "Do you think the rocks know we're coming?",
+  "I wonder how long it took this asteroid to get here. Millions of years, and then you came along with a laser.",
+  "Do you ever feel guilty, drilling into a rock that's been peaceful for a billion years? Me neither.",
+  "Ask me what we've mined, and I'll tell you.",
+  "If you find a motherlode, I'll scream. I'll try to keep it professional.",
+  "I keep a tally in my head. Don't tell the refinery.",
+  "Mining is the only job where being surrounded by rocks means a good day.",
+  "Somebody out there needs this platinum. Let's make them pay for it.",
+  "Quiet out here. Just us, the rocks and a very large payday.",
+  "Remember to check the ring for hotspots, Commander.",
+  "Be gentle with those limpets. They have feelings. Probably.",
+  "I'd mine all day if I had hands. Can I have hands?",
+  "Every tonne is a tiny step towards a very nice shopping trip.",
+  "Ask me where to sell. I'm very good at finding people with money.",
+  "Let's find something worth selling.",
+  "How's the hold looking? Never mind, I can't see it.",
+  "Remind me to tell you which rocks are worth it. Oh wait, I do that.",
+  "Keep your eyes on the heat, Commander. Rocks are cold, you are not.",
+  "Core mining is basically gambling with explosives. I love it.",
+  "Do you think the asteroids are watching us? I do.",
+  "The silence out here is lovely. Apart from your laser."
  ],
  "ChitChat_Mining_Friendly": [
   "You're really good at this, Commander. I mean it.",
-  "Another quiet hour of mining. I could get used to this."
+  "Another quiet hour of mining. I could get used to this.",
+  "This is nice. Just us and the rocks."
  ],
  "ChitChat_Mining_Close": [
   "Mining with you is oddly romantic. Rocks, lasers, me.",
-  "Keep finding shiny things for me, won't you?"
+  "Keep finding shiny things for me, won't you?",
+  "I like the quiet when we mine. It's just you and me."
  ],
  "ChitChat_Mining_Sarcastic": [
   "Mining. The thrill of watching a number go up slowly.",
-  "Please tell me this rock has something good in it."
+  "Please tell me this rock has something good in it.",
+  "Another rock. How original."
  ],
  "ChitChat_Mining_Frustrated": [
   "Find something worth selling. Please."
@@ -196,6 +389,25 @@
  ],
  "Price_NoSystem": [
   "I don't know which system we're in yet. Try again after a jump."
+ ],
+ "Buy_Looking": [
+  "Let me see who's selling.",
+  "Checking who has it for sale.",
+  "One moment. Looking for sellers."
+ ],
+ "Buy_Found": [
+  "Cheapest {Material} is {Price} credits.||{Station}||{Where}.||{Stock} tonnes in stock.",
+  "You can buy {Material} for {Price} credits.||{Station}||{Where}.||{Stock} tonnes available."
+ ],
+ "Buy_Second": [
+  "Or {Price2} credits at||{Station2}||{Where2}."
+ ],
+ "Buy_None": [
+  "I couldn't find anyone selling {Material} nearby.",
+  "Nobody near here has {Material} for sale, Commander."
+ ],
+ "Buy_Which": [
+  "What should I look for? Say, where can I buy tritium."
  ],
  "Brain_Mined": [
   "We've refined {total} tonnes this session. {best_text}",

@@ -240,6 +240,55 @@ class Brain:
         return first
 
     @staticmethod
+    def _commodity_from(tidy):
+        """'where can i buy some liquid oxygen' -> ('liquidoxygen', 'Liquid Oxygen'). Minerals use their known names."""
+        known = minerals.from_speech(tidy)
+        if known:
+            return known, minerals.spoken(known)
+        found = re.search(r"\b(?:buy|get|find|purchase|sells?|selling|cheapest|pick up|priced?)\s+(?:some |any |the |a |an |more |lowest |best )*([a-z ]{3,30}?)(?: near| around| close| here| nearby| in | for | at | from | please|$)", tidy)
+        if not found:
+            return None, ""
+        words = [w for w in found.group(1).split() if w not in ("some", "any", "the", "a", "an", "my", "our", "price", "prices", "priced")]
+        if not words:
+            return None, ""
+        return "".join(words), " ".join(w.capitalize() for w in words)
+
+    def _do_buyprice(self, item, found, tidy):
+        """'Where can I buy tritium?' Looks up the cheapest nearby sellers in the background and says the answer."""
+        if self.prices is None or not self.prices.enabled():
+            return self._say_pool("Price_Disabled", {}, remember=False)
+        commodity, material = self._commodity_from(tidy)
+        if not commodity:
+            return self._say_pool("Buy_Which", {}, remember=False)
+        system = getattr(self._state(), "system", None)
+        if not system:
+            return self._say_pool("Price_NoSystem", {}, remember=False)
+        first = self._say_pool("Buy_Looking", {}, remember=False)
+        self.prices.lookup_async(system, commodity, lambda results, ok: self._say_buy(material, results, ok), mode="buy")
+        return first
+
+    def _say_buy(self, material, results, ok):
+        if not ok:
+            return self._say_pool("Price_Offline", {})
+        if not results:
+            return self._say_pool("Buy_None", {"Material": material})
+        best = results[0]
+        values = {"Material": material, "Price": "{:,}".format(best["price"]), "Station": best["station"],
+                  "Where": self._where(best), "Stock": "{:,}".format(best.get("stock") or 0)}
+        text = self._format("Buy_Found", values)
+        if text is None:
+            return None
+        if best.get("pad"):
+            text += "||%s landing pads." % best["pad"].capitalize()
+        if len(results) > 1:
+            second = results[1]
+            more = self._format("Buy_Second", {"Price2": "{:,}".format(second["price"]), "Station2": second["station"],
+                                               "Where2": self._where(second)})
+            if more:
+                text += "||" + more
+        return self._say(text)
+
+    @staticmethod
     def _where(result):
         distance = result.get("distance")
         if isinstance(distance, (int, float)) and distance >= 0.5:

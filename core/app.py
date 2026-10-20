@@ -208,6 +208,8 @@ class App:
         self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore,
                                    eoc=self.eoc)
         from personality.brain import Brain
+        from mining import minerals
+        minerals.bind(self.settings)          # the Mining page's ten favourite minerals
         from mining.tracker import MiningTracker
         from mining.prices import PriceFinder
         self.miner = MiningTracker(self.bus)

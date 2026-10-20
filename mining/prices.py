@@ -24,14 +24,16 @@ TIMEOUT_SECONDS = 8.0
 PAD_NAMES = {1: "small", 2: "medium", 3: "large"}
 
 
-def build_url(system, commodity, max_distance=100, max_age_days=7, min_demand=50):
-    return "%s/system/name/%s/commodity/name/%s/nearby/imports?%s" % (
+def build_url(system, commodity, max_distance=100, max_age_days=7, min_demand=50, mode="sell"):
+    """mode "sell" = places that BUY from you (Ardent calls them imports), "buy" = places that SELL to you (exports)."""
+    return "%s/system/name/%s/commodity/name/%s/nearby/%s?%s" % (
         BASE_URL, urllib.parse.quote(str(system), safe=""), urllib.parse.quote(str(commodity), safe=""),
+        "exports" if mode == "buy" else "imports",
         urllib.parse.urlencode({"minVolume": int(min_demand), "maxDaysAgo": int(max_age_days),
                                 "fleetCarriers": "false", "maxDistance": int(max_distance)}))
 
 
-def parse(raw, limit=3):
+def parse(raw, limit=3, mode="sell"):
     """Ardent's reply (a list of markets) -> clean results, best price first. Never raises; junk is skipped."""
     if isinstance(raw, dict):
         for key in ("results", "data", "markets"):
@@ -44,7 +46,11 @@ def parse(raw, limit=3):
     for item in raw:
         if not isinstance(item, dict):
             continue
-        price = item.get("sellPrice")
+        buying = mode == "buy"
+        price = item.get("buyPrice" if buying else "sellPrice")
+        stock = item.get("stock")
+        if buying and not (isinstance(stock, (int, float)) and stock > 0):
+            continue                                    # nothing in stock: no use to you
         station = item.get("stationName")
         system = item.get("systemName")
         if not isinstance(price, (int, float)) or price <= 0 or not station or not system:
@@ -57,8 +63,9 @@ def parse(raw, limit=3):
         pad = item.get("maxLandingPadSize")
         found.append({"station": str(station), "system": str(system), "price": int(price),
                       "demand": item.get("demand") if isinstance(item.get("demand"), (int, float)) else None,
+                      "stock": int(stock) if isinstance(stock, (int, float)) else None,
                       "distance": distance, "pad": PAD_NAMES.get(pad, "")})
-    found.sort(key=lambda r: -r["price"])
+    found.sort(key=lambda r: r["price"] if mode == "buy" else -r["price"])
     return found[:limit]
 
 
@@ -81,32 +88,34 @@ class PriceFinder:
     def enabled(self):
         return self.settings is None or bool(self.settings.get("mining.prices", True))
 
-    def lookup(self, system, commodity):
+    def lookup(self, system, commodity, mode="sell"):
         """(results, ok). ok is False when the service could not be reached. Blocking: call from a thread."""
-        key = (str(system).lower(), str(commodity).lower())
+        key = (str(system).lower(), str(commodity).lower(), mode)
         now = self.clock()
         with self._lock:
             cached = self._cache.get(key)
             if cached and now - cached[0] < CACHE_SECONDS:
                 return cached[1], True
         try:
-            raw = self.fetch(build_url(system, commodity))
+            raw = self.fetch(build_url(system, commodity, mode=mode))
         except (urllib.error.URLError, OSError, ValueError, TimeoutError) as error:
             log.warning("Price lookup failed (%s)", error)
             return [], False
         except Exception:
             log.exception("Price lookup crashed")
             return [], False
-        results = parse(raw)
+        results = parse(raw, mode=mode)
         with self._lock:
             self._cache[key] = (now, results)
         return results, True
 
-    def lookup_async(self, system, commodity, done):
+    def lookup_async(self, system, commodity, done, mode="sell"):
         """Run lookup() in the background and call done(results, ok) when it finishes."""
         def work():
             try:
-                results, ok = self.lookup(system, commodity)
+                results, ok = self.lookup(system, commodity, mode)
+                if ok and not results and commodity.endswith("s") and len(commodity) > 4:
+                    results, ok = self.lookup(system, commodity[:-1], mode)          # "diamonds" -> "diamond"
             except Exception:
                 log.exception("Price lookup crashed")
                 results, ok = [], False

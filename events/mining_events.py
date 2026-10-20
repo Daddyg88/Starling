@@ -3,11 +3,17 @@ Mining events: prospecting a rock, cracking it, refining a mineral, and launchin
 Their words live in voicepacks/default/mining.json. The tiers (what is worth getting excited about) are in mining/minerals.py.
 """
 
+import random
+import time
+
 from core.event_bus import NORMAL, LOW
 from events.base_event import BaseEvent
 from mining import minerals
 
+SESSION_GAP_SECONDS = 3 * 3600
 RANK = {"top": 2, "good": 1, "low": 0}
+DEPLETED_PERCENT = 1.0        # Remaining (percent of the rock left) at or below this = depleted
+NEARLY_GONE_PERCENT = 15.0
 GOOD_MIN_PERCENT = 10.0      # a "good" mineral must make up at least this much of the rock to be worth a mention
 
 
@@ -43,6 +49,13 @@ class ProspectedAsteroid(BaseEvent):
             if rank > best_rank or (rank == best_rank and percent > best_percent):
                 best, best_tier, best_percent = item, kind, percent
         data = {"Content": level or "?", "Material": "", "Percent": "", "Announce": "", "Tier": "low", "Motherlode": False}
+        remaining = entry.get("Remaining")
+        if "deplet" in low or (isinstance(remaining, (int, float)) and remaining <= DEPLETED_PERCENT):
+            data["Announce"] = "depleted"              # she checked the rock again and nothing is left
+            return data
+        if isinstance(remaining, (int, float)) and remaining <= NEARLY_GONE_PERCENT:
+            data["Announce"] = "dry"                   # nearly empty: still prospected, so say so
+            return data
         motherlode = entry.get("MotherlodeMaterial_Localised") or entry.get("MotherlodeMaterial")
         if motherlode:
             data["Motherlode"] = True
@@ -63,15 +76,50 @@ class ProspectedAsteroid(BaseEvent):
 
 
 class MiningRefined(BaseEvent):
-    """A mineral came out of the refinery into your hold (one tonne each time)."""
+    """
+    A mineral came out of the refinery into your hold (one tonne each time).
+    She does NOT call out every tonne (that gets tiring): the first of each good mineral, then every few tonnes,
+    now and then a cheer for a top mineral, and a running total. How often is the Mining page's "How chatty" box.
+    """
     name = "MiningRefined"
     priority = LOW
     summary = "Refined {Material}"
 
+    STEPS = {"quiet": (10, 20, 50, 0.0), "normal": (5, 10, 25, 0.12), "chatty": (3, 5, 10, 0.3)}     # top, good, total, chance
+
+    def __init__(self):
+        self.reset()
+        self.rng = random.Random()
+        self.clock = time.monotonic
+
+    def reset(self):
+        self.counts, self.total, self.last = {}, 0, None
+
     def handle(self, entry):
+        now = self.clock()
+        if self.last is not None and now - self.last > SESSION_GAP_SECONDS:
+            self.reset()
+        self.last = now
         kind = entry.get("Type")
-        return {"Material": minerals.spoken(kind, entry.get("Type_Localised")), "Commodity": minerals.normal(kind),
-                "Tier": minerals.tier(kind), "Announce": ""}
+        key = minerals.normal(kind)
+        tier = minerals.tier(kind)
+        self.counts[key] = self.counts.get(key, 0) + 1
+        self.total += 1
+        count = self.counts[key]
+        top_step, good_step, total_step, chance = self.STEPS.get(minerals.option("chatter", "normal"), self.STEPS["normal"])
+        say = ""
+        if tier != "low" and count == 1:
+            say = "first"
+        elif tier == "top" and count % top_step == 0:
+            say = "milestone"
+        elif tier == "good" and count % good_step == 0:
+            say = "milestone"
+        elif tier == "top" and chance and self.rng.random() < chance:
+            say = "cheer"
+        elif total_step and self.total % total_step == 0:
+            say = "total"
+        return {"Material": minerals.spoken(kind, entry.get("Type_Localised")), "Commodity": key, "Tier": tier,
+                "Count": count, "Total": self.total, "Announce": say}
 
 
 class AsteroidCracked(BaseEvent):

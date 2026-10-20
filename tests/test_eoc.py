@@ -150,6 +150,20 @@ class RosterTests(Base):
         self.assertIn("C E O", self.said())
 
 
+class NameMatchingTests(Base):
+    def test_names_are_found_however_they_are_heard(self):
+        for text, expect in (("who is curdnerd", "CurdNerd"), ("who is curd nerd", "CurdNerd"), ("who is kurd nerd", "CurdNerd"),
+                             ("who is nyx", "Nyx Evera"), ("who is nix evera", "Nyx Evera"), ("who is slow joe man", "SlowJoeman"),
+                             ("who is george", "Genx George"), ("tell me about metro racer", "Metroracer")):
+            self.speech.said.clear()
+            self.assertTrue(self.eoc.try_handle(text), text)
+            self.assertIn(expect.split()[0].lower(), self.said().lower(), text)
+
+    def test_strangers_are_left_alone(self):
+        for text in ("who is the king of france", "who is the president", "tell me about the weather"):
+            self.assertIsNone(self.eoc.try_handle(text), text)
+
+
 class ThroughSmallTalk(Base):
     def test_company_questions_beat_the_back_story_and_more_continues(self):
         talk = SmallTalk(self.speech, self.dialogue, self.settings, eoc=self.eoc)

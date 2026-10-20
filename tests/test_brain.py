@@ -53,7 +53,7 @@ class DataTests(Base):
         self.assertGreater(len(intents), 70)
         special = {"Brain_Why", "Brain_More", "Brain_You", "Brain_Really", "Brain_RiddleReveal", "Brain_Riddle", "Brain_Fact",
                    "Brain_Opinion", "Brain_Suggest", "Brain_Status", "Brain_Wanted", "Brain_Time", "Brain_Date",
-                   "Brain_SellPrice", "Brain_Mined"}
+                   "Brain_SellPrice", "Brain_BuyPrice", "Brain_Mined"}
         for item, _patterns in intents:
             key = item["key"]
             if key in special:

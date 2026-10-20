@@ -61,6 +61,15 @@ CHITCHAT = [("Rarely", "rarely"), ("Normal", "normal"), ("Often", "often"), ("Ch
 REMARKS = [("Never", "off"), ("Rarely", "rare"), ("Sometimes", "sometimes"), ("Often", "often")]
 AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million", 500000000),
              ("After 1 billion", 1000000000)]
+MINERAL_CHOICES = [("(nothing)", "")] + [(label, key) for label, key in (
+    ("Platinum", "platinum"), ("Painite", "painite"), ("Void Opals", "opal"), ("Low Temperature Diamonds", "lowtemperaturediamond"),
+    ("Monazite", "monazite"), ("Musgravite", "musgravite"), ("Serendibite", "serendibite"), ("Grandidierite", "grandidierite"),
+    ("Alexandrite", "alexandrite"), ("Rhodplumsite", "rhodplumsite"), ("Osmium", "osmium"), ("Palladium", "palladium"),
+    ("Bromellite", "bromellite"), ("Benitoite", "benitoite"), ("Gold", "gold"), ("Silver", "silver"), ("Cobalt", "cobalt"),
+    ("Bertrandite", "bertrandite"), ("Indite", "indite"), ("Gallite", "gallite"), ("Uraninite", "uraninite"),
+    ("Praseodymium", "praseodymium"), ("Samarium", "samarium"), ("Lithium", "lithium"), ("Tritium", "tritium"))]
+MINING_CHATTER = [("Quiet (first of each, every 10 tonnes)", "quiet"), ("Normal (every 5 tonnes, a few cheers)", "normal"),
+                  ("Chatty (every 3 tonnes, lots of cheers)", "chatty")]
 MOOD_MODES = [("Automatic (follows what I do in the game)", "auto"), ("Fixed (always the mood below)", "fixed")]
 PTT_MODES = [("Off (say her name instead)", "off"), ("Hold the button while I talk", "hold"),
              ("Press once to start, again to stop", "toggle")]
@@ -155,6 +164,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                        "(it needs a keyboard key as well as any joystick button)"),
             Field("combat_assist.pips", "Combat: pips to weapons while I fire", "toggle",
                   help="While your hardpoints are out she puts the pips in weapons when you hold a fire button, and back to systems and engines when you let go. Uses your Primary/Secondary fire buttons from Elite"),
+            Field("combat_assist.pips_analysis", "Combat: also in analysis mode (mining lasers)", "toggle",
+                  help="The same pips to weapons while you hold a fire button, but when the cockpit is in analysis mode instead of hardpoints out"),
             Field("combat_assist.heat_sink", "Combat: deploy a heat sink when overheating", "toggle",
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
             Field("voidcompass.enabled", "Control Void Compass overlays by voice", "toggle",
@@ -238,8 +249,6 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="How often she adds a comment after a line"),
             Field("brain.enabled", "Her brain: answers to almost anything", "toggle",
                   help="Ask her about herself, the game, jokes, riddles, advice, or say hello to chat. Needs her name or push-to-talk"),
-            Field("mining.prices", "Mining: look up the best selling prices online", "toggle",
-                  help="Ask her 'where should I sell the platinum'. Uses the free Ardent price service (needs internet, no sign-up)"),
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.frequency", "How often she chats", "choice", CHITCHAT,
@@ -255,6 +264,13 @@ def build_pages(mic_lister=None, pack_folder=None):
                   restart=True),
             Field("speech.allow_mature", "Allow strong language", "toggle"),
         ]),
+        Page("mining", "Mining", "Pick the ten minerals she gets EXCITED about (she calls them out with a cheer). Osmium, palladium, bromellite "
+             "and benitoite get a calmer mention. Everything else, gold and silver included, she keeps quiet about.", [
+            Field("mining.chatter", "How chatty she is while you refine", "choice", MINING_CHATTER,
+                  help="She does not call out every tonne: the first of each good mineral, then every few tonnes"),
+            Field("mining.prices", "Look up the best prices online", "toggle",
+                  help="Ask her 'where should I sell the platinum' or 'where can I buy tritium'. Uses the free Ardent price service (needs internet, no sign-up)"),
+        ] + [Field("mining.fav%d" % n, "Excited about #%d" % n, "choice", MINERAL_CHOICES) for n in range(1, 11)]),
         Page("game", "Game", "How she watches Elite Dangerous.", [
             Field("journal.folder", "Journal folder", "text", restart=True,
                   placeholder="Leave empty to find it automatically"),

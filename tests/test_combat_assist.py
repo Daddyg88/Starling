@@ -241,3 +241,19 @@ class LinesTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AnalysisModeTests(Base):
+    def test_pips_work_in_analysis_mode_for_mining_lasers(self):
+        self.state.status_flags = 1 << 27                       # analysis mode, hardpoints in
+        self.reader.down.add("key:Space")
+        self.assertEqual(self.assist.poll_once(), "up")
+
+    def test_not_in_analysis_mode_when_switched_off_or_in_supercruise(self):
+        self.state.status_flags = 1 << 27
+        self.settings.values["combat_assist.pips_analysis"] = False
+        self.reader.down.add("key:Space")
+        self.assertEqual(self.assist.poll_once(), "")
+        self.settings.values["combat_assist.pips_analysis"] = True
+        self.state.status_flags = (1 << 27) | (1 << 4)
+        self.assertEqual(self.assist.poll_once(), "")

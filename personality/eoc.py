@@ -76,6 +76,20 @@ def speakable(name):
     return out
 
 
+def sound(text):
+    """A rough 'how it sounds' spelling, so a mis-heard name still matches ('nix evera' ~ 'Nyx Evera', 'curd nerd' ~ 'CurdNerd')."""
+    t = re.sub(r"[^a-z]", "", str(text or "").lower())
+    for old, new in (("ph", "f"), ("ck", "k"), ("ks", "x"), ("x", "x"), ("c", "k"), ("q", "k"), ("z", "s"), ("y", "i"), ("w", "v")):
+        t = t.replace(old, new)
+    t = re.sub(r"[aeiou]+", "a", t)
+    return re.sub(r"(.)\1+", r"\1", t)
+
+
+def similarity(a, b):
+    import difflib
+    return difflib.SequenceMatcher(None, sound(a), sound(b)).ratio()
+
+
 class EOCTeller:
     def __init__(self, speech, dialogue, settings, state_provider=None, path=None, clock=time.monotonic, rng=None):
         import random
@@ -134,13 +148,45 @@ class EOCTeller:
         return best
 
     def find_pilot(self, tidy):
-        """The roster member named in the sentence (longest name wins)."""
+        """
+        The roster member named in the sentence. Tries, in order: the full name written out, the full name with the
+        spaces squashed ('curd nerd' = CurdNerd), one name on its own ('nyx'), then a close sound-alike (speech
+        recognition often hears 'nix' for 'nyx'). Returns None when nothing is close.
+        """
+        pilots = self.data["pilots"]
+        phrase = ENTRY_LEAD.sub("", tidy, count=1)
+        phrase = re.sub(r"^(?:the )?(?:commander |cmdr |captain |admiral |fleet admiral |commodore )", "", phrase).strip()
+        squashed = phrase.replace(" ", "")
         best, best_len = None, 0
-        for pilot in self.data["pilots"]:
+        for pilot in pilots:                                     # 1 and 2: the whole name, as written or squashed
             name = clean(pilot.get("name"))
-            if len(name) >= 4 and re.search(r"\b%s\b" % re.escape(name), tidy) and len(name) > best_len:
+            if len(name) < 3:
+                continue
+            if (re.search(r"\b%s\b" % re.escape(name), tidy) or name.replace(" ", "") == squashed) and len(name) > best_len:
                 best, best_len = pilot, len(name)
-        return best
+        if best is not None:
+            return best
+        if not phrase:
+            return None
+        words = phrase.split()
+        for pilot in pilots:                                     # 3: one name of theirs on its own ("nyx", "curd")
+            parts = [p for p in clean(pilot.get("name")).split() if len(p) >= 3 and p not in ("the", "cpt", "capt", "doc")]
+            if len(words) <= 2 and any(w == p for w in words for p in parts):
+                matches = [q for q in pilots if any(w == p for w in words for p in clean(q.get("name")).split() if len(p) >= 3)]
+                if len(matches) == 1:
+                    return pilot
+        scored = []                                              # 4: sounds like
+        for pilot in pilots:
+            name = clean(pilot.get("name"))
+            candidates = [name] + [p for p in name.split() if len(p) >= 4]
+            top = max(similarity(c, phrase) for c in candidates)
+            scored.append((top, pilot))
+        scored.sort(key=lambda item: -item[0])
+        if scored and scored[0][0] >= 0.8 and (len(scored) < 2 or scored[0][0] - scored[1][0] >= 0.05):
+            return scored[0][1]
+        if scored and scored[0][0] >= 0.6:
+            log.info("No roster match for %r (closest: %s, %.2f)", phrase, scored[0][1].get("name"), scored[0][0])
+        return None
 
     def rank_of(self, name):
         pilot = next((p for p in self.data["pilots"] if same_person(name, p.get("name"))), None)

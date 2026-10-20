@@ -62,8 +62,10 @@ def _keys_for(event):
         return ["Prospected_" + said.capitalize()] if said else []
 
     if name == "MiningRefined":
-        tier = data.get("Tier")
-        return ["Refined_Top"] if tier == "top" else (["Refined_Good"] if tier == "good" else [])
+        said, tier = data.get("Announce"), data.get("Tier")
+        suffix = "Good" if tier == "good" else ""
+        return {"first": ["Refined_First" + suffix], "milestone": ["Refined_Milestone" + suffix],
+                "cheer": ["Refined_Cheer"], "total": ["Refined_Total"]}.get(said, [])
 
     if name in ("LaunchDrone", "BuyDrones"):
         return []

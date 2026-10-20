@@ -1,22 +1,27 @@
-# Mining with Starling (0.19.0)
+# Mining with Starling (0.21.0)
 
 She now knows when you are mining. She reads the journal lines the game writes while you mine, so nothing needs switching on.
 
 ## What she says
 - **Prospector limpet fired at a rock:** she reads out the best thing inside and how much of it ("Platinum! 23 percent.").
-  - **Motherlode** (a rock with a big pocket of one mineral): "Motherlode! Painite!"
-  - **Top minerals** (excited): Platinum, Painite, Void Opals, Low Temperature Diamonds, Monazite, Musgravite, Serendibite, Grandidierite, Alexandrite, Rhodplumsite.
-  - **Good minerals** (pleased, only when at least 10 percent of the rock): Osmium, Palladium, Gold, Bromellite, Benitoite, Silver.
+  - **Motherlode:** "Motherlode! Painite!"
+  - **Your ten favourites** (excited): chosen on the dashboard, **Mining page** (ten boxes). Starting ten: Platinum, Painite, Void Opals, Low Temperature Diamonds, Monazite, Musgravite, Serendibite, Grandidierite, Alexandrite, Rhodplumsite.
+  - **Good minerals** (pleased, at least 10 percent of the rock): Osmium, Palladium, Bromellite, Benitoite. **Gold and silver are ignored** unless you put them in a box.
   - **Low content and nothing good:** a short "skip it".
-- **Refined into your hold:** she calls out top and good minerals as they arrive. Everything else stays quiet so she does not chatter.
+  - **Depleted rock:** if the prospector reports nothing left she says the asteroid is depleted, and "nearly empty" under 15 percent left.
+- **Refined into your hold:** she does NOT call out every tonne. The first of each good mineral, then every 5 tonnes (3, 5 or 10, see "How chatty" on the Mining page), the odd cheer for a favourite, and a running total. Everything else stays quiet.
 - **Core cracked:** a short line.
-- **Quiet moments:** while you are mining she makes mining small talk (platinum, treasure hunting, asking you to let her find prices).
+- **Quiet moments:** mining small talk (about 30 different lines).
+
+### About "depleted"
+Elite does not write a "depleted" line in the journal. She knows when you fire a prospector at a rock again and it reports little or nothing left (the game's Remaining figure). If you want her to say it without re-prospecting, tell me and I can add a guess based on the refining stopping.
 
 ## Her mood
 She likes mining and shopping. Finding a motherlode, a top mineral, refining top minerals, cracking a core, and buying a ship or module all raise her mood a little (the usual soft caps and the hourly limit still apply, so it cannot run away). The rules are in `config/mood_rules.json` (ids: motherlode, prospect_top, refine_top, refine_good, crack_core, buy_ship, buy_module).
 
 ## Asking questions
 - "What have we mined?" - tonnes refined this session and your best find.
+- "Where can I buy tritium?" / "cheapest liquid oxygen" / "who sells ..." - the cheapest nearby sellers that have stock.
 - "Where should I sell the platinum?" / "Best price for void opals" / "Who's paying the most?" - she looks up the best buyers near the system you are in. If you do not name a mineral she uses your best find this session.
 
 ## Where the prices come from
@@ -27,8 +32,11 @@ She likes mining and shopping. Finding a motherlode, a top mineral, refining top
 - Switch it off: dashboard > Personality > "Mining: look up the best selling prices online".
 - Prices are community reported. Always check the market when you arrive.
 
+## Void Compass and Inara
+Void Compass does not use Inara either: its Trading tab gets prices from Spansh. Its Local API (the thing Starling talks to) is only documented for overlays and voice, with no trade lookups I can call, so Starling uses Ardent directly. You get the same job done by voice without opening Void Compass.
+
 ## What is a "top" mineral?
-The lists are in `mining/minerals.py` (a small table you can edit). They follow the community mining guides (core mining for Painite, Platinum, Void Opals, LTDs and the gems; laser mining for Palladium, Osmium and Gold). Prices change every week, so the tiers are a rule of thumb; the price lookup is the real answer.
+The ten favourites are your choice (Mining page); the calmer list is in `mining/minerals.py`. They follow the community mining guides (core mining for Painite, Platinum, Void Opals, LTDs and the gems; laser mining for Palladium, Osmium and Gold). Prices change every week, so the tiers are a rule of thumb; the price lookup is the real answer.
 
 ## Shopping
 She loves shopping. Buying a ship gets a big excited line; modules get a smaller one; docking at a station sometimes gets a "let's go and spend your money" line.

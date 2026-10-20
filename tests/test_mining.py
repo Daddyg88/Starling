@@ -29,7 +29,9 @@ class MineralTests(unittest.TestCase):
         self.assertEqual(minerals.tier("$lowtemperaturediamond_name;"), "top")
         self.assertEqual(minerals.tier("Low Temperature Diamonds"), "top")
         self.assertEqual(minerals.tier("Opal"), "top")
-        self.assertEqual(minerals.tier("Gold"), "good")
+        self.assertEqual(minerals.tier("Osmium"), "good")
+        self.assertEqual(minerals.tier("Gold"), "low")
+        self.assertEqual(minerals.tier("Silver"), "low")
         self.assertEqual(minerals.tier("Bertrandite"), "low")
         self.assertEqual(minerals.tier(None), "low")
 
@@ -61,9 +63,9 @@ class EventTests(unittest.TestCase):
         self.assertEqual(event.data["Material"], "Painite")
 
     def test_good_needs_enough_of_it_and_poor_rocks_are_brief(self):
-        small = {"event": "ProspectedAsteroid", "Materials": [{"Name": "Gold", "Proportion": 4.0}], "Content_Localised": "Material Content: Medium"}
+        small = {"event": "ProspectedAsteroid", "Materials": [{"Name": "Osmium", "Proportion": 4.0}], "Content_Localised": "Material Content: Medium"}
         self.assertEqual(self.feed(small).data["Announce"], "")
-        big = {"event": "ProspectedAsteroid", "Materials": [{"Name": "Gold", "Proportion": 14.0}], "Content_Localised": "Material Content: Medium"}
+        big = {"event": "ProspectedAsteroid", "Materials": [{"Name": "Osmium", "Proportion": 14.0}], "Content_Localised": "Material Content: Medium"}
         self.assertEqual(self.feed(big).data["Announce"], "good")
         poor = {"event": "ProspectedAsteroid", "Materials": [{"Name": "Bertrandite", "Proportion": 14.0}], "Content_Localised": "Material Content: Low"}
         self.assertEqual(line_keys.keys_for(self.feed(poor)), ["Prospected_Poor"])
@@ -73,11 +75,33 @@ class EventTests(unittest.TestCase):
                       {"event": "ProspectedAsteroid", "Materials": [None, {"Name": None, "Proportion": "abc"}]}):
             self.feed(entry)
 
-    def test_refined(self):
-        event = self.feed({"event": "MiningRefined", "Type": "$platinum_name;", "Type_Localised": "Platinum"})
-        self.assertEqual(line_keys.keys_for(event), ["Refined_Top"])
+    def test_refined_is_not_called_out_every_time(self):
+        processor, _bus, heard = make_processor()
+        said = []
+        for _ in range(12):
+            processor.handle_line(json.dumps({"event": "MiningRefined", "Type": "$platinum_name;", "Type_Localised": "Platinum"}))
+            said.append(heard[-1].data["Announce"])
+        self.assertEqual(said[0], "first")
+        self.assertEqual(said[4], "milestone")                  # every 5th tonne (normal chattiness)
+        self.assertEqual(said[9], "milestone")
+        self.assertEqual(line_keys.keys_for(heard[0]), ["Refined_First"])
+        self.assertLess(sum(1 for x in said if x), 8)
         low = self.feed({"event": "MiningRefined", "Type": "bertrandite", "Type_Localised": "Bertrandite"})
         self.assertEqual(line_keys.keys_for(low), [])
+
+    def test_gold_and_silver_are_ignored_entirely(self):
+        for kind in ("Gold", "Silver"):
+            event = self.feed({"event": "MiningRefined", "Type": kind.lower(), "Type_Localised": kind})
+            self.assertEqual(event.data["Tier"], "low")
+            self.assertEqual(line_keys.keys_for(event), [])
+
+    def test_depleted_and_nearly_dry(self):
+        gone = self.feed({"event": "ProspectedAsteroid", "Materials": [], "Content_Localised": "Material Content: Low", "Remaining": 0.0})
+        self.assertEqual(line_keys.keys_for(gone), ["Prospected_Depleted"])
+        dry = self.feed({"event": "ProspectedAsteroid", "Materials": [], "Content_Localised": "Material Content: Low", "Remaining": 9.0})
+        self.assertEqual(line_keys.keys_for(dry), ["Prospected_Dry"])
+        fresh = self.feed(dict(PROSPECT_PLATINUM, Remaining=100.0))
+        self.assertEqual(line_keys.keys_for(fresh), ["Prospected_Top"])
 
     def test_shopping_events(self):
         event = self.feed({"event": "ShipyardBuy", "ShipType": "python", "ShipPrice": 56978000})
@@ -229,7 +253,7 @@ class PackTests(unittest.TestCase):
 
     def test_every_mining_and_shopping_line_has_values_it_can_be_given(self):
         values = {"Material": "Platinum", "Percent": "20", "ship": "Python", "module": "Cargo Rack", "Price": "1", "Station": "S",
-                  "Where": "in X", "Price2": "2", "Station2": "T", "Where2": "in Y", "total": 3, "best_text": "x"}
+                  "Where": "in X", "Count": 5, "Total": 25, "Stock": "9", "Price2": "2", "Station2": "T", "Where2": "in Y", "total": 3, "best_text": "x"}
         for name in ("mining.json", "shopping.json"):
             pack = json.load(open(paths.VOICEPACKS_DIR / "default" / name, encoding="utf-8"))
             for key, lines in pack.items():
@@ -239,6 +263,48 @@ class PackTests(unittest.TestCase):
                     self.assertNotIn(text, seen, key)
                     seen.add(text)
                     text.format(**values)
+
+
+class BuyAndFavouriteTests(BrainMiningTests):
+    def test_where_to_buy(self):
+        self.reply = [{"stationName": "Seller Port", "systemName": "Sol", "buyPrice": 50, "stock": 900, "maxLandingPadSize": 3},
+                      {"stationName": "Empty", "systemName": "Sol", "buyPrice": 10, "stock": 0},
+                      {"stationName": "Dearer", "systemName": "Alpha", "buyPrice": 80, "stock": 10}]
+        self.ask("where can i buy some liquid oxygen")
+        self.assertIn("/commodity/name/liquidoxygen/nearby/exports", self.fetched[0])
+        said = " ".join(self.spoken())
+        self.assertIn("Seller Port", said)
+        self.assertNotIn("Empty", said)
+
+    def test_buy_parse_orders_cheapest_first_and_needs_stock(self):
+        rows = prices.parse([{"stationName": "A", "systemName": "S", "buyPrice": 90, "stock": 5},
+                             {"stationName": "B", "systemName": "S", "buyPrice": 40, "stock": 5},
+                             {"stationName": "C", "systemName": "S", "buyPrice": 1, "stock": 0}], mode="buy")
+        self.assertEqual([r["station"] for r in rows], ["B", "A"])
+
+    def test_selling_still_prefers_the_highest_price(self):
+        self.ask("where should i sell the platinum")
+        self.assertIn("/nearby/imports", self.fetched[0])
+
+    def test_sell_questions_are_not_taken_for_buy_questions(self):
+        self.ask("where can i get rid of the platinum")
+        self.assertIn("/nearby/imports", self.fetched[0])
+
+    def test_the_ten_boxes_decide_what_excites_her(self):
+        self.settings.set("mining.fav1", "gold")
+        minerals.bind(self.settings)
+        self.addCleanup(minerals.bind, None)
+        self.assertEqual(minerals.tier("gold"), "top")
+        self.assertEqual(minerals.tier("painite"), "top")
+        for n in range(1, 11):
+            self.settings.set("mining.fav%d" % n, "")
+        self.assertEqual(minerals.tier("platinum"), "low")
+        self.assertEqual(minerals.tier("osmium"), "good")
+
+    def test_the_mining_page_has_ten_boxes(self):
+        from ui.settings_model import build_pages
+        page = next(p for p in build_pages() if p.id == "mining")
+        self.assertEqual(len([f for f in page.fields if f.key.startswith("mining.fav")]), 10)
 
 
 class ChitChatMiningTests(unittest.TestCase):
