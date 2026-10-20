@@ -1,14 +1,13 @@
 """You swapped to another ship. She says which one."""
 
+from core.ships import ship_name
 from events.base_event import BaseEvent
 from core.event_bus import NORMAL
 
 
 def nice_ship_name(entry):
     """'python' -> 'Python', 'Type9' stays as the game's own spelling when it gives one."""
-    raw = entry.get("ShipType_Localised") or entry.get("ShipType") or ""
-    raw = str(raw).replace("_", " ").strip()
-    return raw.title() if raw.islower() else raw
+    return ship_name(entry.get("ShipType"), entry.get("ShipType_Localised"))
 
 
 class ShipyardSwap(BaseEvent):

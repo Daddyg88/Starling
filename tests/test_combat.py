@@ -38,7 +38,7 @@ class ShipChangeTests(unittest.TestCase):
 
     def test_lowercase_name_is_tidied(self):
         self.processor.handle_line(json.dumps({"event": "ShipyardSwap", "ShipType": "federation_dropship"}))
-        self.assertIn("Federation Dropship", self.speech.said[0]["text"])
+        self.assertIn("Federal Dropship", self.speech.said[0]["text"])
 
 
 class KeyTests(unittest.TestCase):

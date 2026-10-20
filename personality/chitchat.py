@@ -17,6 +17,7 @@ import threading
 import time
 
 from core.identity import personalise
+from core.ships import ship_name
 from core.logger import get_logger
 from personality.mood_engine import effective_mood
 
@@ -130,8 +131,7 @@ class ChitChat:
         values = {}
         ship = getattr(state, "ship", None)
         if ship:
-            ship = str(ship).replace("_", " ")
-            values["ship"] = ship.title() if ship.islower() else ship
+            values["ship"] = ship_name(ship)
         if getattr(state, "system", None):
             values["system"] = state.system
         if getattr(state, "docked", False) and getattr(state, "station", None):

@@ -21,6 +21,7 @@ from datetime import datetime
 from core import paths
 from core.identity import personalise
 from core.logger import get_logger
+from core.ships import ship_name
 from mining import minerals
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
@@ -176,8 +177,7 @@ class Brain:
         values = {}
         ship = getattr(state, "ship", None)
         if ship:
-            ship = str(ship).replace("_", " ")
-            values["ship"] = ship.title() if ship.islower() else ship
+            values["ship"] = ship_name(ship)
         if getattr(state, "ship_name", None):
             values["shipname"] = state.ship_name
         if getattr(state, "system", None):

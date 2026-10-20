@@ -4,6 +4,7 @@ Their words live in voicepacks/default/combat.json. Several small events share t
 """
 
 from core.event_bus import NORMAL
+from core.ships import ship_name
 from events.base_event import BaseEvent
 
 
@@ -58,7 +59,7 @@ def _handle_target(self, entry):
     bounty = entry.get("Bounty") or 0
     return {"ScanStage": entry.get("ScanStage") or 0, "LegalStatus": entry.get("LegalStatus") or "", "Bounty": bounty,
             "BountyText": "{:,}".format(bounty) if isinstance(bounty, (int, float)) else str(bounty),
-            "Ship": entry.get("Ship_Localised") or entry.get("Ship") or "",
+            "Ship": ship_name(entry.get("Ship"), entry.get("Ship_Localised")),
             "Pilot": entry.get("PilotName_Localised") or "", "Announce": getattr(self, "_pending", "")}
 
 

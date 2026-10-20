@@ -169,7 +169,7 @@ class NeutralMoodTests(unittest.TestCase):
     def test_dialogue_picks_up_neutral_lines_for_the_neutral_mood(self):
         d = dialogue()
         plain = {l.text for l in d.lines["Docked_Neutral"] if not l.mature}
-        got = {d.pick("Docked", "Neutral", False, False).text for _ in range(60)}
+        got = {d.pick("Docked", "Neutral", False, False).text for _ in range(600)}
         self.assertTrue(got & plain)
         self.assertFalse(any(d.pick("Docked", "Neutral", False, False).mature for _ in range(60)))
 

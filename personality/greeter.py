@@ -16,6 +16,7 @@ import threading
 import time
 
 from core.identity import personalise
+from core.ships import ship_name
 from core.logger import get_logger
 from personality.mood_engine import effective_mood
 
@@ -116,8 +117,7 @@ class LoginGreeter:
         personality = self.settings.get("personality.style", "personality") == "personality"
         mood = effective_mood(self.settings) if personality else ""
 
-        ship = load.get("Ship_Localised") or load.get("Ship") or getattr(state, "ship", None) or DEFAULTS["Ship"]
-        ship = str(ship).replace("_", " ").title() if str(ship).islower() else str(ship)
+        ship = ship_name(load.get("Ship") or getattr(state, "ship", None), load.get("Ship_Localised")) or DEFAULTS["Ship"]
         name = load.get("ShipName") or getattr(state, "ship_name", None) or ""
         values = {"ship": ship + (" called %s" % name if name and name.lower() != ship.lower() else "")}
 

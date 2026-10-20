@@ -3,6 +3,7 @@
 import time
 
 from core.identity import wake_phrase
+from core.ships import ship_name
 from collections import deque
 from datetime import datetime
 
@@ -86,7 +87,7 @@ def collect_status(app):
         where = state.system or "-"
         rows.append(("System", where, "muted"))
         if state.ship:
-            rows.append(("Ship", str(state.ship_name or state.ship), "muted"))
+            rows.append(("Ship", str(state.ship_name or ship_name(state.ship)), "muted"))
         carried = state.exobiology.carried_total() if state.exobiology else 0
         if carried:
             from journal.exobiology import spoken_credits
