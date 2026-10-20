@@ -215,14 +215,26 @@ class KokoroTTS(BaseTTS):
     # ------------------------------------------------------------------
     # The sound cache (so a line only has to be made once)
     # ------------------------------------------------------------------
+    def _pack_stamp(self):
+        """Identifies the voice file by its CONTENT (not its date), so an update that copies the file does not
+        throw away every saved line. A really re-tuned voice has different content, so it still makes a new cache."""
+        stamp = getattr(self, "_stamp", None)
+        if stamp is None:
+            try:
+                digest = hashlib.sha1()
+                with open(self.pack_path, "rb") as handle:
+                    for block in iter(lambda: handle.read(1 << 20), b""):
+                        digest.update(block)
+                stamp = digest.hexdigest()[:16]
+                self._stamp = stamp
+            except OSError:
+                return "nopack"            # not made yet: do not remember this
+        return stamp
+
     def _cache_file(self, text, speed):
         if self.cache_dir is None or len(text) > MAX_CACHED_CHARS:
             return None
-        try:
-            stat = self.pack_path.stat()
-            stamp = "%d-%d" % (stat.st_mtime_ns, stat.st_size)   # a re-tuned voice makes a new cache
-        except OSError:
-            stamp = "nopack"
+        stamp = self._pack_stamp()
         key = hashlib.sha1(("%s|%.2f|%s|%s" % (text, speed, stamp, self._voice_name)).encode("utf-8")).hexdigest()[:24]
         return self.cache_dir / (key + ".npy")
 
