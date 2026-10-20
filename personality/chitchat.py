@@ -24,6 +24,8 @@ log = get_logger("chitchat")
 
 # frequency -> (seconds of silence needed, minimum seconds between two chats)
 FREQUENCY = {"rarely": (600.0, 1500.0), "normal": (150.0, 360.0), "often": (90.0, 210.0), "chatty": (50.0, 120.0)}
+MINING_EVENTS = ("ProspectedAsteroid", "MiningRefined", "AsteroidCracked")
+MINING_SECONDS = 600.0           # she talks about mining for 10 minutes after the last mining event
 ALARMS = ("UnderAttack", "Interdicted", "InterdictionInProgress", "LowFuel", "Overheating", "HeatWarning", "HeatDamage",
           "HullDamage", "InDanger", "LowHealth", "LowOxygen", "Died", "CockpitBreached", "ShieldState")
 ALARM_QUIET_SECONDS = 75.0
@@ -53,6 +55,7 @@ class ChitChat:
         self._wobble = 1.0
         self._stop = threading.Event()
         self._thread = None
+        self.last_mining = None
 
     # ---- listening ----
     def attach(self):
@@ -68,6 +71,8 @@ class ChitChat:
             dist = (event.data or {}).get("JumpDist")
             if isinstance(dist, (int, float)) and dist > 0:
                 self.distance += float(dist)
+        elif name in MINING_EVENTS:
+            self.last_mining = now
         elif name == "CombatModeOn":
             self.mode = "combat"
         elif name == "AnalysisModeOn":
@@ -107,6 +112,8 @@ class ChitChat:
             return ["ChitChat_Combat"]
         if docked:
             return ["ChitChat_Docked", "ChitChat_Flying"]
+        if self.last_mining is not None and self.clock() - self.last_mining < MINING_SECONDS:
+            return ["ChitChat_Mining"]
         if self.mode == "analysis":
             return ["ChitChat_Analysis", "ChitChat_Flying"]
         if getattr(state, "in_supercruise", False):

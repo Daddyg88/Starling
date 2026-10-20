@@ -57,6 +57,17 @@ def _keys_for(event):
         return {"ship": ["ShipTargeted_Ship"], "bounty": ["ShipTargeted_Bounty", "ShipTargeted_Wanted"],
                 "wanted": ["ShipTargeted_Wanted"]}.get(said, [])
 
+    if name == "ProspectedAsteroid":
+        said = data.get("Announce")
+        return ["Prospected_" + said.capitalize()] if said else []
+
+    if name == "MiningRefined":
+        tier = data.get("Tier")
+        return ["Refined_Top"] if tier == "top" else (["Refined_Good"] if tier == "good" else [])
+
+    if name in ("LaunchDrone", "BuyDrones"):
+        return []
+
     if name == "Interdiction":
         return ["Interdiction_Success" if data.get("Success") else "Interdiction_Failed"]
 

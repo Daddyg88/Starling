@@ -29,7 +29,7 @@ from tts.speech_manager import SpeechManager
 
 APP_NAME = "STARLING"
 from core.version import __version__
-APP_VERSION = __version__ + " (Phase 7: memory, combat helpers, brain)"
+APP_VERSION = __version__ + " (Phase 7: memory, combat, brain, mining)"
 
 
 class App:
@@ -64,6 +64,8 @@ class App:
         self.warmer = None
         self.smalltalk = None
         self.brain = None
+        self.miner = None
+        self.prices = None
         self.lore = None
         self._record_events = True
         self.voice_replies = None
@@ -202,8 +204,13 @@ class App:
         self.lore = LoreTeller(self.speech, self.dialogue, self.settings, path=paths.DATA_DIR / "lore.json")
         self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore)
         from personality.brain import Brain
+        from mining.tracker import MiningTracker
+        from mining.prices import PriceFinder
+        self.miner = MiningTracker(self.bus)
+        self.miner.attach()
+        self.prices = PriceFinder(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
-                           facts=getattr(self.ask, "facts", None))
+                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices)
         return True
 
     def cpu_is_free(self):
@@ -214,13 +221,14 @@ class App:
             return False
 
     def prepare_voice_now(self):
-        """Dashboard button. Returns a sentence for the screen."""
+        """Dashboard button. Returns a sentence for the screen (the dashboard also shows a progress bar)."""
         if self.warmer is None:
             return "Her voice is not set up, so there is nothing to prepare."
-        if self.warmer.finished or self.warmer.force:
+        if self.warmer.finished and not self.warmer.force:
             return self.warmer.status()
-        self.warmer.run_now()
-        return "Preparing her voice in the background. This can take a few minutes and uses some CPU. Press again to see progress.\n" + self.warmer.status()
+        if not self.warmer.force:
+            self.warmer.run_now()
+        return "Preparing her voice in the background. It uses some CPU for a few minutes, and you can keep using the dashboard."
 
     def game_is_active(self):
         """True while you are in the cockpit or on foot and Elite is still writing Status.json."""

@@ -69,6 +69,7 @@ class VoiceWarmer:
         self.failed = 0
         self.total = 0
         self.finished = False
+        self.started_at = None             # when the lines started being made (for the time estimate)
         self.force = False                 # "prepare her voice now": ignore the free-CPU rule
         self._stop = threading.Event()
         self._thread = None
@@ -104,6 +105,7 @@ class VoiceWarmer:
             speed = speed_from_rate(self.settings.get("tts.rate", 0))
             texts = priority_order(self.dialogue, bool(self.settings.get("speech.allow_mature", False)), self.settings)
             self.total = len(texts)
+            self.started_at = self.clock()
             quiet_since = self.clock()
             for text in texts:
                 if self._stop.is_set():
@@ -131,6 +133,21 @@ class VoiceWarmer:
             self.finished = True
             self.force = False
             self._thread = None
+
+    def running(self):
+        return self._thread is not None and not self.finished
+
+    def progress(self):
+        """(lines ready, total lines, seconds left or None). Used by the dashboard's progress bar."""
+        done = self.made + self.skipped + self.failed
+        if not self.total:
+            return 0, 0, None
+        left = None
+        if self.made >= 3 and self.started_at is not None:
+            per_line = (self.clock() - self.started_at) / float(self.made)
+            remaining = max(0, self.total - done)
+            left = remaining * per_line
+        return min(done, self.total), self.total, left
 
     def status(self):
         if self.mode() == "off" and not self.force:

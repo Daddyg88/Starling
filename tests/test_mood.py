@@ -123,6 +123,19 @@ class MoodTests(MoodBase):
         self.engine.refresh()
         self.assertGreater(self.engine.score, before)
 
+    def test_going_afk_does_not_cost_points(self):
+        self.engine.score = 40
+        self.send("Docked", {})                              # the last thing that happened in the game
+        self.clock.wait(3 * 3600)                            # three hours away from the keyboard
+        self.engine.refresh()
+        self.assertGreater(self.engine.score, 39.5)          # at most the 5 minutes after the last event can calm her
+
+    def test_nothing_calms_before_any_game_event(self):
+        self.engine.score = 40
+        self.clock.wait(2 * 3600)
+        self.engine.refresh()
+        self.assertEqual(self.engine.score, 40)
+
     def test_band_changes_have_hysteresis(self):
         self.engine.score = 31
         self.engine.refresh()
@@ -250,6 +263,17 @@ class ThroughTheRealProcessor(unittest.TestCase):
         processor.handle_line(json.dumps({"timestamp": "2026-01-01T00:00:00Z", "event": "MarketSell", "Type": "slaves",
                                           "Count": 3, "SellPrice": 1000, "TotalSale": 3000, "BlackMarket": True}))
         self.assertLess(engine.score, 0)
+
+    def test_mining_and_shopping_please_her(self):
+        for entry in ({"event": "ProspectedAsteroid", "MotherlodeMaterial": "Painite", "Materials": []},
+                      {"event": "MiningRefined", "Type": "Platinum", "Type_Localised": "Platinum"},
+                      {"event": "ShipyardBuy", "ShipType": "python", "ShipPrice": 1000},
+                      {"event": "ModuleBuy", "BuyItem": "x", "BuyPrice": 1}):
+            processor, bus, heard = make_processor()
+            engine = MoodEngine(bus, Settings(Path("nope.json")).load(), persist=False)
+            engine.attach()
+            processor.handle_line(json.dumps(dict(entry, timestamp="2026-01-01T00:00:00Z")))
+            self.assertGreater(engine.score, 0, entry["event"])
 
     def test_pay_fines_is_a_known_event(self):
         processor, bus, heard = make_processor()

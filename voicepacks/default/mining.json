@@ -1,0 +1,211 @@
+{
+ "Prospected_Motherlode": [
+  "Motherlode!||{Material}!",
+  "Motherlode, Commander!||It's {Material}!",
+  "Oh, that's a motherlode.||{Material}. Crack it!",
+  "{Material} motherlode!||Get the charges ready."
+ ],
+ "Prospected_Motherlode_Friendly": [
+  "A {Material} motherlode, Commander! Brilliant!"
+ ],
+ "Prospected_Motherlode_Close": [
+  "A motherlode of {Material}!||Oh, I could kiss you. Go on, crack it."
+ ],
+ "Prospected_Motherlode_Sarcastic": [
+  "A {Material} motherlode. Try not to waste it.",
+  {
+   "text": "Motherlode. {Material}. Fucking jackpot.",
+   "mature": true
+  }
+ ],
+ "Prospected_Motherlode_Frustrated": [
+  "Motherlode of {Material}. Do it properly, then."
+ ],
+ "Prospected_Top": [
+  "{Material}!||{Percent} percent.",
+  "Ooh, {Material}.||{Percent} percent. Lovely.",
+  "This one has {Material}.||{Percent} percent. Get stuck in.",
+  "Valuable one.||{Material}, {Percent} percent.",
+  "{Material}, {Percent} percent.||That's the good stuff."
+ ],
+ "Prospected_Top_Friendly": [
+  "{Material}, Commander!||{Percent} percent. Well spotted."
+ ],
+ "Prospected_Top_Close": [
+  "{Material}! {Percent} percent.||Shiny, shiny credits."
+ ],
+ "Prospected_Top_Sarcastic": [
+  "{Material}, {Percent} percent. Even you can't miss that.",
+  {
+   "text": "{Material}. {Percent} percent. Fucking finally.",
+   "mature": true
+  }
+ ],
+ "Prospected_Top_Frustrated": [
+  "{Material}, {Percent} percent. Mine it."
+ ],
+ "Prospected_Good": [
+  "{Material}, {Percent} percent.",
+  "Some {Material} in this one.||{Percent} percent.",
+  "Decent. {Material}, {Percent} percent."
+ ],
+ "Prospected_Good_Friendly": [
+  "Some {Material}, Commander. {Percent} percent."
+ ],
+ "Prospected_Good_Sarcastic": [
+  "{Material}, {Percent} percent. Not exciting, but it pays."
+ ],
+ "Prospected_Poor": [
+  "Low content. Not worth it.",
+  "Nothing much in that one.",
+  "Skip it.",
+  "Poor rock. Try another.",
+  "Not worth the time."
+ ],
+ "Prospected_Poor_Sarcastic": [
+  "Nothing. Truly thrilling."
+ ],
+ "Refined_Top": [
+  "{Material} in the hold!",
+  "Ooh, {Material}!",
+  "That's {Material}. Lovely.",
+  "{Material}. Cha-ching.",
+  "Got some {Material}!"
+ ],
+ "Refined_Top_Friendly": [
+  "{Material} in the hold, Commander!"
+ ],
+ "Refined_Top_Close": [
+  "More {Material}. I love it when we find shiny things."
+ ],
+ "Refined_Top_Sarcastic": [
+  "{Material}. Well, that's the good one.",
+  {
+   "text": "{Material}. Fucking yes.",
+   "mature": true
+  }
+ ],
+ "Refined_Top_Frustrated": [
+  "{Material}. Good. Keep going."
+ ],
+ "Refined_Good": [
+  "Some {Material}.",
+  "{Material} refined.",
+  "Another bit of {Material}."
+ ],
+ "Refined_Good_Sarcastic": [
+  "{Material}. Every little helps."
+ ],
+ "AsteroidCracked": [
+  "Core cracked. Let's see what comes out.",
+  "Boom. Core's open.",
+  "Cracked it. Grab what you can.",
+  "Core open, Commander."
+ ],
+ "AsteroidCracked_Sarcastic": [
+  "Cracked. Try to collect it this time."
+ ],
+ "ChitChat_Mining": [
+  "I love it when you find platinum. Please find platinum.",
+  "Rocks, rocks and more rocks. I'm having a lovely time, honestly.",
+  "Shiny things in rocks. That's my favourite kind of day.",
+  "Painite, Void Opals, Low Temperature Diamonds. Say them out loud. They sound expensive.",
+  "If we find platinum I'll be insufferable. Just so you know.",
+  "Mining is just treasure hunting with extra explosions.",
+  "Every rock is a surprise. I do love a surprise.",
+  "Ask me where to sell, Commander. I can find the best prices for you.",
+  "Core mining is where the money is. Just saying.",
+  "Do you think the rocks know we're coming?"
+ ],
+ "ChitChat_Mining_Friendly": [
+  "You're really good at this, Commander. I mean it.",
+  "Another quiet hour of mining. I could get used to this."
+ ],
+ "ChitChat_Mining_Close": [
+  "Mining with you is oddly romantic. Rocks, lasers, me.",
+  "Keep finding shiny things for me, won't you?"
+ ],
+ "ChitChat_Mining_Sarcastic": [
+  "Mining. The thrill of watching a number go up slowly.",
+  "Please tell me this rock has something good in it."
+ ],
+ "ChitChat_Mining_Frustrated": [
+  "Find something worth selling. Please."
+ ],
+ "React_MiningTop": [
+  "Now that's the good stuff. I'm very happy.",
+  "A proper find! I love it when you do this.",
+  "Shiny and valuable. My two favourite words."
+ ],
+ "React_MiningTop_Close": [
+  "Look at that haul. You're a wonder."
+ ],
+ "React_MiningTop_Sarcastic": [
+  "Valuable stuff. Who knew you could do it."
+ ],
+ "React_MiningTop_Frustrated": [
+  "Fine. That was a good find."
+ ],
+ "React_Motherlode": [
+  "A motherlode! This is the best bit of mining!",
+  "Jackpot. That's what I came for."
+ ],
+ "React_Motherlode_Close": [
+  "A motherlode! You and me, we make a great team."
+ ],
+ "React_Motherlode_Sarcastic": [
+  "A motherlode. Don't let it go to your head."
+ ],
+ "React_Motherlode_Frustrated": [
+  "A motherlode. Well. That's something."
+ ],
+ "Price_Looking": [
+  "Let me check the market for you.",
+  "One moment. Looking up prices.",
+  "Checking the market, Commander.",
+  "Let me see who's paying the most."
+ ],
+ "Price_Looking_Sarcastic": [
+  "Let me see who'll pay for your rocks."
+ ],
+ "Price_Found": [
+  "Best price for {Material} is {Price} credits.||{Station}||{Where}.",
+  "The best buyer for {Material} pays {Price} credits.||{Station}||{Where}."
+ ],
+ "Price_Found_Close": [
+  "Best price for {Material}, {Price} credits a tonne.||{Station}||{Where}."
+ ],
+ "Price_Second": [
+  "Second best is {Price2} credits at||{Station2}||{Where2}.",
+  "Or {Price2} credits at||{Station2}||{Where2}."
+ ],
+ "Price_None": [
+  "I couldn't find anyone buying {Material} nearby. Try a bigger search later.",
+  "Nobody nearby wants {Material} right now, Commander."
+ ],
+ "Price_Offline": [
+  "I couldn't reach the price service. Check the internet and ask me again.",
+  "The market data is out of reach right now. Try again in a minute."
+ ],
+ "Price_Disabled": [
+  "Online price lookups are switched off in my settings, Commander."
+ ],
+ "Price_Which": [
+  "Which one? Tell me the mineral, like platinum or void opals.",
+  "I don't know what to look up yet. Say, where do I sell platinum."
+ ],
+ "Price_NoSystem": [
+  "I don't know which system we're in yet. Try again after a jump."
+ ],
+ "Brain_Mined": [
+  "We've refined {total} tonnes this session. {best_text}",
+  "So far we've pulled out {total} tonnes. {best_text}"
+ ],
+ "Brain_Mined_None": [
+  "Nothing refined yet. The rocks are waiting.",
+  "We haven't mined anything yet, Commander."
+ ],
+ "Brain_Mined_Close": [
+  "{total} tonnes so far, my clever Commander. {best_text}"
+ ]
+}

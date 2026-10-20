@@ -40,6 +40,7 @@ DEFAULTS = {
     "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "disabled": []},
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True},
+    "mining": {"prices": True},
     "chitchat": {"enabled": True, "frequency": "normal"},
     "memory": {"enabled": True, "recall_at_login": True},
     "updates": {"repo": "", "auto_check": True, "token": ""},

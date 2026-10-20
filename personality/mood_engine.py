@@ -12,8 +12,9 @@ It cannot swing wildly, because of four brakes:
     1. SOFT CAP   repeating the same kind of action gives less each time
                   (each repeat counts 60% of the one before; it recovers after ~10 quiet minutes).
     2. HOURLY CAP the score can rise by at most 15 and fall by at most 15 in any hour.
-    3. CALMING    the score drifts back toward neutral (1 point per 20 minutes) while Starling is running.
-                  It does NOT drift while Starling is closed, so what you earned is still there tomorrow.
+    3. CALMING    the score drifts back toward neutral (1 point per 20 minutes) only while you are really playing.
+                  It does NOT drift while Starling is closed or while you are AFK (no game event for 5 minutes),
+                  so what you earned is still there when you come back.
     4. HYSTERESIS she only changes mood after passing the line by 4 points, so she never flip-flops.
 
 The engine never speaks over safety warnings: she only reacts to ordinary events.
@@ -248,7 +249,7 @@ class MoodEngine:
         now = self.clock() if now is None else now
         self._notoriety_drain(now)
         self._paint_drain(now)
-        self._calm(now - self.updated)
+        self._calm(self._active_seconds(self.updated, now))
         self.updated = now
         band = self._band_for(self.score, self.band)
         if band != self.band:
@@ -319,6 +320,12 @@ class MoodEngine:
         self.save()
 
     # ---- the maths ----
+    def _active_seconds(self, since, now):
+        """Seconds between `since` and `now` that count as really playing. Time while you are AFK (no game event for 5 minutes) never counts."""
+        if self._last_event is None:
+            return 0.0
+        return max(0.0, min(now, self._last_event + ACTIVE_PLAY_SECONDS) - since)
+
     def _calm(self, seconds):
         """Drift toward neutral (she does not forgive you while you are wanted)."""
         if self.wanted_provider():

@@ -182,6 +182,17 @@ class WarmerTests(Cache):
         self.warmer.force = True
         self.assertTrue(self.warmer.may_work())             # the dashboard button still works
 
+    def test_progress_and_time_left(self):
+        self.assertEqual(self.warmer.progress(), (0, 0, None))
+        clock = [100.0]
+        self.warmer.clock = lambda: clock[0]
+        self.warmer.total, self.warmer.started_at = 100, 100.0
+        self.warmer.made, self.warmer.skipped = 10, 10
+        clock[0] = 120.0                                  # 10 lines made in 20 seconds = 2 s each
+        done, total, left = self.warmer.progress()
+        self.assertEqual((done, total), (20, 100))
+        self.assertAlmostEqual(left, 160.0)               # 80 lines left x 2 s
+
     def test_status_sentences(self):
         self.assertIn("Waiting", self.warmer.status())
         self.warmer.total, self.warmer.made = 10, 4

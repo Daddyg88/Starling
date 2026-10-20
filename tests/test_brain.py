@@ -52,7 +52,8 @@ class DataTests(Base):
         intents = load_intents()
         self.assertGreater(len(intents), 70)
         special = {"Brain_Why", "Brain_More", "Brain_You", "Brain_Really", "Brain_RiddleReveal", "Brain_Riddle", "Brain_Fact",
-                   "Brain_Opinion", "Brain_Suggest", "Brain_Status", "Brain_Wanted", "Brain_Time", "Brain_Date"}
+                   "Brain_Opinion", "Brain_Suggest", "Brain_Status", "Brain_Wanted", "Brain_Time", "Brain_Date",
+                   "Brain_SellPrice", "Brain_Mined"}
         for item, _patterns in intents:
             key = item["key"]
             if key in special:
@@ -61,7 +62,7 @@ class DataTests(Base):
 
     def test_placeholders_only_use_known_fields(self):
         known = {"system", "station", "ship", "shipname", "commander", "minutes", "jumps", "distance", "hull", "shields",
-                 "time", "period", "date", "result", "sides", "low", "high", "answer", "topic"}
+                 "time", "period", "date", "result", "sides", "low", "high", "answer", "topic", "total", "best_text"}
         for key, lines in self.dialogue.lines.items():
             if not key.startswith("Brain_"):
                 continue

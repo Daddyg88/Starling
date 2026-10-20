@@ -7,6 +7,7 @@ To change the look, edit theme.py. To add a setting, edit settings_model.py.
 """
 
 import random
+import time
 
 from core.identity import assistant_name
 from core.logger import get_logger
@@ -49,6 +50,9 @@ class Dashboard:
         self._portrait_label = None
         self._portrait_frame = None
         self._mood_chip = None
+        self._busy_until = 0.0          # the window was just moved or resized: skip the 1-second refresh until it settles
+        self._stars_job = None
+        self._stars_size = (0, 0)
 
         ctk.set_appearance_mode("dark")
         self.root = ctk.CTk(fg_color=T.BG)
@@ -58,6 +62,7 @@ class Dashboard:
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         self._build_layout()
+        self.root.bind("<Configure>", self._window_moved, add="+")
         self.show("home")
         self.root.after(REFRESH_MS, self._tick)
 
@@ -112,7 +117,7 @@ class Dashboard:
 
         self.banner = self.ctk.CTkCanvas(right, height=78, bg=T.BG, highlightthickness=0)
         self.banner.grid(row=0, column=0, sticky="ew")
-        self.banner.bind("<Configure>", self._draw_stars)
+        self.banner.bind("<Configure>", self._stars_soon)
         self._stars = [(random.random(), random.random(), random.choice((1, 1, 2)), random.choice((T.TEXT, T.MUTED, T.VIOLET, T.ACCENT)))
                        for _ in range(T.STAR_COUNT)]
 
@@ -134,10 +139,22 @@ class Dashboard:
         for page in self.model.pages:
             self._build_page(page)
 
+    def _stars_soon(self, event=None):
+        """Redraw the starfield once the window has stopped changing size (drawing it 100 times a second made dragging sluggish)."""
+        self._busy_until = time.monotonic() + 0.4
+        size = (getattr(event, "width", 0), getattr(event, "height", 0))
+        if event is not None and size == self._stars_size:
+            return                                     # only moved, not resized: nothing to redraw
+        if self._stars_job is not None:
+            self.root.after_cancel(self._stars_job)
+        self._stars_job = self.root.after(120, self._draw_stars)
+
     def _draw_stars(self, event=None):
+        self._stars_job = None
         canvas = self.banner
-        canvas.delete("all")
         width, height = max(canvas.winfo_width(), 10), max(canvas.winfo_height(), 10)
+        self._stars_size = (width, height)
+        canvas.delete("all")
         for fx, fy, size, colour in self._stars:
             x, y = fx * width, fy * height
             canvas.create_oval(x, y, x + size, y + size, fill=colour, outline="")
@@ -319,6 +336,8 @@ class Dashboard:
                       ("Record my buttons", self.record_buttons),
                       ("Check my Elite keys", self.check_keys),
                       ("Look for my joystick", self.scan_joysticks)]
+        if page.id == "voice":
+            self._build_voice_progress(frame, 2 + len(extra))
         for index, (text, command) in enumerate(extra):
             ctk.CTkButton(frame, text=text, width=230, font=self._font(), fg_color=T.PANEL, border_width=1, corner_radius=8,
                           border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT, command=command).grid(
@@ -605,6 +624,8 @@ class Dashboard:
         if page_id == "home":
             self._refresh_home()
         self._draw_stars()
+        if page_id == "voice":
+            self._start_voice_poll()
 
     def _changed(self, did_change):
         if did_change:
@@ -628,6 +649,57 @@ class Dashboard:
 
     def prepare_voice(self):
         self._controls_result(self.app.prepare_voice_now(), T.GOOD)
+        self._start_voice_poll()
+
+    # ---- the "Prepare her voice" progress bar ----
+    def _build_voice_progress(self, frame, row):
+        ctk = self.ctk
+        box = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
+        box.grid(row=row, column=0, sticky="ew", pady=(16, 0))
+        box.grid_columnconfigure(0, weight=1)
+        self.voice_bar = ctk.CTkProgressBar(box, height=14, corner_radius=7, fg_color=T.PANEL, progress_color=T.ACCENT,
+                                            border_width=1, border_color=T.BORDER)
+        self.voice_bar.set(0)
+        self.voice_bar.grid(row=0, column=0, sticky="ew")
+        self.voice_label = ctk.CTkLabel(box, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left")
+        self.voice_label.grid(row=1, column=0, sticky="w", pady=(6, 0))
+        self._voice_poll = None
+
+    @staticmethod
+    def _minutes_text(seconds):
+        if seconds is None:
+            return ""
+        if seconds < 90:
+            return " - under a minute left"
+        return " - about %d minutes left" % round(seconds / 60.0)
+
+    def _start_voice_poll(self):
+        if getattr(self, "_voice_poll", "none") is None and self.current == "voice":
+            self._voice_poll = self.root.after(0, self._poll_voice)
+
+    def _poll_voice(self):
+        self._voice_poll = None
+        warmer = getattr(self.app, "warmer", None)
+        bar = getattr(self, "voice_bar", None)
+        if bar is None or self.current != "voice":
+            return
+        if warmer is None:
+            self.voice_label.configure(text="Her voice is not running, so there is nothing to prepare.")
+            return
+        done, total, left = warmer.progress()
+        if total:
+            bar.set(done / float(total))
+        finished = warmer.finished or (total and done >= total)
+        if finished:
+            bar.set(1.0 if total else 0)
+            self.voice_label.configure(text=warmer.status(), text_color=T.GOOD)
+            return                                                   # nothing more to watch
+        if total:
+            self.voice_label.configure(text="Preparing her voice: %d of %d lines ready (%d%%)%s" % (
+                done, total, round(100.0 * done / total), self._minutes_text(left)), text_color=T.ACCENT)
+        else:
+            self.voice_label.configure(text=warmer.status(), text_color=T.MUTED)
+        self._voice_poll = self.root.after(600, self._poll_voice)
 
     def test_voice(self):
         speech = self.app.speech
@@ -656,7 +728,14 @@ class Dashboard:
                     menu.set(self.model.current_label(field))
                 self.save_note.configure(text="Microphone list updated.", text_color=T.GOOD)
 
+    def _window_moved(self, event=None):
+        if event is None or event.widget is self.root:
+            self._busy_until = time.monotonic() + 0.4
+
     def _tick(self):
+        if time.monotonic() < self._busy_until:                      # being dragged: do nothing this second
+            self.root.after(300, self._tick)
+            return
         try:
             if self.current == "home":
                 self._refresh_home()

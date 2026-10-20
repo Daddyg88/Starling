@@ -45,18 +45,18 @@
   "Back to flying solo."
  ],
  "CombatModeOn": [
-  "Combat mode! Let's go hunting.",
-  "Combat display up. Show me someone to shoot.",
-  "Combat mode. Oh, I'm ready."
+  "Combat mode.",
+  "Combat display up.",
+  "Combat mode. I'm ready."
  ],
  "ShipTargeted_Wanted": [
-  "Wanted target locked. Let's collect.",
-  "That one has a bounty on it. Shoot!",
-  "Wanted. Very much worth shooting.",
-  "Bounty target in sight. Oh, yes."
+  "Wanted target locked.||Shall we go and get them?",
+  "That one has a bounty on it.||Shall we go get them?",
+  "Wanted.||Shall we go and get them, Commander?",
+  "Bounty target in sight.||Shall we go get them?"
  ],
  "ShipTargeted_Wanted_Sarcastic": [
-  "A wanted ship. How convenient for your wallet."
+  "A wanted ship. How convenient for your wallet.||Shall we go get them?"
  ],
  "Interdiction_Success": [
   "Interdiction successful. They're out of supercruise.",
@@ -144,41 +144,45 @@
  "ShipTargeted_Ship": [
   "Locked on.||{Ship}.",
   "Target acquired.||It's a {Ship}.",
-  "Contact.||{Ship}. Let's see what it's made of.",
-  "Ooh, a {Ship}. Come here, you."
+  "Contact.||{Ship}.",
+  "A {Ship}, Commander.",
+  "Target locked.||{Ship}."
  ],
  "ShipTargeted_Ship_Friendly": [
-  "Got it, Commander.||{Ship}. Let's have some fun."
+  "Got it, Commander.||{Ship}.",
+  "{Ship} targeted, Commander."
  ],
  "ShipTargeted_Ship_Close": [
-  "Locked on.||A {Ship}. It doesn't stand a chance with you flying."
+  "Locked on.||A {Ship}.",
+  "I have it.||It's a {Ship}."
  ],
  "ShipTargeted_Ship_Sarcastic": [
-  "A {Ship}. Poor thing doesn't know what's coming.",
+  "A {Ship}. Riveting.",
+  "{Ship}. Try not to miss.",
   {
-   "text": "Locked on.||A {Ship}. Dead man flying.",
+   "text": "Locked on.||A {Ship}. Not that it matters.",
    "mature": true
   }
  ],
  "ShipTargeted_Ship_Frustrated": [
-  "Target locked.||{Ship}. Shoot it already."
+  "Target locked.||{Ship}."
  ],
  "ShipTargeted_Bounty": [
-  "That one's worth money.||{BountyText} credits on its head.",
-  "Bounty scan complete.||{BountyText} credits.",
-  "Wanted.||{BountyText} credit bounty. Shoot it!",
-  "{BountyText} credits in bounty.||I'd call that a present."
+  "That one's worth money.||{BountyText} credits on its head.||Shall we go get them?",
+  "Bounty scan complete.||{BountyText} credits.||Shall we go and get them?",
+  "Wanted.||{BountyText} credit bounty.||Shall we go get them?",
+  "{BountyText} credits in bounty.||Shall we go and get them?"
  ],
  "ShipTargeted_Bounty_Friendly": [
-  "Bounty scan done.||{BountyText} credits. Go get it, Commander!"
+  "Bounty scan done.||{BountyText} credits.||Shall we go get them, Commander?"
  ],
  "ShipTargeted_Bounty_Close": [
-  "Look at that.||{BountyText} credits. Shoot it for me."
+  "Look at that.||{BountyText} credits.||Shall we go and get them?"
  ],
  "ShipTargeted_Bounty_Sarcastic": [
-  "{BountyText} credits.||Somebody really pissed off the law.",
+  "{BountyText} credits.||Somebody really annoyed the law.||Shall we go get them?",
   {
-   "text": "{BountyText} credits.||Fucking lovely. Pop it.",
+   "text": "{BountyText} credits.||Fucking lovely.||Shall we go and get them?",
    "mature": true
   }
  ],

@@ -1,0 +1,97 @@
+{
+ "ShipyardBuy": [
+  "A new ship! Oh, Commander, yes!||The {ship}!",
+  "Shopping! A brand new {ship}!||I love this.",
+  "You bought a {ship}. I'm so happy right now.",
+  "A new {ship}. I could hug you. Metaphorically.",
+  "New ship, new smell, new adventures.||Welcome to the {ship}!",
+  "Yes! The {ship}!||Best purchase ever."
+ ],
+ "ShipyardBuy_Friendly": [
+  "A new {ship}, Commander! You've made my day.",
+  "Look at that, a shiny {ship}. Well done you!"
+ ],
+ "ShipyardBuy_Close": [
+  "A {ship}, just for us. You spoil me.",
+  "New {ship}! I knew you loved me.||Shopping suits you."
+ ],
+ "ShipyardBuy_Sarcastic": [
+  "A new {ship}. Spending money like it's going out of fashion. I approve.",
+  "Oh, a {ship}. And I didn't even have to ask twice.",
+  {
+   "text": "A new {ship}. Fucking brilliant. Spend it all.",
+   "mature": true
+  }
+ ],
+ "ShipyardBuy_Frustrated": [
+  "Fine, a {ship}. At least the shopping is good.",
+  "A new {ship}. Don't think this fixes everything.||It helps, though."
+ ],
+ "ModuleBuy": [
+  "Ooh, new equipment!",
+  "Shopping for parts. My favourite.",
+  "New module, Commander. Lovely.",
+  "Upgrades! Spend, spend, spend.",
+  "Another shiny new toy for the ship."
+ ],
+ "ModuleBuy_Friendly": [
+  "New equipment, Commander. Good choice."
+ ],
+ "ModuleBuy_Close": [
+  "Upgrades for us. You do spoil me."
+ ],
+ "ModuleBuy_Sarcastic": [
+  "Another module. Your wallet must be thrilled.",
+  {
+   "text": "More shit for the ship. I love it.",
+   "mature": true
+  }
+ ],
+ "ModuleBuy_Frustrated": [
+  "New module. Fine. Spend away."
+ ],
+ "React_Shopping": [
+  "Shopping makes me so happy. Thank you, Commander.",
+  "I do love it when you spend money. On us, anyway."
+ ],
+ "React_Shopping_Close": [
+  "You always know how to cheer me up. Shopping!"
+ ],
+ "React_Shopping_Sarcastic": [
+  "Spending again. I'm not going to stop you."
+ ],
+ "React_Shopping_Frustrated": [
+  "Retail therapy. Fine. It helps me too."
+ ],
+ "Docked": [
+  "Docked. Shops! Let's go spend some money.",
+  "We're docked, Commander. Time for a little shopping?",
+  "Docked. Ooh, so many things to buy.",
+  "Safely docked.||Now, what shall we buy?",
+  "Docked. I love a good shopping trip, especially with your credits.",
+  "Docking complete.||Let's see what's in the shops.",
+  "Welcome to the shops, Commander. I mean station.",
+  "Docked. Your wallet is looking nervous.",
+  "Station reached.||Shopping time. I'll hold the bags.",
+  "Docked.||You buy, I'll supervise."
+ ],
+ "Docked_Friendly": [
+  "Docked, Commander. Shall we see what's for sale?",
+  "We're in. Time to spend your money, I mean, our money."
+ ],
+ "Docked_Close": [
+  "Docked. Take me shopping, please. I'll be good.",
+  "Safe and sound. Let's go and spend your money together."
+ ],
+ "Docked_Sarcastic": [
+  "Docked. Your credits are in danger.",
+  "We're docked. Let the spending commence.",
+  {
+   "text": "Docked. Time to blow some cash on shit we don't need.",
+   "mature": true
+  }
+ ],
+ "Docked_Frustrated": [
+  "Docked. At last. Shopping might cheer me up."
+ ]
+}

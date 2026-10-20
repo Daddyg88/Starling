@@ -21,6 +21,7 @@ from datetime import datetime
 from core import paths
 from core.identity import personalise
 from core.logger import get_logger
+from mining import minerals
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
 
@@ -61,12 +62,14 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
         self.state_provider = state_provider or (lambda: None)
         self.chitchat = chitchat
+        self.mining = mining         # mining/tracker.py: what you have refined this session
+        self.prices = prices         # mining/prices.py: where to sell it
         self.facts = facts
         self.intents = intents if intents is not None else load_intents()
         self.clock = clock
@@ -209,6 +212,60 @@ class Brain:
 
     def _format_exists(self, key):
         return bool(self.dialogue.pool(key, "", self._allow(), False))
+
+    # ---- mining ----
+    def _do_mined(self, item, found, tidy):
+        tracker = self.mining
+        if tracker is None or tracker.total() == 0:
+            return self._say_pool("Brain_Mined_None", {}, remember=True)
+        values = {"total": tracker.total(), "best_text": tracker.best_text()}
+        return self._say_pool("Brain_Mined", values, remember=True)
+
+    def _do_sellprice(self, item, found, tidy):
+        """'Where should I sell the platinum?' Looks up the best nearby buyers in the background and says the answer."""
+        if self.prices is None or not self.prices.enabled():
+            return self._say_pool("Price_Disabled", {}, remember=False)
+        commodity = minerals.from_speech(tidy) or (self.mining.to_sell() if self.mining is not None else None)
+        if not commodity:
+            return self._say_pool("Price_Which", {}, remember=False)
+        system = getattr(self._state(), "system", None)
+        if not system:
+            return self._say_pool("Price_NoSystem", {}, remember=False)
+        material = minerals.spoken(commodity)
+        first = self._say_pool("Price_Looking", {}, remember=False)
+
+        def done(results, ok):
+            self._say_prices(material, results, ok)
+        self.prices.lookup_async(system, commodity, done)
+        return first
+
+    @staticmethod
+    def _where(result):
+        distance = result.get("distance")
+        if isinstance(distance, (int, float)) and distance >= 0.5:
+            return "in %s, %s light years away" % (result["system"], int(round(distance)))
+        return "in %s" % result["system"]
+
+    def _say_prices(self, material, results, ok):
+        if not ok:
+            return self._say_pool("Price_Offline", {})
+        if not results:
+            return self._say_pool("Price_None", {"Material": material})
+        best = results[0]
+        values = {"Material": material, "Price": "{:,}".format(best["price"]), "Station": best["station"],
+                  "Where": self._where(best)}
+        text = self._format("Price_Found", values)
+        if text is None:
+            return None
+        if best.get("pad"):
+            text += "||%s landing pads." % best["pad"].capitalize()
+        if len(results) > 1:
+            second = results[1]
+            more = self._format("Price_Second", {"Price2": "{:,}".format(second["price"]), "Station2": second["station"],
+                                                  "Where2": self._where(second)})
+            if more:
+                text += "||" + more
+        return self._say(text)
 
     def _do_status(self, item, found, tidy):
         state = self._state()
