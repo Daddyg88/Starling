@@ -67,6 +67,7 @@ class App:
         self.miner = None
         self.prices = None
         self.lore = None
+        self.eoc = None
         self._record_events = True
         self.voice_replies = None
         self.manners = None
@@ -202,7 +203,10 @@ class App:
         from personality.smalltalk import SmallTalk
         from personality.lore import LoreTeller
         self.lore = LoreTeller(self.speech, self.dialogue, self.settings, path=paths.DATA_DIR / "lore.json")
-        self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore)
+        from personality.eoc import EOCTeller
+        self.eoc = EOCTeller(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state)
+        self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore,
+                                   eoc=self.eoc)
         from personality.brain import Brain
         from mining.tracker import MiningTracker
         from mining.prices import PriceFinder

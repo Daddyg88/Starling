@@ -62,19 +62,30 @@ def intent_for(text):
 
 
 class SmallTalk:
-    def __init__(self, speech, dialogue, settings, chitchat=None, mood=None, lore=None):
+    def __init__(self, speech, dialogue, settings, chitchat=None, mood=None, lore=None, eoc=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
         self.chitchat = chitchat
         self.mood = mood
         self.lore = lore                 # personality/lore.py: her back story
+        self.eoc = eoc                   # personality/eoc.py: the East Orion Company, its CEO and systems
 
     def try_handle(self, text):
         """Answer small talk. Returns what she said, or None if this wasn't small talk."""
         key = intent_for(text)
         if key is None or self.dialogue is None or not self.settings.get("smalltalk.enabled", True):
+            if (self.eoc is not None and self.dialogue is not None and self.settings.get("smalltalk.enabled", True)):
+                return self.eoc.try_handle(text)          # questions about the company that are not small talk
             return None
+        if self.eoc is not None:
+            if key == "Talk_More" and self.eoc.recent():
+                told = self.eoc.next()                    # "tell me more" after a company answer = next system
+                if told:
+                    return told
+            told = self.eoc.try_handle(text)              # before her back story: the company has its own answers
+            if told:
+                return told
         if key in LORE_KEYS and self.lore is not None:
             if key == "Talk_More" and not self.lore.recent():
                 return None                                  # "more" on its own means nothing unless she was just telling a story

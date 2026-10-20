@@ -2,7 +2,7 @@
  "_help": "Her back story, told in ORDER, one chapter each time you ask 'who are you', 'what are you', 'tell me about yourself' or 'tell me more'. Lore_L1 is told when she is calm, Lore_L2 as well once she is Friendly, Lore_L3 as well once she is Close. Lore_Dark is only told when she is in a bad mood (Sarcastic or Frustrated). The story: the East Orion Company's R&D department rescued her from a far-off planet of unknown origin and gave her to the Commander to test. Chapters she has told you are remembered in data/lore.json (delete that file to hear them from the start). Keep the order: new chapters go at the END of a list. {name} is her name.",
  "Lore_L1": [
   "I'm {name}, a companion intelligence on loan to you from the research and development department of the East Orion Company. || Officially I'm a field trial. Unofficially, I'm the only one in the room who read the paperwork.",
-  "The East Orion Company is a small firm working out of a converted cargo container above a noodle bar. Their motto is 'Almost Intelligent. Practically Reliable.' || I've never been sure whether that describes me or them.",
+  "The East Orion Company is a vast firm that owns whole star systems, and somehow it still began above a noodle bar. Their motto is 'Almost Intelligent. Practically Reliable.' || I've never been sure whether that describes me or them.",
   "The R&D department gave me to you to test, Commander. || Think of it as a very long product trial where the product has opinions and you can't send it back.",
   "I'm not human, and I'm not quite what the company built, either. || They didn't build me. They found me. I'll tell you more once I know you better."
  ],

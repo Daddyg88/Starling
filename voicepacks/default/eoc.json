@@ -1,0 +1,66 @@
+{
+ "EOC_Overview": [
+  "The East Orion Company is a massive organisation, Commander. It owns whole star systems, and every one was built by one of its own Commanders.",
+  "The East Orion Company, or the E O C, is enormous. {count} known systems and counting, each one built by a Commander of the company."
+ ],
+ "EOC_Overview_Close": [
+  "I'm very fond of the East Orion Company. It owns {count} known systems, and every one was built by a Commander of the company."
+ ],
+ "EOC_Overview_Sarcastic": [
+  "The East Orion Company. Massive. It owns {count} systems, built by its Commanders, and still somehow can't afford a decent coffee machine."
+ ],
+ "EOC_Overview_Boss": [
+  "The chief executive is Commander {ceo}, and the company's home is {home}."
+ ],
+ "EOC_Overview_CEO": [
+  "And you, Commander, are the C E O. It's all yours.",
+  "The C E O is you, Commander. No pressure."
+ ],
+ "EOC_Overview_CEO_Close": [
+  "And the C E O is you. I'm so proud I could burst."
+ ],
+ "EOC_Overview_CEO_Sarcastic": [
+  "And the C E O is you. Heaven help us all."
+ ],
+ "EOC_TourOffer": [
+  "Say tell me more, and I'll take you round the systems one at a time.",
+  "Say tell me more for a tour, or ask me about any system by name."
+ ],
+ "EOC_CEO": [
+  "The C E O of the East Orion Company is Commander {ceo}. The company is based at {home}."
+ ],
+ "EOC_CEO_Close": [
+  "Commander {ceo} is the C E O. A fine pilot, and base is {home}."
+ ],
+ "EOC_CEO_You": [
+  "You are, Commander. You're the C E O of the East Orion Company.",
+  "That's you, Commander. C E O of the East Orion Company."
+ ],
+ "EOC_CEO_You_Close": [
+  "It's you, Commander. My boss, and my favourite person."
+ ],
+ "EOC_CEO_You_Sarcastic": [
+  "You are, apparently. Nobody checked."
+ ],
+ "EOC_List": [
+  "The company has {count} known systems: {names}.",
+  "I know of {count} company systems: {names}."
+ ],
+ "EOC_SystemIntro": [
+  "{title}.",
+  "Here we have {title}.",
+  "Next, {title}.",
+  "Let's talk about {title}."
+ ],
+ "EOC_BuiltBy": [
+  "Built by Commander {architect}.",
+  "The architect is Commander {architect}."
+ ],
+ "EOC_BuiltByYou": [
+  "Built by you, Commander. I'm very proud.",
+  "That one is yours, Commander. You built it."
+ ],
+ "EOC_TourEnd": [
+  "That's every company system I know about. The company keeps growing, so ask me again soon."
+ ]
+}

@@ -1,0 +1,242 @@
+"""
+THE EAST ORION COMPANY (EOC) - what she knows about the company, its CEO and the systems it owns.
+
+Ask her:  "tell me about the East Orion Company"   (then "tell me more" takes you round the systems one by one)
+          "who is the CEO"      "which systems does the EOC own"      "tell me about Arcadia / Milliways / Payden's Haven"
+She knows who YOU are: if your Commander name is on the CEO list she treats you as the boss, and if you built one of the
+systems she says so. The facts are in config/eoc.json (edit it as the company grows); her framing words are in
+voicepacks/default/eoc.json.
+"""
+import json
+import re
+import time
+
+from core import paths
+from core.identity import assistant_name, personalise
+from core.logger import get_logger
+from personality.mood_engine import effective_mood
+
+log = get_logger("eoc")
+
+RECENT_SECONDS = 300.0
+_COMPANY = r"(?:east orion(?: company)?|e o c|eoc)"
+_ASK = r"(?:tell me (?:about|more about)|what(?: is|s| was)|who(?: is|s| are| were| was)|explain|describe|talk about|give me (?:a tour of|an overview of))"
+
+OVERVIEW = re.compile(r"^(?:%s )?(?:the )?%s(?: company)?(?: again)?$|^%s (?:the )?%s$|^(?:give me )?(?:a )?(?:tour|overview) of (?:the )?%s$"
+                      % (_ASK, _COMPANY, _ASK, _COMPANY, _COMPANY))
+CEO = re.compile(r"^who(?: is|s) (?:the )?(?:ceo|boss|owner|founder|head|chief)(?: of (?:the )?%s)?$|^who (?:runs|owns|founded|leads|is in charge of) (?:the )?%s$"
+                 % (_COMPANY, _COMPANY))
+LISTING = re.compile(r"\b%s\b.*\b(?:systems?|territory|empire|space|places|stations)\b|\b(?:systems?|stations)\b.*\b%s\b" % (_COMPANY, _COMPANY))
+ENTRY_LEAD = re.compile(r"^(?:%s|where(?: is|s)|show me|do you know|what do you know about|anything on) " % _ASK)
+
+
+def clean(text):
+    text = re.sub(r"['’]", "", (text or "").lower())
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", text)).strip()
+
+
+def same_person(a, b):
+    """'CMDR Ben Can-Obi' and 'ben can obi' are the same person."""
+    def tidy(name):
+        name = re.sub(r"^(?:cmdr|commander)\s+", "", str(name or "").strip(), flags=re.I)
+        return re.sub(r"[^a-z0-9]", "", name.lower())
+    return bool(tidy(a)) and tidy(a) == tidy(b)
+
+
+_LETTERS = re.compile(r"^[A-Za-z]{1,3}$")
+
+
+def speakable(name):
+    """'Wregoe JU-E c25-18' -> 'Wregoe J U, E, C 25, 18' so she reads the code out letter by letter."""
+    out, previous_code = "", False
+    for word in str(name or "").split():
+        code = False
+        if word.upper() in ("HIP", "NGC", "HD", "LHS", "LTT"):
+            spoken = " ".join(word.upper())
+        elif "-" in word or (re.search(r"\d", word) and re.search(r"[A-Za-z]", word)):
+            code = True
+            pieces = []
+            for part in [p for p in word.split("-") if p]:
+                match = re.match(r"^([A-Za-z]+)(\d+)$", part)
+                if match:
+                    pieces.append(" ".join(match.group(1).upper()) + " " + match.group(2))
+                elif part.isdigit():
+                    pieces.append(part)
+                elif _LETTERS.match(part):
+                    pieces.append(" ".join(part.upper()))
+                else:
+                    pieces.append(part)
+            spoken = ", ".join(pieces)
+        else:
+            spoken = word
+        out += (", " if (code and previous_code) else (" " if out else "")) + spoken
+        previous_code = code
+    return out
+
+
+class EOCTeller:
+    def __init__(self, speech, dialogue, settings, state_provider=None, path=None, clock=time.monotonic, rng=None):
+        import random
+        self.speech = speech
+        self.dialogue = dialogue
+        self.settings = settings
+        self.state_provider = state_provider or (lambda: None)
+        self.clock = clock
+        self.rng = rng or random.Random()
+        self.path = path or (paths.CONFIG_DIR / "eoc.json")
+        self.data = {"ceo": [], "pilots": [], "systems": [], "home": ""}
+        self.last_told = None
+        self.tour = 0                         # which system "tell me more" says next
+        self.load()
+
+    def load(self):
+        try:
+            with open(self.path, "r", encoding="utf-8") as handle:
+                data = json.load(handle)
+            if isinstance(data, dict):
+                self.data["ceo"] = [str(x) for x in data.get("ceo", []) if x]
+                self.data["pilots"] = [p for p in data.get("pilots", []) if isinstance(p, dict) and p.get("name")]
+                self.data["systems"] = [s for s in data.get("systems", []) if isinstance(s, dict) and s.get("title")]
+                self.data["home"] = str(data.get("home") or "")
+        except FileNotFoundError:
+            pass
+        except (OSError, ValueError):
+            log.exception("Could not read %s", self.path)
+
+    # ---- who is who ----
+    def commander(self):
+        return getattr(self.state_provider(), "commander", None)
+
+    def player_is_ceo(self):
+        me = self.commander()
+        return bool(me) and any(same_person(me, name) for name in self.data["ceo"])
+
+    def player_systems(self):
+        me = self.commander()
+        return [s for s in self.data["systems"] if me and same_person(me, s.get("architect"))]
+
+    def player_pilot(self):
+        me = self.commander()
+        return next((p for p in self.data["pilots"] if me and same_person(me, p.get("name"))), None)
+
+    def find_system(self, tidy):
+        """The system whose name, architect or station is in the sentence (longest match wins)."""
+        best, best_len = None, 0
+        for system in self.data["systems"]:
+            names = list(system.get("aliases", [])) + [system.get("title", ""), system.get("architect", "")]
+            for name in names:
+                name = clean(name)
+                if name and re.search(r"\b%s\b" % re.escape(name), tidy) and len(name) > best_len:
+                    best, best_len = system, len(name)
+        return best
+
+    def home(self):
+        return next((s for s in self.data["systems"] if s.get("id") == self.data["home"]), None) or (
+            self.data["systems"][0] if self.data["systems"] else None)
+
+    # ---- asking ----
+    def recent(self):
+        return self.last_told is not None and self.clock() - self.last_told <= RECENT_SECONDS
+
+    def try_handle(self, text):
+        """Answer a question about the company. Returns what she said, or None when this wasn't about the company."""
+        if self.dialogue is None or not self.data["systems"]:
+            return None
+        tidy = clean(text)
+        tidy = re.sub(r"^(?:hey |hi |ok |okay )?(?:starling )?(?:please )?", "", tidy)
+        tidy = re.sub(r"(?: please| starling| commander)+$", "", tidy)
+        if not tidy:
+            return None
+        if CEO.match(tidy):
+            return self.say_ceo()
+        if OVERVIEW.match(tidy):
+            return self.say_overview()
+        if LISTING.search(tidy) and re.match(r"^(?:which|what|list|name|how many|where|tell me|show me|give me|does|do)\b", tidy):
+            return self.say_list()
+        if ENTRY_LEAD.match(tidy):
+            system = self.find_system(tidy)
+            if system is not None:
+                return self.say_system(system)
+        return None
+
+    # ---- saying ----
+    def _mood(self):
+        if self.settings.get("personality.style", "personality") != "personality":
+            return ""
+        return effective_mood(self.settings) or ""
+
+    def _pick(self, key, values=None):
+        allow = bool(self.settings.get("speech.allow_mature", False))
+        for _ in range(8):
+            line = self.dialogue.pick(key, self._mood(), allow, False)
+            if line is None:
+                return None
+            try:
+                return line.text.format(**(values or {}))
+            except (KeyError, IndexError, ValueError):
+                continue
+        return None
+
+    def _say(self, text):
+        text = personalise(text.replace("{name}", assistant_name(self.settings)), self.settings)
+        if self.speech is not None and self.settings.get("speech.enabled", True):
+            self.speech.say(text=text, priority="normal", event_name="eoc")
+        self.last_told = self.clock()
+        return text.replace("||", " ")
+
+    def _ceo_name(self):
+        return self.data["ceo"][0] if self.data["ceo"] else "the CEO"
+
+    def say_overview(self):
+        self.tour = 0
+        home = self.home()
+        values = {"count": len(self.data["systems"]), "ceo": self._ceo_name(), "home": home["title"] if home else "home"}
+        parts = [self._pick("EOC_Overview", values)]
+        if self.player_is_ceo():
+            parts.append(self._pick("EOC_Overview_CEO", values))
+        else:
+            parts.append(self._pick("EOC_Overview_Boss", values))
+        parts.append(self._pick("EOC_TourOffer", values))
+        text = "||".join(p for p in parts if p)
+        return self._say(text) if text else None
+
+    def say_ceo(self):
+        if self.player_is_ceo():
+            text = self._pick("EOC_CEO_You", {"ceo": self._ceo_name()})
+        else:
+            home = self.home()
+            text = self._pick("EOC_CEO", {"ceo": self._ceo_name(), "home": home["title"] if home else "home"})
+        return self._say(text) if text else None
+
+    def say_list(self):
+        names = [s["title"] for s in self.data["systems"]]
+        joined = ", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]
+        text = self._pick("EOC_List", {"count": len(names), "names": joined})
+        return self._say(text) if text else None
+
+    def say_system(self, system, intro=True):
+        me_built = self.commander() and same_person(self.commander(), system.get("architect"))
+        parts = []
+        if intro:
+            parts.append(self._pick("EOC_SystemIntro", {"title": system["title"]}))
+        parts.append(system.get("say") or speakable(system.get("system", "")))
+        who = system.get("architect")
+        if who:
+            parts.append(self._pick("EOC_BuiltByYou" if me_built else "EOC_BuiltBy", {"architect": who, "title": system["title"]}))
+        if system.get("blurb"):
+            parts.append(system["blurb"])
+        text = "||".join(p for p in parts if p)
+        return self._say(text) if text else None
+
+    def next(self):
+        """'Tell me more' after a company answer: the next system on the tour."""
+        systems = self.data["systems"]
+        if not systems:
+            return None
+        if self.tour >= len(systems):
+            self.tour = 0
+            text = self._pick("EOC_TourEnd")
+            return self._say(text) if text else None
+        system = systems[self.tour]
+        self.tour += 1
+        return self.say_system(system)

@@ -1,0 +1,90 @@
+{
+  "_help": "The East Orion Company (EOC): who runs it and which systems it owns. Starling reads this when you ask about the company ('tell me about the East Orion Company', 'who is the CEO', 'which systems does the EOC own', 'tell me about Arcadia'). Edit freely; she picks up changes next time she starts. 'ceo' = Commander names (spelled as in the game, capitals do not matter) that she treats as the CEO. 'pilots' = other company Commanders she should recognise, e.g. {\"name\": \"Some Name\", \"role\": \"Captain\"} (a list can be added here later). Each system: title (what she calls it), system (the game's name), say (optional: how to pronounce the system, otherwise she spells out the code), architect (who built it), aliases (other things you might call it, lower case), blurb (what she says; use || for a short pause), stations (name + services).",
+  "ceo": ["Ben Can-Obi"],
+  "pilots": [],
+  "home": "danforth",
+  "systems": [
+    {
+      "id": "danforth",
+      "title": "Danforth",
+      "system": "Wregoe JU-E c25-18",
+      "architect": "Ben Can-Obi",
+      "aliases": ["danforth", "danforth horizons", "eoc anchorage", "the home system", "company home", "eoc home", "head office"],
+      "blurb": "This is where it all began. Home of the company, and home of the CEO. || Danforth Horizons has a market, and so does EOC Anchorage.",
+      "stations": [{"name": "Danforth Horizons", "services": "Market and Home"}, {"name": "EOC Anchorage", "services": "Market"}]
+    },
+    {
+      "id": "arcadia",
+      "title": "Arcadia",
+      "system": "Wregoe XU-H b51-1",
+      "architect": "Nyx Evera",
+      "aliases": ["arcadia", "arcadia gateway"],
+      "blurb": "Arcadia Gateway has Interstellar Factors and a Human Technology Broker. || Very handy when you've been naughty.",
+      "stations": [{"name": "Arcadia Gateway", "services": "Interstellar Factors and Human Technology Broker"}]
+    },
+    {
+      "id": "black_legacy",
+      "title": "Black Legacy",
+      "system": "Wregoe FC-D d12-35",
+      "architect": "Voyager",
+      "aliases": ["black legacy"],
+      "blurb": "Black Legacy has lawyers, and a technology broker. || Everything a growing company needs.",
+      "stations": [{"name": "Black Legacy", "services": "Lawyers and a technology broker"}]
+    },
+    {
+      "id": "baskerville",
+      "title": "Baskerville Ring",
+      "system": "HIP 49836",
+      "architect": "Gravestock",
+      "aliases": ["baskerville", "baskerville ring", "hip 49836", "gravestock"],
+      "blurb": "Baskerville Ring has lawyers. || There are also several haz res sites of various difficulty, so bring a ship you don't love too much.",
+      "stations": [{"name": "Baskerville Ring", "services": "Lawyers"}]
+    },
+    {
+      "id": "paydens_haven",
+      "title": "Payden's Haven",
+      "system": "Prua Dryoae IL-K b42-3",
+      "architect": "Payden",
+      "aliases": ["paydens haven", "payden", "pensioner retreat", "eoc pensioner retreat", "siemens gateway"],
+      "blurb": "The EOC Pensioner Retreat is a Coriolis, where you can put your feet up. || Siemens Gateway is a dodec, and a good place to buy a local exploration ship. || It's eighteen hundred and forty light years from Danforth, and an excellent area for first footfall exploration.",
+      "stations": [{"name": "EOC Pensioner Retreat", "services": "Coriolis, put your feet up"}, {"name": "Siemens Gateway", "services": "Dodec, exploration ships"}]
+    },
+    {
+      "id": "winter_station",
+      "title": "Winter Station",
+      "system": "HIP 49808",
+      "architect": "Inforalook",
+      "aliases": ["winter station", "hip 49808", "inforalook", "feists progress"],
+      "blurb": "Winter Station sells C M M composites. || It sits directly below Feist's Progress.",
+      "stations": [{"name": "Winter Station", "services": "CMM composites"}]
+    },
+    {
+      "id": "rhino_heaven",
+      "title": "Rhino Heaven",
+      "system": "Wregoe BB-G b52-4",
+      "architect": "Ben Can-Obi",
+      "aliases": ["rhino heaven"],
+      "blurb": "Rhino heaven. || I'm told that is a complete description.",
+      "stations": []
+    },
+    {
+      "id": "milliways",
+      "title": "Milliways",
+      "system": "NGC 4463 Sector OW-S a37-1",
+      "architect": "CplStump",
+      "say": "N G C 4463 Sector O W S, A 37, 1",
+      "aliases": ["milliways", "cplstump", "cpl stump", "corporal stump"],
+      "blurb": "Milliways, the restaurant at the end of the universe, or at least at the end of a long jump.",
+      "stations": [{"name": "Milliways", "services": ""}]
+    },
+    {
+      "id": "rancid_roquefort",
+      "title": "Rancid Roquefort",
+      "system": "Wregoe LP-E c25-8",
+      "architect": "Curd Nerd",
+      "aliases": ["rancid roquefort", "roquefort", "curd nerd", "curdnerd", "gabriguri blue council", "blue cheese"],
+      "blurb": "Rancid Roquefort serves the best blue cheese in the known galaxy. || The dominant faction is the Gabriguri Blue Council. Pirates and vagabonds. Arrr.",
+      "stations": [{"name": "Rancid Roquefort", "services": "Best blue cheese in the known galaxy"}]
+    }
+  ]
+}

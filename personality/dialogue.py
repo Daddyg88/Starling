@@ -100,6 +100,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "chitchat.json"))      # small talk when it is quiet
             self._merge(_read_json(self.pack_dir / "combat.json"))        # ship changes, wings, fighting (space and on foot)
             self._merge(_read_json(self.pack_dir / "memory.json"))        # what she remembers about you
+            self._merge(_read_json(self.pack_dir / "eoc.json"))           # the East Orion Company: CEO, systems, tour
             self._merge(_read_json(self.pack_dir / "shopping.json"))      # she loves shopping (new ships, modules, stations)
             self._merge(_read_json(self.pack_dir / "mining.json"))        # mining callouts and price answers
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
