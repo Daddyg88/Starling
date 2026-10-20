@@ -53,7 +53,7 @@ class DataTests(Base):
 
     def test_every_pool_line_formats(self):
         pack = json.load(open(paths.VOICEPACKS_DIR / "default" / "eoc.json", encoding="utf-8"))
-        values = {"count": 9, "ceo": "A", "home": "B", "names": "C", "title": "D", "architect": "E"}
+        values = {"count": 9, "ceo": "A", "home": "B", "names": "C", "title": "D", "architect": "E", "name": "F", "rank": "G", "titles": "H", "more": "", "ranks": 8}
         for key, lines in pack.items():
             for item in lines:
                 (item["text"] if isinstance(item, dict) else item).format(**values)
@@ -107,6 +107,47 @@ class AskingTests(Base):
     def test_ordinary_sentences_are_left_alone(self):
         for text in ("plot a route to arcadia", "lower the landing gear", "what time is it", "tell me a joke", "who are you"):
             self.assertIsNone(self.eoc.try_handle(text), text)
+
+
+class RosterTests(Base):
+    def test_roster_is_complete(self):
+        pilots = self.eoc.data["pilots"]
+        self.assertEqual(len(pilots), 59)
+        counts = {}
+        for p in pilots:
+            counts[p["rank"]] = counts.get(p["rank"], 0) + 1
+        self.assertEqual(counts, {"Admiral of the Fleet": 1, "Fleet Admiral": 5, "Admiral": 8, "Agincourt Helmsman": 9,
+                                  "Commodore": 7, "Captain": 23, "Midshipman": 5, "Cadet": 1})
+        self.assertEqual(self.eoc.data["ranks"][0], "Admiral of the Fleet")
+
+    def test_who_is_a_member(self):
+        self.eoc.try_handle("who is nyx evera")
+        said = self.said()
+        self.assertIn("Admiral", said)
+        self.assertIn("Arcadia", said)
+
+    def test_you_are_recognised_by_rank(self):
+        self.state.commander = "CMDR Doc Hanover"
+        self.eoc.try_handle("tell me about the east orion company")
+        self.assertIn("Captain", self.said())
+        self.speech.said.clear()
+        self.eoc.try_handle("tell me about doc hanover")
+        self.assertIn("you", self.said().lower())
+
+    def test_rank_groups_and_counts(self):
+        self.eoc.try_handle("who are the fleet admirals")
+        self.assertIn("CurdNerd", self.said())
+        self.speech.said.clear()
+        self.eoc.try_handle("who are the captains")
+        self.assertIn("more", self.said())
+        self.speech.said.clear()
+        self.eoc.try_handle("how many members are in the eoc")
+        self.assertIn("59", self.said())
+
+    def test_the_ceo_is_also_the_admiral_of_the_fleet(self):
+        self.eoc.try_handle("who is ben can obi")
+        self.assertIn("Admiral of the Fleet", self.said())
+        self.assertIn("C E O", self.said())
 
 
 class ThroughSmallTalk(Base):

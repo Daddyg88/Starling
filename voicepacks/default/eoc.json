@@ -62,5 +62,31 @@
  ],
  "EOC_TourEnd": [
   "That's every company system I know about. The company keeps growing, so ask me again soon."
+ ],
+ "EOC_Pilot": [
+  "{name}. {rank} of the East Orion Company.",
+  "Commander {name}, {rank} in the company."
+ ],
+ "EOC_PilotYou": [
+  "That's you, Commander. {rank} of the East Orion Company.",
+  "{name} is you, {rank} of the company. I'd know that name anywhere."
+ ],
+ "EOC_PilotCEO": [
+  "And the C E O of the whole company."
+ ],
+ "EOC_PilotBuilt": [
+  "Built {titles}."
+ ],
+ "EOC_YouAre": [
+  "And you, Commander, are {rank} of the company.",
+  "You hold the rank of {rank} yourself, Commander."
+ ],
+ "EOC_Members": [
+  "The roster has {count} members across {ranks} ranks, from Admiral of the Fleet down to Cadet.",
+  "{count} members on the roster. That's a lot of Commanders to keep out of trouble."
+ ],
+ "EOC_RankList": [
+  "The {rank} are {names}{more}.",
+  "{count} of them: {names}{more}."
  ]
 }

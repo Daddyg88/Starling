@@ -26,6 +26,8 @@ OVERVIEW = re.compile(r"^(?:%s )?(?:the )?%s(?: company)?(?: again)?$|^%s (?:the
                       % (_ASK, _COMPANY, _ASK, _COMPANY, _COMPANY))
 CEO = re.compile(r"^who(?: is|s) (?:the )?(?:ceo|boss|owner|founder|head|chief)(?: of (?:the )?%s)?$|^who (?:runs|owns|founded|leads|is in charge of) (?:the )?%s$"
                  % (_COMPANY, _COMPANY))
+MEMBERS = re.compile(r"\bhow many (?:members|people|pilots|commanders|cmdrs)\b.*\b%s\b|\b%s\b.*\bhow many (?:members|people|pilots|commanders|cmdrs)\b|^how many (?:members|people|pilots) (?:do we have|are there|are in the company|are in the squadron|in the squadron)$" % (_COMPANY, _COMPANY))
+RANK_LIST = re.compile(r"^(?:who(?: is|s| are)|list|name|tell me about|show me) (?:all )?(?:the )?(?P<rank>[a-z ]+?)s?(?: in the (?:company|squadron|eoc))?$")
 LISTING = re.compile(r"\b%s\b.*\b(?:systems?|territory|empire|space|places|stations)\b|\b(?:systems?|stations)\b.*\b%s\b" % (_COMPANY, _COMPANY))
 ENTRY_LEAD = re.compile(r"^(?:%s|where(?: is|s)|show me|do you know|what do you know about|anything on) " % _ASK)
 
@@ -84,7 +86,7 @@ class EOCTeller:
         self.clock = clock
         self.rng = rng or random.Random()
         self.path = path or (paths.CONFIG_DIR / "eoc.json")
-        self.data = {"ceo": [], "pilots": [], "systems": [], "home": ""}
+        self.data = {"ceo": [], "pilots": [], "systems": [], "home": "", "ranks": []}
         self.last_told = None
         self.tour = 0                         # which system "tell me more" says next
         self.load()
@@ -98,6 +100,7 @@ class EOCTeller:
                 self.data["pilots"] = [p for p in data.get("pilots", []) if isinstance(p, dict) and p.get("name")]
                 self.data["systems"] = [s for s in data.get("systems", []) if isinstance(s, dict) and s.get("title")]
                 self.data["home"] = str(data.get("home") or "")
+                self.data["ranks"] = [str(r) for r in data.get("ranks", []) if r]
         except FileNotFoundError:
             pass
         except (OSError, ValueError):
@@ -130,6 +133,31 @@ class EOCTeller:
                     best, best_len = system, len(name)
         return best
 
+    def find_pilot(self, tidy):
+        """The roster member named in the sentence (longest name wins)."""
+        best, best_len = None, 0
+        for pilot in self.data["pilots"]:
+            name = clean(pilot.get("name"))
+            if len(name) >= 4 and re.search(r"\b%s\b" % re.escape(name), tidy) and len(name) > best_len:
+                best, best_len = pilot, len(name)
+        return best
+
+    def rank_of(self, name):
+        pilot = next((p for p in self.data["pilots"] if same_person(name, p.get("name"))), None)
+        return pilot.get("rank") if pilot else None
+
+    def rank_group(self, tidy):
+        """'who are the admirals' -> ('Admiral', [pilots]); None when it isn't a rank."""
+        match = RANK_LIST.match(tidy)
+        if not match:
+            return None
+        wanted = match.group("rank").strip()
+        for rank in sorted(self.data["ranks"], key=len, reverse=True):
+            low = clean(rank)
+            if wanted in (low, low + "s") or wanted == low.rstrip("s"):
+                return rank, [p for p in self.data["pilots"] if p.get("rank") == rank]
+        return None
+
     def home(self):
         return next((s for s in self.data["systems"] if s.get("id") == self.data["home"]), None) or (
             self.data["systems"][0] if self.data["systems"] else None)
@@ -151,9 +179,17 @@ class EOCTeller:
             return self.say_ceo()
         if OVERVIEW.match(tidy):
             return self.say_overview()
+        if MEMBERS.search(tidy):
+            return self.say_members()
+        group = self.rank_group(tidy)
+        if group is not None and group[1]:
+            return self.say_rank(*group)
         if LISTING.search(tidy) and re.match(r"^(?:which|what|list|name|how many|where|tell me|show me|give me|does|do)\b", tidy):
             return self.say_list()
         if ENTRY_LEAD.match(tidy):
+            pilot = self.find_pilot(tidy)
+            if pilot is not None:
+                return self.say_pilot(pilot)
             system = self.find_system(tidy)
             if system is not None:
                 return self.say_system(system)
@@ -196,6 +232,9 @@ class EOCTeller:
             parts.append(self._pick("EOC_Overview_CEO", values))
         else:
             parts.append(self._pick("EOC_Overview_Boss", values))
+        rank = self.rank_of(self.commander()) if self.commander() else None
+        if rank and not self.player_is_ceo():
+            parts.append(self._pick("EOC_YouAre", {"rank": rank}))
         parts.append(self._pick("EOC_TourOffer", values))
         text = "||".join(p for p in parts if p)
         return self._say(text) if text else None
@@ -226,6 +265,42 @@ class EOCTeller:
         if system.get("blurb"):
             parts.append(system["blurb"])
         text = "||".join(p for p in parts if p)
+        return self._say(text) if text else None
+
+    @staticmethod
+    def _spoken_name(pilot):
+        return pilot.get("say") or re.sub(r"\.$", "", str(pilot.get("name", "")))
+
+    def say_pilot(self, pilot):
+        built = [s for s in self.data["systems"] if same_person(pilot.get("name"), s.get("architect"))]
+        you = self.commander() and same_person(self.commander(), pilot.get("name"))
+        rank = pilot.get("rank") or "member"
+        ceo = any(same_person(pilot.get("name"), c) for c in self.data["ceo"])
+        parts = [self._pick("EOC_PilotYou" if you else "EOC_Pilot", {"name": self._spoken_name(pilot), "rank": rank})]
+        if ceo:
+            parts.append(self._pick("EOC_PilotCEO", {"name": self._spoken_name(pilot)}))
+        if built:
+            parts.append(self._pick("EOC_PilotBuilt", {"titles": " and ".join(s["title"] for s in built)}))
+            if built[0].get("blurb"):
+                parts.append(built[0]["blurb"])
+        text = "||".join(p for p in parts if p)
+        return self._say(text) if text else None
+
+    def say_members(self):
+        pilots = self.data["pilots"]
+        if not pilots:
+            return None
+        top = [p for p in pilots if p.get("rank") == (self.data["ranks"][0] if self.data["ranks"] else None)]
+        text = self._pick("EOC_Members", {"count": len(pilots), "ranks": len(self.data["ranks"])})
+        return self._say(text) if text else None
+
+    def say_rank(self, rank, pilots):
+        names = [self._spoken_name(p) for p in pilots]
+        shown = names[:8]
+        joined = ", ".join(shown[:-1]) + " and " + shown[-1] if len(shown) > 1 else shown[0]
+        extra = len(names) - len(shown)
+        text = self._pick("EOC_RankList", {"rank": rank + ("" if len(pilots) == 1 else "s"), "count": len(pilots), "names": joined,
+                                          "more": (", and %d more" % extra) if extra > 0 else ""})
         return self._say(text) if text else None
 
     def next(self):

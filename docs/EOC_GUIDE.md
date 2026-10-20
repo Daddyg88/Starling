@@ -9,6 +9,9 @@ She now knows the company: a massive organisation that owns whole star systems, 
 - "Tell me about Arcadia / Milliways / Payden's Haven / Rancid Roquefort / Winter Station..." - also works with station or builder names ("tell me about Curd Nerd", "the Pensioner Retreat").
 - If you built one of the systems she says so ("That one is yours, Commander").
 
+## The roster (0.20.1)
+She knows all 59 squadron members and their ranks (Admiral of the Fleet down to Cadet). Try: "who is Nyx Evera", "who are the admirals", "who are the fleet admirals", "how many members are in the EOC". If your Commander name is on the roster she tells you your own rank when you ask about the company.
+
 ## Where the facts are
 `config/eoc.json`. It holds the CEO list, the systems (name, game system, builder, other names, what she says, stations) and a `pilots` list for company Commanders she should recognise (empty for now; the list can be added there). Her framing words are in `voicepacks/default/eoc.json`.
 Updates replace this file, so send new systems to me and I will add them to the next release.
