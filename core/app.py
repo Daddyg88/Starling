@@ -318,6 +318,7 @@ class App:
                 self.bus, self.speech, self.dialogue, self.settings, book=BindingBook(), sender=KeySender(),
                 matcher=Matcher(learning=self.learning),
                 state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route(),
+                macro_hooks=self._macro_hooks(),
                 memory=self.memory_recall, smalltalk=self.smalltalk, brain=self.brain)
             # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
             self.commands.attach()

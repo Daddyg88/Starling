@@ -230,6 +230,14 @@ class AppWiring(unittest.TestCase):
                     self.assertIsNotNone(app.ensure_commands())
                 self.assertIsNotNone(app.route_follower)
                 self.assertIsNotNone(app.route_follower.auto_plot)
+                # the macro must really call the clipboard step first (it was never wired up before 0.23.3)
+                hook = app.commands.macro_hooks.get("plot_waypoint")
+                self.assertIsNotNone(hook)
+                copied = []
+                app.route_follower.copier = lambda text: copied.append(text) or True
+                app.route_voice.set_target("Wregoe JU-E c25-18")
+                self.assertEqual(hook(), (True, ""))
+                self.assertEqual(copied, ["Wregoe JU-E c25-18"])
             finally:
                 app.stop()
 

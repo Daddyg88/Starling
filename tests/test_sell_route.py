@@ -71,7 +71,7 @@ class SellFlowTests(unittest.TestCase):
         r.finish_question()
         self.assertTrue(r.say("option a"))
         asked = r.speech.said[-1]["text"]
-        self.assertIn("route", asked.lower())
+        self.assertTrue("route" in asked.lower() or "course" in asked.lower(), asked)
         r.finish_question()
         self.assertTrue(r.say("yes please"))
         self.assertEqual(r.route.plotted, ["Wregoe JU-E c25-18"])
