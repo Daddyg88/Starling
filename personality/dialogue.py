@@ -103,6 +103,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "eoc.json"))           # the East Orion Company: CEO, systems, tour
             self._merge(_read_json(self.pack_dir / "shopping.json"))      # she loves shopping (new ships, modules, stations)
             self._merge(_read_json(self.pack_dir / "mining.json"))        # mining callouts and price answers
+            self._merge(_read_json(self.pack_dir / "plans.json"))         # "What are we doing today?"
             self._merge(_read_json(self.pack_dir / "selling.json"))       # where to sell: options A and B, plot a route?
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
         elif self.pack_dir is not None:

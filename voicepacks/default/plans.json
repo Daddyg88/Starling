@@ -1,0 +1,93 @@
+{
+ "Plan_Ask": [
+  "What are we doing today?",
+  "So, Commander, what are we doing today?",
+  "Right then. What are we doing today?",
+  "What are we doing today, Commander?",
+  "Tell me, what are we doing today?",
+  "Okay, what are we doing today? Exploring, mining, fighting, trading, bio, or the Thargoids?"
+ ],
+ "Plan_Open": [
+  "Nothing planned? Lovely. We'll see where the stars take us.",
+  "No plan at all. I like it. Let's just fly.",
+  "Winging it, then. Fine by me, Commander."
+ ],
+ "Plan_Like_exploring": [
+  "Exploring! Yes! I've been itching to see something new.",
+  "Out into the dark, just the two of us. I'm in. Let's go exploring.",
+  "Exploring sounds perfect, Commander. I'm in just the right mood for it.",
+  "Oh, I'd love that. Somewhere nobody has been. Let's go.",
+  "Exploring today. Wonderful. I'll keep the scanner warm."
+ ],
+ "Plan_Like_mining": [
+  "Mining! Good. I'm in the mood for a bit of rock cracking.",
+  "Oh yes, mining. Let's go and find something shiny.",
+  "Mining sounds lovely today, Commander. Let's fill the hold.",
+  "I'm in the mood for it, actually. Let's go and mine.",
+  "Mining it is. I'll watch the prospector for you."
+ ],
+ "Plan_Like_combat": [
+  "A fight! Yes, I'm in the mood for some trouble. Let's go.",
+  "Combat today. Good. I could do with a little excitement.",
+  "Oh, I like that plan. Weapons hot, Commander.",
+  "Fighting it is. I'm feeling dangerous today.",
+  "Now you're talking. Let's go and find someone to shoot."
+ ],
+ "Plan_Like_trading": [
+  "Trading! Good plan. I like a full hold and a fat profit.",
+  "Hauling cargo today. I'm in the mood for it, Commander.",
+  "Trading it is. Let's make some credits.",
+  "Oh, sensible and profitable. I like it.",
+  "A trading day. Perfect. I'll watch the markets for you."
+ ],
+ "Plan_Like_exobiology": [
+  "Exobiology! Yes, I'm in the mood to meet some alien life.",
+  "Biology today. Lovely. Let's go and find something that grows.",
+  "Oh, I'd love to. Strange life on strange worlds.",
+  "Exobiology it is. I'll keep an eye out for the valuable ones.",
+  "Samples and scanners. I'm in just the right mood."
+ ],
+ "Plan_Like_antixeno": [
+  "The Thargoids! Yes. I'm in the mood to give them a bad day.",
+  "Anti-Xeno today. Brave, Commander, and I like it. Let's go.",
+  "Hunting Thargoids. I'm in. Keep your shields up.",
+  "Xeno hunting. Dangerous, and I love it.",
+  "Right, the Thargoids. I'm ready if you are."
+ ],
+ "Plan_Dislike_exploring": [
+  "Exploring? Honestly, I'm not in the mood for the empty dark today. But fine, we'll go anyway.",
+  "Oh. Exploring. I was hoping for something else. Still, we'll go anyway, Commander.",
+  "I'm not really feeling exploring today. But it's your ship, so we'll go anyway.",
+  "Exploring... I'd rather not, but I'll come along anyway. Don't expect me to be cheerful."
+ ],
+ "Plan_Dislike_mining": [
+  "Mining? Ugh. I'm really not in the mood for rocks today. But fine, we'll go anyway.",
+  "Oh, mining. I was hoping for anything else. We'll go anyway, Commander.",
+  "I'm not feeling mining today. But it's your ship, so we'll go anyway.",
+  "Mining... I'd rather not, but I'll come along anyway. Don't expect cheering."
+ ],
+ "Plan_Dislike_combat": [
+  "Combat? I'm really not in the mood for a fight today. But fine, we'll go anyway.",
+  "Oh. Fighting. I was hoping for something calmer. We'll go anyway, Commander.",
+  "I'm not feeling combat today. But it's your ship, so we'll go anyway.",
+  "A fight... I'd rather not, but I'll come along anyway. Try not to get us killed."
+ ],
+ "Plan_Dislike_trading": [
+  "Trading? Ugh. I'm really not in the mood for hauling cargo today. But fine, we'll go anyway.",
+  "Oh, trading. I was hoping for something more exciting. We'll go anyway, Commander.",
+  "I'm not feeling trading today. But it's your ship, so we'll go anyway.",
+  "Trading... I'd rather not, but I'll come along anyway. Don't expect me to enjoy it."
+ ],
+ "Plan_Dislike_exobiology": [
+  "Exobiology? I'm not in the mood for sampling plants today. But fine, we'll go anyway.",
+  "Oh. Biology. I was hoping for something else. We'll go anyway, Commander.",
+  "I'm not feeling exobiology today. But it's your ship, so we'll go anyway.",
+  "Samples and scanners... I'd rather not, but I'll come along anyway. Don't expect me to be thrilled."
+ ],
+ "Plan_Dislike_antixeno": [
+  "The Thargoids? I'm really not in the mood to be shot at by bugs today. But fine, we'll go anyway.",
+  "Oh. Anti-Xeno. I was hoping for something safer. We'll go anyway, Commander.",
+  "I'm not feeling the Thargoids today. But it's your ship, so we'll go anyway.",
+  "Xeno hunting... I'd rather not, but I'll come along anyway. Keep those shields up."
+ ]
+}

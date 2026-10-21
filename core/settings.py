@@ -29,6 +29,7 @@ DEFAULTS = {
             "wake_phrase": "", "require_wake": True, "reply": True, "energy_threshold": 0, "learning": True, "end_silence_ms": 550},
     "facts": {"frequency": "sometimes", "topics": "all"},
     "ask": {"scan_prompts": True, "bio_prompts": True, "answer_seconds": 10},
+    "plans": {"ask": True},
     "voidcompass": {"enabled": True, "port": 7380},
     "neutron": {"enabled": True, "destination": "", "jump_range": 0, "range_margin": 0.9, "efficiency": 60,
                 "supercharge": 4, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},

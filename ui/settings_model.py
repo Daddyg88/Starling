@@ -276,6 +276,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Changes the pet names and compliments she uses (handsome, beautiful...)"),
             Field("personality.login_greeting", "Greet me when I load the game", "toggle",
                   help="Says your ship, where you are, and how she feels"),
+            Field("plans.ask", "Ask me 'What are we doing today?'", "toggle",
+                  help="After the hello she asks. Say exploring, mining, combat, trading, exobiology or Thargoids. One of them she is not in the mood for"),
             Field("personality.style", "Style", "choice", STYLES,
                   help="Info only = no jokes, pet names or moods"),
             Field("personality.mood_mode", "Mood control", "choice", MOOD_MODES,

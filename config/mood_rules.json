@@ -101,6 +101,8 @@
     { "id": "fact_yes", "label": "Wanted to hear a fact", "event": "ask.fact_yes", "delta": 1, "category": "ask_fact_yes" },
     { "id": "fact_streak", "label": "Turned down her facts too often", "event": "ask.fact_streak", "delta": -1, "category": "ask_fact_no" },
     { "id": "fact_ignored", "label": "Ignored her offer of a fact", "event": "ask.fact_ignored", "delta": -1, "category": "ask_fact_ignored" },
+    { "id": "plan_liked", "label": "Chose an activity she was in the mood for", "event": "plan.liked", "delta": 1, "category": "ask_plan_like" },
+    { "id": "plan_disliked", "label": "Chose the activity she was not in the mood for", "event": "plan.disliked", "delta": -1, "category": "ask_plan_dislike" },
     { "id": "scan_yes", "label": "Agreed to scan a good planet", "event": "ask.scan_yes", "delta": 0.75, "category": "ask_scan_yes" },
     { "id": "scan_ignored", "label": "Ignored her about a good planet", "event": "ask.scan_ignored", "delta": -1, "category": "ask_scan_ignored" },
     { "id": "time_together", "label": "Time spent together", "event": "_time_together", "delta": 1, "category": "time_together" }

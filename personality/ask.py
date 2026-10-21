@@ -23,6 +23,7 @@ import random
 
 from core.identity import personalise
 from core.logger import get_logger
+from personality import plans
 from personality.answers import choose, classify, wants_a_fact
 from personality.mood_engine import effective_mood
 
@@ -68,6 +69,9 @@ class AskManager:
         self._asked_bodies = set()
         self._last_critical = None
         self.declines = 0                   # fact offers turned down or ignored in a row
+        self._plan_asked = False            # 'What are we doing today?' is asked once per login
+        self._midgame_tries = 0
+        self.today = None                   # the activity you chose today (exploring, mining, ...)
 
     # ---- wiring ----
     def attach(self):
@@ -127,6 +131,8 @@ class AskManager:
             if event.priority == "critical":
                 self._last_critical = self.clock()
                 self._drop_pending_quietly()        # a safety warning is more important than her question
+            elif name == "LoadGame":
+                self._logged_in()
             elif name == "FSDJump":
                 self._arrived()
             elif name == "StartJump":
@@ -247,6 +253,10 @@ class AskManager:
         self._cancel_timer("answer")
 
     def _speech_finished(self, data):
+        if data.get("event") == "login.greeting":
+            self._cancel_timer("plan_fallback")
+            self._start_timer("plan", 1.5, self.ask_plan)             # as soon as she has finished saying hello
+            return
         if data.get("event") != "ask.question":
             return
         with self._lock:
@@ -274,7 +284,10 @@ class AskManager:
         with self._lock:
             pending = self.pending if (self.pending and self.pending["open"]) else None
         if pending is not None:
-            answer = choose(spoken) if pending["kind"] == "choice" else classify(spoken)
+            if pending["kind"] == "plan":
+                answer = plans.topic_from(spoken)
+            else:
+                answer = choose(spoken) if pending["kind"] == "choice" else classify(spoken)
             if answer is not None:
                 with self._lock:
                     if self.pending is not pending:
@@ -292,6 +305,9 @@ class AskManager:
     def _finish(self, pending, answer):
         kind = pending["kind"]
         data = pending.get("data") or {}
+        if kind == "plan":
+            self._finish_plan(answer, data)
+            return
         if kind == "choice":
             self._finish_choice(answer, data)
             return
@@ -310,6 +326,63 @@ class AskManager:
             if self.rng.random() < 0.5:
                 self._say(self._line("Ask_Ignored", data), "ask.reply")
             self._publish("ask.scan_ignored", "Ignored a question about a planet")
+
+    # ---- "What are we doing today?" ----
+    def _logged_in(self):
+        self._plan_asked = False
+        self.today = None
+        self._cancel_timer("midgame")
+        self._start_timer("plan_fallback", 25.0, self.ask_plan)       # if she never says hello, ask anyway
+
+    def schedule_midgame(self, active_provider, delay=30.0):
+        """Starling started while you were already playing: there was no login, so ask a little after start-up."""
+        self._active_provider = active_provider
+
+        def check():
+            if self._plan_asked:
+                return
+            try:
+                active = bool(self._active_provider())
+            except Exception:
+                active = False
+            if not active:
+                return                                              # not in the game: the next login will ask
+            if not self.ask_plan() and not self._plan_asked and self._midgame_tries < 4:
+                self._midgame_tries += 1                              # ears or voice not ready yet: try again shortly
+                self._start_timer("midgame", 20.0, check)
+        self._start_timer("midgame", delay, check)
+
+    def ask_plan(self):
+        """Says 'What are we doing today?' and listens for an activity. Returns True if she asked."""
+        if not self.settings.get("plans.ask", True):
+            return False
+        with self._lock:
+            if self._plan_asked or self.pending is not None or not self._can_chat():
+                return False
+            if self._last_critical is not None and self.clock() - self._last_critical < SAFE_AFTER_CRITICAL_SECONDS:
+                return False
+        disliked = self.rng.choice(plans.TOPICS)                    # the ONE she is not in the mood for today
+        text = self._line("Plan_Ask")
+        if not text:
+            return False
+        self._plan_asked = True
+        self._ask_text("plan", text, {"disliked": disliked})
+        return True
+
+    def _finish_plan(self, answer, data):
+        topic = answer if answer in plans.TOPICS else None
+        values = {"activity": plans.SPOKEN.get(topic, "")}
+        if topic is None:
+            if answer == "none":
+                self._say(self._line("Plan_Open"), "ask.reply")
+            return                                                    # no answer in time: nothing said, no points
+        self.today = topic
+        if topic == data.get("disliked"):
+            self._say(self._line("Plan_Dislike_" + topic, values), "ask.reply")
+            self._publish("plan.disliked", "Chose %s when she was not in the mood" % plans.SPOKEN[topic])
+        else:
+            self._say(self._line("Plan_Like_" + topic, values), "ask.reply")
+            self._publish("plan.liked", "Chose %s and she was in the mood" % plans.SPOKEN[topic])
 
     # ---- where to sell: "A or B?" then "shall I plot a route?" ----
     @staticmethod

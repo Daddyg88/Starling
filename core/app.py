@@ -175,6 +175,7 @@ class App:
                               listening_provider=lambda: self.listener is not None and self.listener.ready.is_set(),
                               plot_provider=lambda system: self.plot_system_by_macro(system))
         self.ask.attach()
+        self.ask.schedule_midgame(self.game_is_active)       # started while already playing: ask after a moment
 
         # The Watcher (Void Compass's orb): she answers him, and makes him wait for a calm moment.
         self.start_watcher_bridge()
