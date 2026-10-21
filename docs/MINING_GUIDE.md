@@ -61,3 +61,15 @@ Answer "A", "option b", "the second one", "bravo" (or "neither"). A plain "yes" 
 She then asks "Would you like me to plot a route for you?". Say yes and she plots a neutron route to that system and the
 auto neutron macro carries on as usual (needs the Navigation page's neutron plotter switched on). Saying nothing just drops it.
 Buying ("where can I buy ...") keeps its old, gentler search. The sentences are in `voicepacks/default/selling.json`.
+
+
+## Nearest or best (0.23.1)
+
+The same sentence can ask for two different things:
+
+- **Best** (the default): "where can I sell this platinum for the best price" gives the highest price to sell, or the lowest price to buy.
+- **Nearest**: any of "nearest", "closest", "nearby", "close by", "near here", "quickest" in the sentence, for example
+  "where is the nearest place to sell this" or "where can I buy tritium nearby". The closest two come first and she says how far away each is.
+  For selling, "nearest" still needs large pads and prices from the last day, but accepts stations wanting only 100 tons (`NEAREST_MIN_DEMAND` in `mining/prices.py`).
+
+Buying now works like selling: Option A and Option B (price, tons in stock, station, system, distance), then "A or B?" and the offer to plot a neutron route.

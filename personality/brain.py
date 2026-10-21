@@ -222,6 +222,11 @@ class Brain:
         values = {"total": tracker.total(), "best_text": tracker.best_text()}
         return self._say_pool("Brain_Mined", values, remember=True)
 
+    @staticmethod
+    def _order(tidy):
+        """'nearest' when she was asked for the closest place, otherwise 'best' (highest to sell, cheapest to buy)."""
+        return "nearest" if re.search(r"\b(nearest|closest|near|nearby|close by|around here|local|handy|quickest)\b", tidy) else "best"
+
     def _do_sellprice(self, item, found, tidy):
         """'Where should I sell the platinum?' Looks up the best nearby buyers in the background and says the answer."""
         if self.prices is None or not self.prices.enabled():
@@ -235,9 +240,11 @@ class Brain:
         material = minerals.spoken(commodity)
         first = self._say_pool("Price_Looking", {}, remember=False)
 
+        order = self._order(tidy)
+
         def done(results, ok):
-            self._say_prices(material, results, ok)
-        self.prices.lookup_async(system, commodity, done)
+            self._say_prices(material, results, ok, order)
+        self.prices.lookup_async(system, commodity, done, order=order)
         return first
 
     @staticmethod
@@ -265,14 +272,20 @@ class Brain:
         if not system:
             return self._say_pool("Price_NoSystem", {}, remember=False)
         first = self._say_pool("Buy_Looking", {}, remember=False)
-        self.prices.lookup_async(system, commodity, lambda results, ok: self._say_buy(material, results, ok), mode="buy")
+        order = self._order(tidy)
+        self.prices.lookup_async(system, commodity, lambda results, ok: self._say_buy(material, results, ok, order),
+                                 mode="buy", order=order)
         return first
 
-    def _say_buy(self, material, results, ok):
+    def _say_buy(self, material, results, ok, order="best"):
         if not ok:
             return self._say_pool("Price_Offline", {})
         if not results:
             return self._say_pool("Buy_None", {"Material": material})
+        if self.ask is not None and hasattr(self.ask, "offer_sale"):
+            said = self.ask.offer_sale(material, results[:2], order, "buy")
+            if said:
+                return said
         best = results[0]
         values = {"Material": material, "Price": "{:,}".format(best["price"]), "Station": best["station"],
                   "Where": self._where(best), "Stock": "{:,}".format(best.get("stock") or 0)}
@@ -296,13 +309,13 @@ class Brain:
             return "in %s, %s light years away" % (result["system"], int(round(distance)))
         return "in %s" % result["system"]
 
-    def _say_prices(self, material, results, ok):
+    def _say_prices(self, material, results, ok, order="best"):
         if not ok:
             return self._say_pool("Price_Offline", {})
         if not results:
             return self._say_pool("Price_None", {"Material": material})
         if self.ask is not None and hasattr(self.ask, "offer_sale"):
-            said = self.ask.offer_sale(material, results[:2])
+            said = self.ask.offer_sale(material, results[:2], order, "sell")
             if said:
                 return said
         best = results[0]

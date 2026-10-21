@@ -314,22 +314,30 @@ class AskManager:
     # ---- where to sell: "A or B?" then "shall I plot a route?" ----
     @staticmethod
     def _option_values(option, suffix=""):
-        return {"Price" + suffix: "{:,}".format(option["price"]), "Tons" + suffix: "{:,}".format(int(option.get("demand") or 0)),
-                "Station" + suffix: option["station"], "System" + suffix: option["system"]}
+        tons = option.get("tons")
+        if tons is None:
+            tons = option.get("demand") or option.get("stock") or 0
+        distance = option.get("distance")
+        away = ("%d light years away" % int(round(distance))) if isinstance(distance, (int, float)) and distance >= 0.5 \
+            else "right here in this system"
+        return {"Price" + suffix: "{:,}".format(option["price"]), "Tons" + suffix: "{:,}".format(int(tons)),
+                "Station" + suffix: option["station"], "System" + suffix: option["system"], "Away" + suffix: away}
 
-    def offer_sale(self, material, options):
-        """She has found places to sell. Says the best two (A and B) with price, tonnage and station, then asks which.
+    def offer_sale(self, material, options, order="best", mode="sell"):
+        """She has found places to sell (or buy; mode="buy"). Says the best two (A and B) with price, tonnage and station, then asks which.
         Returns the words said (for the log). With one option she goes straight to asking about the route."""
         options = list(options or [])[:2]
         if not options:
             return None
         values = {"Material": material}
         values.update(self._option_values(options[0]))
+        side = "Buy" if mode == "buy" else "Sell"
+        near = order == "nearest"
         if len(options) > 1:
             values.update(self._option_values(options[1], "2"))
-            head = self._line("Sell_Options", values)
+            head = self._line("%s_%sOptions" % (side, "Near" if near else ""), values)
         else:
-            head = self._line("Sell_OneOption", values)
+            head = self._line("Sell_NearOne" if near and side == "Sell" else "%s_OneOption" % side, values)
         if not head:
             return None
         can_answer = self._can_chat()

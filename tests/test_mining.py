@@ -223,6 +223,35 @@ class BrainMiningTests(Base):
         self.assertNotIn("Low Outpost", said)          # medium pad: not offered
         self.assertNotIn("Hungry Little", said)        # only wants 400 tons: not offered
 
+    def test_nearest_sorts_by_distance_and_relaxes_demand(self):
+        self.reply = [
+            {"stationName": "Far Rich", "systemName": "Far", "sellPrice": 400000, "demand": 5000, "maxLandingPadSize": 3, "distance": 300},
+            {"stationName": "Close Small", "systemName": "Near", "sellPrice": 200000, "demand": 150, "maxLandingPadSize": 3, "distance": 5},
+            {"stationName": "Close Medium", "systemName": "Near", "sellPrice": 900000, "demand": 5000, "maxLandingPadSize": 2, "distance": 1},
+        ]
+        self.ask("where is the nearest place to sell this platinum")
+        self.assertIn("minVolume=100", self.fetched[0])
+        said = " ".join(self.spoken())
+        self.assertLess(said.index("Close Small"), said.index("Far Rich"))
+        self.assertNotIn("Close Medium", said)
+        self.fetched.clear()
+        self.ask("where can i sell this platinum for the best price")
+        self.assertIn("minVolume=1000", self.fetched[0])
+
+    def test_nearest_buy_uses_distance_best_buy_uses_price(self):
+        self.reply = [
+            {"stationName": "Cheap Far", "systemName": "Far", "buyPrice": 100, "stock": 500, "distance": 90},
+            {"stationName": "Dear Near", "systemName": "Near", "buyPrice": 500, "stock": 500, "distance": 3},
+        ]
+        self.ask("where is the nearest place to buy tritium")
+        said = " ".join(self.spoken())
+        self.assertLess(said.index("Dear Near"), said.index("Cheap Far"))
+        self.speech.said.clear()
+        self.finder._cache.clear()
+        self.ask("where can i buy tritium")
+        said = " ".join(self.spoken())
+        self.assertLess(said.index("Cheap Far"), said.index("Dear Near"))
+
     def test_uses_what_you_mined_when_no_name_is_given(self):
         self.tracker.on_event(ev("MiningRefined", Commodity="painite", Material="Painite"))
         self.ask("where should i sell this")

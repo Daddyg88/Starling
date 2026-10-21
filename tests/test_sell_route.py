@@ -114,11 +114,51 @@ class SellFlowTests(unittest.TestCase):
         self.assertIsNone(r.ask.pending)
         self.assertIn("Smith Port", r.speech.said[-1]["text"])
 
+    def test_nearest_options_are_spoken_with_the_distance(self):
+        r = self.make()
+        r.ask.offer_sale("Platinum", OPTIONS, "nearest", "sell")
+        said = r.speech.said[-1]["text"]
+        self.assertIn("12 light years", said)
+        self.assertIn("40 light years", said)
+
+    def test_buying_gets_the_same_a_or_b_and_route_offer(self):
+        r = self.make()
+        buy = [{"station": "Shop One", "system": "Sol", "price": 100, "stock": 700, "tons": 700, "distance": 2.0},
+               {"station": "Shop Two", "system": "Alpha", "price": 120, "stock": 300, "tons": 300, "distance": 9.0}]
+        r.ask.offer_sale("Tritium", buy, "best", "buy")
+        said = r.speech.said[-1]["text"]
+        for part in ("Shop One", "700", "Shop Two", "300"):
+            self.assertIn(part, said)
+        r.finish_question()
+        r.say("b")
+        r.finish_question()
+        r.say("yes")
+        self.assertEqual(r.route.plotted, ["Alpha"])
+
+    def test_the_questions_are_understood(self):
+        from personality.brain import Brain
+        import json
+        from core import paths
+        intents = json.load(open(paths.CONFIG_DIR / "brain_intents.json", encoding="utf-8"))["intents"]
+        import re
+        def kind(sentence):
+            for item in intents:
+                if any(re.search(p, sentence) for p in item["patterns"]):
+                    return item.get("kind", "line")
+        for sentence in ("where can i sell this platinum for the best price", "where is the nearest place to sell this",
+                         "where is the closest place to sell this platinum", "where can i sell this near here"):
+            self.assertEqual(kind(sentence), "sellprice", sentence)
+        for sentence in ("where can i buy tritium", "where is the nearest place to buy tritium", "where can i buy tritium nearby",
+                         "where is the cheapest place to buy tritium"):
+            self.assertEqual(kind(sentence), "buyprice", sentence)
+        self.assertEqual(Brain._order("where is the nearest place to sell this"), "nearest")
+        self.assertEqual(Brain._order("where can i sell this for the best price"), "best")
+
     def test_the_lines_have_variety(self):
         from personality.dialogue import DialogueManager
         from core import paths
         d = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
-        for key, minimum in (("Sell_Options", 6), ("Sell_WhichOne", 6), ("Sell_RouteAsk", 6), ("Sell_RouteYes", 6), ("Sell_RouteNo", 5)):
+        for key, minimum in (("Sell_Options", 6), ("Sell_WhichOne", 6), ("Sell_RouteAsk", 6), ("Sell_RouteYes", 6), ("Sell_RouteNo", 5), ("Sell_NearOptions", 5), ("Buy_Options", 5), ("Buy_NearOptions", 4)):
             self.assertGreaterEqual(len(d.lines.get(key, [])), minimum, key)
 
 

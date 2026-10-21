@@ -31,14 +31,22 @@ SELL_MIN_DEMAND = 1000        # the station must want at least this many tons
 BUY_RANGE_LY = 100
 BUY_MAX_AGE_DAYS = 7
 BUY_MIN_STOCK = 50
+# "Where is the NEAREST place to sell?": same large pads and fresh prices, but a smaller appetite is fine.
+NEAREST_MIN_DEMAND = 100
 
 
-def build_url(system, commodity, max_distance=None, max_age_days=None, min_demand=None, mode="sell"):
+def min_demand_for(mode="sell", order="best"):
+    if mode == "buy":
+        return BUY_MIN_STOCK
+    return NEAREST_MIN_DEMAND if order == "nearest" else SELL_MIN_DEMAND
+
+
+def build_url(system, commodity, max_distance=None, max_age_days=None, min_demand=None, mode="sell", order="best"):
     """mode "sell" = places that BUY from you (Ardent calls them imports), "buy" = places that SELL to you (exports)."""
     selling = mode != "buy"
     max_distance = max_distance if max_distance is not None else (SELL_RANGE_LY if selling else BUY_RANGE_LY)
     max_age_days = max_age_days if max_age_days is not None else (SELL_MAX_AGE_DAYS if selling else BUY_MAX_AGE_DAYS)
-    min_demand = min_demand if min_demand is not None else (SELL_MIN_DEMAND if selling else BUY_MIN_STOCK)
+    min_demand = min_demand if min_demand is not None else min_demand_for(mode, order)
     return "%s/system/name/%s/commodity/name/%s/nearby/%s?%s" % (
         BASE_URL, urllib.parse.quote(str(system), safe=""), urllib.parse.quote(str(commodity), safe=""),
         "exports" if mode == "buy" else "imports",
@@ -46,7 +54,7 @@ def build_url(system, commodity, max_distance=None, max_age_days=None, min_deman
                                 "fleetCarriers": "false", "maxDistance": int(max_distance)}))
 
 
-def parse(raw, limit=3, mode="sell", large_only=None):
+def parse(raw, limit=3, mode="sell", large_only=None, order="best"):
     """Ardent's reply (a list of markets) -> clean results, best price first. Never raises; junk is skipped."""
     if isinstance(raw, dict):
         for key in ("results", "data", "markets"):
@@ -78,13 +86,19 @@ def parse(raw, limit=3, mode="sell", large_only=None):
         pad = item.get("maxLandingPadSize")
         if large_only and pad != 3 and str(pad).lower() != "large":
             continue
-        if mode != "buy" and isinstance(item.get("demand"), (int, float)) and item["demand"] < SELL_MIN_DEMAND:
+        if mode != "buy" and isinstance(item.get("demand"), (int, float)) and item["demand"] < min_demand_for(mode, order):
             continue                                    # double-check: the service's own filter is not trusted blindly
         found.append({"station": str(station), "system": str(system), "price": int(price),
                       "demand": item.get("demand") if isinstance(item.get("demand"), (int, float)) else None,
                       "stock": int(stock) if isinstance(stock, (int, float)) else None,
-                      "distance": distance, "pad": PAD_NAMES.get(pad, str(pad).lower() if isinstance(pad, str) else "")})
-    found.sort(key=lambda r: r["price"] if mode == "buy" else -r["price"])
+                      "distance": distance, "tons": (int(stock) if buying and isinstance(stock, (int, float)) else
+                                                     (int(item["demand"]) if isinstance(item.get("demand"), (int, float)) else 0)),
+                      "pad": PAD_NAMES.get(pad, str(pad).lower() if isinstance(pad, str) else "")})
+    if order == "nearest":
+        found.sort(key=lambda r: (r["distance"] is None, r["distance"] if r["distance"] is not None else 0,
+                                  r["price"] if mode == "buy" else -r["price"]))
+    else:
+        found.sort(key=lambda r: r["price"] if mode == "buy" else -r["price"])
     return found[:limit]
 
 
@@ -107,34 +121,34 @@ class PriceFinder:
     def enabled(self):
         return self.settings is None or bool(self.settings.get("mining.prices", True))
 
-    def lookup(self, system, commodity, mode="sell"):
+    def lookup(self, system, commodity, mode="sell", order="best"):
         """(results, ok). ok is False when the service could not be reached. Blocking: call from a thread."""
-        key = (str(system).lower(), str(commodity).lower(), mode)
+        key = (str(system).lower(), str(commodity).lower(), mode, order)
         now = self.clock()
         with self._lock:
             cached = self._cache.get(key)
             if cached and now - cached[0] < CACHE_SECONDS:
                 return cached[1], True
         try:
-            raw = self.fetch(build_url(system, commodity, mode=mode))
+            raw = self.fetch(build_url(system, commodity, mode=mode, order=order))
         except (urllib.error.URLError, OSError, ValueError, TimeoutError) as error:
             log.warning("Price lookup failed (%s)", error)
             return [], False
         except Exception:
             log.exception("Price lookup crashed")
             return [], False
-        results = parse(raw, mode=mode)
+        results = parse(raw, mode=mode, order=order)
         with self._lock:
             self._cache[key] = (now, results)
         return results, True
 
-    def lookup_async(self, system, commodity, done, mode="sell"):
+    def lookup_async(self, system, commodity, done, mode="sell", order="best"):
         """Run lookup() in the background and call done(results, ok) when it finishes."""
         def work():
             try:
-                results, ok = self.lookup(system, commodity, mode)
+                results, ok = self.lookup(system, commodity, mode, order)
                 if ok and not results and commodity.endswith("s") and len(commodity) > 4:
-                    results, ok = self.lookup(system, commodity[:-1], mode)          # "diamonds" -> "diamond"
+                    results, ok = self.lookup(system, commodity[:-1], mode, order)          # "diamonds" -> "diamond"
             except Exception:
                 log.exception("Price lookup crashed")
                 results, ok = [], False
