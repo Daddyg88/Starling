@@ -264,6 +264,21 @@ class AnalysisModeTests(Base):
         self.clock.now += 2.0
         self.assertEqual(self.assist.poll_once(), "down")
 
+    def test_x52_trigger_stages_always_count_as_fire_one_and_two(self):
+        from control import inputs
+        stick = inputs.JoyDevice(index=0, vendor=0x06A3, product=0x075C, name="Saitek X52", buttons=32)
+        self.reader.x52_devices = lambda: [stick]
+        self.assist.book = SimpleNamespace(slots=lambda action: [], lookup=self.assist.book.lookup)     # Elite names no fire buttons at all
+        specs = self.assist.fire_buttons()
+        self.assertIn(inputs.joy_spec(stick, 1), specs)
+        self.assertIn(inputs.joy_spec(stick, 2), specs)
+        self.state.status_flags = 1 << 27                       # analysis mode
+        self.reader.down.add(inputs.joy_spec(stick, 2))
+        self.assertEqual(self.assist.poll_once(), "up")
+        self.settings.values["combat_assist.x52_trigger"] = False
+        self.assist._specs_at = -999.0
+        self.assertNotIn(inputs.joy_spec(stick, 1), self.assist.fire_buttons())
+
     def test_hardpoints_do_not_get_the_top_up(self):
         self.reader.down.add("key:Space")
         self.assist.poll_once()

@@ -198,6 +198,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="While your hardpoints are out she puts the pips in weapons when you hold a fire button, and back to systems and engines when you let go. Uses your Primary/Secondary fire buttons from Elite"),
             Field("combat_assist.pips_analysis", "Combat: also in analysis mode (mining lasers)", "toggle",
                   help="The same pips to weapons while you hold a fire button, but when the cockpit is in analysis mode instead of hardpoints out"),
+            Field("combat_assist.x52_trigger", "X52 trigger counts as fire 1 and 2", "toggle",
+                  help="Buttons 1 and 2 of your X52 stick (both trigger stages) always send pips to weapons, even if Elite's controls do not list them"),
             Field("combat_assist.heat_sink", "Combat: deploy a heat sink when overheating", "toggle",
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
         ]),

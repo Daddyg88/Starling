@@ -37,7 +37,7 @@ DEFAULTS = {
     "watcher": {"enabled": True, "reply": "often", "wait_for_calm": True},
     "autohonk": {"mode": "off", "hold_seconds": 6.0, "delay_seconds": 2.0},
     "combat_assist": {"pips": True, "pips_analysis": True, "heat_sink": True,
-                      "pips_delay": 1.2, "pips_delay_analysis": 3.0, "pips_topup_seconds": 8.0, "pips_press_gap": 0.1, "fire_buttons": ""},
+                      "pips_delay": 1.2, "pips_delay_analysis": 3.0, "pips_topup_seconds": 8.0, "pips_press_gap": 0.1, "x52_trigger": True, "fire_buttons": ""},
     "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "disabled": []},
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True},

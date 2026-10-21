@@ -5,6 +5,7 @@ All three only press the keys YOU bound in Elite (same rules as voice commands: 
 and the action needs a KEYBOARD key as well as any joystick button).
 
 Auto pips
+    An X52 stick's buttons 1 and 2 (the two trigger stages) always count as fire buttons (setting combat_assist.x52_trigger).
     While your hardpoints are out (or you are in analysis mode, for mining lasers) and you HOLD a fire button, she moves the power pips to weapons.
     When you let go (and stay off the button for a moment) she resets and sends pips to systems and engines.
     She finds your fire buttons from Elite's controls file (Primary fire and Secondary fire): keyboard keys, and
@@ -183,12 +184,23 @@ class CombatAssist:
             except Exception:
                 log.exception("Could not work out your fire buttons")
                 found = []
+            if self.option("x52_trigger", True):
+                found += self._x52_trigger_buttons()
             self._specs = list(dict.fromkeys(found + list(extra)))
             self._specs_at = now
             if self._specs != self._logged_specs:
                 self._logged_specs = list(self._specs)
                 log.info("Combat assist watches these fire buttons: %s", ", ".join(self._specs) or "NONE (check Primary/Secondary fire in Elite's controls)")
         return self._specs
+
+    def _x52_trigger_buttons(self):
+        """Buttons 1 and 2 of an X52 stick are the two stages of the trigger (fire 1 and fire 2). They count as firing even when
+        Elite's controls file does not name them, so the pips still follow your trigger in analysis mode too."""
+        try:
+            return [inputs.joy_spec(stick, button) for stick in self.reader.x52_devices() for button in (1, 2)]
+        except Exception:
+            log.exception("Could not look for the X52 trigger")
+            return []
 
     def firing(self):
         return any(self.reader.is_down(spec) for spec in self.fire_buttons())
