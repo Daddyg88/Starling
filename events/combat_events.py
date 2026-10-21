@@ -3,6 +3,8 @@ Fighting events: wings, other pilots, interdictions, suit loadouts.
 Their words live in voicepacks/default/combat.json. Several small events share this one file.
 """
 
+import re
+
 from core.event_bus import NORMAL
 from core.ships import ship_name
 from events.base_event import BaseEvent
@@ -32,6 +34,18 @@ def _handle_interdiction(self, entry):
             "Interdicted": entry.get("Interdicted") or "", "Submitted": bool(entry.get("Submitted"))}
 
 
+THARGOID_NAMES = ("scout", "cyclops", "basilisk", "medusa", "hydra", "orthrus", "glaive", "titan")
+
+
+def _is_thargoid(entry):
+    """A Thargoid ship (Anti-Xeno). The game calls them scout, cyclops, basilisk, medusa, hydra, orthrus..."""
+    raw = str(entry.get("Ship") or "").lower().strip("$;")
+    local = str(entry.get("Ship_Localised") or "").lower()
+    if "thargoid" in raw or "thargoid" in local:
+        return True
+    return raw in THARGOID_NAMES or re.match(r"^scout(_|$)", raw) is not None or local in THARGOID_NAMES
+
+
 def _target_update(self, entry, state):
     """Decide what (if anything) is worth saying about the ship you just targeted or scanned."""
     ship = entry.get("Ship_Localised") or entry.get("Ship") or ""
@@ -46,10 +60,12 @@ def _target_update(self, entry, state):
     fighting = bool(flags is not None and (flags >> 6) & 1)               # hardpoints out
     if target != self._seen:
         self._seen, self._bounty_told = target, None
-        if fighting:
+        if _is_thargoid(entry):
+            pending = "thargoid"                                         # always worth a word, hardpoints or not
+        elif fighting:
             pending = "ship"
     wanted = "wanted" in str(entry.get("LegalStatus", "")).lower()
-    if stage >= 3 and self._bounty_told != target and (wanted or entry.get("Bounty")):
+    if stage >= 3 and self._bounty_told != target and (wanted or entry.get("Bounty")) and pending != "thargoid":
         self._bounty_told = target
         pending = "bounty" if entry.get("Bounty") else "wanted"
     self._pending = pending

@@ -196,5 +196,31 @@
    "text": "It's getting fucking hot in here. Heat sink out.",
    "mature": true
   }
+ ],
+ "ShipTargeted_Thargoid": [
+  "Thargoid! {Ship}.||Stay sharp, Commander.",
+  "{Ship}. That's a Thargoid. Careful.",
+  "Thargoid contact.||{Ship}.",
+  "Locked on.||{Ship}. Thargoid. Be careful.",
+  "{Ship}. Weapons ready, Commander.",
+  "That's a {Ship}.||Thargoid. Don't let it near us.",
+  "Thargoid ship in sight.||{Ship}.",
+  "Contact.||{Ship}. Xeno."
+ ],
+ "ShipTargeted_Thargoid_Friendly": [
+  "A {Ship}, Commander. Thargoid. We can do this."
+ ],
+ "ShipTargeted_Thargoid_Close": [
+  "A {Ship}. Please stay safe. I'd miss you."
+ ],
+ "ShipTargeted_Thargoid_Sarcastic": [
+  "A {Ship}. Thargoid. Try not to die.",
+  {
+   "text": "A {Ship}. Fucking Thargoid. Brilliant.",
+   "mature": true
+  }
+ ],
+ "ShipTargeted_Thargoid_Frustrated": [
+  "{Ship}. Thargoid. Shoot it."
  ]
 }

@@ -482,7 +482,9 @@ class ZipHygieneTests(unittest.TestCase):
         from ui.settings_model import build_pages
         page = next(p for p in build_pages() if p.id == "chat")
         keys = {f.key for f in page.fields}
-        self.assertTrue({"facts.frequency", "facts.topics", "ask.scan_prompts", "ask.bio_prompts"} <= keys)
+        self.assertTrue({"facts.frequency", "facts.topics"} <= keys)
+        everywhere = {f.key for p in build_pages() for f in p.fields}
+        self.assertTrue({"ask.scan_prompts", "ask.bio_prompts"} <= everywhere)       # they now live on the Exploration and Exobiology tabs
         freq = next(f for f in page.fields if f.key == "facts.frequency")
         self.assertEqual([v for _l, v in freq.choices], ["off", "rarely", "sometimes", "often", "very_often"])
 

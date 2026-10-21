@@ -17,7 +17,7 @@ from core.logger import get_logger
 from personality.mood_engine import effective_mood
 from core import paths
 from core.identity import personalise
-from personality import line_keys
+from personality import categories, line_keys
 
 log = get_logger("speaker")
 
@@ -72,6 +72,8 @@ class EventSpeaker:
             return
         if self.echo is not None and self.echo.consume(event):
             return          # she has just told you she did this herself
+        if not categories.allowed(event, self.settings):
+            return          # that dashboard tab's "She comments on ..." switch is off (safety warnings are never affected)
 
         if event.name == "LoadGame" and self.settings.get("personality.login_greeting", True):
             return          # the login greeting (personality/greeter.py) says hello instead

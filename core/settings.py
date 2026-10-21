@@ -40,6 +40,7 @@ DEFAULTS = {
     "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "disabled": []},
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True},
+    "talk": {"combat": True, "exploration": True, "exobiology": True, "mining": True, "trading": True, "antixeno": True},
     "mining": {"prices": True, "chatter": "normal",
                "fav1": "platinum", "fav2": "painite", "fav3": "opal", "fav4": "lowtemperaturediamond", "fav5": "monazite",
                "fav6": "musgravite", "fav7": "serendibite", "fav8": "grandidierite", "fav9": "alexandrite", "fav10": "rhodplumsite"},

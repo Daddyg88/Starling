@@ -54,7 +54,7 @@ def _keys_for(event):
         said = data.get("Announce")
         if said is None:                                  # older style data: only a wanted ship is worth a word
             return ["ShipTargeted_Wanted"] if "wanted" in str(data.get("LegalStatus", "")).lower() else []
-        return {"ship": ["ShipTargeted_Ship"], "bounty": ["ShipTargeted_Bounty", "ShipTargeted_Wanted"],
+        return {"thargoid": ["ShipTargeted_Thargoid"], "ship": ["ShipTargeted_Ship"], "bounty": ["ShipTargeted_Bounty", "ShipTargeted_Wanted"],
                 "wanted": ["ShipTargeted_Wanted"]}.get(said, [])
 
     if name == "ProspectedAsteroid":

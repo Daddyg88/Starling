@@ -1,0 +1,13 @@
+{
+  "_help": "Which of her spoken events belong to which dashboard tab (Combat, Exploration, Exobiology, Mining, Trading, Anti-Xeno). Each tab has a 'She comments on ...' switch; when it is off she stays quiet about that tab's events. Safety warnings (critical events) are NEVER silenced by these switches. An event that is not listed here is always allowed.",
+  "combat": ["Bounty", "FactionKillBond", "CapShipBond", "PVPKill", "ShipTargeted", "Interdiction", "EscapeInterdiction", "CombatModeOn",
+             "HardpointsDeployed", "HardpointsRetracted", "FighterDestroyed", "FighterRebuilt", "LaunchFighter", "DockFighter",
+             "WingInvite", "WingAdd", "WingJoined", "WingLeft", "CommitCrime", "PayFines", "PayBounties", "RedeemVoucher"],
+  "exploration": ["FSSDiscoveryScan", "FSSSignalDiscovered", "FSSAllBodiesFound", "FSSBodySignals", "DiscoveryScan", "Scan",
+                  "SAAScanComplete", "SAASignalsFound", "CodexEntry", "SellExplorationData", "MultiSellExplorationData",
+                  "FuelScoop", "FuelScoopComplete", "JetConeBoost", "MaterialCollected", "AnalysisModeOn"],
+  "exobiology": ["ScanOrganic", "SellOrganicData"],
+  "mining": ["ProspectedAsteroid", "MiningRefined", "AsteroidCracked", "LaunchDrone", "BuyDrones", "CollectCargo", "EjectCargo"],
+  "trading": ["MarketBuy", "MarketSell", "ShipyardBuy", "ModuleBuy"],
+  "antixeno": []
+}
