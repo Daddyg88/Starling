@@ -103,6 +103,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "eoc.json"))           # the East Orion Company: CEO, systems, tour
             self._merge(_read_json(self.pack_dir / "shopping.json"))      # she loves shopping (new ships, modules, stations)
             self._merge(_read_json(self.pack_dir / "mining.json"))        # mining callouts and price answers
+            self._merge(_read_json(self.pack_dir / "mining2.json"))       # more mining lines (less repetition)
             self._merge(_read_json(self.pack_dir / "plans.json"))         # "What are we doing today?"
             self._merge(_read_json(self.pack_dir / "selling.json"))       # where to sell: options A and B, plot a route?
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
@@ -163,7 +164,10 @@ class DialogueManager:
         found = self.pool(key, mood, allow_mature, prefer_recorded)
         if not found:
             return None
-        recent = self._recent.setdefault(key, deque(maxlen=3))
+        size = max(3, min(12, len(found) // 2))              # big pools remember more, so a line is not heard again soon
+        recent = self._recent.get(key)
+        if recent is None or recent.maxlen != size:
+            recent = self._recent[key] = deque(recent or (), maxlen=size)
         fresh = [line for line in found if line not in recent] or found
         choice = self.rng.choice(fresh)
         recent.append(choice)

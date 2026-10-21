@@ -85,7 +85,8 @@ class MiningRefined(BaseEvent):
     priority = LOW
     summary = "Refined {Material}"
 
-    STEPS = {"quiet": (10, 20, 50, 0.0), "normal": (5, 10, 25, 0.12), "chatty": (3, 5, 10, 0.3)}     # top, good, total, chance
+    # top, good, total, cheer chance, chance of a small remark about an ordinary mineral
+    STEPS = {"quiet": (10, 20, 50, 0.0, 0.0), "normal": (5, 10, 25, 0.16, 0.05), "chatty": (3, 5, 10, 0.3, 0.14)}
 
     def __init__(self):
         self.reset()
@@ -106,7 +107,7 @@ class MiningRefined(BaseEvent):
         self.counts[key] = self.counts.get(key, 0) + 1
         self.total += 1
         count = self.counts[key]
-        top_step, good_step, total_step, chance = self.STEPS.get(minerals.option("chatter", "normal"), self.STEPS["normal"])
+        top_step, good_step, total_step, chance, plain = self.STEPS.get(minerals.option("chatter", "normal"), self.STEPS["normal"])
         say = ""
         if tier != "low" and count == 1:
             say = "first"
@@ -116,8 +117,12 @@ class MiningRefined(BaseEvent):
             say = "milestone"
         elif tier == "top" and chance and self.rng.random() < chance:
             say = "cheer"
+        elif tier == "good" and chance and self.rng.random() < chance * 0.6:
+            say = "cheer"
         elif total_step and self.total % total_step == 0:
             say = "total"
+        elif tier == "low" and plain and self.rng.random() < plain:
+            say = "plain"
         return {"Material": minerals.spoken(kind, entry.get("Type_Localised")), "Commodity": key, "Tier": tier,
                 "Count": count, "Total": self.total, "Announce": say}
 
@@ -131,9 +136,20 @@ class AsteroidCracked(BaseEvent):
 
 
 class LaunchDrone(BaseEvent):
-    """Limpets launched. Not spoken; she counts them so she knows you are mining."""
+    """Limpets launched. She only remarks now and then on prospector and collector limpets (so it never gets tiring)."""
     name = "LaunchDrone"
     priority = LOW
     keep = ("Type",)
     summary = "Launched a {Type} limpet"
+    CHANCE = {"prospector": 0.3, "collection": 0.12}
+
+    def __init__(self):
+        self.rng = random.Random()
+
+    def handle(self, entry):
+        data = super().handle(entry)
+        kind = str(entry.get("Type") or "").lower()
+        if minerals.option("chatter", "normal") != "quiet" and self.rng.random() < self.CHANCE.get(kind, 0.0):
+            data["Announce"] = kind
+        return data
 

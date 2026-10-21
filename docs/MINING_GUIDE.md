@@ -72,3 +72,15 @@ The same sentence can ask for two different things:
   For selling, "nearest" still needs large pads and prices from the last day, but accepts stations wanting only 100 tons (`NEAREST_MIN_DEMAND` in `mining/prices.py`).
 
 Buying now works like selling: Option A and Option B (price, tons in stock, station, system, distance), then "A or B?" and the offer to put the chosen system into the galaxy map.
+
+
+## More talk, and pips in analysis mode (0.24.1)
+
+- New lines are in `voicepacks/default/mining2.json`. Big pools now remember up to 12 recent lines, so a line is not heard again soon.
+- She sometimes remarks on an ordinary mineral, cheers for good minerals too, and now and then comments when you launch a prospector or collector limpet.
+  The Mining page's "How chatty" box (quiet / normal / chatty) controls all of it; "quiet" keeps her silent about these extras.
+- While mining she chats about twice as often as usual.
+- Pips: when you hold a fire button in analysis mode she now sends 6 presses to weapons (extra presses do nothing when full),
+  tops the weapons up every 8 seconds while you hold the laser, and waits 3 seconds after you let go before resetting.
+  If it still does not work, open `logs/starling.log` and look for "Combat assist watches these fire buttons" - that line names
+  every button she is watching. If your mining trigger is not in it, add it in `config/settings.json` under `combat_assist` > `fire_buttons`.

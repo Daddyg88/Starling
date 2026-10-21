@@ -107,7 +107,7 @@ class PipTests(Base):
         self.assertEqual(self.assist.poll_once(), "")
         self.reader.down.add("key:Space")
         self.assertEqual(self.assist.poll_once(), "up")
-        self.assertEqual(self.keys(), "AAAA")
+        self.assertEqual(self.keys(), "AAAAAA")
         self.assertEqual(self.assist.poll_once(), "")             # still held: nothing more
         self.reader.down.clear()
         self.assist.poll_once()
@@ -115,7 +115,7 @@ class PipTests(Base):
         self.assertEqual(self.assist.poll_once(), "")             # not long enough yet
         self.clock.now += 1.0
         self.assertEqual(self.assist.poll_once(), "down")
-        self.assertEqual(self.keys(), "AAAA" + "DBC")
+        self.assertEqual(self.keys(), "AAAAAA" + "DBC")
 
     def test_a_quick_tap_does_not_flap_the_pips(self):
         self.reader.down.add("key:Space")
@@ -128,7 +128,7 @@ class PipTests(Base):
         self.clock.now += 5
         self.reader.down.clear()
         self.assist.poll_once()
-        self.assertEqual(self.keys(), "AAAA")                      # never reset between taps
+        self.assertEqual(self.keys(), "AAAAAA")                      # never reset between taps
 
     def test_nothing_without_hardpoints(self):
         self.state.status_flags = 0
@@ -142,7 +142,7 @@ class PipTests(Base):
         self.assertEqual(self.assist.poll_once(), "")
 
     def test_default_steps(self):
-        self.assertEqual(DEFAULT_PIPS_UP, ["IncreaseWeaponsPower"] * 4)
+        self.assertEqual(DEFAULT_PIPS_UP, ["IncreaseWeaponsPower"] * 6)
         self.assertEqual(DEFAULT_PIPS_DOWN[0], "ResetPowerDistribution")
 
 
@@ -248,6 +248,29 @@ class AnalysisModeTests(Base):
         self.state.status_flags = 1 << 27                       # analysis mode, hardpoints in
         self.reader.down.add("key:Space")
         self.assertEqual(self.assist.poll_once(), "up")
+
+    def test_long_mining_burst_is_topped_up_and_reset_is_slower(self):
+        self.state.status_flags = 1 << 27
+        self.reader.down.add("key:Space")
+        self.assertEqual(self.assist.poll_once(), "up")
+        self.sender.pressed.clear()
+        self.clock.now += 9.0                                   # still holding the trigger: weapons are topped up again
+        self.assertEqual(self.assist.poll_once(), "")
+        self.assertEqual(self.keys(), "AA")
+        self.reader.down.clear()
+        self.assertEqual(self.assist.poll_once(), "")
+        self.clock.now += 1.5                                   # hardpoints mode would reset by now; analysis waits longer
+        self.assertEqual(self.assist.poll_once(), "")
+        self.clock.now += 2.0
+        self.assertEqual(self.assist.poll_once(), "down")
+
+    def test_hardpoints_do_not_get_the_top_up(self):
+        self.reader.down.add("key:Space")
+        self.assist.poll_once()
+        self.sender.pressed.clear()
+        self.clock.now += 20
+        self.assist.poll_once()
+        self.assertEqual(self.keys(), "")
 
     def test_not_in_analysis_mode_when_switched_off_or_in_supercruise(self):
         self.state.status_flags = 1 << 27

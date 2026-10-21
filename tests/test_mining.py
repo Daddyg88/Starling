@@ -369,3 +369,41 @@ class ChitChatMiningTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MoreMiningSpeechTests(unittest.TestCase):
+    def test_pools_are_big_enough_and_files_valid(self):
+        from personality.dialogue import DialogueManager
+        d = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
+        for key, minimum in (("Prospected_Good", 20), ("Prospected_Poor", 26), ("Prospected_Depleted", 18), ("Prospected_Dry", 15),
+                             ("Refined_Cheer", 18), ("Refined_Total", 16), ("Refined_Plain", 10), ("Launch_Prospector", 6),
+                             ("Launch_Collector", 6), ("ChitChat_Mining", 60)):
+            self.assertGreaterEqual(len(d.lines.get(key, [])), minimum, key)
+
+    def test_recent_memory_grows_with_the_pool(self):
+        from personality.dialogue import DialogueManager
+        d = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
+        seen = [d.pick("ChitChat_Mining", "", False, False).text for _ in range(20)]
+        self.assertGreaterEqual(len(set(seen)), 17)               # a 60+ line pool does not repeat inside 20 picks
+
+    def test_ordinary_minerals_and_good_ones_sometimes_get_a_remark(self):
+        from events.mining_events import MiningRefined
+        import random
+        event = MiningRefined()
+        event.rng = random.Random(3)
+        said = set()
+        for _ in range(400):
+            said.add(event.handle({"Type": "iron", "Type_Localised": "Iron"})["Announce"])
+        self.assertIn("plain", said)
+        self.assertIn("total", said)
+
+    def test_limpet_launches_get_an_occasional_remark(self):
+        from events.mining_events import LaunchDrone
+        import random
+        event = LaunchDrone()
+        event.rng = random.Random(5)
+        spoken = [event.handle({"Type": "Prospector"}).get("Announce") for _ in range(100)]
+        self.assertTrue(0 < sum(1 for s in spoken if s) < 70)
+        make = lambda data: SimpleNamespace(name="LaunchDrone", data=data, priority="low")
+        self.assertEqual(line_keys.keys_for(make({"Announce": "prospector"})), ["Launch_Prospector"])
+        self.assertEqual(line_keys.keys_for(make({})), [])

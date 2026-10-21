@@ -28,7 +28,7 @@ DOCKED_BIT, LANDED_BIT, SUPERCRUISE_BIT, HARDPOINTS_BIT, SCOOP_BIT, ANALYSIS_BIT
 FIRE_ACTIONS = ("PrimaryFire", "SecondaryFire")
 POLL_SECONDS = 0.03
 IDLE_POLL_SECONDS = 0.4
-DEFAULT_PIPS_UP = ["IncreaseWeaponsPower"] * 4
+DEFAULT_PIPS_UP = ["IncreaseWeaponsPower"] * 6        # more than needed: pressing it when already full does nothing, but a missed press does harm
 DEFAULT_PIPS_DOWN = ["ResetPowerDistribution", "IncreaseSystemsPower", "IncreaseEnginesPower"]
 
 
@@ -86,6 +86,8 @@ class CombatAssist:
         self._thread = None
         self._boosted = False
         self._released_at = None
+        self._topped_at = None
+        self._logged_specs = None
         self._last_sink = -999.0
         self._warned = set()
         self._specs = []
@@ -183,6 +185,9 @@ class CombatAssist:
                 found = []
             self._specs = list(dict.fromkeys(found + list(extra)))
             self._specs_at = now
+            if self._specs != self._logged_specs:
+                self._logged_specs = list(self._specs)
+                log.info("Combat assist watches these fire buttons: %s", ", ".join(self._specs) or "NONE (check Primary/Secondary fire in Elite's controls)")
         return self._specs
 
     def firing(self):
@@ -200,24 +205,37 @@ class CombatAssist:
             self._released_at = None
             if not self._boosted:
                 self._boosted = True
+                self._topped_at = now
+                log.info("Fire button down (%s): pips to weapons", "hardpoints" if hardpoints_out(self.state_provider()) else "analysis mode")
                 self._run_steps(self.option("pips_firing", DEFAULT_PIPS_UP))
                 return "up"
+            # Mining lasers are held for a long time: now and then top the weapons up again (it does nothing when already full)
+            top_up = float(self.option("pips_topup_seconds", 8.0) or 0)
+            if top_up and not hardpoints_out(self.state_provider()) and self._topped_at is not None and now - self._topped_at >= top_up:
+                self._topped_at = now
+                self._run_steps(["IncreaseWeaponsPower"] * 2)
             return ""
         if self._boosted:
             if self._released_at is None:
                 self._released_at = now
-            elif now - self._released_at >= float(self.option("pips_delay", 1.2)):
+            elif now - self._released_at >= self._release_delay():
                 self._boosted, self._released_at = False, None
                 self._run_steps(self.option("pips_resting", DEFAULT_PIPS_DOWN))
                 return "down"
         return ""
+
+    def _release_delay(self):
+        """Mining lasers are held and let go again all the time, so in analysis mode she waits longer before resetting the pips."""
+        if hardpoints_out(self.state_provider()):
+            return float(self.option("pips_delay", 1.2))
+        return float(self.option("pips_delay_analysis", 3.0))
 
     def _run_steps(self, steps):
         for action in steps or []:
             if not self.press(action):
                 if self.last_result != "unbound":
                     return                                              # Elite is not in front: stop quietly
-            self.sleep(0.05)
+            self.sleep(float(self.option("pips_press_gap", 0.1) or 0.1))
 
     def _loop(self):
         while self._running:

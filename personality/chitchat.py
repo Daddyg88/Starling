@@ -86,7 +86,12 @@ class ChitChat:
         quiet, gap = FREQUENCY.get(str(self.settings.get("chitchat.frequency", "normal")), FREQUENCY["normal"])
         if self.mode == "combat":
             quiet = quiet / 2.0                     # a fight is livelier; she may chip in a little sooner
+        if self.mining_now():
+            quiet, gap = quiet * 0.5, gap * 0.6     # mining is long and quiet: she keeps you company more often
         return quiet, gap
+
+    def mining_now(self):
+        return self.last_mining is not None and self.clock() - self.last_mining < MINING_SECONDS
 
     def enabled(self):
         return (bool(self.settings.get("chitchat.enabled", True)) and bool(self.settings.get("speech.enabled", True))
