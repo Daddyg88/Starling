@@ -137,7 +137,7 @@ class DashboardUiTests(unittest.TestCase):
 
     def test_every_page_builds_including_bookmarks(self):
         d = self.dashboard.Dashboard(self.app)
-        for page in ("home", "bookmarks", "navigation", "voice", "controls", "personality"):
+        for page in ("home", "navigation", "voice", "game", "personality"):
             self.assertIn(page, d.page_frames)
             d.show(page)
         self.assertEqual(len(d._bookmark_entries), 11)

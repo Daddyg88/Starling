@@ -946,7 +946,7 @@ class DashboardSmokeTests(unittest.TestCase):
         importlib.reload(dashboard)
         app, kb, joy = ControlsTestScreenTests().make()
         d = dashboard.Dashboard(app)
-        self.assertIn("controls", d.page_frames)
+        self.assertIn("game", d.page_frames)
         d.try_entry.get.return_value = "put the wheels down"
         d.try_command()
         self.assertIn("press L", d.try_result.configure.call_args.kwargs["text"])

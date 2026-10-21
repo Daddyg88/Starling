@@ -50,6 +50,24 @@ class TabLayoutTests(unittest.TestCase):
         self.assertEqual(len(keys), len(set(keys)))
 
 
+class MergedPageTests(unittest.TestCase):
+    def test_small_pages_live_inside_bigger_ones(self):
+        from ui.settings_model import SettingsModel
+        from core.settings import Settings
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            model = SettingsModel(Settings(Path(tmp) / "s.json").load())
+        shown = [p.id for p in model.sidebar_pages]
+        for gone in ("listening", "controls", "chat", "memory", "bookmarks"):
+            self.assertNotIn(gone, shown)
+        homes = {p.id: p.parent for p in model.pages if p.parent}
+        self.assertEqual(homes, {"listening": "voice", "controls": "game", "chat": "personality",
+                                 "memory": "personality", "bookmarks": "navigation"})
+        for parent in set(homes.values()):
+            self.assertIn(parent, shown)
+
+
 class SwitchTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

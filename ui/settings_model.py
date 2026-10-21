@@ -42,6 +42,7 @@ class Page:
     title: str
     blurb: str
     fields: List[Field] = dc_field(default_factory=list)
+    parent: str = ""          # a page with a parent is shown as a section inside that page, not in the sidebar
 
 
 # ---------------------------------------------------------------------------
@@ -125,11 +126,16 @@ def voicepack_choices(folder=None):
     return found or [("Default", "default")]
 
 
+# These pages are not in the sidebar: they appear as a section inside the page named on the right.
+SECTION_OF = {"listening": "voice", "controls": "game", "chat": "personality", "memory": "personality",
+              "bookmarks": "navigation"}
+
+
 # ---------------------------------------------------------------------------
 # THE DASHBOARD CONTENT - edit here
 # ---------------------------------------------------------------------------
 def build_pages(mic_lister=None, pack_folder=None):
-    return [
+    pages = [
         Page("voice", "Voice", "How she sounds when she speaks.", [
             Field("speech.enabled", "She speaks aloud", "toggle", help="Turn her voice on or off"),
             Field("tts.volume", "Volume", "choice", VOLUME),
@@ -300,6 +306,9 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Only change this if you are fixing a problem"),
         ]),
     ]
+    for page in pages:
+        page.parent = SECTION_OF.get(page.id, "")
+    return pages
 
 
 class SettingsModel:
@@ -308,6 +317,7 @@ class SettingsModel:
     def __init__(self, settings, mic_lister=None, pack_folder=None):
         self.settings = settings
         self.pages = build_pages(mic_lister, pack_folder)
+        self.sidebar_pages = [p for p in self.pages if not p.parent]
         self._saved = {f.key: settings.get(f.key) for p in self.pages for f in p.fields}
         self.pending_restart = set()
         self._cache = {}

@@ -92,7 +92,7 @@ class Dashboard:
         ctk.CTkLabel(side, text="SHIP  COMPANION", font=self._font(T.SMALL_SIZE - 1, head=True), text_color=T.MUTED).pack(
             padx=20, pady=(0, 14), anchor="w")
         ctk.CTkFrame(side, height=1, fg_color=T.BORDER, corner_radius=0).pack(fill="x", padx=16, pady=(0, 10))
-        for page_id, title in [("home", "Home")] + [(p.id, p.title) for p in self.model.pages]:
+        for page_id, title in [("home", "Home")] + [(p.id, p.title) for p in self.model.sidebar_pages]:
             icon = T.ICONS.get(page_id, "\u25C7")
             button = ctk.CTkButton(side, text="%s   %s" % (icon, title), anchor="w", height=38, corner_radius=8,
                                    font=self._font(), fg_color="transparent", text_color=T.MUTED,
@@ -136,7 +136,7 @@ class Dashboard:
             row=0, column=1, padx=(0, 20), pady=8)
 
         self._build_home()
-        for page in self.model.pages:
+        for page in self.model.sidebar_pages:
             self._build_page(page)
 
     def _stars_soon(self, event=None):
@@ -165,7 +165,7 @@ class Dashboard:
 
     def _banner_title(self, canvas, width=0, height=78):
         title = self.current or "home"
-        text = "Home" if title == "home" else next((p.title for p in self.model.pages if p.id == title), "")
+        text = "Home" if title == "home" else next((p.title for p in self.model.sidebar_pages if p.id == title), "")
         canvas.create_text(24, 34, text=text.upper(), anchor="w", fill=T.TEXT, font=(T.HEAD_FONT, T.TITLE_SIZE, "bold"))
         # a thin instrument-panel line under the title, with end ticks
         y = max(height - 14, 50)
@@ -299,20 +299,35 @@ class Dashboard:
                 entry["shown"] = None
 
     def _build_page(self, page):
+        """One sidebar page: its own content, then any pages merged into it as titled sections."""
         ctk = self.ctk
         frame = ctk.CTkScrollableFrame(self.area, fg_color=T.BG, corner_radius=0)
         frame.grid_columnconfigure(0, weight=1)
         self.page_frames[page.id] = frame
+        row = self._build_section(frame, page, 0, heading=False)
+        for child in self.model.pages:
+            if child.parent == page.id:
+                row = self._build_section(frame, child, row, heading=True)
+
+    def _build_section(self, frame, page, row, heading):
+        """Draws one model page into the frame starting at grid row `row`; returns the next free row."""
+        ctk = self.ctk
+        if heading:
+            ctk.CTkFrame(frame, height=1, fg_color=T.BORDER, corner_radius=0).grid(row=row, column=0, sticky="ew", pady=(28, 10))
+            ctk.CTkLabel(frame, text=page.title.upper(), font=self._font(T.BODY_SIZE, True, head=True), text_color=T.ACCENT,
+                         anchor="w").grid(row=row + 1, column=0, sticky="w", pady=(0, 4))
+            row += 2
         ctk.CTkLabel(frame, text=page.blurb, font=self._font(), text_color=T.MUTED, anchor="w", justify="left",
-                     wraplength=720).grid(row=0, column=0, sticky="w", pady=(0, 12))
+                     wraplength=720).grid(row=row, column=0, sticky="w", pady=(0, 12))
+        row += 1
         if page.id == "bookmarks":
-            self._build_bookmarks(frame, page)
-            return
+            return self._build_bookmarks(frame, page, row)
         card = self._card(frame)
-        card.grid(row=1, column=0, sticky="ew")
+        card.grid(row=row, column=0, sticky="ew")
         card.grid_columnconfigure(0, weight=1)
-        for row, field in enumerate(page.fields):
-            self._build_field(card, row, field)
+        row += 1
+        for index, field in enumerate(page.fields):
+            self._build_field(card, index, field)
 
         extra = []
         if page.id == "voice":
@@ -337,33 +352,38 @@ class Dashboard:
                       ("Check my Elite keys", self.check_keys),
                       ("Look for my joystick", self.scan_joysticks)]
         if page.id == "voice":
-            self._build_voice_progress(frame, 2 + len(extra))
-        for index, (text, command) in enumerate(extra):
+            self._build_voice_progress(frame, row)
+            row += 1
+        for text, command in extra:
             ctk.CTkButton(frame, text=text, width=230, font=self._font(), fg_color=T.PANEL, border_width=1, corner_radius=8,
                           border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT, command=command).grid(
-                row=2 + index, column=0, sticky="w", pady=(12, 0))
+                row=row, column=0, sticky="w", pady=(12, 0))
+            row += 1
         if page.id == "controls":
-            self._build_try_box(frame, 2 + len(extra))
+            self._build_try_box(frame, row)
+            row += 1
         if page.id == "navigation":
-            row = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
-            row.grid(row=2 + len(extra), column=0, sticky="ew", pady=(16, 0))
-            row.grid_columnconfigure(0, weight=1)
-            self.nav_entry = ctk.CTkEntry(row, font=self._font(), fg_color=T.PANEL, border_color=T.BORDER, text_color=T.TEXT,
+            line = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
+            line.grid(row=row, column=0, sticky="ew", pady=(16, 0))
+            line.grid_columnconfigure(0, weight=1)
+            self.nav_entry = ctk.CTkEntry(line, font=self._font(), fg_color=T.PANEL, border_color=T.BORDER, text_color=T.TEXT,
                                           placeholder_text="Or type any system here, e.g. Colonia", corner_radius=8)
             self.nav_entry.grid(row=0, column=0, sticky="ew", padx=(0, 8))
-            ctk.CTkButton(row, text="Plot to this system", width=170, font=self._font(), fg_color=T.PANEL, border_width=1,
+            ctk.CTkButton(line, text="Plot to this system", width=170, font=self._font(), fg_color=T.PANEL, border_width=1,
                           corner_radius=8, border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT,
                           command=lambda: self.nav_plot(use_entry=True)).grid(row=0, column=1)
             ctk.CTkLabel(frame, text="Plotting a route needs you to be in the game (so she knows where you are). "
                                      "'Plot the next waypoint' waits 4 seconds so you can click back into Elite first.",
                          font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left",
-                         wraplength=720).grid(row=3 + len(extra), column=0, sticky="w", pady=(8, 0))
+                         wraplength=720).grid(row=row + 1, column=0, sticky="w", pady=(8, 0))
+            row += 2
+        return row
 
-    def _build_bookmarks(self, frame, page):
+    def _build_bookmarks(self, frame, page, row=1):
         """Eleven boxes in two columns: Home and Bookmark 1-10. Each holds a system name."""
         ctk = self.ctk
         grid = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
-        grid.grid(row=1, column=0, sticky="ew")
+        grid.grid(row=row, column=0, sticky="ew")
         grid.grid_columnconfigure((0, 1), weight=1, uniform="bm")
         self._bookmark_entries = {}
         self._bookmark_seen = {}
@@ -392,7 +412,8 @@ class Dashboard:
             self._bookmark_seen[field.key] = str(current or "")
         ctk.CTkLabel(frame, text="'Here' fills the box with the system you are in now. You can also say: \"Starling, save this system as bookmark 3\".",
                      font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left", wraplength=720).grid(
-            row=2, column=0, sticky="w", pady=(10, 0))
+            row=row + 1, column=0, sticky="w", pady=(10, 0))
+        return row + 2
 
     def use_current_system(self, field, entry):
         state = getattr(self.app, "state", None)
@@ -739,7 +760,7 @@ class Dashboard:
         try:
             if self.current == "home":
                 self._refresh_home()
-            elif self.current == "bookmarks":
+            elif self.current == "navigation":
                 self._sync_bookmarks()
         except Exception:
             log.exception("Dashboard refresh failed")
