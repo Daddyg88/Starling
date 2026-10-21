@@ -23,7 +23,7 @@ import random
 
 from core.identity import personalise
 from core.logger import get_logger
-from personality.answers import classify, wants_a_fact
+from personality.answers import choose, classify, wants_a_fact
 from personality.mood_engine import effective_mood
 
 log = get_logger("ask")
@@ -46,8 +46,9 @@ class _Quiet(dict):
 
 class AskManager:
     def __init__(self, bus, speech, dialogue, settings, facts, state_provider=None, listening_provider=None,
-                 clock=time.monotonic, rng=None, timer_factory=None):
+                 clock=time.monotonic, rng=None, timer_factory=None, route_provider=None):
         self.bus = bus
+        self.route_provider = route_provider or (lambda: None)      # gives the neutron route voice (navigation/voice.py)
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -218,7 +219,9 @@ class AskManager:
 
     # ---- asking ----
     def _ask(self, kind, key, data):
-        text = self._line(key, data)
+        self._ask_text(kind, self._line(key, data), data)
+
+    def _ask_text(self, kind, text, data):
         if not text:
             return
         with self._lock:
@@ -271,7 +274,7 @@ class AskManager:
         with self._lock:
             pending = self.pending if (self.pending and self.pending["open"]) else None
         if pending is not None:
-            answer = classify(spoken)
+            answer = choose(spoken) if pending["kind"] == "choice" else classify(spoken)
             if answer is not None:
                 with self._lock:
                     if self.pending is not pending:
@@ -289,6 +292,12 @@ class AskManager:
     def _finish(self, pending, answer):
         kind = pending["kind"]
         data = pending.get("data") or {}
+        if kind == "choice":
+            self._finish_choice(answer, data)
+            return
+        if kind == "route":
+            self._finish_route(answer, data)
+            return
         if kind == "fact":
             self._finish_fact(answer)
             return
@@ -301,6 +310,70 @@ class AskManager:
             if self.rng.random() < 0.5:
                 self._say(self._line("Ask_Ignored", data), "ask.reply")
             self._publish("ask.scan_ignored", "Ignored a question about a planet")
+
+    # ---- where to sell: "A or B?" then "shall I plot a route?" ----
+    @staticmethod
+    def _option_values(option, suffix=""):
+        return {"Price" + suffix: "{:,}".format(option["price"]), "Tons" + suffix: "{:,}".format(int(option.get("demand") or 0)),
+                "Station" + suffix: option["station"], "System" + suffix: option["system"]}
+
+    def offer_sale(self, material, options):
+        """She has found places to sell. Says the best two (A and B) with price, tonnage and station, then asks which.
+        Returns the words said (for the log). With one option she goes straight to asking about the route."""
+        options = list(options or [])[:2]
+        if not options:
+            return None
+        values = {"Material": material}
+        values.update(self._option_values(options[0]))
+        if len(options) > 1:
+            values.update(self._option_values(options[1], "2"))
+            head = self._line("Sell_Options", values)
+        else:
+            head = self._line("Sell_OneOption", values)
+        if not head:
+            return None
+        can_answer = self._can_chat()
+        if not can_answer:
+            self._say(head, "brain")                       # she can't hear you, so she only tells you
+            return head.replace("||", " ")
+        data = {"options": options, "material": material}
+        if len(options) > 1:
+            question = self._line("Sell_WhichOne", values)
+            self._ask_text("choice", "%s||%s" % (head, question) if question else head, data)
+        else:
+            data = {"option": options[0], "material": material}
+            question = self._line("Sell_RouteAsk", values)
+            self._ask_text("route", "%s||%s" % (head, question) if question else head, data)
+        return head.replace("||", " ")
+
+    def _finish_choice(self, answer, data):
+        options = data.get("options") or []
+        if answer in ("A", "B"):
+            index = 0 if answer == "A" else 1
+            if index >= len(options):
+                index = 0
+            chosen = options[index]
+            values = {"Material": data.get("material", ""), "Letter": answer}
+            values.update(self._option_values(chosen))
+            text = self._line("Sell_RouteAsk", values)
+            self._ask_text("route", text, {"option": chosen, "material": data.get("material", ""), "Letter": answer})
+        elif answer == "no":
+            self._say(self._line("Sell_NoChoice"), "ask.reply")
+        # no answer in time: she just drops it, nothing to say
+
+    def _finish_route(self, answer, data):
+        option = data.get("option") or {}
+        values = {"Material": data.get("material", "")}
+        values.update(self._option_values(option) if option else {})
+        if answer == "yes":
+            voice = self.route_provider()
+            if voice is None or not hasattr(voice, "plot_exact") or not voice.enabled():
+                self._say(self._line("Sell_RouteOff", values), "ask.reply")
+                return
+            self._say(self._line("Sell_RouteYes", values), "ask.reply")
+            voice.plot_exact(option.get("system"))
+        elif answer == "no":
+            self._say(self._line("Sell_RouteNo", values), "ask.reply")
 
     def _finish_fact(self, answer):
         if answer == "yes":

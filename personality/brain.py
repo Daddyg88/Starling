@@ -63,7 +63,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -71,6 +71,7 @@ class Brain:
         self.chitchat = chitchat
         self.mining = mining         # mining/tracker.py: what you have refined this session
         self.prices = prices         # mining/prices.py: where to sell it
+        self.ask = ask               # personality/ask.py: asks 'A or B?' and 'shall I plot a route?'
         self.facts = facts
         self.intents = intents if intents is not None else load_intents()
         self.clock = clock
@@ -300,6 +301,10 @@ class Brain:
             return self._say_pool("Price_Offline", {})
         if not results:
             return self._say_pool("Price_None", {"Material": material})
+        if self.ask is not None and hasattr(self.ask, "offer_sale"):
+            said = self.ask.offer_sale(material, results[:2])
+            if said:
+                return said
         best = results[0]
         values = {"Material": material, "Price": "{:,}".format(best["price"]), "Station": best["station"],
                   "Where": self._where(best)}

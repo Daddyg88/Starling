@@ -136,8 +136,10 @@ class TrackerTests(unittest.TestCase):
 
 ARDENT = [
     {"stationName": "Fleet Thing", "stationType": "FleetCarrier", "systemName": "Far", "sellPrice": 900000, "maxLandingPadSize": 3},
-    {"stationName": "Smith Port", "stationType": "Coriolis", "systemName": "Sol", "sellPrice": 310000, "demand": 400, "maxLandingPadSize": 3, "distance": 12.4},
-    {"stationName": "Low Outpost", "stationType": "Outpost", "systemName": "Alpha", "sellPrice": 250000, "maxLandingPadSize": 2},
+    {"stationName": "Smith Port", "stationType": "Coriolis", "systemName": "Sol", "sellPrice": 310000, "demand": 5000, "maxLandingPadSize": 3, "distance": 12.4},
+    {"stationName": "Big Dock", "stationType": "Orbis", "systemName": "Alpha", "sellPrice": 250000, "demand": 2500, "maxLandingPadSize": 3},
+    {"stationName": "Low Outpost", "stationType": "Outpost", "systemName": "Beta", "sellPrice": 260000, "demand": 9000, "maxLandingPadSize": 2},
+    {"stationName": "Hungry Little", "stationType": "Coriolis", "systemName": "Gamma", "sellPrice": 290000, "demand": 400, "maxLandingPadSize": 3},
     {"stationName": "Broken"}, "junk", {"stationName": "X", "systemName": "Y", "sellPrice": "lots"},
 ]
 
@@ -145,10 +147,18 @@ ARDENT = [
 class PriceTests(unittest.TestCase):
     def test_parse_orders_by_price_and_skips_carriers_and_junk(self):
         results = prices.parse(ARDENT)
-        self.assertEqual([r["station"] for r in results], ["Smith Port", "Low Outpost"])
+        self.assertEqual([r["station"] for r in results], ["Smith Port", "Big Dock"])
         self.assertEqual(results[0]["pad"], "large")
         self.assertEqual(prices.parse("nonsense"), [])
         self.assertEqual(prices.parse({"results": ARDENT})[0]["price"], 310000)
+
+    def test_sell_search_is_1000ly_one_day_1000_tons(self):
+        url = prices.build_url("Sol", "platinum")
+        for part in ("maxDistance=1000", "maxDaysAgo=1", "minVolume=1000"):
+            self.assertIn(part, url)
+        buy = prices.build_url("Sol", "tritium", mode="buy")
+        self.assertIn("maxDistance=100", buy)
+        self.assertIn("/exports?", buy)
 
     def test_url_is_safe(self):
         url = prices.build_url("Sol & Co", "lowtemperaturediamond")
@@ -209,7 +219,9 @@ class BrainMiningTests(Base):
         said = " ".join(self.spoken())
         self.assertIn("Smith Port", said)
         self.assertIn("310,000", said)
-        self.assertIn("Low Outpost", said)
+        self.assertIn("Big Dock", said)
+        self.assertNotIn("Low Outpost", said)          # medium pad: not offered
+        self.assertNotIn("Hungry Little", said)        # only wants 400 tons: not offered
 
     def test_uses_what_you_mined_when_no_name_is_given(self):
         self.tracker.on_event(ev("MiningRefined", Commodity="painite", Material="Painite"))

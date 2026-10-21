@@ -172,7 +172,8 @@ class App:
         self.ask = AskManager(self.bus, self.speech, self.dialogue, self.settings,
                               FactBook(self.dialogue, persist=self._record_events),
                               state_provider=lambda: self.state,
-                              listening_provider=lambda: self.listener is not None and self.listener.ready.is_set())
+                              listening_provider=lambda: self.listener is not None and self.listener.ready.is_set(),
+                              route_provider=lambda: self.ensure_route())
         self.ask.attach()
 
         # The Watcher (Void Compass's orb): she answers him, and makes him wait for a calm moment.
@@ -216,7 +217,7 @@ class App:
         self.miner.attach()
         self.prices = PriceFinder(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
-                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices)
+                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask)
         return True
 
     def cpu_is_free(self):

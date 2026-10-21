@@ -1,0 +1,88 @@
+{
+ "Sell_Options": [
+  "I found two places for your {Material}.||Option A pays {Price} credits a tonne for up to {Tons} tons, at||{Station}||in {System}.||Option B pays {Price2} credits a tonne for up to {Tons2} tons, at||{Station2}||in {System2}.",
+  "Two good buyers for {Material}, Commander.||A: {Price} credits a tonne, {Tons} tons wanted, at||{Station}||in {System}.||B: {Price2} credits a tonne, {Tons2} tons wanted, at||{Station2}||in {System2}.",
+  "Right, here's who wants your {Material}.||Option A. {Station}||in {System}, paying {Price} credits a tonne, and they need {Tons} tons.||Option B. {Station2}||in {System2}, paying {Price2} credits, and they need {Tons2} tons.",
+  "I've got two large-pad buyers for {Material}.||Option A is||{Station}||in {System}. {Price} credits, {Tons} tons wanted.||Option B is||{Station2}||in {System2}. {Price2} credits, {Tons2} tons wanted.",
+  "Found some takers, Commander.||Option A, {Price} credits a tonne at||{Station}||in {System}, with room for {Tons} tons.||Option B, {Price2} credits a tonne at||{Station2}||in {System2}, with room for {Tons2} tons.",
+  "Two options for selling {Material}.||Option A: {Station}||in {System}. They pay {Price} and want {Tons} tons.||Option B: {Station2}||in {System2}. They pay {Price2} and want {Tons2} tons."
+ ],
+ "Sell_Options_Sarcastic": [
+  "Fine, I looked. Two buyers for your {Material}.||Option A: {Price} credits a tonne, {Tons} tons wanted, at||{Station}||in {System}.||Option B: {Price2} credits a tonne, {Tons2} tons wanted, at||{Station2}||in {System2}.",
+  "Someone actually wants your {Material}. Two someones, in fact.||Option A is||{Station}||in {System}, {Price} a tonne for {Tons} tons.||Option B is||{Station2}||in {System2}, {Price2} a tonne for {Tons2} tons."
+ ],
+ "Sell_Options_Close": [
+  "I found two lovely places for your {Material}, Commander.||Option A: {Station}||in {System}. {Price} credits a tonne, and they want {Tons} tons.||Option B: {Station2}||in {System2}. {Price2} credits a tonne, and they want {Tons2} tons."
+ ],
+ "Sell_OneOption": [
+  "I found one place for your {Material}.||{Station}||in {System}, paying {Price} credits a tonne for up to {Tons} tons.",
+  "Just the one buyer, Commander.||{Station}||in {System}. {Price} credits a tonne, and they want {Tons} tons.",
+  "Only one large-pad station fits the search.||{Station}||in {System}, {Price} credits a tonne, {Tons} tons wanted.",
+  "One option for your {Material}.||{Station}||in {System}. They pay {Price} credits and need {Tons} tons."
+ ],
+ "Sell_WhichOne": [
+  "Which would you like, A or B?",
+  "A or B, Commander?",
+  "Which one suits you, A or B?",
+  "Shall it be A or B?",
+  "Pick one for me. A, or B?",
+  "Which option do you fancy, A or B?"
+ ],
+ "Sell_WhichOne_Sarcastic": [
+  "Go on then. A or B?",
+  "A or B? Take your time. Actually, don't."
+ ],
+ "Sell_WhichOne_Close": [
+  "Which one would you like, A or B, Commander?"
+ ],
+ "Sell_RouteAsk": [
+  "Would you like me to plot a route for you?",
+  "Would you like me to plot a route for you, Commander?",
+  "Shall I plot a route there? Would you like me to plot a route for you?",
+  "Would you like me to plot a neutron route for you?",
+  "Would you like me to plot a route to {System} for you?",
+  "Want me to plot a route for you? Just say yes."
+ ],
+ "Sell_RouteAsk_Sarcastic": [
+  "Would you like me to plot a route for you? Or shall I just guess?",
+  "Would you like me to plot a route for you, or will you wing it?"
+ ],
+ "Sell_RouteAsk_Close": [
+  "Would you like me to plot the route for you, Commander? I'm happy to."
+ ],
+ "Sell_RouteYes": [
+  "On it. Plotting the route to {System}.",
+  "Right away, Commander. Heading for {System}.",
+  "Consider it done. One neutron route to {System}, coming up.",
+  "Lovely. Plotting your course to {System}.",
+  "Setting the course for {System} now.",
+  "Good choice. Working out the route to {System}."
+ ],
+ "Sell_RouteYes_Sarcastic": [
+  "Oh, you want my help. Plotting to {System}.",
+  "Fine. Route to {System}, plotting."
+ ],
+ "Sell_RouteNo": [
+  "No problem, Commander. The details are there if you change your mind.",
+  "Understood. I'll leave the route to you.",
+  "Fair enough. Fly safe.",
+  "Alright. Just ask if you want it later.",
+  "Okay. No route then."
+ ],
+ "Sell_NoChoice": [
+  "Neither? Fair enough. Ask me again later and I'll look again.",
+  "Okay, forget those. I can search again whenever you like.",
+  "No problem. Prices change, so ask me again later.",
+  "Understood. Neither it is."
+ ],
+ "Sell_RouteOff": [
+  "I'd plot it for you, but the neutron plotter is switched off. You can turn it on in the Navigation page.",
+  "The route plotter isn't switched on, Commander. You'll find it on the Navigation page.",
+  "I can't plot that just now, the neutron plotter is off."
+ ],
+ "Price_None": [
+  "I couldn't find a large-pad buyer for {Material} with plenty of demand and prices from the last day. Try again after you've moved, or later.",
+  "Nobody within a thousand light years is paying for {Material} with a big enough appetite and fresh prices, Commander.",
+  "No luck. Nobody in range wants a thousand tons of {Material} on a large pad, with prices from today."
+ ]
+}

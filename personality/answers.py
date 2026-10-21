@@ -57,3 +57,31 @@ def classify(text):
 
 def wants_a_fact(text):
     return bool(FACT_REQUEST.search(text or ""))
+
+
+A_WORDS = {"a", "ay", "eh", "alpha", "first", "one", "1", "top", "best", "either", "whichever"}
+B_WORDS = {"b", "bee", "be", "bravo", "second", "two", "2", "other", "last"}
+
+
+def choose(text):
+    """'A', 'B', 'no' or None for the A-or-B question about where to sell.
+    "option b", "the second one", "bravo" -> B.  "yes" or "either" -> A (the better price).  "neither" or "no" -> 'no'."""
+    cleaned = " ".join(_clean(text).split())
+    if not cleaned or len(cleaned.split()) > 8:
+        return None
+    words = set(cleaned.replace("'", "").split()) | set(cleaned.split())
+    if words & {"neither", "none", "cancel", "nevermind", "never"} or "never mind" in cleaned or "no thanks" in cleaned:
+        return "no"
+    if "one" in words and words & {"first", "second", "last", "other", "top", "best"}:
+        words.discard("one")                            # "the second one" means B, not A
+    wants_a, wants_b = bool(words & A_WORDS), bool(words & B_WORDS)
+    if wants_b and not wants_a:
+        return "B"
+    if wants_a and not wants_b:
+        return "A"
+    if wants_a and wants_b:
+        return "A" if cleaned.find("a") <= cleaned.find("b") and "either" in words else None
+    answer = classify(cleaned)
+    if answer == "yes":
+        return "A"
+    return "no" if answer == "no" else None

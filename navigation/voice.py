@@ -219,6 +219,19 @@ class RouteVoice:
         self.spawn(lambda: self._plot_now(name))
         return "Plotting a neutron route to %s" % name
 
+    def plot_exact(self, system_name):
+        """Plot a neutron route to a system whose exact name we already know (from a price lookup). Same macro afterwards."""
+        name = str(system_name or "").strip()
+        if not name:
+            self.narrator.say("RouteNoDestination")
+            return "No destination."
+        if self._busy:
+            return "Already plotting."
+        self._busy = True
+        self.narrator.say("RoutePlotting", {"destination": name})
+        self.spawn(lambda: self._plot_now(name))
+        return "Plotting a neutron route to %s" % name
+
     def _my_favourites(self):
         return {clean(k): v for k, v in (self.settings.get("neutron.favourites", {}) or {}).items()}
 

@@ -372,10 +372,6 @@
   "Second best is {Price2} credits at||{Station2}||{Where2}.",
   "Or {Price2} credits at||{Station2}||{Where2}."
  ],
- "Price_None": [
-  "I couldn't find anyone buying {Material} nearby. Try a bigger search later.",
-  "Nobody nearby wants {Material} right now, Commander."
- ],
  "Price_Offline": [
   "I couldn't reach the price service. Check the internet and ask me again.",
   "The market data is out of reach right now. Try again in a minute."

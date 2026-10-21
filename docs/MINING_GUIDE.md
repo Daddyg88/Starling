@@ -43,3 +43,21 @@ She loves shopping. Buying a ship gets a big excited line; modules get a smaller
 
 ## Not tested from here
 Written without the game: the journal field names for mining come from the community documentation, so if a line is missing during your first session, check `logs` and tell me.
+
+
+## Where to sell (0.23.0)
+
+Ask: "Starling, where should I sell the platinum?" (or just "where should I sell this" after refining).
+
+What she searches for (numbers live at the top of `mining/prices.py` if you want to change them):
+
+- Stations within **1000 light years** of the system you are in.
+- Prices reported in the last **1 day**.
+- Stations that want at least **1000 tons**.
+- **Large landing pads only**. Fleet carriers are left out.
+
+She then says the two best as **Option A** and **Option B** (price per tonne, tons wanted, station and system), and asks "A or B?".
+Answer "A", "option b", "the second one", "bravo" (or "neither"). A plain "yes" means A, the better price.
+She then asks "Would you like me to plot a route for you?". Say yes and she plots a neutron route to that system and the
+auto neutron macro carries on as usual (needs the Navigation page's neutron plotter switched on). Saying nothing just drops it.
+Buying ("where can I buy ...") keeps its old, gentler search. The sentences are in `voicepacks/default/selling.json`.

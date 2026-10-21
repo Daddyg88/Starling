@@ -23,9 +23,22 @@ CACHE_SECONDS = 15 * 60
 TIMEOUT_SECONDS = 8.0
 PAD_NAMES = {1: "small", 2: "medium", 3: "large"}
 
+# What counts as a good place to SELL (change these numbers to change her search):
+SELL_RANGE_LY = 1000          # how far from you she looks
+SELL_MAX_AGE_DAYS = 1         # prices older than this are ignored
+SELL_MIN_DEMAND = 1000        # the station must want at least this many tons
+# Buying keeps the older, gentler search (nearby, a week old, anything in stock).
+BUY_RANGE_LY = 100
+BUY_MAX_AGE_DAYS = 7
+BUY_MIN_STOCK = 50
 
-def build_url(system, commodity, max_distance=100, max_age_days=7, min_demand=50, mode="sell"):
+
+def build_url(system, commodity, max_distance=None, max_age_days=None, min_demand=None, mode="sell"):
     """mode "sell" = places that BUY from you (Ardent calls them imports), "buy" = places that SELL to you (exports)."""
+    selling = mode != "buy"
+    max_distance = max_distance if max_distance is not None else (SELL_RANGE_LY if selling else BUY_RANGE_LY)
+    max_age_days = max_age_days if max_age_days is not None else (SELL_MAX_AGE_DAYS if selling else BUY_MAX_AGE_DAYS)
+    min_demand = min_demand if min_demand is not None else (SELL_MIN_DEMAND if selling else BUY_MIN_STOCK)
     return "%s/system/name/%s/commodity/name/%s/nearby/%s?%s" % (
         BASE_URL, urllib.parse.quote(str(system), safe=""), urllib.parse.quote(str(commodity), safe=""),
         "exports" if mode == "buy" else "imports",
@@ -33,7 +46,7 @@ def build_url(system, commodity, max_distance=100, max_age_days=7, min_demand=50
                                 "fleetCarriers": "false", "maxDistance": int(max_distance)}))
 
 
-def parse(raw, limit=3, mode="sell"):
+def parse(raw, limit=3, mode="sell", large_only=None):
     """Ardent's reply (a list of markets) -> clean results, best price first. Never raises; junk is skipped."""
     if isinstance(raw, dict):
         for key in ("results", "data", "markets"):
@@ -42,6 +55,8 @@ def parse(raw, limit=3, mode="sell"):
                 break
     if not isinstance(raw, list):
         return []
+    if large_only is None:
+        large_only = mode != "buy"                      # a seller of rocks wants a station a big ship can land at
     found = []
     for item in raw:
         if not isinstance(item, dict):
@@ -61,10 +76,14 @@ def parse(raw, limit=3, mode="sell"):
         if not isinstance(distance, (int, float)):
             distance = item.get("distanceFromSystem") if isinstance(item.get("distanceFromSystem"), (int, float)) else None
         pad = item.get("maxLandingPadSize")
+        if large_only and pad != 3 and str(pad).lower() != "large":
+            continue
+        if mode != "buy" and isinstance(item.get("demand"), (int, float)) and item["demand"] < SELL_MIN_DEMAND:
+            continue                                    # double-check: the service's own filter is not trusted blindly
         found.append({"station": str(station), "system": str(system), "price": int(price),
                       "demand": item.get("demand") if isinstance(item.get("demand"), (int, float)) else None,
                       "stock": int(stock) if isinstance(stock, (int, float)) else None,
-                      "distance": distance, "pad": PAD_NAMES.get(pad, "")})
+                      "distance": distance, "pad": PAD_NAMES.get(pad, str(pad).lower() if isinstance(pad, str) else "")})
     found.sort(key=lambda r: r["price"] if mode == "buy" else -r["price"])
     return found[:limit]
 
