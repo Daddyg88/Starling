@@ -173,7 +173,7 @@ class App:
                               FactBook(self.dialogue, persist=self._record_events),
                               state_provider=lambda: self.state,
                               listening_provider=lambda: self.listener is not None and self.listener.ready.is_set(),
-                              route_provider=lambda: self.ensure_route())
+                              plot_provider=lambda system: self.plot_system_by_macro(system))
         self.ask.attach()
 
         # The Watcher (Void Compass's orb): she answers him, and makes him wait for a calm moment.
@@ -416,6 +416,26 @@ class App:
             runner.run_text("plot the next waypoint", speak_unknown=False)
         threading.Thread(target=go, name="plot-next", daemon=True).start()
         return "Switch to Elite now. I will plot the next waypoint in %d seconds." % int(delay)
+
+    def plot_system_by_macro(self, system):
+        """Copies a system name to the clipboard and runs the galaxy map macro ('plot the next waypoint') for it.
+        No Spansh route is worked out. Returns (ok, reason)."""
+        system = str(system or "").strip()
+        if not system:
+            return False, "I don't have a system name."
+        voice = self.ensure_route()
+        runner = self.ensure_commands()
+        if voice is None or runner is None:
+            return False, "voice commands are not running"
+        from navigation.route import UNSAFE_BITS
+        flags = getattr(self.state, "status_flags", 0) or 0
+        if any((flags >> bit) & 1 for bit in UNSAFE_BITS):
+            return False, "this is not a safe moment to open the galaxy map"
+        voice.set_target(system)
+        import threading
+        threading.Thread(target=lambda: runner.run_text("plot the next waypoint", speak_unknown=False),
+                         name="plot-system", daemon=True).start()
+        return True, ""
 
     def clear_route_now(self):
         voice = self.ensure_route()

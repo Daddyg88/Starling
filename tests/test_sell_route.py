@@ -12,14 +12,15 @@ OPTIONS = [
 
 
 class FakeRoute:
+    """Stands in for core.app.plot_system_by_macro: remembers which system names it was asked to paste."""
     def __init__(self, on=True):
         self.on, self.plotted = on, []
 
-    def enabled(self):
-        return self.on
-
-    def plot_exact(self, name):
-        self.plotted.append(name)
+    def __call__(self, system):
+        if not self.on:
+            return False, "voice commands are not running"
+        self.plotted.append(system)
+        return True, ""
 
 
 class ChooseTests(unittest.TestCase):
@@ -34,11 +35,26 @@ class ChooseTests(unittest.TestCase):
         self.assertIsNone(choose(""))
 
 
+class MacroTargetTests(unittest.TestCase):
+    def test_the_macro_pastes_the_chosen_system_not_a_route_waypoint(self):
+        from types import SimpleNamespace
+        from navigation.voice import RouteVoice
+        copied = []
+        follower = SimpleNamespace(active=False, copier=lambda text: copied.append(text) or True)
+        voice = RouteVoice(follower, None, SimpleNamespace(say=lambda *a, **k: None), SimpleNamespace(get=lambda k, d=None: d),
+                           lambda: None)
+        voice.set_target("Wregoe JU-E c25-18")
+        self.assertEqual(voice.prepare_plot(), (True, ""))
+        self.assertEqual(copied, ["Wregoe JU-E c25-18"])         # exact spelling, no route needed
+        self.assertEqual(voice.prepare_plot()[0], False)         # used once: next time there is no route
+        self.assertEqual(copied, ["Wregoe JU-E c25-18"])
+
+
 class SellFlowTests(unittest.TestCase):
     def make(self, route=None):
         r = Rig()
         r.route = route or FakeRoute()
-        r.ask.route_provider = lambda: r.route
+        r.ask.plot_provider = r.route
         return r
 
     def test_she_says_both_options_with_price_tons_and_station_then_asks_which(self):
@@ -99,13 +115,13 @@ class SellFlowTests(unittest.TestCase):
         r.say("yes")
         self.assertEqual(r.route.plotted, ["Wregoe JU-E c25-18"])
 
-    def test_plotter_switched_off_is_explained(self):
+    def test_macro_unavailable_is_explained(self):
         r = self.make(FakeRoute(on=False))
         r.ask.offer_sale("Platinum", OPTIONS[:1])
         r.finish_question()
         r.say("yes")
         self.assertEqual(r.route.plotted, [])
-        self.assertIn("plotter", r.speech.said[-1]["text"].lower())
+        self.assertIn("voice commands are not running", r.speech.said[-1]["text"])
 
     def test_when_she_cannot_hear_she_only_tells_you(self):
         r = self.make()

@@ -38,10 +38,10 @@
  "Sell_RouteAsk": [
   "Would you like me to plot a route for you?",
   "Would you like me to plot a route for you, Commander?",
-  "Shall I plot a route there? Would you like me to plot a route for you?",
-  "Would you like me to plot a neutron route for you?",
+  "Shall I set it in the galaxy map? Would you like me to plot a route for you?",
   "Would you like me to plot a route to {System} for you?",
-  "Want me to plot a route for you? Just say yes."
+  "Want me to plot a route for you? Just say yes.",
+  "Would you like me to plot a course for you?"
  ],
  "Sell_RouteAsk_Sarcastic": [
   "Would you like me to plot a route for you? Or shall I just guess?",
@@ -51,16 +51,16 @@
   "Would you like me to plot the route for you, Commander? I'm happy to."
  ],
  "Sell_RouteYes": [
-  "On it. Plotting the route to {System}.",
-  "Right away, Commander. Heading for {System}.",
-  "Consider it done. One neutron route to {System}, coming up.",
-  "Lovely. Plotting your course to {System}.",
+  "On it. Putting {System} into the galaxy map.",
+  "Right away, Commander. Setting {System} in the galaxy map.",
+  "Consider it done. {System} is on your clipboard and going into the map.",
+  "Lovely. Plotting {System} now.",
   "Setting the course for {System} now.",
-  "Good choice. Working out the route to {System}."
+  "Good choice. Copying {System} and plotting it."
  ],
  "Sell_RouteYes_Sarcastic": [
-  "Oh, you want my help. Plotting to {System}.",
-  "Fine. Route to {System}, plotting."
+  "Oh, you want my help. Plotting {System}.",
+  "Fine. {System} into the galaxy map."
  ],
  "Sell_RouteNo": [
   "No problem, Commander. The details are there if you change your mind.",
@@ -76,9 +76,9 @@
   "Understood. Neither it is."
  ],
  "Sell_RouteOff": [
-  "I'd plot it for you, but the neutron plotter is switched off. You can turn it on in the Navigation page.",
-  "The route plotter isn't switched on, Commander. You'll find it on the Navigation page.",
-  "I can't plot that just now, the neutron plotter is off."
+  "I can't plot that just now, Commander: {Reason}.",
+  "Sorry, I can't do the galaxy map this moment: {Reason}.",
+  "I'd plot it for you, but {Reason}."
  ],
  "Price_None": [
   "I couldn't find a large-pad buyer for {Material} with plenty of demand and prices from the last day. Try again after you've moved, or later.",
@@ -105,13 +105,13 @@
   "I found two sellers of {Material}.||Option A, the cheaper, is||{Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons available.||Option B is||{Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons available.",
   "Here's where to buy {Material}, Commander.||A: {Station}||in {System}, {Away}, at {Price} credits with {Tons} tons in stock.||B: {Station2}||in {System2}, {Away2}, at {Price2} credits with {Tons2} tons in stock.",
   "Two good prices for {Material}.||Option A. {Station}||in {System}, {Price} credits a tonne, {Tons} tons for sale.||Option B. {Station2}||in {System2}, {Price2} credits a tonne, {Tons2} tons for sale.",
-  "Found some sellers.||Option A is||{Station}||in {System}, {Away}, {Price} credits a tonne.||Option B is||{Station2}||in {System2}, {Away2}, {Price2} credits a tonne."
+  "Found some sellers.||Option A is||{Station}||in {System}, {Away}, {Price} credits a tonne with {Tons} tons in stock.||Option B is||{Station2}||in {System2}, {Away2}, {Price2} credits a tonne with {Tons2} tons in stock."
  ],
  "Buy_NearOptions": [
   "The closest sellers of {Material}, Commander.||Option A: {Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons in stock.||Option B: {Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons in stock.",
-  "Two places close by selling {Material}.||A is {Away}: {Station}||in {System}, {Price} credits a tonne.||B is {Away2}: {Station2}||in {System2}, {Price2} credits a tonne.",
+  "Two places close by selling {Material}.||A is {Away}: {Station}||in {System}, {Price} credits a tonne, {Tons} tons.||B is {Away2}: {Station2}||in {System2}, {Price2} credits a tonne, {Tons2} tons.",
   "Nearest I can find for {Material}.||Option A, {Away}: {Station}||in {System}. {Price} credits, {Tons} tons available.||Option B, {Away2}: {Station2}||in {System2}. {Price2} credits, {Tons2} tons available.",
-  "Not far. Two sellers of {Material}.||Option A, {Station}||in {System}, {Away}, at {Price} credits a tonne.||Option B, {Station2}||in {System2}, {Away2}, at {Price2} credits a tonne."
+  "Not far. Two sellers of {Material}.||Option A, {Station}||in {System}, {Away}, at {Price} credits a tonne with {Tons} tons.||Option B, {Station2}||in {System2}, {Away2}, at {Price2} credits a tonne with {Tons2} tons."
  ],
  "Buy_OneOption": [
   "One seller of {Material} fits.||{Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons in stock.",

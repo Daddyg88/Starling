@@ -120,6 +120,7 @@ class RouteVoice:
         self.state_provider = state_provider
         self.spawn = spawn or self._thread
         self._busy = False
+        self.target_override = None
 
     @staticmethod
     def _thread(function):
@@ -175,8 +176,18 @@ class RouteVoice:
         self.narrator.say("RouteBookmarkSaved", {"slot": slot_name(key), "system": here})
         return "Saved %s as %s" % (here, slot_name(key))
 
+    def set_target(self, system_name):
+        """The next run of the galaxy map macro pastes THIS system (copied to the clipboard) instead of the next waypoint.
+        Used when she finds a place to sell: no route is worked out, only the macro runs."""
+        self.target_override = str(system_name or "").strip() or None
+
     def prepare_plot(self):
         """Runs just before the 'plot the next waypoint' macro: is there something to paste?"""
+        if self.target_override:
+            name, self.target_override = self.target_override, None
+            if self.follower.copier(name):
+                return True, ""
+            return False, "I couldn't copy %s to your clipboard." % name
         if not self.follower.active:
             self.narrator.say("RouteNone")
             return False, "There is no route plotted."
@@ -209,19 +220,6 @@ class RouteVoice:
             self.narrator.say("RouteBookmarkEmpty", {"slot": slot_name(key)})
             return "%s is empty." % slot_name(key)
         name = self._destination_name(destination_text)
-        if not name:
-            self.narrator.say("RouteNoDestination")
-            return "No destination."
-        if self._busy:
-            return "Already plotting."
-        self._busy = True
-        self.narrator.say("RoutePlotting", {"destination": name})
-        self.spawn(lambda: self._plot_now(name))
-        return "Plotting a neutron route to %s" % name
-
-    def plot_exact(self, system_name):
-        """Plot a neutron route to a system whose exact name we already know (from a price lookup). Same macro afterwards."""
-        name = str(system_name or "").strip()
         if not name:
             self.narrator.say("RouteNoDestination")
             return "No destination."

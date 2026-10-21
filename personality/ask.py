@@ -46,9 +46,9 @@ class _Quiet(dict):
 
 class AskManager:
     def __init__(self, bus, speech, dialogue, settings, facts, state_provider=None, listening_provider=None,
-                 clock=time.monotonic, rng=None, timer_factory=None, route_provider=None):
+                 clock=time.monotonic, rng=None, timer_factory=None, plot_provider=None):
         self.bus = bus
-        self.route_provider = route_provider or (lambda: None)      # gives the neutron route voice (navigation/voice.py)
+        self.plot_provider = plot_provider or (lambda system: (False, ""))   # copies a system name and runs the galaxy map macro
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -374,12 +374,12 @@ class AskManager:
         values = {"Material": data.get("material", "")}
         values.update(self._option_values(option) if option else {})
         if answer == "yes":
-            voice = self.route_provider()
-            if voice is None or not hasattr(voice, "plot_exact") or not voice.enabled():
+            ok, reason = self.plot_provider(option.get("system"))
+            if not ok:
+                values["Reason"] = reason or "the galaxy map macro is not available"
                 self._say(self._line("Sell_RouteOff", values), "ask.reply")
                 return
             self._say(self._line("Sell_RouteYes", values), "ask.reply")
-            voice.plot_exact(option.get("system"))
         elif answer == "no":
             self._say(self._line("Sell_RouteNo", values), "ask.reply")
 

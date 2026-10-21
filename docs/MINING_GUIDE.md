@@ -58,8 +58,7 @@ What she searches for (numbers live at the top of `mining/prices.py` if you want
 
 She then says the two best as **Option A** and **Option B** (price per tonne, tons wanted, station and system), and asks "A or B?".
 Answer "A", "option b", "the second one", "bravo" (or "neither"). A plain "yes" means A, the better price.
-She then asks "Would you like me to plot a route for you?". Say yes and she plots a neutron route to that system and the
-auto neutron macro carries on as usual (needs the Navigation page's neutron plotter switched on). Saying nothing just drops it.
+She then asks "Would you like me to plot a route for you?". Say yes and she copies that system's name to your clipboard and runs the same galaxy map macro as "plot the next waypoint" (no Spansh route is worked out; voice commands must be on). Saying nothing just drops it.
 Buying ("where can I buy ...") keeps its old, gentler search. The sentences are in `voicepacks/default/selling.json`.
 
 
@@ -72,4 +71,4 @@ The same sentence can ask for two different things:
   "where is the nearest place to sell this" or "where can I buy tritium nearby". The closest two come first and she says how far away each is.
   For selling, "nearest" still needs large pads and prices from the last day, but accepts stations wanting only 100 tons (`NEAREST_MIN_DEMAND` in `mining/prices.py`).
 
-Buying now works like selling: Option A and Option B (price, tons in stock, station, system, distance), then "A or B?" and the offer to plot a neutron route.
+Buying now works like selling: Option A and Option B (price, tons in stock, station, system, distance), then "A or B?" and the offer to put the chosen system into the galaxy map.
