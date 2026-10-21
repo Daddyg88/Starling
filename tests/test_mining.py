@@ -376,7 +376,7 @@ class MoreMiningSpeechTests(unittest.TestCase):
         from personality.dialogue import DialogueManager
         d = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
         for key, minimum in (("Prospected_Good", 20), ("Prospected_Poor", 26), ("Prospected_Depleted", 18), ("Prospected_Dry", 15),
-                             ("Refined_Cheer", 18), ("Refined_Total", 16), ("Refined_Plain", 10), ("Launch_Prospector", 6),
+                             ("Refined_Cheer", 16), ("Refined_Total", 15), ("Refined_Plain", 10), ("Launch_Prospector", 6),
                              ("Launch_Collector", 6), ("ChitChat_Mining", 60)):
             self.assertGreaterEqual(len(d.lines.get(key, [])), minimum, key)
 

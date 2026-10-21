@@ -121,7 +121,7 @@ class MiningRefined(BaseEvent):
             say = "cheer"
         elif total_step and self.total % total_step == 0:
             say = "total"
-        elif tier == "low" and plain and self.rng.random() < plain:
+        elif tier == "low" and plain and key not in ("gold", "silver") and self.rng.random() < plain:   # she ignores gold and silver
             say = "plain"
         return {"Material": minerals.spoken(kind, entry.get("Type_Localised")), "Commodity": key, "Tier": tier,
                 "Count": count, "Total": self.total, "Announce": say}
