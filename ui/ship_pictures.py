@@ -2,7 +2,7 @@
 Finds the picture for a ship. No window code here, so it is easy to test.
 
 Pictures are looked for (in this order) in
-    data/ship_pictures/     your own pictures, and the ones tools/get_ship_pictures.py downloads (updates never delete this folder)
+    data/ship_pictures/     your own pictures (updates never delete this folder; used first)
     ui/assets/ships/        pictures that ship with Starling
 A picture is named after the ship with letters and numbers only: anaconda.png, cobra3.png (Cobra Mark 3), type9heavy.jpg ...
 The name she says is used ("Cobra Mark 3" -> cobra3), and so is the game's code ("cobramkiii"), so either works.

@@ -45,8 +45,6 @@ class Dashboard:
         self._status_labels = []
         self._home_signature = None
         self._ship_shown = None
-        self._download_busy = False
-        self._download_result = None
         self._ship_label = None
         self._ship_outline = None
         self._ship_images = {}
@@ -378,10 +376,7 @@ class Dashboard:
             value.grid(row=index, column=2, sticky="e", pady=5)
             self._home_widgets["bars"][key] = (bar, value)
         self._home_widgets["where"] = ctk.CTkLabel(card, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w")
-        self._home_widgets["where"].grid(row=3, column=0, columnspan=2, sticky="w", padx=18, pady=(8, 4))
-        ctk.CTkButton(card, text="GET SHIP PICTURES", width=150, height=24, font=self._font(T.SMALL_SIZE - 1, True, head=True),
-                      fg_color="transparent", text_color=T.ACCENT, hover_color=T.PANEL_HOVER, corner_radius=4,
-                      command=self.get_ship_pictures).grid(row=4, column=0, columnspan=2, sticky="w", padx=14, pady=(0, 10))
+        self._home_widgets["where"].grid(row=3, column=0, columnspan=2, sticky="w", padx=18, pady=(8, 14))
 
     @staticmethod
     def _draw_ship(canvas):
@@ -512,33 +507,6 @@ class Dashboard:
         if self._mood_score is not None:
             self._mood_score.configure(text=data["mood"])
         self._sync_events(items)
-
-    def get_ship_pictures(self):
-        """Downloads the ship pictures from the wiki in the background (the Home page keeps working)."""
-        if self._download_busy:
-            return
-        self._download_busy = True
-        self.save_note.configure(text="Downloading ship pictures... this takes a minute.", text_color=T.MUTED)
-        import threading
-
-        def work():
-            try:
-                from tools import get_ship_pictures
-                self._download_result = get_ship_pictures.download(lambda text: None)[1]
-            except Exception as problem:
-                log.exception("Ship picture download failed")
-                self._download_result = "Could not download the ship pictures: %s" % problem
-        threading.Thread(target=work, name="ship-pictures", daemon=True).start()
-
-    def _check_download(self):
-        """Called every second: shows the result of the download when it has finished."""
-        if self._download_result is None:
-            return
-        message, self._download_result = self._download_result, None
-        self._download_busy = False
-        self._ship_shown = None
-        self._home_signature = None
-        self.save_note.configure(text=message, text_color=T.MUTED)
 
     def _update_ship_picture(self, ship):
         """Her picture of the ship you are flying (see ui/assets/ships/README.txt). Only changes when the ship changes."""
@@ -1138,7 +1106,6 @@ class Dashboard:
             return
         try:
             self._update_header()
-            self._check_download()
             if self.current == "home":
                 self._refresh_home()
             elif self.current == "navigation":

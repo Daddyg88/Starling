@@ -8,7 +8,6 @@ from core import paths
 from personality import moods
 from personality.dialogue import DialogueManager
 from personality.mood_engine import BANDS, MoodEngine
-from tools import get_ship_pictures
 from ui import portraits, ship_pictures
 
 
@@ -31,13 +30,14 @@ class ShipPictureTests(unittest.TestCase):
             (Path(folder) / "sidewinder1.png").write_bytes(b"x")
             self.assertIsNotNone(ship_pictures.picture_for("sidewinder", folders=[folder]))
 
-    def test_downloader_reads_image_tags(self):
-        html = ('<img src="data:image/gif;base64,AAA" alt="x">'
-                '<img alt="Anaconda" data-src="https://static.wikia.nocookie.net/elite/images/a/ab/Anaconda.png/revision/latest/scale-to-width-down/185?cb=1">'
-                '<img alt="Wiki logo" src="https://static.wikia.nocookie.net/x/logo.png">')
-        found = get_ship_pictures.find_pictures(html)
-        self.assertEqual([name for name, _ in found], ["Anaconda"])
-        self.assertNotIn("scale-to-width", found[0][1])
+    def test_every_bundled_picture_is_named_with_a_slug(self):
+        for path in ship_pictures.ASSETS.iterdir():
+            if path.suffix in ship_pictures.EXTENSIONS:
+                self.assertEqual(ship_pictures.slug(path.stem), path.stem)
+
+    def test_known_ships_have_their_picture(self):
+        for code in ("anaconda", "cobramkiii", "typex", "federation_dropship_mkii", "python_nx", "sidewinder"):
+            self.assertIsNotNone(ship_pictures.picture_for(code, folders=[ship_pictures.ASSETS]), code)
 
 
 class MoodTests(unittest.TestCase):
