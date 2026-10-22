@@ -136,19 +136,46 @@ class MoodTests(MoodBase):
         self.engine.refresh()
         self.assertEqual(self.engine.score, 40)
 
-    def test_band_changes_have_hysteresis(self):
-        self.engine.score = 31
+    def test_moods_switch_up_at_the_line_and_fall_back_four_points_below_it(self):
+        self.engine.score = 29
         self.engine.refresh()
-        self.assertEqual(self.engine.band, "Friendly")      # needs 34 to become Close
-        self.engine.score = 35
+        self.assertEqual(self.engine.band, "Friendly")
+        self.engine.score = 30
         self.engine.refresh()
-        self.assertEqual(self.engine.band, "Close")
+        self.assertEqual(self.engine.band, "Close")         # no extra points needed to move up
         self.engine.score = 28
         self.engine.refresh()
-        self.assertEqual(self.engine.band, "Close")         # stays Close until 26
+        self.assertEqual(self.engine.band, "Close")         # stays Close until she is below 26
         self.engine.score = 25
         self.engine.refresh()
         self.assertEqual(self.engine.band, "Friendly")
+
+    def test_every_mood_switches_live_the_same_way_a_restart_would_choose_it(self):
+        """Climbing slowly through every score gives the same mood as starting fresh at that score (what a restart does)."""
+        self.engine.score = -100
+        self.engine.band = None
+        self.engine.refresh()
+        for tenths in range(-1000, 1001, 5):
+            self.engine.score = tenths / 10.0
+            self.engine.refresh()
+            fresh = self.engine._band_for(self.engine.score, None)
+            self.assertEqual(self.engine.band, fresh, self.engine.score)
+        self.assertEqual(self.engine.band, "Close")
+        for band, edge in (("Close", 30), ("Friendly", 10), ("Neutral", -10), ("Sarcastic", -35)):
+            self.engine.score = edge - 3.9
+            self.engine.refresh()
+            self.assertEqual(self.engine.band, band)         # still holding on, 4 points of grace going down
+            self.engine.score = edge - 4.1
+            self.engine.refresh()
+            self.assertNotEqual(self.engine.band, band)
+
+    def test_the_live_setting_follows_each_change(self):
+        for score, band in ((12, "Friendly"), (31, "Close"), (0, "Neutral"), (-12, "Sarcastic"), (-40, "Frustrated")):
+            self.engine.score = score
+            self.engine.band = None
+            self.engine.refresh()
+            self.assertEqual(self.engine.band, band)
+            self.assertEqual(self.engine.settings.get("personality.mood_live"), band)
 
     def test_neutral_is_the_calm_middle_between_friendly_and_sarcastic(self):
         bands = []
@@ -158,11 +185,11 @@ class MoodTests(MoodBase):
             self.engine.refresh()
             bands.append(self.engine.band)
         self.assertEqual(bands, ["Frustrated", "Sarcastic", "Neutral", "Friendly", "Close"])
-        self.engine.score = 12
+        self.engine.score = 9
         self.engine.band = "Neutral"
         self.engine.refresh()
-        self.assertEqual(self.engine.band, "Neutral")       # needs 14 to become Friendly
-        self.engine.score = 15
+        self.assertEqual(self.engine.band, "Neutral")       # Friendly starts at 10
+        self.engine.score = 10
         self.engine.refresh()
         self.assertEqual(self.engine.band, "Friendly")
 

@@ -28,7 +28,7 @@ While the game says you are **wanted** (a bounty or notoriety where you are), sh
 1. **Soft cap** - doing the same *kind* of thing again counts only 60% as much as the time before. Five repeats are worth about 2.3 times the first, never more than 2.5 times. It recovers after about 10 quiet minutes.
 2. **Hourly cap** - her mood can rise by at most 15 points and fall by at most 15 points in any hour (for actions; the notoriety drain is slow on its own).
 3. **Calming** - the score drifts back toward 0 by 1 point every 20 minutes (she forgives you), except while you are wanted.
-4. **Hysteresis** - she changes mood only after passing the line by 4 points, so she doesn't flip back and forth.
+4. **Hysteresis** - she moves UP to a better or worse band the moment she reaches the line (Close at 30, Friendly at 10, Neutral above -10, Sarcastic at -10 or lower, Frustrated at -35 or lower), but only falls BACK once she is 4 points past it (Close until 26, Friendly until 6), so she doesn't flip back and forth. (Before 0.24.3 the 4 points also applied going up, so she needed 34 for Close until you restarted.)
 5. **Not nagging** - she says something about an action at most once every 90 seconds, and stops mentioning it when repeats are worth almost nothing.
 6. **Safety first** - she never talks over, or instead of, safety warnings.
 

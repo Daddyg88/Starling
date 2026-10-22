@@ -354,7 +354,9 @@ class MoodEngine:
                     index = i
             return BANDS[index]
         index = BANDS.index(current)
-        while index < len(BANDS) - 1 and score >= bounds[index + 1] + hys:
+        # Going UP happens the moment she reaches the line (33 points means Close at once). The 4 points of hysteresis
+        # only apply going DOWN, so a mood does not flicker when she hovers just under it.
+        while index < len(BANDS) - 1 and score >= bounds[index + 1]:
             index += 1
         while index > 0 and score < bounds[index] - hys:
             index -= 1
