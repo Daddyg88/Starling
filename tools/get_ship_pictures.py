@@ -51,18 +51,17 @@ def find_pictures(html):
     return found
 
 
-def main():
+def download(say=print):
+    """Downloads every picture not already in data/ship_pictures/. Returns (new pictures, a sentence for the screen)."""
     folder = user_folder()
     folder.mkdir(parents=True, exist_ok=True)
-    print("Reading the ship list from the wiki...")
+    say("Reading the ship list from the wiki...")
     try:
         pictures = find_pictures(fetch(PAGE))
     except Exception as problem:                              # network down, wiki blocked, ...
-        print("Could not read the wiki page: %s" % problem)
-        return 1
+        return 0, "Could not read the wiki page: %s" % problem
     if not pictures:
-        print("The page did not list any pictures (the wiki may have changed). Put pictures in %s by hand instead." % folder)
-        return 1
+        return 0, "The wiki page listed no pictures (it may have changed). Put pictures in %s by hand instead." % folder
     done = 0
     for name, url in pictures:
         target = folder / (slug(name) + ".png")
@@ -77,15 +76,19 @@ def main():
                 picture.thumbnail((600, 600))
                 picture.save(target)
             except Exception:
-                target = folder / (slug(name) + ".png")
                 target.write_bytes(data)
             done += 1
-            print("  saved %s" % target.name)
+            say("  saved %s" % target.name)
             time.sleep(0.3)
         except Exception as problem:
-            print("  could not get %s: %s" % (name, problem))
-    print("Done: %d new pictures in %s" % (done, folder))
-    return 0
+            say("  could not get %s: %s" % (name, problem))
+    return done, "Ship pictures: %d new downloaded." % done
+
+
+def main():
+    done, message = download()
+    print(message)
+    return 0 if done or "new downloaded" in message else 1
 
 
 if __name__ == "__main__":

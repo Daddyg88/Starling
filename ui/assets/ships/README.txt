@@ -1,7 +1,7 @@
 SHIP PICTURES
 The Home page shows a picture of the ship you are flying.
 
-Easiest way: double-click run_get_ship_pictures.bat. It downloads the pictures from the Elite Dangerous wiki into
+Easiest way: press GET SHIP PICTURES on the Home page (Ship status card). It downloads the pictures from the Elite Dangerous wiki into
 data/ship_pictures/ (that folder is kept when Starling updates).
 
 By hand: put a picture in data/ship_pictures/ (or in this folder) named after the ship, letters and numbers only:
