@@ -2,11 +2,13 @@
 The MoodEngine: Starling's mood follows what you do in the game.
 
 A hidden score from -100 to +100 moves a little with each action (see config/mood_rules.json):
-    +30 or more   Close         (very happy, fond of you)
+    +60 or more   Infatuated    (head over heels)
+    +30 .. +60    Close         (very happy, fond of you)
     +10 .. +30    Friendly
     -10 .. +10    Neutral       (calm and professional: where she settles when nothing is happening)
     -35 .. -10    Sarcastic     (annoyed)
-    -35 or less   Frustrated
+    -60 .. -35    Frustrated
+    -60 or less   Upset         (really hurt and angry)
 
 It cannot swing wildly, because of four brakes:
     1. SOFT CAP   repeating the same kind of action gives less each time
@@ -32,7 +34,7 @@ from core.logger import get_logger
 
 log = get_logger("mood")
 
-BANDS = ["Frustrated", "Sarcastic", "Neutral", "Friendly", "Close"]
+BANDS = ["Upset", "Frustrated", "Sarcastic", "Neutral", "Friendly", "Close", "Infatuated"]
 WINDOW_SECONDS = 3600
 MAX_OFFLINE_CALMING_SECONDS = 0          # she does NOT calm down while Starling is closed (see offline_calm_hours)
 SAVE_AT_MOST_EVERY = 2.0                 # a change is saved straight away, but not more often than this
@@ -41,7 +43,8 @@ ACTIVE_PLAY_SECONDS = 300       # time counts as "playing" for 5 minutes after e
 SKIP_PREFIXES = ("app.", "journal.", "speech.", "voice.", "personality.")
 
 DEFAULT_SETTINGS = {
-    "start_score": 0, "close_at": 30, "friendly_at": 10, "sarcastic_at": -10, "frustrated_at": -35, "hysteresis": 4,
+    "start_score": 0, "close_at": 30, "friendly_at": 10, "sarcastic_at": -10, "frustrated_at": -35, "infatuated_at": 60, "upset_at": -60,
+    "hysteresis": 4,
     "hourly_cap": 15, "fatigue_factor": 0.6, "recovery_minutes": 10, "calm_minutes_per_point": 20, "offline_calm_hours": 0,
     "react_cooldown_seconds": 90, "react_min_effect": 0.9, "time_together_minutes": 25,
     "combat_grace_seconds": 45, "notoriety_points_per_hour": 6, "notoriety_floor": -25,
@@ -343,7 +346,7 @@ class MoodEngine:
 
     def _bounds(self):
         o = self.options
-        return [None, o["frustrated_at"], o["sarcastic_at"], o["friendly_at"], o["close_at"]]   # lower edge of each band
+        return [None, o["upset_at"], o["frustrated_at"], o["sarcastic_at"], o["friendly_at"], o["close_at"], o["infatuated_at"]]   # lower edge of each band
 
     def _band_for(self, score, current):
         bounds, hys = self._bounds(), float(self.options["hysteresis"])

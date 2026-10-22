@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Optional
 
 from core.logger import get_logger
+from personality import moods
 
 log = get_logger("dialogue")
 
@@ -106,6 +107,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "mining2.json"))       # more mining lines (less repetition)
             self._merge(_read_json(self.pack_dir / "plans.json"))         # "What are we doing today?"
             self._merge(_read_json(self.pack_dir / "selling.json"))       # where to sell: options A and B, plot a route?
+            self._merge(_read_json(self.pack_dir / "moods.json"))         # lines for Infatuated and Upset
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
         elif self.pack_dir is not None:
             log.warning("Voice pack folder not found: %s", self.pack_dir)
@@ -151,6 +153,9 @@ class DialogueManager:
         found = list(self.lines.get(key, []))
         if mood:
             found += self.lines.get("%s_%s" % (key, mood), [])
+            parent = moods.PARENT.get(mood)                      # Infatuated also uses Close lines, Upset also Frustrated lines
+            if parent:
+                found += self.lines.get("%s_%s" % (key, parent), [])
         if not allow_mature:
             found = [line for line in found if not line.mature]
         if prefer_recorded:

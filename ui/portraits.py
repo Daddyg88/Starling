@@ -1,15 +1,17 @@
 """
 Her picture for each mood. No window code here, so it is easy to test.
 
-Pictures live in ui/assets/portraits/ and are named after the mood: Close, Friendly, Neutral, Sarcastic, Frustrated
+Pictures live in ui/assets/portraits/ and are named after the mood: Infatuated, Close, Friendly, Neutral, Sarcastic, Frustrated, Upset
 (.png, .jpg, .jpeg or .webp). A mood without its own picture uses Neutral; if that is missing too, ui/assets/avatar.png.
 """
 
 from pathlib import Path
 
+from personality.moods import PARENT
+
 ASSETS = Path(__file__).resolve().parent / "assets"
 PORTRAITS = ASSETS / "portraits"
-MOODS = ("Close", "Friendly", "Neutral", "Sarcastic", "Frustrated")
+MOODS = ("Infatuated", "Close", "Friendly", "Neutral", "Sarcastic", "Frustrated", "Upset")
 EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
 
 
@@ -26,7 +28,7 @@ def portrait_for(mood, folder=None):
     """The picture file for this mood, or None if there are no pictures at all."""
     folder = Path(folder) if folder is not None else PORTRAITS
     mood = mood if mood in MOODS else "Neutral"
-    found = _find(folder, mood) or _find(folder, "Neutral")
+    found = _find(folder, mood) or _find(folder, PARENT.get(mood, "Neutral")) or _find(folder, "Neutral")
     if found is None and (ASSETS / "avatar.png").is_file():
         found = ASSETS / "avatar.png"
     return found

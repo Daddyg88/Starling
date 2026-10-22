@@ -50,8 +50,9 @@ class Page:
 # ---------------------------------------------------------------------------
 VOLUME = [("Mute", 0)] + [("%d%%" % v, v) for v in range(10, 101, 10)]
 SPEED = [("Very slow", -6), ("Slow", -3), ("Normal", 0), ("Fast", 3), ("Very fast", 6)]
-MOODS = [("Neutral (calm, professional)", "Neutral"), ("Friendly", "Friendly"), ("Close (very happy, loving)", "Close"), ("Sarcastic (sassy)", "Sarcastic"),
-         ("Frustrated", "Frustrated")]
+MOODS = [("Infatuated (head over heels)", "Infatuated"), ("Close (very happy, loving)", "Close"), ("Friendly", "Friendly"),
+         ("Neutral (calm, professional)", "Neutral"), ("Sarcastic (sassy)", "Sarcastic"), ("Frustrated", "Frustrated"),
+         ("Upset (really angry)", "Upset")]
 LISTEN_QUALITY = [("Fast (smallest)", "tiny.en"), ("Balanced", "base.en"), ("Accurate (slower)", "small.en")]
 SENSITIVITY = [("Automatic (recommended)", 0), ("Very sensitive (quiet room)", 0.008), ("Sensitive", 0.015),
                ("Normal", 0.025), ("Noisy room", 0.05)]

@@ -28,7 +28,7 @@ WARN = "#FFB84D"
 BAD = "#FF5C7A"
 
 # the frame round her picture changes with her mood
-MOOD_COLOURS = {"Close": "#FF7AC8", "Friendly": "#3DFFB0", "Neutral": "#3DD9FF",
+MOOD_COLOURS = {"Infatuated": "#FF4FB3", "Upset": "#C8203F", "Close": "#FF7AC8", "Friendly": "#3DFFB0", "Neutral": "#3DD9FF",
                 "Sarcastic": "#FFB84D", "Frustrated": "#FF5C7A"}
 
 FONT = "Segoe UI"         # body text: a clean font every Windows PC has

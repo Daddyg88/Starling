@@ -7,6 +7,8 @@
     "friendly_at": 10,
     "sarcastic_at": -10,
     "frustrated_at": -35,
+    "infatuated_at": 60,
+    "upset_at": -60,
     "hysteresis": 4,
     "hourly_cap": 15,
     "fatigue_factor": 0.6,

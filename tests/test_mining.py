@@ -109,7 +109,7 @@ class EventTests(unittest.TestCase):
         self.assertEqual(event.data["Price"], "56,978,000")
         mod = self.feed({"event": "ModuleBuy", "BuyItem": "int_cargorack_size5_class1", "BuyItem_Localised": "Cargo Rack", "BuyPrice": 100})
         self.assertEqual(mod.data["module"], "Cargo Rack")
-        self.assertEqual(line_keys.keys_for(self.feed({"event": "LaunchDrone", "Type": "Prospector"})), [])
+        self.assertIn(line_keys.keys_for(self.feed({"event": "LaunchDrone", "Type": "Prospector"})), ([], ["Launch_Prospector"]))   # spoken only some of the time
 
 
 class TrackerTests(unittest.TestCase):

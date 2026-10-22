@@ -149,7 +149,7 @@ class NeutralMoodTests(unittest.TestCase):
     def test_neutral_is_in_the_dashboard_choices(self):
         from ui.settings_model import MOODS
         self.assertIn("Neutral", [value for _label, value in MOODS])
-        self.assertEqual(len(MOODS), 5)
+        self.assertEqual(len(MOODS), 7)
 
     def test_neutral_has_calm_remarks_and_pet_names(self):
         f, d = self.flavour("Neutral")

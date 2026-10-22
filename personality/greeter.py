@@ -144,7 +144,7 @@ class LoginGreeter:
                 sentence = "%s || %s" % (sentence, remembered)
         if personality:
             key = "Login_Mood_" + (mood or "Friendly")
-            if (self.flavour is not None and self.flavour.innuendo_on(mood) and mood not in ("Sarcastic", "Frustrated")
+            if (self.flavour is not None and self.flavour.innuendo_on(mood) and mood not in ("Sarcastic", "Frustrated", "Upset")
                     and random.random() < 0.5):
                 key = "Login_Mood_Innuendo"
             feeling = self._say(key, "", values) or self._say("Login_Mood_" + (mood or "Friendly"), "", values)

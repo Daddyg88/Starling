@@ -12,7 +12,7 @@ import time
 
 from core.identity import assistant_name
 from core.logger import get_logger
-from ui import portraits
+from ui import portraits, ship_pictures
 from ui import theme as T
 from ui.settings_model import SettingsModel
 from ui.status import EventFeed, collect_status, header_data, home_data
@@ -44,6 +44,11 @@ class Dashboard:
         self.current = None
         self._status_labels = []
         self._home_signature = None
+        self._ship_shown = None
+        self._ship_label = None
+        self._ship_outline = None
+        self._ship_images = {}
+        self._galaxy_image = None
         self._status_pool = []
         self._feed_pool = []
         self._portrait_images = {}
@@ -296,12 +301,27 @@ class Dashboard:
             value = ctk.CTkLabel(facts, text="-", font=self._font(T.BODY_SIZE), text_color=T.ORANGE if key == "security" else T.TEXT, anchor="w")
             value.grid(row=index, column=1, sticky="w", padx=(8, 0), pady=2)
             self._home_widgets["system_" + key] = value
-        galaxy = ctk.CTkCanvas(card, width=210, height=130, bg=T.PANEL, highlightthickness=0)
-        galaxy.grid(row=0, column=1, rowspan=3, padx=(0, 10), pady=6)
-        self._draw_galaxy(galaxy)
+        self._galaxy_picture(card)
         ctk.CTkButton(card, text="GALAXY MAP  \u2197", width=130, height=24, font=self._font(T.SMALL_SIZE - 1, True, head=True),
                       fg_color="transparent", text_color=T.ACCENT, hover_color=T.PANEL_HOVER, corner_radius=4,
                       command=self.open_system_map).grid(row=3, column=1, sticky="e", padx=(0, 14), pady=(0, 10))
+
+    def _galaxy_picture(self, card):
+        """The galaxy map picture (ui/assets/galaxy.jpg). If it cannot be loaded, a little drawn spiral is used instead."""
+        ctk = self.ctk
+        try:
+            from PIL import Image
+            picture = Image.open(portraits.ASSETS / "galaxy.jpg")
+            picture.load()
+            image = ctk.CTkImage(light_image=picture, dark_image=picture, size=(150, 150))
+            self._galaxy_image = image                                  # keep a reference, or the picture disappears
+            ctk.CTkLabel(card, text="", image=image, fg_color="transparent").grid(
+                row=0, column=1, rowspan=3, padx=(0, 14), pady=(10, 4))
+        except Exception:
+            log.warning("Could not load the galaxy picture", exc_info=True)
+            canvas = ctk.CTkCanvas(card, width=210, height=130, bg=T.PANEL, highlightthickness=0)
+            canvas.grid(row=0, column=1, rowspan=3, padx=(0, 10), pady=6)
+            self._draw_galaxy(canvas)
 
     @staticmethod
     def _draw_galaxy(canvas):
@@ -330,9 +350,17 @@ class Dashboard:
         self._panel_title(card, "\u2630", "Ship status", T.ACCENT, row=0, column=0)
         self._home_widgets["ship_name"] = ctk.CTkLabel(card, text="-", font=self._font(T.BODY_SIZE), text_color=T.TEXT, anchor="e")
         self._home_widgets["ship_name"].grid(row=0, column=1, sticky="e", padx=18, pady=(14, 6))
-        ship = ctk.CTkCanvas(card, width=290, height=84, bg=T.PANEL, highlightthickness=0)
-        ship.grid(row=1, column=0, columnspan=2, pady=(0, 6))
-        self._draw_ship(ship)
+        holder = ctk.CTkFrame(card, fg_color="transparent", width=290, height=100)
+        holder.grid(row=1, column=0, columnspan=2, pady=(0, 6))
+        holder.grid_propagate(False)
+        holder.grid_columnconfigure(0, weight=1)
+        holder.grid_rowconfigure(0, weight=1)
+        self._ship_outline = ctk.CTkCanvas(holder, width=290, height=84, bg=T.PANEL, highlightthickness=0)
+        self._ship_outline.grid(row=0, column=0)
+        self._draw_ship(self._ship_outline)
+        self._ship_label = ctk.CTkLabel(holder, text="", fg_color="transparent")     # shown instead of the outline when a picture exists
+        self._ship_label.grid(row=0, column=0)
+        self._ship_label.grid_remove()
         bars = ctk.CTkFrame(card, fg_color="transparent")
         bars.grid(row=2, column=0, columnspan=2, sticky="ew", padx=18)
         bars.grid_columnconfigure(1, weight=1)
@@ -470,6 +498,7 @@ class Dashboard:
             w["system_" + key].configure(text=system[key])
         ship = data["ship"]
         w["ship_name"].configure(text=ship["name"])
+        self._update_ship_picture(ship)
         w["where"].configure(text=ship["where"])
         for key in ("fuel", "hull", "shields", "cargo"):
             bar, value = w["bars"][key]
@@ -478,6 +507,33 @@ class Dashboard:
         if self._mood_score is not None:
             self._mood_score.configure(text=data["mood"])
         self._sync_events(items)
+
+    def _update_ship_picture(self, ship):
+        """Her picture of the ship you are flying (see ui/assets/ships/README.txt). Only changes when the ship changes."""
+        key = (ship.get("code"), ship.get("name"))
+        if key == self._ship_shown or self._ship_label is None:
+            return
+        self._ship_shown = key
+        path = None
+        try:
+            path = ship_pictures.picture_for(ship.get("code") or "", ship.get("name") if ship.get("name") != "-" else "")
+            if path is not None:
+                if path not in self._ship_images:
+                    from PIL import Image
+                    picture = Image.open(path)
+                    picture.load()
+                    size = portraits.fit(picture.width, picture.height, 290, 100)
+                    self._ship_images[path] = self.ctk.CTkImage(light_image=picture, dark_image=picture, size=size)
+                self._ship_label.configure(image=self._ship_images[path])
+        except Exception:
+            log.warning("Could not load the ship picture", exc_info=True)
+            path = None
+        if path is not None:
+            self._ship_outline.grid_remove()
+            self._ship_label.grid()
+        else:
+            self._ship_label.grid_remove()
+            self._ship_outline.grid()
 
     def _sync_events(self, items):
         """The Recent events list: time, kind and words. Rows are re-used."""

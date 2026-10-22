@@ -20,6 +20,7 @@ All the words live in voicepacks/default/personality.json - edit them freely.
 import random
 import re
 
+from personality import moods
 from personality.mood_engine import effective_mood
 import time
 
@@ -30,8 +31,8 @@ PET_NAME_CHANCE = 0.35
 REMARK_COOLDOWN_SECONDS = 40
 MAX_LINE_CHARS = 150            # long lines (exobiology numbers etc.) are left alone
 _COMMANDER = re.compile(r"\bCommander\b(?!\s+[A-Z])")
-GOOD_MOODS = ("Friendly", "Close")
-BAD_MOODS = ("Sarcastic", "Frustrated")
+GOOD_MOODS = ("Friendly", "Close", "Infatuated")
+BAD_MOODS = ("Sarcastic", "Frustrated", "Upset")
 DARK_HUMOUR_CHANCE = 0.2          # of the remarks she makes, about one in five is gallows humour
 
 
@@ -59,11 +60,11 @@ class Flavour:
         """The dashboard switch is on, and she is Friendly or Close (flirty), Sarcastic or Frustrated (rude), or calm and rich-in-cargo."""
         if not self.settings.get("personality.innuendo", False):
             return False
-        return mood in ("Close", "Friendly", "Sarcastic", "Frustrated") or (self.rich() and mood == "Neutral")
+        return mood in ("Infatuated", "Close", "Friendly", "Sarcastic", "Frustrated", "Upset") or (self.rich() and mood == "Neutral")
 
     def _innuendo_chance(self, mood, close_chance):
         """Cheekiest when she is Close; less often when Friendly, and when she is in a bad mood."""
-        if mood == "Close":
+        if mood in ("Close", "Infatuated"):
             return close_chance
         return close_chance * (0.6 if mood == "Friendly" else 0.5)
 
@@ -72,7 +73,7 @@ class Flavour:
         if not self.settings.get("personality.dark_humour", True):
             return None
         mature = self._mature()
-        key = "Remark_Dark_%s" % mood
+        key = "Remark_Dark_%s" % moods.base(mood)
         pool = self.dialogue.pool(key, "", mature, False)
         if pool and self.rng.random() < 0.6:
             return self._pick(key)
@@ -92,13 +93,13 @@ class Flavour:
             name = self._pick("PetName_Naughty_Grumpy" if mood in BAD_MOODS else "PetName_Naughty")
             if name:
                 return name
-        if self.rich() and (mood != "Frustrated" or self.rng.random() < 0.4):
+        if self.rich() and (mood not in ("Frustrated", "Upset") or self.rng.random() < 0.4):
             return self._pick("PetName_Affection")
         if mood == "Neutral":
             return self._pick("PetName_Neutral")
         if mood in GOOD_MOODS:
             return self._pick("PetName_Cute")
-        if mood == "Frustrated" and self._mature() and self.rng.random() < 0.5:
+        if mood in ("Frustrated", "Upset") and self._mature() and self.rng.random() < 0.5:
             return self._pick("PetName_Sweary")
         return self._pick("PetName_Snide")
 
@@ -112,15 +113,15 @@ class Flavour:
             remark = self._dark_remark(mood)
             if remark:
                 return remark
-        if self.rich() and (mood != "Frustrated" or self.rng.random() < 0.4):
+        if self.rich() and (mood not in ("Frustrated", "Upset") or self.rng.random() < 0.4):
             return self._pick("Remark_Affection")
         if mood == "Neutral":
             return self._pick("Remark_Neutral")
         if mood in GOOD_MOODS:
-            if mood == "Close" and self.rng.random() < 0.3:
+            if mood in ("Close", "Infatuated") and self.rng.random() < 0.3:
                 return self._pick("Remark_Affection") if self.rich() else self._pick("Remark_Cute")
             return self._pick("Remark_Cute")
-        sweary_chance = 0.6 if mood == "Frustrated" else 0.3
+        sweary_chance = 0.6 if mood in ("Frustrated", "Upset") else 0.3
         if self._mature() and self.rng.random() < sweary_chance:
             return self._pick("Remark_Sweary")
         return self._pick("Remark_Snide")

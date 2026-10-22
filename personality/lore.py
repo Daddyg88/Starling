@@ -21,8 +21,9 @@ from personality.mood_engine import effective_mood
 
 log = get_logger("lore")
 
-BAD_MOODS = ("Sarcastic", "Frustrated")
-TIERS = {"": ["Lore_L1"], "Neutral": ["Lore_L1"], "Friendly": ["Lore_L1", "Lore_L2"], "Close": ["Lore_L1", "Lore_L2", "Lore_L3"]}
+BAD_MOODS = ("Sarcastic", "Frustrated", "Upset")
+TIERS = {"": ["Lore_L1"], "Neutral": ["Lore_L1"], "Friendly": ["Lore_L1", "Lore_L2"], "Close": ["Lore_L1", "Lore_L2", "Lore_L3"],
+         "Infatuated": ["Lore_L1", "Lore_L2", "Lore_L3"]}
 ALL_GOOD = ["Lore_L1", "Lore_L2", "Lore_L3"]
 RECENT_SECONDS = 300.0
 

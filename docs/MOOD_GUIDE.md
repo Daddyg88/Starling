@@ -6,11 +6,13 @@ Her mood follows what you do in the game. Choose **Automatic** under *Personalit
 
 | Score | Mood |
 |---|---|
-| 30 and above | **Close** (very happy, fond of you) |
+| 60 and above | **Infatuated** (new in 0.26.0: head over heels) |
+| 30 to 60 | **Close** (very happy, fond of you) |
 | 10 to 30 | **Friendly** |
 | -10 to 10 | **Neutral** (calm and professional; where she settles when nothing is happening) |
 | -35 to -10 | **Sarcastic** (annoyed) |
-| -35 and below | **Frustrated** |
+| -35 to -60 | **Frustrated** |
+| -60 and below | **Upset** (new in 0.26.0: really hurt and angry) |
 
 Scores run from -100 to +100 and start at 0. The score is saved in `data/mood.json`.
 
@@ -96,3 +98,7 @@ Everything above is in `config/mood_rules.json`. Change a `delta`, or the number
 - **Flirty and naughty when she's very happy** (Personality page, off by default). Only in the **Close** mood (or Friendly/Neutral while she is
   affectionate about the exobiology you carry). Cheeky double meanings about flying, never explicit. With strong language on, a few
   are cheekier. Never added to safety warnings or in "info" style.
+
+
+## Infatuated and Upset (0.26.0)
+Infatuated sits above Close and Upset sits below Frustrated. Both use every line written for Close / Frustrated and add a few of their own (voicepacks/default/moods.json). Their lines of their own are short for now; add more under keys like `FSDJump_Infatuated` or `Docked_Upset`. The lines are `infatuated_at` (60) and `upset_at` (-60) in config/mood_rules.json. Pictures: Infatuated.png and Upset.png in ui/assets/portraits/ (until you add them she shows Close and Neutral).

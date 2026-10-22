@@ -19,8 +19,8 @@ from ui.settings_model import SettingsModel
 class PortraitTests(unittest.TestCase):
     def test_pictures_match_moods_and_bad_moods_use_neutral(self):
         names = {m: portraits.portrait_for(m).stem for m in portraits.MOODS}
-        self.assertEqual(names, {"Close": "Close", "Friendly": "Friendly", "Neutral": "Neutral",
-                                 "Sarcastic": "Neutral", "Frustrated": "Neutral"})
+        self.assertEqual(names, {"Infatuated": "Close", "Close": "Close", "Friendly": "Friendly", "Neutral": "Neutral",
+                                 "Sarcastic": "Neutral", "Frustrated": "Neutral", "Upset": "Neutral"})
 
     def test_unknown_mood_is_neutral(self):
         self.assertEqual(portraits.portrait_for("Whatever").stem, "Neutral")

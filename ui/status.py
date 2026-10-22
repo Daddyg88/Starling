@@ -218,7 +218,7 @@ def home_data(app, now=None):
         "time": now.strftime("%H:%M"), "date": elite_date(now),
         "system": {"name": system, "security": get("system_security") or "-", "allegiance": get("system_allegiance") or "-",
                    "population": population_text(get("system_population"))},
-        "ship": {"name": ship, "fuel": fuel, "hull": max(0.0, min(1.0, float(hull or 0))), "shields": shields,
+        "ship": {"name": ship, "code": get("ship") or "", "fuel": fuel, "hull": max(0.0, min(1.0, float(hull or 0))), "shields": shields,
                  "cargo": _percent(cargo, capacity), "cargo_text": cargo_text, "where": "%s  |  %s" % (system, where)},
         "mood": mood_text,
     }

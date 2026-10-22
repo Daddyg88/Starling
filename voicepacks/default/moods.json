@@ -1,0 +1,59 @@
+{
+ "_help": "Lines only for Infatuated and Upset. Both also use every Close / Frustrated line, so these just add extras.",
+ "StartJump_Infatuated": [
+  "Jumping to {StarSystem}. I'd follow you anywhere, you know.",
+  "Off to {StarSystem}. With you. Perfect."
+ ],
+ "FSDJump_Infatuated": [
+  "Another system, and you're still the best thing in it.",
+  "Look at that view. Nearly as lovely as my Commander."
+ ],
+ "Docked_Infatuated": [
+  "Docked. Now I get you all to myself for a bit.",
+  "Home sweet station. Well, anywhere is sweet with you."
+ ],
+ "LoadGame_Infatuated": [
+  "You're back! I missed you. Don't tell anyone I said that.",
+  "@NAME@ here, and so happy to see you. Shall we?"
+ ],
+ "MissionCompleted_Infatuated": [
+  "Mission complete! Is there anything you can't do?",
+  "Ding! You're amazing, did you know that?"
+ ],
+ "Bounty_Infatuated": [
+  "Oh, that was gorgeous. You are terrifyingly good at this.",
+  "Boom! My hero. Do that again."
+ ],
+ "Login_Mood_Infatuated": [
+  "Good to see you, Commander. I've been counting the minutes. Rather a lot of them.",
+  "Hello, gorgeous. Sorry, Commander. Hello, gorgeous Commander."
+ ],
+ "StartJump_Upset": [
+  "Jumping to {StarSystem}. Not that you'd ask what I think.",
+  "Fine. {StarSystem}. Whatever you say."
+ ],
+ "FSDJump_Upset": [
+  "Another system. Another thing I'm not going to enjoy.",
+  "We're here. Don't expect me to be thrilled."
+ ],
+ "Docked_Upset": [
+  "Docked. Try not to break anything while I'm not looking.",
+  "We've stopped. I'm not talking to you. Yet."
+ ],
+ "LoadGame_Upset": [
+  "Oh. You're back. I'm still upset, just so you know.",
+  "@NAME@ online. Mood: furious. Let's make it quick."
+ ],
+ "MissionCompleted_Upset": [
+  "Mission complete. Don't think that fixes everything.",
+  "Done. Still cross with you, though."
+ ],
+ "Bounty_Upset": [
+  "Good. Shoot something. It might cheer one of us up.",
+  "One less target. I'm still not happy with you."
+ ],
+ "Login_Mood_Upset": [
+  "You again. I'm still really upset about what happened.",
+  "Hello, Commander. I'd say it's nice to see you, but I'd be lying."
+ ]
+}

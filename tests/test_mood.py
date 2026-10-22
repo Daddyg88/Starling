@@ -160,8 +160,8 @@ class MoodTests(MoodBase):
             self.engine.refresh()
             fresh = self.engine._band_for(self.engine.score, None)
             self.assertEqual(self.engine.band, fresh, self.engine.score)
-        self.assertEqual(self.engine.band, "Close")
-        for band, edge in (("Close", 30), ("Friendly", 10), ("Neutral", -10), ("Sarcastic", -35)):
+        self.assertEqual(self.engine.band, "Infatuated")
+        for band, edge in (("Infatuated", 60), ("Close", 30), ("Friendly", 10), ("Neutral", -10), ("Sarcastic", -35), ("Frustrated", -60)):
             self.engine.score = edge - 3.9
             self.engine.refresh()
             self.assertEqual(self.engine.band, band)         # still holding on, 4 points of grace going down
