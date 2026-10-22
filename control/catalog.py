@@ -51,6 +51,9 @@ DOCKING_MACRO = ("FocusLeftPanel", "wait 1.2", "CycleNextPanel x2", "wait 1.2", 
                  "UI_Select", "wait 1.2", "UI_Back")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
+# Auto launch from a station: Select on the Launch button of the station menu. Only works while docked (see core/app.py). If
+# your menu needs more presses, put your own steps in config/settings.json under macros.auto_launch.
+LAUNCH_MACRO = ("wait 0.3", "UI_Select")
 NOMAD_MACRO = ("FocusRadarPanel", "wait 0.8", "UI_Down", "wait 0.2", "UI_Right", "wait 0.2", "UI_Select")
 
 # Plot the next neutron waypoint, hands free (the clipboard already holds its name, see navigation/route.py).
@@ -129,8 +132,8 @@ CATALOG = [
       doing={"on": "Deploying hardpoints", "off": "Retracting hardpoints", "toggle": "Toggling hardpoints"},
       flag=("Flags", 6, False), words=("deployed", "retracted")),
     C("scoop", "ToggleCargoScoop", "The cargo scoop",
-      on=["{DEPLOY_V} scoop", "{ON_V} scoop", "scoop (out|open|on|deployed)", "(open|extend) [the] scoop"],
-      off=["{RETRACT_V} scoop", "{OFF_V} scoop", "scoop (in|closed|off|away|retracted)", "(close|retract) [the] scoop"],
+      on=["{DEPLOY_V} scoop", "{ON_V} scoop", "scoop (out|open|on|deployed|down)", "(open|extend) [the] scoop"],
+      off=["{RETRACT_V} scoop", "{OFF_V} scoop", "scoop (in|up|closed|off|away|retracted)", "(close|retract) [the] scoop"],
       toggle=["{TOGGLE_V} scoop", "scoop toggle", "scoop"],
       doing={"on": "Deploying the cargo scoop", "off": "Retracting the cargo scoop", "toggle": "Toggling the cargo scoop"},
       flag=("Flags", 9, False), words=("deployed", "retracted")),
@@ -354,6 +357,11 @@ CATALOG = [
       press=["(deploy|launch|send out|release|drop|put out) [the|my] nomad", "nomad (deploy|launch)", "(deploy|launch) [the|my] (nomad shuttle|exploration shuttle)",
              "get the nomad out", "(deploy|launch) nomad"],
       doing={"press": "Deploying the Nomad"}, strict=True, macro=NOMAD_MACRO),
+
+    C("auto_launch", "UI_Select", "the launch",
+      press=["launch", "auto launch", "[(please|ok)] launch (the ship|us|now)", "(launch|take off|lift off|depart) (from|out of|off) [the] (station|port|pad|dock|starport|outpost)",
+             "(auto|automatic) (launch|take off)", "{REQUEST_V} (launch|take off)", "undock", "(undock|launch) [the] ship", "take off", "launch us"],
+      doing={"press": "Launching"}, strict=True, macro=LAUNCH_MACRO),
 
     C("plot_waypoint", "GalaxyMapOpen", "the next waypoint",
       press=["(plot|set|put in|enter|load|lay in) [the] (next|neutron) (waypoint|stop|neutron|neutron star)",

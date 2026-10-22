@@ -352,7 +352,18 @@ class App:
 
     def _macro_hooks(self):
         voice = self.route_voice
-        return {"plot_waypoint": voice.prepare_plot} if voice is not None else {}
+        hooks = {"plot_waypoint": voice.prepare_plot} if voice is not None else {}
+        hooks["auto_launch"] = self._launch_check
+        return hooks
+
+    def _launch_check(self):
+        """'Launch' only works while docked, so she never presses Select somewhere else by mistake."""
+        state = getattr(self, "state", None)
+        if state is None or not getattr(state, "status_seen", False):
+            return True, ""                                    # no Status.json yet: trust the commander
+        if (getattr(state, "status_flags", 0) or 0) & 1:       # bit 0 = docked
+            return True, ""
+        return False, "We are not docked, Commander."
 
     def _connect_auto_plot(self):
         """Lets the route follower start the galaxy map macro by itself (when the setting is on)."""

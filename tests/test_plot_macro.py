@@ -296,3 +296,24 @@ class NavigationButtonTests(unittest.TestCase):
         self.assertEqual(waits, [4])
         self.assertEqual(ran, ["plot the next waypoint"])
         self.assertIn("4 seconds", message)
+
+
+class AutoLaunchTests(unittest.TestCase):
+    def test_launch_phrases_and_scoop_words(self):
+        from control.matcher import Matcher
+        m = Matcher()
+        for text in ("launch", "auto launch", "launch from the station", "undock"):
+            self.assertEqual(m.match(text).command.id, "auto_launch", text)
+        self.assertEqual(m.match("launch the nomad").command.id, "deploy_nomad")
+        self.assertEqual((m.match("lower the cargo scoop").command.id, m.match("lower the cargo scoop").intent), ("scoop", "on"))
+        self.assertEqual(m.match("raise the cargo scoop").intent, "off")
+        self.assertEqual(m.match("cargo scoop up").intent, "off")
+
+    def test_launch_only_while_docked(self):
+        from types import SimpleNamespace
+        from core.app import App
+        check = App._launch_check
+        fake = lambda **kw: SimpleNamespace(state=SimpleNamespace(**kw))
+        self.assertTrue(check(fake(status_seen=True, status_flags=1))[0])
+        self.assertFalse(check(fake(status_seen=True, status_flags=16))[0])
+        self.assertTrue(check(fake(status_seen=False, status_flags=0))[0])

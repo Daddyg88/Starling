@@ -371,3 +371,10 @@ If your Navigation page already has the toggle saved as off, switch it on and Sa
 **Navigation page buttons** *Plot neutron route to my destination*, a box to type any system and *Plot to this system*, *Plot the next waypoint in the galaxy map* (waits 4 seconds so you can click back into Elite), and *Clear the route*.
 
 **Not tested here:** Windows, Elite, the X52, Spansh and Void Compass (all tested with fakes only). The Navigation page itself can't be shown without a screen; its actions are tested.
+
+## "Launch" from a station (0.27.0)
+Say "launch", "auto launch", "launch from the station" or "undock" while docked and she presses UI Select (after 0.3 s) on the station menu. She refuses with "We are not docked, Commander." anywhere else. If your menu needs different presses, put your own steps in `config/settings.json`:
+
+    "macros": { "auto_launch": ["wait 0.3", "UI_Down", "UI_Select"] }
+
+Cargo scoop: "lower / raise / drop / retract the cargo scoop" (and "scoop down / up") already worked.
