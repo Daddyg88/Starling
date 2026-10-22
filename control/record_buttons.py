@@ -75,7 +75,7 @@ def run_record_buttons(app, reader=None, out=print, ask=input, sleep=time.sleep,
     devices = reader.devices(force=True)
     if devices:
         for device in devices:
-            out("   Found: %s%s" % (device.name, "  <-- X52 HOTAS" if device.is_x52() else ""))
+            out("   Found: %s%s" % (device.name, ("  <-- X52 HOTAS" if device.is_x52() else "  <-- HOTAS" if device.is_hotas() else "")))
     else:
         out("   No joystick found. Plug it in and run this again (keyboard and mouse still work).")
     out("")

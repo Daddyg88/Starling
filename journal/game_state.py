@@ -11,6 +11,7 @@ class GameState:
     commander: Optional[str] = None
     ship: Optional[str] = None
     ship_name: Optional[str] = None
+    ship_model: Optional[str] = None          # the model the game names ("Caspian Explorer"), as opposed to ship_name (your own name for it)
     system: Optional[str] = None
     station: Optional[str] = None
     docked: bool = False

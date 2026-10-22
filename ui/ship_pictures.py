@@ -15,7 +15,9 @@ from core.ships import ship_name
 
 ASSETS = Path(__file__).resolve().parent / "assets" / "ships"
 EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
-ALIASES = {"eagle": ("eagle2",), "viper": ("viper3",), "cobramkiii": ("cobra3",), "cobramkiv": ("cobra4",)}
+ALIASES = {"eagle": ("eagle2",), "viper": ("viper3",), "cobramkiii": ("cobra3",), "cobramkiv": ("cobra4",),
+           "explorernx": ("caspianexplorer",), "lakonminer": ("type11prospector",), "typex": ("alliancechieftain", "chieftain"),
+           "lynxbloodline": ("lynxhighliner",), "panthermkii": ("pantherclipper2",)}
 _MARK = re.compile(r"m(?:ar)?k\.?[\s_-]*(vi|iv|iii|ii|v|i|[1-6])(?![a-z])", re.I)
 _ROMAN = {"i": "1", "ii": "2", "iii": "3", "iv": "4", "v": "5", "vi": "6"}
 

@@ -49,6 +49,18 @@ MOUSE = {"X1": 0x05, "X2": 0x06, "Middle": 0x04}      # left and right click are
 MOUSE_NAME = {code: name for name, code in MOUSE.items()}
 
 
+# Any HOTAS / flight stick works, not only the X52. A device counts as a flight stick if its name has one of these words.
+STICK_WORDS = ("x52", "x55", "x56", "x65", "x45", "saitek", "thrustmaster", "t16000", "t.16000", "warthog", "hotas", "tca", "tflight",
+               "t flight", "vkb", "gladiator", "gunfighter", "virpil", "constellation", "honeycomb", "alpha", "ch products",
+               "fighterstick", "cougar", "extreme 3d", "attack 3", "flight", "joystick", "stick", "sidewinder", "cyborg", "mad catz")
+NOT_THE_STICK_WORDS = ("throttle", "tqs", "rudder", "pedal", "pedals", "panel", "button box", "mfd", "sltek")
+GAMEPAD_WORDS = ("xbox", "gamepad", "xinput", "dualshock", "dualsense", "wireless controller", "vjoy", "virtual", "keyboard", "mouse")
+
+
+def _flat(text):
+    return "".join(ch for ch in str(text).lower() if ch.isalnum())
+
+
 @dataclass(frozen=True)
 class JoyDevice:
     index: int            # 0-15, Windows' own numbering (can change when you plug things in)
@@ -60,6 +72,32 @@ class JoyDevice:
     @property
     def ident(self):
         return "%04X:%04X" % (self.vendor, self.product)
+
+    def is_hotas(self):
+        """Any flight stick, throttle or pedals (not a gamepad, not a virtual joystick)."""
+        text = self.name.lower()
+        if any(word in text for word in GAMEPAD_WORDS):
+            return False
+        return self.is_x52() or any(word in text for word in STICK_WORDS) or self.buttons >= 12
+
+    def is_stick(self):
+        """A flight STICK (the part with the trigger), not a throttle or pedals."""
+        text = self.name.lower()
+        return self.is_hotas() and not any(word in text for word in NOT_THE_STICK_WORDS)
+
+    def matches_elite_name(self, flat):
+        """Does Elite's controls file name (letters and digits only, e.g. 'ThrustMasterWarthogJoystick') mean this device?"""
+        flat = _flat(flat)
+        mine = _flat(self.name)
+        if not flat or not mine:
+            return False
+        side = ("throttle", "tqs", "rudder", "pedal")
+        if any(w in flat for w in side) != any(w in mine for w in side):
+            return False                              # a joystick name never means the throttle, and the other way round
+        if flat in mine or mine in flat:
+            return True
+        words = [w for w in STICK_WORDS if len(w) >= 4 and _flat(w) in flat and _flat(w) in mine]
+        return bool(words)
 
     def is_x52(self):
         return ("x52" in self.name.lower().replace("-", "").replace(" ", "")
@@ -161,6 +199,18 @@ class ButtonReader:
 
     def x52_devices(self):
         return [d for d in self.devices() if d.is_x52()]
+
+    def hotas_devices(self):
+        """Every flight stick, throttle and pedal set Windows can see (any make)."""
+        return [d for d in self.devices() if d.is_hotas()]
+
+    def stick_devices(self):
+        """Just the flight sticks (the trigger is button 1 and 2 on nearly all of them)."""
+        return [d for d in self.devices() if d.is_stick()]
+
+    def devices_named(self, flat):
+        """The devices an Elite controls file name points at."""
+        return [d for d in self.devices() if d.matches_elite_name(flat)]
 
     def is_down(self, spec):
         parsed = parse_spec(spec)

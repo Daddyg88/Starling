@@ -66,6 +66,7 @@ class MergedPageTests(unittest.TestCase):
                                  "memory": "personality", "bookmarks": "navigation"})
         for parent in set(homes.values()):
             self.assertIn(parent, shown)
+        self.assertEqual(shown[-1], "developer")                  # the Developer tab holds the tests
 
 
 class SwitchTests(unittest.TestCase):

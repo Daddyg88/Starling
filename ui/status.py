@@ -102,9 +102,10 @@ def collect_status(app):
                      "good" if ptt.is_open() else "muted"))
     reader = getattr(app, "buttons", None)
     if reader is not None:
-        x52 = reader.x52_devices()
-        if x52:
-            rows.append(("Joystick", "%s found" % x52[0].name, "good"))
+        hotas = reader.hotas_devices() if hasattr(reader, "hotas_devices") else reader.x52_devices()
+        if hotas:
+            names = ", ".join(d.name for d in hotas[:2])
+            rows.append(("Joystick", "%s found" % names + (" (+%d more)" % (len(hotas) - 2) if len(hotas) > 2 else ""), "good"))
 
     # game
     if app.monitor is None:
@@ -199,7 +200,9 @@ def home_data(app, now=None):
         cargo_text = "-"
     fuel = _percent(get("fuel_main"), get("fuel_capacity"))
     system = get("system") or "-"
-    ship = get("ship_name") or (ship_name(get("ship")) if get("ship") else "") or "-"
+    model = get("ship_model") or (ship_name(get("ship")) if get("ship") else "") or ""
+    custom = get("ship_name") or ""
+    ship = custom or model or "-"
     where = "Docked" if get("docked") else ("Supercruise" if get("in_supercruise") else "In flight")
     mood_text = ""
     mood = getattr(app, "mood", None)
@@ -218,7 +221,7 @@ def home_data(app, now=None):
         "time": now.strftime("%H:%M"), "date": elite_date(now),
         "system": {"name": system, "security": get("system_security") or "-", "allegiance": get("system_allegiance") or "-",
                    "population": population_text(get("system_population"))},
-        "ship": {"name": ship, "code": get("ship") or "", "fuel": fuel, "hull": max(0.0, min(1.0, float(hull or 0))), "shields": shields,
+        "ship": {"name": ship, "model": model, "code": get("ship") or "", "fuel": fuel, "hull": max(0.0, min(1.0, float(hull or 0))), "shields": shields,
                  "cargo": _percent(cargo, capacity), "cargo_text": cargo_text, "where": "%s  |  %s" % (system, where)},
         "mood": mood_text,
     }
@@ -231,6 +234,26 @@ def _wake(app):
         return "Starling"
 
 
+def mic_state(app):
+    """(words, tone) for the microphone box at the top of the window: is she listening to me right now?"""
+    listener = getattr(app, "listener", None)
+    if listener is None:
+        return "MIC OFF", "muted"
+    if getattr(listener, "failed_reason", None):
+        return "MIC PROBLEM", "bad"
+    ready = getattr(listener, "ready", None)
+    if ready is not None and not ready.is_set():
+        return "MIC STARTING", "warn"
+    ptt = getattr(app, "ptt", None)
+    try:
+        mode = app.settings.get("ptt.mode", "off")
+        if mode != "off" and ptt is not None:
+            return ("LISTENING", "good") if ptt.is_open() else ("PUSH TO TALK", "muted")
+    except Exception:
+        pass
+    return "LISTENING", "good"
+
+
 def header_data(app, now=None):
     """The small words at the top right of the window (cheap: it runs every second on every page)."""
     now = now or datetime.now()
@@ -238,4 +261,5 @@ def header_data(app, now=None):
     commander = getattr(state, "commander", None) if state is not None else None
     system = getattr(state, "system", None) if state is not None else None
     return {"commander": ("CMDR " + str(commander).upper()) if commander else "COMMANDER",
-            "system": str(system).upper() if system else "", "time": now.strftime("%H:%M"), "date": elite_date(now)}
+            "system": str(system).upper() if system else "", "time": now.strftime("%H:%M"), "date": elite_date(now),
+            "mic": mic_state(app)}

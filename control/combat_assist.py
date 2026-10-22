@@ -5,7 +5,7 @@ All three only press the keys YOU bound in Elite (same rules as voice commands: 
 and the action needs a KEYBOARD key as well as any joystick button).
 
 Auto pips
-    An X52 stick's buttons 1 and 2 (the two trigger stages) always count as fire buttons (setting combat_assist.x52_trigger).
+    A flight stick's buttons 1 and 2 (the two trigger stages) always count as fire buttons, any make (setting combat_assist.x52_trigger).
     While your hardpoints are out (or you are in analysis mode, for mining lasers) and you HOLD a fire button, she moves the power pips to weapons.
     When you let go (and stay off the button for a moment) she resets and sends pips to systems and engines.
     She finds your fire buttons from Elite's controls file (Primary fire and Secondary fire): keyboard keys, and
@@ -71,8 +71,12 @@ def fire_specs(book, reader):
             flat = re.sub(r"[^0-9a-z]", "", device.lower())
             if re.fullmatch(r"[0-9a-f]{8}", flat):
                 found.append("joy:%s:%s:%d" % (flat[:4].upper(), flat[4:].upper(), button))
-            elif "x52" in flat:
-                for stick in reader.x52_devices():
+            else:
+                named = getattr(reader, "devices_named", None)
+                matches = named(flat) if named is not None else []
+                if not matches and "x52" in flat:
+                    matches = reader.x52_devices()
+                for stick in matches:
                     found.append(inputs.joy_spec(stick, button))
     return list(dict.fromkeys(found))
 
@@ -184,7 +188,7 @@ class CombatAssist:
             except Exception:
                 log.exception("Could not work out your fire buttons")
                 found = []
-            if self.option("x52_trigger", True):
+            if self.option("stick_trigger", self.option("x52_trigger", True)):
                 found += self._x52_trigger_buttons()
             self._specs = list(dict.fromkeys(found + list(extra)))
             self._specs_at = now
@@ -197,7 +201,9 @@ class CombatAssist:
         """Buttons 1 and 2 of an X52 stick are the two stages of the trigger (fire 1 and fire 2). They count as firing even when
         Elite's controls file does not name them, so the pips still follow your trigger in analysis mode too."""
         try:
-            return [inputs.joy_spec(stick, button) for stick in self.reader.x52_devices() for button in (1, 2)]
+            sticks = getattr(self.reader, "stick_devices", None)
+            sticks = sticks() if sticks is not None else self.reader.x52_devices()
+            return [inputs.joy_spec(stick, button) for stick in sticks for button in (1, 2)]
         except Exception:
             log.exception("Could not look for the X52 trigger")
             return []

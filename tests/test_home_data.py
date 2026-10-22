@@ -83,3 +83,47 @@ class HomeDataTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MicBoxTests(unittest.TestCase):
+    def app(self, listener, ptt=None, mode="off"):
+        class S:
+            def get(self, key, default=None):
+                return {"ptt.mode": mode}.get(key, default)
+        return SimpleNamespace(listener=listener, ptt=ptt, settings=S())
+
+    def listener(self, ready=True, failed=None):
+        import threading
+        event = threading.Event()
+        if ready:
+            event.set()
+        return SimpleNamespace(ready=event, failed_reason=failed)
+
+    def test_states(self):
+        from ui.status import mic_state
+        self.assertEqual(mic_state(self.app(None)), ("MIC OFF", "muted"))
+        self.assertEqual(mic_state(self.app(self.listener(failed="no mic")))[1], "bad")
+        self.assertEqual(mic_state(self.app(self.listener(ready=False)))[1], "warn")
+        self.assertEqual(mic_state(self.app(self.listener())), ("LISTENING", "good"))
+
+    def test_push_to_talk_lights_only_while_the_mic_is_open(self):
+        from ui.status import mic_state
+        closed = SimpleNamespace(is_open=lambda: False)
+        opened = SimpleNamespace(is_open=lambda: True)
+        self.assertEqual(mic_state(self.app(self.listener(), closed, "toggle")), ("PUSH TO TALK", "muted"))
+        self.assertEqual(mic_state(self.app(self.listener(), opened, "toggle")), ("LISTENING", "good"))
+
+
+class ShipModelTests(unittest.TestCase):
+    def test_model_is_shown_next_to_your_own_name(self):
+        state = GameState()
+        state.ship, state.ship_name, state.ship_model = "explorer_nx", "Pooh bear", "Caspian Explorer"
+        app = SimpleNamespace(state=state, settings=Settings(), mood=None, providers=None, listener=None, monitor=None)
+        ship = home_data(app)["ship"]
+        self.assertEqual((ship["name"], ship["model"]), ("Pooh bear", "Caspian Explorer"))
+
+    def test_model_comes_from_the_code_when_the_game_gave_no_name(self):
+        state = GameState()
+        state.ship = "explorer_nx"
+        app = SimpleNamespace(state=state, settings=Settings(), mood=None, providers=None, listener=None, monitor=None)
+        self.assertEqual(home_data(app)["ship"]["model"], "Caspian Explorer")

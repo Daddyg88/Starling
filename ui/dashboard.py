@@ -207,6 +207,9 @@ class Dashboard:
         canvas.create_text(right - 128, 26, text="", tags="hdr_cmdr", anchor="e", fill=T.TEXT, font=(T.HEAD_FONT, T.BODY_SIZE - 1, "bold"))
         canvas.create_text(right - 128, 50, text="", tags="hdr_sys", anchor="e", fill=T.ACCENT, font=(T.HEAD_FONT, T.SMALL_SIZE))
         canvas.create_line(right - 108, 14, right - 108, 62, fill=T.ORANGE)
+        # the microphone box: lit green while she is listening to you
+        canvas.create_rectangle(right - 470, 22, right - 330, 56, outline=T.BORDER, width=2, tags="hdr_micbox")
+        canvas.create_text(right - 400, 39, text="", tags="hdr_mic", anchor="center", fill=T.MUTED, font=(T.HEAD_FONT, T.SMALL_SIZE, "bold"))
         canvas.create_text(right, 26, text="", tags="hdr_time", anchor="e", fill=T.TEXT, font=(T.HEAD_FONT, T.BODY_SIZE - 1))
         canvas.create_text(right, 50, text="", tags="hdr_date", anchor="e", fill=T.MUTED, font=(T.HEAD_FONT, T.SMALL_SIZE))
         self._header_shown = {}
@@ -222,6 +225,12 @@ class Dashboard:
             if self._header_shown.get(tag) != data[key]:
                 self._header_shown[tag] = data[key]
                 self.banner.itemconfigure(tag, text=data[key])
+        words, tone = data.get("mic", ("", "muted"))
+        if self._header_shown.get("hdr_mic") != (words, tone):
+            self._header_shown["hdr_mic"] = (words, tone)
+            colour = STATUS_COLOURS.get(tone, T.MUTED)
+            self.banner.itemconfigure("hdr_mic", text=("\u25CF  " if tone == "good" else "\u25CB  ") + words, fill=colour)
+            self.banner.itemconfigure("hdr_micbox", outline=colour)
 
     @staticmethod
     def _draw_logo(canvas):
@@ -264,6 +273,25 @@ class Dashboard:
         label.grid(row=row, column=column, columnspan=columnspan, sticky="w", padx=18, pady=(14, 6))
         return label
 
+    def _autowrap(self, card, *labels, margin=34, minimum=90):
+        """Makes the words in a card wrap to the card's real width, so nothing is cut off when the window is small."""
+        state = {"width": 0}
+
+        def resize(event=None):
+            width = max(minimum, (getattr(event, "width", 0) or card.winfo_width()) - margin)
+            if abs(width - state["width"]) < 6:
+                return
+            state["width"] = width
+            for label in labels:
+                try:
+                    label.configure(wraplength=width)
+                except Exception:
+                    pass
+        try:
+            card.bind("<Configure>", resize, add="+")
+        except Exception:
+            pass
+
     def _build_tiles(self, parent):
         ctk = self.ctk
         holder = ctk.CTkFrame(parent, fg_color=T.BG, corner_radius=0)
@@ -281,8 +309,10 @@ class Dashboard:
             status = ctk.CTkLabel(card, text="", font=self._font(T.SMALL_SIZE + 1, True, head=True), text_color=T.MUTED, anchor="w")
             status.grid(row=1, column=0, columnspan=2, sticky="w", padx=16, pady=(4, 0))
             sub = ctk.CTkLabel(card, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left",
-                               wraplength=170)
+                               wraplength=110)
             sub.grid(row=2, column=0, columnspan=2, sticky="w", padx=16, pady=(2, 12))
+            status.configure(wraplength=110, justify="left")
+            self._autowrap(card, sub, status)
             self._home_widgets["tiles"].append((status, sub))
 
     def _build_system_card(self, parent):
@@ -293,6 +323,8 @@ class Dashboard:
         self._panel_title(card, "\u25CE", "Current system", T.ORANGE)
         self._home_widgets["system_name"] = ctk.CTkLabel(card, text="-", font=self._font(T.TITLE_SIZE - 2, True), text_color=T.TEXT, anchor="w")
         self._home_widgets["system_name"].grid(row=1, column=0, sticky="w", padx=18, pady=(2, 6))
+        self._home_widgets["system_name"].configure(wraplength=240, justify="left")
+        self._autowrap(card, self._home_widgets["system_name"], margin=210, minimum=140)
         facts = ctk.CTkFrame(card, fg_color="transparent")
         facts.grid(row=2, column=0, sticky="w", padx=18, pady=(0, 14))
         for index, (label, key) in enumerate((("SECURITY", "security"), ("ALLEGIANCE", "allegiance"), ("POPULATION", "population"))):
@@ -350,6 +382,7 @@ class Dashboard:
         self._panel_title(card, "\u2630", "Ship status", T.ACCENT, row=0, column=0)
         self._home_widgets["ship_name"] = ctk.CTkLabel(card, text="-", font=self._font(T.BODY_SIZE), text_color=T.TEXT, anchor="e")
         self._home_widgets["ship_name"].grid(row=0, column=1, sticky="e", padx=18, pady=(14, 6))
+        self._home_widgets["ship_name"].configure(wraplength=150, justify="right")
         holder = ctk.CTkFrame(card, fg_color="transparent", width=290, height=100)
         holder.grid(row=1, column=0, columnspan=2, pady=(0, 6))
         holder.grid_propagate(False)
@@ -497,7 +530,8 @@ class Dashboard:
         for key in ("security", "allegiance", "population"):
             w["system_" + key].configure(text=system[key])
         ship = data["ship"]
-        w["ship_name"].configure(text=ship["name"])
+        shown = ship["name"] if not ship.get("model") or ship["model"].lower() == ship["name"].lower() else "%s  (%s)" % (ship["name"], ship["model"])
+        w["ship_name"].configure(text=shown)
         self._update_ship_picture(ship)
         w["where"].configure(text=ship["where"])
         for key in ("fuel", "hull", "shields", "cargo"):
@@ -510,13 +544,13 @@ class Dashboard:
 
     def _update_ship_picture(self, ship):
         """Her picture of the ship you are flying (see ui/assets/ships/README.txt). Only changes when the ship changes."""
-        key = (ship.get("code"), ship.get("name"))
+        key = (ship.get("code"), ship.get("model"))
         if key == self._ship_shown or self._ship_label is None:
             return
         self._ship_shown = key
         path = None
         try:
-            path = ship_pictures.picture_for(ship.get("code") or "", ship.get("name") if ship.get("name") != "-" else "")
+            path = ship_pictures.picture_for(ship.get("code") or "", ship.get("model") or "")
             if path is not None:
                 if path not in self._ship_images:
                     from PIL import Image
@@ -544,8 +578,10 @@ class Dashboard:
             when.grid(row=row, column=0, padx=(12, 6), pady=4, sticky="w")
             kind = ctk.CTkLabel(self.feed_card, text="", font=self._font(T.SMALL_SIZE + 1), text_color=T.TEXT, anchor="w", width=130)
             kind.grid(row=row, column=1, padx=6, pady=4, sticky="w")
-            text = ctk.CTkLabel(self.feed_card, text="", font=self._font(T.SMALL_SIZE + 1), text_color=T.TEXT, anchor="w")
+            text = ctk.CTkLabel(self.feed_card, text="", font=self._font(T.SMALL_SIZE + 1), text_color=T.TEXT, anchor="w",
+                                justify="left", wraplength=260)
             text.grid(row=row, column=2, padx=6, pady=4, sticky="w")
+            self._autowrap(self.feed_card, text, margin=240, minimum=140)
             self._event_rows.append({"when": when, "kind": kind, "text": text, "shown": None})
         if not items:
             items = [("", "", "Nothing yet. Fly somewhere!", "low")]
@@ -560,7 +596,7 @@ class Dashboard:
                     entry["when"].configure(text=when)
                     entry["kind"].configure(text=("%s   %s" % (T.KIND_ICONS.get(kind, "\u25A4"), kind)) if kind else "")
                     colour = T.BAD if priority == "critical" else (T.MUTED if not kind else T.TEXT)
-                    entry["text"].configure(text=text[:95], text_color=colour)
+                    entry["text"].configure(text=text[:160], text_color=colour)
                     entry["shown"] = shown
             elif entry["shown"] is not None:
                 for part in ("when", "kind", "text"):
@@ -669,38 +705,39 @@ class Dashboard:
         row += 1
         if page.id == "bookmarks":
             return self._build_bookmarks(frame, page, row)
-        card = self._card(frame)
-        card.grid(row=row, column=0, sticky="ew")
-        card.grid_columnconfigure(0, weight=1)
-        row += 1
-        for index, field in enumerate(page.fields):
-            self._build_field(card, index, field)
+        if page.fields:
+            card = self._card(frame)
+            card.grid(row=row, column=0, sticky="ew")
+            card.grid_columnconfigure(0, weight=1)
+            row += 1
+            for index, field in enumerate(page.fields):
+                self._build_field(card, index, field)
 
         extra = []
         if page.id == "voice":
-            extra.append(("Test her voice", self.test_voice))
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
-        if page.id == "exploration":
-            extra.append(("Test the honk now", self.test_honk))
         if page.id == "listening":
             extra.append(("Refresh microphone list", lambda p=page: self.refresh_mics(p)))
         if page.id == "memory":
             extra += [("Show what she remembers", self.show_memories),
                       ("Forget everything", self.forget_memories)]
         if page.id == "updates":
-            extra += [("Check for updates now", self.check_updates),
-                      ("Copy my log to the clipboard (to send to Claude)", self.copy_log)]
+            extra += [("Check for updates now", self.check_updates)]
         if page.id == "navigation":
             extra += [("Plot neutron route to my destination", lambda: self.nav_plot(use_entry=False)),
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
                       ("Clear the route", self.nav_clear)]
         if page.id == "controls":
-            extra += [("Learn push-to-talk button", self.learn_button),
-                      ("Record my buttons", self.record_buttons),
+            extra += [("Learn push-to-talk button", self.learn_button)]
+        if page.id == "developer":
+            extra += [("Test her voice", self.test_voice),
+                      ("Test the honk now", self.test_honk),
                       ("Check my Elite keys", self.check_keys),
-                      ("Look for my joystick", self.scan_joysticks)]
+                      ("Look for my joystick / HOTAS", self.scan_joysticks),
+                      ("Record my buttons", self.record_buttons),
+                      ("Copy my log to the clipboard (to send to Claude)", self.copy_log)]
         if page.id == "voice":
             self._build_voice_progress(frame, row)
             row += 1
@@ -709,7 +746,7 @@ class Dashboard:
                           border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT, command=command).grid(
                 row=row, column=0, sticky="w", pady=(12, 0))
             row += 1
-        if page.id == "controls":
+        if page.id == "developer":
             self._build_try_box(frame, row)
             row += 1
         if page.id == "navigation":
@@ -886,7 +923,7 @@ class Dashboard:
         if not devices:
             self._controls_result("No joystick found. Plug it in, then press this again.", T.WARN)
             return
-        names = ", ".join(("%s [X52]" if d.is_x52() else "%s") % d.name for d in devices)
+        names = ", ".join(("%s [HOTAS]" if d.is_hotas() else "%s") % d.name for d in devices)
         self._controls_result("Found: " + names, T.GOOD)
 
     def show_memories(self):

@@ -18,6 +18,7 @@ class ShipyardSwap(BaseEvent):
 
     def update_state(self, entry, state):
         state.ship = entry.get("ShipType") or state.ship
+        state.ship_model = entry.get("ShipType_Localised")
         state.ship_name = None                      # the Loadout that follows tells us the new ship's own name
 
     def handle(self, entry):

@@ -14,6 +14,7 @@ class LoadGame(BaseEvent):
         state.commander = entry.get("Commander", state.commander)
         state.ship = entry.get("Ship_Localised") or entry.get("Ship") or state.ship
         state.ship_name = entry.get("ShipName") or state.ship_name
+        state.ship_model = entry.get("Ship_Localised") or state.ship_model
         capacity = entry.get("FuelCapacity")
         if isinstance(capacity, (int, float)):
             state.fuel_capacity = capacity

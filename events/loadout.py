@@ -12,6 +12,7 @@ class Loadout(BaseEvent):
     def update_state(self, entry, state):
         state.ship = entry.get("Ship") or state.ship
         state.ship_name = entry.get("ShipName") or state.ship_name
+        state.ship_model = entry.get("Ship_Localised") or state.ship_model
         capacity = entry.get("FuelCapacity")
         if isinstance(capacity, dict) and isinstance(capacity.get("Main"), (int, float)):
             state.fuel_capacity = capacity["Main"]

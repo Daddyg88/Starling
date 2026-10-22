@@ -38,7 +38,7 @@ HEADING_SIZE = 15
 BODY_SIZE = 13
 SMALL_SIZE = 11
 
-WINDOW_SIZE = "1280x820"
+WINDOW_SIZE = "1360x860"
 MIN_SIZE = (1000, 640)
 BANNER_HEIGHT = 92
 SIDEBAR_WIDTH = 214
@@ -48,7 +48,7 @@ STAR_COUNT = 110
 ICONS = {"home": "\u25C8", "voice": "\u25C9", "listening": "\u25CE", "controls": "\u25A3", "chat": "\u2726",
          "combat": "\u271B", "exploration": "\u25CD", "exobiology": "\u2740", "mining": "\u2692", "trading": "\u21C4",
          "antixeno": "\u2620", "navigation": "\u25B2", "updates": "\u21E9", "bookmarks": "\u25C6", "personality": "\u25CF",
-         "game": "\u25A7"}
+         "game": "\u25A7", "developer": "\u2699"}
 
 # one line along the bottom of the window, changed each time the dashboard opens
 QUOTES = ["The best view comes after the hardest jump.", "Same sky. Different horizon.", "Fly safe, Commander.",

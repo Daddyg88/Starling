@@ -41,7 +41,7 @@ def run_controls_test(app, reader=None, seconds=15, out=print, ask=input, sleep=
     if not devices:
         out("   None found. Plug your X52 in and run this again.")
     for device in devices:
-        out("   %s  (%d buttons)%s" % (device.name, device.buttons, "   <-- X52 HOTAS" if device.is_x52() else ""))
+        out("   %s  (%d buttons)%s" % (device.name, device.buttons, ("   <-- X52 HOTAS" if device.is_x52() else "   <-- HOTAS" if device.is_hotas() else "")))
     out("")
 
     # 3. live buttons
