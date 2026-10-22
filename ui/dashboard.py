@@ -6,6 +6,7 @@ what colours are used lives in ui/theme.py, and what the Home page says lives in
 To change the look, edit theme.py. To add a setting, edit settings_model.py.
 """
 
+import math
 import random
 import time
 
@@ -14,7 +15,7 @@ from core.logger import get_logger
 from ui import portraits
 from ui import theme as T
 from ui.settings_model import SettingsModel
-from ui.status import EventFeed, collect_status
+from ui.status import EventFeed, collect_status, header_data, home_data
 
 log = get_logger("dashboard")
 
@@ -50,6 +51,11 @@ class Dashboard:
         self._portrait_label = None
         self._portrait_frame = None
         self._mood_chip = None
+        self._mood_score = None
+        self._quote = random.choice(T.QUOTES)
+        self._header_shown = {}
+        self._home_widgets = {}
+        self._event_rows = []
         self._busy_until = 0.0          # the window was just moved or resized: skip the 1-second refresh until it settles
         self._stars_job = None
         self._stars_size = (0, 0)
@@ -87,10 +93,15 @@ class Dashboard:
         side.grid(row=0, column=0, sticky="nsew")
         side.grid_propagate(False)
         name = assistant_name(self.app.settings).upper()
-        ctk.CTkLabel(side, text=" ".join(name), font=self._font(T.TITLE_SIZE - 2, True, head=True), text_color=T.ACCENT).pack(
-            padx=20, pady=(26, 0), anchor="w")
-        ctk.CTkLabel(side, text="SHIP  COMPANION", font=self._font(T.SMALL_SIZE - 1, head=True), text_color=T.MUTED).pack(
-            padx=20, pady=(0, 14), anchor="w")
+        head = ctk.CTkFrame(side, fg_color="transparent")
+        head.pack(fill="x", padx=16, pady=(20, 12))
+        logo = ctk.CTkCanvas(head, width=48, height=48, bg=T.SIDEBAR, highlightthickness=0)
+        logo.grid(row=0, column=0, rowspan=2, padx=(0, 10))
+        self._draw_logo(logo)
+        ctk.CTkLabel(head, text=" ".join(name), font=self._font(T.TITLE_SIZE - 2, True, head=True), text_color=T.TEXT).grid(
+            row=0, column=1, sticky="w")
+        ctk.CTkLabel(head, text="SHIP  COMPANION", font=self._font(T.SMALL_SIZE - 1, head=True), text_color=T.ACCENT).grid(
+            row=1, column=1, sticky="w")
         ctk.CTkFrame(side, height=1, fg_color=T.BORDER, corner_radius=0).pack(fill="x", padx=16, pady=(0, 10))
         for page_id, title in [("home", "Home")] + [(p.id, p.title) for p in self.model.sidebar_pages]:
             icon = T.ICONS.get(page_id, "\u25C7")
@@ -107,7 +118,9 @@ class Dashboard:
             version = ""
         if version:
             ctk.CTkLabel(side, text="v" + version, font=self._font(T.SMALL_SIZE - 1), text_color=T.BORDER_GLOW).pack(
-                side="bottom", padx=20, pady=14, anchor="w")
+                side="bottom", padx=20, pady=(0, 12), anchor="w")
+        ctk.CTkLabel(side, text="A  SAFER  GALAXY\nT O G E T H E R", font=self._font(T.SMALL_SIZE - 2, head=True), text_color=T.MUTED,
+                     justify="center").pack(side="bottom", pady=(0, 8))
 
         # right side: starfield banner, page area, save bar
         right = ctk.CTkFrame(self.root, fg_color=T.BG, corner_radius=0)
@@ -115,7 +128,7 @@ class Dashboard:
         right.grid_columnconfigure(0, weight=1)
         right.grid_rowconfigure(1, weight=1)
 
-        self.banner = self.ctk.CTkCanvas(right, height=78, bg=T.BG, highlightthickness=0)
+        self.banner = self.ctk.CTkCanvas(right, height=T.BANNER_HEIGHT, bg=T.BG, highlightthickness=0)
         self.banner.grid(row=0, column=0, sticky="ew")
         self.banner.bind("<Configure>", self._stars_soon)
         self._stars = [(random.random(), random.random(), random.choice((1, 1, 2)), random.choice((T.TEXT, T.MUTED, T.VIOLET, T.ACCENT)))
@@ -126,14 +139,16 @@ class Dashboard:
         self.area.grid_columnconfigure(0, weight=1)
         self.area.grid_rowconfigure(0, weight=1)
 
-        bar = ctk.CTkFrame(right, fg_color=T.SIDEBAR, corner_radius=0, height=52)
+        bar = ctk.CTkFrame(right, fg_color=T.SIDEBAR, corner_radius=0, height=56)
         bar.grid(row=2, column=0, sticky="ew")
         bar.grid_columnconfigure(0, weight=1)
-        self.save_note = ctk.CTkLabel(bar, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED)
+        self.save_note = ctk.CTkLabel(bar, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w")
         self.save_note.grid(row=0, column=0, padx=20, pady=14, sticky="w")
-        ctk.CTkButton(bar, text="SAVE SETTINGS", width=150, font=self._font(T.SMALL_SIZE + 1, True, head=True), fg_color=T.ACCENT,
-                      hover_color=T.ACCENT_HOVER, text_color=T.BG, corner_radius=8, command=self.save).grid(
-            row=0, column=1, padx=(0, 20), pady=8)
+        ctk.CTkLabel(bar, text="\u201C%s\u201D" % self._quote, font=self._font(T.SMALL_SIZE), text_color=T.MUTED).grid(
+            row=0, column=1, padx=16, pady=14)
+        ctk.CTkButton(bar, text="\u2699   SAVE SETTINGS", width=170, font=self._font(T.SMALL_SIZE + 1, True, head=True),
+                      fg_color="transparent", border_width=1, border_color=T.ACCENT, hover_color=T.PANEL_HOVER, text_color=T.ACCENT,
+                      corner_radius=6, command=self.save).grid(row=0, column=2, padx=(0, 20), pady=8)
 
         self._build_home()
         for page in self.model.sidebar_pages:
@@ -163,58 +178,237 @@ class Dashboard:
                 canvas.create_line(x + 1, y - 4, x + 1, y + 6, fill=T.BORDER_GLOW)
         self._banner_title(canvas, width, height)
 
-    def _banner_title(self, canvas, width=0, height=78):
-        title = self.current or "home"
-        text = "Home" if title == "home" else next((p.title for p in self.model.sidebar_pages if p.id == title), "")
-        canvas.create_text(24, 34, text=text.upper(), anchor="w", fill=T.TEXT, font=(T.HEAD_FONT, T.TITLE_SIZE, "bold"))
+    def _banner_title(self, canvas, width=0, height=None):
+        height = height or T.BANNER_HEIGHT
+        page = self.current or "home"
+        if page == "home":
+            text = "WELCOME, COMMANDER"
+            sub = "\u201C%s\u201D   \u2013   %s" % (self._quote, assistant_name(self.app.settings).title())
+        else:
+            text = next((p.title for p in self.model.sidebar_pages if p.id == page), "").upper()
+            sub = ""
+        right = max(width - 24, 400)
+        canvas.create_text(24, 12, text=T.TAGLINE, anchor="w", fill=T.ORANGE, font=(T.HEAD_FONT, T.SMALL_SIZE - 2))
+        canvas.create_text(24, 38, text=text, anchor="w", fill=T.TEXT, font=(T.HEAD_FONT, T.TITLE_SIZE + 2, "bold"))
+        if sub:
+            canvas.create_text(24, 66, text=sub, anchor="w", fill=T.MUTED, font=(T.FONT, T.BODY_SIZE))
         # a thin instrument-panel line under the title, with end ticks
-        y = max(height - 14, 50)
-        canvas.create_line(24, y, max(width - 24, 60), y, fill=T.BORDER)
+        y = max(height - 10, 50)
+        canvas.create_line(24, y, right, y, fill=T.BORDER)
         canvas.create_line(24, y, 150, y, fill=T.ACCENT, width=2)
         canvas.create_line(24, y - 4, 24, y + 4, fill=T.ACCENT)
-        canvas.create_line(max(width - 24, 60), y - 4, max(width - 24, 60), y + 4, fill=T.BORDER_GLOW)
-        canvas.create_text(max(width - 24, 60), 28, text="COMMAND DECK", anchor="e", fill=T.MUTED,
-                           font=(T.HEAD_FONT, T.SMALL_SIZE - 1))
+        canvas.create_line(right, y - 4, right, y + 4, fill=T.BORDER_GLOW)
+        # top right: who and where, and the clocks
+        canvas.create_text(right - 128, 26, text="", tags="hdr_cmdr", anchor="e", fill=T.TEXT, font=(T.HEAD_FONT, T.BODY_SIZE - 1, "bold"))
+        canvas.create_text(right - 128, 50, text="", tags="hdr_sys", anchor="e", fill=T.ACCENT, font=(T.HEAD_FONT, T.SMALL_SIZE))
+        canvas.create_line(right - 108, 14, right - 108, 62, fill=T.ORANGE)
+        canvas.create_text(right, 26, text="", tags="hdr_time", anchor="e", fill=T.TEXT, font=(T.HEAD_FONT, T.BODY_SIZE - 1))
+        canvas.create_text(right, 50, text="", tags="hdr_date", anchor="e", fill=T.MUTED, font=(T.HEAD_FONT, T.SMALL_SIZE))
+        self._header_shown = {}
+        self._update_header()
+
+    def _update_header(self):
+        """Commander, system, time and game date at the top right. Only changed words are sent to the window."""
+        try:
+            data = header_data(self.app)
+        except Exception:
+            return
+        for tag, key in (("hdr_cmdr", "commander"), ("hdr_sys", "system"), ("hdr_time", "time"), ("hdr_date", "date")):
+            if self._header_shown.get(tag) != data[key]:
+                self._header_shown[tag] = data[key]
+                self.banner.itemconfigure(tag, text=data[key])
+
+    @staticmethod
+    def _draw_logo(canvas):
+        """A small ring logo: a glowing blue circle with a bright gap."""
+        canvas.create_oval(4, 4, 44, 44, outline=T.ACCENT_DIM, width=6)
+        canvas.create_arc(4, 4, 44, 44, start=30, extent=280, style="arc", outline=T.ACCENT, width=4)
+        canvas.create_oval(18, 18, 30, 30, outline=T.BORDER_GLOW, width=1)
 
     # ------------------------------------------------------------------ pages
     def _card(self, parent):
         return self.ctk.CTkFrame(parent, fg_color=T.PANEL, corner_radius=12, border_width=1, border_color=T.BORDER)
 
     def _build_home(self):
+        """The Home page: her picture, three status tiles, the current system, ship status, recent events and quick actions."""
         ctk = self.ctk
         frame = ctk.CTkScrollableFrame(self.area, fg_color=T.BG, corner_radius=0)
         frame.grid_columnconfigure(0, weight=0)
         frame.grid_columnconfigure(1, weight=1)
+        frame.grid_columnconfigure(2, weight=0)
         self.page_frames["home"] = frame
+        w = self._home_widgets
 
-        # left: her picture, which follows her mood. right: how things are going.
-        self._build_avatar(frame)
+        self._build_avatar(frame)                                           # left, tall
 
-        right = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
-        right.grid(row=0, column=1, sticky="nsew", padx=(16, 0))
-        right.grid_columnconfigure(0, weight=1)
-        self._heading(right, "Systems").grid(row=0, column=0, sticky="w", pady=(2, 6))
-        self.status_card = self._card(right)
-        self.status_card.grid(row=1, column=0, sticky="ew", pady=(0, 14))
-        self.status_card.grid_columnconfigure(1, weight=1)
-        self._heading(right, "Recent events").grid(row=2, column=0, sticky="w", pady=(2, 6))
-        self.feed_card = self._card(right)
-        self.feed_card.grid(row=3, column=0, sticky="ew")
-        self.feed_card.grid_columnconfigure(1, weight=1)
+        middle = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)         # middle top: tiles + current system
+        middle.grid(row=0, column=1, sticky="nsew", padx=(14, 0))
+        middle.grid_columnconfigure(0, weight=1)
+        self._build_tiles(middle)
+        self._build_system_card(middle)
+
+        self._build_ship_card(frame)                                        # right top
+        self._build_events_card(frame)                                      # middle bottom
+        self._build_quick_actions(frame)                                    # right bottom
+        w["ready"] = True
         self._refresh_home()
+
+    def _panel_title(self, parent, icon, text, colour=None, row=0, column=0, columnspan=1):
+        label = self.ctk.CTkLabel(parent, text="%s   %s" % (icon, " ".join(text.upper()) if len(text) < 16 else text.upper()),
+                                  font=self._font(T.SMALL_SIZE + 1, True, head=True), text_color=colour or T.ACCENT, anchor="w")
+        label.grid(row=row, column=column, columnspan=columnspan, sticky="w", padx=18, pady=(14, 6))
+        return label
+
+    def _build_tiles(self, parent):
+        ctk = self.ctk
+        holder = ctk.CTkFrame(parent, fg_color=T.BG, corner_radius=0)
+        holder.grid(row=0, column=0, sticky="ew")
+        holder.grid_columnconfigure((0, 1, 2), weight=1, uniform="tile")
+        self._home_widgets["tiles"] = []
+        for index, (title, icon) in enumerate((("VOICE", "\u25C9"), ("HOTAS", "\u2316"), ("JOURNAL", "\u25A4"))):
+            card = self._card(holder)
+            card.grid(row=0, column=index, sticky="nsew", padx=(0 if index == 0 else 8, 0))
+            card.grid_columnconfigure(1, weight=1)
+            ctk.CTkLabel(card, text=icon, font=self._font(T.TITLE_SIZE, True), text_color=T.ACCENT, width=34).grid(
+                row=0, column=0, padx=(14, 4), pady=(12, 0))
+            ctk.CTkLabel(card, text=title, font=self._font(T.BODY_SIZE, True, head=True), text_color=T.TEXT, anchor="w").grid(
+                row=0, column=1, sticky="w", pady=(12, 0))
+            status = ctk.CTkLabel(card, text="", font=self._font(T.SMALL_SIZE + 1, True, head=True), text_color=T.MUTED, anchor="w")
+            status.grid(row=1, column=0, columnspan=2, sticky="w", padx=16, pady=(4, 0))
+            sub = ctk.CTkLabel(card, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left",
+                               wraplength=170)
+            sub.grid(row=2, column=0, columnspan=2, sticky="w", padx=16, pady=(2, 12))
+            self._home_widgets["tiles"].append((status, sub))
+
+    def _build_system_card(self, parent):
+        ctk = self.ctk
+        card = self._card(parent)
+        card.grid(row=1, column=0, sticky="ew", pady=(14, 0))
+        card.grid_columnconfigure(0, weight=1)
+        self._panel_title(card, "\u25CE", "Current system", T.ORANGE)
+        self._home_widgets["system_name"] = ctk.CTkLabel(card, text="-", font=self._font(T.TITLE_SIZE - 2, True), text_color=T.TEXT, anchor="w")
+        self._home_widgets["system_name"].grid(row=1, column=0, sticky="w", padx=18, pady=(2, 6))
+        facts = ctk.CTkFrame(card, fg_color="transparent")
+        facts.grid(row=2, column=0, sticky="w", padx=18, pady=(0, 14))
+        for index, (label, key) in enumerate((("SECURITY", "security"), ("ALLEGIANCE", "allegiance"), ("POPULATION", "population"))):
+            ctk.CTkLabel(facts, text=label, font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", width=110).grid(
+                row=index, column=0, sticky="w", pady=2)
+            value = ctk.CTkLabel(facts, text="-", font=self._font(T.BODY_SIZE), text_color=T.ORANGE if key == "security" else T.TEXT, anchor="w")
+            value.grid(row=index, column=1, sticky="w", padx=(8, 0), pady=2)
+            self._home_widgets["system_" + key] = value
+        galaxy = ctk.CTkCanvas(card, width=210, height=130, bg=T.PANEL, highlightthickness=0)
+        galaxy.grid(row=0, column=1, rowspan=3, padx=(0, 10), pady=6)
+        self._draw_galaxy(galaxy)
+        ctk.CTkButton(card, text="GALAXY MAP  \u2197", width=130, height=24, font=self._font(T.SMALL_SIZE - 1, True, head=True),
+                      fg_color="transparent", text_color=T.ACCENT, hover_color=T.PANEL_HOVER, corner_radius=4,
+                      command=self.open_system_map).grid(row=3, column=1, sticky="e", padx=(0, 14), pady=(0, 10))
+
+    @staticmethod
+    def _draw_galaxy(canvas):
+        """A little spiral galaxy made of dots (drawn once)."""
+        rng = random.Random(7)
+        cx, cy = 105, 65
+        canvas.create_oval(cx - 14, cy - 8, cx + 14, cy + 8, fill=T.ACCENT_DIM, outline="")
+        canvas.create_oval(cx - 6, cy - 4, cx + 6, cy + 4, fill=T.ORANGE, outline="")
+        for arm in (0.0, math.pi):
+            for i in range(90):
+                t = i / 90.0
+                angle = arm + t * 5.2
+                radius = 8 + t * 82
+                x = cx + radius * math.cos(angle) * 1.1 + rng.uniform(-4, 4)
+                y = cy + radius * math.sin(angle) * 0.55 + rng.uniform(-3, 3)
+                colour = rng.choice((T.ACCENT, T.ACCENT_DIM, T.VIOLET, T.TEXT))
+                size = 2 if rng.random() < 0.25 else 1
+                canvas.create_oval(x, y, x + size, y + size, fill=colour, outline="")
+
+    def _build_ship_card(self, frame):
+        ctk = self.ctk
+        card = self._card(frame)
+        card.grid(row=0, column=2, sticky="nsew", padx=(14, 0))
+        card.grid_columnconfigure(0, weight=1)
+        card.grid_columnconfigure(1, weight=0)
+        self._panel_title(card, "\u2630", "Ship status", T.ACCENT, row=0, column=0)
+        self._home_widgets["ship_name"] = ctk.CTkLabel(card, text="-", font=self._font(T.BODY_SIZE), text_color=T.TEXT, anchor="e")
+        self._home_widgets["ship_name"].grid(row=0, column=1, sticky="e", padx=18, pady=(14, 6))
+        ship = ctk.CTkCanvas(card, width=290, height=84, bg=T.PANEL, highlightthickness=0)
+        ship.grid(row=1, column=0, columnspan=2, pady=(0, 6))
+        self._draw_ship(ship)
+        bars = ctk.CTkFrame(card, fg_color="transparent")
+        bars.grid(row=2, column=0, columnspan=2, sticky="ew", padx=18)
+        bars.grid_columnconfigure(1, weight=1)
+        self._home_widgets["bars"] = {}
+        for index, (label, key, colour) in enumerate((("FUEL", "fuel", T.ACCENT), ("HULL", "hull", T.ORANGE),
+                                                      ("SHIELDS", "shields", T.ACCENT), ("CARGO", "cargo", T.ORANGE))):
+            ctk.CTkLabel(bars, text=label, font=self._font(T.SMALL_SIZE + 1, False, head=True), text_color=T.TEXT, anchor="w", width=70).grid(
+                row=index, column=0, sticky="w", pady=5)
+            bar = ctk.CTkProgressBar(bars, height=9, corner_radius=4, fg_color=T.BG, progress_color=colour)
+            bar.set(0)
+            bar.grid(row=index, column=1, sticky="ew", padx=8, pady=5)
+            value = ctk.CTkLabel(bars, text="-", font=self._font(T.SMALL_SIZE + 1), text_color=T.TEXT, anchor="e", width=70)
+            value.grid(row=index, column=2, sticky="e", pady=5)
+            self._home_widgets["bars"][key] = (bar, value)
+        self._home_widgets["where"] = ctk.CTkLabel(card, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w")
+        self._home_widgets["where"].grid(row=3, column=0, columnspan=2, sticky="w", padx=18, pady=(8, 14))
+
+    @staticmethod
+    def _draw_ship(canvas):
+        """A simple orange outline of a ship (drawn once)."""
+        outline = [(20, 56), (90, 40), (150, 18), (240, 12), (272, 26), (210, 34), (190, 44), (250, 52), (214, 64),
+                   (130, 66), (70, 70)]
+        canvas.create_polygon(outline, outline=T.ORANGE, fill="", width=2)
+        canvas.create_line(90, 40, 130, 66, fill=T.ORANGE)
+        canvas.create_line(150, 18, 190, 44, fill=T.ORANGE)
+        canvas.create_line(240, 12, 214, 64, fill=T.ORANGE)
+        canvas.create_oval(160, 22, 186, 34, outline=T.ACCENT, width=1)
+
+    def _build_events_card(self, frame):
+        ctk = self.ctk
+        card = self._card(frame)
+        card.grid(row=1, column=1, columnspan=1, sticky="nsew", padx=(14, 0), pady=(14, 0))
+        card.grid_columnconfigure(0, weight=1)
+        top = ctk.CTkFrame(card, fg_color="transparent")
+        top.grid(row=0, column=0, sticky="ew")
+        top.grid_columnconfigure(0, weight=1)
+        self._panel_title(top, "\u2630", "Recent events", T.ORANGE)
+        ctk.CTkButton(top, text="CLEAR", width=64, height=24, font=self._font(T.SMALL_SIZE - 1, True, head=True), fg_color="transparent",
+                      text_color=T.ACCENT, hover_color=T.PANEL_HOVER, corner_radius=4, command=self.clear_events).grid(
+            row=0, column=1, padx=14, pady=(10, 0))
+        self.feed_card = ctk.CTkFrame(card, fg_color="transparent")
+        self.feed_card.grid(row=1, column=0, sticky="ew", padx=6, pady=(0, 12))
+        self.feed_card.grid_columnconfigure(2, weight=1)
+
+    def _build_quick_actions(self, frame):
+        ctk = self.ctk
+        card = self._card(frame)
+        card.grid(row=1, column=2, sticky="nsew", padx=(14, 0), pady=(14, 0))
+        card.grid_columnconfigure(0, weight=1)
+        self._panel_title(card, "\u26A1", "Quick actions", T.ACCENT)
+        for index, (icon, text, command) in enumerate((
+                ("\u2692", "Plot Route", self.quick_plot), ("\u25A3", "Open Galaxy Map", self.quick_map),
+                ("\u25C9", "Toggle Voice", self.quick_voice), ("\u25CE", "Check Systems", self.quick_check),
+                ("\u25A4", "Read Journal", self.quick_journal))):
+            ctk.CTkButton(card, text="%s     %s" % (icon, text), anchor="w", height=34, font=self._font(), fg_color=T.PANEL,
+                          border_width=1, border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT, corner_radius=6,
+                          command=command).grid(row=1 + index, column=0, sticky="ew", padx=14, pady=(0, 6))
 
     def _build_avatar(self, frame):
         """Her picture, framed in the colour of her mood. The pictures are in ui/assets/portraits/ (see the README there)."""
         ctk = self.ctk
-        holder = ctk.CTkFrame(frame, fg_color=T.PANEL, corner_radius=16, border_width=2, border_color=T.MOOD_COLOURS["Neutral"])
-        holder.grid(row=0, column=0, sticky="n")
+        holder = ctk.CTkFrame(frame, fg_color=T.PANEL, corner_radius=12, border_width=2, border_color=T.MOOD_COLOURS["Neutral"])
+        holder.grid(row=0, column=0, rowspan=2, sticky="n")
         self._portrait_frame = holder
-        self._portrait_label = ctk.CTkLabel(holder, text="", fg_color="transparent")
-        self._portrait_label.pack(padx=12, pady=(12, 6))
         ctk.CTkLabel(holder, text=" ".join(assistant_name(self.app.settings).upper()), font=self._font(T.BODY_SIZE + 1, True, head=True),
-                     text_color=T.TEXT).pack()
+                     text_color=T.ACCENT, anchor="w").pack(fill="x", padx=16, pady=(12, 6))
+        self._portrait_label = ctk.CTkLabel(holder, text="", fg_color="transparent")
+        self._portrait_label.pack(padx=12, pady=(0, 6))
+        ctk.CTkLabel(holder, text="\u25CF  ONLINE", font=self._font(T.SMALL_SIZE, True, head=True), text_color=T.GOOD).pack()
+        ctk.CTkLabel(holder, text="Your AI co-pilot", font=self._font(T.SMALL_SIZE), text_color=T.MUTED).pack()
+        ctk.CTkLabel(holder, text="\u201CReady when you are,\nCommander.\u201D", font=self._font(T.SMALL_SIZE), text_color=T.MUTED,
+                     justify="center").pack(pady=(8, 4))
         self._mood_chip = ctk.CTkLabel(holder, text="", font=self._font(T.SMALL_SIZE, True, head=True), text_color=T.MUTED)
-        self._mood_chip.pack(pady=(0, 12))
+        self._mood_chip.pack(pady=(4, 0))
+        self._mood_score = ctk.CTkLabel(holder, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED)
+        self._mood_score.pack(pady=(0, 12))
         self._update_portrait()
 
     def _current_mood(self):
@@ -255,22 +449,119 @@ class Dashboard:
         self._mood_chip.configure(text="\u25CF  %s" % mood.upper(), text_color=colour)
 
     def _refresh_home(self):
-        """Update the Home page in place. Labels are re-used and only changed when their words change,
+        """Update the Home page in place. Widgets are re-used and only changed when their words change,
         so nothing is destroyed and rebuilt (that was what made the page flicker)."""
-        rows = collect_status(self.app)
-        items = self.feed.recent()
-        signature = (tuple(rows), tuple(items))
+        w = self._home_widgets
+        if not w.get("ready"):
+            return
+        data = home_data(self.app)
+        items = self.feed.recent_with_kind()[:6]
+        signature = (repr(data["tiles"]), repr(data["system"]), repr(data["ship"]), data["mood"], tuple(items))
         self._update_portrait()
         if signature == self._home_signature:
             return
         self._home_signature = signature
-        status = [(label, text, STATUS_COLOURS.get(tone, T.TEXT)) for label, text, tone in rows]
-        self._sync_rows(self.status_card, self._status_pool, status, left_width=150, left_bold=False, pad=5)
-        if items:
-            feed = [(when, text[:90], T.BAD if priority == "critical" else T.TEXT) for when, text, priority in items]
+        for (status, sub), (_title, _icon, word, tone, text) in zip(w["tiles"], data["tiles"]):
+            status.configure(text="\u25CF  " + word, text_color=STATUS_COLOURS.get(tone, T.TEXT))
+            sub.configure(text=text)
+        system = data["system"]
+        w["system_name"].configure(text=system["name"])
+        for key in ("security", "allegiance", "population"):
+            w["system_" + key].configure(text=system[key])
+        ship = data["ship"]
+        w["ship_name"].configure(text=ship["name"])
+        w["where"].configure(text=ship["where"])
+        for key in ("fuel", "hull", "shields", "cargo"):
+            bar, value = w["bars"][key]
+            bar.set(ship[key])
+            value.configure(text=ship["cargo_text"] if key == "cargo" else "%d%%" % round(ship[key] * 100))
+        if self._mood_score is not None:
+            self._mood_score.configure(text=data["mood"])
+        self._sync_events(items)
+
+    def _sync_events(self, items):
+        """The Recent events list: time, kind and words. Rows are re-used."""
+        ctk = self.ctk
+        while len(self._event_rows) < 6:
+            row = len(self._event_rows)
+            when = ctk.CTkLabel(self.feed_card, text="", font=self._font(T.SMALL_SIZE + 1), text_color=T.MUTED, anchor="w", width=60)
+            when.grid(row=row, column=0, padx=(12, 6), pady=4, sticky="w")
+            kind = ctk.CTkLabel(self.feed_card, text="", font=self._font(T.SMALL_SIZE + 1), text_color=T.TEXT, anchor="w", width=130)
+            kind.grid(row=row, column=1, padx=6, pady=4, sticky="w")
+            text = ctk.CTkLabel(self.feed_card, text="", font=self._font(T.SMALL_SIZE + 1), text_color=T.TEXT, anchor="w")
+            text.grid(row=row, column=2, padx=6, pady=4, sticky="w")
+            self._event_rows.append({"when": when, "kind": kind, "text": text, "shown": None})
+        if not items:
+            items = [("", "", "Nothing yet. Fly somewhere!", "low")]
+        for index, entry in enumerate(self._event_rows):
+            if index < len(items):
+                when, kind, text, priority = items[index]
+                shown = (when, kind, text, priority)
+                if entry["shown"] is None:
+                    for part in ("when", "kind", "text"):
+                        entry[part].grid()
+                if entry["shown"] != shown:
+                    entry["when"].configure(text=when)
+                    entry["kind"].configure(text=("%s   %s" % (T.KIND_ICONS.get(kind, "\u25A4"), kind)) if kind else "")
+                    colour = T.BAD if priority == "critical" else (T.MUTED if not kind else T.TEXT)
+                    entry["text"].configure(text=text[:95], text_color=colour)
+                    entry["shown"] = shown
+            elif entry["shown"] is not None:
+                for part in ("when", "kind", "text"):
+                    entry[part].grid_remove()
+                entry["shown"] = None
+
+    # ---- Home page buttons ----
+    def clear_events(self):
+        self.feed.clear()
+        self._home_signature = None
+        self._refresh_home()
+
+    def open_system_map(self):
+        state = getattr(self.app, "state", None)
+        system = getattr(state, "system", None) if state is not None else None
+        if not system:
+            self.save_note.configure(text="I don't know which system you are in yet.", text_color=T.WARN)
+            return
+        import urllib.parse
+        import webbrowser
+        webbrowser.open("https://www.edsm.net/en/system?systemName=" + urllib.parse.quote(system))
+        self.save_note.configure(text="Opening %s on EDSM in your browser." % system, text_color=T.MUTED)
+
+    def quick_plot(self):
+        self._controls_result(self.app.plot_route_now(""), T.GOOD)
+
+    def quick_map(self):
+        self._controls_result(self.app.run_command_now("open the galaxy map", doing="open the galaxy map"), T.WARN)
+
+    def quick_voice(self):
+        """Switch her voice on or off (the same setting as the Voice page; press Save settings to keep it)."""
+        field = self.model.field("speech.enabled")
+        now_on = not bool(self.model.current_value(field))
+        self._changed(self.model.set_value(field, now_on))
+        switch = getattr(self, "_w_speech_enabled", None)
+        if switch is not None:
+            (switch.select if now_on else switch.deselect)()
+        self.save_note.configure(text="Her voice is now %s. Save settings to keep that." % ("ON" if now_on else "OFF"), text_color=T.WARN)
+
+    def quick_check(self):
+        problems = [(label, text) for label, text, tone in collect_status(self.app) if tone in ("bad", "warn")]
+        if problems:
+            self.save_note.configure(text="Check: " + "; ".join("%s - %s" % p for p in problems)[:140], text_color=T.WARN)
         else:
-            feed = [("", "Nothing yet. Fly somewhere!", T.MUTED)]
-        self._sync_rows(self.feed_card, self._feed_pool, feed, left_width=0, left_bold=False, pad=3)
+            self.save_note.configure(text="All systems ready, Commander.", text_color=T.GOOD)
+
+    def quick_journal(self):
+        folder = getattr(self.app, "journal_folder", None)
+        if not folder:
+            self.save_note.configure(text="I can't see the Elite journal folder yet.", text_color=T.WARN)
+            return
+        try:
+            import os
+            os.startfile(str(folder))                           # Windows: opens the folder in Explorer
+            self.save_note.configure(text="Opening the journal folder.", text_color=T.MUTED)
+        except (AttributeError, OSError):
+            self.save_note.configure(text="Journal folder: %s" % folder, text_color=T.MUTED)
 
     def _sync_rows(self, card, pool, data, left_width, left_bold, pad):
         """Make the rows in `card` show `data` [(left, right, right_colour)], touching only what changed."""
@@ -758,6 +1049,7 @@ class Dashboard:
             self.root.after(300, self._tick)
             return
         try:
+            self._update_header()
             if self.current == "home":
                 self._refresh_home()
             elif self.current == "navigation":

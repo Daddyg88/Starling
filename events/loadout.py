@@ -15,6 +15,9 @@ class Loadout(BaseEvent):
         capacity = entry.get("FuelCapacity")
         if isinstance(capacity, dict) and isinstance(capacity.get("Main"), (int, float)):
             state.fuel_capacity = capacity["Main"]
+        cargo = entry.get("CargoCapacity")
+        if isinstance(cargo, (int, float)):
+            state.cargo_capacity = float(cargo)
         jump_range = entry.get("MaxJumpRange")
         if isinstance(jump_range, (int, float)) and jump_range > 0:
             state.max_jump_range = float(jump_range)

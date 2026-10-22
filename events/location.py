@@ -4,6 +4,7 @@ It is not spoken by itself; the login greeting uses it to say where you are.
 """
 
 from events.base_event import BaseEvent
+from events.system_facts import remember_system_facts
 from core.event_bus import LOW
 
 
@@ -24,5 +25,6 @@ class Location(BaseEvent):
     def update_state(self, entry, state):
         state.system = entry.get("StarSystem") or state.system
         state.wanted = bool(entry.get("Wanted", False))
+        remember_system_facts(entry, state)
         state.docked = bool(entry.get("Docked", False))
         state.station = entry.get("StationName") if state.docked else None

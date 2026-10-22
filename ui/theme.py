@@ -38,14 +38,27 @@ HEADING_SIZE = 15
 BODY_SIZE = 13
 SMALL_SIZE = 11
 
-WINDOW_SIZE = "1120x720"
-MIN_SIZE = (900, 600)
+WINDOW_SIZE = "1280x820"
+MIN_SIZE = (1000, 640)
+BANNER_HEIGHT = 92
 SIDEBAR_WIDTH = 214
 STAR_COUNT = 110
 
 # small symbols on the menu buttons (all in Windows' standard symbol font)
-ICONS = {"home": "◈", "voice": "◉", "listening": "◎", "controls": "▣", "chat": "✦",
-         "navigation": "▲", "bookmarks": "◆", "personality": "●", "game": "■"}
+ICONS = {"home": "\u25C8", "voice": "\u25C9", "listening": "\u25CE", "controls": "\u25A3", "chat": "\u2726",
+         "combat": "\u271B", "exploration": "\u25CD", "exobiology": "\u2740", "mining": "\u2692", "trading": "\u21C4",
+         "antixeno": "\u2620", "navigation": "\u25B2", "updates": "\u21E9", "bookmarks": "\u25C6", "personality": "\u25CF",
+         "game": "\u25A7"}
+
+# one line along the bottom of the window, changed each time the dashboard opens
+QUOTES = ["The best view comes after the hardest jump.", "Same sky. Different horizon.", "Fly safe, Commander.",
+          "Every system has a story.", "The black is never empty.", "Fuel up. Look up. Jump.", "Somewhere out there is the next rock worth mining."]
+TAGLINE = "FLY FURTHER   \u2022   KNOW MORE   \u2022   NEVER ALONE"
+
+# the small symbol in front of each kind of event in the Recent events list
+KIND_ICONS = {"Journal": "\u25A4", "Navigation": "\u25B2", "System": "\u25CE", "Voice": "\u25C9", "Ship": "\u25ED",
+              "Exploration": "\u25CD", "Combat": "\u271B", "Exobiology": "\u2740", "Mining": "\u2692", "Trading": "\u21C4",
+              "Anti-Xeno": "\u2620"}
 
 # her picture (the old single picture is still used if there are no mood pictures)
 AVATAR_FILE = Path(__file__).resolve().parent / "assets" / "avatar.png"

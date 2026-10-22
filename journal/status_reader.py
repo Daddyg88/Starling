@@ -111,6 +111,11 @@ class StatusReader:
         state = getattr(self.processor, "state", None)
         if state is not None:
             state.status_flags, state.status_flags2, state.status_seen = flags, flags2, flags != 0
+            main = (status.get("Fuel") or {}).get("FuelMain")
+            if isinstance(main, (int, float)):
+                state.fuel_main = float(main)
+            if isinstance(status.get("Cargo"), (int, float)):
+                state.cargo_tons = float(status["Cargo"])
         vehicle = self._work_out_vehicle(flags, flags2)
         if vehicle == "main ship":
             self.processor.state.in_nomad = False   # back aboard: the Nomad is stowed

@@ -404,8 +404,8 @@ class App:
         text = (destination or "").strip() or "my destination"
         return voice.plot(text)
 
-    def plot_next_now(self, delay=4.0, sleep=None):
-        """Runs the galaxy map macro for the next waypoint after a short wait, so you can click back into Elite."""
+    def run_command_now(self, text, delay=4.0, sleep=None, doing="do that"):
+        """Runs a voice command (for example 'open the galaxy map') after a short wait, so you can click back into Elite."""
         runner = self.ensure_commands()
         if runner is None:
             return "Voice commands could not start. Check the log."
@@ -415,9 +415,13 @@ class App:
 
         def go():
             wait(delay)
-            runner.run_text("plot the next waypoint", speak_unknown=False)
-        threading.Thread(target=go, name="plot-next", daemon=True).start()
-        return "Switch to Elite now. I will plot the next waypoint in %d seconds." % int(delay)
+            runner.run_text(text, speak_unknown=False)
+        threading.Thread(target=go, name="run-command", daemon=True).start()
+        return "Switch to Elite now. I will %s in %d seconds." % (doing, int(delay))
+
+    def plot_next_now(self, delay=4.0, sleep=None):
+        """Runs the galaxy map macro for the next waypoint after a short wait, so you can click back into Elite."""
+        return self.run_command_now("plot the next waypoint", delay, sleep, doing="plot the next waypoint")
 
     def plot_system_by_macro(self, system):
         """Copies a system name to the clipboard and runs the galaxy map macro ('plot the next waypoint') for it.
