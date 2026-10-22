@@ -34,7 +34,7 @@ def make(mood="Friendly", mature=False, style="personality", remarks="often", ca
 
 
 def texts(d, key):
-    return [l.text for l in d.lines[key]]
+    return {l.text for l in d.lines.get(key, [])}
 
 
 class FlavourTests(unittest.TestCase):
@@ -50,14 +50,14 @@ class FlavourTests(unittest.TestCase):
         f, d = make("Friendly")
         out = f.apply("Docked, Commander.", "normal")
         name, remark = out.replace("Docked, ", "").split(". || ")
-        self.assertIn(name, texts(d, "PetName_Cute"))
-        self.assertIn(remark, texts(d, "Remark_Cute"))
+        self.assertIn(name, texts(d, "PetName_Cute") | texts(d, "PetName_Neutral"))
+        self.assertIn(remark, texts(d, "Remark_Cute") | texts(d, "Remark_Dry"))
 
     def test_bad_mood_is_snide_without_strong_language(self):
         f, d = make("Frustrated", mature=False)
         out = f.apply("Docked, Commander.", "normal")
         remark = out.split(" || ")[1]
-        self.assertIn(remark, texts(d, "Remark_Snide"))
+        self.assertIn(remark, texts(d, "Remark_Snide") | texts(d, "Remark_Dry"))
         self.assertNotIn(remark, texts(d, "Remark_Sweary"))
 
     def test_bad_mood_swears_only_when_allowed(self):

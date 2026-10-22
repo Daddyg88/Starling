@@ -378,3 +378,11 @@ Say "launch", "auto launch", "launch from the station" or "undock" while docked 
     "macros": { "auto_launch": ["wait 0.3", "UI_Down", "UI_Select"] }
 
 Cargo scoop: "lower / raise / drop / retract the cargo scoop" (and "scoop down / up") already worked.
+
+## 0.28.0: honk fixes, update screen, more jump speech
+- **Auto honk now also starts from a separate "arrived" signal**, so it works even if you switched her jump speech off. If the cockpit is in combat mode (hardpoints away) she presses your Cockpit mode key first (needs a keyboard key), honks, then switches back (`autohonk.switch_mode`: false in settings.json stops that).
+- **Exploration page > Test the honk now**: click back into Elite and 4 seconds later she honks once and tells you out loud what happened (no keyboard key on your fire button, Elite not in front, hardpoints out...). A joystick-only fire button still cannot be pressed by Starling: add a second, keyboard binding for it in Elite's controls.
+- **Updates page > Copy my log to the clipboard**: paste it into the chat when something is not working.
+- **Update screen**: Starling.exe now shows "A new Starling is ready" (Update now / Not now / always update automatically) before she loads. This needs the NEWEST Starling.exe: download it once from the GitHub release page and replace the old one (the exe itself cannot update itself). Turn the question back on in the dashboard Updates page ("Ask me before updating").
+- **Void Compass check**: no overlay name triggers a ship control and no ship phrase switches an overlay (there is now a test for this). Bare words such as "navigation" or "cargo" still mean the ship; say "navigation overlay" for Void Compass.
+- **Jump speech**: about 140 new lines (many plain or dry), fewer pet names and compliments, and a pool of plain dry remarks used in every mood (`Remark_Dry`). Flirty remarks happen less often (switch the Flirty setting off for none).

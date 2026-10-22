@@ -161,3 +161,60 @@ class CleanEnvTests(unittest.TestCase):
         self.assertNotIn("PYTHONPATH", env)
         self.assertEqual(env["KEEP"], "1")
         self.assertEqual(env["STARLING_LAUNCHER"], "1")
+
+
+class UpdatePromptTests(LauncherTests):
+    """The 'Update available' screen: Update now / Not now / always."""
+
+    def old_install(self):
+        self.layout.app.mkdir(parents=True)
+        (self.layout.app / "core").mkdir()
+        (self.layout.app / "core" / "version.py").write_text('__version__ = "0.11.0"\n')
+        (self.layout.app / "main.py").write_text("print(1)\n")
+
+    def asking(self, answer):
+        self.asked = []
+
+        def ask(info, current):
+            self.asked.append((info["version"], current))
+            return answer
+        self.launcher.ask = ask
+
+    def test_not_now_keeps_the_old_version(self):
+        self.old_install()
+        self.asking("later")
+        with mock.patch.object(updater.urllib.request, "urlopen", self.net()):
+            self.launcher.get_newest(first_run=False)
+        self.assertEqual(self.asked, [("0.12.0", "0.11.0")])
+        self.assertEqual(self.launcher.current_version(), "0.11.0")
+
+    def test_update_now_installs(self):
+        self.old_install()
+        self.asking("now")
+        with mock.patch.object(updater.urllib.request, "urlopen", self.net()):
+            self.launcher.get_newest(first_run=False)
+        self.assertEqual(self.launcher.current_version(), "0.12.0")
+
+    def test_always_installs_and_stops_asking(self):
+        self.old_install()
+        self.asking("always")
+        with mock.patch.object(updater.urllib.request, "urlopen", self.net()):
+            self.launcher.get_newest(first_run=False)
+        self.assertEqual(self.launcher.current_version(), "0.12.0")
+        self.assertFalse(self.launcher.wants_question())
+
+    def test_no_question_when_up_to_date_or_first_run(self):
+        self.asking("later")
+        with mock.patch.object(updater.urllib.request, "urlopen", self.net()):
+            self.launcher.get_newest(first_run=True)
+        self.assertEqual(self.asked, [])
+        self.assertEqual(self.launcher.current_version(), "0.12.0")
+
+    def test_no_question_when_you_chose_always(self):
+        self.old_install()
+        self.launcher.remember_always()
+        self.asking("later")
+        with mock.patch.object(updater.urllib.request, "urlopen", self.net()):
+            self.launcher.get_newest(first_run=False)
+        self.assertEqual(self.asked, [])
+        self.assertEqual(self.launcher.current_version(), "0.12.0")

@@ -8,10 +8,14 @@ Double-click it and it does everything, showing one small progress window, then 
   4. builds Starling's private environment and installs its add-ons (only when they changed),
   5. starts the dashboard.
 
+When a newer version exists it first shows a separate "Update available" screen (Update now / Not now / always update
+automatically) before Starling loads. "Always update automatically" is saved as updates.ask = false in config/settings.json.
+
 Everything lives in  %LOCALAPPDATA%\\Starling   (app\\, updates\\, .venv\\, launcher.log).
 Your settings, mood and data live in app\\data and app\\config and survive every update.
 """
 import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -101,8 +105,33 @@ def find_system_python():
 
 
 class Launcher:
-    def __init__(self, layout, say, repo=REPO, run=subprocess.run, popen=subprocess.Popen):
+    def __init__(self, layout, say, repo=REPO, run=subprocess.run, popen=subprocess.Popen, ask=None):
         self.l, self.say, self.repo, self.run, self.popen = layout, say, repo, run, popen
+        self.ask = ask                       # ask(info, current_version) -> "now", "later" or "always"; None = just update
+
+    def settings_path(self):
+        return self.l.app / "config" / "settings.json"
+
+    def wants_question(self):
+        """True unless you chose 'always update automatically' (updates.ask = false in settings.json)."""
+        try:
+            data = json.loads(self.settings_path().read_text(encoding="utf-8"))
+            return bool((data.get("updates") or {}).get("ask", True))
+        except (OSError, ValueError, AttributeError):
+            return True
+
+    def remember_always(self):
+        """Saves updates.ask = false without touching anything else in settings.json."""
+        path = self.settings_path()
+        try:
+            data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+            if not isinstance(data, dict):
+                data = {}
+            data.setdefault("updates", {})["ask"] = False
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        except (OSError, ValueError, AttributeError):
+            self.log("Could not save the 'always update' choice")
 
     def log(self, text):
         try:
@@ -155,6 +184,13 @@ class Launcher:
             return
         if not first_run and not updater.is_newer(info["version"], self.current_version()):
             return
+        if not first_run and self.ask is not None and self.wants_question():
+            answer = self.ask(info, self.current_version())
+            self.log("Update %s offered, answer: %s" % (info["version"], answer))
+            if answer == "always":
+                self.remember_always()
+            elif answer != "now":
+                return                           # "Not now": start the version you have; she asks again next time
         self.say("Downloading Starling %s..." % info["version"])
         updater.stage_update(info, self.l.updates,
                              progress=lambda done, total: self.say("Downloading Starling %s... %d%%" % (
@@ -276,7 +312,42 @@ def main():
     except Exception:
         root, say = None, (lambda text: None)
 
-    launcher = Launcher(layout, say)
+    def ask(info, current):
+        """The separate 'Update available' screen. Runs the question on the window thread and waits for the answer."""
+        if root is None:
+            return "now"
+        done, answer = threading.Event(), []
+
+        def show():
+            box = tk.Toplevel(root)
+            box.title("Starling update")
+            box.geometry("520x330")
+            box.resizable(False, False)
+            box.attributes("-topmost", True)
+            tk.Label(box, text="A new Starling is ready", font=("Segoe UI", 14, "bold")).pack(padx=18, pady=(16, 2), anchor="w")
+            tk.Label(box, text="Version %s is available (you have %s). Update before she starts?" % (info["version"], current),
+                     wraplength=480, justify="left").pack(padx=18, anchor="w")
+            notes = tk.Text(box, height=9, width=60, wrap="word")
+            notes.insert("1.0", (info.get("notes") or "No release notes.").strip()[:1500])
+            notes.config(state="disabled")
+            notes.pack(padx=18, pady=10)
+            always = tk.BooleanVar(value=False)
+            tk.Checkbutton(box, text="Always update automatically (don't ask again)", variable=always).pack(padx=18, anchor="w")
+            row = tk.Frame(box)
+            row.pack(pady=10)
+
+            def choose(value):
+                answer.append("always" if value == "now" and always.get() else value)
+                box.destroy()
+                done.set()
+            tk.Button(row, text="Update now", width=16, command=lambda: choose("now")).pack(side="left", padx=8)
+            tk.Button(row, text="Not now", width=16, command=lambda: choose("later")).pack(side="left", padx=8)
+            box.protocol("WM_DELETE_WINDOW", lambda: choose("later"))
+        root.after(0, show)
+        done.wait()
+        return answer[0] if answer else "later"
+
+    launcher = Launcher(layout, say, ask=ask)
 
     def work():
         try:

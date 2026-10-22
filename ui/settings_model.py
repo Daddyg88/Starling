@@ -266,6 +266,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Filled in automatically when you start from Starling.exe"),
             Field("updates.auto_check", "Look for updates when Starling starts", "toggle",
                   help="A new version is downloaded in the background and installed the next time you open Starling.exe"),
+            Field("updates.ask", "Ask me before updating when I open Starling.exe", "toggle",
+                  help="On: a separate 'Update available' screen appears before she loads (Update now / Not now). Off: updates install by themselves. Needs the newest Starling.exe"),
             Field("updates.token", "GitHub token (only for a private repository)", "text",
                   help="Leave empty for a public repository. A token lets Starling read a private one. Keep it secret"),
         ]),

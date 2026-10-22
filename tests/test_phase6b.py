@@ -153,7 +153,7 @@ class NeutralMoodTests(unittest.TestCase):
 
     def test_neutral_has_calm_remarks_and_pet_names(self):
         f, d = self.flavour("Neutral")
-        calm = {l.text for l in d.lines["Remark_Neutral"] if not l.mature}
+        calm = {l.text for l in d.lines["Remark_Neutral"] if not l.mature} | {l.text for l in d.lines["Remark_Dry"]}
         out = f.apply("Docked, Commander.", "normal")
         self.assertIn(out.split("||")[-1].strip(), calm)
         self.assertNotIn("Commander", out.split("||")[0])

@@ -33,6 +33,7 @@ MAX_LINE_CHARS = 150            # long lines (exobiology numbers etc.) are left 
 _COMMANDER = re.compile(r"\bCommander\b(?!\s+[A-Z])")
 GOOD_MOODS = ("Friendly", "Close", "Infatuated")
 BAD_MOODS = ("Sarcastic", "Frustrated", "Upset")
+DRY_CHANCE = 0.35              # of the other remarks, about a third are plain and dry
 DARK_HUMOUR_CHANCE = 0.2          # of the remarks she makes, about one in five is gallows humour
 
 
@@ -65,8 +66,8 @@ class Flavour:
     def _innuendo_chance(self, mood, close_chance):
         """Cheekiest when she is Close; less often when Friendly, and when she is in a bad mood."""
         if mood in ("Close", "Infatuated"):
-            return close_chance
-        return close_chance * (0.6 if mood == "Friendly" else 0.5)
+            return close_chance * 0.7                    # less often than before: she should not be flirty all the time
+        return close_chance * (0.4 if mood == "Friendly" else 0.4)
 
     def _dark_remark(self, mood):
         """A little gallows humour, in every mood. Uses the mood's own lines when there are some."""
@@ -98,7 +99,7 @@ class Flavour:
         if mood == "Neutral":
             return self._pick("PetName_Neutral")
         if mood in GOOD_MOODS:
-            return self._pick("PetName_Cute")
+            return self._pick("PetName_Cute") if self.rng.random() < 0.5 else self._pick("PetName_Neutral")
         if mood in ("Frustrated", "Upset") and self._mature() and self.rng.random() < 0.5:
             return self._pick("PetName_Sweary")
         return self._pick("PetName_Snide")
@@ -115,15 +116,19 @@ class Flavour:
                 return remark
         if self.rich() and (mood not in ("Frustrated", "Upset") or self.rng.random() < 0.4):
             return self._pick("Remark_Affection")
+        sweary_chance = 0.6 if mood in ("Frustrated", "Upset") else 0.3
+        if mood in BAD_MOODS and self._mature() and self.rng.random() < sweary_chance:
+            return self._pick("Remark_Sweary")
+        if self.rng.random() < DRY_CHANCE:                  # plain, dry remarks in every mood (not everything is a compliment)
+            dry = self._pick("Remark_Dry")
+            if dry:
+                return dry
         if mood == "Neutral":
             return self._pick("Remark_Neutral")
         if mood in GOOD_MOODS:
             if mood in ("Close", "Infatuated") and self.rng.random() < 0.3:
                 return self._pick("Remark_Affection") if self.rich() else self._pick("Remark_Cute")
             return self._pick("Remark_Cute")
-        sweary_chance = 0.6 if mood in ("Frustrated", "Upset") else 0.3
-        if self._mature() and self.rng.random() < sweary_chance:
-            return self._pick("Remark_Sweary")
         return self._pick("Remark_Snide")
 
     def rename(self, text, always=False):

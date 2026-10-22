@@ -107,6 +107,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "mining2.json"))       # more mining lines (less repetition)
             self._merge(_read_json(self.pack_dir / "plans.json"))         # "What are we doing today?"
             self._merge(_read_json(self.pack_dir / "selling.json"))       # where to sell: options A and B, plot a route?
+            self._merge(_read_json(self.pack_dir / "jumps.json"))         # many more jump lines, plain and dry as well as warm
             self._merge(_read_json(self.pack_dir / "moods.json"))         # lines for Infatuated and Upset
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
         elif self.pack_dir is not None:

@@ -682,13 +682,16 @@ class Dashboard:
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
+        if page.id == "exploration":
+            extra.append(("Test the honk now", self.test_honk))
         if page.id == "listening":
             extra.append(("Refresh microphone list", lambda p=page: self.refresh_mics(p)))
         if page.id == "memory":
             extra += [("Show what she remembers", self.show_memories),
                       ("Forget everything", self.forget_memories)]
         if page.id == "updates":
-            extra += [("Check for updates now", self.check_updates)]
+            extra += [("Check for updates now", self.check_updates),
+                      ("Copy my log to the clipboard (to send to Claude)", self.copy_log)]
         if page.id == "navigation":
             extra += [("Plot neutron route to my destination", lambda: self.nav_plot(use_entry=False)),
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
@@ -895,6 +898,18 @@ class Dashboard:
             return
         self._controls_result(self.app.forget_memories(), T.WARN)
 
+    def copy_log(self):
+        """Puts the end of logs/starling.log on the clipboard, so you can paste it into a chat when something is not working."""
+        from core import paths
+        try:
+            lines = (paths.LOGS_DIR / "starling.log").read_text(encoding="utf-8", errors="replace").splitlines()[-300:]
+            text = "\n".join(lines)
+            self.root.clipboard_clear()
+            self.root.clipboard_append(text)
+            self.save_note.configure(text="Copied the last %d log lines. Paste them into the chat." % len(lines), text_color=T.GOOD)
+        except OSError:
+            self.save_note.configure(text="I could not find the log file yet.", text_color=T.WARN)
+
     def check_updates(self):
         """Updates page: look on GitHub (in the background) and say what was found."""
         import threading
@@ -915,6 +930,10 @@ class Dashboard:
                 self._controls_result("Type a system name in the box first.", T.WARN)
                 return
         self._controls_result(self.app.plot_route_now(typed), T.GOOD)
+
+    def test_honk(self):
+        """Exploration page: honk once, 4 seconds from now, so you can click back into Elite. She says what happened."""
+        self._controls_result(self.app.honk_now(), T.WARN)
 
     def nav_next(self):
         self._controls_result(self.app.plot_next_now(), T.WARN)

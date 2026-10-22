@@ -493,6 +493,13 @@ class App:
             self.autohonk = None
         return self.autohonk
 
+    def honk_now(self):
+        """The dashboard's test button. Returns a sentence for the screen."""
+        honk = self.ensure_autohonk()
+        if honk is None:
+            return "Auto honk could not start. Check the log."
+        return honk.test_now()
+
     def ensure_combat_assist(self):
         """Auto pips, shield cells and heat sinks in a fight. Always attached; the dashboard toggles decide."""
         if self.combat_assist is not None:

@@ -82,3 +82,40 @@ class AutoHonkTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HonkExtrasTests(AutoHonkTests):
+    """0.28.0: honk even when jump speech is off, switch to analysis mode if needed, and a test button."""
+
+    def test_the_arrival_signal_also_starts_a_honk(self):
+        honk = self.build("primary")
+        honk.attach()
+        honk.bus.publish("journal.arrived", {"StarSystem": "Sol"}, "low")
+        self.assertEqual(len(self.sender.pressed), 1)
+
+    def test_combat_mode_switches_to_analysis_and_back(self):
+        from control.autohonk import ANALYSIS_BIT, HUD_MODE_ACTION
+        honk = self.build("primary", table={"PrimaryFire": (Keystroke("Key_1"), ""), HUD_MODE_ACTION: (Keystroke("Key_h"), "")})
+        self.state.status_seen = True
+        honk.on_jump(None)
+        self.assertEqual([k.key for k in self.sender.pressed], ["Key_h", "Key_1", "Key_h"])
+        self.sender.pressed.clear()
+        self.now[0] += 100
+        self.state.status_flags = 1 << ANALYSIS_BIT              # already in analysis mode: no switching
+        honk.on_jump(None)
+        self.assertEqual([k.key for k in self.sender.pressed], ["Key_1"])
+
+    def test_no_switch_when_the_mode_key_is_missing_or_status_unknown(self):
+        honk = self.build("primary")
+        self.state.status_seen = True
+        honk.on_jump(None)
+        self.assertEqual([k.key for k in self.sender.pressed], ["Key_1"])
+
+    def test_test_button_explains_and_speaks_the_result(self):
+        honk = self.build("primary", table={})
+        said = honk.test_now(delay=0)
+        self.assertIn("Click into Elite", said)
+        self.assertEqual(honk.last_result, "unbound")
+        spoken = [call["text"] for call in self.speech.said]
+        self.assertEqual(len(spoken), 1)                       # the test result only, not the one-time warning as well
+        self.assertIn("KEYBOARD key", spoken[0])

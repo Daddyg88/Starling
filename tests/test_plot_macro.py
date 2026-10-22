@@ -317,3 +317,33 @@ class AutoLaunchTests(unittest.TestCase):
         self.assertTrue(check(fake(status_seen=True, status_flags=1))[0])
         self.assertFalse(check(fake(status_seen=True, status_flags=16))[0])
         self.assertTrue(check(fake(status_seen=False, status_flags=0))[0])
+
+
+class VoidCompassNoClashTests(unittest.TestCase):
+    """Saying the name of a Void Compass overlay must never press a ship control, and ship phrases must never switch an overlay."""
+
+    def test_overlay_phrases_never_hit_ship_commands(self):
+        from control.catalog import CATALOG
+        from control.matcher import Matcher
+        from control.vc_overlays import OVERLAYS
+        overlay_ids = {c.id for c in CATALOG if c.service}
+        m = Matcher()
+        for _oid, _label, names, needs_word in OVERLAYS:
+            if needs_word:
+                names = [n + " overlay" for n in names]          # the bare word (cargo, navigation...) belongs to the ship
+            for name in names:
+                for verb in ("show", "hide", "turn on", "turn off"):
+                    found = m.match("%s the %s" % (verb, name))
+                    if found is not None:
+                        self.assertIn(found.command.id, overlay_ids, "%s the %s" % (verb, name))
+
+    def test_ship_phrases_never_hit_overlays(self):
+        from control.catalog import CATALOG
+        from control.matcher import Matcher
+        overlay_ids = {c.id for c in CATALOG if c.service}
+        m = Matcher()
+        for text in ("lower the landing gear", "raise landing gear", "cargo scoop up", "deploy hardpoints", "lights on",
+                     "open the galaxy map", "open the left panel", "show navigation", "open comms", "flight assist off"):
+            found = m.match(text)
+            self.assertIsNotNone(found, text)
+            self.assertNotIn(found.command.id, overlay_ids, text)

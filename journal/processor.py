@@ -53,6 +53,8 @@ class EventProcessor:
         if handler is None or handler.source != "journal":
             return
         handler.update_state(entry, self.state)
+        if handler.name == "FSDJump" and not silent:
+            self.bus.publish("journal.arrived", {"StarSystem": entry.get("StarSystem", "")}, "low")    # auto honk listens for this
         if silent or not handler.announce:
             return
         data = handler.handle(entry)
