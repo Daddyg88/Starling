@@ -1,0 +1,226 @@
+{
+ "_help": "Callouts added in 0.30.0: glide temperature and gravity, scoopable stars, undiscovered systems, jumps left, the Nomad. Placeholders: {temperature} kelvin, {gravity} g, {StarSystem}, {jumps}.",
+ "GlideStarted_Info": [
+  "Gliding in. Surface temperature {temperature} kelvin, gravity {gravity} g.",
+  "Glide engaged. It's {temperature} kelvin down there, and {gravity} g.",
+  "Gliding. Temperature {temperature} kelvin, gravity {gravity} g.",
+  "Glide initiated. Surface is {temperature} kelvin with {gravity} g of gravity.",
+  "Going down. {temperature} kelvin and {gravity} g, Commander.",
+  "Gliding in. Gravity {gravity} g, temperature {temperature} kelvin.",
+  "Glide on. Expect {gravity} g and {temperature} kelvin at the surface.",
+  "Entering the glide. {temperature} kelvin outside, {gravity} g pulling at us.",
+  "Here we go. Gravity {gravity} g, surface temperature {temperature} kelvin.",
+  "Gliding down. That's {gravity} g and {temperature} kelvin, for the record."
+ ],
+ "GlideStarted_Info_Sarcastic": [
+  "Gliding. {temperature} kelvin and {gravity} g. Try to land it rather than park it.",
+  "Glide engaged. {gravity} g, {temperature} kelvin. Do keep the pointy end up.",
+  "Going down. {temperature} kelvin, {gravity} g. I'm sure you've got this.",
+  "{temperature} kelvin, {gravity} g. Lovely spot you picked."
+ ],
+ "GlideStarted_Info_Close": [
+  "Gliding in, love. {temperature} kelvin, {gravity} g. I've got you.",
+  "Glide engaged. {gravity} g and {temperature} kelvin. Gently now.",
+  "Going down together. {temperature} kelvin outside, {gravity} g.",
+  "Easy does it. {gravity} g, {temperature} kelvin down there."
+ ],
+ "GlideStarted_Info_Frustrated": [
+  "Gliding. {temperature} kelvin, {gravity} g. Don't crash.",
+  "Glide on. {gravity} g, {temperature} kelvin. Concentrate.",
+  "{temperature} kelvin and {gravity} g. Gliding. Happy now?"
+ ],
+ "GlideStarted_Heavy": [
+  "Gliding in. Heavy world: {gravity} g, and {temperature} kelvin on the surface.",
+  "Careful, Commander. {gravity} g down there. Temperature {temperature} kelvin.",
+  "Glide engaged. High gravity, {gravity} g. Surface {temperature} kelvin.",
+  "Fair warning: {gravity} g. That's a heavy one. {temperature} kelvin outside."
+ ],
+ "StartJump_Scoop": [
+  "Jumping to {StarSystem}. The star is scoopable.",
+  "Next stop, {StarSystem}. Scoopable star, if you need fuel.",
+  "{StarSystem} ahead, and the star is scoopable.",
+  "Heading for {StarSystem}. You can scoop there.",
+  "Jumping to {StarSystem}. Fuel star on arrival.",
+  "Off to {StarSystem}. It's a scoopable star.",
+  "Hyperspace to {StarSystem}. Scoopable, so top up if you like.",
+  "Charging for {StarSystem}. Good news, the star can be scooped.",
+  "{StarSystem}. Scoopable star waiting for us.",
+  "Setting off for {StarSystem}. Fuel's available there.",
+  "Jumping. {StarSystem} has a scoopable star.",
+  "On our way to {StarSystem}. Scoop will work there."
+ ],
+ "StartJump_Scoop_Sarcastic": [
+  "Jumping to {StarSystem}. The star's scoopable, so no excuses about fuel.",
+  "{StarSystem}. Scoopable. Try not to cook us this time.",
+  "Off to {StarSystem}. You can scoop there, in case you forgot how."
+ ],
+ "StartJump_Scoop_Close": [
+  "Jumping to {StarSystem}, love. The star's scoopable.",
+  "Off we go to {StarSystem}. You can top up there.",
+  "{StarSystem} next. Scoopable star, so we can take on fuel together."
+ ],
+ "StartJump_Scoop_Frustrated": [
+  "Jumping to {StarSystem}. Scoopable. Fuel up for once.",
+  "{StarSystem}. The star's scoopable. Don't say I never tell you."
+ ],
+ "StartJump_NoScoop": [
+  "Jumping to {StarSystem}. The star is not scoopable.",
+  "Next stop, {StarSystem}. No fuel scooping there.",
+  "{StarSystem} ahead, but you can't scoop that star.",
+  "Heading for {StarSystem}. Not a scoopable star, so mind your fuel.",
+  "Jumping to {StarSystem}. No scooping on arrival.",
+  "Off to {StarSystem}. That star won't give us any fuel.",
+  "Hyperspace to {StarSystem}. Unscoopable star, watch the tank.",
+  "Charging for {StarSystem}. Careful, the star can't be scooped.",
+  "{StarSystem}. No scoop there, Commander.",
+  "Setting off for {StarSystem}. There's no fuel to be had at that star.",
+  "Jumping. {StarSystem} has a star we can't scoop.",
+  "On our way to {StarSystem}. Scoop won't work there."
+ ],
+ "StartJump_NoScoop_Sarcastic": [
+  "Jumping to {StarSystem}. Not scoopable. I do hope you've got fuel.",
+  "{StarSystem}. No scooping there, so no wishful thinking.",
+  "Off to {StarSystem}. Unscoopable, which is a shame for your fuel gauge."
+ ],
+ "StartJump_NoScoop_Close": [
+  "Jumping to {StarSystem}, love. We can't scoop there, so keep an eye on the tank.",
+  "Off we go to {StarSystem}. No fuel at that star, I'm afraid.",
+  "{StarSystem} next. Unscoopable, so we'll plan our top-up for later."
+ ],
+ "StartJump_NoScoop_Frustrated": [
+  "Jumping to {StarSystem}. Not scoopable. Mind your fuel.",
+  "{StarSystem}. No scoop. Don't come crying to me."
+ ],
+ "UndiscoveredSystem": [
+  "Nobody has been here before, Commander. Not one soul. Well, apart from us.",
+  "Undiscovered system. Go on, name it after your ship.",
+  "This system has never been seen. We're the first. No pressure.",
+  "Fresh system, Commander. Not a single footprint in the cosmic dust.",
+  "Undiscovered! Somebody call the cartographers. Actually, don't, we want the credit.",
+  "Nobody's been here. The stars haven't even been introduced yet.",
+  "First to arrive. I'd say we should have brought a flag.",
+  "New system. Never visited. The welcome mat is still in the box.",
+  "We're the first ones here. Please try not to break anything, it's brand new.",
+  "Undiscovered system. The galaxy is a big place and we found a quiet corner of it.",
+  "Nobody has seen this place. I'd look pleased with myself, if I had a face.",
+  "Virgin territory, Commander. For the system, I mean. Mostly.",
+  "This one's never been logged. Time to put our names on it.",
+  "Undiscovered. That's either a great find or a very lonely place.",
+  "Unexplored system. The universe left the light on and nobody came.",
+  "We've got a first. Nobody has scanned this system before.",
+  "Look at that. No discoverer on record. Finders keepers.",
+  "This system has no name on the plaque yet. Shall we find a pen?",
+  "Undiscovered system ahead of us and behind us and everywhere. Mostly rocks, probably.",
+  "First visitors, Commander. I'd have tidied up if I'd known.",
+  "Nobody home. Not ever. How exciting.",
+  "We've arrived somewhere nobody else has. Quick, act important.",
+  "A system with no history. We get to write the first line.",
+  "Newly discovered by us. Don't tell the others, they'll want a go.",
+  "Zero previous visitors. That's either exclusive or suspicious.",
+  "Undiscovered. I'll alert the press. Both of them.",
+  "Nobody has charted this place. Which means we get to be wrong about it first.",
+  "Pristine system. Not a single scanner ping from anyone else.",
+  "This is a first for the records. Let's not waste it.",
+  "Nobody has ever been here, which is a lot of pressure for a lot of rocks.",
+  "Brand new discovery. I'm told that's worth something. To somebody.",
+  "We're the first to see this system. Try to look dignified.",
+  "Undiscovered system. Honk it, name it, mourn nothing.",
+  "No one has been here. We should leave a review.",
+  "First footprints, metaphorically speaking. We're in a ship.",
+  "An undiscovered system. Somebody's about to get very slightly famous.",
+  "Hello, empty system! Nobody's said that to you yet, have they?",
+  "Uncharted, unclaimed, and unimpressed to see us.",
+  "This system's virgin, as far as the records go. Handle it gently.",
+  "Nobody has discovered this place. Well. Somebody has now.",
+  "We found something nobody found. I'm glowing. Metaphorically.",
+  "Not a single entry in the register. We're writing history. Small history, but history.",
+  "Undiscovered. Let's get scanning before somebody else turns up.",
+  "This is somewhere new, Commander. Properly new.",
+  "A system no one has seen. I'd say it's a blank page. Spoiler: it's mostly vacuum.",
+  "Untouched system. Smells like fresh paint and mild radiation.",
+  "The records say nobody's been here. The records are very sure about it.",
+  "You've done it again, Commander. Another system that nobody knew about.",
+  "Nobody's discovered this place. Do try to make a good first impression.",
+  "Welcome to the middle of nowhere. Population: us. Previous visitors: none.",
+  "First discoverer, that's us. I'll put it on the invoice.",
+  "Undiscovered system. If there's a prize, I'm splitting it sixty-forty."
+ ],
+ "UndiscoveredSystem_Friendly": [
+  "Oh, how lovely. Nobody has discovered this place. It's ours, Commander.",
+  "A brand new system! I do like being the first.",
+  "Nobody's ever been here. What a nice little find.",
+  "Undiscovered, Commander. Let's take our time and enjoy it.",
+  "We're the first here. I think that deserves a tiny celebration.",
+  "A completely new system. Good eye, Commander."
+ ],
+ "UndiscoveredSystem_Sarcastic": [
+  "Undiscovered system. Nobody else wanted it. I wonder why.",
+  "Nobody has been here. Possibly with good reason.",
+  "A first discovery. I'm sure the rocks are thrilled.",
+  "Congratulations on finding the one place everyone else skipped.",
+  "Undiscovered. That's what happens when you go where nobody sensible goes.",
+  "First to arrive. Last to find anything interesting, I expect.",
+  "No visitors on record. Shocking.",
+  "You found a new system. I'll alert the committee that doesn't exist."
+ ],
+ "UndiscoveredSystem_Close": [
+  "Nobody has been here before, love. Just you and me.",
+  "An undiscovered system, all to ourselves. I like that.",
+  "Just us out here, Commander. No one has ever seen this place.",
+  "We're the first ones here, together. Good moment.",
+  "A new system, and I get to share it with you.",
+  "Nobody's been here. It feels a bit like our own little secret.",
+  "Undiscovered, and we found it. I'm proud of you.",
+  "Quiet, new and untouched. Rather like a first date."
+ ],
+ "UndiscoveredSystem_Frustrated": [
+  "Undiscovered system. Fine. Scan it, then.",
+  "Nobody has been here. Go on, do your thing.",
+  "A new system. Try not to waste it.",
+  "First to arrive. Now do something with it.",
+  "Undiscovered. Don't just sit there."
+ ],
+ "JumpsLeft": [
+  "{jumps} jumps left in the route.",
+  "{jumps} more jumps to go.",
+  "Still {jumps} jumps ahead of us.",
+  "{jumps} jumps remaining, Commander.",
+  "Route check: {jumps} jumps left.",
+  "Only {jumps} more jumps to go.",
+  "{jumps} jumps to the end of the route.",
+  "We have {jumps} jumps still to make.",
+  "{jumps} left on the route. Keep going.",
+  "That leaves {jumps} jumps."
+ ],
+ "JumpsLeft_Sarcastic": [
+  "{jumps} jumps left. Try to stay awake.",
+  "{jumps} more to go. Not that anyone's counting. I am.",
+  "Still {jumps} jumps. We're nearly somewhere, probably."
+ ],
+ "JumpsLeft_Close": [
+  "{jumps} jumps left, love. We're getting there.",
+  "Just {jumps} more together, Commander.",
+  "{jumps} to go. I'm enjoying the ride."
+ ],
+ "JumpsLeft_Last": [
+  "Last jump of the route.",
+  "One jump left, Commander.",
+  "Final jump coming up.",
+  "That's the last jump on the route.",
+  "One more jump and we're there.",
+  "Last hop. Nearly there."
+ ],
+ "JumpsLeft_Last_Sarcastic": [
+  "Last jump. You made it this far without incident. I'm stunned."
+ ],
+ "JumpsLeft_Last_Close": [
+  "One more jump, love, and we're there."
+ ],
+ "NomadDocked": [
+  "Nomad's back aboard.",
+  "Nomad recovered.",
+  "Nomad docked and stowed.",
+  "Nomad is home, Commander.",
+  "Nomad safely on board."
+ ]
+}

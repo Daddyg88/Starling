@@ -89,7 +89,17 @@ class Flavour:
         return line.text if line is not None else None
 
     # ---- pet names ----
+    def custom_names(self):
+        """The names you typed in the Personality page (comma separated)."""
+        raw = self.settings.get("personality.custom_pet_names", "")
+        if not isinstance(raw, str):
+            return []
+        return [n.strip() for n in raw.replace(";", ",").replace("\n", ",").split(",") if n.strip()][:30]
+
     def _pet_name(self, mood):
+        mine = self.custom_names()
+        if mine and self.rng.random() < (0.15 if mood in ("Frustrated", "Upset") else 0.55):
+            return self.rng.choice(mine)
         if self.innuendo_on(mood) and self.rng.random() < self._innuendo_chance(mood, 0.4):
             name = self._pick("PetName_Naughty_Grumpy" if mood in BAD_MOODS else "PetName_Naughty")
             if name:

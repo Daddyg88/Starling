@@ -116,7 +116,11 @@ class StatusReader:
                 state.fuel_main = float(main)
             if isinstance(status.get("Cargo"), (int, float)):
                 state.cargo_tons = float(status["Cargo"])
+        if state is not None and isinstance(status.get("BodyName"), str) and status.get("BodyName"):
+            state.current_body = status["BodyName"]       # present while you are near a planet
         vehicle = self._work_out_vehicle(flags, flags2)
+        if vehicle == "main ship" and self._vehicle == "Nomad" and not baseline_only and not initial:
+            self._announce("NomadDocked", status)             # the Nomad came home: the app puts the hardpoints away
         if vehicle == "main ship":
             self.processor.state.in_nomad = False   # back aboard: the Nomad is stowed
 
@@ -243,4 +247,15 @@ class StatusReader:
                 capacity = self.processor.state.fuel_capacity
                 if capacity:
                     data["fuel_percent"] = round(main / capacity * 100)
+        if name == "GlideStarted":
+            data.update(self._body_facts())
         self.processor.emit(name, data)
+
+    def _body_facts(self):
+        """Temperature (kelvin) and gravity (g) of the planet you are gliding to, if a scan told us."""
+        state = self.processor.state
+        facts = (getattr(state, "bodies", None) or {}).get(getattr(state, "current_body", None))
+        if not facts:
+            return {}
+        return {"temperature": int(round(facts["temperature"])), "gravity": "%.2f" % facts["gravity"],
+                "heavy": facts["gravity"] >= 2.0}

@@ -111,6 +111,15 @@ class _Quiet(dict):
         return ""
 
 
+def is_caspian(state):
+    """True when the ship you are flying is the Caspian Explorer (journal name explorer_nx)."""
+    for text in (getattr(state, "ship", None), getattr(state, "ship_model", None)):
+        low = str(text or "").lower()
+        if low == "explorer_nx" or "caspian" in low:
+            return True
+    return False
+
+
 class RouteVoice:
     def __init__(self, follower, spansh, narrator, settings, state_provider, spawn=None):
         self.follower = follower
@@ -121,6 +130,12 @@ class RouteVoice:
         self.spawn = spawn or self._thread
         self._busy = False
         self.target_override = None
+
+    def supercharge(self):
+        """x6 in the Caspian Explorer (the only ship that gets it), otherwise whatever the dashboard says."""
+        if self.settings.get("neutron.auto_x6", True) and is_caspian(self.state_provider()):
+            return 6
+        return self.settings.get("neutron.supercharge", 4)
 
     @staticmethod
     def _thread(function):
@@ -277,7 +292,7 @@ class RouteVoice:
                 return
             target = self.spansh.find_system(name)
             waypoints = self.spansh.neutron_route(
-                here, target, rng, self.settings.get("neutron.efficiency", 60), self.settings.get("neutron.supercharge", 4))
+                here, target, rng, self.settings.get("neutron.efficiency", 60), self.supercharge())
             self.follower.set_route(waypoints, target, here)
             if not self.follower.active:
                 self.narrator.say("RouteArrived", {"destination": target})

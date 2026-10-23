@@ -493,6 +493,22 @@ class App:
             self.autohonk = None
         return self.autohonk
 
+    def on_nomad_docked(self, _event=None):
+        """The Nomad is back aboard: put the hardpoints away (only if they are out, and only if the setting is on)."""
+        if not self.settings.get("nomad.stow_hardpoints", True):
+            return
+        runner = self.ensure_commands()
+        if runner is None:
+            return
+        import threading
+        import time
+
+        def go():
+            time.sleep(2.5)                                   # let the game finish switching you back to the ship
+            if (getattr(self.state, "status_flags", 0) or 0) & (1 << 6):      # bit 6 = hardpoints deployed
+                runner.run_text("weapons away", speak_unknown=False)
+        threading.Thread(target=go, name="nomad-stow", daemon=True).start()
+
     def honk_now(self):
         """The dashboard's test button. Returns a sentence for the screen."""
         honk = self.ensure_autohonk()
@@ -525,6 +541,7 @@ class App:
         if self.journal_folder is None:
             return None
         self.ensure_autohonk()
+        self.bus.subscribe("NomadDocked", self.on_nomad_docked)
         self.ensure_combat_assist()
         self.ensure_route()
         poll = self.settings.get("journal.poll_seconds", 1.0)

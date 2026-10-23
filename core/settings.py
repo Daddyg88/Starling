@@ -32,7 +32,8 @@ DEFAULTS = {
     "plans": {"ask": True},
     "voidcompass": {"enabled": True, "port": 7380},
     "neutron": {"enabled": True, "destination": "", "jump_range": 0, "range_margin": 0.9, "efficiency": 60,
-                "supercharge": 4, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},
+                "supercharge": 4, "auto_x6": True, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},
+    "nomad": {"stow_hardpoints": True},
     "bookmarks": {"home": "", "b1": "", "b2": "", "b3": "", "b4": "", "b5": "", "b6": "", "b7": "", "b8": "", "b9": "", "b10": ""},
     "watcher": {"enabled": True, "reply": "often", "wait_for_calm": True},
     "autohonk": {"mode": "off", "hold_seconds": 6.0, "delay_seconds": 2.0},
@@ -51,7 +52,7 @@ DEFAULTS = {
     "recorder": {"seconds": 20, "countdown": 5},
     "ptt": {"mode": "off", "button": "", "beep": True, "skip_wake": True},
     "personality": {"active_voicepack": "default", "mood": "Friendly", "style": "personality", "mood_mode": "auto", "login_greeting": True, "mood_live": "Friendly",
-                    "remarks": "sometimes", "pet_names": True, "innuendo": False, "dark_humour": True, "affection_credits": 500000000},
+                    "remarks": "sometimes", "pet_names": True, "custom_pet_names": "", "innuendo": False, "dark_humour": True, "affection_credits": 500000000},
     "speech": {"enabled": True, "use_recordings": True, "allow_mature": False,
                "windows_emergency_voice": False},
     "ai": {

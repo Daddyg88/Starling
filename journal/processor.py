@@ -53,6 +53,7 @@ class EventProcessor:
         if handler is None or handler.source != "journal":
             return
         handler.update_state(entry, self.state)
+        pending, self.state.pending_events = list(getattr(self.state, "pending_events", None) or []), []
         if handler.name == "FSDJump" and not silent:
             self.bus.publish("journal.arrived", {"StarSystem": entry.get("StarSystem", "")}, "low")    # auto honk listens for this
         if silent or not handler.announce:
@@ -61,6 +62,8 @@ class EventProcessor:
         if getattr(handler, "tag_on_foot", False):
             data["OnFoot"] = bool(getattr(self.state, "status_flags2", 0) & 1)      # Status.json Flags2 bit 0
         self._announce(handler, data)
+        for name, extra in pending:       # things this line made her notice (undiscovered system, jumps left)
+            self.emit(name, extra)
 
     # ---- events made up from Status.json ----
     def emit(self, name, data):

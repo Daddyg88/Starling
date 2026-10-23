@@ -12,3 +12,5 @@ class SupercruiseExit(BaseEvent):
 
     def update_state(self, entry, state):
         state.in_supercruise = False
+        if entry.get("BodyType") in ("Planet", "Moon"):
+            state.current_body = entry.get("Body") or state.current_body

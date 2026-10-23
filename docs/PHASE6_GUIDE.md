@@ -393,3 +393,14 @@ Cargo scoop: "lower / raise / drop / retract the cargo scoop" (and "scoop down /
 - **Microphone box** at the top of the window: green "LISTENING" while she can hear you (with push-to-talk it lights only while the mic is open), grey "PUSH TO TALK" when it is closed, "MIC OFF" / "MIC STARTING" / "MIC PROBLEM" otherwise.
 - **Ship card** shows your own name for the ship and the model next to it ("Pooh bear (Caspian Explorer)"), and the picture follows the model. New ships added: Caspian Explorer, Kestrel Mark 2, Type 11 Prospector, Type 8 Transporter, Lynx Highliner.
 - **Home page boxes** wrap their words to the box width, so nothing is cut off.
+
+
+## 0.30.0: glide, scoopable stars, undiscovered systems, jumps left, own pet names, Caspian x6, Nomad
+* **Glide:** when you start gliding to a planet she says its surface temperature (kelvin) and gravity (g). Over 2 g she warns you it is heavy. This needs a scan of that planet (the game scans nearby bodies by itself, or use the FSS); with no scan she just says "Glide engaged".
+* **Scoopable star:** when a hyperspace jump starts she says whether the star you are jumping to can be scooped (classes O B A F G K M can; neutron stars, white dwarfs, black holes, brown dwarfs cannot).
+* **Undiscovered system:** the first scan after you arrive tells the game whether anyone discovered the system. If nobody did she says so, with funny chatter (50 lines, plus lines for her moods).
+* **Jumps left:** after a jump she sometimes (about 3 times in 10) says how many jumps are left, and always says "last jump" for the final one. It uses the route you plotted in the game (or by neutron plotter). Switch off with the Exploration "She comments" switch, or the JumpsLeft entry in config/events.json.
+* **Own pet names:** Personality page > "My own pet names". Type names with commas between them. She mixes them in with hers (often when happy, rarely when upset).
+* **Caspian x6:** when you fly the Caspian Explorer the neutron plotter uses x6 for you (Navigation page > "Use x6 automatically in the Caspian Explorer").
+* **Nomad:** when you recover the Nomad she puts the hardpoints away 2.5 seconds later, if they are out (Exploration page > "Put the hardpoints away when the Nomad docks"). Elite must be the window in front.
+* Could not be tested without the game: the real journal values (SurfaceTemperature, SurfaceGravity, WasDiscovered, RemainingJumpsInRoute) and the Nomad recovery. If a callout is missing, use Developer > Copy my log and send it.

@@ -9,3 +9,6 @@ class ApproachBody(BaseEvent):
     priority = LOW
     keep = ("Body", "StarSystem",)
     summary = "Approaching {Body}"
+
+    def update_state(self, entry, state):
+        state.current_body = entry.get("Body") or state.current_body

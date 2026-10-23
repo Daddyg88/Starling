@@ -91,7 +91,20 @@ def _keys_for(event):
 
     if name == "StartJump":
         # "Four, three, two, one, engage" is for hyperspace jumps only.
-        return ["StartJump"] if data.get("JumpType") == "Hyperspace" else []
+        if data.get("JumpType") != "Hyperspace":
+            return []
+        scoop = data.get("Scoopable")
+        if scoop is None:
+            return ["StartJump"]
+        return ["StartJump_Scoop" if scoop else "StartJump_NoScoop", "StartJump"]
+
+    if name == "GlideStarted":
+        if data.get("temperature") is not None and data.get("gravity") is not None:
+            return (["GlideStarted_Heavy"] if data.get("heavy") else []) + ["GlideStarted_Info", "GlideStarted"]
+        return ["GlideStarted"]
+
+    if name == "JumpsLeft":
+        return ["JumpsLeft_Last"] if data.get("last") else ["JumpsLeft"]
 
     if name == "Scan":
         return scan_keys(data)
