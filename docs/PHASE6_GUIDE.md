@@ -404,3 +404,12 @@ Cargo scoop: "lower / raise / drop / retract the cargo scoop" (and "scoop down /
 * **Caspian x6:** when you fly the Caspian Explorer the neutron plotter uses x6 for you (Navigation page > "Use x6 automatically in the Caspian Explorer").
 * **Nomad:** when you recover the Nomad she puts the hardpoints away 2.5 seconds later, if they are out (Exploration page > "Put the hardpoints away when the Nomad docks"). Elite must be the window in front.
 * Could not be tested without the game: the real journal values (SurfaceTemperature, SurfaceGravity, WasDiscovered, RemainingJumpsInRoute) and the Nomad recovery. If a callout is missing, use Developer > Copy my log and send it.
+
+
+## 0.31.0: boost stars, fuel warnings, waypoint count, quiet map macro, game target
+* **Neutron stars and white dwarfs:** when a jump starts she says they are for supercharging only (not for fuel).
+* **Fuel warnings:** a gentle "we should start looking for fuel" at 50 percent, the game's own low fuel warning at 25 percent (with extra lines, a few teasing Curd Nerd), and panic at 10 percent. Each is said once per tank and comes back after you refuel above 60 percent. Not while docked or landed. The 10 percent one is a safety warning and cannot be switched off.
+* **Waypoints left:** the neutron plotter now says "6 waypoints to go" (or "Last waypoint") each time you reach one.
+* **Quiet map macro:** while the "plot the next waypoint" macro opens and closes the galaxy map she no longer says "galaxy map opened / closed".
+* **Plot to the game's target:** pick a destination in the galaxy map, then say "plot a neutron route" (or "plot neutron course to my target"). She reads the end of your plotted route from the game's NavRoute.json. "Plot a neutron route to my destination" uses the Navigation page box first, then the game's target. "Plot neutron course to Home" uses your Home bookmark.
+* Not testable without the game: NavRoute.json contents and the exact moment the game reports the map closing.

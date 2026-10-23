@@ -139,6 +139,8 @@
     "GalaxyMapOpened":             { "enabled": true, "priority": "normal", "source": "status" },
     "GlideEnded":                  { "enabled": true, "priority": "low", "source": "status" },
     "GlideStarted":                { "enabled": true, "priority": "low", "source": "status" },
+    "FuelHalf":                    { "enabled": true, "priority": "normal", "source": "status" },
+    "FuelPanic":                   { "enabled": true, "priority": "critical", "source": "status" },
     "UndiscoveredSystem":          { "enabled": true, "priority": "normal", "source": "status" },
     "JumpsLeft":                   { "enabled": true, "priority": "low", "source": "status" },
     "NomadDocked":                 { "enabled": true, "priority": "low", "source": "status" },

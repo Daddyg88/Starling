@@ -214,7 +214,7 @@ class ControlsAndScreensTests(unittest.TestCase):
         self.scoop(True, 12.0)
         self.now[0] += 8
         self.scoop(False, 15.0)
-        self.assertEqual(self.names(), ["FuelScoopStarted", "FuelScoopDisengaged"])
+        self.assertEqual([n for n in self.names() if n != "FuelHalf"], ["FuelScoopStarted", "FuelScoopDisengaged"])
 
     def test_tank_filling_in_the_same_moment_the_scoop_stops_says_complete_first(self):
         self.processor.state.fuel_capacity = 32.0
@@ -252,7 +252,7 @@ class ControlsAndScreensTests(unittest.TestCase):
         self.scoop(True, 11.0)
         self.now[0] += 1
         self.scoop(False, 11.0)
-        self.assertEqual(self.names(), ["FuelScoopStarted"])
+        self.assertEqual([n for n in self.names() if n != "FuelHalf"], ["FuelScoopStarted"])
 
     def test_no_tank_full_call_while_in_the_srv_or_on_foot(self):
         self.processor.state.fuel_capacity = 32.0

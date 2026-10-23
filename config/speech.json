@@ -46,6 +46,8 @@
     "FuelScoopComplete": 10,
     "FsdCharging": 8,
     "StartJump": 5,
+    "FuelHalf": 120,
+    "FuelPanic": 45,
     "UndiscoveredSystem": 10,
     "JumpsLeft": 60,
     "NomadDocked": 20,

@@ -62,6 +62,7 @@ class StatusReader:
         self._on_since = {}
         self._suppressed = set()   # switches that changed while ignored (supercruise)
         self._tank_full_said = False
+        self._fuel_said = set()       # which fuel warnings ("half", "panic") were already given for this tank
         self._clock = time.monotonic
 
     # ---- watching the file ----
@@ -139,6 +140,7 @@ class StatusReader:
         fresh_start = baseline_only or changed or self._unknown_last
         self._unknown_last = False
         moving_fast = bool(flags & ((1 << 4) | (1 << 30)))  # supercruise or mid-jump
+        self._check_fuel_levels(status, vehicle, flags, quiet=baseline_only or initial or fresh_start)
 
         # Fuel scooping: "complete" means the tank is full. It is said once per scoop,
         # and always BEFORE "scoop disengaged" if the tank filled as you left.
@@ -205,6 +207,28 @@ class StatusReader:
         if flags or flags2:
             return "other vehicle"   # for example the Nomad
         return None
+
+    def _check_fuel_levels(self, status, vehicle, flags, quiet):
+        """A gentle nudge at 50 percent and a panic at 10. (The game's own low fuel warning, at 25 percent, is the one in between.)
+        Each is said once per tank: they come back after you refuel above 60 percent. Never while docked or landed."""
+        main = (status.get("Fuel") or {}).get("FuelMain")
+        capacity = getattr(self.processor.state, "fuel_capacity", None)
+        if vehicle != "main ship" or not isinstance(main, (int, float)) or not capacity:
+            return
+        percent = main / capacity * 100
+        if percent > 60:
+            self._fuel_said.clear()
+        said = self._fuel_said
+        name = "FuelPanic" if percent <= 10 else ("FuelHalf" if percent <= 50 else None)
+        if name is None:
+            return
+        due = ["half", "panic"] if name == "FuelPanic" else ["half"]
+        fresh = [tier for tier in due if tier not in said]
+        said.update(due)
+        docked = flags & ((1 << 0) | (1 << 1))                  # docked or landed
+        if quiet or docked or not fresh or (name == "FuelHalf" and "panic" in said):
+            return
+        self._announce(name, status, {"fuel_percent": round(percent)})
 
     def _tank_is_full(self, status):
         fuel = status.get("Fuel") or {}

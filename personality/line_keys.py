@@ -96,7 +96,8 @@ def _keys_for(event):
         scoop = data.get("Scoopable")
         if scoop is None:
             return ["StartJump"]
-        return ["StartJump_Scoop" if scoop else "StartJump_NoScoop", "StartJump"]
+        boost = {"neutron": ["StartJump_Neutron"], "whitedwarf": ["StartJump_WhiteDwarf"]}.get(data.get("Boost"), [])
+        return boost + ["StartJump_Scoop" if scoop else "StartJump_NoScoop", "StartJump"]
 
     if name == "GlideStarted":
         if data.get("temperature") is not None and data.get("gravity") is not None:

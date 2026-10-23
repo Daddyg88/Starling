@@ -13,46 +13,46 @@
   "Anywhere you like. Plotting to {destination} now."
  ],
  "RouteReady": [
-  "Route ready, Commander. {left} jumps in total with {stops} neutron stops. First waypoint is {next}, {jumps} jumps from here.{clip}",
-  "Done. {stops} neutron stops, {left} jumps to {destination}. Head for {next} first.{clip}",
-  "All set. First stop is {next}, {jumps} jumps away. {left} jumps overall.{clip}"
+  "Route ready, Commander. {left} jumps in total with {stops} neutron stops. First waypoint is {next}, {jumps} jumps from here. {count}{clip}",
+  "Done. {stops} neutron stops, {left} jumps to {destination}. Head for {next} first. {count}{clip}",
+  "All set. First stop is {next}, {jumps} jumps away. {left} jumps overall. {count}{clip}"
  ],
  "RouteReady_Sarcastic": [
-  "There. {left} jumps to {destination}, try not to get lost. First waypoint is {next}.{clip}"
+  "There. {left} jumps to {destination}, try not to get lost. First waypoint is {next}. {count}{clip}"
  ],
  "RouteReady_Friendly": [
-  "Lovely, we have a route. {left} jumps to {destination}, starting with {next}.{clip}"
+  "Lovely, we have a route. {left} jumps to {destination}, starting with {next}. {count}{clip}"
  ],
  "RouteReady_Close": [
-  "Our route is ready, my favourite Commander. First stop {next}, {left} jumps in all.{clip}"
+  "Our route is ready, my favourite Commander. First stop {next}, {left} jumps in all. {count}{clip}"
  ],
  "RouteReady_Frustrated": [
-  "Route's done. {left} jumps. First waypoint {next}.{clip}"
+  "Route's done. {left} jumps. First waypoint {next}. {count}{clip}"
  ],
  "RouteNeutronNext": [
-  "Neutron star reached. Supercharge, then head for {next}, {jumps} jumps.{clip}",
-  "Neutron star. Boost now. Next waypoint is {next}, {jumps} jumps away.{clip}",
-  "Cone ahead, supercharge before you leave. Next is {next}.{clip}"
+  "Neutron star reached. Supercharge, then head for {next}, {jumps} jumps. {count}{clip}",
+  "Neutron star. Boost now. Next waypoint is {next}, {jumps} jumps away. {count}{clip}",
+  "Cone ahead, supercharge before you leave. Next is {next}. {count}{clip}"
  ],
  "RouteNeutronNext_Sarcastic": [
-  "A neutron star. Do try to touch the cone this time. Next is {next}.{clip}"
+  "A neutron star. Do try to touch the cone this time. Next is {next}. {count}{clip}"
  ],
  "RouteNeutronNext_Close": [
-  "Neutron star, darling. Boost up. Then {next}.{clip}"
+  "Neutron star, darling. Boost up. Then {next}. {count}{clip}"
  ],
  "RouteNext": [
-  "Waypoint reached. Next is {next}, {jumps} jumps away.{clip}",
-  "Next waypoint: {next}, {jumps} jumps.{clip}"
+  "Waypoint reached. Next is {next}, {jumps} jumps away. {count}{clip}",
+  "Next waypoint: {next}, {jumps} jumps. {count}{clip}"
  ],
  "RouteNextAgain": [
-  "Next waypoint is {next}, {jumps} jumps away.{clip}",
-  "Heading for {next}. {jumps} jumps to go.{clip}",
-  "The next stop is {next}.{clip}"
+  "Next waypoint is {next}, {jumps} jumps away. {count}{clip}",
+  "Heading for {next}. {jumps} jumps to go. {count}{clip}",
+  "The next stop is {next}. {count}{clip}"
  ],
  "RouteStatus": [
-  "{left} jumps to go and {stops} neutron stops. Next waypoint is {next}.",
-  "{stops} neutron stops left, {left} jumps in total. Next is {next}.",
-  "You have {left} jumps left to {destination}."
+  "{left} jumps to go and {stops} neutron stops. Next waypoint is {next}. {count}",
+  "{stops} neutron stops left, {left} jumps in total. Next is {next}. {count}",
+  "You have {left} jumps left to {destination}. {count}"
  ],
  "RouteArrived": [
   "That's the end of the route. We've arrived at {destination}.",
@@ -76,7 +76,10 @@
  ],
  "RouteNoDestination": [
   "Where to, Commander? Say plot a neutron route to, and the system name.",
-  "I didn't catch the destination."
+  "I didn't catch the destination.",
+  "I can't see a target. Pick a destination in the galaxy map first, or say plot a neutron route to, and the system name.",
+  "No destination set. Choose one in the galaxy map, then ask me again.",
+  "Where are we going? Set a target in the galaxy map, or tell me the system."
  ],
  "RouteNoLocation": [
   "I don't know which system we're in yet. Make a jump and ask me again."

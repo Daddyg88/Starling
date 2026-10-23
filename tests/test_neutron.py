@@ -318,7 +318,7 @@ class NarratorTests(unittest.TestCase):
         keys = ["RoutePlotting", "RouteReady", "RouteNeutronNext", "RouteNext", "RouteNextAgain", "RouteStatus",
                 "RouteArrived", "RouteCancelled", "RouteNone", "RouteNoDestination", "RouteNoLocation",
                 "RouteNoRange", "RouteFailed"]
-        fields = dict(destination="Colonia", next="Neutron A", jumps=3, stops=2, left=9, clip=" On clipboard.", reason="why")
+        fields = dict(destination="Colonia", next="Neutron A", jumps=3, stops=2, left=9, clip=" On clipboard.", reason="why", count="3 waypoints to go.")
         for key in keys:
             for mood in ("Close", "Friendly", "Neutral", "Sarcastic", "Frustrated"):
                 self.assertTrue(pool.pool(key, mood, False, False), (key, mood))

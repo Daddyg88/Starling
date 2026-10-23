@@ -41,7 +41,10 @@ FAVOURITES = {
 
 _FILLER = re.compile(r"\b(please|starling|commander|cmdr|could you|can you|would you|will you|for me|hey|ok|okay|now|just|quickly)\b")
 _PLOT = re.compile(r"\b(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart)\b"
-                   r".*?\b(neutron|route|course)\b.*?\bto\b\s+(?P<dest>.+)$")
+                   r".*?\b(neutron|route|course|highway|trail)\b.*?\bto\b\s+(?P<dest>.+)$")
+# "plot a neutron route" with no place named: use the destination set in the game
+_PLOT_BARE = re.compile(r"^(?:\w+ ){0,3}?(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart)\b"
+                        r".*\bneutron\b.*\b(route|course|highway|trail)\b(?!.*\bto\b)")
 _NEXT = re.compile(r"\b(next (waypoint|stop|neutron|neutron star|star)|where (to )?next|where s the next|waypoint again|repeat the waypoint)\b")
 _STATUS = re.compile(r"\b(how far|how much (further|farther|left)|how many (jumps|stops|neutron).*left|route status|how s the route|jumps left|stops left)\b")
 _CANCEL = re.compile(r"\b(cancel|clear|stop|abandon|forget|scrap|delete|drop)\b.*\b(neutron route|the route|my route|route|plot)\b")
@@ -130,6 +133,14 @@ class RouteVoice:
         self.spawn = spawn or self._thread
         self._busy = False
         self.target_override = None
+        self.game_target = None          # the app sets this: a function giving the destination picked in the game's galaxy map
+
+    def _target_in_game(self):
+        try:
+            return str(self.game_target() or "").strip() if self.game_target else ""
+        except Exception:
+            log.exception("Could not read the game's route")
+            return ""
 
     def supercharge(self):
         """x6 in the Caspian Explorer (the only ship that gets it), otherwise whatever the dashboard says."""
@@ -159,6 +170,8 @@ class RouteVoice:
         found = _PLOT.search(said)
         if found:
             return self.plot(found.group("dest"))
+        if _PLOT_BARE.search(said) and not _PLOT_NEXT.search(said):
+            return self.plot("my target")
         if _REPLOT.search(said):
             return self.plot(self.follower.destination or str(self.settings.get("neutron.destination", "")))
         if _CANCEL.search(said) and (self.follower.active or "route" in said):
@@ -252,8 +265,10 @@ class RouteVoice:
         spoken = _TAIL.sub("", clean(spoken)).strip()
         if spoken.startswith("the ") and spoken not in FAVOURITES:
             spoken = spoken[4:]
-        if spoken in ("my destination", "destination", "the destination", "my saved destination", "my target", "my usual destination"):
-            return str(self.settings.get("neutron.destination", "") or "").strip()
+        if spoken in ("my target", "the target", "target", "my target destination", "target destination", "where i am going", "where i m going"):
+            return self._target_in_game() or str(self.settings.get("neutron.destination", "") or "").strip()
+        if spoken in ("my destination", "destination", "the destination", "my saved destination", "my usual destination"):
+            return str(self.settings.get("neutron.destination", "") or "").strip() or self._target_in_game()
         mine = self._my_favourites()
         if spoken in mine:
             return mine[spoken]

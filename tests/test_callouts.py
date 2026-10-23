@@ -233,12 +233,12 @@ class DialogueTests(unittest.TestCase):
         self.assertGreaterEqual(len(self.d.lines["UndiscoveredSystem"]), 50)
 
     def test_placeholders_are_known(self):
-        allowed = {"GlideStarted": {"temperature", "gravity"}, "StartJump": {"StarSystem"}, "UndiscoveredSystem": {"StarSystem"},
+        allowed = {"FuelHalf": set(), "FuelPanic": {"fuel_percent"}, "LowFuel": {"fuel_percent"}, "GlideStarted": {"temperature", "gravity"}, "StartJump": {"StarSystem"}, "UndiscoveredSystem": {"StarSystem"},
                    "JumpsLeft": {"jumps"}, "NomadDocked": set()}
         import string
         for key, lines in self.d.lines.items():
             base = key.split("_")[0]
-            if key.startswith(("GlideStarted_", "StartJump_", "UndiscoveredSystem", "JumpsLeft", "NomadDocked")):
+            if key.startswith(("FuelHalf", "FuelPanic", "LowFuel", "GlideStarted_", "StartJump_", "UndiscoveredSystem", "JumpsLeft", "NomadDocked")):
                 for line in lines:
                     names = {f for _t, f, _s, _c in string.Formatter().parse(line.text) if f}
                     self.assertLessEqual(names, allowed[base], (key, line.text))
@@ -247,6 +247,158 @@ class DialogueTests(unittest.TestCase):
         for key in ("UndiscoveredSystem", "StartJump_Scoop", "StartJump_NoScoop", "JumpsLeft", "GlideStarted_Info"):
             texts = [l.text for l in self.d.lines[key]]
             self.assertEqual(len(texts), len(set(texts)), key)
+
+
+class BoostStars(unittest.TestCase):
+    def test_neutron_and_white_dwarfs_are_boost_stars_not_fuel(self):
+        from events.start_jump import StartJump
+        h = StartJump()
+        for star, boost in (("N", "neutron"), ("D", "whitedwarf"), ("DA", "whitedwarf"), ("DB", "whitedwarf")):
+            data = h.handle({"JumpType": "Hyperspace", "StarClass": star})
+            self.assertEqual(data["Boost"], boost, star)
+            self.assertFalse(data["Scoopable"], star)
+        self.assertNotIn("Boost", h.handle({"JumpType": "Hyperspace", "StarClass": "G"}))
+
+    def test_boost_keys_come_first(self):
+        class E:
+            name = "StartJump"
+            data = {"JumpType": "Hyperspace", "Scoopable": False, "Boost": "neutron"}
+        self.assertEqual(line_keys.keys_for(E()), ["StartJump_Neutron", "StartJump_NoScoop", "StartJump"])
+        E.data = {"JumpType": "Hyperspace", "Scoopable": False, "Boost": "whitedwarf"}
+        self.assertEqual(line_keys.keys_for(E())[0], "StartJump_WhiteDwarf")
+
+
+class FuelLevels(unittest.TestCase):
+    def setUp(self):
+        self.processor, _bus, self.heard = make_processor()
+        self.processor.state.fuel_capacity = 32.0
+        self.reader = StatusReader(None, self.processor, min_gap_seconds={})
+        self.reader.handle_status({"Flags": 1 << 24, "Fuel": {"FuelMain": 32.0}})
+
+    def fuel(self, tons, flags=1 << 24):
+        self.reader.handle_status({"Flags": flags, "Fuel": {"FuelMain": tons}})
+
+    def names(self):
+        return [e.name for e in self.heard]
+
+    def test_half_then_panic_each_once(self):
+        self.fuel(20.0)
+        self.assertEqual(self.names(), [])
+        self.fuel(15.9)
+        self.fuel(15.0)
+        self.assertEqual(self.names(), ["FuelHalf"])
+        self.fuel(3.0)
+        self.fuel(2.9)
+        self.assertEqual(self.names(), ["FuelHalf", "FuelPanic"])
+        self.assertEqual(self.heard[-1].priority, "critical")
+
+    def test_dropping_straight_to_panic_does_not_also_say_half(self):
+        self.fuel(3.0)
+        self.assertEqual(self.names(), ["FuelPanic"])
+
+    def test_warnings_come_back_after_refuelling(self):
+        self.fuel(15.0)
+        self.fuel(30.0)
+        self.fuel(15.0)
+        self.assertEqual(self.names(), ["FuelHalf", "FuelHalf"])
+
+    def test_quiet_when_docked(self):
+        self.fuel(10.0, flags=(1 << 24) | 1)
+        self.assertEqual(self.names(), [])
+
+    def test_quiet_at_start_up(self):
+        processor, _bus, heard = make_processor()
+        processor.state.fuel_capacity = 32.0
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        reader.handle_status({"Flags": 1 << 24, "Fuel": {"FuelMain": 10.0}}, initial=True)
+        reader.handle_status({"Flags": 1 << 24, "Fuel": {"FuelMain": 9.5}})
+        self.assertEqual([e.name for e in heard], [])
+
+
+class EchoMute(unittest.TestCase):
+    def test_muted_events_stay_quiet_every_time_until_it_runs_out(self):
+        from control.echo import Echo
+        now = [0.0]
+        echo = Echo(clock=lambda: now[0])
+        echo.mute(("GalaxyMapOpened", "ScreenClosed"), 10)
+        event = type("E", (), {"name": "ScreenClosed", "priority": "low"})()
+        self.assertTrue(echo.consume(event))
+        self.assertTrue(echo.consume(event))
+        now[0] = 11
+        self.assertFalse(echo.consume(event))
+
+    def test_safety_events_are_never_muted(self):
+        from control.echo import Echo
+        echo = Echo()
+        echo.mute(("LowFuel",), 10)
+        self.assertFalse(echo.consume(type("E", (), {"name": "LowFuel", "priority": "critical"})()))
+
+
+class RouteTargetTests(unittest.TestCase):
+    class Settings:
+        def __init__(self, **v): self.v = v
+        def get(self, k, d=None): return self.v.get(k, d)
+
+    class Narrator:
+        def __init__(self): self.said = []
+        def say(self, key, fields=None): self.said.append(key)
+
+    class Follower:
+        active = False
+
+    def voice(self, target="", **settings):
+        v = RouteVoice(self.Follower(), None, self.Narrator(), self.Settings(**settings), lambda: None, spawn=lambda f: None)
+        v.game_target = lambda: target
+        return v
+
+    def test_plot_neutron_course_to_home_uses_the_home_bookmark(self):
+        v = self.voice(**{"bookmarks.home": "Sol"})
+        self.assertEqual(v.try_handle("plot neutron course to Home"), "Plotting a neutron route to Sol")
+
+    def test_bare_plot_uses_the_destination_set_in_the_game(self):
+        v = self.voice(target="Colonia")
+        self.assertEqual(v.try_handle("plot a neutron route"), "Plotting a neutron route to Colonia")
+        self.assertEqual(self.voice(target="Colonia").try_handle("plot neutron course"), "Plotting a neutron route to Colonia")
+
+    def test_bare_plot_with_no_target_asks_where(self):
+        v = self.voice(target="")
+        self.assertEqual(v.try_handle("plot a neutron route"), "No destination.")
+
+    def test_my_destination_prefers_the_dashboard_box_then_the_game(self):
+        self.assertEqual(self.voice(target="Colonia", **{"neutron.destination": "Sag A*"}).try_handle("plot a neutron route to my destination"),
+                         "Plotting a neutron route to Sag A*")
+        self.assertEqual(self.voice(target="Colonia").try_handle("plot a neutron route to my destination"),
+                         "Plotting a neutron route to Colonia")
+
+    def test_next_waypoint_phrases_are_not_hijacked(self):
+        v = self.voice(target="Colonia")
+        self.assertIsNone(v.try_handle("plot the next neutron waypoint"))
+
+    def test_navroute_file_gives_the_last_system(self):
+        import tempfile
+        from navigation.game_target import read_target
+        with tempfile.TemporaryDirectory() as folder:
+            self.assertEqual(read_target(folder), "")
+            Path(folder, "NavRoute.json").write_text(json.dumps({"Route": [{"StarSystem": "Sol"}, {"StarSystem": "Colonia"}]}))
+            self.assertEqual(read_target(folder), "Colonia")
+            Path(folder, "NavRoute.json").write_text("{damaged")
+            self.assertEqual(read_target(folder), "")
+
+
+class WaypointCount(unittest.TestCase):
+    def test_count_phrase(self):
+        import tempfile
+        from navigation.route import RouteFollower
+
+        class S:
+            def get(self, k, d=None): return d
+        with tempfile.TemporaryDirectory() as folder:
+            f = RouteFollower(None, S(), save_path=Path(folder, "r.json"))
+            f.set_route([{"system": "A", "jumps": 3, "neutron": True}, {"system": "B", "jumps": 2, "neutron": True},
+                         {"system": "C", "jumps": 1, "neutron": False}], "C")
+            self.assertEqual(f.fields()["count"], "3 waypoints to go.")
+            f.index = 2
+            self.assertEqual(f.fields()["count"], "Last waypoint.")
 
 
 if __name__ == "__main__":

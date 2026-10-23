@@ -222,5 +222,108 @@
   "Nomad docked and stowed.",
   "Nomad is home, Commander.",
   "Nomad safely on board."
+ ],
+ "StartJump_Neutron": [
+  "Jumping to {StarSystem}. Neutron star on arrival. Not for fuel, but you can supercharge there.",
+  "Next stop, {StarSystem}. A neutron star, so a supercharge is on offer. Don't scoop it.",
+  "{StarSystem} ahead. Neutron star, supercharge available, no fuel.",
+  "Heading for {StarSystem}. Neutron star there. Boost the drive, but it won't refuel us.",
+  "Jumping to {StarSystem}. Supercharge opportunity. Mind the exclusion cone.",
+  "{StarSystem}. Neutron star, good for a supercharge only.",
+  "Off to {StarSystem}. Neutron star waiting. Boost if you want it, but not for fuel.",
+  "Charging for {StarSystem}. Supercharge available on arrival, no scooping."
+ ],
+ "StartJump_Neutron_Sarcastic": [
+  "Jumping to {StarSystem}. Neutron star. Supercharge it, and please don't try to scoop it like last time.",
+  "{StarSystem}. A neutron star. Boost only. It's not a fuel pump."
+ ],
+ "StartJump_Neutron_Close": [
+  "Jumping to {StarSystem}, love. Neutron star, supercharge only. Keep us out of the cone.",
+  "Off we go to {StarSystem}. A neutron star to boost from. No fuel there, though."
+ ],
+ "StartJump_WhiteDwarf": [
+  "Jumping to {StarSystem}. White dwarf on arrival. Not for fuel, but you can supercharge there.",
+  "Next stop, {StarSystem}. A white dwarf, so a supercharge is on offer. No scooping.",
+  "{StarSystem} ahead. White dwarf, supercharge available, no fuel.",
+  "Heading for {StarSystem}. White dwarf there. Boost the drive, but it won't refuel us.",
+  "Jumping to {StarSystem}. Supercharge opportunity at the white dwarf.",
+  "{StarSystem}. White dwarf, good for a supercharge only.",
+  "Off to {StarSystem}. White dwarf waiting. Boost if you want it, but not for fuel.",
+  "Charging for {StarSystem}. Supercharge available at the white dwarf, no scooping."
+ ],
+ "StartJump_WhiteDwarf_Sarcastic": [
+  "Jumping to {StarSystem}. White dwarf. Supercharge it. Fuel is somebody else's problem.",
+  "{StarSystem}. A white dwarf. Boost only, in case you were wondering."
+ ],
+ "StartJump_WhiteDwarf_Close": [
+  "Jumping to {StarSystem}, love. White dwarf, supercharge only. No fuel there.",
+  "Off we go to {StarSystem}. A white dwarf to boost from. We can't refuel there."
+ ],
+ "FuelHalf": [
+  "Fuel's at half. We should start looking for a scoopable star.",
+  "We're down to half a tank. Time to think about fuel.",
+  "Half a tank, Commander. Worth keeping an eye out for somewhere to refuel.",
+  "Fuel is at fifty percent. We should start looking for fuel.",
+  "Just a thought: half a tank left.",
+  "Half the fuel is gone. Next scoopable star might be a good idea.",
+  "Fuel at half. No rush, but I'd start planning a top-up.",
+  "We've used half our fuel. Gentle reminder.",
+  "Half a tank. Plenty left, but let's not forget it.",
+  "Fuel check: fifty percent. Keep a lookout for a scoopable star.",
+  "Half a tank, Commander. You know how this usually goes.",
+  "Fuel is at half. Let's not turn this into one of your famous stories, Curd Nerd.",
+  "Half a tank. I'd hate for this to become another Curd Nerd legend.",
+  "Fifty percent fuel. Just saying it now, so I don't have to say it in a panic later."
+ ],
+ "FuelHalf_Sarcastic": [
+  "Half a tank. I'm sure you've got a plan. You always do. It's usually a bad one.",
+  "Fuel at half. Do let me know when you start caring.",
+  "Fifty percent. Plenty of time to ignore this warning."
+ ],
+ "FuelHalf_Close": [
+  "We're at half a tank, love. Let's find a star to drink from soon.",
+  "Half the fuel left, Commander. I'd like to get home with you, so let's top up."
+ ],
+ "FuelHalf_Frustrated": [
+  "Half a tank. Refuel. Please.",
+  "Fuel's at half. Don't make me say it again at ten."
+ ],
+ "FuelPanic": [
+  "Fuel is at {fuel_percent} percent! We need to refuel right now!",
+  "Commander, we're almost out of fuel! Find a star, any star!",
+  "Ten percent fuel! Ten! We have to scoop, now!",
+  "Fuel's nearly gone! Please, please find something to scoop!",
+  "We are about to run dry! Fuel at {fuel_percent} percent!",
+  "Fuel critical! We need a scoopable star immediately!",
+  "We're running on fumes, Commander! Do something!",
+  "Almost no fuel left! I don't want to drift out here!",
+  "Fuel at {fuel_percent} percent! This is not a drill!",
+  "Empty! Nearly empty! Find fuel, find fuel, find fuel!",
+  "Curd Nerd! Not again! We're almost out of fuel!",
+  "Oh no. Oh no no no. Fuel's at {fuel_percent} percent. Curd Nerd, you promised!",
+  "Fuel at {fuel_percent} percent and I can feel my circuits sweating. Again, Curd Nerd?",
+  "Another day, another near-empty tank. Curd Nerd, please! Find a star!"
+ ],
+ "FuelPanic_Sarcastic": [
+  "Ten percent fuel. Of course. Right on schedule. Curd Nerd does it again.",
+  "We're out of fuel, practically. What a surprise. Nobody saw that coming. Except me, ten minutes ago."
+ ],
+ "FuelPanic_Close": [
+  "Darling, we're nearly out of fuel! Please find a star, I'm scared!",
+  "Fuel at {fuel_percent} percent! I need you safe, Commander. Scoop, please!"
+ ],
+ "FuelPanic_Frustrated": [
+  "Ten percent! I told you at half! Scoop something!",
+  "Fuel's nearly gone. I warned you. Twice. Fix it."
+ ],
+ "LowFuel": [
+  "Fuel is at {fuel_percent} percent. Quarter of a tank. Time to find a star.",
+  "A quarter tank left, Commander, {fuel_percent} percent. Let's go and find some fuel.",
+  "Fuel at {fuel_percent} percent. I'm reminding you again, nicely.",
+  "We are at a quarter of a tank, {fuel_percent} percent. Please don't make this interesting.",
+  "Fuel's getting low, {fuel_percent} percent. Curd Nerd, you know how this ends.",
+  "Quarter of a tank, {fuel_percent} percent. Not another Curd Nerd special, please.",
+  "{fuel_percent} percent fuel. Let's refuel before it becomes a story people tell.",
+  "Fuel is low, {fuel_percent} percent. The last time this happened to Curd Nerd, it took an hour of drifting. Just saying."
  ]
 }

@@ -332,6 +332,9 @@ class CommandRunner:
             strokes[action] = stroke
         self._key_clashes(strokes)               # logged only: she no longer talks about it
         self.sender.require_game = bool(self.settings.get("commands.require_game_focus", True))
+        quiet = ("GalaxyMapOpened", "GalaxyMapClosed", "ScreenClosed") if command.id == "plot_waypoint" else ()
+        if quiet and self.echo is not None:
+            self.echo.mute(quiet, 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
         pressed = []
         for step in steps:
             if step[0] == "wait":
@@ -356,6 +359,8 @@ class CommandRunner:
                 pressed.append(step[1])
                 self.sleep(GAP_SECONDS)
         self._last[key] = now
+        if quiet and self.echo is not None:
+            self.echo.mute(quiet, 6)            # the game's "map closed" can arrive a moment after the last key
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
                        detail=command.do_text(intent) + ".")
 

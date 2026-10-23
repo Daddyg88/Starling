@@ -159,7 +159,7 @@ class SpeakerTests(unittest.TestCase):
     def test_low_fuel_fills_in_the_percentage(self):
         self.speaker.on_event(self.event("LowFuel", "critical", fuel_percent=20, summary="Fuel is low"))
         said = self.speech.said[0]
-        self.assertIn("20 percent remaining", said["text"])
+        self.assertIn("20 percent", said["text"])
         self.assertNotIn("{", said["text"])
 
     def test_low_fuel_without_percentage_uses_the_summary(self):

@@ -170,7 +170,9 @@ class RouteFollower:
 
     def fields(self):
         waypoint = self.next_waypoint() or {}
-        return {"next": waypoint.get("system", ""), "jumps": self.jumps_left, "stops": self.stops_left(),
+        left = len(self.waypoints) - self.index if self.active else 0
+        count = "Last waypoint." if left == 1 else ("%d waypoints to go." % left if left > 1 else "")
+        return {"count": count, "waypoints": left, "next": waypoint.get("system", ""), "jumps": self.jumps_left, "stops": self.stops_left(),
                 "left": self.total_jumps_left(), "destination": self.destination,
                 "clip": " It's on your clipboard." if self.settings.get("neutron.clipboard", True) else ""}
 
