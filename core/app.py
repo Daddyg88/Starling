@@ -472,8 +472,8 @@ class App:
             self.route_follower = RouteFollower(self.bus, self.settings, narrator, lambda: self.state)
             self.route_follower.attach()
             self.route_voice = RouteVoice(self.route_follower, Spansh(), narrator, self.settings, lambda: self.state)
-            from navigation.game_target import read_target
-            self.route_voice.game_target = lambda: read_target(getattr(self, "journal_folder", None))
+            from navigation.game_target import choose_target
+            self.route_voice.game_target = lambda: choose_target(getattr(self, "journal_folder", None), self.state)
             self.bus.subscribe("NavRoute", self.route_voice.on_nav_route)
         except Exception:
             self.log.exception("The neutron plotter could not start")

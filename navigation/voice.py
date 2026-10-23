@@ -188,7 +188,7 @@ class RouteVoice:
     def _target_in_game(self):
         try:
             name = str(self.game_target() or "").strip() if self.game_target else ""
-            log.info("The destination set in the game's galaxy map: %s", name or "(none found in NavRoute.json)")
+            log.info("The destination set in the game's galaxy map: %s", name or "(none: no plotted course and no target set)")
             return name
         except Exception:
             log.exception("Could not read the game's route")

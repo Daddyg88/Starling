@@ -23,6 +23,8 @@ class FSDJump(BaseEvent):
         state.station = None
         state.in_supercruise = True
         state.awaiting_discovery = True
+        if str(state.fsd_target or "").casefold() == str(entry.get("StarSystem") or "").casefold():
+            state.fsd_target = None            # we got there
         left, state.route_jumps_left = state.route_jumps_left, None
         if isinstance(left, int) and left >= 1 and (left == 1 or random.random() < JUMPS_LEFT_CHANCE):
             state.pending_events.append(("JumpsLeft", {"jumps": left, "last": left == 1}))

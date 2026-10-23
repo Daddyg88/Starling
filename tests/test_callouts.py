@@ -505,3 +505,39 @@ class MishearingTests(unittest.TestCase):
         v = RouteTargetTests().voice(target="Colonia")
         for said in ("what is the neutral mood", "open the galaxy map", "who is Ben Kenobi"):
             self.assertIsNone(v.try_handle(said), said)
+
+
+class SetTargetTests(unittest.TestCase):
+    def test_set_target_without_a_plotted_course(self):
+        import tempfile
+        from navigation.game_target import choose_target
+        processor, _bus, _heard = make_processor()
+        processor.handle_entry({"event": "FSDTarget", "Name": "Colonia", "RemainingJumpsInRoute": 0})
+        with tempfile.TemporaryDirectory() as folder:
+            self.assertEqual(choose_target(folder, processor.state), "Colonia")        # no NavRoute.json at all
+
+    def test_plotted_course_still_works(self):
+        import tempfile
+        from navigation.game_target import choose_target
+        processor, _bus, _heard = make_processor()
+        with tempfile.TemporaryDirectory() as folder:
+            Path(folder, "NavRoute.json").write_text(json.dumps({"Route": [{"StarSystem": "Sol"}, {"StarSystem": "B"}, {"StarSystem": "Colonia"}]}))
+            self.assertEqual(choose_target(folder, processor.state), "Colonia")
+            processor.handle_entry({"event": "FSDTarget", "Name": "B", "RemainingJumpsInRoute": 1})   # the next hop of that course
+            self.assertEqual(choose_target(folder, processor.state), "Colonia")
+
+    def test_a_newer_target_beats_an_old_course(self):
+        import tempfile
+        from navigation.game_target import choose_target
+        processor, _bus, _heard = make_processor()
+        with tempfile.TemporaryDirectory() as folder:
+            Path(folder, "NavRoute.json").write_text(json.dumps({"Route": [{"StarSystem": "Sol"}, {"StarSystem": "Colonia"}]}))
+            processor.handle_entry({"event": "FSDTarget", "Name": "Sagittarius A*", "RemainingJumpsInRoute": 0})
+            self.assertEqual(choose_target(folder, processor.state), "Sagittarius A*")
+
+    def test_arriving_clears_the_target(self):
+        from navigation.game_target import choose_target
+        processor, _bus, _heard = make_processor()
+        processor.handle_entry({"event": "FSDTarget", "Name": "Colonia"})
+        processor.handle_line(jump("Colonia"))
+        self.assertEqual(choose_target(None, processor.state), "")

@@ -426,3 +426,6 @@ Set a target in the galaxy map, then say "plot neutron route", "start the neutro
 
 ## 0.31.4: neutron plotter and mishearings
 From a real log: the microphone heard "neutron plotter" as "neutron platter", "plot neutron course" as "plot neutron cores", "route" as "root", "neutron" as "neutral" or "Neatron". In a sentence about neutrons these are now corrected. The log now says which destination she found in the game (`The destination set in the game's galaxy map: ...`).
+
+## 0.31.5: Set Target as well as Plot Course
+The game does two different things. Plot Course writes the whole route to NavRoute.json. Set Target only selects the system (the journal's FSDTarget event). Both now work for "plot neutron route": she uses the selected target if it is not part of an already plotted course, otherwise the end of the plotted course. Arriving at the target clears it. Not testable here: exactly what the game writes for Set Target; the log line "The destination set in the game's galaxy map" shows what she found.

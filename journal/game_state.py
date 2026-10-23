@@ -34,6 +34,7 @@ class GameState:
     bodies: dict = field(default_factory=dict)       # body name -> {"temperature": kelvin, "gravity": g} from Scan events
     current_body: Optional[str] = None      # the planet or moon you are near (ApproachBody / SupercruiseExit / Status.json)
     awaiting_discovery: bool = False        # just arrived: the first Scan tells us whether anyone discovered this system
+    fsd_target: Optional[str] = None        # the system selected as the jump target (FSDTarget): what "Set Target" does
     route_jumps_left: Optional[int] = None  # RemainingJumpsInRoute from the last FSDTarget
     pending_events: list = field(default_factory=list)   # (name, data) she should announce after this journal line
     status_seen: bool = False               # True once Status.json has been read
