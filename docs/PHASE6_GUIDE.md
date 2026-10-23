@@ -416,3 +416,6 @@ Cargo scoop: "lower / raise / drop / retract the cargo scoop" (and "scoop down /
 
 ## 0.31.1: neutron route as soon as you set a target
 Pick a destination in the galaxy map and she plots the neutron route to it by herself (Navigation page > "Plot a neutron route when I set a target in the galaxy map", on by default). She ignores targets her own waypoint macro or a "where to sell" lookup sets, a target that is already part of the route she follows, the system you are in, and the same target twice in a row. Not testable without the game: when exactly the game writes NavRoute.json after you set the target (she waits 1.5 seconds).
+
+## 0.31.2: by voice, to the game's target
+Set a target in the galaxy map, then say "plot neutron route", "start the neutron plotter" or "plot neutron". She plots to that target. "My destination" now also means the game's target first (the Navigation page box is only the fallback). The automatic version from 0.31.1 is now OFF by default (Navigation page switch).

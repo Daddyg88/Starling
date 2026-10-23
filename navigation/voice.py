@@ -44,8 +44,8 @@ _FILLER = re.compile(r"\b(please|starling|commander|cmdr|could you|can you|would
 _PLOT = re.compile(r"\b(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart)\b"
                    r".*?\b(neutron|route|course|highway|trail)\b.*?\bto\b\s+(?P<dest>.+)$")
 # "plot a neutron route" with no place named: use the destination set in the game
-_PLOT_BARE = re.compile(r"^(?:\w+ ){0,3}?(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart)\b"
-                        r".*\bneutron\b.*\b(route|course|highway|trail)\b(?!.*\bto\b)")
+_PLOT_BARE = re.compile(r"^(?:\w+ ){0,3}?(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart|start|use|run|do)\b"
+                        r".*\bneutron\b.*\b(route|course|highway|trail|plotter|plot)\b(?!.*\bto\b)|^neutron (route|course|plotter|plot|highway)$|^(plot|start) neutron$")
 _NEXT = re.compile(r"\b(next (waypoint|stop|neutron|neutron star|star)|where (to )?next|where s the next|waypoint again|repeat the waypoint)\b")
 _STATUS = re.compile(r"\b(how far|how much (further|farther|left)|how many (jumps|stops|neutron).*left|route status|how s the route|jumps left|stops left)\b")
 _CANCEL = re.compile(r"\b(cancel|clear|stop|abandon|forget|scrap|delete|drop)\b.*\b(neutron route|the route|my route|route|plot)\b")
@@ -143,7 +143,7 @@ class RouteVoice:
     # ---- "plot it for me when I set a target in the galaxy map" ----
     def on_nav_route(self, _event=None):
         """The game says a route was set (or cleared). Wait a moment for NavRoute.json, then plot a neutron route to its end."""
-        if not self.enabled() or not self.settings.get("neutron.auto_on_target", True):
+        if not self.enabled() or not self.settings.get("neutron.auto_on_target", False):
             return
         if self.clock() < self._ignore_until:
             return
@@ -299,7 +299,7 @@ class RouteVoice:
         if spoken in ("my target", "the target", "target", "my target destination", "target destination", "where i am going", "where i m going"):
             return self._target_in_game() or str(self.settings.get("neutron.destination", "") or "").strip()
         if spoken in ("my destination", "destination", "the destination", "my saved destination", "my usual destination"):
-            return str(self.settings.get("neutron.destination", "") or "").strip() or self._target_in_game()
+            return self._target_in_game() or str(self.settings.get("neutron.destination", "") or "").strip()
         mine = self._my_favourites()
         if spoken in mine:
             return mine[spoken]

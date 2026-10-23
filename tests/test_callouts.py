@@ -364,11 +364,21 @@ class RouteTargetTests(unittest.TestCase):
         v = self.voice(target="")
         self.assertEqual(v.try_handle("plot a neutron route"), "No destination.")
 
-    def test_my_destination_prefers_the_dashboard_box_then_the_game(self):
+    def test_my_destination_prefers_the_game_target_then_the_dashboard_box(self):
         self.assertEqual(self.voice(target="Colonia", **{"neutron.destination": "Sag A*"}).try_handle("plot a neutron route to my destination"),
-                         "Plotting a neutron route to Sag A*")
-        self.assertEqual(self.voice(target="Colonia").try_handle("plot a neutron route to my destination"),
                          "Plotting a neutron route to Colonia")
+        self.assertEqual(self.voice(target="").try_handle("plot a neutron route to my destination"), "No destination.")
+        self.assertEqual(self.voice(target="", **{"neutron.destination": "Sag A*"}).try_handle("plot a neutron route to my destination"),
+                         "Plotting a neutron route to Sag A*")
+
+    def test_other_ways_to_ask(self):
+        for said in ("plot neutron route", "start the neutron plotter", "neutron plotter", "plot neutron", "do the neutron plot"):
+            self.assertEqual(self.voice(target="Colonia").try_handle(said), "Plotting a neutron route to Colonia", said)
+
+    def test_automatic_plotting_is_off_unless_switched_on(self):
+        v = self.voice(target="Colonia")
+        v.spawn = lambda f: self.fail("should not plot by itself")
+        v.on_nav_route()
 
     def test_next_waypoint_phrases_are_not_hijacked(self):
         v = self.voice(target="Colonia")
@@ -407,6 +417,7 @@ if __name__ == "__main__":
 
 class AutoOnTarget(unittest.TestCase):
     def make(self, target="Colonia", here="Sol", **settings):
+        settings.setdefault("neutron.auto_on_target", True)
         v = RouteVoice(RouteTargetTests.Follower(), None, RouteTargetTests.Narrator(), RouteTargetTests.Settings(**settings),
                        lambda: type("S", (), {"system": here})(), spawn=lambda f: f())
         v.game_target = lambda: target
