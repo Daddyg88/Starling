@@ -18,6 +18,17 @@ FAVOURITE_BOXES = 10
 # Solid money: she is pleased but not excited. (Gold and silver are deliberately NOT here: she ignores them.)
 GOOD = {"osmium", "palladium", "bromellite", "benitoite"}
 
+# Every mineral, metal and ice you can mine in Elite (the labels the game shows). The dashboard drop-downs list all of them,
+# so you can pick any ten to get excited about.
+MINABLE = (
+    "Alexandrite", "Aluminium", "Bauxite", "Benitoite", "Bertrandite", "Beryllium", "Bismuth", "Bromellite", "Cobalt", "Coltan",
+    "Copper", "Cryolite", "Gallite", "Gallium", "Gold", "Goslarite", "Grandidierite", "Hafnium 178", "Indite", "Indium", "Jadeite",
+    "Lanthanum", "Lepidolite", "Lithium", "Lithium Hydroxide", "Low Temperature Diamonds", "Methane Clathrate",
+    "Methanol Monohydrate Crystals", "Moissanite", "Monazite", "Musgravite", "Osmium", "Painite", "Palladium", "Platinum",
+    "Praseodymium", "Pyrophyllite", "Rhodplumsite", "Rutile", "Samarium", "Serendibite", "Silver", "Taaffeite", "Tantalum",
+    "Thallium", "Thorium", "Titanium", "Tritium", "Uraninite", "Uranium", "Void Opals", "Water",
+)
+
 _settings = None
 
 
@@ -77,12 +88,17 @@ ALIASES = {
 }
 
 
+def choices():
+    """[(label, game name)] for the dashboard drop-downs: (nothing) first, then every minable thing A to Z."""
+    return [("(nothing)", "")] + [(label, normal(label)) for label in MINABLE]
+
+
 def normal(name):
     """'Low Temperature Diamonds' / '$lowtemperaturediamond_name;' -> 'lowtemperaturediamond'. Never fails."""
     text = str(name or "").lower().strip()
     text = re.sub(r"[$;]|_name", "", text)
     text = re.sub(r"[^a-z]", "", text)
-    if text in ("lowtemperaturediamonds",):
+    if text in ("lowtemperaturediamonds", "lowtempdiamonds", "ltd"):
         text = "lowtemperaturediamond"
     if text in ("voidopal", "voidopals", "opals"):
         text = "opal"
@@ -114,3 +130,11 @@ def from_speech(text):
         if " " + alias + " " in tidy:
             return ALIASES[alias]
     return None
+
+
+# Everything in the list can also be said ("where do I sell the cryolite"). Written after the functions so normal() exists.
+for _label in MINABLE:
+    _key = normal(_label)
+    SPOKEN_NAMES.setdefault(_key, _label)
+    ALIASES.setdefault(_label.lower(), _key)
+    ALIASES.setdefault(_key, _key)

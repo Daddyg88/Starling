@@ -20,6 +20,7 @@ from typing import Callable, List, Optional, Union
 
 from core import paths
 from core.logger import get_logger
+from mining import minerals
 from tts.kokoro_tts import BUILT_IN_VOICES
 
 log = get_logger("dashboard")
@@ -63,13 +64,7 @@ CHITCHAT = [("Rarely", "rarely"), ("Normal", "normal"), ("Often", "often"), ("Ch
 REMARKS = [("Never", "off"), ("Rarely", "rare"), ("Sometimes", "sometimes"), ("Often", "often")]
 AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million", 500000000),
              ("After 1 billion", 1000000000)]
-MINERAL_CHOICES = [("(nothing)", "")] + [(label, key) for label, key in (
-    ("Platinum", "platinum"), ("Painite", "painite"), ("Void Opals", "opal"), ("Low Temperature Diamonds", "lowtemperaturediamond"),
-    ("Monazite", "monazite"), ("Musgravite", "musgravite"), ("Serendibite", "serendibite"), ("Grandidierite", "grandidierite"),
-    ("Alexandrite", "alexandrite"), ("Rhodplumsite", "rhodplumsite"), ("Osmium", "osmium"), ("Palladium", "palladium"),
-    ("Bromellite", "bromellite"), ("Benitoite", "benitoite"), ("Gold", "gold"), ("Silver", "silver"), ("Cobalt", "cobalt"),
-    ("Bertrandite", "bertrandite"), ("Indite", "indite"), ("Gallite", "gallite"), ("Uraninite", "uraninite"),
-    ("Praseodymium", "praseodymium"), ("Samarium", "samarium"), ("Lithium", "lithium"), ("Tritium", "tritium"))]
+MINERAL_CHOICES = minerals.choices()      # every mineral, metal and ice you can mine (mining/minerals.py)
 MINING_CHATTER = [("Quiet (first of each, every 10 tonnes)", "quiet"), ("Normal (every 5 tonnes, a few cheers)", "normal"),
                   ("Chatty (every 3 tonnes, lots of cheers)", "chatty")]
 MOOD_MODES = [("Automatic (follows what I do in the game)", "auto"), ("Fixed (always the mood below)", "fixed")]

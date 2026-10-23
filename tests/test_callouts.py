@@ -457,3 +457,37 @@ class AutoOnTarget(unittest.TestCase):
         v.follower.waypoints = [{"system": "Neutron B"}]
         v.on_nav_route()
         self.assertEqual(v.plotted, [])
+
+
+class MineralList(unittest.TestCase):
+    def test_dropdown_lists_every_mineral_and_keeps_old_choices(self):
+        from mining import minerals
+        from ui.settings_model import MINERAL_CHOICES
+        keys = [k for _l, k in MINERAL_CHOICES]
+        self.assertEqual(MINERAL_CHOICES[0], ("(nothing)", ""))
+        self.assertEqual(len(keys), len(set(keys)))
+        for old in ("platinum", "painite", "opal", "lowtemperaturediamond", "monazite", "musgravite", "serendibite",
+                    "grandidierite", "alexandrite", "rhodplumsite", "osmium", "palladium", "bromellite", "benitoite",
+                    "gold", "silver", "cobalt", "bertrandite", "indite", "gallite", "uraninite", "praseodymium",
+                    "samarium", "lithium", "tritium"):
+            self.assertIn(old, keys)
+        for new in ("cryolite", "taaffeite", "jadeite", "thorium", "titanium", "methaneclathrate", "water", "hafnium"):
+            self.assertIn(new, keys)
+        self.assertGreaterEqual(len(keys), 50)
+
+    def test_new_minerals_can_be_named_in_speech(self):
+        from mining import minerals
+        self.assertEqual(minerals.from_speech("where do I sell the cryolite"), "cryolite")
+        self.assertEqual(minerals.from_speech("sell my taaffeite"), "taaffeite")
+        self.assertEqual(minerals.from_speech("sell the void opals"), "opal")
+        self.assertEqual(minerals.spoken("lithiumhydroxide"), "Lithium Hydroxide")
+
+    def test_a_new_favourite_is_exciting(self):
+        from mining import minerals
+        class S:
+            def get(self, k, d=None): return "cryolite" if k == "mining.fav1" else None
+        minerals.bind(S())
+        try:
+            self.assertEqual(minerals.tier("Cryolite"), "top")
+        finally:
+            minerals.bind(None)

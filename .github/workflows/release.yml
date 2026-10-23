@@ -1,4 +1,5 @@
-# Builds a Starling release when you push a tag like v0.12.0.
+# Builds a Starling release by itself whenever core/version.py changes on the main branch (the tag v<version> and the
+# GitHub Release are made for you), or when you push a tag like v0.12.0 by hand.
 #   git tag v0.12.0 && git push origin v0.12.0
 # It runs the tests, builds Starling.exe (the launcher) on Windows, zips the program, and publishes all of it as a
 # GitHub Release. Starling.exe on your computer then finds and installs the new version by itself.
@@ -7,6 +8,9 @@ name: Release
 on:
   push:
     tags: ["v*"]
+    branches: [main]
+    paths: ["core/version.py"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,18 +25,27 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check the tag matches core/version.py
+      - name: Work out the release tag (from core/version.py)
+        id: tag
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           v=$(python -c "from core.version import __version__ as v; print(v)")
-          if [ "v$v" != "${GITHUB_REF_NAME}" ]; then echo "Tag ${GITHUB_REF_NAME} does not match version $v"; exit 1; fi
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "v$v" != "${GITHUB_REF_NAME}" ]; then echo "Tag ${GITHUB_REF_NAME} does not match version $v"; exit 1; fi
+          echo "name=v$v" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" != "tag" ] && gh release view "v$v" >/dev/null 2>&1; then
+            echo "Release v$v already exists: nothing to do"; echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Run the tests (a failure is shown but does not stop the release)
+        if: steps.tag.outputs.skip != 'true'
         shell: bash
         continue-on-error: true
         run: python -m unittest discover -s tests -t .
 
       - name: Build the program zip
+        if: steps.tag.outputs.skip != 'true'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
@@ -42,6 +55,7 @@ jobs:
           "$hash  Starling-app.zip" | Out-File -Encoding ascii -NoNewline dist/Starling-app.zip.sha256
 
       - name: Build Starling.exe
+        if: steps.tag.outputs.skip != 'true'
         shell: pwsh
         run: |
           "REPO = `"${{ github.repository }}`"" | Out-File -Encoding ascii launcher/launcher_config.py
@@ -49,13 +63,15 @@ jobs:
           pyinstaller --noconfirm --onefile --windowed --name Starling --paths . --paths launcher launcher/launcher.py
 
       - name: Publish the release
+        if: steps.tag.outputs.skip != 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          tag="${{ steps.tag.outputs.name }}"
           files="dist/Starling.exe dist/Starling-app.zip dist/Starling-app.zip.sha256"
-          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" $files --clobber     # you already made the release by hand: add the files
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" $files --clobber     # you already made the release by hand: add the files
           else
-            gh release create "${GITHUB_REF_NAME}" $files --title "Starling ${GITHUB_REF_NAME}" --generate-notes
+            gh release create "$tag" $files --target "${GITHUB_SHA}" --title "Starling $tag" --generate-notes
           fi

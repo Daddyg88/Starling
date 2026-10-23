@@ -419,3 +419,7 @@ Pick a destination in the galaxy map and she plots the neutron route to it by he
 
 ## 0.31.2: by voice, to the game's target
 Set a target in the galaxy map, then say "plot neutron route", "start the neutron plotter" or "plot neutron". She plots to that target. "My destination" now also means the game's target first (the Navigation page box is only the fallback). The automatic version from 0.31.1 is now OFF by default (Navigation page switch).
+
+## 0.31.3: automatic releases, every mineral in the Mining boxes
+* `.github/workflows/release.yml` now runs by itself when `core/version.py` changes on the main branch: it makes the tag and the GitHub Release, builds Starling.exe and the zip. Nobody has to create a release by hand any more (takes about 5 to 10 minutes on GitHub; watch the Actions tab). Starling.exe then offers the update at the next start.
+* The ten "Excited about" boxes list every mineral, metal and ice (A to Z). Anything in the list can also be named in speech ("where do I sell the cryolite").
