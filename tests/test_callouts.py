@@ -486,8 +486,9 @@ class MineralList(unittest.TestCase):
         from mining import minerals
         class S:
             def get(self, k, d=None): return "cryolite" if k == "mining.fav1" else None
+        before = minerals._settings
         minerals.bind(S())
         try:
             self.assertEqual(minerals.tier("Cryolite"), "top")
         finally:
-            minerals.bind(None)
+            minerals.bind(before)
