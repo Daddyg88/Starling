@@ -13,12 +13,15 @@ neutron.favourites), because a microphone is bad at "Sagittarius A star". Anythi
 and she tells you the name she found so you can cancel if it is wrong.
 """
 
+import json
 import re
 import threading
 import time
 
+from core import paths
 from core.identity import personalise
 from core.logger import get_logger
+from navigation.edastro import EdAstro, EdAstroError, distance
 from navigation.spansh import SpanshError
 from personality.mood_engine import effective_mood
 
@@ -46,9 +49,12 @@ _PLOT = re.compile(r"\b(plot|set|work out|find|calculate|create|make|give me|get
 # "plot a neutron route" with no place named: use the destination set in the game
 _PLOT_BARE = re.compile(r"^(?:\w+ ){0,3}?(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart|start|use|run|do)\b"
                         r".*\bneutron\b.*\b(route|course|highway|trail|plotter|plot)\b(?!.*\bto\b)|^neutron (route|course|plotter|plot|highway)$|^(plot|start) neutron$")
+# "emergency protocol": Spansh does not know where I am, find a known landmark nearby and get me there
+_EMERGENCY = re.compile(r"\b(emergency (protocol|route|plot|plotter)|(i m|i am|we re|we are) lost|spansh (can t|cannot|doesn t) find me|"
+                        r"find (me )?(a |the )?nearest (landmark|poi|point of interest|beacon|nav marker|carrier)|get me out of here)\b")
 _NEXT = re.compile(r"\b(next (waypoint|stop|neutron|neutron star|star)|where (to )?next|where s the next|waypoint again|repeat the waypoint)\b")
 _STATUS = re.compile(r"\b(how far|how much (further|farther|left)|how many (jumps|stops|neutron).*left|route status|how s the route|jumps left|stops left)\b")
-_CANCEL = re.compile(r"\b(cancel|clear|stop|abandon|forget|scrap|delete|drop)\b.*\b(neutron route|the route|my route|route|plot)\b")
+_CANCEL = re.compile(r"\b(cancel|clear|stop|abandon|forget|scrap|delete|drop|reset|remove)\b.*\b(neutron route|the route|my route|route|root|course|plot|neutron plotter|emergency)\b")
 _REPLOT = re.compile(r"\b(re ?plot|plot (it )?again|redo the route|new route from here|recalculate)\b")
 # "plot the next waypoint" is the hands-free galaxy map macro (control/catalog.py), not a question about the route
 _PLOT_NEXT = re.compile(r"\b(plot|set|put in|enter|load|lay in|select)\b.*\b(next|waypoint)\b|\bnext waypoint in\b")
@@ -158,6 +164,9 @@ class RouteVoice:
         self.clock = time.monotonic
         self._ignore_until = 0.0         # her own galaxy map macro sets targets too: ignore those
         self._last_auto = ""
+        self.edastro = EdAstro()
+        self.emergency_file = paths.DATA_DIR / "emergency_route.json"
+        self._emergency = self._load_emergency()
         self.game_target = None          # the app sets this: a function giving the destination picked in the game's galaxy map
 
     # ---- "plot it for me when I set a target in the galaxy map" ----
@@ -224,11 +233,15 @@ class RouteVoice:
             return self.plot(found.group("dest"))
         if _PLOT_BARE.search(said) and not _PLOT_NEXT.search(said):
             return self.plot("my target")
+        if _EMERGENCY.search(said):
+            return self.start_emergency()
         if _REPLOT.search(said):
             return self.plot(self.follower.destination or str(self.settings.get("neutron.destination", "")))
-        if _CANCEL.search(said) and (self.follower.active or "route" in said):
-            had = self.follower.active
+        if _CANCEL.search(said) and (self.follower.active or self._emergency or re.search(r"\b(route|root|course|emergency)\b", said)):
+            had = self.follower.active or bool(self._emergency)
             self.follower.clear()
+            self._set_emergency(None)
+            self.target_override = None
             self.narrator.say("RouteCancelled" if had else "RouteNone")
             return "Route cancelled." if had else "There was no route."
         if _NEXT.search(said) and (self.follower.active or "waypoint" in said or "route" in said):
@@ -369,9 +382,127 @@ class RouteVoice:
             self.narrator.say("RouteReady", self.follower.fields())
             self.follower.maybe_auto_plot()
         except SpanshError as error:
-            self.narrator.say("RouteFailed", {"reason": str(error)})
+            if self._spansh_does_not_know(here) and self.settings.get("neutron.emergency", True):
+                self.emergency(name)
+            else:
+                self.narrator.say("RouteFailed", {"reason": str(error)})
         except Exception:
             log.exception("Plotting the route failed")
             self.narrator.say("RouteFailed", {"reason": "Something went wrong. The log has the details."})
         finally:
             self._busy = False
+
+    # ---- the emergency protocol ----
+    def _spansh_does_not_know(self, system):
+        """True when Spansh answers that it has never heard of this system (so no route can start from here)."""
+        try:
+            self.spansh.find_system(system)
+            return False
+        except SpanshError as error:
+            return str(error).startswith(("Spansh doesn't know", "I couldn't find a system like"))
+        except Exception:
+            return False
+
+    def start_emergency(self):
+        """'Emergency protocol': works out where you want to go (the target set in the game) and finds a way."""
+        destination = self._target_in_game() or str(self.settings.get("neutron.destination", "") or "").strip()
+        if not destination:
+            self.narrator.say("RouteNoDestination")
+            return "No destination."
+        if self._busy:
+            return "Already plotting."
+        self._busy = True
+
+        def work():
+            try:
+                self.emergency(self.spansh.find_system(destination))
+            except SpanshError as error:
+                self.narrator.say("RouteFailed", {"reason": str(error)})
+            except Exception:
+                log.exception("The emergency protocol failed")
+                self.narrator.say("RouteFailed", {"reason": "Something went wrong. The log has the details."})
+            finally:
+                self._busy = False
+        self.spawn(work)
+        return "Emergency protocol: finding a known place near us."
+
+    def emergency(self, destination):
+        """Spansh can't start a route from here. Find the nearest landmark that Spansh DOES know, plot a course to it in
+        the game, and (on arrival, see on_arrival) plot the neutron route from there to `destination`."""
+        state = self.state_provider()
+        position = getattr(state, "star_pos", None)
+        if not position:
+            self.narrator.say("EmergencyNoPosition")
+            return False
+        self.narrator.say("EmergencyStart", {"destination": destination})
+        found = self._nearest_known_place(position)
+        if found is None:
+            self.narrator.say("EmergencyNone")
+            return False
+        miles = round(distance(position, found["coords"])) if found.get("coords") else 0
+        self._set_emergency({"poi": found["system"], "destination": destination})
+        fields = {"poi": found["system"], "place": found.get("poi") or found["system"], "distance": miles or "",
+                  "destination": destination}
+        self.set_target(found["system"])
+        plot = getattr(self.follower, "auto_plot", None)
+        if plot is not None and self.settings.get("neutron.auto_plot", False):
+            self.narrator.say("EmergencyPlotting", fields)
+            self.schedule_plot(plot)
+        else:
+            self.follower.copier(found["system"])
+            self.narrator.say("EmergencyManual", fields)
+        return True
+
+    def schedule_plot(self, plot):
+        threading.Timer(3.0, plot).start()
+
+    def _nearest_known_place(self, position):
+        """Ask EDAstro for the nearest landmark, then for better-rated ones, until Spansh knows the system by that exact name."""
+        tried = set()
+        for rating in (None, 2, 3, 4, 5):
+            try:
+                place = self.edastro.nearest(position, rating)
+            except EdAstroError as error:
+                self.narrator.say("RouteFailed", {"reason": str(error)})
+                return None
+            if not place or place["system"].casefold() in tried:
+                continue
+            tried.add(place["system"].casefold())
+            try:
+                exact = self.spansh.find_system(place["system"])
+            except SpanshError:
+                continue
+            if exact.casefold() == place["system"].casefold():
+                place["system"] = exact
+                return place
+        return None
+
+    def on_arrival(self, event):
+        """Arrived somewhere: if it is the landmark from the emergency protocol, plot the neutron route to the real destination."""
+        waiting = self._emergency
+        system = str((getattr(event, "data", None) or {}).get("StarSystem") or "")
+        if not waiting or not system or system.casefold() != str(waiting.get("poi", "")).casefold():
+            return
+        self._set_emergency(None)
+        self.narrator.say("EmergencyArrived", {"destination": waiting["destination"], "poi": system})
+        if not self._busy:
+            self._busy = True
+            self.spawn(lambda: self._plot_now(waiting["destination"]))
+
+    def _set_emergency(self, value):
+        self._emergency = value
+        try:
+            if value:
+                self.emergency_file.parent.mkdir(parents=True, exist_ok=True)
+                self.emergency_file.write_text(json.dumps(value), encoding="utf-8")
+            elif self.emergency_file.exists():
+                self.emergency_file.unlink()
+        except OSError:
+            log.exception("Could not save the emergency route")
+
+    def _load_emergency(self):
+        try:
+            data = json.loads(self.emergency_file.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) and data.get("poi") and data.get("destination") else None
+        except (OSError, ValueError):
+            return None

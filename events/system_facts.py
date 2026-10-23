@@ -12,3 +12,10 @@ def remember_system_facts(entry, state):
     population = entry.get("Population")
     if isinstance(population, (int, float)):
         state.system_population = int(population)
+
+
+def remember_star_pos(entry, state):
+    """The galaxy coordinates of the system (journal "StarPos": [x, y, z]). The emergency route finder needs them."""
+    pos = entry.get("StarPos")
+    if isinstance(pos, (list, tuple)) and len(pos) == 3 and all(isinstance(v, (int, float)) for v in pos):
+        state.star_pos = (float(pos[0]), float(pos[1]), float(pos[2]))

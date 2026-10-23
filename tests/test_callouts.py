@@ -541,3 +541,175 @@ class SetTargetTests(unittest.TestCase):
         processor.handle_entry({"event": "FSDTarget", "Name": "Colonia"})
         processor.handle_line(jump("Colonia"))
         self.assertEqual(choose_target(None, processor.state), "")
+
+
+class EdAstroTests(unittest.TestCase):
+    class Reply:
+        def __init__(self, text): self.text = text
+        def read(self): return self.text.encode()
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+
+    def client(self, payload):
+        from navigation.edastro import EdAstro
+        self.urls = []
+
+        def opener(request, timeout=0):
+            self.urls.append(request.full_url)
+            return self.Reply(payload if isinstance(payload, str) else json.dumps(payload))
+        return EdAstro(opener)
+
+    def test_url_and_parse(self):
+        c = self.client({"id": 7, "name": "Beacon X", "galMapSearch": "Eorgh Prou AA-A h1", "coordinates": [1, 2, 3], "rating": 4})
+        place = c.nearest((10.5, -20.25, 30))
+        self.assertEqual(self.urls, ["https://edastro.com/gec/json/nearest/10.50/-20.25/30.00"])
+        self.assertEqual(place["system"], "Eorgh Prou AA-A h1")
+        self.assertEqual(place["poi"], "Beacon X")
+        self.assertEqual(place["coords"], [1, 2, 3])
+        c.nearest((0, 0, 0), 3)
+        self.assertTrue(self.urls[-1].endswith("/nearest/0.00/0.00/0.00/3"))
+
+    def test_odd_replies(self):
+        self.assertIsNone(self.client([]).nearest((0, 0, 0)))
+        self.assertIsNone(self.client({"error": "none"}).nearest((0, 0, 0)))
+        self.assertEqual(self.client([{"name": "Sol"}]).nearest((0, 0, 0))["system"], "Sol")
+        from navigation.edastro import EdAstroError
+        with self.assertRaises(EdAstroError):
+            self.client("not json").nearest((0, 0, 0))
+
+
+class EmergencyTests(unittest.TestCase):
+    class Spansh:
+        def __init__(self, known): self.known, self.routes = known, []
+        def find_system(self, name):
+            from navigation.spansh import SpanshError
+            for k in self.known:
+                if k.casefold() == name.casefold():
+                    return k
+            raise SpanshError("Spansh doesn't know a system called %s." % name)
+        def neutron_route(self, *a, **k):
+            from navigation.spansh import SpanshError
+            self.routes.append(a)
+            if a[0] not in self.known:
+                raise SpanshError("Could not find the starting system.")
+            return [{"system": a[0], "neutron": False, "jumps": 0, "distance_left": 10},
+                    {"system": a[1], "neutron": False, "jumps": 3, "distance_left": 0}]
+
+    class Edastro:
+        def __init__(self, places): self.places, self.calls = list(places), []
+        def nearest(self, position, rating=None):
+            self.calls.append(rating)
+            return self.places.pop(0) if self.places else None
+
+    class Follower:
+        active = False
+        destination = ""
+        waypoints = []
+        def __init__(self): self.copied, self.ran, self.set = [], 0, None
+        def copier(self, text): self.copied.append(text); return True
+        def auto_plot(self): self.ran += 1
+        def clear(self): pass
+        def set_route(self, waypoints, target, here=None): self.set = (waypoints, target, here); self.active = True
+        def copy_next(self): return True
+        def fields(self): return {}
+        def maybe_auto_plot(self): return False
+
+    def make(self, known=("Colonia", "Landmark"), places=(), auto_plot=True, position=(1, 2, 3), here="Lostville"):
+        import tempfile
+        state = type("S", (), {"system": here, "star_pos": position, "max_jump_range": 40.0})()
+        v = RouteVoice(self.Follower(), self.Spansh(known), RouteTargetTests.Narrator(),
+                       RouteTargetTests.Settings(**{"neutron.auto_plot": auto_plot, "neutron.emergency": True}), lambda: state,
+                       spawn=lambda f: f())
+        v.edastro = self.Edastro(places)
+        v.emergency_file = Path(tempfile.mkdtemp()) / "e.json"
+        v._emergency = None
+        v.schedule_plot = lambda f: f()
+        v.game_target = lambda: "Colonia"
+        return v
+
+    def place(self, system="Landmark", coords=(4, 6, 3)):
+        return {"system": system, "poi": "The Landmark", "coords": list(coords), "rating": 3}
+
+    def test_unknown_start_triggers_the_protocol_and_plots_a_course_there(self):
+        v = self.make(places=[self.place()])
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertEqual(v.narrator.said[:2], ["EmergencyStart", "EmergencyPlotting"])
+        self.assertEqual(v._emergency, {"poi": "Landmark", "destination": "Colonia"})
+        self.assertEqual(v.follower.ran, 1)                  # the galaxy map macro was started
+        self.assertEqual(v.target_override, "Landmark")      # ...and will paste the landmark
+        self.assertTrue(v.emergency_file.exists())
+
+    def test_arriving_at_the_landmark_plots_the_neutron_route(self):
+        v = self.make(places=[self.place()])
+        v._busy = True
+        v._plot_now("Colonia")
+        v.state_provider().system = "Landmark"
+        v.on_arrival(type("E", (), {"data": {"StarSystem": "Landmark"}})())
+        self.assertIn("EmergencyArrived", v.narrator.said)
+        self.assertEqual(v.spansh.routes[-1][:2], ("Landmark", "Colonia"))
+        self.assertIsNone(v._emergency)
+        self.assertFalse(v.emergency_file.exists())
+
+    def test_other_arrivals_are_ignored(self):
+        v = self.make(places=[self.place()])
+        v._busy = True
+        v._plot_now("Colonia")
+        v.on_arrival(type("E", (), {"data": {"StarSystem": "Somewhere else"}})())
+        self.assertEqual(v._emergency["poi"], "Landmark")
+
+    def test_a_landmark_spansh_does_not_know_is_skipped(self):
+        v = self.make(places=[self.place("Unknown Rock"), self.place("Landmark")])
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertEqual(v._emergency["poi"], "Landmark")
+        self.assertEqual(v.edastro.calls[:2], [None, 2])      # asked for a better-rated one next
+
+    def test_without_the_auto_plotter_the_name_goes_on_the_clipboard(self):
+        v = self.make(places=[self.place()], auto_plot=False)
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertIn("EmergencyManual", v.narrator.said)
+        self.assertEqual(v.follower.copied, ["Landmark"])
+        self.assertEqual(v.follower.ran, 0)
+
+    def test_nothing_found_and_no_position(self):
+        v = self.make(places=[])
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertIn("EmergencyNone", v.narrator.said)
+        v = self.make(position=None)
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertIn("EmergencyNoPosition", v.narrator.said)
+
+    def test_a_known_start_does_not_trigger_it(self):
+        v = self.make(known=("Colonia", "Landmark", "Lostville"), places=[self.place()])
+        v.spansh.neutron_route = lambda *a, **k: (_ for _ in ()).throw(__import__("navigation.spansh").spansh.SpanshError("Spansh found no route."))
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertEqual(v.narrator.said, ["RouteFailed"])
+
+    def test_switched_off(self):
+        v = self.make(places=[self.place()])
+        v.settings.v["neutron.emergency"] = False
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertEqual(v.narrator.said, ["RouteFailed"])
+
+    def test_spoken_commands(self):
+        v = self.make(places=[self.place()])
+        self.assertEqual(v.try_handle("emergency protocol"), "Emergency protocol: finding a known place near us.")
+        self.assertIn("EmergencyPlotting", v.narrator.said)
+        v = self.make()
+        v._emergency = {"poi": "Landmark", "destination": "Colonia"}
+        self.assertEqual(v.try_handle("clear the route"), "Route cancelled.")
+        self.assertIsNone(v._emergency)
+        self.assertEqual(v.try_handle("clear the root"), "There was no route.")
+
+    def test_position_comes_from_the_journal(self):
+        processor, _bus, _heard = make_processor()
+        processor.handle_line(json.dumps({"event": "FSDJump", "StarSystem": "X", "StarPos": [1.5, -2, 3], "JumpDist": 5, "FuelUsed": 1, "FuelLevel": 9}))
+        self.assertEqual(processor.state.star_pos, (1.5, -2.0, 3.0))
+        processor.handle_line(json.dumps({"event": "Location", "StarSystem": "Y", "StarPos": [7, 8, 9]}))
+        self.assertEqual(processor.state.star_pos, (7.0, 8.0, 9.0))

@@ -475,6 +475,7 @@ class App:
             from navigation.game_target import choose_target
             self.route_voice.game_target = lambda: choose_target(getattr(self, "journal_folder", None), self.state)
             self.bus.subscribe("NavRoute", self.route_voice.on_nav_route)
+            self.bus.subscribe("FSDJump", self.route_voice.on_arrival)
         except Exception:
             self.log.exception("The neutron plotter could not start")
             self.route_voice = None

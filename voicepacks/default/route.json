@@ -105,5 +105,45 @@
  "RouteBookmarkEmpty": [
   "{slot} is empty. Put a system name in it on the Bookmarks page, or say: save this system as {slot}.",
   "I have nothing saved for {slot} yet."
+ ],
+ "EmergencyStart": [
+  "Spansh can't find us. Emergency protocol. Looking for the nearest landmark it knows.",
+  "Spansh doesn't know this system. Starting the emergency protocol. One moment.",
+  "We're off the map, Commander. Looking for a known place nearby.",
+  "Nobody has mapped this spot. Emergency protocol: finding the nearest landmark."
+ ],
+ "EmergencyStart_Sarcastic": [
+  "Spansh has never heard of this place. Naturally. Emergency protocol it is."
+ ],
+ "EmergencyStart_Close": [
+  "Don't worry, love, I'll get us back to civilisation. Looking for a landmark."
+ ],
+ "EmergencyPlotting": [
+  "Found {poi}, about {distance} light years away. Plotting a course there now, then I'll plot the neutron route to {destination}.",
+  "The nearest known place is {poi}, {distance} light years out. Setting the course, and the neutron route follows from there.",
+  "Got one. {poi}, {distance} light years. I'll plot us there, then on to {destination}."
+ ],
+ "EmergencyPlotting_Close": [
+  "Found us a way out, love. {poi}, {distance} light years. Plotting it now."
+ ],
+ "EmergencyManual": [
+  "Found {poi}, about {distance} light years away. It's on your clipboard. Plot it in the galaxy map, and I'll plot the neutron route to {destination} when we arrive.",
+  "The nearest known place is {poi}. It's on your clipboard. Plot a course there, then I'll take over."
+ ],
+ "EmergencyArrived": [
+  "Arrived at {poi}. Spansh knows this one. Plotting the neutron route to {destination}.",
+  "We're back on the map at {poi}. Now the neutron route to {destination}.",
+  "{poi}. Known territory. Plotting to {destination} now."
+ ],
+ "EmergencyArrived_Sarcastic": [
+  "Back on the map at {poi}. See, I told you I'd find it. Now {destination}."
+ ],
+ "EmergencyNone": [
+  "I couldn't find a landmark that Spansh knows near here. You may need to jump out by hand.",
+  "No luck. Nothing nearby that Spansh recognises. Try a few jumps toward the core and ask again."
+ ],
+ "EmergencyNoPosition": [
+  "I don't know where in the galaxy we are yet. Make a jump and ask me again.",
+  "I need our coordinates, and the game hasn't given me any yet. Make a jump first."
  ]
 }

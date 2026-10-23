@@ -32,7 +32,7 @@ DEFAULTS = {
     "plans": {"ask": True},
     "voidcompass": {"enabled": True, "port": 7380},
     "neutron": {"enabled": True, "destination": "", "jump_range": 0, "range_margin": 0.9, "efficiency": 60,
-                "supercharge": 4, "auto_x6": True, "auto_on_target": False, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},
+                "supercharge": 4, "auto_x6": True, "auto_on_target": False, "emergency": True, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},
     "nomad": {"stow_hardpoints": True},
     "bookmarks": {"home": "", "b1": "", "b2": "", "b3": "", "b4": "", "b5": "", "b6": "", "b7": "", "b8": "", "b9": "", "b10": ""},
     "watcher": {"enabled": True, "reply": "often", "wait_for_calm": True},

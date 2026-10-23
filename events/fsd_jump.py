@@ -1,7 +1,7 @@
 """You arrived in a new system."""
 
 from events.base_event import BaseEvent
-from events.system_facts import remember_system_facts
+from events.system_facts import remember_star_pos, remember_system_facts
 import random
 
 from core.event_bus import NORMAL
@@ -23,6 +23,7 @@ class FSDJump(BaseEvent):
         state.station = None
         state.in_supercruise = True
         state.awaiting_discovery = True
+        remember_star_pos(entry, state)
         if str(state.fsd_target or "").casefold() == str(entry.get("StarSystem") or "").casefold():
             state.fsd_target = None            # we got there
         left, state.route_jumps_left = state.route_jumps_left, None

@@ -429,3 +429,11 @@ From a real log: the microphone heard "neutron plotter" as "neutron platter", "p
 
 ## 0.31.5: Set Target as well as Plot Course
 The game does two different things. Plot Course writes the whole route to NavRoute.json. Set Target only selects the system (the journal's FSDTarget event). Both now work for "plot neutron route": she uses the selected target if it is not part of an already plotted course, otherwise the end of the plotted course. Arriving at the target clears it. Not testable here: exactly what the game writes for Set Target; the log line "The destination set in the game's galaxy map" shows what she found.
+
+## 0.32.0: emergency protocol (EDAstro) and "clear the route"
+When you ask for a neutron route and Spansh does not know the system you are in:
+1. She says so and asks EDAstro (edastro.com, free, 100 requests per 15 minutes) for the landmark nearest your galaxy coordinates (the journal gives them). If Spansh doesn't know that landmark either she asks for better rated ones.
+2. She plots a course to it in the game with the galaxy map macro (needs "Plot each waypoint in the galaxy map for me" on; otherwise the name goes on your clipboard).
+3. When you arrive there she plots the neutron route from the landmark to your real destination, and the normal auto plotter takes over.
+You can start it by hand: set a target in the galaxy map and say **"emergency protocol"** (also "I'm lost", "Spansh can't find me", "find me the nearest landmark"). Switch it off on the Navigation page. **"Clear the route"** (also "cancel / reset the route", "clear the course") clears her route and any emergency in progress. It cannot clear the route inside the game itself.
+Not testable here (the sandbox cannot reach edastro.com): the exact reply EDAstro sends. She reads the system from its `galMapSearch` field (falling back to `system` or `name`) and only uses it if Spansh knows that exact name. If EDAstro changes, send me the log line starting "edastro".
