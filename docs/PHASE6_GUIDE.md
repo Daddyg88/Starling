@@ -413,3 +413,6 @@ Cargo scoop: "lower / raise / drop / retract the cargo scoop" (and "scoop down /
 * **Quiet map macro:** while the "plot the next waypoint" macro opens and closes the galaxy map she no longer says "galaxy map opened / closed".
 * **Plot to the game's target:** pick a destination in the galaxy map, then say "plot a neutron route" (or "plot neutron course to my target"). She reads the end of your plotted route from the game's NavRoute.json. "Plot a neutron route to my destination" uses the Navigation page box first, then the game's target. "Plot neutron course to Home" uses your Home bookmark.
 * Not testable without the game: NavRoute.json contents and the exact moment the game reports the map closing.
+
+## 0.31.1: neutron route as soon as you set a target
+Pick a destination in the galaxy map and she plots the neutron route to it by herself (Navigation page > "Plot a neutron route when I set a target in the galaxy map", on by default). She ignores targets her own waypoint macro or a "where to sell" lookup sets, a target that is already part of the route she follows, the system you are in, and the same target twice in a row. Not testable without the game: when exactly the game writes NavRoute.json after you set the target (she waits 1.5 seconds).

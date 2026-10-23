@@ -253,6 +253,9 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Leave on Normal unless you know your ship gets x6. The Caspian Explorer is switched to x6 for you (next setting)"),
             Field("neutron.auto_x6", "Use x6 automatically in the Caspian Explorer", "toggle",
                   help="The Caspian is the only ship that gets the x6 boost, so when you fly it she plots with x6 and ignores the setting above"),
+            Field("neutron.auto_on_target", "Plot a neutron route when I set a target in the galaxy map", "toggle",
+                  help="Pick a destination in the galaxy map and she works out the neutron route to it by herself. "
+                       "Her own waypoint plotting and 'where to sell' targets are ignored"),
             Field("neutron.clipboard", "Copy the next waypoint to my clipboard", "toggle",
                   help="Then in the galaxy map: click search, Ctrl+V, Enter, and plot"),
             Field("neutron.auto_plot", "Plot each waypoint in the galaxy map for me", "toggle",

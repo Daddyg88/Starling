@@ -403,3 +403,46 @@ class WaypointCount(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AutoOnTarget(unittest.TestCase):
+    def make(self, target="Colonia", here="Sol", **settings):
+        v = RouteVoice(RouteTargetTests.Follower(), None, RouteTargetTests.Narrator(), RouteTargetTests.Settings(**settings),
+                       lambda: type("S", (), {"system": here})(), spawn=lambda f: f())
+        v.game_target = lambda: target
+        v.sleep = lambda s: None
+        v.plotted = []
+        v.plot = lambda name: v.plotted.append(name)
+        return v
+
+    def test_setting_a_target_plots_it(self):
+        v = self.make()
+        v.on_nav_route()
+        self.assertEqual(v.plotted, ["Colonia"])
+
+    def test_same_target_is_not_plotted_twice(self):
+        v = self.make()
+        v.on_nav_route()
+        v.on_nav_route()
+        self.assertEqual(v.plotted, ["Colonia"])
+
+    def test_off_switch_target_here_and_no_target(self):
+        for v in (self.make(**{"neutron.auto_on_target": False}), self.make(target="Sol"), self.make(target="")):
+            v.on_nav_route()
+            self.assertEqual(v.plotted, [])
+
+    def test_her_own_macro_is_ignored(self):
+        v = self.make()
+        v.follower.active = False
+        v.narrator = RouteTargetTests.Narrator()
+        v.prepare_plot()                   # the macro is about to run
+        v.on_nav_route()
+        self.assertEqual(v.plotted, [])
+
+    def test_a_waypoint_of_the_current_route_is_ignored(self):
+        v = self.make(target="Neutron B")
+        v.follower.active = True
+        v.follower.destination = "Colonia"
+        v.follower.waypoints = [{"system": "Neutron B"}]
+        v.on_nav_route()
+        self.assertEqual(v.plotted, [])

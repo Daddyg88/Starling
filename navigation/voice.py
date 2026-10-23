@@ -15,6 +15,7 @@ and she tells you the name she found so you can cancel if it is wrong.
 
 import re
 import threading
+import time
 
 from core.identity import personalise
 from core.logger import get_logger
@@ -133,7 +134,36 @@ class RouteVoice:
         self.spawn = spawn or self._thread
         self._busy = False
         self.target_override = None
+        self.sleep = time.sleep
+        self.clock = time.monotonic
+        self._ignore_until = 0.0         # her own galaxy map macro sets targets too: ignore those
+        self._last_auto = ""
         self.game_target = None          # the app sets this: a function giving the destination picked in the game's galaxy map
+
+    # ---- "plot it for me when I set a target in the galaxy map" ----
+    def on_nav_route(self, _event=None):
+        """The game says a route was set (or cleared). Wait a moment for NavRoute.json, then plot a neutron route to its end."""
+        if not self.enabled() or not self.settings.get("neutron.auto_on_target", True):
+            return
+        if self.clock() < self._ignore_until:
+            return
+        self.spawn(self._auto_plot_target)
+
+    def _auto_plot_target(self):
+        self.sleep(1.5)
+        if self.clock() < self._ignore_until or self._busy:
+            return
+        name = self._target_in_game()
+        state = self.state_provider()
+        here = str(getattr(state, "system", "") or "")
+        if not name or name.casefold() == here.casefold() or name.casefold() == self._last_auto.casefold():
+            return
+        follower = self.follower
+        if follower.active and (name.casefold() == str(follower.destination).casefold()
+                                or any(w["system"].casefold() == name.casefold() for w in follower.waypoints)):
+            return                          # that is part of the route she is already following
+        self._last_auto = name
+        self.plot(name)
 
     def _target_in_game(self):
         try:
@@ -211,6 +241,7 @@ class RouteVoice:
 
     def prepare_plot(self):
         """Runs just before the 'plot the next waypoint' macro: is there something to paste?"""
+        self._ignore_until = self.clock() + 90          # the macro sets a target in the game itself: not a new request
         if self.target_override:
             name, self.target_override = self.target_override, None
             if self.follower.copier(name):
