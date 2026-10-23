@@ -492,3 +492,16 @@ class MineralList(unittest.TestCase):
             self.assertEqual(minerals.tier("Cryolite"), "top")
         finally:
             minerals.bind(before)
+
+
+class MishearingTests(unittest.TestCase):
+    def test_phrases_from_a_real_log_are_understood(self):
+        for said in ("Start the neutron platter.", "Plot neutron cores.", "Plot your neutron route.", "Touch neutron.",
+                     "Plot neutral.", "Set a new trunk horse.", "Plot Neatron Root.", "Plot Neutron Root.", "Plot neutron."):
+            v = RouteTargetTests().voice(target="Colonia")
+            self.assertEqual(v.try_handle(said), "Plotting a neutron route to Colonia", said)
+
+    def test_ordinary_sentences_are_left_alone(self):
+        v = RouteTargetTests().voice(target="Colonia")
+        for said in ("what is the neutral mood", "open the galaxy map", "who is Ben Kenobi"):
+            self.assertIsNone(v.try_handle(said), said)

@@ -423,3 +423,6 @@ Set a target in the galaxy map, then say "plot neutron route", "start the neutro
 ## 0.31.3: automatic releases, every mineral in the Mining boxes
 * `.github/workflows/release.yml` now runs by itself when `core/version.py` changes on the main branch: it makes the tag and the GitHub Release, builds Starling.exe and the zip. Nobody has to create a release by hand any more (takes about 5 to 10 minutes on GitHub; watch the Actions tab). Starling.exe then offers the update at the next start.
 * The ten "Excited about" boxes list every mineral, metal and ice (A to Z). Anything in the list can also be named in speech ("where do I sell the cryolite").
+
+## 0.31.4: neutron plotter and mishearings
+From a real log: the microphone heard "neutron plotter" as "neutron platter", "plot neutron course" as "plot neutron cores", "route" as "root", "neutron" as "neutral" or "Neatron". In a sentence about neutrons these are now corrected. The log now says which destination she found in the game (`The destination set in the game's galaxy map: ...`).

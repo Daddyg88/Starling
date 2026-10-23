@@ -55,6 +55,26 @@ _PLOT_NEXT = re.compile(r"\b(plot|set|put in|enter|load|lay in|select)\b.*\b(nex
 _TAIL = re.compile(r"\b(using|via|by|with|through)\b.*\bneutron.*$|\bneutron (route|stars?)\b$")
 
 
+_NEUTRON_WORD = re.compile(r"\b(neutrons?|neutral|neatron|neotron|newtron|nutron|nuetron|neutrino|new tron|new trunk|neutro)\b")
+_MISHEARD = (
+    (re.compile(r"\b(platter|plotta|plota|plodder|plot her|plot are)\b"), "plotter"),
+    (re.compile(r"\b(root|rout|rote|route s)\b"), "route"),
+    (re.compile(r"\b(cores|coarse|cors|chorus|horse|course s)\b"), "course"),
+    (re.compile(r"^(touch|blot|plod|plots|plat|lot|clot|pilot|plant|flat|plug|plop) "), "plot "),
+    (re.compile(r"\byour neutron\b"), "a neutron"),
+)
+
+
+def fix_neutron_mishearings(said):
+    """The microphone often hears 'neutron' as neutral, platter, cores, root... Fix those, but only in a sentence about neutrons."""
+    if not _NEUTRON_WORD.search(said):
+        return said
+    said = _NEUTRON_WORD.sub("neutron", said)
+    for pattern, replacement in _MISHEARD:
+        said = pattern.sub(replacement, said)
+    return " ".join(said.split())
+
+
 def clean(text):
     text = re.sub(r"[^a-z0-9*\s]", " ", str(text or "").lower().replace("*", " star "))
     text = _FILLER.sub(" ", text)
@@ -167,7 +187,9 @@ class RouteVoice:
 
     def _target_in_game(self):
         try:
-            return str(self.game_target() or "").strip() if self.game_target else ""
+            name = str(self.game_target() or "").strip() if self.game_target else ""
+            log.info("The destination set in the game's galaxy map: %s", name or "(none found in NavRoute.json)")
+            return name
         except Exception:
             log.exception("Could not read the game's route")
             return ""
@@ -189,7 +211,7 @@ class RouteVoice:
     def try_handle(self, text):
         if not self.enabled():
             return None
-        said = clean(text)
+        said = fix_neutron_mishearings(clean(text))
         if not said:
             return None
         if _PLOT_NEXT.search(said):
