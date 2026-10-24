@@ -80,6 +80,7 @@ class App:
         self.combat_assist = None
         self.watcher = None
         self.region_tracker = None
+        self.bio_distance = None
         self.route_voice = None
         self.route_follower = None
         self.ask = None
@@ -493,6 +494,19 @@ class App:
             self.route_voice = None
         return self.route_voice
 
+    def ensure_bio_distance(self):
+        """Beep and speak when you have walked far enough from a biological sample. Needs the monitor (Status.json)."""
+        try:
+            from journal.bio_distance import BioDistance
+            from navigation.voice import Narrator
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.bio_distance = BioDistance(self.bus, narrator, self.settings, lambda: self.state)
+            self.bio_distance.attach()
+            self.monitor.status.listeners.append(self.bio_distance.check)
+        except Exception:
+            self.log.exception("The biology distance alert could not start")
+            self.bio_distance = None
+
     def ensure_regions(self):
         """Announces the galaxy region you jump into (and the first time you are in it). Safe to call twice."""
         if getattr(self, "region_tracker", None) is not None:
@@ -599,6 +613,7 @@ class App:
         self.ensure_regions()
         poll = self.settings.get("journal.poll_seconds", 1.0)
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
+        self.ensure_bio_distance()
         self.monitor.start()
         return self.journal_folder
 
@@ -610,6 +625,9 @@ class App:
         if self.warmer is not None:
             self.warmer.stop()
             self.warmer = None
+        if getattr(self, "bio_distance", None) is not None:
+            self.bio_distance.detach()
+            self.bio_distance = None
         if getattr(self, "region_tracker", None) is not None:
             self.region_tracker.detach()
             self.region_tracker = None

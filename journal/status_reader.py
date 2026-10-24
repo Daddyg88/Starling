@@ -64,6 +64,7 @@ class StatusReader:
         self._tank_full_said = False
         self._fuel_said = set()       # which fuel warnings ("half", "panic") were already given for this tank
         self._clock = time.monotonic
+        self.listeners = []         # functions called with the game state after every Status.json read (the biology distance check)
 
     # ---- watching the file ----
     def poll_once(self):
@@ -118,6 +119,16 @@ class StatusReader:
                 state.fuel_main = float(main)
             if isinstance(status.get("Cargo"), (int, float)):
                 state.cargo_tons = float(status["Cargo"])
+        if state is not None:
+            near = all(isinstance(status.get(k), (int, float)) for k in ("Latitude", "Longitude", "PlanetRadius"))
+            state.latitude = float(status["Latitude"]) if near else None
+            state.longitude = float(status["Longitude"]) if near else None
+            state.planet_radius = float(status["PlanetRadius"]) if near else None
+            for listener in self.listeners:
+                try:
+                    listener(state)
+                except Exception:
+                    log.exception("A Status.json listener failed")
         if state is not None and isinstance(status.get("BodyName"), str) and status.get("BodyName"):
             state.current_body = status["BodyName"]       # present while you are near a planet
         vehicle = self._work_out_vehicle(flags, flags2)

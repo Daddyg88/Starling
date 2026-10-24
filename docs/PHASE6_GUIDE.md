@@ -538,3 +538,11 @@ When a jump (or a carrier jump) takes you into a different galaxy region she say
 - Her lines are in `voicepacks/default/regions.json`.
 
 Not tested with the real game: the region map was checked against known systems (Sol is Inner Orion Spur, Sagittarius A* is the Galactic Centre) but not against live jumps. The game shows the region of the boxel corner in some cases, so right at a region edge she may disagree with the galaxy map by one jump.
+
+## 0.38.0: far enough from the last biological sample
+
+After each biological sample she remembers where you stood (Status.json latitude, longitude and the planet's radius) and watches how far you walk. When you are as far as that species needs (config/exobiology_values.json, `colony_distance_m`: for example 150 m for Aleoida, 500 m for Bacterium) she plays two short beeps (Windows) and says so, once per sample. Finishing the third sample cancels it.
+
+Two switches on the Exobiology page: **Tell me when I'm far enough from the last sample** and **Beep as well**. Her lines are in `voicepacks/default/biodistance.json`.
+
+Not tested with the real game: the distance maths is tested, but Status.json only gives your position while you are close to the planet's surface, so if you are in a vehicle that doesn't report it she stays quiet. Tell me if the distances feel off for a species and I will adjust the table.

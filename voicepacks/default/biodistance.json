@@ -1,0 +1,22 @@
+{
+ "_help": "Said (after a beep) when you have walked far enough from the last biological sample. Field: {distance} (metres).",
+ "BioFarEnough": [
+  "You're far enough away now. Take the next sample.",
+  "That's {distance} metres. Far enough. Next sample, Commander.",
+  "Far enough from the last one. Go ahead and sample.",
+  "Distance reached. You can take the next sample now.",
+  "This is far enough. Sample whenever you're ready."
+ ],
+ "BioFarEnough_Friendly": [
+  "Nice walking. That's far enough, take the next sample."
+ ],
+ "BioFarEnough_Close": [
+  "That's far enough, love. Go on, take your sample."
+ ],
+ "BioFarEnough_Sarcastic": [
+  "Congratulations, you've walked {distance} metres. Now sample something."
+ ],
+ "BioFarEnough_Frustrated": [
+  "Far enough. Sample. Now."
+ ]
+}

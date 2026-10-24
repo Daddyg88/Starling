@@ -217,6 +217,9 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("exobiology", "Exobiology", "Biological samples on planets.", [
             Field("talk.exobiology", "She comments on exobiology", "toggle",
                   help="The value on the first sample, what it is on the second, and selling biological data. Off = quiet"),
+            Field("exobiology.distance_alert", "Tell me when I'm far enough from the last sample", "toggle",
+                  help="After a sample she watches how far you walk and says when you can take the next one (the distance depends on the species)"),
+            Field("exobiology.distance_beep", "Beep as well", "toggle", help="Two short beeps (Windows) just before she speaks"),
             Field("ask.bio_prompts", "Wonder aloud about planets with life", "toggle",
                   help="She says 'shall we go and see what's down there?'. No answer is needed and it never changes her mood"),
             Field("personality.affection_credits", "Gets affectionate when rich", "choice", AFFECTION,
