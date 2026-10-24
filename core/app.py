@@ -185,6 +185,12 @@ class App:
         # The Watcher (Void Compass's orb): she answers him, and makes him wait for a calm moment.
         self.start_watcher_bridge()
 
+        # Incoming chat messages, read out when nothing else is happening.
+        from personality.messages import MessageReader
+        self.message_reader = MessageReader(self.bus, self.speech, self.dialogue, self.settings,
+                                            state_provider=lambda: self.state, ask_provider=lambda: self.ask)
+        self.message_reader.attach()
+
         # The hello when you load into the game: ship, where you are, and how she feels.
         from personality.greeter import LoginGreeter
         from memory.recall import MemoryRecall
@@ -586,6 +592,9 @@ class App:
         if self.warmer is not None:
             self.warmer.stop()
             self.warmer = None
+        if getattr(self, "message_reader", None) is not None:
+            self.message_reader.detach()
+            self.message_reader = None
         if getattr(self, "watcher", None) is not None:
             self.watcher.detach()
             self.watcher = None

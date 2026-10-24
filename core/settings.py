@@ -30,6 +30,7 @@ DEFAULTS = {
     "facts": {"frequency": "sometimes", "topics": "all"},
     "ask": {"scan_prompts": True, "bio_prompts": True, "answer_seconds": 10},
     "plans": {"ask": True},
+    "messages": {"read": True, "npc": False},
     "voidcompass": {"enabled": True, "port": 7380},
     "neutron": {"enabled": True, "destination": "", "jump_range": 0, "range_margin": 0.9, "efficiency": 60,
                 "supercharge": 4, "auto_x6": True, "auto_on_target": False, "emergency": True, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},

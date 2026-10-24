@@ -519,3 +519,11 @@ Not tested on a real game: the journal field names come from the Elite journal m
 ## 0.35.2
 
 The "exit supercruise" voice command from 0.35.1 was removed again, as asked.
+
+## 0.36.0: she reads your messages out loud
+
+Wing, squadron, local, friend, direct, system and crew messages that arrive in the game (the journal's `ReceiveText`) are read out one at a time, but only when nothing else is happening: she is not talking or asking you something, no safety warning in the last 30 seconds, and the ship is not jumping, in danger, overheating, low on fuel or has weapons out. A message that waited more than 3 minutes is dropped, and only the newest 6 are kept. Links are read as "a link".
+
+Two switches on the Personality page: **Read my incoming messages out loud** (on) and **Also read computer-controlled ships and stations** (off: pirates, stations and police talk a lot). Her lines are in `voicepacks/default/messages.json`.
+
+Not tested with the real game: the journal field names (`From`, `Message`, `Channel`, `_Localised`) are from the Elite journal manual.

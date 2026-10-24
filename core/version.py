@@ -1,2 +1,2 @@
 """The one place the version number lives. The updater compares this with the newest GitHub release."""
-__version__ = "0.35.2"
+__version__ = "0.36.0"

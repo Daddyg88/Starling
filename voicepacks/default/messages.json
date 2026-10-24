@@ -1,0 +1,82 @@
+{
+ "_help": "Incoming chat read aloud. Fields: {name} {message}. Keys: MessageIn_<channel> and MessageIn_<channel>_Anonymous (channels: wing, squadron, local, friend, player, voicechat, starsystem, multicrew, npc).",
+ "MessageIn_local": [
+  "{name} says: {message}",
+  "Message from {name}: {message}",
+  "{name} writes: {message}"
+ ],
+ "MessageIn_local_Anonymous": [
+  "A message: {message}",
+  "Someone says: {message}"
+ ],
+ "MessageIn_wing": [
+  "Wing message from {name}: {message}",
+  "{name} in wing chat: {message}",
+  "Your wingman {name} says: {message}"
+ ],
+ "MessageIn_wing_Anonymous": [
+  "Wing message: {message}"
+ ],
+ "MessageIn_squadron": [
+  "Squadron message from {name}: {message}",
+  "{name} in squadron chat: {message}"
+ ],
+ "MessageIn_squadron_Anonymous": [
+  "Squadron message: {message}"
+ ],
+ "MessageIn_friend": [
+  "{name} messaged you: {message}",
+  "Message from your friend {name}: {message}"
+ ],
+ "MessageIn_friend_Anonymous": [
+  "A friend says: {message}"
+ ],
+ "MessageIn_player": [
+  "{name} sent you a direct message: {message}",
+  "Direct message from {name}: {message}"
+ ],
+ "MessageIn_player_Anonymous": [
+  "Direct message: {message}"
+ ],
+ "MessageIn_voicechat": [
+  "{name} says: {message}"
+ ],
+ "MessageIn_voicechat_Anonymous": [
+  "Someone says: {message}"
+ ],
+ "MessageIn_starsystem": [
+  "System chat, {name}: {message}",
+  "{name} in system chat: {message}"
+ ],
+ "MessageIn_starsystem_Anonymous": [
+  "System chat: {message}"
+ ],
+ "MessageIn_multicrew": [
+  "Crew message from {name}: {message}"
+ ],
+ "MessageIn_multicrew_Anonymous": [
+  "Crew message: {message}"
+ ],
+ "MessageIn_npc": [
+  "{name} is transmitting: {message}",
+  "Incoming transmission from {name}: {message}"
+ ],
+ "MessageIn_npc_Anonymous": [
+  "Incoming transmission: {message}"
+ ],
+ "MessageIn_local_Close": [
+  "{name} says: {message}. Just so you know, love."
+ ],
+ "MessageIn_wing_Close": [
+  "Your wing's talking, love. {name} says: {message}"
+ ],
+ "MessageIn_local_Sarcastic": [
+  "{name} has something to say, apparently: {message}"
+ ],
+ "MessageIn_wing_Sarcastic": [
+  "Wing chat, from {name}. Riveting: {message}"
+ ],
+ "MessageIn_local_Frustrated": [
+  "{name} again. {message}"
+ ]
+}

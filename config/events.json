@@ -81,6 +81,7 @@
     "LaunchSRV":                   { "enabled": true, "priority": "low", "source": "journal" },
     "LeaveBody":                   { "enabled": true, "priority": "low", "source": "journal" },
     "Location":                   { "enabled": true, "priority": "low", "source": "journal" },
+    "ReceiveText":                 { "enabled": true, "priority": "low", "source": "journal" },
     "LoadGame":                    { "enabled": true, "priority": "low", "source": "journal" },
     "MarketBuy":                   { "enabled": true, "priority": "low", "source": "journal" },
     "PayFines":                    { "enabled": true, "priority": "low", "source": "journal" },
