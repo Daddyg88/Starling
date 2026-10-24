@@ -482,6 +482,45 @@ class CommandRunner:
                 problems.append((command.label, self._explain(status, command)))
         return working, problems
 
+    @staticmethod
+    def _nice(action):
+        """UI_Select -> 'UI Select', CycleNextPanel -> 'Cycle Next Panel' (what the Elite controls screen calls it, roughly)."""
+        import re
+        return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", action.replace("_", " "))
+
+    def binding_conflicts(self):
+        """Keys that one of her commands presses but Elite ALSO gives to another ship action (so a press may do the wrong thing).
+
+        Returns a list of sentences, one per clash, each saying what to change in Elite's controls. Empty when all is clear.
+        """
+        from control.macros import actions_in, parse_macro
+        actions = []
+        for c in self.matcher.commands:
+            if c.service:
+                continue
+            if c.macro:
+                try:
+                    wanted = actions_in(parse_macro(self.macro_steps(c)))
+                except ValueError:
+                    continue
+            else:
+                wanted = [c.action]
+            for action in wanted:
+                if action not in actions:
+                    actions.append(action)
+        found = []
+        for action in actions:
+            try:
+                others = self.book.conflicts(action)
+                stroke, _why = self.book.lookup(action)
+            except Exception:
+                continue
+            if not others or stroke is None:
+                continue
+            found.append("%s (key %s) is also used by %s. Change one of them in Elite: Options > Controls." % (
+                self._nice(action), stroke.describe(), ", ".join(self._nice(o) for o in others[:4])))
+        return found
+
     # ---- telling you ----
     def _finish(self, outcomes, speak, text):
         self.last_outcomes = outcomes

@@ -29,6 +29,13 @@ def run_controls_test(app, reader=None, seconds=15, out=print, ask=input, sleep=
     out("   %d voice commands have a keyboard key." % working)
     for label, why in problems:
         out("   - %s" % why)
+    clashes = runner.binding_conflicts()
+    if clashes:
+        out("   Keys that clash (Elite may do the wrong thing). Change one of each pair in Elite's controls:")
+        for line in clashes:
+            out("   - %s" % line)
+    else:
+        out("   No key clashes found.")
     out("")
 
     # 2. joysticks

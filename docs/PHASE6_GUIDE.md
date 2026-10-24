@@ -477,3 +477,7 @@ The "Key clash" warning in the log tells you which actions share a key.
 - **New ways to ask** (docked only): "take us out", "number one, take us out", "you have control", "you have the helm", "take her out", "get us out of here", "the ship is yours", "take the helm", "engage launch sequence".
 - **Macro speech**: a macro step like `"say Launch_Go"` makes her say a line from that dialogue key. If you write your own `macros.auto_launch` without `say` steps she just confirms as before.
 - **Request docking** presses Right again before Select (the step that worked in 0.10.4). Untested in game. If it still fails, edit `macros.request_docking` in `config/settings.json`.
+
+### 0.34.5: key clash list
+
+**Check my Elite keys** (Controls page) and `run_controls_test.bat` now also list every key that one of her commands presses but Elite also gives to another ship action, for example "UI Select (key Enter) is also used by Quick Comms Panel". Change one of each pair in Elite: Options > Controls. If an action has two keyboard keys she already prefers the one nothing else uses. SRV, on-foot and fighter versions of an action are ignored. Joystick buttons are not checked, because she only presses keyboard keys.

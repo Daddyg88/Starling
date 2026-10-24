@@ -955,3 +955,36 @@ class LaunchTalk(unittest.TestCase):
         r = t.build(macros__auto_launch=["UI_Select"])
         r.run_text("launch")
         self.assertEqual(len(t.speech.said), 1)
+
+
+class KeyClashReport(unittest.TestCase):
+    def runner(self, xml):
+        from control.binds import BindingBook, parse_binds
+        from tests.test_macros import MacroTests
+        book = BindingBook.__new__(BindingBook)
+        book._actions = parse_binds(xml)
+        book.refresh = lambda: True
+        t = MacroTests()
+        r = t.build()
+        r.book = book
+        return r
+
+    def test_clashes_are_listed_with_what_to_change(self):
+        xml = """<Root>
+  <UI_Select><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></UI_Select>
+  <QuickCommsPanel><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></QuickCommsPanel>
+  <LandingGearToggle><Primary Device="Keyboard" Key="Key_L" /><Secondary Device="{NoDevice}" Key="" /></LandingGearToggle>
+</Root>"""
+        found = self.runner(xml).binding_conflicts()
+        text = "\n".join(found)
+        self.assertIn("UI Select", text)
+        self.assertIn("Quick Comms Panel", text)
+        self.assertIn("Options > Controls", text)
+        self.assertNotIn("Landing Gear", text)
+
+    def test_no_clashes_gives_an_empty_list(self):
+        xml = """<Root>
+  <UI_Select><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></UI_Select>
+  <LandingGearToggle><Primary Device="Keyboard" Key="Key_L" /><Secondary Device="{NoDevice}" Key="" /></LandingGearToggle>
+</Root>"""
+        self.assertEqual(self.runner(xml).binding_conflicts(), [])

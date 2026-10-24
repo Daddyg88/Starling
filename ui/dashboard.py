@@ -912,7 +912,12 @@ class Dashboard:
         if problems:
             head += " Without one: " + ", ".join("%s" % label for label, _why in problems[:12])
             head += "." if len(problems) <= 12 else " and %d more." % (len(problems) - 12)
-        self._controls_result(head, T.GOOD if not problems else T.WARN)
+        clashes = runner.binding_conflicts()
+        if clashes:
+            head += "\n\nKeys that clash (Elite may do the wrong thing):\n- " + "\n- ".join(clashes)
+        else:
+            head += "\nNo key clashes found."
+        self._controls_result(head, T.GOOD if not (problems or clashes) else T.WARN)
 
     def scan_joysticks(self):
         reader = self.app.ensure_buttons()
