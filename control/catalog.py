@@ -47,12 +47,12 @@ MACROS = {
 # Next Tab twice (Navigation to Contacts), Right, Select (that sends the request; the game answered 0.35 s later),
 # wait, then Back to close the panel. The waits are the commander's own pace: lower them in config/settings.json if
 # you want it faster (macros.request_docking).
-# 0.34.9: the commander's own 12:38 recording, exactly (no Right press: Right shares a key with Yaw Right), but every key is
-# held for 0.15 s like the joystick buttons in the recording (0.05 to 0.2 s). Starling's usual 0.06 s tap may be too short for the
-# game's panels. Tab presses are 0.4 s apart as in the recording.
-DOCKING_MACRO = ("FocusLeftPanel", "wait 0.85", "hold CycleNextPanel 0.15", "wait 0.4", "hold CycleNextPanel 0.15", "wait 1.2",
-                 "hold UI_Select 0.15", "wait 1.45", "hold CyclePreviousPanel 0.15", "wait 0.3", "hold CyclePreviousPanel 0.15",
-                 "wait 0.75", "hold UI_Back 0.15")
+# 0.34.10: the commander's 12:38 recording (no Right press: Right shares a key with Yaw Right), with every key held 0.15 s
+# and much more patient waits. The 17:03 log showed the left panel was still not open (Status.json GuiFocus 0) when the first
+# Next Tab was pressed 0.85 s after Focus Left Panel, so that press, and the next, could land on the wrong tab.
+DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "hold CycleNextPanel 0.15", "wait 0.7", "hold CycleNextPanel 0.15", "wait 1.6",
+                 "hold UI_Select 0.15", "wait 2.0", "hold CyclePreviousPanel 0.15", "wait 0.4", "hold CyclePreviousPanel 0.15",
+                 "wait 0.8", "hold UI_Back 0.15")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
 # Auto launch from a station: Select on the Launch button of the station menu. Only works while docked (see core/app.py). If

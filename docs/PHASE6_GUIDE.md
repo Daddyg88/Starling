@@ -496,3 +496,7 @@ Two actions only get in each other's way when they work in the same view. She no
 - After every macro the log gets a line like `Macro request_docking trace (...): FocusLeftPanel>gui2, CycleNextPanel>gui2 ...`. The number is the screen the game showed (Status.json GuiFocus): 0 cockpit, 1 right panel, 2 left panel, 6 galaxy map. If the first number after FocusLeftPanel is not 2, the left panel never opened.
 - Four seconds after a docking request the log says either `the game answered` (journal DockingRequested/Granted/Denied) or `did NOT answer`.
 - New setting `commands.key_hold` (default 0.06 seconds) in `config/settings.json` sets how long every macro key is held. Try 0.12 if keys get missed.
+
+### 0.34.10: docking waits for the panel
+
+Your 17:03 trace showed `FocusLeftPanel>gui0`: the game was still showing the cockpit 0.85 s after she pressed Focus Left Panel, so the first Next Tab presses may have been lost and Select landed on the wrong tab. The docking macro now waits 1.6 s after Focus Left Panel, 0.7 s between the tab presses and 1.6 s before Select. If it still does not work, tell me which tab is highlighted when you open the left panel by hand and which one she ends on.

@@ -53,7 +53,7 @@ class MacroTests(unittest.TestCase):
         # 0.34.9: the recording exactly: focus left panel, Next Tab x2, Select, Previous Tab x2, Back (no Right press)
         self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_4", "Key_8", "Key_8", "Key_6"])
         self.assertNotIn("Key_7", names)
-        self.assertIn(1.2, self.sleeps)
+        self.assertIn(1.6, self.sleeps)
 
     def test_your_own_steps_replace_the_built_in_ones(self):
         r = self.build(macros__deploy_nomad=["FocusRightPanel", "wait 1", "UI_Down x2", "UI_Select"])
