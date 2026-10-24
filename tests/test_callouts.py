@@ -713,3 +713,160 @@ class EmergencyTests(unittest.TestCase):
         self.assertEqual(processor.state.star_pos, (1.5, -2.0, 3.0))
         processor.handle_line(json.dumps({"event": "Location", "StarSystem": "Y", "StarPos": [7, 8, 9]}))
         self.assertEqual(processor.state.star_pos, (7.0, 8.0, 9.0))
+
+
+class WelcomeHomeAndMap(unittest.TestCase):
+    def test_welcome_home_once(self):
+        v = EmergencyTests().make(places=[])
+        v.settings.v["bookmarks.home"] = "Sol"
+        arrive = lambda s: v.on_arrival(type("E", (), {"data": {"StarSystem": s}})())
+        arrive("Elsewhere")
+        self.assertEqual(v.narrator.said, [])
+        arrive("sol")
+        arrive("Sol")
+        self.assertEqual(v.narrator.said, ["WelcomeHome"])
+
+    def test_no_home_no_greeting(self):
+        v = EmergencyTests().make(places=[])
+        v.on_arrival(type("E", (), {"data": {"StarSystem": "Sol"}})())
+        self.assertEqual(v.narrator.said, [])
+
+    def test_open_galaxy_map_skips_the_open_key(self):
+        from control.runner import CommandRunner
+        from control.catalog import PLOT_MACRO
+        from control.macros import parse_macro
+        r = CommandRunner.__new__(CommandRunner)
+        r.state_provider = lambda: type("S", (), {"status_seen": True, "gui_focus": 6})()
+        self.assertTrue(r.galaxy_map_open())
+        r.state_provider = lambda: type("S", (), {"status_seen": True, "gui_focus": 0})()
+        self.assertFalse(r.galaxy_map_open())
+        self.assertEqual(parse_macro(PLOT_MACRO)[0], ("press", "GalaxyMapOpen", 1))
+
+    def test_status_reader_records_the_open_screen(self):
+        processor, _bus, _heard = make_processor()
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        reader.handle_status({"Flags": 1 << 24, "GuiFocus": 6})
+        self.assertEqual(processor.state.gui_focus, 6)
+
+
+class FavouriteShipTests(unittest.TestCase):
+    def make(self, ship="explorer_nx"):
+        import tempfile
+        from personality.favourite_ship import FavouriteShip
+        state = type("S", (), {"ship": ship, "ship_model": None, "favourite_ship": None})()
+        said = []
+        f = FavouriteShip(lambda: state, None, say=lambda k, fields: said.append((k, fields)),
+                          path=Path(tempfile.mkdtemp()) / "f.json")
+        f.state, f.said = state, said
+        return f
+
+    def test_twenty_good_points_make_a_favourite(self):
+        f = self.make()
+        for _ in range(19):
+            f.add(1.0)
+        self.assertIsNone(f.favourite)
+        f.add(1.0)
+        self.assertEqual(f.favourite, "explorer_nx")
+        self.assertEqual(f.state.favourite_ship, "explorer_nx")
+        self.assertEqual(f.said[0][0], "FavouriteShip_New")
+
+    def test_points_go_to_the_ship_you_are_flying_and_losses_do_not_count(self):
+        f = self.make("anaconda")
+        f.add(15)
+        f.state.ship = "python"
+        f.add(15)
+        f.add(-10)
+        self.assertIsNone(f.favourite)
+        f.add(6)
+        self.assertEqual(f.favourite, "python")
+
+    def test_another_ship_must_beat_the_favourite(self):
+        f = self.make("anaconda")
+        f.add(25)
+        f.state.ship = "python"
+        f.add(22)
+        self.assertEqual(f.favourite, "anaconda")        # 22 is over 20 but not more than 25
+        f.add(5)
+        self.assertEqual(f.favourite, "python")
+        self.assertEqual(f.said[-1][0], "FavouriteShip_Changed")
+
+    def test_it_is_remembered(self):
+        from personality.favourite_ship import FavouriteShip
+        f = self.make()
+        f.add(30)
+        again = FavouriteShip(lambda: f.state, None, path=f.path)
+        self.assertEqual(again.favourite, "explorer_nx")
+        self.assertTrue(again.is_favourite("EXPLORER_NX"))
+
+    def test_mood_gains_feed_it(self):
+        from core.event_bus import EventBus
+        from personality.mood_engine import MoodEngine
+        gains = []
+        engine = MoodEngine(EventBus(), RouteTargetTests.Settings(**{}), persist=False)
+        engine.good_listener = gains.append
+        rule = {"id": "x", "label": "x", "delta": 2, "category": "c1"}
+        engine._apply(rule, type("E", (), {"data": {}, "priority": "normal", "name": "X"})(), 1000.0)
+        self.assertTrue(gains and gains[0] > 0)
+
+    def test_swap_and_login_and_smalltalk_use_it(self):
+        class E:
+            name = "ShipyardSwap"
+            data = {"Favourite": True}
+        self.assertEqual(line_keys.keys_for(E()), ["ShipyardSwap_Favourite", "ShipyardSwap"])
+        from events.shipyard_swap import ShipyardSwap
+        h = ShipyardSwap()
+        st = type("S", (), {"favourite_ship": "python", "ship": "x", "ship_model": None, "ship_name": None})()
+        h.update_state({"ShipType": "python"}, st)
+        self.assertTrue(h.handle({"ShipType": "python"})["Favourite"])
+        h.update_state({"ShipType": "anaconda"}, st)
+        self.assertFalse(h.handle({"ShipType": "anaconda"})["Favourite"])
+        from personality.smalltalk import intent_for
+        for said in ("what's your favourite ship", "which ship do you like the most", "do you have a favourite ship"):
+            self.assertEqual(intent_for(said), "Talk_FavouriteShip", said)
+
+
+class WatcherHushTests(unittest.TestCase):
+    def make(self):
+        from personality.watcher import WatcherBridge
+        calls = []
+
+        class Client:
+            def voice_hush(self, seconds): calls.append(seconds)
+        now = [100.0]
+        s = RouteTargetTests.Settings(**{"voidcompass.enabled": True, "watcher.enabled": True, "speech.enabled": True})
+        b = WatcherBridge(None, None, None, s, Client(), clock=lambda: now[0])
+        b.calls, b.now = calls, now
+        return b
+
+    def run_hush(self, b):
+        import threading
+        original = threading.Thread
+        threading.Thread = lambda target=None, **k: type("T", (), {"start": lambda self: target()})()
+        try:
+            return b.hush_if_needed()
+        finally:
+            threading.Thread = original
+
+    def test_hush_is_sent_and_not_too_often(self):
+        b = self.make()
+        self.assertTrue(self.run_hush(b))
+        self.assertFalse(self.run_hush(b))
+        b.now[0] += 7
+        self.assertTrue(self.run_hush(b))
+        self.assertEqual(len(b.calls), 2)
+
+    def test_old_void_compass_without_hush_is_given_up_on(self):
+        from control.voidcompass import VoidError
+        b = self.make()
+
+        def fail(seconds): raise VoidError("missing", "no such call")
+        b.client.voice_hush = fail
+        for _ in range(5):
+            b.now[0] += 10
+            self.run_hush(b)
+        self.assertFalse(b.hush_wanted())
+
+    def test_switch_off(self):
+        b = self.make()
+        b.settings.v["watcher.hush"] = False
+        self.assertFalse(self.run_hush(b))

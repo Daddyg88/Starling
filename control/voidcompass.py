@@ -104,5 +104,13 @@ class VoidCompass:
     def voice_say(self, text):
         return self._call("POST", "/voice/say", {"text": str(text)[:400]})
 
+    def voice_hush(self, seconds=12):
+        """Newer Void Compass: keep the Watcher quiet for a while (POST /voice/hush) because our own voice assistant is talking."""
+        return self._call("POST", "/voice/hush", {"seconds": int(seconds), "duration": int(seconds)})
+
+    def watcher_answer(self, answer):
+        """Newer Void Compass: answer a question the Watcher asked (POST /watcher/answer), the same as a Stream Deck button."""
+        return self._call("POST", "/watcher/answer", {"answer": answer})
+
     def voice_stop(self):
         return self._call("POST", "/voice/stop")

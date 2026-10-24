@@ -39,6 +39,9 @@ REPLY_START_DELAY_SECONDS = 1.5     # give his voice a moment to actually start 
 REPLY_WAIT_SECONDS = 25.0           # how long we wait for him to finish before giving up on the reply
 REPLY_CHANCE = {"always": 1.0, "often": 0.7, "sometimes": 0.4, "never": 0.0}
 OFFLINE_RETRY_SECONDS = 10.0
+HUSH_SECONDS = 12                   # how long one hush lasts (it is renewed while she keeps talking)
+HUSH_GAP_SECONDS = 6.0              # do not ask more often than this
+HUSH_GIVE_UP_AFTER = 3              # this many errors in a row (an older Void Compass): stop trying
 
 
 class WatcherBridge:
@@ -59,6 +62,10 @@ class WatcherBridge:
         self.held = None                  # (text, since) he wanted to say at a bad time
         self.reply_due = None             # (deadline, was_waiting_for_voice_to_end)
         self.seq = None
+        self._hush_at = None
+        self._logged_other_voice_event = False
+        self._hush_failures = 0
+        self._hush_offline_until = 0.0
         self._stop = threading.Event()
         self._thread = None
 
@@ -73,6 +80,37 @@ class WatcherBridge:
     def _on_bus(self, event):
         if event.priority == "critical":
             self._last_critical = self.clock()
+        if not str(getattr(event, "name", "")).startswith(("app.", "journal.", "speech.", "voice.", "personality.")):
+            self.hush_if_needed()
+
+    # ---- keep him quiet while she talks (newer Void Compass: POST /voice/hush) ----
+    def hush_wanted(self):
+        """True when she is about to speak or it is no time for him to talk."""
+        return self.enabled() and self.settings.get("watcher.hush", True) and self._hush_failures < HUSH_GIVE_UP_AFTER
+
+    def hush_if_needed(self):
+        if not self.hush_wanted():
+            return False
+        now = self.clock()
+        if now < self._hush_offline_until or (self._hush_at is not None and now - self._hush_at < HUSH_GAP_SECONDS):
+            return False
+        self._hush_at = now
+        threading.Thread(target=self._send_hush, name="watcher-hush", daemon=True).start()
+        return True
+
+    def _send_hush(self):
+        try:
+            self.client.voice_hush(HUSH_SECONDS)
+            if self._hush_failures:
+                log.info("Void Compass accepted the hush")
+            self._hush_failures = 0
+        except VoidError as error:
+            if error.kind == "offline":
+                self._hush_offline_until = self.clock() + 30.0
+                return
+            self._hush_failures += 1
+            log.info("Void Compass would not hush the Watcher (%s): %s%s", error.kind, error.message or "",
+                     "; I will stop asking" if self._hush_failures >= HUSH_GIVE_UP_AFTER else "")
 
     def start(self):
         if self._thread is not None:
@@ -114,6 +152,9 @@ class WatcherBridge:
         if not self.enabled() or item.get("type") != "voice":
             return
         data = item.get("data") or {}
+        if not data.get("text") and not self._logged_other_voice_event:
+            self._logged_other_voice_event = True          # newer Void Compass sends start/stop events: write one down so we can learn the format
+            log.info("Void Compass voice event without text (start/stop?): %s", item)
         if data.get("from") != "watcher":
             return                                    # our own replay, or something sent by another script
         text = str(data.get("text") or "").strip()
@@ -145,6 +186,8 @@ class WatcherBridge:
             with self._lock:
                 self.held = self.reply_due = None
             return
+        if self.settings.get("watcher.wait_for_calm", True) and not self.calm():
+            self.hush_if_needed()
         with self._lock:
             held, due = self.held, self.reply_due
         now = self.clock()

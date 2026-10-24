@@ -32,6 +32,7 @@ INTENTS = [
     ("Talk_Back", r"(?:i(?: am|m) back|im back|i(?: have|ve) returned)"),
     ("Talk_Compliment", r"(?:good (?:job|girl|work)|well done|nice (?:one|work|job)|great (?:job|work)|you(?: are|re) (?:amazing|brilliant|the best|great|wonderful|awesome|clever|good)|you(?: are|re) doing (?:great|well|brilliantly)|i like you|i appreciate you|i(?: am|m) glad you(?: are|re) here)"),
     ("Talk_Love", r"(?:i love you|love you|i adore you)"),
+    ("Talk_FavouriteShip", r"(?:what(?: is|s) your favou?rite ship|which(?: ship)? (?:is|do you like|do you love) (?:your favou?rite|best)|which ship do you (?:like|love|prefer)(?: the most| best)?|do you have a favou?rite ship|favou?rite ship)"),
     ("Talk_Thinking", r"(?:what are you (?:thinking|up to|doing)|penny for your thoughts|what(?: is|s) on your mind)"),
     ("Talk_Name", r"(?:what(?: is|s) your name|who are you|what are you called|introduce yourself|what should i call you)"),
     ("Talk_What", r"(?:what are you|what kind of (?:ai|thing|computer|machine) are you|what exactly are you|are you (?:a |an )?(?:robot|ai|human|real|person|computer|machine|program|bot|intelligence))"),
@@ -62,7 +63,8 @@ def intent_for(text):
 
 
 class SmallTalk:
-    def __init__(self, speech, dialogue, settings, chitchat=None, mood=None, lore=None, eoc=None):
+    def __init__(self, speech, dialogue, settings, chitchat=None, mood=None, lore=None, eoc=None, favourite=None):
+        self.favourite = favourite       # personality/favourite_ship.py
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -96,6 +98,8 @@ class SmallTalk:
                 return None
         if key == "Talk_More":
             return None
+        if key == "Talk_FavouriteShip":
+            return self._favourite_answer()
         if key == "Talk_Chat" and self.chitchat is not None:
             said = self.chitchat.say_now()                 # speaks by itself
             if said:
@@ -112,4 +116,17 @@ class SmallTalk:
                 self.mood.on_event(Event(name="Complimented", data={}, priority="normal"))
             except Exception:
                 log.exception("Could not record the kind word")
+        return reply
+
+    def _favourite_answer(self):
+        """'What is your favourite ship?' She names it, or says how far along she is."""
+        mood = effective_mood(self.settings) if self.settings.get("personality.style", "personality") == "personality" else ""
+        label = self.favourite.favourite_label() if self.favourite is not None else None
+        key = "Talk_FavouriteShip" if label else "Talk_FavouriteShip_None"
+        line = self.dialogue.pick(key, mood or "", bool(self.settings.get("speech.allow_mature", False)), False)
+        if line is None:
+            return None
+        reply = personalise(line.text.replace("{ship}", label or ""), self.settings)
+        if self.speech is not None and self.settings.get("speech.enabled", True):
+            self.speech.say(text=reply, priority="normal", event_name="smalltalk")
         return reply

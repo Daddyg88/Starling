@@ -164,6 +164,7 @@ class RouteVoice:
         self.clock = time.monotonic
         self._ignore_until = 0.0         # her own galaxy map macro sets targets too: ignore those
         self._last_auto = ""
+        self._home_said = None
         self.edastro = EdAstro()
         self.emergency_file = paths.DATA_DIR / "emergency_route.json"
         self._emergency = self._load_emergency()
@@ -481,6 +482,7 @@ class RouteVoice:
         """Arrived somewhere: if it is the landmark from the emergency protocol, plot the neutron route to the real destination."""
         waiting = self._emergency
         system = str((getattr(event, "data", None) or {}).get("StarSystem") or "")
+        self._welcome_home(system)
         if not waiting or not system or system.casefold() != str(waiting.get("poi", "")).casefold():
             return
         self._set_emergency(None)
@@ -488,6 +490,17 @@ class RouteVoice:
         if not self._busy:
             self._busy = True
             self.spawn(lambda: self._plot_now(waiting["destination"]))
+
+    def _welcome_home(self, system):
+        """Arriving in the system saved as Home (Navigation page > Bookmarks): she welcomes you back, at most once every 20 minutes."""
+        home = str(self.settings.get("bookmarks.home", "") or "").strip()
+        if not home or not system or home.casefold() != system.casefold():
+            return
+        now = self.clock()
+        if self._home_said is not None and now - self._home_said < 1200:
+            return
+        self._home_said = now
+        self.narrator.say("WelcomeHome", {"system": system})
 
     def _set_emergency(self, value):
         self._emergency = value

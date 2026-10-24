@@ -35,7 +35,9 @@ class GameState:
     current_body: Optional[str] = None      # the planet or moon you are near (ApproachBody / SupercruiseExit / Status.json)
     awaiting_discovery: bool = False        # just arrived: the first Scan tells us whether anyone discovered this system
     star_pos: Optional[tuple] = None        # galaxy coordinates (x, y, z) of the system you are in, from FSDJump / Location
+    favourite_ship: Optional[str] = None    # code name of the ship she likes best (personality/favourite_ship.py)
     fsd_target: Optional[str] = None        # the system selected as the jump target (FSDTarget): what "Set Target" does
     route_jumps_left: Optional[int] = None  # RemainingJumpsInRoute from the last FSDTarget
     pending_events: list = field(default_factory=list)   # (name, data) she should announce after this journal line
+    gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     status_seen: bool = False               # True once Status.json has been read

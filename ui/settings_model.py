@@ -168,6 +168,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("watcher.enabled", "Answer the Watcher from Void Compass", "toggle",
                   help="When his voice is on in Void Compass she answers him in her mood. Needs the Local API on, as above"),
             Field("watcher.reply", "How often she answers him", "choice", WATCHER_REPLY),
+            Field("watcher.hush", "Ask Void Compass to keep the Watcher quiet while she talks", "toggle",
+                  help="Needs a recent Void Compass (it has a 'hush' call). If your version has none she notices and stops asking"),
             Field("watcher.wait_for_calm", "Make the Watcher wait for a calm moment", "toggle",
                   help="If he speaks while she is talking, during a warning, in a fight or while jumping, she cuts him off and he repeats it later"),
             Field("ptt.mode", "Push-to-talk", "choice", PTT_MODES,

@@ -99,6 +99,9 @@ def _keys_for(event):
         boost = {"neutron": ["StartJump_Neutron"], "whitedwarf": ["StartJump_WhiteDwarf"]}.get(data.get("Boost"), [])
         return boost + ["StartJump_Scoop" if scoop else "StartJump_NoScoop", "StartJump"]
 
+    if name == "ShipyardSwap":
+        return (["ShipyardSwap_Favourite"] if data.get("Favourite") else []) + ["ShipyardSwap"]
+
     if name == "GlideStarted":
         if data.get("temperature") is not None and data.get("gravity") is not None:
             return (["GlideStarted_Heavy"] if data.get("heavy") else []) + ["GlideStarted_Info", "GlideStarted"]

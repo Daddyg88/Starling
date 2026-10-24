@@ -308,12 +308,21 @@ class CommandRunner:
         custom = (self.settings.get("macros", {}) or {}).get(command.id)
         return custom if isinstance(custom, list) and custom else list(command.macro)
 
+    def galaxy_map_open(self):
+        """True while Status.json says the galaxy map is the screen you are looking at (GuiFocus 6)."""
+        state = self.state_provider()
+        return bool(state is not None and getattr(state, "status_seen", False) and getattr(state, "gui_focus", 0) == 6)
+
     def _run_macro(self, command, intent, text, now, key):
         from control.macros import GAP_SECONDS, actions_in, parse_macro
         try:
             steps = parse_macro(self.macro_steps(command))
         except ValueError as error:
             return Outcome("failed", text, command, intent, detail="The %s macro in your settings is wrong: %s" % (command.label, error))
+        if command.id == "plot_waypoint" and self.galaxy_map_open() and steps and steps[0] == ("press", "GalaxyMapOpen", 1):
+            steps = steps[1:]                                    # the map is already open: pressing its key would CLOSE it
+            if steps and steps[0][0] == "wait":
+                steps = [("wait", 0.4)] + steps[1:]
         hook = self.macro_hooks.get(command.id)
         if hook is not None:
             ok, sentence = hook()

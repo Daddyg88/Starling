@@ -128,6 +128,7 @@ class MoodEngine:
         self.speak = speak
         self.clock = clock
         self.persist = persist
+        self.good_listener = None          # called with every gain: the favourite-ship counter
         self.wanted_provider = wanted_provider or (lambda: False)   # True while the game says you are wanted
 
         now = self.clock()
@@ -470,6 +471,11 @@ class MoodEngine:
         if abs(applied) < 0.05:
             return
         self._window.append((now, applied))
+        if applied > 0 and self.good_listener is not None:
+            try:
+                self.good_listener(applied)
+            except Exception:
+                log.exception("The favourite ship counter failed")
         before = self.band
         self.score = max(-100.0, min(100.0, self.score + applied))
         self.band = self._band_for(self.score, self.band)

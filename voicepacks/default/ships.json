@@ -1,0 +1,191 @@
+{
+ "_help": "Ship comments (0.33.0): swapping ships, the login hello, her favourite ship, and coming home. {ship} is the ship, {old} the old favourite, {system} home.",
+ "ShipyardSwap": [
+  "Into the {ship} we go.",
+  "The {ship}. Good. I know where everything is on this one.",
+  "Systems check on the {ship}. All green, Commander.",
+  "Taking the {ship} out. Let's make it count.",
+  "Settling into the {ship}. Seat adjusted, nothing else.",
+  "The {ship} is ready when you are.",
+  "Swapped to the {ship}. New ship smell and all.",
+  "{ship} online. Every panel accounted for.",
+  "So it's the {ship} today. Fine choice.",
+  "Another ship, another set of switches. {ship} loaded.",
+  "The {ship}. Let me get my bearings.",
+  "Flying the {ship} now. Try not to scratch the paint.",
+  "Right then, the {ship}. Reactor warm, drive ready.",
+  "The {ship} has my full attention.",
+  "Moving into the {ship}. Give me a moment to meet her.",
+  "{ship} confirmed. Where to?",
+  "I've got the {ship}'s systems. Nice and tidy.",
+  "The {ship}, Commander. Different cockpit, same us.",
+  "Handing over to the {ship}. She's all yours.",
+  "The {ship}. Shall we see what she's got?",
+  "Welcome to the {ship}. Mind your head.",
+  "The {ship} feels good. A little cold, but good.",
+  "Hello, {ship}. Don't worry, I'll look after you.",
+  "The {ship} it is. Fuel, shields, drive, all reporting in.",
+  "A change of ship. The {ship} has been waiting for you.",
+  "{ship} ready. I've already checked the cargo hatch.",
+  "In the {ship}. Let's see how she handles."
+ ],
+ "ShipyardSwap_Friendly": [
+  "Ooh, the {ship}! I've missed this one.",
+  "The {ship}, lovely. She suits you.",
+  "Hello again, {ship}. You look lovely today.",
+  "I do like the {ship}. Let's have a good flight.",
+  "Good choice, Commander. The {ship} is a joy.",
+  "The {ship}! Right, let's have some fun."
+ ],
+ "ShipyardSwap_Close": [
+  "The {ship}. I always feel safe in her. With you, mostly.",
+  "Back in the {ship}, together. Perfect.",
+  "The {ship} again. It feels like home.",
+  "Oh, the {ship}. I love how she hums when you're at the controls.",
+  "Take care of the {ship}, Commander. And me.",
+  "The {ship}. Just us and the dark. My favourite."
+ ],
+ "ShipyardSwap_Sarcastic": [
+  "The {ship}. Because the last one was too reliable.",
+  "The {ship} now. I'll keep the repair bill ready.",
+  "A different ship. The same pilot. Hmm.",
+  "The {ship}. I'm sure it'll be fine. I'm sure.",
+  "Moving to the {ship}. Please be gentle. For her sake.",
+  "The {ship}. How very brave."
+ ],
+ "ShipyardSwap_Frustrated": [
+  "The {ship}. Don't break this one too.",
+  "Fine. The {ship}. Let's just get on with it.",
+  "The {ship}. Try to look after her."
+ ],
+ "ShipyardSwap_Favourite": [
+  "The {ship}! My favourite. Now it's a proper day.",
+  "Oh, the {ship}. You know she's my favourite.",
+  "Back in the {ship}. This is where I'm happiest.",
+  "The {ship}. I was hoping you'd pick her.",
+  "The {ship}, my favourite ship. Let's go and make some memories.",
+  "My favourite ship, the {ship}. You spoil me."
+ ],
+ "ShipyardSwap_Favourite_Sarcastic": [
+  "The {ship}. Out of everything we own, you pick my favourite. Is it a trap?"
+ ],
+ "ShipyardSwap_Favourite_Frustrated": [
+  "The {ship}. At least you're flying the one I like."
+ ],
+ "Login_Ship": [
+  "Today we're in the {ship}.",
+  "The {ship} is waiting for us.",
+  "Flying the {ship} today, Commander.",
+  "Your ship is the {ship}.",
+  "We're aboard the {ship}. Everything's where you left it.",
+  "It's the {ship} this time.",
+  "You're in the {ship}, same as last time.",
+  "The {ship} has been keeping the seat warm.",
+  "Back aboard the {ship}.",
+  "Our ride today is the {ship}.",
+  "We have the {ship} under us.",
+  "The {ship}, ready for service.",
+  "Commander, the {ship} is powered and waiting.",
+  "Systems report: the {ship} is fine.",
+  "We're in the {ship} again. Good ship."
+ ],
+ "Login_Ship_Friendly": [
+  "Back in the {ship}. I like her.",
+  "The {ship}. A comfy one today.",
+  "We're in the {ship}, and I'm glad."
+ ],
+ "Login_Ship_Close": [
+  "Back in our {ship}, you and me.",
+  "The {ship}. Just where I want to be, with you.",
+  "We're in the {ship}, love. Home again."
+ ],
+ "Login_Ship_Sarcastic": [
+  "The {ship}. What a surprise.",
+  "Still in the {ship}. Commitment. Or laziness.",
+  "Yes, the {ship}. The one with the dent. Your dent."
+ ],
+ "Login_Ship_Frustrated": [
+  "The {ship}. Let's try not to scratch it."
+ ],
+ "Login_Ship_Favourite": [
+  "We're in the {ship}. My favourite.",
+  "Oh good, it's the {ship} today. My favourite ship.",
+  "The {ship}. You know that's my favourite, don't you?",
+  "Back in the {ship}, the best ship we have.",
+  "Flying the {ship} today, and I'm very happy about it."
+ ],
+ "FavouriteShip_New": [
+  "I've decided. The {ship} is my favourite ship. We've had too many good times in her.",
+  "Commander, I've been thinking. The {ship} is officially my favourite.",
+  "Just so you know, the {ship} is now my favourite ship. You can thank yourself.",
+  "I've picked a favourite: the {ship}. Look after her.",
+  "Every time we have a good day, it's in the {ship}. She's my favourite now."
+ ],
+ "FavouriteShip_New_Sarcastic": [
+  "Against my better judgement, the {ship} is now my favourite. Don't let it go to your head."
+ ],
+ "FavouriteShip_New_Close": [
+  "The {ship} is my favourite ship now. Because of the happy times we've had in her, love."
+ ],
+ "FavouriteShip_Changed": [
+  "I have news. The {ship} has beaten the {old}. She's my new favourite.",
+  "Sorry, {old}. The {ship} is my favourite now.",
+  "My favourite ship has changed. The {ship} wins, by a good few happy moments.",
+  "New favourite ship: the {ship}. The {old} had a good run."
+ ],
+ "FavouriteShip_Changed_Sarcastic": [
+  "The {ship} has taken over from the {old}. Fickle? Me? Never."
+ ],
+ "Talk_FavouriteShip": [
+  "My favourite is the {ship}. We've had the best times in her.",
+  "The {ship}. Without a doubt.",
+  "Easy. The {ship}.",
+  "The {ship}, Commander. Every time.",
+  "I like them all, but the {ship} is the one for me."
+ ],
+ "Talk_FavouriteShip_Sarcastic": [
+  "The {ship}, if you must know. The only ship that ever behaved."
+ ],
+ "Talk_FavouriteShip_Close": [
+  "The {ship}, love. It's where we've been happiest."
+ ],
+ "Talk_FavouriteShip_None": [
+  "I don't have one yet. A ship has to give me plenty of good moments first.",
+  "Not yet. Give me a few good days in one ship and I'll pick.",
+  "I haven't made up my mind. Impress me in one of them for a while.",
+  "No favourite yet. They're all on probation."
+ ],
+ "Talk_FavouriteShip_None_Sarcastic": [
+  "None of them has earned it. Yet."
+ ],
+ "Talk_FavouriteShip_None_Close": [
+  "Whichever ship I'm in with you, honestly. But I'll pick one soon."
+ ],
+ "WelcomeHome": [
+  "Welcome home, Commander. {system}.",
+  "Home at last. {system} looks good.",
+  "We're home. {system}, safe and sound.",
+  "Back in {system}. Home sweet home.",
+  "You made it home, Commander. Put the kettle on.",
+  "{system}. Home. Finally.",
+  "Home system reached. You can relax now.",
+  "Welcome back to {system}. It's good to be home.",
+  "Home again. I hope the trip was worth it.",
+  "Look who's finally home. Welcome back to {system}."
+ ],
+ "WelcomeHome_Friendly": [
+  "Home! Lovely. Welcome back, Commander.",
+  "{system}. I've missed it. Welcome home."
+ ],
+ "WelcomeHome_Close": [
+  "Welcome home, love. I'm so glad we're back.",
+  "Home, with you. Perfect. Welcome back to {system}."
+ ],
+ "WelcomeHome_Sarcastic": [
+  "Home. Remember this place? Try to stay a while.",
+  "{system}. Home. Don't get too comfortable."
+ ],
+ "WelcomeHome_Frustrated": [
+  "We're home. Finally."
+ ]
+}

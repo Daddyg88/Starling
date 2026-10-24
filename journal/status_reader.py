@@ -112,6 +112,7 @@ class StatusReader:
         state = getattr(self.processor, "state", None)
         if state is not None:
             state.status_flags, state.status_flags2, state.status_seen = flags, flags2, flags != 0
+            state.gui_focus = int(status.get("GuiFocus") or 0)
             main = (status.get("Fuel") or {}).get("FuelMain")
             if isinstance(main, (int, float)):
                 state.fuel_main = float(main)

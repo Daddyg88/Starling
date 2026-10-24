@@ -111,6 +111,16 @@ class RunMacro(unittest.TestCase):
         self.assertEqual([h for _, h in self.rec.events if h], [0.2, 1.2])  # zoom in briefly, then hold select
         self.assertEqual(self.parts["copied"][-1], "Neutron A")             # the clipboard was filled first
 
+    def test_open_galaxy_map_is_not_toggled_closed(self):
+        r = self.runner()
+        r.state_provider = lambda: type("S", (), {"status_seen": True, "gui_focus": 6, "status_flags": 0, "status_flags2": 0})()
+        outcome = r.run_text("plot the next waypoint")[0]
+        self.assertEqual(outcome.status, "done")
+        pressed = [e[0] for e in self.rec.events]
+        g, u = (Keystroke(k).describe() for k in ("Key_G", "Key_U"))
+        self.assertNotIn(g, pressed)                     # the map key was never pressed (it would have closed the map)
+        self.assertEqual(pressed[0], u)
+
     def test_no_route_means_no_key_presses(self):
         r = self.runner()
         self.parts["follower"].clear()

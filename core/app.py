@@ -165,6 +165,11 @@ class App:
                                speak=lambda text: self.speech.say(text=text, priority="normal", event_name="mood.react")
                                if self.speech is not None else None)
         self.mood.attach()
+        from personality.favourite_ship import FavouriteShip
+        self.favourite_ship = FavouriteShip(
+            lambda: self.state, self.settings, persist=self._record_events,
+            say=lambda key, fields: self._say_line(key, fields))
+        self.mood.good_listener = self.favourite_ship.add
 
         # Questions she asks out loud (facts, valuable planets, life) and the yes/no answers.
         from personality.ask import AskManager
@@ -208,7 +213,7 @@ class App:
         from personality.eoc import EOCTeller
         self.eoc = EOCTeller(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state)
         self.smalltalk = SmallTalk(self.speech, self.dialogue, self.settings, chitchat=self.chitchat, mood=self.mood, lore=self.lore,
-                                   eoc=self.eoc)
+                                   eoc=self.eoc, favourite=getattr(self, "favourite_ship", None))
         from personality.brain import Brain
         from mining import minerals
         minerals.bind(self.settings)          # the Mining page's ten favourite minerals
@@ -512,6 +517,26 @@ class App:
             if (getattr(self.state, "status_flags", 0) or 0) & (1 << 6):      # bit 6 = hardpoints deployed
                 runner.run_text("weapons away", speak_unknown=False)
         threading.Thread(target=go, name="nomad-stow", daemon=True).start()
+
+    def _say_line(self, key, fields=None):
+        """Speak a line of dialogue in her current mood, filling in {gaps} (used by the favourite ship)."""
+        if self.speech is None or self.dialogue is None or not self.settings.get("speech.enabled", True):
+            return False
+        from core.identity import personalise
+        from personality.mood_engine import effective_mood
+        info = self.settings.get("personality.style", "personality") == "info"
+        line = self.dialogue.pick(key, "" if info else effective_mood(self.settings), bool(self.settings.get("speech.allow_mature", False)), False)
+        if line is None:
+            return False
+
+        class _Quiet(dict):
+            def __missing__(self, k):
+                return ""
+        try:
+            text = line.text.format_map(_Quiet(fields or {}))
+        except (ValueError, IndexError):
+            text = line.text
+        return bool(self.speech.say(text=personalise(text, self.settings), priority="normal", event_name="personality.favourite"))
 
     def honk_now(self):
         """The dashboard's test button. Returns a sentence for the screen."""

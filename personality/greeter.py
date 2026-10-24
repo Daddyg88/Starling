@@ -126,7 +126,8 @@ class LoginGreeter:
         if opener and self.flavour is not None and personality:
             opener = self.flavour.rename(opener)
         parts.append(opener)
-        parts.append(self._say("Login_Ship", mood, values))
+        is_favourite = bool(getattr(state, "favourite_ship", None)) and str(getattr(state, "ship", "") or "").lower() == state.favourite_ship
+        parts.append((self._say("Login_Ship_Favourite", mood, values) if is_favourite else None) or self._say("Login_Ship", mood, values))
 
         where = self._where(location, state, mood, values)
         parts.append(where)
