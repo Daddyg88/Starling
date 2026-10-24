@@ -55,14 +55,13 @@ DOCKING_MACRO = ("FocusLeftPanel", "wait 0.85", "CycleNextPanel", "wait 0.4", "C
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
 # Auto launch from a station: Select on the Launch button of the station menu. Only works while docked (see core/app.py). If
 # your menu needs more presses, put your own steps in config/settings.json under macros.auto_launch.
-# 0.34.0: now the commander's own recording (12:31): hop through the left and right panels to wake the station menu,
-# tap the focus button to clear them, then Down and Select (Launch). The last two are the menu keys (UI_Down / UI_Select),
-# the same buttons the recorder showed as ResetPowerDistribution / SelectTarget. 0.34.1: one more Select at the
-# end (the first one only highlighted Launch in the commander's game).
-LAUNCH_MACRO = ("FocusLeftPanel", "wait 0.85", "CycleNextPanel x2", "wait 0.6", "CyclePreviousPanel", "wait 0.45",
-                "CyclePreviousPanel", "wait 0.8", "FocusRightPanel", "wait 0.85", "CycleNextPanel x4", "wait 0.6",
-                "CyclePreviousPanel x4", "wait 0.55", "hold UIFocus 0.5", "wait 0.55", "UI_Down", "wait 0.5",
-                "UI_Select", "wait 0.8", "UI_Select")
+# 0.34.2: the commander's second recording (13:25). Left panel: Next Tab x2, Previous Tab x2, Back to close it. Right
+# panel: Next Tab x5, Previous Tab x5, Back to close it. Then wait for the panels to go, Down and Select (Launch). The last
+# two are the menu keys (UI_Down / UI_Select), the same buttons the recorder showed as ResetPowerDistribution / SelectTarget.
+# (0.34.0/0.34.1 closed the panels with the focus button instead of Back, so the Down and Select probably hit the panel.)
+LAUNCH_MACRO = ("FocusLeftPanel", "wait 1.35", "CycleNextPanel x2", "wait 0.9", "CyclePreviousPanel x2", "wait 1.1",
+                "UI_Back", "wait 0.9", "FocusRightPanel", "wait 1.25", "CycleNextPanel x5", "wait 0.25",
+                "CyclePreviousPanel x5", "wait 0.9", "UI_Back", "wait 2", "UI_Down", "wait 0.6", "UI_Select")
 NOMAD_MACRO = ("FocusRadarPanel", "wait 0.8", "UI_Down", "wait 0.2", "UI_Right", "wait 0.2", "UI_Select")
 
 # Plot the next neutron waypoint, hands free (the clipboard already holds its name, see navigation/route.py).

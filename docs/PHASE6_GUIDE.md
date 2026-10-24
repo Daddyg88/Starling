@@ -458,3 +458,6 @@ Not tested in the game (I can't run Elite). If a pause is too short or long, put
 
 ### 0.34.1
 Auto launch now presses Select twice at the end (0.8 s apart). Untested in game; edit `macros.auto_launch` in `config/settings.json` if it needs a different pause.
+
+### 0.34.2
+Auto launch follows your 13:25 recording: both panels are closed with Back, then Down and Select. Untested in game (the recording shows no Undocked line, so I could not see the launch itself).
