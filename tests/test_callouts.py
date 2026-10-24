@@ -996,3 +996,16 @@ class WatcherLines(unittest.TestCase):
         for mood, least in (("Neutral", 30), ("Friendly", 38), ("Close", 38), ("Sarcastic", 38), ("Frustrated", 38),
                             ("Infatuated", 10), ("Upset", 10)):
             self.assertGreaterEqual(len(said_by("WatcherReply_" + mood)), least, mood)
+
+
+class OnFootClashesIgnored(unittest.TestCase):
+    def test_on_foot_actions_never_count_as_clashes(self):
+        from tests.test_callouts import KeyClashReport
+        xml = """<Root>
+  <UI_Select><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></UI_Select>
+  <HumanoidInteractButton><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></HumanoidInteractButton>
+  <UI_Select_Humanoid><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></UI_Select_Humanoid>
+</Root>"""
+        r = KeyClashReport().runner(xml)
+        self.assertEqual(r.binding_conflicts(), [])
+        self.assertEqual(r.book.conflicts("UI_Select"), [])

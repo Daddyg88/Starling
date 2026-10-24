@@ -216,7 +216,7 @@ class BindingBook:
         """True when another (ship) action uses the same keyboard key and shift keys as this slot."""
         mine = (_norm_key(mine_slot.key), frozenset(_norm_key(m[1]) for m in mine_slot.modifiers))
         for other, slots in self._actions.items():
-            if other == action or other.endswith(self.CONTEXT_VARIANTS) or other.startswith(("Humanoid", "Vanity", "FreeCam", "HeadLook")):
+            if other == action or other.endswith(self.CONTEXT_VARIANTS) or "Humanoid" in other or other.startswith(("Vanity", "FreeCam", "HeadLook")):
                 continue
             for slot in slots:
                 if slot.is_empty() or slot.device.lower() != "keyboard":
@@ -242,7 +242,7 @@ class BindingBook:
         mine = (_norm_key(stroke.key), frozenset(_norm_key(m) for m in stroke.modifiers))
         found = []
         for other, slots in self._actions.items():
-            if other == action or other.endswith(self.CONTEXT_VARIANTS) or other.startswith(("Humanoid", "Vanity", "FreeCam", "HeadLook")):
+            if other == action or other.endswith(self.CONTEXT_VARIANTS) or "Humanoid" in other or other.startswith(("Vanity", "FreeCam", "HeadLook")):
                 continue
             for slot in slots:
                 if slot.is_empty() or slot.device.lower() != "keyboard":
