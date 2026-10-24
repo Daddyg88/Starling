@@ -1,0 +1,46 @@
+{
+ "_help": "Galaxy region announcements. Field: {region}.",
+ "RegionEntered": [
+  "Entering {region}.",
+  "We've crossed into {region}.",
+  "Welcome to {region}, Commander.",
+  "This is {region} now.",
+  "Region change. {region}."
+ ],
+ "RegionEntered_Friendly": [
+  "Crossing into {region}. Nice change of scenery.",
+  "We're in {region} now, Commander."
+ ],
+ "RegionEntered_Close": [
+  "Onwards into {region}, love. I'm right here with you.",
+  "{region}. Another stretch of sky for the two of us."
+ ],
+ "RegionEntered_Sarcastic": [
+  "{region}. Congratulations, the sky looks exactly the same.",
+  "We've left one patch of darkness for {region}. Thrilling."
+ ],
+ "RegionEntered_Frustrated": [
+  "{region}. Fine."
+ ],
+ "RegionFirst": [
+  "Entering {region}. We've never been here before.",
+  "{region}. First time in this region, Commander.",
+  "New territory. Welcome to {region}.",
+  "We've just entered {region} for the very first time."
+ ],
+ "RegionFirst_Friendly": [
+  "{region}. A brand new region for us, Commander. Exciting.",
+  "First time in {region}. Enjoy it."
+ ],
+ "RegionFirst_Close": [
+  "Our first time in {region}, love. I like sharing these with you.",
+  "A new region, {region}, and you brought me along. Thank you."
+ ],
+ "RegionFirst_Sarcastic": [
+  "{region}, never visited. Do try not to get us lost.",
+  "First time in {region}. Put it on the list of places we've broken nothing in yet."
+ ],
+ "RegionFirst_Frustrated": [
+  "{region}. New. Don't expect me to be thrilled."
+ ]
+}

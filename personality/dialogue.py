@@ -110,6 +110,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "jumps.json"))         # many more jump lines, plain and dry as well as warm
             self._merge(_read_json(self.pack_dir / "ships.json"))         # ship comments, favourite ship, welcome home
             self._merge(_read_json(self.pack_dir / "callouts.json"))      # glide, scoopable star, undiscovered system, jumps left
+            self._merge(_read_json(self.pack_dir / "regions.json"))       # entering a galaxy region, first time in a region
             self._merge(_read_json(self.pack_dir / "messages.json"))      # incoming chat read aloud
             self._merge(_read_json(self.pack_dir / "carriers.json"))      # routes to the fleet carrier and the squad carrier
             self._merge(_read_json(self.pack_dir / "launch.json"))        # "I have control", "checking systems", launch speech

@@ -527,3 +527,14 @@ Wing, squadron, local, friend, direct, system and crew messages that arrive in t
 Two switches on the Personality page: **Read my incoming messages out loud** (on) and **Also read computer-controlled ships and stations** (off: pirates, stations and police talk a lot). Her lines are in `voicepacks/default/messages.json`.
 
 Not tested with the real game: the journal field names (`From`, `Message`, `Channel`, `_Localised`) are from the Elite journal manual.
+
+## 0.37.0: galaxy regions
+
+When a jump (or a carrier jump) takes you into a different galaxy region she says its name ("Entering the Galactic Centre"), and if you have never been in that region before the line says so ("First time in ..."). Nothing is said when you load the game, only on a jump into another region.
+
+- The region is worked out from the system's coordinates (`StarPos` in the journal) with the community region map (42 regions) in `navigation/region_data.py`, by Ben Peddell, MIT licence (`docs/THIRD_PARTY.md`).
+- The first time she runs she reads all your old journal files once, in the background, to learn which regions you have already visited. This can take a few seconds to a minute if you have years of journals. Until it finishes she announces the region but does not claim it is new. The result is kept in `data/regions_visited.json`; delete that file to make her scan again.
+- Switch it off on the Exploration page: **Announce the galaxy region I enter**.
+- Her lines are in `voicepacks/default/regions.json`.
+
+Not tested with the real game: the region map was checked against known systems (Sol is Inner Orion Spur, Sagittarius A* is the Galactic Centre) but not against live jumps. The game shows the region of the boxel corner in some cases, so right at a region edge she may disagree with the galaxy map by one jump.

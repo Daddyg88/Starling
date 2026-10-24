@@ -79,6 +79,7 @@ class App:
         self.autohonk = None
         self.combat_assist = None
         self.watcher = None
+        self.region_tracker = None
         self.route_voice = None
         self.route_follower = None
         self.ask = None
@@ -492,6 +493,22 @@ class App:
             self.route_voice = None
         return self.route_voice
 
+    def ensure_regions(self):
+        """Announces the galaxy region you jump into (and the first time you are in it). Safe to call twice."""
+        if getattr(self, "region_tracker", None) is not None:
+            return self.region_tracker
+        try:
+            from navigation.regions import RegionTracker
+            from navigation.voice import Narrator
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.region_tracker = RegionTracker(self.bus, narrator, self.settings, lambda: self.state,
+                                                journal_folder=self.journal_folder)
+            self.region_tracker.attach()
+        except Exception:
+            self.log.exception("The region announcer could not start")
+            self.region_tracker = None
+        return self.region_tracker
+
     def ensure_autohonk(self):
         """Auto honk on arrival. Always attached; the dashboard setting decides whether it does anything."""
         if self.autohonk is not None:
@@ -579,6 +596,7 @@ class App:
         self.bus.subscribe("NomadDocked", self.on_nomad_docked)
         self.ensure_combat_assist()
         self.ensure_route()
+        self.ensure_regions()
         poll = self.settings.get("journal.poll_seconds", 1.0)
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
         self.monitor.start()
@@ -592,6 +610,9 @@ class App:
         if self.warmer is not None:
             self.warmer.stop()
             self.warmer = None
+        if getattr(self, "region_tracker", None) is not None:
+            self.region_tracker.detach()
+            self.region_tracker = None
         if getattr(self, "message_reader", None) is not None:
             self.message_reader.detach()
             self.message_reader = None

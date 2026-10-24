@@ -204,6 +204,8 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("exploration", "Exploration", "Scanning, discoveries, fuel scooping and the honk.", [
             Field("talk.exploration", "She comments on exploration", "toggle",
                   help="Scans of interesting bodies, signals, codex finds, exploration data sales and fuel scooping. Off = quiet, safety warnings are never silenced"),
+            Field("regions.announce", "Announce the galaxy region I enter", "toggle",
+                  help="Says the region's name when you jump into a new one, and when it is your first time there"),
             Field("ask.scan_prompts", "Ask if we should scan valuable planets", "toggle",
                   help="Earth-like worlds, water worlds and other good finds. Saying nothing costs a little mood; saying no does not"),
             Field("nomad.stow_hardpoints", "Put the hardpoints away when the Nomad docks", "toggle",
