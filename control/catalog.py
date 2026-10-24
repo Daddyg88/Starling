@@ -47,9 +47,9 @@ MACROS = {
 # Next Tab twice (Navigation to Contacts), Right, Select (that sends the request; the game answered 0.35 s later),
 # wait, then Back to close the panel. The waits are the commander's own pace: lower them in config/settings.json if
 # you want it faster (macros.request_docking).
-# 0.34.0: re-recorded (the commander's own recording from 12:38): Next Tab twice, a pause, Select (the game answered 0.5 s
-# later with DockingRequested then DockingGranted), then Previous Tab twice and Back to close the panel.
-DOCKING_MACRO = ("FocusLeftPanel", "wait 0.85", "CycleNextPanel", "wait 0.4", "CycleNextPanel", "wait 1.2",
+# 0.34.4: back to the step that worked in 0.10.4 (Right before Select, so the cursor is on the request button), then the
+# commander's 0.34.0 recording for the close-out: Select, Previous Tab twice, Back.
+DOCKING_MACRO = ("FocusLeftPanel", "wait 1.2", "CycleNextPanel x2", "wait 1.2", "UI_Right", "wait 0.7",
                  "UI_Select", "wait 1.45", "CyclePreviousPanel x2", "wait 0.75", "UI_Back")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
@@ -59,9 +59,11 @@ DOCKING_MACRO = ("FocusLeftPanel", "wait 0.85", "CycleNextPanel", "wait 0.4", "C
 # panel: Next Tab x5, Previous Tab x5, Back to close it. Then wait for the panels to go, Down and Select (Launch). The last
 # two are the menu keys (UI_Down / UI_Select), the same buttons the recorder showed as ResetPowerDistribution / SelectTarget.
 # (0.34.0/0.34.1 closed the panels with the focus button instead of Back, so the Down and Select probably hit the panel.)
-LAUNCH_MACRO = ("FocusLeftPanel", "wait 1.35", "CycleNextPanel x2", "wait 0.9", "CyclePreviousPanel x2", "wait 1.1",
-                "UI_Back", "wait 0.9", "FocusRightPanel", "wait 1.25", "CycleNextPanel x5", "wait 0.25",
-                "CyclePreviousPanel x5", "wait 0.9", "UI_Back", "wait 2", "UI_Down", "wait 0.6", "UI_Select")
+# 0.34.4: "say Launch_Start" and friends make her talk her way through it ("I have control", "checking systems"...).
+LAUNCH_MACRO = ("say Launch_Start", "FocusLeftPanel", "wait 1.35", "CycleNextPanel x2", "wait 0.9", "CyclePreviousPanel x2",
+                "wait 1.1", "UI_Back", "wait 0.9", "FocusRightPanel", "say Launch_Systems", "wait 1.25", "CycleNextPanel x5",
+                "wait 0.25", "CyclePreviousPanel x5", "wait 0.9", "UI_Back", "say Launch_Go", "wait 2", "UI_Down", "wait 0.6",
+                "UI_Select")
 NOMAD_MACRO = ("FocusRadarPanel", "wait 0.8", "UI_Down", "wait 0.2", "UI_Right", "wait 0.2", "UI_Select")
 
 # Plot the next neutron waypoint, hands free (the clipboard already holds its name, see navigation/route.py).
@@ -368,7 +370,13 @@ CATALOG = [
 
     C("auto_launch", "UI_Select", "the launch",
       press=["launch", "auto launch", "[(please|ok)] launch (the ship|us|now)", "(launch|take off|lift off|depart) (from|out of|off) [the] (station|port|pad|dock|starport|outpost)",
-             "(auto|automatic) (launch|take off)", "{REQUEST_V} (launch|take off)", "undock", "(undock|launch) [the] ship", "take off", "launch us"],
+             "(auto|automatic) (launch|take off)", "{REQUEST_V} (launch|take off)", "undock", "(undock|launch) [the] ship", "take off", "launch us",
+             "[(number one|number 1|number|one|ok|okay|alright|right|computer|starling)] (take|get|bring) (us|her|the ship) (out|off|away|underway)",
+             "(take|get|bring) (us|her|the ship) out of (here|the station|the dock|the port|the hangar)",
+             "(you|starling) (have|has) (control|the (helm|conn|con|ship|controls|wheel))", "you've got (control|the (helm|conn|ship|controls))",
+             "(the )?(ship|helm|conn|controls) (is|are) yours", "take (control|the helm|the conn|the controls)",
+             "(take|make) (it|us) (out|away) (please|now)", "(engage|begin|start) (the )?(launch|undock|undocking)( sequence)?",
+             "(let's|lets) get out of here", "(launch|undock|take off) (please|now)"],
       doing={"press": "Launching"}, strict=True, macro=LAUNCH_MACRO),
 
     C("plot_waypoint", "GalaxyMapOpen", "the next waypoint",

@@ -470,3 +470,10 @@ Your Elite controls have Enter on both UI Select and Quick Comms Panel, so out i
 2. Or take Enter off **Quick Comms Panel** (Comms section).
 
 The "Key clash" warning in the log tells you which actions share a key.
+
+## 0.34.4: launch talk, "take us out", docking
+
+- **Auto launch talks**: she says a line when she starts ("I have control"), one while the panels are checked ("Checking systems"), and one just before undocking ("All systems green. Taking us out."). The lines are in `voicepacks/default/launch.json` (keys `Launch_Start`, `Launch_Systems`, `Launch_Go`, plus a few per mood). Add your own lines there.
+- **New ways to ask** (docked only): "take us out", "number one, take us out", "you have control", "you have the helm", "take her out", "get us out of here", "the ship is yours", "take the helm", "engage launch sequence".
+- **Macro speech**: a macro step like `"say Launch_Go"` makes her say a line from that dialogue key. If you write your own `macros.auto_launch` without `say` steps she just confirms as before.
+- **Request docking** presses Right again before Select (the step that worked in 0.10.4). Untested in game. If it still fails, edit `macros.request_docking` in `config/settings.json`.

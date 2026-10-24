@@ -9,6 +9,7 @@ A step is one of:
     "hold UI_Select 1.5"   hold that key down for 1.5 seconds (longest 5)
     "paste"                press Ctrl+V (pastes what is on the clipboard, e.g. the next neutron waypoint)
     "enter"                press the Enter key
+    "say Launch_Start"     she says a line from that dialogue key (used by auto launch: "I have control")
 """
 
 import re
@@ -23,7 +24,7 @@ _STEP = re.compile(r"^\s*([A-Za-z0-9_]+)\s*(?:[x*]\s*(\d+))?\s*$")
 
 
 def parse_macro(steps):
-    """[("wait", s) | ("press", action, count) | ("hold", action, s) | ("literal", "paste"|"enter")] - raises ValueError for a step that makes no sense."""
+    """[("say", key) | ("wait", s) | ("press", action, count) | ("hold", action, s) | ("literal", "paste"|"enter")] - raises ValueError for a step that makes no sense."""
     parsed = []
     for raw in steps or ():
         text = str(raw).strip()
@@ -37,6 +38,12 @@ def parse_macro(steps):
             parsed.append(("wait", max(0.0, min(seconds, MAX_WAIT))))
             continue
         lowered = text.lower()
+        if lowered.startswith("say "):
+            key = text[4:].strip()
+            if not re.match(r"^[A-Za-z0-9_]+$", key):
+                raise ValueError("I don't understand this say step (write it like: say Launch_Start): %r" % text)
+            parsed.append(("say", key))
+            continue
         if lowered in LITERALS:
             parsed.append(("literal", lowered))
             continue

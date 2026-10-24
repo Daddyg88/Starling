@@ -879,6 +879,7 @@ class NewMacros(unittest.TestCase):
         for m in (LAUNCH_MACRO, DOCKING_MACRO):
             self.assertTrue(parse_macro(list(m)))
         self.assertEqual(LAUNCH_MACRO[-3:], ("UI_Down", "wait 0.6", "UI_Select"))
+        self.assertEqual([s for s in LAUNCH_MACRO if s.startswith("say ")], ["say Launch_Start", "say Launch_Systems", "say Launch_Go"])
         self.assertEqual(LAUNCH_MACRO.count("UI_Back"), 2)
         self.assertEqual(DOCKING_MACRO[-1], "UI_Back")
 
@@ -897,3 +898,60 @@ class PreferUnsharedKey(unittest.TestCase):
         self.assertEqual(book.lookup("UI_Select")[0].key, "Key_Numpad_Enter")
         self.assertEqual(book.lookup("UI_Back")[0].key, "Key_Backspace")
         self.assertEqual(book.lookup("QuickCommsPanel")[0].key, "Key_Enter")
+
+
+class LaunchTalk(unittest.TestCase):
+    PHRASES = ("take us out", "number one take us out", "Number 1, take us out.", "you have control", "you have the helm",
+               "take her out please", "get us out of here", "starling take us out", "take control", "the ship is yours")
+    NOT = ("let's go", "it's yours", "all yours", "make it so", "what's going on")
+
+    def runner(self):
+        from tests.test_macros import MacroTests
+        t = MacroTests()
+        return t, t.build()
+
+    def test_many_ways_to_hand_over_and_launch(self):
+        t, r = self.runner()
+        for text in self.PHRASES:
+            m = r.matcher.match(text)
+            self.assertIsNotNone(m, text)
+            self.assertEqual(m.command.id, "auto_launch", text)
+
+    def test_everyday_phrases_do_not_launch(self):
+        t, r = self.runner()
+        for text in self.NOT:
+            m = r.matcher.match(text)
+            self.assertTrue(m is None or m.command.id != "auto_launch", text)
+
+    def test_say_step_parses_and_needs_no_key(self):
+        from control.macros import actions_in, parse_macro
+        steps = parse_macro(["say Launch_Start", "UI_Select"])
+        self.assertEqual(steps[0], ("say", "Launch_Start"))
+        self.assertEqual(actions_in(steps), ["UI_Select"])
+        with self.assertRaises(ValueError):
+            parse_macro(["say not a key!"])
+
+    def test_launch_has_lots_of_lines_in_every_part(self):
+        from tests.test_dialogue import said_by
+        for key in ("Launch_Start", "Launch_Systems", "Launch_Go"):
+            self.assertGreaterEqual(len(said_by(key)), 25, key)
+            for mood in ("Friendly", "Close", "Sarcastic", "Frustrated"):
+                self.assertGreaterEqual(len(said_by("%s_%s" % (key, mood))), 5, key + mood)
+
+    def test_launching_talks_three_times_and_skips_the_generic_line(self):
+        from tests.test_dialogue import said_by
+        t, r = self.runner()
+        r.run_text("number one take us out")
+        said = [kw["text"] for kw in t.speech.said]
+        self.assertEqual(len(said), 3, said)
+        pools = [said_by(k) | said_by(k + "_Friendly") | said_by(k + "_Close") | said_by(k + "_Sarcastic") | said_by(k + "_Frustrated")
+                 for k in ("Launch_Start", "Launch_Systems", "Launch_Go")]
+        for text, pool in zip(said, pools):
+            self.assertTrue(any(line.split("{")[0].strip()[:12] in text for line in pool) or text, text)
+
+    def test_a_custom_launch_macro_without_say_steps_still_confirms(self):
+        from tests.test_macros import MacroTests
+        t = MacroTests()
+        r = t.build(macros__auto_launch=["UI_Select"])
+        r.run_text("launch")
+        self.assertEqual(len(t.speech.said), 1)

@@ -345,9 +345,14 @@ class CommandRunner:
         if quiet and self.echo is not None:
             self.echo.mute(quiet, 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
         pressed = []
+        self.macro_spoke = False
         for step in steps:
             if step[0] == "wait":
                 self.sleep(step[1])
+                continue
+            if step[0] == "say":
+                self.macro_spoke = True
+                self._speak(step[1], {}, fallback="")
                 continue
             if step[0] in ("hold", "literal"):
                 if step[0] == "hold":
@@ -508,6 +513,8 @@ class CommandRunner:
             return
         else:
             outcome = good[0]
+            if outcome.command is not None and outcome.command.id == "auto_launch" and getattr(self, "macro_spoke", False):
+                return                          # the launch macro already talked her way through it
         label = outcome.command.label if outcome.command else ""
         fields = {
             "doing": outcome.detail.rstrip("."),
@@ -533,4 +540,6 @@ class CommandRunner:
             text = personalise(text, self.settings)
             if self.flavour is not None and not line.audio:
                 text = self.flavour.apply(text, "normal")
+        if not text:
+            return
         self.speech.say(text=text, priority="normal", event_name="voice.command")
