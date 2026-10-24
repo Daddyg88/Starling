@@ -136,6 +136,32 @@ def parse_binds(text):
     return actions
 
 
+def view_of(action):
+    """Which Elite 'view' an action works in. Two actions can only get in each other's way if they share a view.
+
+    ship = flying, targeting, the cockpit panels and menus (all live together); galaxymap, fss (system scanner),
+    saa (surface scanner), camera, srv, onfoot, fighter and multicrew are separate screens or vehicles.
+    """
+    name = action or ""
+    if "Humanoid" in name:
+        return "onfoot"
+    if name.endswith("_Buggy") or name.startswith("Buggy"):
+        return "srv"
+    if name.endswith("_Fighter") or name.startswith(("Fighter", "Order")):
+        return "fighter"
+    if name.endswith("_MultiCrew") or name.startswith("MultiCrew"):
+        return "multicrew"
+    if name.startswith("ExplorationFSS"):
+        return "fss"
+    if name.startswith("ExplorationSAA"):
+        return "saa"
+    if name.startswith("GalaxyMap") and name != "GalaxyMapOpen":
+        return "galaxymap"
+    if name.startswith(("FreeCam", "Vanity", "MoveFreeCam", "Photo")):
+        return "camera"
+    return "ship"
+
+
 class BindingBook:
     """Knows the player's keys. Re-reads the file when it changes."""
 
@@ -216,8 +242,8 @@ class BindingBook:
         """True when another (ship) action uses the same keyboard key and shift keys as this slot."""
         mine = (_norm_key(mine_slot.key), frozenset(_norm_key(m[1]) for m in mine_slot.modifiers))
         for other, slots in self._actions.items():
-            if other == action or other.endswith(self.CONTEXT_VARIANTS) or "Humanoid" in other or other.startswith(("Vanity", "FreeCam", "HeadLook")):
-                continue
+            if other == action or view_of(other) != view_of(action):
+                continue                       # a different screen or vehicle: the two never meet
             for slot in slots:
                 if slot.is_empty() or slot.device.lower() != "keyboard":
                     continue
@@ -232,7 +258,7 @@ class BindingBook:
 
         Elite lets one key do several things. In menus that is fine, but when two actions are live at the same moment
         (for example UI Select and the quick comms panel both on Enter) Elite may do the wrong one, and a macro
-        then goes wrong at that key press. Returns a list of action names (SRV / on-foot / fighter versions skipped).
+        then goes wrong at that key press. Returns a list of action names (only actions in the same view count: see view_of).
         """
         if not self.refresh():
             return []
@@ -242,8 +268,8 @@ class BindingBook:
         mine = (_norm_key(stroke.key), frozenset(_norm_key(m) for m in stroke.modifiers))
         found = []
         for other, slots in self._actions.items():
-            if other == action or other.endswith(self.CONTEXT_VARIANTS) or "Humanoid" in other or other.startswith(("Vanity", "FreeCam", "HeadLook")):
-                continue
+            if other == action or view_of(other) != view_of(action):
+                continue                       # a different screen or vehicle: the two never meet
             for slot in slots:
                 if slot.is_empty() or slot.device.lower() != "keyboard":
                     continue

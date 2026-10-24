@@ -485,3 +485,7 @@ The "Key clash" warning in the log tells you which actions share a key.
 ## 0.34.6: more Watcher replies
 
 `voicepacks/default/watcher.json` grew from about 100 to about 220 lines. They are written for a Watcher who is gloomy and brilliant, like Marvin the paranoid android: she teases his doom when she is cross, cheers him up when she is happy, and fondly puts up with him when she is close. Infatuated and Upset moods now have their own sets instead of falling back to Neutral. A few Frustrated lines are marked `mature` and only play with strong language switched on. Add your own lines to the same file.
+
+### 0.34.8: only clashes that can really happen
+
+Two actions only get in each other's way when they work in the same view. She now groups every Elite action into one of: ship (flying, targeting, cockpit panels and menus), galaxy map, system scanner (FSS), surface scanner (SAA), camera, SRV, on foot, fighter, multicrew. Key clashes between different groups are ignored, both in "Check my Elite keys" and in the log warnings. The grouping is by action name (`view_of` in `control/binds.py`), so a few odd actions may land in "ship" and be reported when they would not matter. Tell me which and I'll move them.

@@ -1009,3 +1009,34 @@ class OnFootClashesIgnored(unittest.TestCase):
         r = KeyClashReport().runner(xml)
         self.assertEqual(r.binding_conflicts(), [])
         self.assertEqual(r.book.conflicts("UI_Select"), [])
+
+
+class OnlyClashesThatMeet(unittest.TestCase):
+    def test_views(self):
+        from control.binds import view_of
+        self.assertEqual(view_of("UI_Select"), "ship")
+        self.assertEqual(view_of("RightThrustButton"), "ship")
+        self.assertEqual(view_of("GalaxyMapOpen"), "ship")
+        self.assertEqual(view_of("GalaxyMapHome"), "galaxymap")
+        self.assertEqual(view_of("ExplorationFSSTarget"), "fss")
+        self.assertEqual(view_of("ExplorationSAANextGenus"), "saa")
+        self.assertEqual(view_of("HumanoidJumpButton"), "onfoot")
+        self.assertEqual(view_of("UI_Select_Buggy"), "srv")
+        self.assertEqual(view_of("FreeCamToggleHUD"), "camera")
+
+    def test_a_clash_in_another_view_is_ignored_but_a_real_one_is_not(self):
+        from tests.test_callouts import KeyClashReport
+        xml = """<Root>
+  <CycleNextPanel><Primary Device="Keyboard" Key="Key_E" /><Secondary Device="{NoDevice}" Key="" /></CycleNextPanel>
+  <ExplorationSAANextGenus><Primary Device="Keyboard" Key="Key_E" /><Secondary Device="{NoDevice}" Key="" /></ExplorationSAANextGenus>
+  <ExplorationFSSTarget><Primary Device="Keyboard" Key="Key_E" /><Secondary Device="{NoDevice}" Key="" /></ExplorationFSSTarget>
+  <GalaxyMapHome><Primary Device="Keyboard" Key="Key_E" /><Secondary Device="{NoDevice}" Key="" /></GalaxyMapHome>
+  <UI_Down><Primary Device="Keyboard" Key="Key_S" /><Secondary Device="{NoDevice}" Key="" /></UI_Down>
+  <BackwardKey><Primary Device="Keyboard" Key="Key_S" /><Secondary Device="{NoDevice}" Key="" /></BackwardKey>
+</Root>"""
+        r = KeyClashReport().runner(xml)
+        self.assertEqual(r.book.conflicts("CycleNextPanel"), [])
+        self.assertEqual(r.book.conflicts("UI_Down"), ["BackwardKey"])
+        text = "\n".join(r.binding_conflicts())
+        self.assertIn("UI Down", text)
+        self.assertNotIn("Cycle Next Panel", text)
