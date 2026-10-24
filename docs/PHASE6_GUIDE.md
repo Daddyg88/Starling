@@ -445,3 +445,13 @@ Not testable here (the sandbox cannot reach edastro.com): the exact reply EDAstr
 * **Favourite ship:** every mood gain (good jump, sale, kind word...) is counted for the ship you are flying (`data/favourite_ship.json`). At 20 good points a ship becomes her favourite and she says so; another ship replaces it only by collecting more. She is happier when you fly it, and answers "what's your favourite ship?". Change the threshold in `personality/favourite_ship.py` (THRESHOLD).
 * **Void Compass hush:** newer Void Compass has `POST /voice/hush` ("keep the Watcher quiet while my own voice assistant talks"). Whenever she is about to speak, or it is a bad moment for him, she asks for a 12 second hush (at most every 6 seconds). Controls page: "Ask Void Compass to keep the Watcher quiet while she talks". If your Void Compass rejects the call 3 times she stops asking and the log says why. Also added to the client but not yet used: `watcher_answer` (`POST /watcher/answer`). Void Compass's new start/stop voice events are written to the log once so I can learn their format.
 * Not testable here: the exact body Void Compass wants for hush (she sends `seconds` and `duration`), the real GuiFocus value while the galaxy map is open (6 in the journal documentation), and the voice start/stop events.
+
+## 0.34.0: new launch and docking macros
+
+Both macros were rebuilt from your button recordings.
+
+- **Request docking**: left panel, Next Tab twice, Select (sends the request), Previous Tab twice, Back.
+- **Auto launch** (only while docked): left panel and right panel tab hopping, a tap of the focus button, Down, Select.
+
+Not tested in the game (I can't run Elite). If a pause is too short or long, put your own steps in
+`config/settings.json` under `macros.auto_launch` or `macros.request_docking`.

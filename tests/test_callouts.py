@@ -870,3 +870,13 @@ class WatcherHushTests(unittest.TestCase):
         b = self.make()
         b.settings.v["watcher.hush"] = False
         self.assertFalse(self.run_hush(b))
+
+
+class NewMacros(unittest.TestCase):
+    def test_launch_and_docking_macros_parse(self):
+        from control.catalog import LAUNCH_MACRO, DOCKING_MACRO
+        from control.macros import parse_macro
+        for m in (LAUNCH_MACRO, DOCKING_MACRO):
+            self.assertTrue(parse_macro(list(m)))
+        self.assertEqual(LAUNCH_MACRO[-1], "UI_Select")
+        self.assertEqual(DOCKING_MACRO[-1], "UI_Back")

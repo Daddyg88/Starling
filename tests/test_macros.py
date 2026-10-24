@@ -13,7 +13,7 @@ from tests.test_commands import FakeBook, FakeSender, FakeSpeech
 from tests.test_phase6b import dialogue, make_settings
 
 ALL = {name: (Keystroke("Key_%s" % i), "") for i, name in enumerate(
-    ["FocusLeftPanel", "FocusRightPanel", "FocusRadarPanel", "CycleNextPanel", "UI_Select", "UI_Right", "UI_Back", "UI_Down"])}
+    ["FocusLeftPanel", "FocusRightPanel", "FocusRadarPanel", "CycleNextPanel", "UI_Select", "UI_Right", "UI_Back", "UI_Down", "CyclePreviousPanel"])}
 
 
 class MacroTests(unittest.TestCase):
@@ -50,8 +50,8 @@ class MacroTests(unittest.TestCase):
         r = self.build()
         r.run_text("request docking")
         names = [s.key for s in self.sender.pressed]
-        # focus left panel, Next Tab x2, Right, Select, Back (the Down press was taken out on the commander's request)
-        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_5", "Key_4", "Key_6"])
+        # 0.34.0 recording: focus left panel, Next Tab x2, Select, Previous Tab x2, Back
+        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_4", "Key_8", "Key_8", "Key_6"])
         self.assertNotIn("Key_7", names)
         self.assertIn(1.2, self.sleeps)
 
