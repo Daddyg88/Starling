@@ -881,3 +881,19 @@ class NewMacros(unittest.TestCase):
         self.assertEqual(LAUNCH_MACRO[-3:], ("UI_Down", "wait 0.6", "UI_Select"))
         self.assertEqual(LAUNCH_MACRO.count("UI_Back"), 2)
         self.assertEqual(DOCKING_MACRO[-1], "UI_Back")
+
+
+class PreferUnsharedKey(unittest.TestCase):
+    def test_a_secondary_key_nobody_shares_wins_over_a_shared_primary(self):
+        from control.binds import BindingBook, parse_binds
+        xml = """<Root>
+  <UI_Select><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="Keyboard" Key="Key_Numpad_Enter" /></UI_Select>
+  <QuickCommsPanel><Primary Device="Keyboard" Key="Key_Enter" /><Secondary Device="{NoDevice}" Key="" /></QuickCommsPanel>
+  <UI_Back><Primary Device="Keyboard" Key="Key_Backspace" /><Secondary Device="{NoDevice}" Key="" /></UI_Back>
+</Root>"""
+        book = BindingBook.__new__(BindingBook)
+        book._actions = parse_binds(xml)
+        book.refresh = lambda: True
+        self.assertEqual(book.lookup("UI_Select")[0].key, "Key_Numpad_Enter")
+        self.assertEqual(book.lookup("UI_Back")[0].key, "Key_Backspace")
+        self.assertEqual(book.lookup("QuickCommsPanel")[0].key, "Key_Enter")

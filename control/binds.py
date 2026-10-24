@@ -192,6 +192,7 @@ class BindingBook:
         if slots is None:
             return None, NOT_IN_FILE
         problem = UNBOUND
+        usable = []
         for slot in slots:                       # primary first, then secondary
             if slot.is_empty():
                 continue
@@ -203,8 +204,26 @@ class BindingBook:
                 problem = UNKNOWN_KEY
                 log.warning("Unknown key name in the binds file for %s: %s", action, names)
                 continue
-            return Keystroke(slot.key, tuple(k for _d, k in slot.modifiers)), ""
+            usable.append(slot)
+        if usable:
+            # 0.34.3: when both slots are keyboard keys, prefer the one no other action shares (Enter for UI Select and
+            # for the quick comms panel made the launch macro open chat). Otherwise primary first, as before.
+            best = next((sl for sl in usable if not self._others_on(action, sl)), usable[0])
+            return Keystroke(best.key, tuple(k for _d, k in best.modifiers)), ""
         return None, problem
+
+    def _others_on(self, action, mine_slot):
+        """True when another (ship) action uses the same keyboard key and shift keys as this slot."""
+        mine = (_norm_key(mine_slot.key), frozenset(_norm_key(m[1]) for m in mine_slot.modifiers))
+        for other, slots in self._actions.items():
+            if other == action or other.endswith(self.CONTEXT_VARIANTS) or other.startswith(("Humanoid", "Vanity", "FreeCam", "HeadLook")):
+                continue
+            for slot in slots:
+                if slot.is_empty() or slot.device.lower() != "keyboard":
+                    continue
+                if (_norm_key(slot.key), frozenset(_norm_key(m[1]) for m in slot.modifiers)) == mine:
+                    return True
+        return False
 
     CONTEXT_VARIANTS = ("_Buggy", "_Humanoid", "_Fighter", "_MultiCrew")
 

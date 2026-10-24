@@ -461,3 +461,12 @@ Auto launch now presses Select twice at the end (0.8 s apart). Untested in game;
 
 ### 0.34.2
 Auto launch follows your 13:25 recording: both panels are closed with Back, then Down and Select. Untested in game (the recording shows no Undocked line, so I could not see the launch itself).
+
+### 0.34.3: Select opened chat
+
+Your Elite controls have Enter on both UI Select and Quick Comms Panel, so out in the hangar the macro's Select opened chat. Two ways to fix it:
+
+1. In Elite, Options > Controls, give **UI Select** a second keyboard key (for example Numpad Enter) in its second slot. Starling now picks the key that no other action shares.
+2. Or take Enter off **Quick Comms Panel** (Comms section).
+
+The "Key clash" warning in the log tells you which actions share a key.
