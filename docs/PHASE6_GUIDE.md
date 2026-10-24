@@ -546,3 +546,20 @@ After each biological sample she remembers where you stood (Status.json latitude
 Two switches on the Exobiology page: **Tell me when I'm far enough from the last sample** and **Beep as well**. Her lines are in `voicepacks/default/biodistance.json`.
 
 Not tested with the real game: the distance maths is tested, but Status.json only gives your position while you are close to the planet's surface, so if you are in a vehicle that doesn't report it she stays quiet. Tell me if the distances feel off for a species and I will adjust the table.
+
+## 0.39.0: "I want to go merit mining"
+
+Say "Starling, I want to go merit mining" (also "merit mining", "mine for merits"). She searches Spansh (spansh.co.uk, free, no sign-up) for systems that:
+
+1. are **controlled by your pledged Power** (Fortified, Stronghold or Exploited),
+2. have a planet with a **Pristine Metallic ring**, and
+3. have a **station or outpost** (never a fleet carrier) with a market that wants **2000 tonnes or more** of a metal (Platinum, Osmium, Painite or Palladium).
+
+She says the two nearest matches as **Option A** and **Option B** (planet, system, distance, the station and how much it wants), asks which, then "Would you like me to plot a route for you?" and, on yes, puts the system into the galaxy map with the auto plotter (the same galaxy map macro the "where to sell" answers use). With only one match she goes straight to the route question.
+
+- **Your Power:** she reads it from the journal (the `Powerplay` event when you load the game while pledged). If she doesn't know it, choose it on the Mining page: **Your Power for merit mining**.
+- **Switch:** Mining page > **Find merit mining spots**.
+- **Metals:** `merit.commodities` in `config/settings.json` (default Platinum, Osmium, Painite, Palladium).
+- Her lines are in `voicepacks/default/merit.json`.
+
+Checked live against Spansh's own search while building this (a power's systems, Metallic + Pristine rings, and station markets with demand 2000+), but not with a real game session. Limits: Spansh only says which Power CONTROLS a system, so systems that are merely influenced are not found. Spansh's data is only as fresh as the last player who docked there, so a market may have changed. She needs to be talked to by name (wake word or push-to-talk) like her other answers.

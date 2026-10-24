@@ -230,8 +230,10 @@ class App:
         self.miner = MiningTracker(self.bus)
         self.miner.attach()
         self.prices = PriceFinder(self.settings)
+        from mining.merit import MeritFinder
+        self.merit = MeritFinder(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
-                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask)
+                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit)
         return True
 
     def cpu_is_free(self):

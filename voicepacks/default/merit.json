@@ -1,0 +1,58 @@
+{
+ "_help": "Merit mining lines. Fields: {Power} {Station} {System} {Body} {Metal} {Tons} {Away}; option B uses {Station2} {System2} {Body2} {Metal2} {Tons2} {Away2}. || splits the line into sentences.",
+ "Merit_Looking": [
+  "Looking for merit mining spots for {Power}. One moment.",
+  "Let me find somewhere for you to mine merits for {Power}.",
+  "Searching for a pristine metallic ring in {Power} space. Give me a few seconds.",
+  "Right, merit mining. Checking rings and markets for {Power}.",
+  "Hold on, Commander. Finding a good ring in {Power} territory."
+ ],
+ "Merit_Looking_Friendly": [
+  "Ooh, merit mining. I'll find you a good one for {Power}."
+ ],
+ "Merit_Looking_Close": [
+  "Anything for {Power}, love. Let me find a lovely ring for you."
+ ],
+ "Merit_Looking_Sarcastic": [
+  "Merit mining for {Power}. How thrilling. Searching."
+ ],
+ "Merit_Looking_Frustrated": [
+  "Fine. Searching for {Power} rings."
+ ],
+ "Merit_NoPower": [
+  "I don't know which Power you've pledged to. Choose it on the Mining page, or load the game while pledged and I'll see it in the journal.",
+  "You haven't told me your Power, and the journal hasn't either. Pick it on the Mining page."
+ ],
+ "Merit_NoSystem": [
+  "I don't know which system we're in yet. Make a jump and ask me again."
+ ],
+ "Merit_Disabled": [
+  "Merit mining searches are switched off. You can turn them on in the Mining page."
+ ],
+ "Merit_Offline": [
+  "I couldn't reach Spansh just now. Check your internet and ask me again."
+ ],
+ "Merit_None": [
+  "I couldn't find a system controlled by {Power} with a pristine metallic ring and a station that wants two thousand tonnes or more. Try again later.",
+  "Nothing matches for {Power} right now. No pristine metallic ring with a hungry market. Ask me again later."
+ ],
+ "Merit_Options": [
+  "I found two merit mining spots for {Power}.||Option A is a pristine metallic ring at {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||Option B is {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}.",
+  "Two places for you, Commander.||Option A: {Body} in {System}, {Away}. Sell your {Metal} at {Station}, they want {Tons} tons.||Option B: {Body2} in {System2}, {Away2}. Sell at {Station2}, wanting {Tons2} tons of {Metal2}.",
+  "Here's what I have for {Power}.||Option A, {System}, {Away}. Pristine metallic ring at {Body}, and {Station} wants {Tons} tons of {Metal}.||Option B, {System2}, {Away2}. Ring at {Body2}, and {Station2} wants {Tons2} tons of {Metal2}."
+ ],
+ "Merit_Options_Sarcastic": [
+  "Two merit spots, since you asked.||Option A: {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||Option B: {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}."
+ ],
+ "Merit_Options_Close": [
+  "I found two for you, love.||Option A is {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||Option B is {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}."
+ ],
+ "Merit_OneOption": [
+  "I found one merit mining spot for {Power}.||A pristine metallic ring at {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.",
+  "One match, Commander.||{Body} in {System}, {Away}, with a pristine metallic ring. {Station} wants {Tons} tons of {Metal}.",
+  "Just the one for {Power}: {System}, {Away}.||Pristine metallic ring at {Body}, and {Station} wants {Tons} tons of {Metal}."
+ ],
+ "Merit_OneOption_Sarcastic": [
+  "Only one. {System}, {Away}. Ring at {Body}, and {Station} wants {Tons} tons of {Metal}."
+ ]
+}

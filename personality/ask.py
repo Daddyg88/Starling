@@ -393,8 +393,13 @@ class AskManager:
         distance = option.get("distance")
         away = ("%d light years away" % int(round(distance))) if isinstance(distance, (int, float)) and distance >= 0.5 \
             else "right here in this system"
-        return {"Price" + suffix: "{:,}".format(option["price"]), "Tons" + suffix: "{:,}".format(int(tons)),
-                "Station" + suffix: option["station"], "System" + suffix: option["system"], "Away" + suffix: away}
+        values = {"Price" + suffix: "{:,}".format(option["price"]), "Tons" + suffix: "{:,}".format(int(tons)),
+                  "Station" + suffix: option["station"], "System" + suffix: option["system"], "Away" + suffix: away}
+        if option.get("body"):                       # merit mining: the planet with the pristine metallic ring, and the metal wanted
+            values["Body" + suffix] = option["body"]
+        if option.get("material"):
+            values["Metal" + suffix] = option["material"]
+        return values
 
     def offer_sale(self, material, options, order="best", mode="sell"):
         """She has found places to sell (or buy; mode="buy"). Says the best two (A and B) with price, tonnage and station, then asks which.
@@ -404,7 +409,7 @@ class AskManager:
             return None
         values = {"Material": material}
         values.update(self._option_values(options[0]))
-        side = "Buy" if mode == "buy" else "Sell"
+        side = {"buy": "Buy", "merit": "Merit"}.get(mode, "Sell")
         near = order == "nearest"
         if len(options) > 1:
             values.update(self._option_values(options[1], "2"))

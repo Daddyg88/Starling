@@ -80,6 +80,9 @@ RECORD_COUNTDOWN = [("3 seconds", 3), ("5 seconds", 5), ("10 seconds", 10)]
 RANGE_MARGIN = [("Full range (100%)", 1.0), ("Safe (95%)", 0.95), ("Safer, with cargo (90%)", 0.9), ("Heavy cargo (85%)", 0.85), ("Very heavy (80%)", 0.8)]
 ROUTE_EFFICIENCY = [("Fewest jumps (40)", 40), ("Balanced (60)", 60), ("Most neutron stops (80)", 80), ("Strict neutron route (100)", 100)]
 SUPERCHARGE = [("Normal (x4)", 4), ("Special (x6)", 6)]
+MERIT_POWERS = [("From the game (what the journal says)", "")] + [(p, p) for p in (
+    "Aisling Duval", "Archon Delaine", "Arissa Lavigny-Duval", "Denton Patreus", "Edmund Mahon", "Felicia Winters",
+    "Jerome Archer", "Li Yong-Rui", "Nakato Kaine", "Pranav Antal", "Yuri Grom", "Zemina Torval")]
 WATCHER_REPLY = [("Every time", "always"), ("Often", "often"), ("Sometimes", "sometimes"), ("Never", "never")]
 ANSWER_TIMES = [("5 seconds", 5), ("8 seconds", 8), ("10 seconds", 10), ("15 seconds", 15), ("20 seconds", 20)]
 SEXES = [("Not specified", "neutral"), ("Male", "male"), ("Female", "female")]
@@ -229,6 +232,10 @@ def build_pages(mic_lister=None, pack_folder=None):
              "and benitoite get a calmer mention. Everything else, gold and silver included, she keeps quiet about.", [
             Field("talk.mining", "She comments on mining", "toggle",
                   help="Prospector results, refining, cracked cores and depleted rocks. Off = quiet"),
+            Field("mining.merit", "Find merit mining spots (\"I want to go merit mining\")", "toggle",
+                  help="Looks on Spansh for a system your Power controls with a pristine metallic ring and a station wanting 2000+ tonnes, then asks A or B and plots the route"),
+            Field("merit.power", "Your Power for merit mining", "choice", MERIT_POWERS,
+                  help="Leave on 'From the game' and she reads it from the journal when you load the game while pledged"),
             Field("mining.chatter", "How chatty she is while you refine", "choice", MINING_CHATTER,
                   help="She does not call out every tonne: the first of each good mineral, then every few tonnes"),
         ] + [Field("mining.fav%d" % n, "Excited about #%d" % n, "choice", MINERAL_CHOICES) for n in range(1, 11)]),

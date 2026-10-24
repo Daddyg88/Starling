@@ -1,6 +1,7 @@
 {
   "_help": "What sentences mean what for her brain (personality/brain.py). Each intent has a key (the answer pool in voicepacks/default/brain.json) and patterns. Patterns are regular expressions matched against the sentence in lower case, with punctuation and apostrophes removed (whats, im, dont). The FIRST intent that matches wins, so put specific ones first. kind: line (default), sellprice, buyprice, mined, game, status, wanted, time, date, suggest, coin, dice, number, opinion, fact, riddle, riddle_answer, why, more, you, really.",
   "intents": [
+    {"key": "Brain_Merit", "kind": "meritmining", "patterns": ["\\bmerit(?:s)? (?:mining|mine|miner)\\b", "\\b(?:mine|mining) for merits?\\b", "\\b(?:farm|farming|earn|earning|get|getting) (?:some )?merits?\\b", "\\bgo (?:and )?mine for (?:my )?(?:power|powerplay)\\b"]},
     {"key": "Brain_RiddleReveal", "kind": "riddle_answer", "patterns": ["^(?:i )?give up$", "^(?:whats|what is|tell me) the answer$", "^i (?:dont|do not) know$", "^go on tell me$", "^what is it$"]},
     {"key": "Brain_Why", "kind": "why", "patterns": ["^(?:why|why is that|why is that so|how come|why do you say that|why though|explain|explain that|what do you mean|how so)$"]},
     {"key": "Brain_More", "kind": "more", "patterns": ["^(?:tell me more|go on|more|and|and\\?|elaborate|carry on|keep going|say more|expand on that|what else)$"]},

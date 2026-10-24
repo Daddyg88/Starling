@@ -63,7 +63,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -71,6 +71,7 @@ class Brain:
         self.chitchat = chitchat
         self.mining = mining         # mining/tracker.py: what you have refined this session
         self.prices = prices         # mining/prices.py: where to sell it
+        self.merit = merit           # mining/merit.py: pristine metallic rings in your Power's systems
         self.ask = ask               # personality/ask.py: asks 'A or B?' and 'shall I plot a route?'
         self.facts = facts
         self.intents = intents if intents is not None else load_intents()
@@ -260,6 +261,38 @@ class Brain:
         if not words:
             return None, ""
         return "".join(words), " ".join(w.capitalize() for w in words)
+
+    def _do_meritmining(self, item, found, tidy):
+        """'I want to go merit mining': systems your Power controls with a pristine metallic ring and a station wanting 2000+ tonnes."""
+        if self.merit is None or not self.merit.enabled():
+            return self._say_pool("Merit_Disabled", {}, remember=False)
+        state = self._state()
+        power = self.merit.power(state)
+        if not power:
+            return self._say_pool("Merit_NoPower", {}, remember=False)
+        system = getattr(state, "system", None)
+        if not system:
+            return self._say_pool("Merit_NoSystem", {}, remember=False)
+        first = self._say_pool("Merit_Looking", {"Power": power}, remember=False)
+        self.merit.lookup_async(system, power, lambda options, ok: self._say_merit(power, options, ok))
+        return first
+
+    def _say_merit(self, power, options, ok):
+        if not ok:
+            return self._say_pool("Merit_Offline", {})
+        if not options:
+            return self._say_pool("Merit_None", {"Power": power})
+        if self.ask is not None and hasattr(self.ask, "offer_sale"):
+            said = self.ask.offer_sale("", options[:2], "best", "merit")
+            if said:
+                return said
+        from personality.ask import AskManager
+        values = {"Power": power}
+        values.update(AskManager._option_values(options[0]))
+        if len(options) > 1:
+            values.update(AskManager._option_values(options[1], "2"))
+        text = self._format("Merit_Options" if len(options) > 1 else "Merit_OneOption", values)
+        return self._say(text) if text else None
 
     def _do_buyprice(self, item, found, tidy):
         """'Where can I buy tritium?' Looks up the cheapest nearby sellers in the background and says the answer."""
