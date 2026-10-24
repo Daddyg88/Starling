@@ -455,3 +455,6 @@ Both macros were rebuilt from your button recordings.
 
 Not tested in the game (I can't run Elite). If a pause is too short or long, put your own steps in
 `config/settings.json` under `macros.auto_launch` or `macros.request_docking`.
+
+### 0.34.1
+Auto launch now presses Select twice at the end (0.8 s apart). Untested in game; edit `macros.auto_launch` in `config/settings.json` if it needs a different pause.

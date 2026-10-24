@@ -878,5 +878,5 @@ class NewMacros(unittest.TestCase):
         from control.macros import parse_macro
         for m in (LAUNCH_MACRO, DOCKING_MACRO):
             self.assertTrue(parse_macro(list(m)))
-        self.assertEqual(LAUNCH_MACRO[-1], "UI_Select")
+        self.assertEqual(LAUNCH_MACRO[-3:], ("UI_Select", "wait 0.8", "UI_Select"))
         self.assertEqual(DOCKING_MACRO[-1], "UI_Back")

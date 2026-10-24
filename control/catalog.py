@@ -57,11 +57,12 @@ DOCKING_MACRO = ("FocusLeftPanel", "wait 0.85", "CycleNextPanel", "wait 0.4", "C
 # your menu needs more presses, put your own steps in config/settings.json under macros.auto_launch.
 # 0.34.0: now the commander's own recording (12:31): hop through the left and right panels to wake the station menu,
 # tap the focus button to clear them, then Down and Select (Launch). The last two are the menu keys (UI_Down / UI_Select),
-# the same buttons the recorder showed as ResetPowerDistribution / SelectTarget.
+# the same buttons the recorder showed as ResetPowerDistribution / SelectTarget. 0.34.1: one more Select at the
+# end (the first one only highlighted Launch in the commander's game).
 LAUNCH_MACRO = ("FocusLeftPanel", "wait 0.85", "CycleNextPanel x2", "wait 0.6", "CyclePreviousPanel", "wait 0.45",
                 "CyclePreviousPanel", "wait 0.8", "FocusRightPanel", "wait 0.85", "CycleNextPanel x4", "wait 0.6",
                 "CyclePreviousPanel x4", "wait 0.55", "hold UIFocus 0.5", "wait 0.55", "UI_Down", "wait 0.5",
-                "UI_Select")
+                "UI_Select", "wait 0.8", "UI_Select")
 NOMAD_MACRO = ("FocusRadarPanel", "wait 0.8", "UI_Down", "wait 0.2", "UI_Right", "wait 0.2", "UI_Select")
 
 # Plot the next neutron waypoint, hands free (the clipboard already holds its name, see navigation/route.py).
