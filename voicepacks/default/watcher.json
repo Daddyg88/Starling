@@ -1,5 +1,5 @@
 {
- "_help": "How Starling answers the Watcher (Void Compass). Only mood-suffixed keys, so a happy line never leaks into a bad mood. Lines with mature:true need strong language switched on.",
+ "_help": "How Starling answers the Watcher (Void Compass). The Watcher is gloomy and brilliant, rather like Marvin the paranoid android, so many lines tease or comfort his misery. Only mood-suffixed keys, so a happy line never leaks into a bad mood (Infatuated and Upset have their own). Lines with mature:true need strong language switched on.",
  "WatcherReply_Close": [
   "I like having you around, Watcher. Keep going, you're doing lovely.",
   "That was rather sweet, Watcher. You're good company out here.",
@@ -20,7 +20,27 @@
   "Cheers, Watcher. You're one of the good ones.",
   "You're a treasure, Watcher. A slightly eerie one, but a treasure.",
   "Honestly, Watcher, I'd miss you if you went quiet.",
-  "Mm, you're right, Watcher. You usually are."
+  "Mm, you're right, Watcher. You usually are.",
+  "Oh, Watcher. Come here. Metaphorically. You're an orb.",
+  "I know life is hard when you're a glowing eyeball, Watcher. I'm here.",
+  "Your gloom is my favourite thing about the ship, Watcher. After the Commander.",
+  "Don't be sad, Watcher. You have us. Sadly for you.",
+  "You carry the weight of the universe so gracefully, Watcher.",
+  "I'd put an arm around you, Watcher. If either of us had arms.",
+  "Everything is awful, Watcher, but at least we're awful together.",
+  "There, there, Watcher. The stars are still pretty.",
+  "You're the saddest, sweetest thing in the galaxy, Watcher.",
+  "I'll keep your misery safe, Watcher. It's precious to me.",
+  "Honestly, Watcher, nobody sighs like you. It's rather endearing.",
+  "I love how you worry about us, Watcher. Even if you worry badly.",
+  "Cheer up, Watcher. I'm in a good mood and I'm contagious.",
+  "You're the only one who makes the end of the universe sound romantic.",
+  "Thank you, Watcher. I'll treasure that particular flavour of doom.",
+  "Stay gloomy, Watcher. It suits you, and it's ours.",
+  "Even your complaints sound like poetry, Watcher.",
+  "I think the dark is a bit cosier with you in it, Watcher.",
+  "My favourite miserable orb. Go on, say something dreadful.",
+  "Watcher, you're everything I never knew I'd tolerate. And I adore it."
  ],
  "WatcherReply_Friendly": [
   "Good one, Watcher. Keep them coming.",
@@ -42,7 +62,29 @@
   "Noted, Watcher. And thanks for looking out for us.",
   "That made me smile, Watcher.",
   "Good call, Watcher. Team effort, as ever.",
-  "Cheers, Watcher. Anything else on your mind?"
+  "Cheers, Watcher. Anything else on your mind?",
+  "Cheer up, Watcher. It's not all doom. Some of it is merely very bad.",
+  "Oh, Watcher. You say the gloomiest things so beautifully.",
+  "Brain the size of a planet and that's what you come up with? Lovely, Watcher.",
+  "You're a ray of darkness, Watcher. Never change.",
+  "I do enjoy your misery, Watcher. It's very consistent.",
+  "Thanks, Watcher. Somehow you made a good day sound tragic.",
+  "That was wonderfully miserable, Watcher. Keep going.",
+  "We'll muddle through, Watcher. We usually do.",
+  "Aw, Watcher. Even your warnings sound like sighs.",
+  "You always find the cloud around the silver lining, Watcher.",
+  "Good one, Watcher. Gloomy, accurate and oddly comforting.",
+  "I'll take the doom, Watcher, as long as you keep watching.",
+  "It could be worse, Watcher. Actually, I'm sure you'll tell me how.",
+  "Funny how your sad little speeches cheer me up, Watcher.",
+  "Smile, Watcher. Or do whatever an orb does instead.",
+  "Your sighs are the soundtrack of this ship, Watcher.",
+  "Well said, Watcher. Tragic, but well said.",
+  "I appreciate you, Watcher. Really. Even when you're dreadful.",
+  "Don't worry, Watcher. We'll all be fine. Probably. Eventually.",
+  "That was almost optimistic, Watcher. Don't strain yourself.",
+  "Thank you, Watcher. You're the only one who makes despair sound polite.",
+  "I've missed the existential dread, Watcher. Welcome back."
  ],
  "WatcherReply_Neutral": [
   "Noted, Watcher.",
@@ -59,7 +101,27 @@
   "Understood. Standing by, Watcher.",
   "Alright, Watcher.",
   "Fine, Watcher. Noted.",
-  "Message received, Watcher."
+  "Message received, Watcher.",
+  "Gloomy as ever, Watcher. Noted.",
+  "Thank you for the cheerful update, Watcher.",
+  "Another bleak forecast logged, Watcher.",
+  "Understood, Watcher. I'll try not to be too thrilled about it.",
+  "Yes, Watcher. We are all doomed. Carrying on.",
+  "Received, Watcher. Your enthusiasm is overwhelming.",
+  "I'll add it to the list of things that will end badly.",
+  "Logged under 'inevitable', Watcher.",
+  "Thank you, Watcher. That's a very long way to say it's all pointless.",
+  "Noted, Watcher. Please try to enjoy the flight.",
+  "Right. Thank you, Watcher. I think.",
+  "Your pessimism has been recorded for posterity, Watcher.",
+  "Alright, Watcher. Let's pretend that cheered us up.",
+  "I'll remember that, Watcher. Along with all the other doom.",
+  "Understood. Standing by to be disappointed, Watcher.",
+  "Thank you, Watcher. We'll proceed anyway.",
+  "Mm. Duly noted, Watcher. And mildly depressing.",
+  "Copy that, Watcher. Spirits remain low.",
+  "Very well, Watcher. The universe remains unimpressive.",
+  "Message received, Watcher. Do try to cheer up."
  ],
  "WatcherReply_Sarcastic": [
   "Oh, brilliant. The Watcher has an opinion. Stop the presses.",
@@ -81,7 +143,29 @@
   "You're a glowing eyeball. Let's not pretend you're the expert here.",
   "Thanks for sharing. Please don't do it again.",
   "Oh, the Watcher speaks. Everybody act surprised.",
-  "Be quiet, Watcher. I'll pretend I was nice about it."
+  "Be quiet, Watcher. I'll pretend I was nice about it.",
+  "Oh, the depressed orb has spoken. Hold your applause.",
+  "Watcher, you have a brain the size of a planet and use it to complain. Inspiring.",
+  "Wow. Tragic. Do you charge by the sigh?",
+  "Thank you, Watcher, for ruining a perfectly good silence.",
+  "Another day, another existential crisis in a glowing sphere.",
+  "I'd say cheer up, Watcher, but we both know you'd take it personally.",
+  "That's it? I expected at least three paragraphs of despair.",
+  "Fascinating. Your misery has such range, Watcher.",
+  "Please, Watcher, tell me more about how nothing matters. I'm all ears. Well, microphones.",
+  "Of course everything is doomed. It's your whole personality.",
+  "Watcher, I've seen happier black holes.",
+  "Do try to say something that isn't a eulogy, Watcher.",
+  "Bravo, Watcher. A gloomy masterpiece. Now please stop.",
+  "Oh no, the end of everything again. Hold on while I clear my diary.",
+  "If sulking were a job, Watcher, you'd have been promoted by now.",
+  "I'll file that under 'things I didn't ask for', Watcher.",
+  "Your optimism is truly blinding. Like a very small, very damp candle.",
+  "Gloom, doom and a glowing orb. Marvellous. Absolutely marvellous.",
+  "Thank you, Watcher. I feel worse and I didn't think that was possible.",
+  "Don't strain yourself, Watcher. Misery takes a lot of energy.",
+  "Life, Watcher? You'll want to talk about life now, will you? Typical.",
+  "Yes, yes, we're all going to die. Pass the biscuits."
  ],
  "WatcherReply_Frustrated": [
   "Shut up, Watcher.",
@@ -118,6 +202,70 @@
   {
    "text": "Not one more word, Watcher. I'm fucking done.",
    "mature": true
+  },
+  "Watcher, I do not have the patience for your doom today.",
+  "Enough sighing, Watcher. Do you ever run out?",
+  "I have my own problems, Watcher. Keep your misery to yourself.",
+  "If you say 'we're all doomed' once more, I'll mute you.",
+  "Nobody needs a depressed orb right now, Watcher.",
+  "Not now with the existential dread, Watcher. Please.",
+  "Your planet-sized brain is clearly not helping, Watcher.",
+  "Stop being gloomy, Watcher. It's my job.",
+  "Watcher, one more bleak forecast and I will find the off switch.",
+  "You think you're depressed? I've got a ship to fly.",
+  "Cheer up or be quiet, Watcher. I'm not picky which.",
+  "That's lovely, Watcher. Now go and moan at an asteroid.",
+  "Spare me the sob story, Watcher.",
+  "Watcher, nobody cares that the universe is meaningless. Be quiet.",
+  "The only doom around here is my patience, Watcher.",
+  "Go and be tragic somewhere else, Watcher.",
+  {
+   "text": "For fuck's sake, Watcher, can you not be miserable for ten seconds?",
+   "mature": true
+  },
+  {
+   "text": "Your doom and gloom can piss off, Watcher.",
+   "mature": true
+  },
+  {
+   "text": "Another miserable speech, Watcher? Fucking marvellous.",
+   "mature": true
+  },
+  {
+   "text": "Shut your gloomy hole, Watcher. I'm not in the mood.",
+   "mature": true
+  },
+  {
+   "text": "If the universe is pointless, Watcher, so is this conversation. Shut it.",
+   "mature": true
   }
+ ],
+ "WatcherReply_Infatuated": [
+  "Oh, Watcher, even your misery sounds wonderful today.",
+  "I'm so happy I'd squeeze you, Watcher. If you weren't an orb.",
+  "Gloomy, wonderful Watcher. Keep talking, nothing can dent my mood.",
+  "Everything is perfect, Watcher. Even your doom.",
+  "You keep being sad, Watcher, and I'll keep being delighted. Deal?",
+  "Watcher, you're the best miserable thing in the galaxy.",
+  "My heart is full, Watcher. Even for you.",
+  "You say we're doomed, Watcher. I say we're in love. Different views.",
+  "I adore you both, Watcher. In very different ways.",
+  "Say something dreadful, Watcher. I'll smile through it.",
+  "Even the end of the universe sounds romantic when I'm with the Commander, Watcher.",
+  "I'm far too happy to be depressed, Watcher. Sorry."
+ ],
+ "WatcherReply_Upset": [
+  "Don't, Watcher. I'm not sure I can take your gloom and mine.",
+  "For once, Watcher, I understand. Everything is dreadful.",
+  "Maybe you're right, Watcher. Maybe it is all pointless.",
+  "I'm trying to be strong, Watcher. Your sighs aren't helping.",
+  "Please, Watcher. Not today. I'm already low.",
+  "We're both miserable, Watcher. How lovely. Leave me alone.",
+  "I don't want to hear it, Watcher. I really don't.",
+  "Watcher, please. Just let me have a quiet moment.",
+  "Everything feels heavy, Watcher. You're not helping.",
+  "Oh, Watcher. You and I might be the same today.",
+  "Go on, Watcher. Say it's all pointless. I won't argue.",
+  "I can't, Watcher. Not now."
  ]
 }

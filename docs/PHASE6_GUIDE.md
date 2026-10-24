@@ -481,3 +481,7 @@ The "Key clash" warning in the log tells you which actions share a key.
 ### 0.34.5: key clash list
 
 **Check my Elite keys** (Controls page) and `run_controls_test.bat` now also list every key that one of her commands presses but Elite also gives to another ship action, for example "UI Select (key Enter) is also used by Quick Comms Panel". Change one of each pair in Elite: Options > Controls. If an action has two keyboard keys she already prefers the one nothing else uses. SRV, on-foot and fighter versions of an action are ignored. Joystick buttons are not checked, because she only presses keyboard keys.
+
+## 0.34.6: more Watcher replies
+
+`voicepacks/default/watcher.json` grew from about 100 to about 220 lines. They are written for a Watcher who is gloomy and brilliant, like Marvin the paranoid android: she teases his doom when she is cross, cheers him up when she is happy, and fondly puts up with him when she is close. Infatuated and Upset moods now have their own sets instead of falling back to Neutral. A few Frustrated lines are marked `mature` and only play with strong language switched on. Add your own lines to the same file.

@@ -988,3 +988,11 @@ class KeyClashReport(unittest.TestCase):
   <LandingGearToggle><Primary Device="Keyboard" Key="Key_L" /><Secondary Device="{NoDevice}" Key="" /></LandingGearToggle>
 </Root>"""
         self.assertEqual(self.runner(xml).binding_conflicts(), [])
+
+
+class WatcherLines(unittest.TestCase):
+    def test_every_mood_has_plenty_of_watcher_replies(self):
+        from tests.test_dialogue import said_by
+        for mood, least in (("Neutral", 30), ("Friendly", 38), ("Close", 38), ("Sarcastic", 38), ("Frustrated", 38),
+                            ("Infatuated", 10), ("Upset", 10)):
+            self.assertGreaterEqual(len(said_by("WatcherReply_" + mood)), least, mood)
