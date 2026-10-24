@@ -488,6 +488,7 @@ class App:
             self.route_follower.attach()
             self.route_voice = RouteVoice(self.route_follower, Spansh(), narrator, self.settings, lambda: self.state)
             from navigation.game_target import choose_target
+            self.route_voice.plot_macro = lambda system: self.plot_system_by_macro(system)
             self.route_voice.game_target = lambda: choose_target(getattr(self, "journal_folder", None), self.state)
             self.bus.subscribe("NavRoute", self.route_voice.on_nav_route)
             self.bus.subscribe("FSDJump", self.route_voice.on_arrival)

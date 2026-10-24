@@ -22,6 +22,7 @@ from core import paths
 from core.identity import personalise
 from core.logger import get_logger
 from navigation.edastro import EdAstro, EdAstroError, distance
+from navigation.engineers import EngineerBook, distance as engineer_distance
 from navigation.spansh import SpanshError
 from personality.mood_engine import effective_mood
 
@@ -61,6 +62,9 @@ _PLOT_NEXT = re.compile(r"\b(plot|set|put in|enter|load|lay in|select)\b.*\b(nex
 # "take us to my carrier" / "set a course for the squad carrier": no word like route needed
 _CARRIER_GO = re.compile(r"\b(plot|set|lay in|navigate|take (me|us)|head|fly|go|route|course)\b.*\b(to|for)\b (?P<dest>(?:(?:my|the|our) )?"
                          r"(?:(?:squad|squadron|wing) (?:fleet )?carrier|(?:fleet |home )?carrier))$")
+# "take me to Felicity Farseer": only counts when the name really is an engineer (navigation/engineers.py)
+_GO_ENGINEER = re.compile(r"^(?:\w+ ){0,2}?(?:take|bring|fly|get|navigate|head|go|plot|set|lay in|route|lead|find)\b.*?\b(?:to|for|towards?)\b\s+(?P<who>.+)$")
+_WHERE_ENGINEER = re.compile(r"^where (?:is|s|does) (?P<who>.+?)(?: live| based| located)?$")
 _TAIL = re.compile(r"\b(using|via|by|with|through)\b.*\bneutron.*$|\bneutron (route|stars?)\b$")
 
 
@@ -175,6 +179,8 @@ class RouteVoice:
         self.edastro = EdAstro()
         self.emergency_file = paths.DATA_DIR / "emergency_route.json"
         self._emergency = self._load_emergency()
+        self.engineers = EngineerBook()
+        self.plot_macro = None           # the app sets this: plots a system with the galaxy map macro (the "auto plotter"): (system) -> (ok, reason)
         self.game_target = None          # the app sets this: a function giving the destination picked in the game's galaxy map
 
     # ---- "plot it for me when I set a target in the galaxy map" ----
@@ -236,6 +242,9 @@ class RouteVoice:
         saved = self._save_bookmark(said)
         if saved is not None:
             return saved
+        engineer = self._engineer_asked(said)
+        if engineer is not None:
+            return engineer
         found = _CARRIER_GO.search(said)
         if found:
             return self.plot(found.group("dest"))
@@ -336,6 +345,62 @@ class RouteVoice:
         self.narrator.say("RoutePlotting", {"destination": name})
         self.spawn(lambda: self._plot_now(name))
         return "Plotting a neutron route to %s" % name
+
+    # ---- "take me to Felicity Farseer" ----
+    def _engineer_asked(self, said):
+        found = _GO_ENGINEER.search(said)
+        if found:
+            engineer = self.engineers.find(found.group("who"))
+            if engineer is not None:
+                return self.go_to_engineer(engineer)
+        found = _WHERE_ENGINEER.search(said)
+        if found:
+            engineer = self.engineers.find(found.group("who"))
+            if engineer is not None:
+                return self.where_is_engineer(engineer)
+        return None
+
+    def _engineer_fields(self, engineer):
+        state = self.state_provider()
+        miles = engineer_distance(getattr(state, "star_pos", None), engineer.pos)
+        return {"engineer": engineer.spoken(), "system": engineer.system, "station": engineer.station,
+                "distance": "{:,}".format(int(round(miles))) if miles is not None else "an unknown number of", "ly": miles}
+
+    def where_is_engineer(self, engineer):
+        fields = self._engineer_fields(engineer)
+        self.narrator.say("EngineerWhere", fields)
+        return "%s is at %s in %s" % (engineer.name, engineer.station, engineer.system)
+
+    def go_to_engineer(self, engineer):
+        """Close (1000 light years or less): the galaxy map macro. Far away (or distance unknown): a neutron route from Spansh."""
+        state = self.state_provider()
+        fields = self._engineer_fields(engineer)
+        here = str(getattr(state, "system", "") or "")
+        if here.casefold() == engineer.system.casefold():
+            self.narrator.say("EngineerHere", fields)
+            return "%s is right here in %s" % (engineer.name, here)
+        limit = self._engineer_limit()
+        miles = fields["ly"]
+        if miles is not None and miles <= limit and self.plot_macro is not None:
+            ok, reason = self.plot_macro(engineer.system)
+            if not ok:
+                fields["reason"] = reason or "the galaxy map macro is not available"
+                self.narrator.say("EngineerPlotOff", fields)
+                return "Could not plot: %s" % fields["reason"]
+            self.narrator.say("EngineerNear", fields)
+            return "Plotting %s in %s with the galaxy map" % (engineer.name, engineer.system)
+        if self._busy:
+            return "Already plotting."
+        self._busy = True
+        self.narrator.say("EngineerFar" if miles is not None else "EngineerFarUnknown", fields)
+        self.spawn(lambda: self._plot_now(engineer.system))
+        return "Plotting a neutron route to %s in %s" % (engineer.name, engineer.system)
+
+    def _engineer_limit(self):
+        try:
+            return float(self.settings.get("engineers.neutron_over_ly", 1000))
+        except (TypeError, ValueError):
+            return 1000.0
 
     def carrier_system(self, key):
         """Where is the carrier? Your own: what the journal says, else the 'Fleet carrier' bookmark. The squad's: the 'Squad carrier' bookmark."""

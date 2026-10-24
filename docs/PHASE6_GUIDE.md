@@ -563,3 +563,15 @@ She says the two nearest matches as **Option A** and **Option B** (planet, syste
 - Her lines are in `voicepacks/default/merit.json`.
 
 Checked live against Spansh's own search while building this (a power's systems, Metallic + Pristine rings, and station markets with demand 2000+), but not with a real game session. Limits: Spansh only says which Power CONTROLS a system, so systems that are merely influenced are not found. Spansh's data is only as fresh as the last player who docked there, so a market may have changed. She needs to be talked to by name (wake word or push-to-talk) like her other answers.
+
+## 0.40.0: "take me to <engineer>"
+
+Say "Starling, take me to Felicity Farseer" (also "take us to", "go to", "navigate to", "fly to", "plot a course to") with any first name, last name, nickname or the full name of one of the 38 engineers (list in `docs/ENGINEERS.md`). Titles are optional ("Dekker", "Colonel Bris Dekker", "the Dweller", "Sarge"). If the microphone mishears a name she takes the closest one.
+
+- **1000 light years or closer:** she puts the engineer's system into the galaxy map with the auto plotter (the galaxy map macro).
+- **Farther:** she asks Spansh for a neutron route to the system and plots it like any neutron route.
+- **Already there:** she tells you which station.
+- **"Where is Felicity Farseer?"** gives the system, the station and the distance.
+- The 1000 can be changed on the Navigation page. The engineers are in `config/engineers.json` (add an `aliases` list to an engineer to give a name another spelling).
+
+Not tested with the real game: the galaxy map macro and Spansh's live route. The engineer list comes from EDDI's data (38 engineers); if a new engineer is added by Frontier, add a block to `config/engineers.json`.

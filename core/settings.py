@@ -32,6 +32,7 @@ DEFAULTS = {
     "plans": {"ask": True},
     "exobiology": {"distance_alert": True, "distance_beep": True},
     "merit": {"power": "", "commodities": ["Platinum", "Osmium", "Painite", "Palladium"]},
+    "engineers": {"neutron_over_ly": 1000},
     "regions": {"announce": True},
     "messages": {"read": True, "npc": False},
     "voidcompass": {"enabled": True, "port": 7380},

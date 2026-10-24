@@ -1,0 +1,47 @@
+{
+ "_help": "Engineers. Fields: {engineer} {system} {station} {distance} (light years) {reason}.",
+ "EngineerNear": [
+  "Taking you to {engineer}. {station} in {system}, {distance} light years. Plotting it in the galaxy map.",
+  "{engineer} is at {station} in {system}, {distance} light years away. Setting the course.",
+  "Right, {engineer}. {system} is {distance} light years from here. Plotting now.",
+  "Plotting {system} for {engineer}. It's {distance} light years."
+ ],
+ "EngineerNear_Friendly": [
+  "Off to see {engineer} we go. {system} is {distance} light years away, I'm plotting it."
+ ],
+ "EngineerNear_Close": [
+  "Let's go and see {engineer}, love. {system}, {distance} light years. Plotting."
+ ],
+ "EngineerNear_Sarcastic": [
+  "{engineer}, again. {system} is {distance} light years away. Plotting it."
+ ],
+ "EngineerFar": [
+  "{engineer} is a long way off: {distance} light years, in {system}. Working out a neutron route on Spansh.",
+  "That's {distance} light years to {engineer} at {system}. I'll plot a neutron route.",
+  "{system} is {distance} light years away. Asking Spansh for a neutron route to {engineer}."
+ ],
+ "EngineerFar_Close": [
+  "{engineer} is far, {distance} light years, but I'll get you there. Plotting a neutron route."
+ ],
+ "EngineerFar_Sarcastic": [
+  "{distance} light years to see {engineer}. Sensible. Plotting a neutron route."
+ ],
+ "EngineerFarUnknown": [
+  "I don't know exactly where we are, so I'll ask Spansh for a neutron route to {engineer} in {system}.",
+  "Plotting a neutron route to {engineer} at {system}."
+ ],
+ "EngineerHere": [
+  "{engineer} is right here in {system}, at {station}.",
+  "We're already in {system}. {engineer} is at {station}.",
+  "No route needed. {engineer} is at {station}, in this system."
+ ],
+ "EngineerWhere": [
+  "{engineer} is at {station} in {system}, {distance} light years from here.",
+  "You'll find {engineer} at {station}, in the {system} system. That's {distance} light years away.",
+  "{engineer}: {station}, {system}, {distance} light years."
+ ],
+ "EngineerPlotOff": [
+  "I can't plot to {engineer} just now: {reason}.",
+  "Sorry, Commander. I can't use the galaxy map right now: {reason}."
+ ]
+}
