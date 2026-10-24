@@ -34,7 +34,7 @@ DEFAULTS = {
     "neutron": {"enabled": True, "destination": "", "jump_range": 0, "range_margin": 0.9, "efficiency": 60,
                 "supercharge": 4, "auto_x6": True, "auto_on_target": False, "emergency": True, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},
     "nomad": {"stow_hardpoints": True},
-    "bookmarks": {"home": "", "b1": "", "b2": "", "b3": "", "b4": "", "b5": "", "b6": "", "b7": "", "b8": "", "b9": "", "b10": ""},
+    "bookmarks": {"home": "", "b1": "", "b2": "", "b3": "", "b4": "", "b5": "", "b6": "", "b7": "", "b8": "", "b9": "", "b10": "", "fleet": "", "squad": ""},
     "watcher": {"enabled": True, "hush": True, "reply": "often", "wait_for_calm": True},
     "autohonk": {"mode": "off", "hold_seconds": 6.0, "delay_seconds": 2.0},
     "combat_assist": {"pips": True, "pips_analysis": True, "heat_sink": True,

@@ -58,6 +58,9 @@ _CANCEL = re.compile(r"\b(cancel|clear|stop|abandon|forget|scrap|delete|drop|res
 _REPLOT = re.compile(r"\b(re ?plot|plot (it )?again|redo the route|new route from here|recalculate)\b")
 # "plot the next waypoint" is the hands-free galaxy map macro (control/catalog.py), not a question about the route
 _PLOT_NEXT = re.compile(r"\b(plot|set|put in|enter|load|lay in|select)\b.*\b(next|waypoint)\b|\bnext waypoint in\b")
+# "take us to my carrier" / "set a course for the squad carrier": no word like route needed
+_CARRIER_GO = re.compile(r"\b(plot|set|lay in|navigate|take (me|us)|head|fly|go|route|course)\b.*\b(to|for)\b (?P<dest>(?:(?:my|the|our) )?"
+                         r"(?:(?:squad|squadron|wing) (?:fleet )?carrier|(?:fleet |home )?carrier))$")
 _TAIL = re.compile(r"\b(using|via|by|with|through)\b.*\bneutron.*$|\bneutron (route|stars?)\b$")
 
 
@@ -89,7 +92,7 @@ def clean(text):
 
 _NUMBER_WORDS = {"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8",
                  "nine": "9", "ten": "10", "won": "1", "to": "2", "too": "2", "for": "4", "tin": "10"}
-_SLOT = re.compile(r"^(?:my |the )?(?:(?P<home>home(?: system| base| star)?)|book ?mark(?: number| no)? (?P<n>\w+))$")
+_SLOT = re.compile(r"^(?:my |the |our )?(?:(?P<squad>(?:squad|squadron|wing) (?:fleet )?carrier)|(?P<fleet>(?:(?:fleet|home) )?carrier)|(?P<home>home(?: system| base| star)?)|book ?mark(?: number| no)? (?P<n>\w+))$")
 _SAVE = re.compile(r"\b(save|store|remember|bookmark|mark|set|put|keep|file)\b (?:this|the current|current|our current|my current|here)?\s*"
                    r"(?:system|location|place|star|here)?\s*\b(as|in|into|to|under|for)\b\s+(?P<slot>.+)$")
 _SAVE_SLOT_FIRST = re.compile(r"\b(set|make)\b (?P<slot>.+?) (?:to|as|equal to) (?:here|this system|the current system|where we are|where i am)$")
@@ -100,6 +103,10 @@ def slot_key(text):
     found = _SLOT.match(clean(text))
     if not found:
         return None
+    if found.group("squad"):
+        return "squad"
+    if found.group("fleet"):
+        return "fleet"
     if found.group("home"):
         return "home"
     number = _NUMBER_WORDS.get(found.group("n"), found.group("n"))
@@ -107,7 +114,7 @@ def slot_key(text):
 
 
 def slot_name(key):
-    return "Home" if key == "home" else "Bookmark %s" % key[1:]
+    return {"home": "Home", "fleet": "Fleet carrier", "squad": "Squad carrier"}.get(key) or "Bookmark %s" % key[1:]
 
 
 class Narrator:
@@ -229,6 +236,9 @@ class RouteVoice:
         saved = self._save_bookmark(said)
         if saved is not None:
             return saved
+        found = _CARRIER_GO.search(said)
+        if found:
+            return self.plot(found.group("dest"))
         found = _PLOT.search(said)
         if found:
             return self.plot(found.group("dest"))
@@ -311,6 +321,8 @@ class RouteVoice:
     def plot(self, destination_text):
         spoken = _TAIL.sub("", clean(destination_text)).strip()
         key = None if spoken in self._my_favourites() else slot_key(spoken)
+        if key in ("fleet", "squad"):
+            return self._plot_carrier(key)
         if key is not None and not str(self.settings.get("bookmarks." + key, "") or "").strip():
             self.narrator.say("RouteBookmarkEmpty", {"slot": slot_name(key)})
             return "%s is empty." % slot_name(key)
@@ -324,6 +336,39 @@ class RouteVoice:
         self.narrator.say("RoutePlotting", {"destination": name})
         self.spawn(lambda: self._plot_now(name))
         return "Plotting a neutron route to %s" % name
+
+    def carrier_system(self, key):
+        """Where is the carrier? Your own: what the journal says, else the 'Fleet carrier' bookmark. The squad's: the 'Squad carrier' bookmark."""
+        state = self.state_provider()
+        if key == "fleet":
+            seen = str(getattr(state, "fleet_carrier_system", "") or "").strip()
+            if seen:
+                return seen
+        return str(self.settings.get("bookmarks." + key, "") or "").strip()
+
+    def _plot_carrier(self, key):
+        name = self.carrier_system(key)
+        state = self.state_provider()
+        if not name:
+            if key == "fleet":
+                self.narrator.say("CarrierFleetUnknown")
+                return "I don't know where your fleet carrier is."
+            squad = str(getattr(state, "squadron", "") or "").strip()
+            if squad:
+                self.narrator.say("CarrierSquadUnknown", {"squadron": squad})
+                return "I don't know where the squad carrier is."
+            self.narrator.say("CarrierNoSquad")
+            return "No squad carrier saved, and no squadron known."
+        here = str(getattr(state, "system", "") or "")
+        if here and here.casefold() == name.casefold():
+            self.narrator.say("CarrierHere", {"system": name, "carrier": slot_name(key).lower()})
+            return "We are already in %s." % name
+        if self._busy:
+            return "Already plotting."
+        self._busy = True
+        self.narrator.say("CarrierPlotting", {"destination": name, "carrier": slot_name(key).lower()})
+        self.spawn(lambda: self._plot_now(name))
+        return "Plotting a route to the %s in %s" % (slot_name(key).lower(), name)
 
     def _my_favourites(self):
         return {clean(k): v for k, v in (self.settings.get("neutron.favourites", {}) or {}).items()}
@@ -340,6 +385,8 @@ class RouteVoice:
         if spoken in mine:
             return mine[spoken]
         key = slot_key(spoken)
+        if key in ("fleet", "squad"):
+            return self.carrier_system(key)
         if key is not None:
             return str(self.settings.get("bookmarks." + key, "") or "").strip()
         return FAVOURITES.get(spoken) or " ".join(w.capitalize() if not w.isupper() else w for w in spoken.split())

@@ -48,8 +48,8 @@ class PortraitTests(unittest.TestCase):
 class BookmarkSettings(unittest.TestCase):
     def test_eleven_boxes(self):
         page = next(p for p in SettingsModel(make_settings()).pages if p.id == "bookmarks")
-        self.assertEqual([f.label for f in page.fields], ["Home"] + ["Bookmark %d" % n for n in range(1, 11)])
-        self.assertEqual(set(DEFAULTS["bookmarks"]), {"home"} | {"b%d" % n for n in range(1, 11)})
+        self.assertEqual([f.label for f in page.fields], ["Home", "Fleet carrier", "Squad carrier"] + ["Bookmark %d" % n for n in range(1, 11)])
+        self.assertEqual(set(DEFAULTS["bookmarks"]), {"home", "fleet", "squad"} | {"b%d" % n for n in range(1, 11)})
 
     def test_saving_through_the_model(self):
         settings = make_settings()
@@ -140,7 +140,7 @@ class DashboardUiTests(unittest.TestCase):
         for page in ("home", "navigation", "voice", "game", "personality"):
             self.assertIn(page, d.page_frames)
             d.show(page)
-        self.assertEqual(len(d._bookmark_entries), 11)
+        self.assertEqual(len(d._bookmark_entries), 13)
 
     def test_picture_follows_the_mood(self):
         d = self.dashboard.Dashboard(self.app)

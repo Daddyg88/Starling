@@ -500,3 +500,18 @@ Two actions only get in each other's way when they work in the same view. She no
 ### 0.34.10: docking waits for the panel
 
 Your 17:03 trace showed `FocusLeftPanel>gui0`: the game was still showing the cockpit 0.85 s after she pressed Focus Left Panel, so the first Next Tab presses may have been lost and Select landed on the wrong tab. The docking macro now waits 1.6 s after Focus Left Panel, 0.7 s between the tab presses and 1.6 s before Select. If it still does not work, tell me which tab is highlighted when you open the left panel by hand and which one she ends on.
+
+## 0.35.0: routes to your fleet carrier and the squad carrier
+
+Say any of these (the usual neutron route is plotted, from where you are to the carrier's system):
+
+- "Starling, plot a route to my fleet carrier" / "to my carrier" / "take us to my carrier" / "set a course for my carrier"
+- "Starling, plot a route to the squad carrier" / "the squadron carrier"
+
+**Your fleet carrier.** She learns where it is from the journal: `CarrierStats` (its callsign), `CarrierLocation` (when you load the game), `CarrierJump` and docking at it. The journal only tells her about the carrier when you have played with it, so if she says she doesn't know, dock at it once, or type the system in the new **Fleet carrier** box on the Bookmarks page, or say "save this system as my carrier" while you are in its system.
+
+**The squad carrier.** The journal never says where a squadron's carrier is, so she cannot find it by herself. Stand in its system and say "save this system as the squad carrier" (or type it in the **Squad carrier** box). If nothing is saved she says so; if she knows you are in a squadron (`SquadronStartup`) she names it, otherwise she says she can't find a squad.
+
+If you are already in that system she says so instead of plotting. Her lines are in `voicepacks/default/carriers.json`.
+
+Not tested on a real game: the journal field names come from the Elite journal manual and from memory. If "my carrier" is never learned, send me a journal and I will check the field names.

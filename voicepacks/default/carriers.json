@@ -1,0 +1,54 @@
+{
+ "_help": "Carrier route lines. Fields: {destination} {carrier} {system} {squadron}. Plotting uses the normal route lines afterwards.",
+ "CarrierPlotting": [
+  "Plotting a route to the {carrier} in {destination}. One moment.",
+  "Heading for the {carrier}. Working out the route to {destination}.",
+  "Let me find the way to the {carrier} in {destination}.",
+  "Route to the {carrier}, {destination}. Give me a few seconds.",
+  "Carrier route coming up. {destination} is where she's parked."
+ ],
+ "CarrierPlotting_Friendly": [
+  "Home sweet carrier. Plotting to {destination} now.",
+  "Right, taking you back to the {carrier} in {destination}."
+ ],
+ "CarrierPlotting_Close": [
+  "Back to the {carrier}, and a proper rest. Plotting to {destination}.",
+  "Let's get you home, love. Route to {destination} coming up."
+ ],
+ "CarrierPlotting_Sarcastic": [
+  "The {carrier}, again. Plotting to {destination}.",
+  "Off to {destination} we go, because apparently the {carrier} won't come to us."
+ ],
+ "CarrierPlotting_Frustrated": [
+  "Fine. {destination}, the {carrier}. Plotting."
+ ],
+ "CarrierHere": [
+  "We're already in {system}, Commander. The {carrier} should be right here.",
+  "Look around. The {carrier} is in this very system, {system}.",
+  "No route needed. We're in {system} already."
+ ],
+ "CarrierHere_Sarcastic": [
+  "We are in {system}. The {carrier} is in {system}. I'll let you work out the rest."
+ ],
+ "CarrierFleetUnknown": [
+  "I don't know where your fleet carrier is. Dock at it once, or type the system on the Bookmarks page, or say: save this system as my carrier.",
+  "No idea where your carrier is yet. Visit it, or save its system as your carrier and I'll remember.",
+  "I haven't seen your fleet carrier this session. Put its system in the Fleet carrier bookmark and ask me again."
+ ],
+ "CarrierFleetUnknown_Sarcastic": [
+  "You've lost a carrier. That's quite a feat. Tell me which system it's in: save this system as my carrier."
+ ],
+ "CarrierSquadUnknown": [
+  "I know you're in {squadron}, but I don't know where the squad carrier is. Go to it and say: save this system as the squad carrier.",
+  "No squad carrier saved for {squadron}. Stand in its system and tell me to save it, or type it on the Bookmarks page.",
+  "Where is the {squadron} carrier? I can't tell. Save its system as the squad carrier and I'll plot there."
+ ],
+ "CarrierNoSquad": [
+  "I don't have a squad carrier saved, and I don't think you're in a squadron. If you are, save the carrier's system as the squad carrier.",
+  "No squad carrier that I know of. If you have one, stand in its system and say: save this system as the squad carrier.",
+  "I can't find a squadron for you. If there is a squad carrier, tell me where with: save this system as the squad carrier."
+ ],
+ "CarrierNoSquad_Sarcastic": [
+  "A squad carrier needs a squad. I haven't seen one. Save its system if you do have one."
+ ]
+}

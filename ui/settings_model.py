@@ -278,8 +278,10 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("updates.token", "GitHub token (only for a private repository)", "text",
                   help="Leave empty for a public repository. A token lets Starling read a private one. Keep it secret"),
         ]),
-        Page("bookmarks", "Bookmarks", "Eleven places to keep system names. Say 'Starling, plot a neutron route to Home' or 'to bookmark 3'.",
-             [Field("bookmarks.home", "Home", "text", placeholder="System name")]
+        Page("bookmarks", "Bookmarks", "Places to keep system names. Say 'Starling, plot a neutron route to Home', 'to bookmark 3', 'to my fleet carrier' or 'to the squad carrier'.",
+             [Field("bookmarks.home", "Home", "text", placeholder="System name"),
+              Field("bookmarks.fleet", "Fleet carrier", "text", placeholder="Filled in from the journal"),
+              Field("bookmarks.squad", "Squad carrier", "text", placeholder="System name")]
              + [Field("bookmarks.b%d" % n, "Bookmark %d" % n, "text", placeholder="System name") for n in range(1, 11)]),
         Page("personality", "Personality", "Who she is today.", [
             Field("app.name", "Her name", "text", restart=True, placeholder="Starling",

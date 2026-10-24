@@ -1,6 +1,7 @@
 """You docked at a station."""
 
 from events.base_event import BaseEvent
+from events.carriers import remember_carrier_visit
 from core.event_bus import NORMAL
 
 
@@ -17,3 +18,4 @@ class Docked(BaseEvent):
         state.station = entry.get("StationName")
         state.system = entry.get("StarSystem") or state.system
         state.in_supercruise = False
+        remember_carrier_visit(entry, state)
