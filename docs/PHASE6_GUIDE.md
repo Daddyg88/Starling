@@ -515,3 +515,7 @@ Say any of these (the usual neutron route is plotted, from where you are to the 
 If you are already in that system she says so instead of plotting. Her lines are in `voicepacks/default/carriers.json`.
 
 Not tested on a real game: the journal field names come from the Elite journal manual and from memory. If "my carrier" is never learned, send me a journal and I will check the field names.
+
+## 0.35.1: drop out of supercruise by voice
+
+Say "exit supercruise", "drop out", "drop us out", "safe disengage" or "bring us down" and she presses your Supercruise key (the same key that starts supercruise, the one in "Press J to exit supercruise"). It is not automatic: Elite does not write that on-screen prompt to the journal or Status.json, and the distance to your target is not in any file she can read, so she cannot know when the prompt appears. Say it when you see it.

@@ -134,3 +134,15 @@ class CarrierLines(unittest.TestCase):
             self.assertEqual(len(lines), len(set(lines)), key)
             for line in lines:
                 self.assertFalse([b for b in banned if b in line.lower()], line)
+
+
+class DropOut(unittest.TestCase):
+    def test_exit_supercruise_phrases(self):
+        from control.catalog import CATALOG
+        from control.matcher import Matcher
+        m = Matcher(CATALOG)
+        for text in ("exit supercruise", "drop out", "drop us out", "safe disengage", "leave super cruise"):
+            hit = m.match(text)
+            self.assertEqual(hit.command.id, "exit_supercruise", text)
+            self.assertEqual(hit.command.action, "Supercruise")
+        self.assertEqual(m.match("engage supercruise").command.id, "supercruise")
