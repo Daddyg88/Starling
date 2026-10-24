@@ -39,7 +39,7 @@ DEFAULTS = {
     "autohonk": {"mode": "off", "hold_seconds": 6.0, "delay_seconds": 2.0},
     "combat_assist": {"pips": True, "pips_analysis": True, "heat_sink": True,
                       "pips_delay": 1.2, "pips_delay_analysis": 3.0, "pips_topup_seconds": 8.0, "pips_press_gap": 0.1, "x52_trigger": True, "fire_buttons": ""},
-    "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "disabled": []},
+    "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "key_hold": 0.06, "disabled": []},
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True},
     "talk": {"combat": True, "exploration": True, "exobiology": True, "mining": True, "trading": True, "antixeno": True},

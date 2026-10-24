@@ -80,6 +80,7 @@ class CommandRunner:
         self.state_provider = state_provider or (lambda: None)
         self.matcher = matcher or Matcher()
         self.flavour = flavour
+        self._docking_seen = []
         self.echo = echo                 # control/echo.py: tells the event speaker not to repeat what she just did
         self.macro_hooks = macro_hooks or {}     # command id -> function run before its macro; returns (ok, sentence)
         self.brain = brain               # personality/brain.py: answers anything that is not a command
@@ -96,9 +97,16 @@ class CommandRunner:
     # ---- wiring ----
     def attach(self):
         self.bus.subscribe("voice.heard", self.on_heard)
+        for name in ("DockingRequested", "DockingGranted", "DockingDenied"):
+            self.bus.subscribe(name, self._on_docking_event)
+
+    def _on_docking_event(self, event):
+        self._docking_seen.append(getattr(event, "name", None) or str(event))
 
     def detach(self):
         self.bus.unsubscribe("voice.heard", self.on_heard)
+        for name in ("DockingRequested", "DockingGranted", "DockingDenied"):
+            self.bus.unsubscribe(name, self._on_docking_event)
 
     def learn_overlays(self):
         """Ask Void Compass what overlays it has and add voice commands for any we don't know. Returns the labels added.
@@ -308,6 +316,24 @@ class CommandRunner:
         custom = (self.settings.get("macros", {}) or {}).get(command.id)
         return custom if isinstance(custom, list) and custom else list(command.macro)
 
+    def _gui_focus(self):
+        state = self.state_provider()
+        return getattr(state, "gui_focus", "?") if state is not None and getattr(state, "status_seen", False) else "?"
+
+    def _check_docking_later(self):
+        """Four seconds after the docking macro, writes to the log whether the game really answered (journal DockingRequested)."""
+        import threading
+
+        def check():
+            if self._docking_seen:
+                log.info("Docking request: the game answered (%s).", ", ".join(self._docking_seen))
+            else:
+                log.warning("Docking request: the game did NOT answer within 4 s (no DockingRequested in the journal). "
+                            "The keys were sent, so one of them was not taken: see the macro trace line above.")
+        timer = threading.Timer(4.0, check)
+        timer.daemon = True
+        timer.start()
+
     def galaxy_map_open(self):
         """True while Status.json says the galaxy map is the screen you are looking at (GuiFocus 6)."""
         state = self.state_provider()
@@ -341,6 +367,12 @@ class CommandRunner:
             strokes[action] = stroke
         self._key_clashes(strokes)               # logged only: she no longer talks about it
         self.sender.require_game = bool(self.settings.get("commands.require_game_focus", True))
+        try:
+            self.sender.hold_seconds = max(0.03, min(float(self.settings.get("commands.key_hold", 0.06)), 0.5))
+        except (TypeError, ValueError, AttributeError):
+            pass
+        trace = []                               # what the game was showing after each wait (GuiFocus from Status.json)
+        self._docking_seen = []
         quiet = ("GalaxyMapOpened", "GalaxyMapClosed", "ScreenClosed") if command.id == "plot_waypoint" else ()
         if quiet and self.echo is not None:
             self.echo.mute(quiet, 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
@@ -349,6 +381,7 @@ class CommandRunner:
         for step in steps:
             if step[0] == "wait":
                 self.sleep(step[1])
+                trace.append("%s>gui%s" % (pressed[-1] if pressed else "-", self._gui_focus()))
                 continue
             if step[0] == "say":
                 self.macro_spoke = True
@@ -373,6 +406,10 @@ class CommandRunner:
                 pressed.append(step[1])
                 self.sleep(GAP_SECONDS)
         self._last[key] = now
+        log.info("Macro %s trace (key>screen after each wait; gui 0=cockpit 1=right panel 2=left panel 6=galaxy map): %s",
+                 command.id, ", ".join(trace) if trace else "none")
+        if command.id == "request_docking":
+            self._check_docking_later()
         if quiet and self.echo is not None:
             self.echo.mute(quiet, 6)            # the game's "map closed" can arrive a moment after the last key
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),

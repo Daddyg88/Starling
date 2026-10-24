@@ -881,7 +881,7 @@ class NewMacros(unittest.TestCase):
         self.assertEqual(LAUNCH_MACRO[-3:], ("UI_Down", "wait 0.6", "UI_Select"))
         self.assertEqual([s for s in LAUNCH_MACRO if s.startswith("say ")], ["say Launch_Start", "say Launch_Systems", "say Launch_Go"])
         self.assertEqual(LAUNCH_MACRO.count("UI_Back"), 2)
-        self.assertEqual(DOCKING_MACRO[-1], "UI_Back")
+        self.assertEqual(DOCKING_MACRO[-1], "hold UI_Back 0.15")
 
 
 class PreferUnsharedKey(unittest.TestCase):
@@ -1040,3 +1040,20 @@ class OnlyClashesThatMeet(unittest.TestCase):
         text = "\n".join(r.binding_conflicts())
         self.assertIn("UI Down", text)
         self.assertNotIn("Cycle Next Panel", text)
+
+
+class DockingSelfCheck(unittest.TestCase):
+    def test_the_runner_notices_the_games_docking_answer(self):
+        from tests.test_macros import MacroTests
+        t = MacroTests()
+        r = t.build()
+        r.attach()
+        r.bus.publish("DockingRequested", {"StationName": "X"}, "normal")
+        self.assertEqual(r._docking_seen, ["DockingRequested"])
+
+    def test_key_hold_setting_reaches_the_sender(self):
+        from tests.test_macros import MacroTests
+        t = MacroTests()
+        r = t.build(commands__key_hold=0.2)
+        r.run_text("request docking")
+        self.assertAlmostEqual(r.sender.hold_seconds, 0.2)

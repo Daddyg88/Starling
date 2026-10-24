@@ -50,8 +50,8 @@ class MacroTests(unittest.TestCase):
         r = self.build()
         r.run_text("request docking")
         names = [s.key for s in self.sender.pressed]
-        # 0.34.4: focus left panel, Next Tab x2, Right, Select, Previous Tab x2, Back
-        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_5", "Key_4", "Key_8", "Key_8", "Key_6"])
+        # 0.34.9: the recording exactly: focus left panel, Next Tab x2, Select, Previous Tab x2, Back (no Right press)
+        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_4", "Key_8", "Key_8", "Key_6"])
         self.assertNotIn("Key_7", names)
         self.assertIn(1.2, self.sleeps)
 

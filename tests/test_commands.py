@@ -359,7 +359,7 @@ class FakeSender:
     def __init__(self, problem=""):
         self.pressed, self.problem, self.require_game = [], problem, True
 
-    def send(self, stroke):
+    def send(self, stroke, hold=None):
         if self.problem:
             return self.problem
         self.pressed.append(stroke)

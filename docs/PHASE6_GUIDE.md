@@ -489,3 +489,10 @@ The "Key clash" warning in the log tells you which actions share a key.
 ### 0.34.8: only clashes that can really happen
 
 Two actions only get in each other's way when they work in the same view. She now groups every Elite action into one of: ship (flying, targeting, cockpit panels and menus), galaxy map, system scanner (FSS), surface scanner (SAA), camera, SRV, on foot, fighter, multicrew. Key clashes between different groups are ignored, both in "Check my Elite keys" and in the log warnings. The grouping is by action name (`view_of` in `control/binds.py`), so a few odd actions may land in "ship" and be reported when they would not matter. Tell me which and I'll move them.
+
+## 0.34.9: docking, with a self-check
+
+- The docking macro is now your 12:38 recording exactly (left panel, Next Tab, Next Tab, Select, Previous Tab twice, Back). The Right press is gone because Right shares a key with Yaw Right. Every key is held 0.15 s, like the buttons in your recording, instead of her usual 0.06 s tap.
+- After every macro the log gets a line like `Macro request_docking trace (...): FocusLeftPanel>gui2, CycleNextPanel>gui2 ...`. The number is the screen the game showed (Status.json GuiFocus): 0 cockpit, 1 right panel, 2 left panel, 6 galaxy map. If the first number after FocusLeftPanel is not 2, the left panel never opened.
+- Four seconds after a docking request the log says either `the game answered` (journal DockingRequested/Granted/Denied) or `did NOT answer`.
+- New setting `commands.key_hold` (default 0.06 seconds) in `config/settings.json` sets how long every macro key is held. Try 0.12 if keys get missed.
