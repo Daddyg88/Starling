@@ -203,6 +203,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Buttons 1 and 2 of your flight stick (any make: X52, X56, Warthog, T16000M, VKB, Virpil...) (both trigger stages) always send pips to weapons, even if Elite's controls do not list them"),
             Field("combat_assist.heat_sink", "Combat: deploy a heat sink when overheating", "toggle",
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
+            Field("onfoot.auto_shields", "On foot: raise my suit shields when I draw a weapon or take damage", "toggle",
+                  help="Presses your Toggle Shields key once. Elite has only a toggle and does not say if the shields are up, so if they were already up they go down (say 'suit shields' to flip them back). Needs a keyboard key for Toggle Shields"),
         ]),
         Page("exploration", "Exploration", "Scanning, discoveries, fuel scooping and the honk.", [
             Field("talk.exploration", "She comments on exploration", "toggle",

@@ -575,3 +575,35 @@ Say "Starling, take me to Felicity Farseer" (also "take us to", "go to", "naviga
 - The 1000 can be changed on the Navigation page. The engineers are in `config/engineers.json` (add an `aliases` list to an engineer to give a name another spelling).
 
 Not tested with the real game: the galaxy map macro and Spansh's live route. The engineer list comes from EDDI's data (38 engineers); if a new engineer is added by Frontier, add a block to `config/engineers.json`.
+
+
+## 0.41.0 - On-foot voice control and auto shields
+
+Every on-foot (Humanoid) key from your Elite controls can now be said. Each one needs a KEYBOARD key in Elite's on-foot controls (a second binding is fine).
+
+Things you can say (no "Starling" needed when listening is open, as with the other commands):
+
+| Say | Presses |
+|---|---|
+| "suit shields" / "raise my suit shields" | Toggle Shields |
+| "torch" / "flashlight" | Toggle Flashlight |
+| "helmet night vision" / "visor night vision" | Toggle Night Vision (on foot). Plain "night vision" is still the ship's |
+| "use a health pack" / "heal me" | Health Pack |
+| "use a battery" / "energy cell" | Battery |
+| "throw a grenade" | Throw Grenade |
+| "next grenade type" / "previous grenade type" | Next / Previous Grenade Type |
+| "select frag grenades" / "EMP grenades" / "shield grenades" | the three grenade select keys |
+| "primary weapon", "secondary weapon", "utility slot", "next weapon", "other weapon", "holster", "reload", "melee" | weapon keys |
+| "energy link", "composition scanner", "suit tool", "tool mode" | the tool keys |
+| "interact", "jump over it", "crouch", "sprint", "walk", "aim", "item wheel", "emote wheel", "ping", "mission help", "access panel" | the rest |
+| "wave", "dance", "point", "salute", "clap", "shrug", "thumbs up", "sit" | EmoteSlot1 to 8, see below |
+
+EMOTES: Elite does not tell Starling which emote is in which slot. `config/emotes.json` maps a word to a slot number (1-8). The numbers are a FIRST GUESS: open your emote wheel in the game, see which slot is the wave, and edit the number in that file (you can add words too). Restart Starling after editing.
+
+AUTO SHIELDS (Combat page, off by default): when you pull out a weapon, or your health drops while on foot, she presses your Toggle Shields key once. Please read the limits:
+* Elite only has a TOGGLE key and does not say whether the shields are up. If they were already up, her press turns them off; say "suit shields" to flip them back.
+* She counts her own presses: after she raises them she waits until you holster and draw again, or leave the suit.
+* "Weapon in hand" comes from the Status.json field SelectedWeapon. Its exact wording could not be checked here; fists, tools and scanners are ignored.
+* Several keys in a typical bindings file are shared between actions (for example W is Forward and Battery, E is Interact and Frag Grenade). The key Starling presses may therefore do something else too. Give the on-foot actions spare keys if that bites.
+
+NOT TESTED against the real game (only the logic): any key press, the emote slot numbers, the SelectedWeapon wording.

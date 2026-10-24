@@ -34,6 +34,8 @@ class GameState:
     in_nomad: bool = False                  # the Nomad (a ship-launched vessel) is out; the game reports it as an SRV
     status_flags: int = 0                   # the raw "Flags" from Status.json (gear, lights...), used by voice commands
     status_flags2: int = 0
+    selected_weapon: str = ""        # Status.json SelectedWeapon (on foot); empty when none
+    health: object = None             # Status.json Health, 0-1 on foot (None when absent)
     bodies: dict = field(default_factory=dict)       # body name -> {"temperature": kelvin, "gravity": g} from Scan events
     current_body: Optional[str] = None      # the planet or moon you are near (ApproachBody / SupercruiseExit / Status.json)
     awaiting_discovery: bool = False        # just arrived: the first Scan tells us whether anyone discovered this system

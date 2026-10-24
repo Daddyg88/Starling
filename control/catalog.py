@@ -448,6 +448,8 @@ def _overlay_commands():
 
 
 CATALOG.extend(_overlay_commands())
+from control.onfoot import on_foot_commands   # noqa: E402  (the on-foot Humanoid commands live in control/onfoot.py)
+CATALOG.extend(on_foot_commands(C))
 
 # Game events each command causes. After she does it, she does not announce these again.
 ECHO = {

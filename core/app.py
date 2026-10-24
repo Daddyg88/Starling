@@ -81,6 +81,7 @@ class App:
         self.watcher = None
         self.region_tracker = None
         self.bio_distance = None
+        self.auto_shields = None
         self.route_voice = None
         self.route_follower = None
         self.ask = None
@@ -510,6 +511,18 @@ class App:
             self.log.exception("The biology distance alert could not start")
             self.bio_distance = None
 
+    def ensure_auto_shields(self):
+        """Raises the suit shields when you draw a weapon or take damage on foot (dashboard setting, off by default)."""
+        try:
+            from control.auto_shields import AutoShields
+            from control.binds import BindingBook
+            from control.sender import KeySender
+            self.auto_shields = AutoShields(self.settings, BindingBook(), KeySender())
+            self.monitor.status.listeners.append(self.auto_shields.check)
+        except Exception:
+            self.log.exception("Auto shields could not start")
+            self.auto_shields = None
+
     def ensure_regions(self):
         """Announces the galaxy region you jump into (and the first time you are in it). Safe to call twice."""
         if getattr(self, "region_tracker", None) is not None:
@@ -617,6 +630,7 @@ class App:
         poll = self.settings.get("journal.poll_seconds", 1.0)
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
         self.ensure_bio_distance()
+        self.ensure_auto_shields()
         self.monitor.start()
         return self.journal_folder
 

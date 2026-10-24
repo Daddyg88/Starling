@@ -114,6 +114,8 @@ class StatusReader:
         if state is not None:
             state.status_flags, state.status_flags2, state.status_seen = flags, flags2, flags != 0
             state.gui_focus = int(status.get("GuiFocus") or 0)
+            state.selected_weapon = str(status.get("SelectedWeapon") or "")
+            state.health = float(status["Health"]) if isinstance(status.get("Health"), (int, float)) else None
             main = (status.get("Fuel") or {}).get("FuelMain")
             if isinstance(main, (int, float)):
                 state.fuel_main = float(main)

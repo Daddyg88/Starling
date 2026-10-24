@@ -1,0 +1,11 @@
+{
+  "_help": "Which emote slot each word triggers. Slot numbers 1-8 are the EmoteSlot1-8 keys in Elite's on-foot controls. These are a first guess: open the emote wheel in the game, see which slot is the wave, and change the numbers here. Words can be added freely.",
+  "wave": 1,
+  "point": 2,
+  "salute": 3,
+  "thumbs up": 4,
+  "clap": 5,
+  "dance": 6,
+  "shrug": 7,
+  "sit": 8
+}
