@@ -37,6 +37,7 @@ def msg(text="Hello there", sender="CMDR Nyx", channel="wing", **extra):
 
 class Reader(unittest.TestCase):
     def build(self, **values):
+        values.setdefault("messages__channels", "all")                   # the other tests use wing and local chat
         self.settings = make_settings(**values)
         self.speech, self.state, self.clock = Speech(), GameState(), Clock()
         self.state.status_flags = 0
@@ -95,6 +96,27 @@ class Reader(unittest.TestCase):
         self.build(messages__npc=True)
         self.r.on_event(msg(channel="npc", sender="Pirate"))
         self.assertEqual(len(self.r.queue), 1)
+
+    def test_direct_messages_only_is_the_default(self):
+        self.build(messages__channels="direct")
+        for channel in ("local", "starsystem", "wing", "squadron", "friend", "voicechat"):
+            self.r.on_event(msg(channel=channel))
+        self.assertEqual(len(self.r.queue), 0)
+        self.r.on_event(msg(channel="player"))
+        self.assertEqual(len(self.r.queue), 1)
+
+    def test_direct_plus_reads_friends_wing_and_squadron_but_not_local(self):
+        self.build(messages__channels="direct_plus")
+        for channel in ("local", "starsystem"):
+            self.r.on_event(msg(channel=channel))
+        self.assertEqual(len(self.r.queue), 0)
+        for channel in ("player", "friend", "wing", "squadron"):
+            self.r.on_event(msg(channel=channel))
+        self.assertEqual(len(self.r.queue), 4)
+
+    def test_the_real_default_is_direct(self):
+        from core.settings import DEFAULTS
+        self.assertEqual(DEFAULTS["messages"]["channels"], "direct")
 
     def test_switch_off(self):
         self.build(messages__read=False)

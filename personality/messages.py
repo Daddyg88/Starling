@@ -6,7 +6,8 @@ short queue and she says them one at a time when it is calm: she is not talking 
 warning in the last 30 seconds, and the ship is not jumping, in danger, overheating, low on fuel or has weapons out.
 A message that has waited more than 3 minutes is dropped (it would be old news), and the queue keeps the newest 6.
 
-Settings: messages.read (on/off) and messages.npc (also read computer-controlled ships and stations, off by default).
+Settings: messages.read (on/off), messages.channels (direct = direct messages only, the default; direct_plus = also friends,
+wing, squadron and multicrew; all = also local and system chat) and messages.npc (also read computer-controlled ships and stations, off by default).
 Her lines are in voicepacks/default/messages.json.
 """
 
@@ -23,6 +24,12 @@ from personality.watcher import BUSY_BITS, CALM_AFTER_CRITICAL_SECONDS
 log = get_logger("messages")
 
 PLAYER_CHANNELS = {"wing", "local", "voicechat", "friend", "player", "squadron", "starsystem", "multicrew"}
+# messages.channels: which player chat she reads ("npc" has its own switch). Elite's channel "player" is a DIRECT message.
+CHANNEL_SETS = {
+    "direct": {"player"},
+    "direct_plus": {"player", "friend", "wing", "squadron", "multicrew", "voicechat"},
+    "all": PLAYER_CHANNELS,
+}
 MAX_WAITING = 6
 STALE_SECONDS = 180.0
 MAX_CHARS = 220
@@ -84,7 +91,8 @@ class MessageReader:
         channel = str(data.get("Channel") or "").lower()
         if channel == "npc" and not self.settings.get("messages.npc", False):
             return
-        if channel != "npc" and channel not in PLAYER_CHANNELS:
+        allowed = CHANNEL_SETS.get(str(self.settings.get("messages.channels", "direct")), CHANNEL_SETS["direct"])
+        if channel != "npc" and channel not in allowed:
             return
         message = tidy(data.get("Message_Localised") or data.get("Message"))
         name = tidy_name(data.get("From_Localised") or data.get("From"))

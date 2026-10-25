@@ -36,7 +36,7 @@ DEFAULTS = {
     "regions": {"announce": True},
     "onfoot": {"auto_shields": False, "preset": "", "auto_health": False, "auto_battery": False, "last_grenade_callout": True},
     "keybinds": {"ship": "", "srv": "", "fighter": "", "multicrew": ""},
-    "messages": {"read": True, "npc": False},
+    "messages": {"read": True, "npc": False, "channels": "direct"},
     "voidcompass": {"enabled": True, "port": 7380},
     "neutron": {"enabled": True, "destination": "", "jump_range": 0, "range_margin": 0.9, "efficiency": 60,
                 "supercharge": 4, "auto_x6": True, "auto_on_target": False, "emergency": True, "clipboard": True, "announce": True, "auto_plot": True, "favourites": {}},

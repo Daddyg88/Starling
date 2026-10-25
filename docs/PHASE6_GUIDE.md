@@ -699,3 +699,7 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.
+
+## 0.46.0 - Only direct messages
+
+Dashboard > Personality > **Which messages she reads**: *Direct messages only* (the new default), *Direct, friends, wing and squadron*, or *Everything, including local and system chat*. Computer-controlled ships keep their own switch (off). It applies to everyone, so your existing setting changes to direct only after this update. Elite's journal calls a direct message the "player" channel; if one of yours is not read, send me the log line and I will check the channel name.

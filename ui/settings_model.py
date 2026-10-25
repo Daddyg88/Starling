@@ -88,6 +88,8 @@ MERIT_POWERS = [("From the game (what the journal says)", "")] + [(p, p) for p i
     "Jerome Archer", "Li Yong-Rui", "Nakato Kaine", "Pranav Antal", "Yuri Grom", "Zemina Torval")]
 WATCHER_REPLY = [("Every time", "always"), ("Often", "often"), ("Sometimes", "sometimes"), ("Never", "never")]
 ANSWER_TIMES = [("5 seconds", 5), ("8 seconds", 8), ("10 seconds", 10), ("15 seconds", 15), ("20 seconds", 20)]
+MESSAGE_CHANNELS = [("Direct messages only", "direct"), ("Direct, friends, wing and squadron", "direct_plus"),
+                    ("Everything, including local and system chat", "all")]
 SEXES = [("Not specified", "neutral"), ("Male", "male"), ("Female", "female")]
 VOICES = ([("Her own cloned voice", "")]
           + [("%s - female" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("af_")]
@@ -354,7 +356,9 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("personality.login_greeting", "Greet me when I load the game", "toggle",
                   help="Says your ship, where you are, and how she feels"),
             Field("messages.read", "Read my incoming messages out loud", "toggle",
-                  help="Wing, squadron, local, friend and direct messages. She waits until nothing else is happening"),
+                  help="She waits until nothing else is happening"),
+            Field("messages.channels", "Which messages she reads", "choice", MESSAGE_CHANNELS,
+                  help="Direct messages only (the default) keeps her quiet in busy systems. Local and system chat are only read with Everything"),
             Field("messages.npc", "Also read computer-controlled ships and stations", "toggle",
                   help="Off by default: pirates, stations and police talk a lot"),
             Field("plans.ask", "Ask me 'What are we doing today?'", "toggle",
