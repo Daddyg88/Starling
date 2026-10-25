@@ -62,17 +62,18 @@ DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "hold CycleNextPanel 0.15", "wait
                  "hold CyclePreviousPanel 0.15", "wait 0.7", "hold CyclePreviousPanel 0.15",
                  "wait 0.85", "hold UI_Back 0.15")
 # 0.48.0: SHOW OFF. She talks through what she can do while she opens and closes the screens herself: galaxy map, left panel
-# (a couple of tabs), right panel. Only screens: nothing that moves the ship. "talk" waits until she has finished the sentence,
+# (a couple of tabs), right panel. Only screens: nothing that moves the ship. "talk" queues a plain line (no extra remarks, so it
+# starts at once) and the steps go on while she speaks; "finish" waits for her;
 # "leave" closes a screen only if it is open. Change or add steps under macros.show_off in config/settings.json.
-SHOWOFF_MACRO = ("talk ShowOff_Start", "wait 0.4",
-                 "GalaxyMapOpen", "wait 3.0", "talk ShowOff_Map", "leave UI_Back 6", "wait 1.5",
-                 "FocusLeftPanel", "wait 1.8", "talk ShowOff_Left", "hold CycleNextPanel 0.15", "wait 1.4",
-                 "hold CycleNextPanel 0.15", "wait 1.4", "talk ShowOff_Contacts", "hold CyclePreviousPanel 0.15", "wait 0.8",
-                 "hold CyclePreviousPanel 0.15", "wait 0.8", "leave UI_Back 2", "wait 1.4",
-                 "FocusRightPanel", "wait 1.6", "talk ShowOff_Right", "hold CycleNextPanel 0.15", "wait 1.4",
-                 "hold CycleNextPanel 0.15", "wait 1.4", "hold CyclePreviousPanel 0.15", "wait 0.8",
-                 "hold CyclePreviousPanel 0.15", "wait 0.8", "leave UI_Back 1", "wait 1.2",
-                 "talk ShowOff_Voice", "talk ShowOff_Care", "talk ShowOff_New", "talk ShowOff_End")
+SHOWOFF_MACRO = ("talk ShowOff_Start", "finish",
+                 "GalaxyMapOpen", "talk ShowOff_Map", "finish", "leave UI_Back 6", "wait 1.0",
+                 "FocusLeftPanel", "talk ShowOff_Left", "talk ShowOff_Contacts", "wait 1.6", "hold CycleNextPanel 0.15", "wait 1.2",
+                 "hold CycleNextPanel 0.15", "finish", "hold CyclePreviousPanel 0.15", "wait 0.5",
+                 "hold CyclePreviousPanel 0.15", "wait 0.5", "leave UI_Back 2", "wait 0.8",
+                 "FocusRightPanel", "talk ShowOff_Right", "wait 1.6", "hold CycleNextPanel 0.15", "wait 1.2",
+                 "hold CycleNextPanel 0.15", "finish", "hold CyclePreviousPanel 0.15", "wait 0.5",
+                 "hold CyclePreviousPanel 0.15", "wait 0.5", "leave UI_Back 1", "wait 0.6",
+                 "talk ShowOff_Voice", "talk ShowOff_Care", "talk ShowOff_New", "talk ShowOff_End", "finish")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
 # Auto launch from a station: Select on the Launch button of the station menu. Only works while docked (see core/app.py). If

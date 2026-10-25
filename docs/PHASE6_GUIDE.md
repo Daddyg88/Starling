@@ -739,3 +739,11 @@ She waits until each sentence is finished before changing screen. It only opens 
 **Keeping it up to date:** the part about new features is `ShowOff_New` in `voicepacks/default/showoff.json`. When we add something worth showing, those lines are updated (this is part of every release that adds a big feature). The steps are `macros.show_off` (defaults in control/catalog.py): you can add screens, tabs or `talk` steps.
 
 New macro steps: `talk ShowOff_Map` (speak and wait until finished) and `leave UI_Back 2` (press only if screen 2/1/6 is open). Not tested in the live game: the timing of the panels and the galaxy map closing with Back.
+
+## 0.48.1 - Show off: faster and quieter
+
+Your three runs felt slow with long pauses. Causes I could find, all fixed:
+- She announced each screen ("opening the galaxy map", "closing it", the panels). These are muted for the whole show-off now (and for a few seconds after).
+- She waited for each screen to open BEFORE talking, then waited again. Now she starts the sentence at the same moment as the key press, and flicks the tabs while she is still speaking; the only waits are for her to finish (`finish` step) before she closes a screen.
+- Her usual random extras ("by the way..." remarks) were added to these lines, which makes the voice build a new sentence on the spot (slow start). The show-off lines are now spoken exactly as written, so the prepared voice can play them at once.
+Macro steps changed: `talk Key` now queues a plain line and carries on; `finish` waits until she has said everything queued. If you still hear long gaps, send me the log: "Slow start: ... (made on the spot)" lines tell us which sentence was not prepared. Run "prepare her voice" once after this update so the new lines are ready.

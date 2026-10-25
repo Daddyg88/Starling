@@ -46,6 +46,23 @@ class ShowOffTests(unittest.TestCase):
         self.assertGreaterEqual(len(said), 8)
         self.assertGreater(len(t.sender.pressed), 8)
 
+    def test_the_screen_chatter_is_muted_and_talk_lines_are_plain(self):
+        t = MacroTests()
+        r = t.build(table={**ALL, "GalaxyMapOpen": ALL["FocusLeftPanel"]})
+        muted = []
+        r.echo = SimpleNamespace(mute=lambda names, seconds: muted.append((tuple(names), seconds)), expect=lambda *a, **k: None,
+                                 cancel=lambda *a, **k: None)
+        r.flavour = SimpleNamespace(apply=lambda text, _p: text + " EXTRA", rename=lambda x: x)
+        said = []
+        r.speech = SimpleNamespace(say=lambda **kw: said.append(kw["text"]), wait_until_idle=lambda timeout=0: True)
+        r.state_provider = lambda: SimpleNamespace(gui_focus="?", status_seen=False)
+        r.run_text("show off")
+        self.assertIn("GalaxyMapOpened", muted[0][0])
+        self.assertIn("ScreenClosed", muted[0][0])
+        self.assertGreaterEqual(muted[0][1], 120)
+        self.assertTrue(said)
+        self.assertFalse([x for x in said if "EXTRA" in x and x.startswith("Right.")])      # the talk lines skip the flavour
+
     def test_leave_presses_only_when_that_screen_is_open_or_unknown(self):
         self.assertEqual(parse_macro(["leave UI_Back 2"]), [("leave", "UI_Back", 2)])
         t = MacroTests()
@@ -56,8 +73,8 @@ class ShowOffTests(unittest.TestCase):
             r.run_text("request docking")
             self.assertEqual(len(t.sender.pressed), expected, gui)
 
-    def test_talk_parses(self):
-        self.assertEqual(parse_macro(["talk ShowOff_Map"]), [("talk", "ShowOff_Map")])
+    def test_talk_parses_and_finish_waits(self):
+        self.assertEqual(parse_macro(["talk ShowOff_Map", "finish"]), [("talk", "ShowOff_Map"), ("finish",)])
         with self.assertRaises(ValueError):
             parse_macro(["talk bad key!"])
 

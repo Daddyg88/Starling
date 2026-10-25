@@ -7,7 +7,9 @@ A step is one of:
     "UI_Down x3"           press it three times
     "wait 0.5"             pause for half a second
     "hold UI_Select 1.5"   hold that key down for 1.5 seconds (longest 5)
-    "talk ShowOff_Map"     like "say" but she finishes speaking before the next step (used by the show-off)
+    "talk ShowOff_Map"     like "say" but plain (exactly the recorded line, so it starts at once) and queued: she keeps talking
+                           while the next steps carry on (used by the show-off)
+    "finish"               wait until she has finished everything she was told to say
     "leave UI_Back 2"      press that key only if screen 2 (left panel) is open now (1 = right panel, 6 = galaxy map); also when
                            Status.json cannot be read. Closes what she opened without ever pressing Back into an empty cockpit
     "ensure FocusLeftPanel 2"  if Status.json says NO screen is open (the panel closed by accident), press that key (0.15 s)
@@ -54,6 +56,9 @@ def parse_macro(steps):
             if not re.match(r"^[A-Za-z0-9_]+$", key):
                 raise ValueError("I don't understand this talk step (write it like: talk ShowOff_Map): %r" % text)
             parsed.append(("talk", key))
+            continue
+        if lowered == "finish":
+            parsed.append(("finish",))
             continue
         if lowered.startswith("leave "):
             bits = text.split()

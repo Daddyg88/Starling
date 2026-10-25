@@ -374,8 +374,11 @@ class CommandRunner:
         trace = []                               # what the game was showing after each wait (GuiFocus from Status.json)
         self._docking_seen = []
         quiet = ("GalaxyMapOpened", "GalaxyMapClosed", "ScreenClosed") if command.id == "plot_waypoint" else ()
+        if command.id == "show_off":                      # she opens and closes these herself: no "opening the galaxy map" chatter
+            quiet = ("GalaxyMapOpened", "GalaxyMapClosed", "ScreenClosed", "InternalPanelOpened", "ExternalPanelOpened",
+                     "CommsPanelOpened", "RolePanelOpened")
         if quiet and self.echo is not None:
-            self.echo.mute(quiet, 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
+            self.echo.mute(quiet, 300 if command.id == "show_off" else 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
         pressed = []
         self.macro_spoke = False
         for step in steps:
@@ -389,10 +392,12 @@ class CommandRunner:
                 continue
             if step[0] == "talk":
                 self.macro_spoke = True
-                self._speak(step[1], {}, fallback="")
+                self._speak(step[1], {}, fallback="", plain=True)       # queued: the next steps run while she talks
+                continue
+            if step[0] == "finish":
                 waiter = getattr(self.speech, "wait_until_idle", None)
                 if waiter is not None:
-                    waiter(40.0)                           # let her finish the sentence before the next screen change
+                    waiter(60.0)
                 continue
             if step[0] == "leave":
                 gui = self._gui_focus()
@@ -627,7 +632,7 @@ class CommandRunner:
         }
         self._speak(LINE_FOR_STATUS.get(outcome.status, "CommandFailed"), fields, fallback=outcome.detail)
 
-    def _speak(self, key, fields, fallback):
+    def _speak(self, key, fields, fallback, plain=False):
         if self.dialogue is not None:
             info = self.settings.get("personality.style", "personality") == "info"
             mood = "" if info else effective_mood(self.settings)
@@ -641,7 +646,7 @@ class CommandRunner:
             except (KeyError, IndexError, ValueError):
                 text = fallback
             text = personalise(text, self.settings)
-            if self.flavour is not None and not line.audio:
+            if self.flavour is not None and not line.audio and not plain:
                 text = self.flavour.apply(text, "normal")
         if not text:
             return
