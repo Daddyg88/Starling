@@ -93,6 +93,50 @@ def _preset_names(folder):
     return [line.strip() for line in text.splitlines() if line.strip()]
 
 
+def _resolve_preset(folder, name):
+    """The .binds file for a preset name (Custom.4.0.binds, Custom.3.0.binds, Custom.binds ...) or None."""
+    exact = [folder / ("%s.%s.binds" % (name, v)) for v in ("4.2", "4.1", "4.0", "3.0", "2.0")] + [folder / (name + ".binds")]
+    for path in exact:
+        if path.is_file():
+            return path
+    loose = sorted(folder.glob(name + ".*binds"), key=lambda p: p.stat().st_mtime, reverse=True)
+    return loose[0] if loose else None
+
+
+def humanoid_count(path):
+    """How many on-foot actions in this file have a real binding (used to pick the on-foot preset)."""
+    try:
+        actions = parse_binds(Path(path).read_text(encoding="utf-8", errors="ignore"))
+    except (OSError, ValueError):
+        return 0
+    return sum(1 for name, slots in actions.items() if "Humanoid" in name and any(not sl.is_empty() for sl in slots))
+
+
+def find_foot_binds_file(folder, ship_path=None):
+    """
+    Elite lets the ship, SRV and on-foot controls each use a DIFFERENT preset (StartPreset.start has one line for each).
+    Returns the .binds file that holds the on-foot keys when it is not the ship's file, otherwise None.
+    Which line is the on-foot one is not written down anywhere, so of the other presets named there we take the one with
+    the most on-foot keys set.
+    """
+    if folder is None:
+        return None
+    folder = Path(folder)
+    best, best_count = None, 0
+    seen = set()
+    for name in _preset_names(folder):
+        if name in seen:
+            continue
+        seen.add(name)
+        path = _resolve_preset(folder, name)
+        if path is None or (ship_path is not None and path == ship_path):
+            continue
+        count = humanoid_count(path)
+        if count > best_count:
+            best, best_count = path, count
+    return best
+
+
 def find_binds_file(folder):
     """
     Which .binds file is in use? Returns a Path or None.
@@ -165,9 +209,11 @@ def view_of(action):
 class BindingBook:
     """Knows the player's keys. Re-reads the file when it changes."""
 
-    def __init__(self, folder=None, finder=find_binds_file):
+    def __init__(self, folder=None, finder=find_binds_file, foot_finder=find_foot_binds_file):
         self.folder = Path(folder) if folder else bindings_folder()
         self._finder = finder
+        self._foot_finder = foot_finder
+        self._foot_path = None
         self._path = None
         self._stamp = None
         self._actions = {}
@@ -186,7 +232,13 @@ class BindingBook:
         except OSError:
             self.error = "I can't read your controls file."
             return False
-        stamp = (str(path), info.st_mtime_ns, info.st_size)
+        try:
+            foot = self._foot_finder(self.folder, path) if self._foot_finder else None
+            foot_info = foot.stat() if foot is not None else None
+        except OSError:
+            foot, foot_info = None, None
+        stamp = (str(path), info.st_mtime_ns, info.st_size,
+                 (str(foot), foot_info.st_mtime_ns, foot_info.st_size) if foot_info is not None else None)
         if stamp == self._stamp:
             return bool(self._actions)
         try:
@@ -195,9 +247,27 @@ class BindingBook:
             log.error("Could not read %s: %s", path, error)
             self.error = "I couldn't read your controls file."
             return False
+        self._foot_path = None
+        if foot is not None:
+            try:
+                on_foot = parse_binds(foot.read_text(encoding="utf-8", errors="ignore"))
+                taken = 0
+                for name, slots in on_foot.items():
+                    if "Humanoid" in name:
+                        self._actions[name] = slots
+                        taken += 1
+                self._foot_path = foot
+                log.info("On-foot keys (%d) come from %s, the rest from %s", taken, foot.name, path.name)
+            except (OSError, ValueError) as error:
+                log.warning("Could not read the on-foot controls %s: %s", foot, error)
         self._path, self._stamp, self.error = path, stamp, ""
         log.info("Loaded %d bindings from %s", len(self._actions), path.name)
         return True
+
+    @property
+    def foot_path(self):
+        """The separate file the on-foot keys come from, or None when they are in the main file."""
+        return self._foot_path
 
     @property
     def path(self):

@@ -42,7 +42,7 @@ class VoiceTests(unittest.TestCase):
         self.m = Matcher(catalog.CATALOG)
 
     def test_phrases(self):
-        for said, wanted in (("wave", "foot_emote_wave"), ("do a dance", "foot_emote_dance"), ("next grenade type", "foot_grenade_next"),
+        for said, wanted in (("wave", "foot_emote_wave"), ("do a clap", "foot_emote_clap"), ("next grenade type", "foot_grenade_next"),
                              ("select EMP grenades", "foot_grenade_emp"), ("use a battery", "foot_battery"),
                              ("use a health pack", "foot_health"), ("torch", "foot_torch"), ("suit shields", "foot_shields"),
                              ("helmet night vision", "foot_night_vision"), ("equip the energy link", "foot_recharge_tool"),
@@ -165,3 +165,29 @@ class HcsBindsTests(unittest.TestCase):
         book = binds.BindingBook(folder=folder, finder=lambda f: Path(f) / "T.4.0.binds")
         stroke, why = book.lookup("HumanoidHealthPack")
         self.assertEqual((stroke.key, stroke.modifiers, why), ("Key_Q", ("Key_RightAlt", "Key_Apps"), ""))
+
+
+class OnFootPresetTests(unittest.TestCase):
+    """The on-foot keys can live in a different preset file from the ship's (StartPreset.start names several)."""
+
+    def make(self, foot_bound=True):
+        import tempfile
+        from pathlib import Path
+        from control import binds
+        folder = Path(tempfile.mkdtemp())
+        (folder / "StartPreset.start").write_text("HCS Custom\nHCS Custom\nMCUSTOM\nHCS Custom\n")
+        (folder / "HCS Custom.4.2.binds").write_text(
+            '<Root><LandingGearToggle><Primary Device="Keyboard" Key="Key_L" /><Secondary Device="{NoDevice}" Key="" /></LandingGearToggle>'
+            '<HumanoidEmoteSlot2><Primary Device="{NoDevice}" Key="" /><Secondary Device="{NoDevice}" Key="" /></HumanoidEmoteSlot2></Root>')
+        (folder / "MCUSTOM.4.2.binds").write_text(
+            '<Root><HumanoidEmoteSlot2><Primary Device="Keyboard" Key="Key_N"><Modifier Device="Keyboard" Key="Key_T" /></Primary>'
+            '<Secondary Device="{NoDevice}" Key="" /></HumanoidEmoteSlot2>'
+            '<LandingGearToggle><Primary Device="Keyboard" Key="Key_K" /><Secondary Device="{NoDevice}" Key="" /></LandingGearToggle></Root>')
+        return binds.BindingBook(folder=folder)
+
+    def test_foot_keys_come_from_the_foot_preset_and_ship_keys_from_the_ship_preset(self):
+        book = self.make()
+        stroke, _ = book.lookup("HumanoidEmoteSlot2")
+        self.assertEqual((stroke.key, stroke.modifiers), ("Key_N", ("Key_T",)))
+        self.assertEqual(book.lookup("LandingGearToggle")[0].key, "Key_L")
+        self.assertEqual(book.foot_path.name, "MCUSTOM.4.2.binds")

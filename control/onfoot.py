@@ -14,6 +14,10 @@ from core.logger import get_logger
 log = get_logger("onfoot")
 
 
+# words that are ordinary commands on their own ("stop", "go"): they only count with the word "emote" ("stop emote")
+GENERIC_WORDS = {"go", "stop", "agree", "disagree"}
+
+
 def _load_emotes(path=None):
     try:
         with open(path or (paths.CONFIG_DIR / "emotes.json"), "r", encoding="utf-8") as handle:
@@ -113,8 +117,9 @@ def on_foot_commands(C, emotes=None):
     ]
     for word, slot in (emotes if emotes is not None else _load_emotes()).items():
         key = word.replace(" ", "_")
+        bare = [] if word in GENERIC_WORDS else [word]
         cmds.append(C("foot_emote_" + key, "HumanoidEmoteSlot%d" % slot, "the %s emote" % word,
-                      press=[word, "(do|play|perform|give|make) [a|an|the] %s" % word, "%s (emote|please)" % word,
-                             "emote %s" % word],
+                      press=bare + ["(do|play|perform|give|make) [a|an|the] %s emote" % word if word in GENERIC_WORDS else
+                                    "(do|play|perform|give|make) [a|an|the] %s" % word, "%s emote" % word, "emote %s" % word],
                       doing={"press": word.capitalize()}))
     return cmds

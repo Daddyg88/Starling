@@ -909,6 +909,9 @@ class Dashboard:
         working, problems = runner.binding_report()
         path = runner.book.path
         head = "%d commands have a keyboard key%s." % (working, " (from %s)" % path.name if path else "")
+        foot = getattr(runner.book, "foot_path", None)
+        if foot is not None:
+            head += "\nOn-foot keys are read from %s (you use a different preset on foot)." % foot.name
         try:
             import time as _time
             if path:

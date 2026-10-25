@@ -632,3 +632,10 @@ NOT TESTED against the real game (only the logic): any key press, the emote slot
 
 ## 0.42.2 - The Apps key
 Your HCS controls file puts many on-foot actions on RightAlt + Apps + a key (for example Health Pack on RightAlt + Apps + Q). Starling did not know the Apps (menu) key, so it called all of those commands "unknown key" and would not press them. She knows it now (scancode 5D). This also fixes the emotes, grenade types, battery, weapon switching and aim commands.
+
+
+## 0.42.3 - On-foot keys from the on-foot preset
+Elite lets the ship and the on-foot controls use different presets (the on-foot page of your controls says PRESETS: MCUSTOM, while the ship uses HCS Custom). Starling only read the ship's file, so she pressed keys from the wrong preset ("salute" pressed a chord that does nothing in your on-foot controls). Now she also reads the other presets named in StartPreset.start, takes the one with the most on-foot keys set, and uses it for every on-foot action. "Check my Elite keys" says which file the on-foot keys came from.
+
+Emote words now follow the game's own list, which is also the slot order: point 1, wave 2, agree 3 (also "thumbs up"), disagree 4, go 5, stop 6, applaud 7 (also "clap"), salute 8. Change the numbers in config/emotes.json if your wheel differs. The old guesses (dance, shrug, sit) were removed because the game has no such emote in that list.
+NOT tested against your real files: which preset line is the on-foot one is a guess based on "the other preset with the most on-foot keys".
