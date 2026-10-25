@@ -394,12 +394,6 @@ class RunnerTests(unittest.TestCase):
     def summaries(self):
         return [e.data["summary"] for e in self.events]
 
-    def test_missing_actions_lists_unbound_but_not_joystick_only(self):
-        found = [a for _label, a in self.runner().missing_actions()]
-        self.assertIn("ToggleCargoScoop", found)
-        self.assertNotIn("DeployHardpointToggle", found)
-        self.assertNotIn("LandingGearToggle", found)
-
     def hear(self, text, wake=True, command=None, ptt=False):
         self.bus.publish("voice.heard", {"text": text, "wake": wake, "ptt": ptt,
                                          "command": text if command is None else command})

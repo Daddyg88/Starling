@@ -655,18 +655,6 @@ NOT tested with real SRV, fighter or multicrew presets.
 ## 0.43.1 - Preset drop-downs
 The boxes on the Keybinds page are now drop-down menus. Each lists "Automatic" plus every preset she finds in Elite's controls folder (the names of the .binds files without the version number, for example HCS Custom and MCUSTOM). A name you chose earlier is kept even if its file is missing. Restart Starling after changing one.
 
-## 0.44.0 - Check my Elite keys on the Keybinds page, and a safe way to fill in missing keys
+## 0.44.1 - Check my Elite keys on the Keybinds page (list only)
 
-**Keybinds > Check my Elite keys** (moved from the Developer page) shows the same report as before. Under it, if some commands have NO key at all, a **Keys that are missing** box lists them.
-
-The rules she follows (all tested in `tests/test_fillin.py`):
-- She only lists actions whose Primary AND Secondary are both empty. An action with any key, chord or joystick button on it is never listed and never touched.
-- Each drop-down offers only keys that nothing else uses in the same view (on foot, ship, SRV...), neither as a key nor as a shift key. The default is **Leave it alone**.
-- Nothing is written until you pick a key and press **Write my choices into Elite's file** and say Yes in the question box.
-- The file is copied first (`<name>.binds.starling-backup-<time>`, in the same folder; Elite ignores it). After the edit she reads the whole file again, and if any other action differs by even one key, nothing is written.
-- Only the empty Primary line of each chosen action changes; the rest of the file stays byte for byte.
-- It writes into the preset file that holds that group (for example your on-foot preset).
-
-Close Elite (or leave its controls screen without pressing Apply) before writing, or Elite can overwrite the change when you press Apply. You can always ignore the helper and set the keys yourself in Elite.
-
-Not tested against the real game: I could only test with copies of binds files. Try it first with one action, then open Elite's controls screen and check it.
+**Keybinds > Check my Elite keys** (moved from the Developer page) lists the missing keybinds, the files she read and any key clashes. She never writes to your Elite controls files and never changes a key: you set the missing ones yourself in Elite (Options > Controls), then press Apply and check again. (A fill-in helper was built in 0.44.0 and removed again at your request.)

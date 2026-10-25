@@ -162,7 +162,7 @@ def build_pages(mic_lister=None, pack_folder=None):
     pages = [
         Page("keybinds", "Keybinds", "Elite lets each group of controls use its own PRESET (look at the top of each controls page in Elite: Options > Controls, where it says PRESETS). "
              "Choose the preset for each group from the list (she lists every preset saved in Elite's controls folder, and the name must match the one the game shows at the top of that controls page). Leave a box on Automatic and she works it out. Restart Starling after changing one. "
-             "Press Check my Elite keys below to see which files she found and which commands still have no key. For any action with NO key at all she can offer free keys, but she never changes a key you already set.", [
+             "Press Check my Elite keys below to see which files she found and which commands still have no key. She only gives you the list of missing keys; you set them yourself in Elite and she never changes any of your keys.", [
             Field("keybinds.ship", "Ship controls preset", "choice", preset_choices, restart=True,
                   help="Flying, panels, galaxy map, scanners. Empty = the one Elite starts with"),
             Field("onfoot.preset", "On foot controls preset", "choice", preset_choices, restart=True,
