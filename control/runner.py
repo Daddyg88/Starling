@@ -488,6 +488,31 @@ class CommandRunner:
             return "%s -> macro needs keyboard keys for: %s" % (command.do_text(intent), ", ".join(missing))
         return "%s -> macro of %d steps (%s)" % (command.do_text(intent), len(steps), ", ".join(actions_in(steps)))
 
+    def missing_actions(self):
+        """[(label, action)] for every action one of her commands needs that has NO key at all (both slots empty).
+
+        Joystick-only actions are NOT listed: the player chose those. Used by the Keybinds page to offer help.
+        """
+        from control.macros import actions_in, parse_macro
+        found, seen = [], set()
+        for c in self.matcher.commands:
+            if c.service:
+                continue
+            if c.macro:
+                try:
+                    actions = actions_in(parse_macro(self.macro_steps(c)))
+                except ValueError:
+                    continue
+            else:
+                actions = [c.action]
+            for action in actions:
+                if action in seen:
+                    continue
+                seen.add(action)
+                if self.book.lookup(action)[1] == binds.UNBOUND:
+                    found.append((c.label if not c.macro else self._nice(action), action))
+        return found
+
     def binding_report(self):
         """Every command checked against your keys. Returns (working_count, [(label, reason sentence), ...])."""
         working, problems = 0, []

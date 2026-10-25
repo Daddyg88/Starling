@@ -394,6 +394,12 @@ class RunnerTests(unittest.TestCase):
     def summaries(self):
         return [e.data["summary"] for e in self.events]
 
+    def test_missing_actions_lists_unbound_but_not_joystick_only(self):
+        found = [a for _label, a in self.runner().missing_actions()]
+        self.assertIn("ToggleCargoScoop", found)
+        self.assertNotIn("DeployHardpointToggle", found)
+        self.assertNotIn("LandingGearToggle", found)
+
     def hear(self, text, wake=True, command=None, ptt=False):
         self.bus.publish("voice.heard", {"text": text, "wake": wake, "ptt": ptt,
                                          "command": text if command is None else command})
@@ -951,7 +957,7 @@ class DashboardSmokeTests(unittest.TestCase):
         d.try_command()
         self.assertIn("press L", d.try_result.configure.call_args.kwargs["text"])
         d.check_keys()
-        self.assertIn("1 commands have a keyboard key", d.try_result.configure.call_args.kwargs["text"])
+        self.assertIn("1 commands have a keyboard key", d.key_result.configure.call_args.kwargs["text"])
         d.scan_joysticks()
         self.assertIn("X52", d.try_result.configure.call_args.kwargs["text"])
         d._learned("joy:06A3:075C:5", app._reader)

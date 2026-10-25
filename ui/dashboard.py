@@ -734,7 +734,6 @@ class Dashboard:
         if page.id == "developer":
             extra += [("Test her voice", self.test_voice),
                       ("Test the honk now", self.test_honk),
-                      ("Check my Elite keys", self.check_keys),
                       ("Look for my joystick / HOTAS", self.scan_joysticks),
                       ("Record my buttons", self.record_buttons),
                       ("Copy my log to the clipboard (to send to Claude)", self.copy_log)]
@@ -749,6 +748,8 @@ class Dashboard:
         if page.id == "developer":
             self._build_try_box(frame, row)
             row += 1
+        if page.id == "keybinds":
+            row = self._build_key_check(frame, row)
         if page.id == "navigation":
             line = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
             line.grid(row=row, column=0, sticky="ew", pady=(16, 0))
@@ -887,10 +888,13 @@ class Dashboard:
         self.try_result.grid(row=2, column=0, columnspan=2, padx=18, pady=(0, 12), sticky="w")
 
     # ------------------------------------------------------------------ actions
-    def _controls_result(self, text, colour=None):
-        label = getattr(self, "try_result", None)
+    def _controls_result(self, text, colour=None, target="try_result"):
+        label = getattr(self, target, None)
         if label is not None:
-            label.configure(text=text, text_color=colour or T.MUTED)
+            try:
+                label.configure(text=text, text_color=colour or T.MUTED)
+            except Exception:                                  # the page that owned the label was rebuilt
+                pass
         self.save_note.configure(text=text.splitlines()[0][:110] if text else "", text_color=colour or T.MUTED)
 
     def try_command(self):
@@ -901,10 +905,90 @@ class Dashboard:
         lines = runner.explain(self.try_entry.get())
         self._controls_result("\n".join(lines), T.TEXT)
 
+    def _build_key_check(self, frame, row):
+        """The key check on the Keybinds page: a button, the report, and the (optional) missing-keys helper."""
+        ctk = self.ctk
+        ctk.CTkButton(frame, text="Check my Elite keys", width=230, font=self._font(), fg_color=T.PANEL, border_width=1,
+                      corner_radius=8, border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT,
+                      command=self.check_keys).grid(row=row, column=0, sticky="w", pady=(16, 0))
+        self.key_result = ctk.CTkLabel(frame, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w",
+                                       justify="left", wraplength=720)
+        self.key_result.grid(row=row + 1, column=0, sticky="w", pady=(10, 0))
+        self.fill_frame = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
+        self.fill_frame.grid(row=row + 2, column=0, sticky="ew", pady=(8, 0))
+        self.fill_frame.grid_columnconfigure(0, weight=1)
+        self._fill_gaps, self._fill_vars = [], {}
+        return row + 3
+
+    def _show_fill_helper(self, gaps):
+        """Lists each action with no key at all, with a drop-down of FREE keys. Nothing is written until the player asks."""
+        ctk = self.ctk
+        frame = getattr(self, "fill_frame", None)
+        if frame is None:
+            return
+        try:
+            for child in frame.winfo_children():
+                child.destroy()
+        except Exception:
+            return
+        self._fill_gaps, self._fill_vars = list(gaps), {}
+        if not gaps:
+            return
+        card = self._card(frame)
+        card.grid(row=0, column=0, sticky="ew")
+        card.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(card, text="Keys that are missing", font=self._font(bold=True), text_color=T.ACCENT, anchor="w").grid(
+            row=0, column=0, columnspan=2, padx=18, pady=(12, 2), sticky="w")
+        ctk.CTkLabel(card, text="These actions have NO key at all in Elite. I will never change a key you already set. "
+                                "Each list only has keys nothing else uses, so nothing can clash. "
+                                "You can leave them all, set them yourself in Elite (Options > Controls), or pick a key here. "
+                                "Nothing is written until you press the button at the bottom; I make a backup copy of your file first.",
+                     font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left", wraplength=640).grid(
+            row=1, column=0, columnspan=2, padx=18, pady=(0, 8), sticky="w")
+        from control import keys as _keys
+        for index, gap in enumerate(gaps):
+            ctk.CTkLabel(card, text="%s  (%s)" % (gap.label, gap.path.name), font=self._font(), text_color=T.TEXT,
+                         anchor="w").grid(row=2 + index, column=0, padx=18, pady=6, sticky="w")
+            none = "Leave it alone"
+            values = [none] + [_keys.nice_name(k) for k in gap.options]
+            var = ctk.StringVar(value=none)
+            self._fill_vars[gap.action] = (var, dict(zip(values[1:], gap.options)), none)
+            ctk.CTkOptionMenu(card, values=values, variable=var, width=200, font=self._font(), fg_color=T.PANEL,
+                              button_color=T.ACCENT_DIM, text_color=T.TEXT).grid(row=2 + index, column=1, padx=18, pady=6, sticky="e")
+        ctk.CTkButton(card, text="Write my choices into Elite's file", width=260, font=self._font(), fg_color=T.ACCENT,
+                      hover_color=T.ACCENT_HOVER, text_color=T.BG, command=self.write_key_choices).grid(
+            row=3 + len(gaps), column=0, columnspan=2, padx=18, pady=(10, 14), sticky="w")
+
+    def write_key_choices(self):
+        from tkinter import messagebox
+        from control import fillin, keys as _keys
+        choices = {}
+        for action, (var, lookup, none) in self._fill_vars.items():
+            picked = lookup.get(var.get())
+            if picked:
+                choices[action] = picked
+        if not choices:
+            self._controls_result("You have not picked any key, so nothing was changed.", T.MUTED, target="key_result")
+            return
+        names = {g.action: g.label for g in self._fill_gaps}
+        listing = "\n".join("  %s  ->  %s" % (names.get(a, a), _keys.nice_name(k)) for a, k in choices.items())
+        if not messagebox.askyesno("Write these keys?",
+                                   "Only these empty actions will get a key:\n\n%s\n\nEvery other key stays exactly as it is, and a backup copy "
+                                   "of the file is made first.\n\nClose Elite first, or leave its controls screen without pressing Apply, "
+                                   "or Elite may overwrite this. Write them now?" % listing):
+            self._controls_result("Cancelled. Nothing was changed.", T.MUTED, target="key_result")
+            return
+        done, error = fillin.apply_choices(choices, self._fill_gaps)
+        text = ("\n".join(done) if done else "") + (("\n" if done else "") + error if error else "")
+        if done:
+            text += "\nOpen Elite's controls screen to see them. Press 'Check my Elite keys' again to confirm."
+        self._controls_result(text or "Nothing was changed.", T.GOOD if done and not error else T.WARN, target="key_result")
+        self._show_fill_helper([])
+
     def check_keys(self):
         runner = self.app.ensure_commands()
         if runner is None:
-            self._controls_result("Voice commands could not start. Check the log.", T.BAD)
+            self._controls_result("Voice commands could not start. Check the log.", T.BAD, target="key_result")
             return
         working, problems = runner.binding_report()
         path = runner.book.path
@@ -939,7 +1023,13 @@ class Dashboard:
             get_logger("controls").info("Key check:\n%s", head)         # the whole report, in case the box is too small to show it
         except Exception:
             pass
-        self._controls_result(head, T.GOOD if not (problems or clashes) else T.WARN)
+        self._controls_result(head, T.GOOD if not (problems or clashes) else T.WARN, target="key_result")
+        try:
+            from control import fillin
+            self._show_fill_helper(fillin.find_gaps(runner))
+        except Exception as error:                              # the helper is optional; the report above already showed
+            from core.logger import get_logger
+            get_logger("controls").warning("Missing-keys helper failed: %s", error)
 
     def scan_joysticks(self):
         reader = self.app.ensure_buttons()
