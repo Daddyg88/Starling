@@ -54,6 +54,16 @@ class MacroTests(unittest.TestCase):
         self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_9", "Key_5", "Key_4", "Key_10", "Key_8", "Key_8", "Key_6"])
         self.assertIn(1.6, self.sleeps)
 
+    def test_ensure_reopens_the_panel_only_when_the_game_shows_no_screen(self):
+        from types import SimpleNamespace
+        self.assertEqual(parse_macro(["ensure FocusLeftPanel 2"]), [("ensure", "FocusLeftPanel", 2)])
+        for gui, expected in ((0, 1), (2, 0), ("?", 0)):
+            r = self.build(macros__test=["ensure FocusLeftPanel 2"])
+            r.state_provider = lambda g=gui: SimpleNamespace(gui_focus=g, status_seen=True) if g != "?" else GameState()
+            r.macro_steps = lambda command: ["ensure FocusLeftPanel 2"]
+            r.run_text("request docking")
+            self.assertEqual(len(self.sender.pressed), expected, gui)
+
     def test_your_own_steps_replace_the_built_in_ones(self):
         r = self.build(macros__deploy_nomad=["FocusRightPanel", "wait 1", "UI_Down x2", "UI_Select"])
         r.run_text("deploy the nomad")

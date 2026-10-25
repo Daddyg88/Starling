@@ -387,6 +387,16 @@ class CommandRunner:
                 self.macro_spoke = True
                 self._speak(step[1], {}, fallback="")
                 continue
+            if step[0] == "ensure":
+                if self._gui_focus() == 0:                       # only when Status.json clearly says NO screen is open
+                    problem = self.sender.send(strokes[step[1]], hold=0.15)
+                    pressed.append(step[1])
+                    if problem:
+                        status = SEND_FAILURE_STATUS.get(problem, "failed")
+                        return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                    self.sleep(1.6)
+                    trace.append("reopened>gui%s" % self._gui_focus())
+                continue
             if step[0] in ("hold", "literal"):
                 if step[0] == "hold":
                     problem = self.sender.send(strokes[step[1]], hold=step[2])

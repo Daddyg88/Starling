@@ -50,13 +50,16 @@ MACROS = {
 # 0.34.10: the commander's 12:38 recording (no Right press: Right shares a key with Yaw Right), with every key held 0.15 s
 # and much more patient waits. The 17:03 log showed the left panel was still not open (Status.json GuiFocus 0) when the first
 # Next Tab was pressed 0.85 s after Focus Left Panel, so that press, and the next, could land on the wrong tab.
-# 0.45.3: the commander's own recording of 15:13 (the game answered DockingGranted 0.2 s after Select): Focus Left Panel, Next Tab x2,
-# HOLD Up for 1.4 s (scrolls to the top so the station is highlighted), Right (opens the station menu), Select (Request Docking),
-# Left, Previous Tab x2, Back (closes the panel). Her pace, but with 0.15 s presses and a longer wait for the panel to open
-# (the 0.34.10 log showed 0.85 s was too short).
+# 0.45.4: the 15:13 and 15:28 logs showed the left panel CLOSING (screen 0) right after UI Up (key W, the same key as Forward Thrust):
+# a key that is also a flight control seems to drop the panel focus. So after each UI key she looks at the screen
+# (Status.json, which updates about once a second, hence the 1.2 s waits) and presses Focus Left Panel again if it closed.
+# Steps: your recording (Next Tab x2, Up, Right, Select, Left, Previous Tab x2, Back).
 DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "hold CycleNextPanel 0.15", "wait 0.5", "hold CycleNextPanel 0.15", "wait 1.15",
-                 "hold UI_Up 1.4", "wait 0.8", "hold UI_Right 0.15", "wait 0.8", "hold UI_Select 0.15", "wait 1.2",
-                 "hold UI_Left 0.15", "wait 0.8", "hold CyclePreviousPanel 0.15", "wait 0.7", "hold CyclePreviousPanel 0.15",
+                 "hold UI_Up 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
+                 "hold UI_Right 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
+                 "hold UI_Select 0.15", "wait 1.2",
+                 "hold UI_Left 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
+                 "hold CyclePreviousPanel 0.15", "wait 0.7", "hold CyclePreviousPanel 0.15",
                  "wait 0.85", "hold UI_Back 0.15")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).

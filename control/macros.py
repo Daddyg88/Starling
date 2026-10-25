@@ -7,6 +7,8 @@ A step is one of:
     "UI_Down x3"           press it three times
     "wait 0.5"             pause for half a second
     "hold UI_Select 1.5"   hold that key down for 1.5 seconds (longest 5)
+    "ensure FocusLeftPanel 2"  if Status.json says NO screen is open (the panel closed by accident), press that key (0.15 s)
+                           and wait for the screen to open. Used when a key press closes the panel by accident.
     "paste"                press Ctrl+V (pastes what is on the clipboard, e.g. the next neutron waypoint)
     "enter"                press the Enter key
     "say Launch_Start"     she says a line from that dialogue key (used by auto launch: "I have control")
@@ -44,6 +46,15 @@ def parse_macro(steps):
                 raise ValueError("I don't understand this say step (write it like: say Launch_Start): %r" % text)
             parsed.append(("say", key))
             continue
+        if lowered.startswith("ensure "):
+            bits = text.split()
+            try:
+                if len(bits) != 3 or not re.match(r"^[A-Za-z0-9_]+$", bits[1]):
+                    raise ValueError
+                parsed.append(("ensure", bits[1], int(bits[2])))
+            except ValueError:
+                raise ValueError("I don't understand this ensure (write it like: ensure FocusLeftPanel 2): %r" % text)
+            continue
         if lowered in LITERALS:
             parsed.append(("literal", lowered))
             continue
@@ -69,6 +80,6 @@ def parse_macro(steps):
 def actions_in(parsed):
     seen = []
     for step in parsed:
-        if step[0] in ("press", "hold") and step[1] not in seen:
+        if step[0] in ("press", "hold", "ensure") and step[1] not in seen:
             seen.append(step[1])
     return seen

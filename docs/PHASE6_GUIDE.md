@@ -689,3 +689,13 @@ Needs keyboard keys for UI Up, UI Right, UI Select, UI Left and both panel tabs.
 ## 0.45.3 - Request docking, from your recording
 
 Replaces the 0.45.2 written sequence. Your recording: Focus Left Panel, Next Tab x2, hold Up for 1.4 s, Right, Select (the game answered DockingGranted 0.2 s later), Left, Previous Tab x2, Back. She uses your pacing, with 0.15 s presses and 1.6 s for the panel to open (your recording has it open 0.6 s after the key, but earlier logs showed short waits failing). Change any step under `macros.request_docking` in config/settings.json. If it fails, send the log line "Macro request_docking trace".
+
+## 0.45.4 - Request docking: the panel closes after UI Up
+
+Your 15:13 and 15:28 logs: the left panel opened, Next Tab x2 worked (screen 2), then the screen went to 0 (no screen) right after UI Up, so Right, Select and Left went to the cockpit and the game never heard a docking request. Your UI Up key is W, which is also Forward Thrust (UI Right is D, also Yaw Right). My guess, not proven: a key that is also a flight control makes Elite drop the panel focus.
+
+What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json, and if NO screen is open she presses Focus Left Panel again (new macro step `ensure FocusLeftPanel 2`). Up is one short tap now (the 1.4 s hold closed it at once). Look for "reopened>gui2" in the "Macro request_docking trace" log line.
+
+If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
+
+A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.
