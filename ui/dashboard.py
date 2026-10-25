@@ -909,14 +909,26 @@ class Dashboard:
         working, problems = runner.binding_report()
         path = runner.book.path
         head = "%d commands have a keyboard key%s." % (working, " (from %s)" % path.name if path else "")
+        try:
+            import time as _time
+            if path:
+                head += "\nThat file was last saved by Elite at %s. If you changed keys just now, press APPLY in Elite's controls screen, then check again." % \
+                    _time.strftime("%H:%M on %d %b", _time.localtime(path.stat().st_mtime))
+        except OSError:
+            pass
         if problems:
-            head += " Without one: " + ", ".join("%s" % label for label, _why in problems[:12])
-            head += "." if len(problems) <= 12 else " and %d more." % (len(problems) - 12)
+            head += "\n\nCommands she cannot press (each needs a KEYBOARD key, a chord like [T]+[B] is fine):\n- " + "\n- ".join(
+                "%s" % why for _label, why in problems)
         clashes = runner.binding_conflicts()
         if clashes:
             head += "\n\nKeys that clash (Elite may do the wrong thing):\n- " + "\n- ".join(clashes)
         else:
             head += "\nNo key clashes found."
+        try:
+            from core.logger import get_logger
+            get_logger("controls").info("Key check:\n%s", head)         # the whole report, in case the box is too small to show it
+        except Exception:
+            pass
         self._controls_result(head, T.GOOD if not (problems or clashes) else T.WARN)
 
     def scan_joysticks(self):

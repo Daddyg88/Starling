@@ -624,3 +624,7 @@ NOT TESTED against the real game (only the logic): any key press, the emote slot
 * **Fixed mood** (Personality page) now also has a **Fixed mood level**.
 * I added to her lines rather than rewriting the thousands she already had. Tell me which mood or area sounds flat and I will rewrite those lines.
 * NOT tested: how the new lines sound spoken, and how it feels over days of real play.
+
+
+## 0.42.1 - A clearer key check
+"Check my Elite keys" (Developer page) now lists each command she cannot press with its reason, shows when Elite last saved the controls file, and copies the whole report to the log (Copy my log). Elite only writes new keys to that file when you press APPLY in the controls screen.
