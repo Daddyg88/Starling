@@ -206,6 +206,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
         ]),
         Page("onfoot", "On foot", "Voice control for everything on foot. Say 'suit shields', 'torch', 'next grenade type', 'select EMP grenades', 'use a health pack', 'use a battery', 'helmet night vision', 'energy link', 'crouch', 'wave'... Each needs a keyboard key in Elite's on-foot controls. Emote words are in config/emotes.json (docs/PHASE6_GUIDE.md).", [
+            Field("onfoot.preset", "My on-foot controls preset (only if it is not your ship's)", "text", placeholder="e.g. MCUSTOM", restart=True,
+                  help="Elite lets on-foot controls use a different preset from your ship (see Options > Controls > On Foot: PRESETS). Type its name here and she reads the on-foot keys from that file. Leave empty to let her work it out"),
             Field("onfoot.auto_shields", "On foot: raise my suit shields when I draw a weapon or take damage", "toggle",
                   help="Presses your Toggle Shields key once. Elite has only a toggle and does not say if the shields are up, so if they were already up they go down (say 'suit shields' to flip them back). Needs a keyboard key for Toggle Shields"),
         ]),

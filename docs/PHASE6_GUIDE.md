@@ -639,3 +639,7 @@ Elite lets the ship and the on-foot controls use different presets (the on-foot 
 
 Emote words now follow the game's own list, which is also the slot order: point 1, wave 2, agree 3 (also "thumbs up"), disagree 4, go 5, stop 6, applaud 7 (also "clap"), salute 8. Change the numbers in config/emotes.json if your wheel differs. The old guesses (dance, shrug, sit) were removed because the game has no such emote in that list.
 NOT tested against your real files: which preset line is the on-foot one is a guess based on "the other preset with the most on-foot keys".
+
+
+## 0.42.4 - Finding the on-foot controls file
+In 0.42.3 she only looked at the presets named in StartPreset.start, and your log showed it did not find your on-foot preset (salute still pressed the HCS key Right Alt + Apps + S). Now the order is: the preset name you type in **On foot > My on-foot controls preset** (for example MCUSTOM, as your on-foot controls page says; restart Starling after changing it), then the other presets named in StartPreset.start, then any other .binds file in the Elite controls folder (newest first). A file needs at least 10 on-foot keys set to count. "Check my Elite keys" now says which file the on-foot keys come from, what StartPreset.start says, and lists the controls files with their saved times, so we can see what she sees.

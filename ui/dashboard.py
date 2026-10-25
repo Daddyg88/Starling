@@ -912,6 +912,13 @@ class Dashboard:
         foot = getattr(runner.book, "foot_path", None)
         if foot is not None:
             head += "\nOn-foot keys are read from %s (you use a different preset on foot)." % foot.name
+        else:
+            head += "\nOn-foot keys are read from the same file. If your on-foot controls use another preset, type its name on the On foot page."
+        try:
+            from control import binds as _binds
+            head += "\n" + "\n".join(_binds.describe_folder(runner.book.folder))
+        except Exception:
+            pass
         try:
             import time as _time
             if path:

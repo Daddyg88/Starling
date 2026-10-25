@@ -137,7 +137,7 @@ class PageTests(unittest.TestCase):
         from ui.settings_model import build_pages
         pages = {p.id: p for p in build_pages()}
         self.assertIn("onfoot", pages)
-        self.assertEqual([f.key for f in pages["onfoot"].fields], ["onfoot.auto_shields"])
+        self.assertEqual([f.key for f in pages["onfoot"].fields], ["onfoot.preset", "onfoot.auto_shields"])
         self.assertNotIn("onfoot.auto_shields", [f.key for f in pages["combat"].fields])
 
     def test_updates_install_by_themselves_by_default(self):
@@ -168,26 +168,57 @@ class HcsBindsTests(unittest.TestCase):
 
 
 class OnFootPresetTests(unittest.TestCase):
-    """The on-foot keys can live in a different preset file from the ship's (StartPreset.start names several)."""
+    """The on-foot keys can live in a different preset file from the ship's."""
 
-    def make(self, foot_bound=True):
+    FILLER = "".join('<HumanoidFiller%d><Primary Device="Keyboard" Key="Key_J" /><Secondary Device="{NoDevice}" Key="" /></HumanoidFiller%d>' % (i, i)
+                     for i in range(12))
+
+    def make(self, start_lines="HCS Custom\nHCS Custom\nMCUSTOM\nHCS Custom\n", foot_name="MCUSTOM.4.2.binds", preset=""):
         import tempfile
         from pathlib import Path
         from control import binds
+        binds.FOOT_PRESET_NAME = preset
+        self.addCleanup(setattr, binds, "FOOT_PRESET_NAME", "")
         folder = Path(tempfile.mkdtemp())
-        (folder / "StartPreset.start").write_text("HCS Custom\nHCS Custom\nMCUSTOM\nHCS Custom\n")
+        if start_lines is not None:
+            (folder / "StartPreset.start").write_text(start_lines)
         (folder / "HCS Custom.4.2.binds").write_text(
             '<Root><LandingGearToggle><Primary Device="Keyboard" Key="Key_L" /><Secondary Device="{NoDevice}" Key="" /></LandingGearToggle>'
             '<HumanoidEmoteSlot2><Primary Device="{NoDevice}" Key="" /><Secondary Device="{NoDevice}" Key="" /></HumanoidEmoteSlot2></Root>')
-        (folder / "MCUSTOM.4.2.binds").write_text(
+        (folder / foot_name).write_text(
             '<Root><HumanoidEmoteSlot2><Primary Device="Keyboard" Key="Key_N"><Modifier Device="Keyboard" Key="Key_T" /></Primary>'
-            '<Secondary Device="{NoDevice}" Key="" /></HumanoidEmoteSlot2>'
+            '<Secondary Device="{NoDevice}" Key="" /></HumanoidEmoteSlot2>' + self.FILLER +
             '<LandingGearToggle><Primary Device="Keyboard" Key="Key_K" /><Secondary Device="{NoDevice}" Key="" /></LandingGearToggle></Root>')
-        return binds.BindingBook(folder=folder)
+        return binds.BindingBook(folder=folder, finder=lambda f: Path(f) / "HCS Custom.4.2.binds")
 
-    def test_foot_keys_come_from_the_foot_preset_and_ship_keys_from_the_ship_preset(self):
-        book = self.make()
+    def check(self, book, name="MCUSTOM.4.2.binds"):
         stroke, _ = book.lookup("HumanoidEmoteSlot2")
         self.assertEqual((stroke.key, stroke.modifiers), ("Key_N", ("Key_T",)))
-        self.assertEqual(book.lookup("LandingGearToggle")[0].key, "Key_L")
-        self.assertEqual(book.foot_path.name, "MCUSTOM.4.2.binds")
+        self.assertEqual(book.lookup("LandingGearToggle")[0].key, "Key_L")      # ship keys stay on the ship preset
+        self.assertEqual(book.foot_path.name, name)
+
+    def test_named_in_start_preset(self):
+        self.check(self.make())
+
+    def test_name_typed_on_the_on_foot_page(self):
+        self.check(self.make(start_lines="HCS Custom\n", preset="MCUSTOM"))
+
+    def test_found_by_looking_through_the_folder(self):
+        self.check(self.make(start_lines=None, foot_name="Whatever.4.0.binds"), name="Whatever.4.0.binds")
+
+    def test_no_foot_file_means_the_ship_file_is_used(self):
+        from pathlib import Path
+        import tempfile
+        from control import binds
+        folder = Path(tempfile.mkdtemp())
+        (folder / "HCS Custom.4.2.binds").write_text('<Root><HumanoidJumpButton><Primary Device="Keyboard" Key="Key_Space" /></HumanoidJumpButton></Root>')
+        book = binds.BindingBook(folder=folder, finder=lambda f: Path(f) / "HCS Custom.4.2.binds")
+        self.assertEqual(book.lookup("HumanoidJumpButton")[0].key, "Key_Space")
+        self.assertIsNone(book.foot_path)
+
+    def test_describe_folder_lists_files(self):
+        from control import binds
+        book = self.make()
+        text = "\n".join(binds.describe_folder(book.folder))
+        self.assertIn("MCUSTOM.4.2.binds", text)
+        self.assertIn("StartPreset.start names", text)

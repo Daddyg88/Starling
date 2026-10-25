@@ -96,6 +96,11 @@ class App:
 
         # Load settings first, because they say how chatty the log should be.
         self.settings = Settings(self._settings_path).load()
+        try:
+            from control import binds as _binds
+            _binds.FOOT_PRESET_NAME = str(self.settings.get("onfoot.preset", "") or "")
+        except Exception:
+            pass
         if not self.settings.get("updates.ask_reset", False):
             # 0.41.1: updates install by themselves again. An older saved "ask me first" is switched off ONCE; switch it on again if you want it.
             self.settings.set("updates.ask", False)

@@ -112,29 +112,69 @@ def humanoid_count(path):
     return sum(1 for name, slots in actions.items() if "Humanoid" in name and any(not sl.is_empty() for sl in slots))
 
 
+FOOT_PRESET_NAME = ""      # set from the dashboard (On foot page): the name of the preset your on-foot controls use, e.g. MCUSTOM
+
+
+def _candidate_foot_files(folder, ship_path):
+    """Other controls files that might hold the on-foot keys, best guess first."""
+    out, seen = [], set()
+
+    def add(path):
+        if path is not None and path != ship_path and path not in seen:
+            seen.add(path)
+            out.append(path)
+    if FOOT_PRESET_NAME.strip():                                  # 1. the name you typed
+        add(_resolve_preset(folder, FOOT_PRESET_NAME.strip()))
+        if out:
+            return out
+    for name in _preset_names(folder):                            # 2. the other presets StartPreset.start names
+        add(_resolve_preset(folder, name))
+    if out:
+        return out
+    try:                                                          # 3. any other controls file, newest first
+        others = sorted((p for p in folder.glob("*.binds") if p != ship_path), key=lambda p: p.stat().st_mtime, reverse=True)
+    except OSError:
+        others = []
+    for path in others:
+        add(path)
+    return out
+
+
 def find_foot_binds_file(folder, ship_path=None):
     """
-    Elite lets the ship, SRV and on-foot controls each use a DIFFERENT preset (StartPreset.start has one line for each).
-    Returns the .binds file that holds the on-foot keys when it is not the ship's file, otherwise None.
-    Which line is the on-foot one is not written down anywhere, so of the other presets named there we take the one with
-    the most on-foot keys set.
+    Elite lets the ship, SRV and on-foot controls each use a DIFFERENT preset (your on-foot page says MCUSTOM, the ship uses
+    HCS Custom). Returns the .binds file that holds the on-foot keys when it is not the ship's file, otherwise None.
+    Which one is the on-foot preset is not written down anywhere reliable, so: the name you typed on the On foot page, else
+    the other presets named in StartPreset.start, else any other controls file in the folder. Of those, the one with the
+    most on-foot keys set wins (a file with fewer than 10 is ignored).
     """
     if folder is None:
         return None
     folder = Path(folder)
-    best, best_count = None, 0
-    seen = set()
-    for name in _preset_names(folder):
-        if name in seen:
-            continue
-        seen.add(name)
-        path = _resolve_preset(folder, name)
-        if path is None or (ship_path is not None and path == ship_path):
-            continue
+    if not folder.is_dir():
+        return None
+    best, best_count = None, 9
+    for path in _candidate_foot_files(folder, ship_path):
         count = humanoid_count(path)
         if count > best_count:
             best, best_count = path, count
     return best
+
+
+def describe_folder(folder):
+    """A few plain lines for the key check: what StartPreset.start says and which controls files exist."""
+    if folder is None or not Path(folder).is_dir():
+        return ["The Elite controls folder was not found."]
+    folder = Path(folder)
+    lines = ["StartPreset.start names: %s" % (", ".join(_preset_names(folder)) or "(nothing / file missing)")]
+    try:
+        for path in sorted(folder.glob("*.binds"), key=lambda p: p.stat().st_mtime, reverse=True)[:8]:
+            import time as _t
+            lines.append("  %s - saved %s - %d on-foot keys set" % (
+                path.name, _t.strftime("%d %b %H:%M", _t.localtime(path.stat().st_mtime)), humanoid_count(path)))
+    except OSError:
+        pass
+    return lines
 
 
 def find_binds_file(folder):
