@@ -137,7 +137,7 @@ class PageTests(unittest.TestCase):
         from ui.settings_model import build_pages
         pages = {p.id: p for p in build_pages()}
         self.assertIn("onfoot", pages)
-        self.assertEqual([f.key for f in pages["onfoot"].fields], ["onfoot.preset", "onfoot.auto_shields"])
+        self.assertEqual([f.key for f in pages["onfoot"].fields], ["onfoot.auto_shields"])
         self.assertNotIn("onfoot.auto_shields", [f.key for f in pages["combat"].fields])
 
     def test_updates_install_by_themselves_by_default(self):
@@ -177,8 +177,8 @@ class OnFootPresetTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
         from control import binds
-        binds.FOOT_PRESET_NAME = preset
-        self.addCleanup(setattr, binds, "FOOT_PRESET_NAME", "")
+        binds.PRESET_NAMES["onfoot"] = preset
+        self.addCleanup(binds.PRESET_NAMES.__setitem__, "onfoot", "")
         folder = Path(tempfile.mkdtemp())
         if start_lines is not None:
             (folder / "StartPreset.start").write_text(start_lines)
@@ -222,3 +222,35 @@ class OnFootPresetTests(unittest.TestCase):
         text = "\n".join(binds.describe_folder(book.folder))
         self.assertIn("MCUSTOM.4.2.binds", text)
         self.assertIn("StartPreset.start names", text)
+
+
+class KeybindsPageTests(unittest.TestCase):
+    def test_keybinds_page_comes_first_and_has_a_box_per_group(self):
+        from ui.settings_model import build_pages
+        pages = build_pages()
+        self.assertEqual(pages[0].id, "keybinds")
+        self.assertEqual([f.key for f in pages[0].fields],
+                         ["keybinds.ship", "onfoot.preset", "keybinds.srv", "keybinds.fighter", "keybinds.multicrew"])
+
+    def test_names_reach_the_bindings_code(self):
+        from control import binds
+        settings = FakeSettings()
+        settings.get = lambda key, default=None: {"keybinds.ship": " HCS Custom ", "onfoot.preset": "MCUSTOM"}.get(key, default)
+        binds.set_preset_names(settings)
+        self.addCleanup(lambda: [binds.PRESET_NAMES.__setitem__(k, "") for k in binds.PRESET_NAMES])
+        self.assertEqual((binds.PRESET_NAMES["ship"], binds.PRESET_NAMES["onfoot"], binds.PRESET_NAMES["srv"]), ("HCS Custom", "MCUSTOM", ""))
+
+    def test_typed_srv_preset_is_used_for_srv_keys_only(self):
+        import tempfile
+        from pathlib import Path
+        from control import binds
+        binds.PRESET_NAMES["srv"] = "Rover"
+        self.addCleanup(binds.PRESET_NAMES.__setitem__, "srv", "")
+        folder = Path(tempfile.mkdtemp())
+        (folder / "Ship.4.0.binds").write_text('<Root><LandingGearToggle><Primary Device="Keyboard" Key="Key_L" /></LandingGearToggle>'
+                                               '<IncreaseSpeed_Buggy><Primary Device="Keyboard" Key="Key_P" /></IncreaseSpeed_Buggy></Root>')
+        (folder / "Rover.4.0.binds").write_text('<Root><LandingGearToggle><Primary Device="Keyboard" Key="Key_K" /></LandingGearToggle>'
+                                                '<IncreaseSpeed_Buggy><Primary Device="Keyboard" Key="Key_O" /></IncreaseSpeed_Buggy></Root>')
+        book = binds.BindingBook(folder=folder, finder=lambda f: Path(f) / "Ship.4.0.binds", foot_finder=None)
+        self.assertEqual(book.lookup("IncreaseSpeed_Buggy")[0].key, "Key_O")
+        self.assertEqual(book.lookup("LandingGearToggle")[0].key, "Key_L")

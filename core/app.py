@@ -98,7 +98,7 @@ class App:
         self.settings = Settings(self._settings_path).load()
         try:
             from control import binds as _binds
-            _binds.FOOT_PRESET_NAME = str(self.settings.get("onfoot.preset", "") or "")
+            _binds.set_preset_names(self.settings)
         except Exception:
             pass
         if not self.settings.get("updates.ask_reset", False):

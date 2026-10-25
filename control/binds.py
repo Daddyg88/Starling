@@ -112,7 +112,16 @@ def humanoid_count(path):
     return sum(1 for name, slots in actions.items() if "Humanoid" in name and any(not sl.is_empty() for sl in slots))
 
 
-FOOT_PRESET_NAME = ""      # set from the dashboard (On foot page): the name of the preset your on-foot controls use, e.g. MCUSTOM
+# Names typed on the dashboard's Keybinds page (empty = work it out). Elite lets each group of controls use its own preset.
+PRESET_NAMES = {"ship": "", "srv": "", "onfoot": "", "fighter": "", "multicrew": ""}
+GROUP_LABELS = {"ship": "Ship", "srv": "SRV", "onfoot": "On foot", "fighter": "Ship-launched fighter", "multicrew": "Multicrew"}
+
+
+def set_preset_names(settings):
+    """Copy the names from the settings (keybinds.ship, keybinds.srv, onfoot.preset, ...) into PRESET_NAMES."""
+    for group, key in (("ship", "keybinds.ship"), ("srv", "keybinds.srv"), ("onfoot", "onfoot.preset"),
+                       ("fighter", "keybinds.fighter"), ("multicrew", "keybinds.multicrew")):
+        PRESET_NAMES[group] = str(settings.get(key, "") or "").strip()
 
 
 def _candidate_foot_files(folder, ship_path):
@@ -123,8 +132,8 @@ def _candidate_foot_files(folder, ship_path):
         if path is not None and path != ship_path and path not in seen:
             seen.add(path)
             out.append(path)
-    if FOOT_PRESET_NAME.strip():                                  # 1. the name you typed
-        add(_resolve_preset(folder, FOOT_PRESET_NAME.strip()))
+    if PRESET_NAMES["onfoot"].strip():                            # 1. the name you typed
+        add(_resolve_preset(folder, PRESET_NAMES["onfoot"].strip()))
         if out:
             return out
     for name in _preset_names(folder):                            # 2. the other presets StartPreset.start names
@@ -188,6 +197,11 @@ def find_binds_file(folder):
     folder = Path(folder)
     if not folder.is_dir():
         return None
+    typed = PRESET_NAMES["ship"].strip()
+    if typed:
+        found = _resolve_preset(folder, typed)
+        if found is not None:
+            return found
     for name in _preset_names(folder)[:1]:
         exact = [folder / ("%s.%s.binds" % (name, v)) for v in ("4.0", "3.0", "2.0")] + [folder / (name + ".binds")]
         for path in exact:
@@ -253,7 +267,7 @@ class BindingBook:
         self.folder = Path(folder) if folder else bindings_folder()
         self._finder = finder
         self._foot_finder = foot_finder
-        self._foot_path = None
+        self._overlays = {}
         self._path = None
         self._stamp = None
         self._actions = {}
@@ -277,8 +291,21 @@ class BindingBook:
             foot_info = foot.stat() if foot is not None else None
         except OSError:
             foot, foot_info = None, None
+        overlays = {}                                  # group -> file that holds that group's keys
+        try:
+            foot = self._foot_finder(self.folder, path) if self._foot_finder else None
+            if foot is not None:
+                overlays["onfoot"] = foot
+            for group in ("srv", "fighter", "multicrew"):                     # only when you typed a name for it
+                typed = PRESET_NAMES[group].strip()
+                other = _resolve_preset(Path(self.folder), typed) if typed and self.folder else None
+                if other is not None and other != path:
+                    overlays[group] = other
+            infos = {g: p.stat() for g, p in overlays.items()}
+        except OSError:
+            overlays, infos = {}, {}
         stamp = (str(path), info.st_mtime_ns, info.st_size,
-                 (str(foot), foot_info.st_mtime_ns, foot_info.st_size) if foot_info is not None else None)
+                 tuple(sorted((g, str(p), infos[g].st_mtime_ns, infos[g].st_size) for g, p in overlays.items())))
         if stamp == self._stamp:
             return bool(self._actions)
         try:
@@ -287,27 +314,33 @@ class BindingBook:
             log.error("Could not read %s: %s", path, error)
             self.error = "I couldn't read your controls file."
             return False
-        self._foot_path = None
-        if foot is not None:
+        self._overlays = {}
+        for group, other in overlays.items():
             try:
-                on_foot = parse_binds(foot.read_text(encoding="utf-8", errors="ignore"))
-                taken = 0
-                for name, slots in on_foot.items():
-                    if "Humanoid" in name:
-                        self._actions[name] = slots
-                        taken += 1
-                self._foot_path = foot
-                log.info("On-foot keys (%d) come from %s, the rest from %s", taken, foot.name, path.name)
+                theirs = parse_binds(other.read_text(encoding="utf-8", errors="ignore"))
             except (OSError, ValueError) as error:
-                log.warning("Could not read the on-foot controls %s: %s", foot, error)
+                log.warning("Could not read the %s controls %s: %s", group, other, error)
+                continue
+            taken = 0
+            for name, slots in theirs.items():
+                if view_of(name) == group:
+                    self._actions[name] = slots
+                    taken += 1
+            self._overlays[group] = other
+            log.info("%s keys (%d) come from %s, the rest from %s", GROUP_LABELS[group], taken, other.name, path.name)
         self._path, self._stamp, self.error = path, stamp, ""
         log.info("Loaded %d bindings from %s", len(self._actions), path.name)
         return True
 
     @property
+    def overlays(self):
+        """{"onfoot": Path, ...}: the groups whose keys are read from a different file than the ship's."""
+        return dict(self._overlays)
+
+    @property
     def foot_path(self):
         """The separate file the on-foot keys come from, or None when they are in the main file."""
-        return self._foot_path
+        return self._overlays.get("onfoot")
 
     @property
     def path(self):

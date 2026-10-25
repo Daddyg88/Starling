@@ -136,6 +136,20 @@ SECTION_OF = {"listening": "voice", "controls": "game", "chat": "personality", "
 # ---------------------------------------------------------------------------
 def build_pages(mic_lister=None, pack_folder=None):
     pages = [
+        Page("keybinds", "Keybinds", "Elite lets each group of controls use its own PRESET (look at the top of each controls page in Elite: Options > Controls, where it says PRESETS). "
+             "Type the preset name for each group here so she reads the right keys. Leave a box empty and she works it out. Restart Starling after changing one. "
+             "Use Developer > Check my Elite keys to see which files she found and which commands still have no key.", [
+            Field("keybinds.ship", "Ship controls preset", "text", placeholder="e.g. HCS Custom", restart=True,
+                  help="Flying, panels, galaxy map, scanners. Empty = the one Elite starts with"),
+            Field("onfoot.preset", "On foot controls preset", "text", placeholder="e.g. MCUSTOM", restart=True,
+                  help="Walking, weapons, emotes, suit tools. Empty = she looks for it"),
+            Field("keybinds.srv", "SRV controls preset", "text", placeholder="e.g. HCS Custom", restart=True,
+                  help="The surface vehicle. Empty = same file as the ship"),
+            Field("keybinds.fighter", "Ship-launched fighter preset", "text", placeholder="e.g. HCS Custom", restart=True,
+                  help="Fighter orders and flying a fighter. Empty = same file as the ship"),
+            Field("keybinds.multicrew", "Multicrew preset", "text", placeholder="e.g. HCS Custom", restart=True,
+                  help="Flying with another commander. Empty = same file as the ship"),
+        ]),
         Page("voice", "Voice", "How she sounds when she speaks.", [
             Field("speech.enabled", "She speaks aloud", "toggle", help="Turn her voice on or off"),
             Field("tts.volume", "Volume", "choice", VOLUME),
@@ -206,8 +220,6 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
         ]),
         Page("onfoot", "On foot", "Voice control for everything on foot. Say 'suit shields', 'torch', 'next grenade type', 'select EMP grenades', 'use a health pack', 'use a battery', 'helmet night vision', 'energy link', 'crouch', 'wave'... Each needs a keyboard key in Elite's on-foot controls. Emote words are in config/emotes.json (docs/PHASE6_GUIDE.md).", [
-            Field("onfoot.preset", "My on-foot controls preset (only if it is not your ship's)", "text", placeholder="e.g. MCUSTOM", restart=True,
-                  help="Elite lets on-foot controls use a different preset from your ship (see Options > Controls > On Foot: PRESETS). Type its name here and she reads the on-foot keys from that file. Leave empty to let her work it out"),
             Field("onfoot.auto_shields", "On foot: raise my suit shields when I draw a weapon or take damage", "toggle",
                   help="Presses your Toggle Shields key once. Elite has only a toggle and does not say if the shields are up, so if they were already up they go down (say 'suit shields' to flip them back). Needs a keyboard key for Toggle Shields"),
         ]),

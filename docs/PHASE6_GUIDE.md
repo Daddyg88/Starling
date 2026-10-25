@@ -643,3 +643,10 @@ NOT tested against your real files: which preset line is the on-foot one is a gu
 
 ## 0.42.4 - Finding the on-foot controls file
 In 0.42.3 she only looked at the presets named in StartPreset.start, and your log showed it did not find your on-foot preset (salute still pressed the HCS key Right Alt + Apps + S). Now the order is: the preset name you type in **On foot > My on-foot controls preset** (for example MCUSTOM, as your on-foot controls page says; restart Starling after changing it), then the other presets named in StartPreset.start, then any other .binds file in the Elite controls folder (newest first). A file needs at least 10 on-foot keys set to count. "Check my Elite keys" now says which file the on-foot keys come from, what StartPreset.start says, and lists the controls files with their saved times, so we can see what she sees.
+
+
+## 0.43.0 - The Keybinds page
+Elite lets each group of controls use its own preset (the top of each controls page in the game says PRESETS: ...). There is now a **Keybinds** page right under Home with a box for each:
+Ship, On foot, SRV, Ship-launched fighter, Multicrew. Type the preset's name exactly as the game shows it (for example `MCUSTOM`), save, and restart Starling. An empty box means "work it out": the ship uses the preset Elite starts with, the on-foot keys are searched for (see 0.42.4), and SRV, fighter and multicrew use the ship's file. Your on-foot box still uses the same setting as before (it already holds MCUSTOM).
+Developer > Check my Elite keys shows which groups are read from which file.
+NOT tested with real SRV, fighter or multicrew presets.

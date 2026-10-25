@@ -909,11 +909,11 @@ class Dashboard:
         working, problems = runner.binding_report()
         path = runner.book.path
         head = "%d commands have a keyboard key%s." % (working, " (from %s)" % path.name if path else "")
-        foot = getattr(runner.book, "foot_path", None)
-        if foot is not None:
-            head += "\nOn-foot keys are read from %s (you use a different preset on foot)." % foot.name
+        used = getattr(runner.book, "overlays", None) or {}
+        if used:
+            head += "\nKeys read from other presets: " + ", ".join("%s = %s" % (g, p.name) for g, p in used.items()) + "."
         else:
-            head += "\nOn-foot keys are read from the same file. If your on-foot controls use another preset, type its name on the On foot page."
+            head += "\nEvery group of controls is read from the same file. If one of them uses another preset, type its name on the Keybinds page."
         try:
             from control import binds as _binds
             head += "\n" + "\n".join(_binds.describe_folder(runner.book.folder))

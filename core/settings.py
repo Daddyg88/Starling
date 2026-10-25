@@ -35,6 +35,7 @@ DEFAULTS = {
     "engineers": {"neutron_over_ly": 1000},
     "regions": {"announce": True},
     "onfoot": {"auto_shields": False, "preset": ""},
+    "keybinds": {"ship": "", "srv": "", "fighter": "", "multicrew": ""},
     "messages": {"read": True, "npc": False},
     "voidcompass": {"enabled": True, "port": 7380},
     "neutron": {"enabled": True, "destination": "", "jump_range": 0, "range_margin": 0.9, "efficiency": 60,
