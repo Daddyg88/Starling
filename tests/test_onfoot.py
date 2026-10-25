@@ -88,9 +88,29 @@ class ShieldTests(unittest.TestCase):
         a.check(foot(""))
         a.check(foot("rifle"))
         a.check(foot(""))
-        self.clock[0] = 20
         a.check(foot("rifle"))
-        self.assertEqual(len(self.sender.sent), 2)
+        self.assertEqual(len(self.sender.sent), 3)           # up, down, up (no waiting between)
+
+    def test_holstering_lowers_the_shields_she_raised(self):
+        a = self.make()
+        a.check(foot(""))
+        a.check(foot("rifle"))
+        a.check(foot("rifle"))
+        a.check(foot(""))
+        a.check(foot(""))
+        self.assertEqual(self.sender.sent, ["C", "C"])
+        self.assertEqual(a.last_result, "lowered")
+
+    def test_holstering_does_nothing_when_she_did_not_raise_them_or_the_switch_is_off(self):
+        a = self.make()
+        a.check(foot("rifle"))                                # already armed at start: she pressed nothing
+        a.check(foot(""))
+        self.assertEqual(self.sender.sent, [])
+        b = self.make(on=False)
+        b.check(foot(""))
+        b.check(foot("rifle"))
+        b.check(foot(""))
+        self.assertEqual(self.sender.sent, [])
 
     def test_damage_raises(self):
         a = self.make()

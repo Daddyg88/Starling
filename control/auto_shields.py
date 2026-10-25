@@ -2,11 +2,12 @@
 Auto shields on foot: raise the suit shields when you pull a weapon out, or when you start taking damage.
 
 How: Status.json says what you are holding (SelectedWeapon) and your health (Health, 0 to 1). When you go from "no weapon" to
-"a weapon in hand", or your health drops while on foot, she presses your Toggle Shields key ONCE.
+"a weapon in hand", or your health drops while on foot, she presses your Toggle Shields key ONCE. When you put the weapon away she presses it again to lower them
+(only if she was the one who raised them).
 
 Honest limits (nobody has been able to check these against a live game yet):
   * The game has one Toggle Shields key, and nothing in Status.json or the journal says whether the shields are up. So she keeps
-    her own count: after she raises them she will not press again until you holster and draw again, or you leave the suit.
+    her own count: after she raises them she will not press again until she lowers them (you holster) or you leave the suit.
     If your shields were already up when she pressed, they go DOWN. Say "suit shields" to flip them back.
   * What SelectedWeapon looks like for fists, tools and guns is read from the usual wording. Fists, tools and scanners are ignored.
   * The setting is OFF until you switch it on in the dashboard (On foot page).
@@ -62,20 +63,41 @@ class AutoShields:
             reason = "weapon"
         elif (self._health is not None and isinstance(health, (int, float)) and self._health - health >= HURT_DROP):
             reason = "damage"
-        if not armed and self._armed:
-            self.up = False           # holstered: her count restarts, so the next draw raises them again
+        holstered = (not armed) and bool(self._armed)
         self._armed = armed
         if isinstance(health, (int, float)):
             self._health = health
-        if reason and self.enabled():
+        if holstered and self.enabled():
+            self._lower()
+        elif holstered:
+            self.up = False
+        elif reason and self.enabled():
             self._raise(reason)
+
+    def _lower(self):
+        """Weapon put away: if SHE raised the shields, press the key again to drop them."""
+        if not self.up:
+            self.last_result = "nothing to lower"
+            return
+        stroke, why = self.book.lookup(ACTION)
+        if stroke is None:
+            self.last_result = "unbound"
+            self.up = False
+            return
+        problem = self.sender.send(stroke)
+        self.last_result = problem or "lowered"
+        if not problem:
+            self.up = False
+            log.info("Auto shields: weapon holstered, pressed the shields key to lower them")
+        else:
+            log.warning("Auto shields could not lower the shields: %s", problem)
 
     def _raise(self, reason):
         if self.up:
             self.last_result = "already up"
             return
         now = self.clock()
-        if self._last is not None and now - self._last < COOLDOWN_SECONDS:
+        if reason == "damage" and self._last is not None and now - self._last < COOLDOWN_SECONDS:
             self.last_result = "too soon"
             return
         stroke, why = self.book.lookup(ACTION)
@@ -83,7 +105,8 @@ class AutoShields:
             self.last_result = "unbound"
             log.warning("Auto shields: no keyboard key for %s (%s)", ACTION, why)
             return
-        self._last = now
+        if reason == "damage":
+            self._last = now
         problem = self.sender.send(stroke)
         self.last_result = problem or "done"
         if not problem:
