@@ -245,7 +245,13 @@ def build_pages(mic_lister=None, pack_folder=None):
         ]),
         Page("onfoot", "On foot", "Voice control for everything on foot. Say 'suit shields', 'torch', 'next grenade type', 'select EMP grenades', 'use a health pack', 'use a battery', 'helmet night vision', 'energy link', 'crouch', 'wave'... Each needs a keyboard key in Elite's on-foot controls. Emote words are in config/emotes.json (docs/PHASE6_GUIDE.md).", [
             Field("onfoot.auto_shields", "On foot: raise my suit shields when I draw a weapon or take damage", "toggle",
-                  help="Presses your Toggle Shields key once. Elite has only a toggle and does not say if the shields are up, so if they were already up they go down (say 'suit shields' to flip them back). Needs a keyboard key for Toggle Shields"),
+                  help="Presses your Toggle Shields key once. Elite has only a toggle and does not say if the shields are up, so if they were already up they go down (say 'suit shields' to flip them back). Needs a keyboard key for Toggle Shields. In a fight (a combat bond, a bounty or damage) she keeps them up for 2 minutes and does not lower them when you holster; otherwise they go down when you holster. The game has no combat-zone flag, so she cannot raise them before the first sign of a fight"),
+            Field("onfoot.auto_health", "On foot: use a medical pack when my health is 20% or lower", "toggle",
+                  help="Presses your Health Pack key. Only if your backpack still has one (read from Backpack.json). Waits 6 seconds between uses"),
+            Field("onfoot.auto_battery", "On foot: use an energy cell when my shields are gone", "toggle",
+                  help="The game does not share the shield level, so she uses the first loss of health as the sign that the shields are gone. Only if your backpack still has an energy cell. Waits 25 seconds between uses"),
+            Field("onfoot.last_grenade_callout", "On foot: tell me when I throw my last grenade of a type", "toggle",
+                  help="Reads your backpack counts (Backpack.json). Low ammo for guns cannot be called out because the game does not share ammo"),
         ]),
         Page("exploration", "Exploration", "Scanning, discoveries, fuel scooping and the honk.", [
             Field("talk.exploration", "She comments on exploration", "toggle",

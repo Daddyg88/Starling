@@ -82,6 +82,7 @@ class App:
         self.region_tracker = None
         self.bio_distance = None
         self.auto_shields = None
+        self.onfoot_care = None
         self.route_voice = None
         self.route_follower = None
         self.ask = None
@@ -530,11 +531,20 @@ class App:
             from control.auto_shields import AutoShields
             from control.binds import BindingBook
             from control.sender import KeySender
-            self.auto_shields = AutoShields(self.settings, BindingBook(), KeySender())
+            book, sender = BindingBook(), KeySender()
+            self.auto_shields = AutoShields(self.settings, book, sender)
             self.monitor.status.listeners.append(self.auto_shields.check)
+            for name in ("FactionKillBond", "Bounty"):              # signs of a fight on foot
+                self.bus.subscribe(name, self.auto_shields.on_combat_event)
+            from control.onfoot_care import OnFootCare
+            from navigation.voice import Narrator
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.onfoot_care = OnFootCare(self.settings, book, sender, narrator, lambda: self.journal_folder)
+            self.monitor.status.listeners.append(self.onfoot_care.check)
         except Exception:
             self.log.exception("Auto shields could not start")
             self.auto_shields = None
+        self.onfoot_care = None
 
     def ensure_regions(self):
         """Announces the galaxy region you jump into (and the first time you are in it). Safe to call twice."""

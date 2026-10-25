@@ -1,0 +1,35 @@
+{
+ "_help": "On foot: automatic medical pack, energy cell, last grenade. Fields: {grenade} (frag, EMP, shield), {item}.",
+ "OnFootMedpack": [
+  "Health critical. Using a medical pack.",
+  "Medpack applied. Try not to get shot.",
+  "Patching you up, Commander.",
+  "Medical pack used. You're welcome."
+ ],
+ "OnFootMedpack_Sarcastic": [
+  "Medpack. Again. You're a very expensive hobby."
+ ],
+ "OnFootMedpack_Close": [
+  "Hold still, love. Patching you up."
+ ],
+ "OnFootBattery": [
+  "Shields are gone. Energy cell in.",
+  "Fresh energy cell, Commander.",
+  "Recharging your shields."
+ ],
+ "OnFootNoSupplies": [
+  "You're out of {item}, Commander.",
+  "No {item} left in the backpack."
+ ],
+ "OnFootLastGrenade": [
+  "That was your last {grenade} grenade.",
+  "Last {grenade} grenade gone, Commander.",
+  "Out of {grenade} grenades."
+ ],
+ "OnFootLastGrenade_Sarcastic": [
+  "That was the last {grenade} grenade. I hope it was worth it."
+ ],
+ "OnFootLastGrenade_Close": [
+  "That was your last {grenade} grenade, love. Be careful."
+ ]
+}

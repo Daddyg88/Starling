@@ -662,3 +662,16 @@ The boxes on the Keybinds page are now drop-down menus. Each lists "Automatic" p
 ## 0.44.2 - Shields come down when you holster
 
 With **On foot > raise my suit shields** switched on: weapon drawn = shields up, weapon holstered = shields down (she presses your Toggle Shields key again). She only lowers shields SHE raised; if you raised them yourself she leaves them. Drawing again straight away raises them again (no waiting). Shields raised by damage while your weapon is away stay up until you draw and holster. Not tested in the live game.
+
+## 0.45.0 - On-foot care
+
+New switches on **On foot** (the medpack and energy cell ones are OFF until you switch them on):
+- **Shields in a fight.** The game has no "I am in a combat zone" flag. She treats you as in a fight for 2 minutes after a combat bond (those only happen in conflict zones), a bounty, or taking damage on foot. In a fight she raises the shields if they are down and does NOT lower them when you holster. When the fight is over and your weapon is away, they go down. She cannot raise them before the first sign of a fight.
+- **Medical pack at 20% health or lower.** Health is in Status.json, so this one is exact. Waits 6 seconds between uses.
+- **Energy cell when your shields are gone.** The game does not share the shield level (not in any file). Damage hits shields first, so the first loss of health is her sign. Waits 25 seconds between uses.
+- Both only press when your backpack still has one (read from Backpack.json); if it is empty she says so (at most every 30 seconds) and presses nothing.
+- **Last grenade.** When a grenade type in Backpack.json goes from 1 to 0 while you hold a weapon she says "That was your last frag grenade". Lines: `voicepacks/default/onfoot.json`.
+
+**Low ammo is NOT possible.** The game does not put your ammo in Status.json, the journal or any file. I will not guess.
+
+Not tested in the live game: the exact item names in Backpack.json (the log line "Backpack: ..." shows what she reads, please send it if grenades or packs are not noticed), whether the game writes Backpack.json straight away when you throw, and the key presses.

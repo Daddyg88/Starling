@@ -157,7 +157,7 @@ class PageTests(unittest.TestCase):
         from ui.settings_model import build_pages
         pages = {p.id: p for p in build_pages()}
         self.assertIn("onfoot", pages)
-        self.assertEqual([f.key for f in pages["onfoot"].fields], ["onfoot.auto_shields"])
+        self.assertEqual([f.key for f in pages["onfoot"].fields], ["onfoot.auto_shields", "onfoot.auto_health", "onfoot.auto_battery", "onfoot.last_grenade_callout"])
         self.assertNotIn("onfoot.auto_shields", [f.key for f in pages["combat"].fields])
 
     def test_updates_install_by_themselves_by_default(self):
