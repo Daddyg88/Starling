@@ -80,6 +80,7 @@ _add("End", 0x4F, True)
 _add("DownArrow", 0x50, True)
 _add("PageDown", 0x51, True)
 _add("Insert", 0x52, True)
+_add("Apps", 0x5D, True)      # the menu key next to right Ctrl; HCS bindings use RightAlt + Apps as a shift pair
 _add("Delete", 0x53, True)
 
 MODIFIER_NAMES = {"leftshift", "rightshift", "leftcontrol", "rightcontrol", "leftctrl", "rightctrl",

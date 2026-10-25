@@ -628,3 +628,7 @@ NOT TESTED against the real game (only the logic): any key press, the emote slot
 
 ## 0.42.1 - A clearer key check
 "Check my Elite keys" (Developer page) now lists each command she cannot press with its reason, shows when Elite last saved the controls file, and copies the whole report to the log (Copy my log). Elite only writes new keys to that file when you press APPLY in the controls screen.
+
+
+## 0.42.2 - The Apps key
+Your HCS controls file puts many on-foot actions on RightAlt + Apps + a key (for example Health Pack on RightAlt + Apps + Q). Starling did not know the Apps (menu) key, so it called all of those commands "unknown key" and would not press them. She knows it now (scancode 5D). This also fixes the emotes, grenade types, battery, weapon switching and aim commands.

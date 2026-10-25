@@ -143,3 +143,25 @@ class PageTests(unittest.TestCase):
     def test_updates_install_by_themselves_by_default(self):
         from core.settings import DEFAULTS
         self.assertFalse(DEFAULTS["updates"]["ask"])
+
+
+class HcsBindsTests(unittest.TestCase):
+    """The HCS controls file puts on-foot actions on RightAlt + Apps + a key; the Apps key used to be unknown."""
+
+    def test_apps_key_is_known(self):
+        from control import keys
+        self.assertTrue(keys.is_known("Key_Apps"))
+        self.assertEqual(keys.scancode_for("Key_Apps"), (0x5D, True))
+
+    def test_hcs_chord_is_usable(self):
+        import tempfile
+        from pathlib import Path
+        from control import binds
+        folder = Path(tempfile.mkdtemp())
+        (folder / "T.4.0.binds").write_text(
+            '<Root><HumanoidHealthPack><Primary Device="{NoDevice}" Key="" />'
+            '<Secondary Device="Keyboard" Key="Key_Q"><Modifier Device="Keyboard" Key="Key_RightAlt" />'
+            '<Modifier Device="Keyboard" Key="Key_Apps" /></Secondary></HumanoidHealthPack></Root>')
+        book = binds.BindingBook(folder=folder, finder=lambda f: Path(f) / "T.4.0.binds")
+        stroke, why = book.lookup("HumanoidHealthPack")
+        self.assertEqual((stroke.key, stroke.modifiers, why), ("Key_Q", ("Key_RightAlt", "Key_Apps"), ""))
