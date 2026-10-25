@@ -724,3 +724,18 @@ Edit any number in config/mood_rules.json (rules and swings). Not tested in the 
 ## 0.47.1 - Still upset at login
 
 If you load into the game while a mood swing is still running (for example you died 3 minutes ago and restarted), the login greeting says so instead of the usual "how she feels" line: "I'm still upset with you for dying, Commander." Each swing in config/mood_rules.json has a `still` line (Still_Died, Still_General, Still_Good in voicepacks/default/swings.json). A swing keeps counting down while Starling is closed, so after the full 5 minutes the greeting is back to normal.
+
+## 0.48.0 - Show off
+
+Say **"show off"**, "show chat what you can do", "show us your skills" or "impress chat". From the cockpit only (not on foot, in the SRV or a fighter, and not while in danger, being interdicted or jumping) she:
+1. says she has the controls, opens the **galaxy map** and talks about routes and engineers, then closes it;
+2. opens the **left panel**, flicks through two tabs while she talks, goes back and closes it;
+3. does the same with the **right panel**;
+4. talks about voice control, her fight and on-foot care, what is NEW, and a closing line.
+She waits until each sentence is finished before changing screen. It only opens and closes screens: no key that moves the ship. Each close key (Back) is pressed only if that screen is really open. To stop it, switch off her voice or press the screens closed yourself; she cannot be interrupted halfway.
+
+"What can you do" is still a spoken answer only; it now also mentions "show off".
+
+**Keeping it up to date:** the part about new features is `ShowOff_New` in `voicepacks/default/showoff.json`. When we add something worth showing, those lines are updated (this is part of every release that adds a big feature). The steps are `macros.show_off` (defaults in control/catalog.py): you can add screens, tabs or `talk` steps.
+
+New macro steps: `talk ShowOff_Map` (speak and wait until finished) and `leave UI_Back 2` (press only if screen 2/1/6 is open). Not tested in the live game: the timing of the panels and the galaxy map closing with Back.

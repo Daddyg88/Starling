@@ -61,6 +61,18 @@ DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "hold CycleNextPanel 0.15", "wait
                  "hold UI_Left 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
                  "hold CyclePreviousPanel 0.15", "wait 0.7", "hold CyclePreviousPanel 0.15",
                  "wait 0.85", "hold UI_Back 0.15")
+# 0.48.0: SHOW OFF. She talks through what she can do while she opens and closes the screens herself: galaxy map, left panel
+# (a couple of tabs), right panel. Only screens: nothing that moves the ship. "talk" waits until she has finished the sentence,
+# "leave" closes a screen only if it is open. Change or add steps under macros.show_off in config/settings.json.
+SHOWOFF_MACRO = ("talk ShowOff_Start", "wait 0.4",
+                 "GalaxyMapOpen", "wait 3.0", "talk ShowOff_Map", "leave UI_Back 6", "wait 1.5",
+                 "FocusLeftPanel", "wait 1.8", "talk ShowOff_Left", "hold CycleNextPanel 0.15", "wait 1.4",
+                 "hold CycleNextPanel 0.15", "wait 1.4", "talk ShowOff_Contacts", "hold CyclePreviousPanel 0.15", "wait 0.8",
+                 "hold CyclePreviousPanel 0.15", "wait 0.8", "leave UI_Back 2", "wait 1.4",
+                 "FocusRightPanel", "wait 1.6", "talk ShowOff_Right", "hold CycleNextPanel 0.15", "wait 1.4",
+                 "hold CycleNextPanel 0.15", "wait 1.4", "hold CyclePreviousPanel 0.15", "wait 0.8",
+                 "hold CyclePreviousPanel 0.15", "wait 0.8", "leave UI_Back 1", "wait 1.2",
+                 "talk ShowOff_Voice", "talk ShowOff_Care", "talk ShowOff_New", "talk ShowOff_End")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
 # Auto launch from a station: Select on the Launch button of the station menu. Only works while docked (see core/app.py). If
@@ -373,6 +385,12 @@ CATALOG = [
              "docking request", "can I (dock|land)", "request (a )?(dock|landing)", "request station docking", "dock request",
              "ask for (docking|landing)"],
       doing={"press": "Requesting docking"}, strict=True, macro=DOCKING_MACRO),
+    C("show_off", "GalaxyMapOpen", "the show-off",
+      press=["show off", "(go on|go ahead|ok|okay|alright|now) show off", "show (them|us|chat|everyone|the viewers|the stream) (what you can do|what you(ve| have) got|your skills|your features|how good you are)",
+             "show (me|us) what you can do", "show your (skills|features)", "impress (me|us|chat|them|everyone|the viewers)", "(go on|come on) impress (me|us|chat|them)",
+             "take (the ship|control) and show off", "show off (for|to) (chat|the viewers|the stream|everyone)"],
+      doing={"press": "Showing off"}, strict=True, macro=SHOWOFF_MACRO),
+
     C("deploy_nomad", "FocusRadarPanel", "the Nomad",
       press=["(deploy|launch|send out|release|drop|put out) [the|my] nomad", "nomad (deploy|launch)", "(deploy|launch) [the|my] (nomad shuttle|exploration shuttle)",
              "get the nomad out", "(deploy|launch) nomad"],

@@ -7,6 +7,9 @@ A step is one of:
     "UI_Down x3"           press it three times
     "wait 0.5"             pause for half a second
     "hold UI_Select 1.5"   hold that key down for 1.5 seconds (longest 5)
+    "talk ShowOff_Map"     like "say" but she finishes speaking before the next step (used by the show-off)
+    "leave UI_Back 2"      press that key only if screen 2 (left panel) is open now (1 = right panel, 6 = galaxy map); also when
+                           Status.json cannot be read. Closes what she opened without ever pressing Back into an empty cockpit
     "ensure FocusLeftPanel 2"  if Status.json says NO screen is open (the panel closed by accident), press that key (0.15 s)
                            and wait for the screen to open. Used when a key press closes the panel by accident.
     "paste"                press Ctrl+V (pastes what is on the clipboard, e.g. the next neutron waypoint)
@@ -46,6 +49,21 @@ def parse_macro(steps):
                 raise ValueError("I don't understand this say step (write it like: say Launch_Start): %r" % text)
             parsed.append(("say", key))
             continue
+        if lowered.startswith("talk "):
+            key = text[5:].strip()
+            if not re.match(r"^[A-Za-z0-9_]+$", key):
+                raise ValueError("I don't understand this talk step (write it like: talk ShowOff_Map): %r" % text)
+            parsed.append(("talk", key))
+            continue
+        if lowered.startswith("leave "):
+            bits = text.split()
+            try:
+                if len(bits) != 3 or not re.match(r"^[A-Za-z0-9_]+$", bits[1]):
+                    raise ValueError
+                parsed.append(("leave", bits[1], int(bits[2])))
+            except ValueError:
+                raise ValueError("I don't understand this leave (write it like: leave UI_Back 2): %r" % text)
+            continue
         if lowered.startswith("ensure "):
             bits = text.split()
             try:
@@ -80,6 +98,6 @@ def parse_macro(steps):
 def actions_in(parsed):
     seen = []
     for step in parsed:
-        if step[0] in ("press", "hold", "ensure") and step[1] not in seen:
+        if step[0] in ("press", "hold", "ensure", "leave") and step[1] not in seen:
             seen.append(step[1])
     return seen

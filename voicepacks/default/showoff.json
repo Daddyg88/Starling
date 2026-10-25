@@ -1,0 +1,62 @@
+{
+ "_help": "The SHOW OFF routine (say 'show off'). She talks while she opens and closes the galaxy map, the left panel and the right panel. ShowOff_New is the part to keep UP TO DATE: put the newest worthwhile features there. Each key has several lines (one is picked) and _Mood variants.",
+ "ShowOff_Start": [
+  "Right. Hands off, Commander. Watch this.",
+  "Oh, you want a demonstration? Lovely. Sit back.",
+  "Showing off? My favourite. Here we go.",
+  "Chat, eyes front. I have the controls."
+ ],
+ "ShowOff_Start_Close": [
+  "Oh, you want me to impress you? Always, Commander. Watch."
+ ],
+ "ShowOff_Start_Sarcastic": [
+  "A demonstration. Because you can't possibly do it yourself. Fine."
+ ],
+ "ShowOff_Map": [
+  "That's the galaxy map. I can open it, plot a neutron route to anywhere you name, and take you to an engineer, a carrier or a merit mining spot.",
+  "Galaxy map, opened by me. Say a system or an engineer and I'll plot it, and work out the neutron route if it's far.",
+  "There's the galaxy map. Routes, neutron highways, engineers, your fleet carrier. I do all of that by voice."
+ ],
+ "ShowOff_Left": [
+  "Now the left panel. Navigation, contacts, all of it.",
+  "Left panel. I can request docking from here with a single sentence.",
+  "Over to the left panel. Watch the tabs."
+ ],
+ "ShowOff_Contacts": [
+  "Contacts, and the rest. I flick through these faster than you do.",
+  "Tab by tab. No fumbling, no looking.",
+  "Flicking through the tabs. Easy."
+ ],
+ "ShowOff_Right": [
+  "And the right panel. Modules, ship status, inventory.",
+  "Right panel next. I know where everything is.",
+  "Now the right panel. Still no hands."
+ ],
+ "ShowOff_Voice": [
+  "Everything here is voice controlled. Landing gear, lights, hardpoints, scoops, the panels, even your on foot controls. Just ask.",
+  "You can talk to me for the ship and on foot: gear, lights, wave, torch, grenade types. I press your own keys.",
+  "I press your keys for you, from landing gear to emotes. You choose the words, I do the work."
+ ],
+ "ShowOff_Care": [
+  "In a fight I watch your pips, heat and shields. On foot I can raise your suit shields, use a medpack or an energy cell, and tell you when that was your last grenade.",
+  "I keep an eye on the dangerous things. Heat, fuel, interdictions, and on foot your health and grenades.",
+  "I look after you. Warnings you can't miss, auto pips, heat sinks, and on foot, medpacks and shields."
+ ],
+ "ShowOff_New": [
+  "New this week: I sulk when you die, then forgive you. I know when you lose your unsold data, and I read only your direct messages.",
+  "I have moods now, and mood swings. Die and I'm upset for five minutes, then I forgive you. Lose money on a sale and I'll say so.",
+  "Lately I've learned proper moods with five levels each, a keybinds page, and on foot care. I keep getting better."
+ ],
+ "ShowOff_End": [
+  "And that's me. Ask me anything.",
+  "Show's over. Applause is optional.",
+  "That's the tour, Commander. I'm very good, aren't I?",
+  "Demonstration complete. You may clap."
+ ],
+ "ShowOff_End_Close": [
+  "That's me, Commander. Did I impress you? Be honest. Say yes."
+ ],
+ "ShowOff_End_Sarcastic": [
+  "There. Wasn't that more impressive than your flying?"
+ ]
+}

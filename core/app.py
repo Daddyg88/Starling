@@ -385,7 +385,23 @@ class App:
         voice = self.route_voice
         hooks = {"plot_waypoint": voice.prepare_plot} if voice is not None else {}
         hooks["auto_launch"] = self._launch_check
+        hooks["show_off"] = self._showoff_check
         return hooks
+
+    def _showoff_check(self):
+        """Showing off opens and closes screens, so only from the cockpit and only when it is calm."""
+        state = getattr(self, "state", None)
+        if state is None or not getattr(state, "status_seen", False):
+            return True, ""
+        flags = getattr(state, "status_flags", 0) or 0
+        flags2 = getattr(state, "status_flags2", 0) or 0
+        if flags2 & 1:
+            return False, "I can only show off from the cockpit, Commander."
+        if flags & ((1 << 25) | (1 << 26)):
+            return False, "Not from the SRV or a fighter, Commander."
+        if flags & ((1 << 22) | (1 << 23) | (1 << 17) | (1 << 30)):
+            return False, "Not now, Commander. We are busy."
+        return True, ""
 
     def _launch_check(self):
         """'Launch' only works while docked, so she never presses Select somewhere else by mistake."""

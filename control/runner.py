@@ -387,6 +387,23 @@ class CommandRunner:
                 self.macro_spoke = True
                 self._speak(step[1], {}, fallback="")
                 continue
+            if step[0] == "talk":
+                self.macro_spoke = True
+                self._speak(step[1], {}, fallback="")
+                waiter = getattr(self.speech, "wait_until_idle", None)
+                if waiter is not None:
+                    waiter(40.0)                           # let her finish the sentence before the next screen change
+                continue
+            if step[0] == "leave":
+                gui = self._gui_focus()
+                if gui == step[2] or gui == "?":
+                    problem = self.sender.send(strokes[step[1]], hold=0.15)
+                    pressed.append(step[1])
+                    if problem:
+                        status = SEND_FAILURE_STATUS.get(problem, "failed")
+                        return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                    self.sleep(GAP_SECONDS)
+                continue
             if step[0] == "ensure":
                 if self._gui_focus() == 0:                       # only when Status.json clearly says NO screen is open
                     problem = self.sender.send(strokes[step[1]], hold=0.15)
