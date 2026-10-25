@@ -8,5 +8,5 @@ class Resurrect(BaseEvent):
     name = "Resurrect"
     priority = NORMAL
     tag_on_foot = True
-    keep = ("Option", "Cost",)
+    keep = ("Option", "Cost", "Bankrupt",)
     summary = "Rebuy paid. Ship restored"

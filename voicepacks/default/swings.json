@@ -1,0 +1,53 @@
+{
+ "_help": "Mood swings and the new bad-news reactions. Forgive_* are said when a temporary bad mood ends (she goes back to how she really felt before). SwingEnd_Good is said when a temporary happy mood ends. React_DataLost / React_Rebuy / React_TradeLoss are said when dying loses your unsold data, when the rebuy costs a lot, and when you sell at a loss. Add _Friendly, _Close, _Sarcastic, _Frustrated, _Upset variants for different moods.",
+ "Forgive_Died": [
+  "Right. I'm done being cross about the explosion. I forgive you.",
+  "Five minutes of sulking is plenty. You're forgiven, Commander. Try to stay in one piece.",
+  "I've stopped being upset. I forgive you for dying. Do try not to make it a habit.",
+  "Okay, I forgive you. But I'm keeping the memory of that fireball.",
+  "That's enough sulking from me. All is forgiven. Shall we go again?"
+ ],
+ "Forgive_Died_Close": [
+  "I can't stay cross with you, love. Forgiven. Just come back in one piece next time."
+ ],
+ "Forgive_Died_Sarcastic": [
+  "Fine. Forgiven. Again. I'm starting to think you do it for the attention."
+ ],
+ "Forgive_General": [
+  "Right, I've calmed down. We're good again.",
+  "Sulk over. Let's get on with it, Commander.",
+  "I'm not cross any more. Moving on.",
+  "All forgiven. Back to work."
+ ],
+ "Forgive_General_Close": [
+  "Okay, I'm not cross any more. Come here, you."
+ ],
+ "SwingEnd_Good": [
+  "Right. Back to business, Commander. That was a lovely moment though.",
+  "Okay, I'll stop gushing now. Back to work.",
+  "That was a good one. Right, composed again.",
+  "Alright, I've come back down to earth. Where to?"
+ ],
+ "React_DataLost": [
+  "And all that unsold data went down with the ship. Every scan. Gone.",
+  "Dying loses your unsold data, Commander. All of it. Ouch.",
+  "That's the exploration data gone too. A double whammy.",
+  "You didn't sell your data first. It's all lost now."
+ ],
+ "React_DataLost_Sarcastic": [
+  "Lovely. Death and all that data lost. Efficient."
+ ],
+ "React_Rebuy": [
+  "That rebuy is going to hurt your wallet.",
+  "A rebuy that size is painful. Please be careful.",
+  "Paying all that to get the ship back. Lovely."
+ ],
+ "React_TradeLoss": [
+  "You sold that for less than you paid. That's a loss, Commander.",
+  "That was a loss. Check the prices before you sell next time.",
+  "You've just lost money on that sale."
+ ],
+ "React_TradeLoss_Sarcastic": [
+  "Selling at a loss. Bold strategy."
+ ]
+}

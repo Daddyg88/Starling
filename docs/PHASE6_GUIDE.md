@@ -703,3 +703,20 @@ A quick test that tells us if I am right: with Elite open, press your Focus Left
 ## 0.46.0 - Only direct messages
 
 Dashboard > Personality > **Which messages she reads**: *Direct messages only* (the new default), *Direct, friends, wing and squadron*, or *Everything, including local and system chat*. Computer-controlled ships keep their own switch (off). It applies to everyone, so your existing setting changes to direct only after this update. Elite's journal calls a direct message the "player" channel; if one of yours is not read, send me the log line and I will check the channel name.
+
+## 0.47.0 - Mood swings, and more ways to lose points
+
+**Mood swings** (`swings` in config/mood_rules.json): a big event puts her in another mood for a few minutes WITHOUT changing her score. When the time is up she says a forgiving line (or "back to business" after good news) and returns to the mood she really was in. The swing is saved, so closing Starling does not cancel it. The "Reset her mood" button clears it.
+- You died: Upset, 5 minutes ("I forgive you").
+- You blew yourself up: Frustrated, 3 minutes. Killing civilians: Frustrated, 5. Canopy broken: Frustrated, 2.
+- Failed mission: Sarcastic, 3. A sale that lost 200,000+ credits: Sarcastic, 3.
+- Good news: a bounty of 2,000,000+: Infatuated, 3 minutes. Selling 10,000,000+ of exploration or biology data: Close, 5 minutes.
+A worse swing is never replaced by a milder one; it just lasts longer.
+
+**New ways to lose points** (these DO change the score):
+- Dying: the penalty is now only -1 (the sulk is the main punishment, and she is forgiving), but losing unsold data is a second hit: she counts scans, system mapping, codex entries and biology samples since your last sale (a rough count, kept only while Starling is open). Dying with 8+ "units" costs 2, 25+ costs 4, 60+ costs 6.
+- A rebuy over 1,000,000: -1, over 10,000,000: -2, over 50,000,000: -3.
+- Selling at a loss (she works it out from what you paid): 10,000+ lost: -1, 200,000+: -2, 1,000,000+: -3.
+- Dumping cargo -1, being interdicted -1, losing your fighter -1, canopy broken -2, nearly out of fuel -2.
+
+Edit any number in config/mood_rules.json (rules and swings). Not tested in the live game: the real journal fields (AvgPricePaid on a sale, Cost on a rebuy). Also, the lines for medpack, energy cell and last grenade from 0.45 were never loaded by mistake, so she could not say them; fixed now.

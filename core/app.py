@@ -182,6 +182,7 @@ class App:
                                speak=lambda text: self.speech.say(text=text, priority="normal", event_name="mood.react")
                                if self.speech is not None else None)
         self.mood.attach()
+        self.mood.start_timer()                 # ends her temporary moods on time
         from personality.favourite_ship import FavouriteShip
         self.favourite_ship = FavouriteShip(
             lambda: self.state, self.settings, persist=self._record_events,
@@ -678,6 +679,7 @@ class App:
             self.watcher.detach()
             self.watcher = None
         if self.mood is not None:
+            self.mood.stop_timer()
             self.mood.save()
         if self.listener is not None:
             self.listener.stop()

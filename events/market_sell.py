@@ -7,5 +7,5 @@ from core.event_bus import LOW
 class MarketSell(BaseEvent):
     name = "MarketSell"
     priority = LOW
-    keep = ("Type", "Count", "SellPrice", "TotalSale", "IllegalGoods", "StolenGoods", "BlackMarket",)
+    keep = ("Type", "Count", "SellPrice", "TotalSale", "AvgPricePaid", "IllegalGoods", "StolenGoods", "BlackMarket",)
     summary = "Sold {Count} {Type}"

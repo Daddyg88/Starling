@@ -22,11 +22,17 @@ It cannot swing wildly, because of four brakes:
                   so what you earned is still there when you come back.
     4. HYSTERESIS she only changes mood after passing the line by 4 points, so she never flip-flops.
 
+On top of the score there are MOOD SWINGS (the "swings" list in config/mood_rules.json): a big event (dying, a failed mission, a
+heavy trade loss...) puts her in another mood for a few minutes WITHOUT touching the score. When the time is up she says she forgives
+you (or calms down after good news) and goes straight back to the mood she was in before. Unsold exploration and biology data is
+lost when you die, so dying with a lot of it costs extra points (the "double whammy").
+
 The engine never speaks over safety warnings: she only reacts to ordinary events.
 """
 
 import json
 import shutil
+import threading
 import time
 from collections import deque
 from datetime import datetime
@@ -99,6 +105,26 @@ def load_rules(path=None):
     return options, rules
 
 
+def load_swings(path=None):
+    """The mood swings from mood_rules.json: [{id, event, when, mood, minutes, forgive, label}, ...]. Bad ones are ignored."""
+    path = path or (paths.CONFIG_DIR / "mood_rules.json")
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    except (OSError, ValueError):
+        return []
+    swings = []
+    for item in data.get("swings", []):
+        if isinstance(item, dict) and item.get("event") and item.get("mood") in BANDS:
+            try:
+                item = dict(item)
+                item["minutes"] = max(0.1, min(60.0, float(item.get("minutes", 5))))
+            except (TypeError, ValueError):
+                continue
+            swings.append(item)
+    return swings
+
+
 # ---------------------------------------------------------------------------
 # Conditions in the rules file
 # ---------------------------------------------------------------------------
@@ -134,6 +160,8 @@ def matches(condition, data, ctx):
             return value is condition["is"] or value == condition["is"]
         if "gt" in condition:
             return float(value) > float(condition["gt"])
+        if "lt" in condition:
+            return float(value) < float(condition["lt"])
         if "in" in condition:
             return any(_same(value, v) for v in condition["in"])
     except (TypeError, ValueError):
@@ -150,6 +178,10 @@ class MoodEngine:
         self.bus = bus
         self.settings = settings
         self.options, self.rules = load_rules(rules_path)
+        self.swings = load_swings(rules_path)
+        self._swing = None                 # {"mood", "until", "forgive", "label"} while she is in a temporary mood
+        self._swing_lock = threading.Lock()
+        self._unsold = 0                   # exploration / biology work done since the last sale: lost if you die
         self.save_path = save_path or (paths.DATA_DIR / "mood.json")
         self.dialogue = dialogue
         self.speak = speak
@@ -290,6 +322,7 @@ class MoodEngine:
         self._paint_drain(now)
         self._calm(self._active_seconds(self.updated, now))
         self.updated = now
+        self.check_swing(now)
         band = self._band_for(self.score, self.band)
         if band != self.band:
             self.band = band
@@ -312,6 +345,10 @@ class MoodEngine:
                 self.score = self._converted(float(saved.get("score", self.score)), saved.get("scale"))
                 self.paint_jumps = max(0, int(saved.get("paint_jumps", 0)))
                 self.paint_debt = max(0.0, float(saved.get("paint_debt", 0.0)))
+                swing = saved.get("swing")
+                if isinstance(swing, dict) and swing.get("mood") in BANDS and float(swing.get("until", 0)) > self.clock():
+                    self._swing = {"mood": swing["mood"], "until": float(swing["until"]), "forgive": str(swing.get("forgive", "")),
+                                   "label": str(swing.get("label", ""))}
                 hours = max(0.0, float(self.options.get("offline_calm_hours", 0) or 0))
                 away = max(0.0, min(self.clock() - float(saved.get("saved_at", self.clock())), hours * 3600.0))
                 if away:
@@ -332,7 +369,8 @@ class MoodEngine:
             temp = self.save_path.with_suffix(".tmp")
             with open(temp, "w", encoding="utf-8") as handle:
                 json.dump({"score": round(self.score, 2), "scale": self.scale, "saved_at": self.clock(),
-                           "paint_jumps": self.paint_jumps, "paint_debt": round(self.paint_debt, 2)}, handle)
+                           "paint_jumps": self.paint_jumps, "paint_debt": round(self.paint_debt, 2),
+                           "swing": self._swing}, handle)
             if self.save_path.exists():
                 try:
                     shutil.copyfile(self.save_path, self.save_path.with_name(self.save_path.name + ".bak"))   # last good copy
@@ -353,6 +391,7 @@ class MoodEngine:
         """Back to neutral (the dashboard button)."""
         self.score = float(self.options["start_score"])
         self.paint_debt = 0.0
+        self._swing = None
         self._fatigue.clear()
         self._window.clear()
         self.band = self._band_for(self.score, None)
@@ -454,10 +493,75 @@ class MoodEngine:
         used = -sum(d for _t, d in self._window if d < 0)
         return -max(0.0, min(-delta, cap - used))
 
+    SWING_LEVEL = 3
+
+    def _shown_band(self):
+        """The mood she shows: her temporary swing if she has one, else the real mood from the score."""
+        swing = self._swing
+        return swing["mood"] if swing else self.band
+
+    def _shown_level(self):
+        return self.SWING_LEVEL if self._swing else self.level
+
+    def swing_active(self):
+        return self._swing is not None
+
+    def _start_swing(self, swing, now):
+        mood = swing["mood"]
+        until = now + 60.0 * swing["minutes"]
+        with self._swing_lock:
+            current = self._swing
+            if current and BANDS.index(current["mood"]) < BANDS.index(mood) <= BANDS.index("Neutral") and current["until"] > now:
+                current["until"] = max(current["until"], until)          # already in a worse mood: only stay in it longer
+            else:
+                self._swing = {"mood": mood, "until": until, "forgive": swing.get("forgive", ""), "label": swing.get("label", swing.get("id", ""))}
+        self.history.appendleft((datetime.fromtimestamp(now).strftime("%H:%M"), "Mood swing: %s for %g min (%s)" % (
+            mood, swing["minutes"], swing.get("label", swing.get("id", ""))), 0.0))
+        self._dirty = True
+        self._publish_live()
+        log.info("Mood swing: %s for %g minutes (%s)", mood, swing["minutes"], swing.get("id"))
+
+    def check_swing(self, now=None):
+        """Ends her temporary mood when its time is up: she says the forgiving line and returns to her real mood. Safe to call often."""
+        now = self.clock() if now is None else now
+        with self._swing_lock:
+            swing = self._swing
+            if swing is None or now < swing["until"]:
+                return False
+            self._swing = None
+        self._dirty = True
+        self._publish_live()
+        log.info("Mood swing over (%s); back to %s", swing["label"], self.band)
+        if swing["forgive"] and self._can_speak():
+            text = self._line(swing["forgive"], effective_mood(self.settings))
+            if text:
+                self.speak(text)
+        return True
+
+    def start_timer(self, seconds=5.0):
+        """A small background tick so a swing ends on time even when nothing is happening in the game."""
+        if getattr(self, "_timer_thread", None) is not None:
+            return
+
+        def loop():
+            while not self._timer_stop.wait(seconds):
+                try:
+                    self.check_swing()
+                except Exception:
+                    log.exception("Mood swing timer problem")
+        self._timer_stop = threading.Event()
+        self._timer_thread = threading.Thread(target=loop, name="mood-swing", daemon=True)
+        self._timer_thread.start()
+
+    def stop_timer(self):
+        if getattr(self, "_timer_thread", None) is not None:
+            self._timer_stop.set()
+            self._timer_thread = None
+
     def _publish_level(self):
         """The level can change without the mood changing: keep the published number up to date."""
         try:
-            level = self.level
+            level = self._shown_level()
             if self.settings.get("personality.mood_level_live") != level:
                 self.settings.set("personality.mood_level_live", level)
         except Exception:
@@ -465,8 +569,8 @@ class MoodEngine:
 
     def _publish_live(self):
         try:
-            self.settings.set("personality.mood_live", self.band)
-            self.settings.set("personality.mood_level_live", self.level)
+            self.settings.set("personality.mood_live", self._shown_band())
+            self.settings.set("personality.mood_level_live", self._shown_level())
         except Exception:
             log.debug("Could not publish the live mood", exc_info=True)
 
@@ -491,6 +595,7 @@ class MoodEngine:
             self._paint_jump(now)
         elif name == "Repair":
             self._repainted(data, now)
+        self._enrich(name, data)
         for rule in self.rules:
             if rule["event"] != name:
                 continue
@@ -498,10 +603,46 @@ class MoodEngine:
                 continue
             self._apply(rule, event, now)
             break                                    # only the first matching rule counts
+        if name == "Died":
+            self._lose_data(now)
+        for swing in self.swings:
+            if swing["event"] == name and matches(swing.get("when"), data, self._ctx_flags(now)):
+                self._start_swing(swing, now)
+                break
         if self._dirty and now - self._last_save >= SAVE_EVERY_SECONDS:
             self.save()
 
+    def _enrich(self, name, data):
+        """Adds worked-out fields to the event's data so the rules file can use them (the journal does not give them)."""
+        if name == "MarketSell":
+            try:
+                paid = float(data["AvgPricePaid"]) * float(data.get("Count", 0))
+                data["Loss"] = max(0.0, paid - float(data.get("TotalSale", 0)))      # what you lost on this sale
+            except (KeyError, TypeError, ValueError):
+                pass
+
+    # unsold work worth this many "units" each (exploration data and biology samples are lost when you die)
+    UNSOLD_UNITS = {"Scan": 1, "FSSAllBodiesFound": 2, "SAAScanComplete": 2, "CodexEntry": 1}
+
+    def _lose_data(self, now):
+        """Dying loses everything you have not sold yet: a second penalty on top of the death itself."""
+        units, self._unsold = self._unsold, 0
+        if units <= 0:
+            return
+        rule = next((r for r in self.rules if r["event"] == "_data_lost"), None)
+        if rule is None:
+            return
+        fake = type("Lost", (), {"name": "_data_lost", "data": {"Units": units}, "priority": "normal"})()
+        self._last_react = None                 # this one is its own sentence, not part of the death reaction
+        self._apply(rule, fake, now)
+
     def _track_context(self, name, data, now):
+        if name in self.UNSOLD_UNITS:
+            self._unsold += self.UNSOLD_UNITS[name]
+        elif name == "ScanOrganic" and str(data.get("ScanType", "")).lower() == "analyse":
+            self._unsold += 5
+        elif name in ("SellExplorationData", "MultiSellExplorationData", "SellOrganicData"):
+            self._unsold = 0
         if name == "CombatModeOn":
             self._ctx["combat_mode"] = True
         elif name == "AnalysisModeOn":
