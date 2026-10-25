@@ -254,3 +254,34 @@ class KeybindsPageTests(unittest.TestCase):
         book = binds.BindingBook(folder=folder, finder=lambda f: Path(f) / "Ship.4.0.binds", foot_finder=None)
         self.assertEqual(book.lookup("IncreaseSpeed_Buggy")[0].key, "Key_O")
         self.assertEqual(book.lookup("LandingGearToggle")[0].key, "Key_L")
+
+
+class PresetDropDownTests(unittest.TestCase):
+    def test_every_preset_in_the_folder_is_listed_once(self):
+        import tempfile
+        from pathlib import Path
+        from ui.settings_model import preset_choices
+        folder = Path(tempfile.mkdtemp())
+        for name in ("HCS Custom.4.2.binds", "HCS Custom.4.0.binds", "MCUSTOM.4.2.binds", "Old Setup.3.0.binds", "notes.txt", "Custom.binds"):
+            (folder / name).write_text("<Root/>")
+        found = preset_choices(folder)
+        self.assertEqual(found[0], ("Automatic (she works it out)", ""))
+        self.assertEqual([v for _l, v in found[1:]], ["Custom", "HCS Custom", "MCUSTOM", "Old Setup"])
+
+    def test_missing_folder_still_gives_automatic(self):
+        from pathlib import Path
+        from ui.settings_model import preset_choices
+        self.assertEqual(preset_choices(Path("/nowhere/at/all")), [("Automatic (she works it out)", "")])
+
+    def test_keybinds_boxes_are_drop_downs_and_keep_a_saved_name(self):
+        from ui.settings_model import build_pages
+        pages = build_pages()
+        self.assertTrue(all(f.kind == "choice" for f in pages[0].fields))
+        from pathlib import Path
+        from core.settings import Settings
+        from ui.settings_model import SettingsModel
+        settings = Settings(Path("nope.json")).load()
+        settings.set("onfoot.preset", "MCUSTOM")
+        model = SettingsModel(settings)
+        field = model.field("onfoot.preset")
+        self.assertIn("MCUSTOM", [value for _label, value in model.choices(field)])      # a saved name is never lost

@@ -650,3 +650,7 @@ Elite lets each group of controls use its own preset (the top of each controls p
 Ship, On foot, SRV, Ship-launched fighter, Multicrew. Type the preset's name exactly as the game shows it (for example `MCUSTOM`), save, and restart Starling. An empty box means "work it out": the ship uses the preset Elite starts with, the on-foot keys are searched for (see 0.42.4), and SRV, fighter and multicrew use the ship's file. Your on-foot box still uses the same setting as before (it already holds MCUSTOM).
 Developer > Check my Elite keys shows which groups are read from which file.
 NOT tested with real SRV, fighter or multicrew presets.
+
+
+## 0.43.1 - Preset drop-downs
+The boxes on the Keybinds page are now drop-down menus. Each lists "Automatic" plus every preset she finds in Elite's controls folder (the names of the .binds files without the version number, for example HCS Custom and MCUSTOM). A name you chose earlier is kept even if its file is missing. Restart Starling after changing one.

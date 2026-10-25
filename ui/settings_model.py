@@ -15,6 +15,8 @@ This file contains no window code, so it is easy to test and cannot crash the wi
 """
 
 import json
+from pathlib import Path
+import re
 from dataclasses import dataclass, field as dc_field
 from typing import Callable, List, Optional, Union
 
@@ -108,6 +110,28 @@ def microphone_choices(lister=None):
     return found
 
 
+_VERSION_TAIL = re.compile(r"\.\d+\.\d+$")
+
+
+def preset_choices(folder=None):
+    """The control presets Elite has saved, for the Keybinds page drop-downs:
+    [("Automatic (she works it out)", ""), ("HCS Custom", "HCS Custom"), ("MCUSTOM", "MCUSTOM"), ...]"""
+    found = [("Automatic (she works it out)", "")]
+    try:
+        from control import binds
+        folder = folder if folder is not None else binds.bindings_folder()
+        names = {}
+        if folder is not None and Path(folder).is_dir():
+            for path in sorted(Path(folder).glob("*.binds")):
+                name = _VERSION_TAIL.sub("", path.name[:-len(".binds")])
+                names.setdefault(name.lower(), name)
+        for name in sorted(names.values(), key=str.lower):
+            found.append((name, name))
+    except Exception:
+        log.exception("Could not list the Elite control presets for the dashboard")
+    return found
+
+
 def voicepack_choices(folder=None):
     folder = folder or paths.VOICEPACKS_DIR
     found = []
@@ -137,17 +161,17 @@ SECTION_OF = {"listening": "voice", "controls": "game", "chat": "personality", "
 def build_pages(mic_lister=None, pack_folder=None):
     pages = [
         Page("keybinds", "Keybinds", "Elite lets each group of controls use its own PRESET (look at the top of each controls page in Elite: Options > Controls, where it says PRESETS). "
-             "Type the preset name for each group here so she reads the right keys. Leave a box empty and she works it out. Restart Starling after changing one. "
+             "Choose the preset for each group from the list (she lists every preset saved in Elite's controls folder, and the name must match the one the game shows at the top of that controls page). Leave a box on Automatic and she works it out. Restart Starling after changing one. "
              "Use Developer > Check my Elite keys to see which files she found and which commands still have no key.", [
-            Field("keybinds.ship", "Ship controls preset", "text", placeholder="e.g. HCS Custom", restart=True,
+            Field("keybinds.ship", "Ship controls preset", "choice", preset_choices, restart=True,
                   help="Flying, panels, galaxy map, scanners. Empty = the one Elite starts with"),
-            Field("onfoot.preset", "On foot controls preset", "text", placeholder="e.g. MCUSTOM", restart=True,
+            Field("onfoot.preset", "On foot controls preset", "choice", preset_choices, restart=True,
                   help="Walking, weapons, emotes, suit tools. Empty = she looks for it"),
-            Field("keybinds.srv", "SRV controls preset", "text", placeholder="e.g. HCS Custom", restart=True,
+            Field("keybinds.srv", "SRV controls preset", "choice", preset_choices, restart=True,
                   help="The surface vehicle. Empty = same file as the ship"),
-            Field("keybinds.fighter", "Ship-launched fighter preset", "text", placeholder="e.g. HCS Custom", restart=True,
+            Field("keybinds.fighter", "Ship-launched fighter preset", "choice", preset_choices, restart=True,
                   help="Fighter orders and flying a fighter. Empty = same file as the ship"),
-            Field("keybinds.multicrew", "Multicrew preset", "text", placeholder="e.g. HCS Custom", restart=True,
+            Field("keybinds.multicrew", "Multicrew preset", "choice", preset_choices, restart=True,
                   help="Flying with another commander. Empty = same file as the ship"),
         ]),
         Page("voice", "Voice", "How she sounds when she speaks.", [
