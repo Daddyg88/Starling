@@ -123,3 +123,25 @@ class SwingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LoginTests(unittest.TestCase):
+    def test_login_while_still_upset_says_so(self):
+        from personality.greeter import LoginGreeter
+        clock = Clock()
+        settings = Settings(Path("nope.json")).load()
+        dialogue = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
+        engine = MoodEngine(EventBus(), settings, persist=False, clock=clock, dialogue=dialogue)
+        greeter = LoginGreeter(EventBus(), None, dialogue, settings, mood=engine)
+        before = greeter.compose({"Ship": "python"}, None)
+        engine.on_event(Ev("Died", {"KillerName": "x"}))
+        text = greeter.compose({"Ship": "python"}, None)
+        self.assertIn("dying", text.lower())
+        clock.t += 6 * 60
+        engine.check_swing()
+        self.assertNotIn("dying", greeter.compose({"Ship": "python"}, None).lower())
+
+    def test_every_swing_has_a_still_line(self):
+        known = set(DialogueManager(paths.VOICEPACKS_DIR / "default").load().lines)
+        for s in mood_engine.load_swings():
+            self.assertIn(s["still"], known)

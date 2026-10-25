@@ -73,14 +73,14 @@
   "_swings_help": "Mood swings: when the event (and the optional 'when') happens, she shows this mood for 'minutes' WITHOUT changing the score, then says the 'forgive' line and goes back to the mood she was really in.",
 
   "swings": [
-    {"id": "died", "label": "You died", "event": "Died", "mood": "Upset", "minutes": 5, "forgive": "Forgive_Died"},
-    {"id": "self_destruct", "label": "You blew yourself up", "event": "SelfDestruct", "mood": "Frustrated", "minutes": 3, "forgive": "Forgive_General"},
-    {"id": "murder", "label": "Killing civilians", "event": "CommitCrime", "when": {"field": "CrimeType", "equals": "murder"}, "mood": "Frustrated", "minutes": 5, "forgive": "Forgive_General"},
-    {"id": "mission_failed", "label": "A failed mission", "event": "MissionFailed", "mood": "Sarcastic", "minutes": 3, "forgive": "Forgive_General"},
-    {"id": "big_trade_loss", "label": "A heavy loss on a sale", "event": "MarketSell", "when": {"field": "Loss", "gt": 199999}, "mood": "Sarcastic", "minutes": 3, "forgive": "Forgive_General"},
-    {"id": "canopy", "label": "Canopy broken", "event": "CockpitBreached", "mood": "Frustrated", "minutes": 2, "forgive": "Forgive_General"},
-    {"id": "big_bounty", "label": "A huge bounty", "event": "Bounty", "when": {"field": "TotalReward", "gt": 1999999}, "mood": "Infatuated", "minutes": 3, "forgive": "SwingEnd_Good"},
-    {"id": "big_data_sale", "label": "A very big data sale", "event": "SellExplorationData", "when": {"field": "TotalEarnings", "gt": 9999999}, "mood": "Close", "minutes": 5, "forgive": "SwingEnd_Good"},
-    {"id": "big_bio_sale", "label": "A very big biology sale", "event": "SellOrganicData", "when": {"field": "TotalEarnings", "gt": 9999999}, "mood": "Close", "minutes": 5, "forgive": "SwingEnd_Good"}
+    {"id": "died", "label": "You died", "event": "Died", "mood": "Upset", "minutes": 5, "forgive": "Forgive_Died", "still": "Still_Died"},
+    {"id": "self_destruct", "label": "You blew yourself up", "event": "SelfDestruct", "mood": "Frustrated", "minutes": 3, "forgive": "Forgive_General", "still": "Still_General"},
+    {"id": "murder", "label": "Killing civilians", "event": "CommitCrime", "when": {"field": "CrimeType", "equals": "murder"}, "mood": "Frustrated", "minutes": 5, "forgive": "Forgive_General", "still": "Still_General"},
+    {"id": "mission_failed", "label": "A failed mission", "event": "MissionFailed", "mood": "Sarcastic", "minutes": 3, "forgive": "Forgive_General", "still": "Still_General"},
+    {"id": "big_trade_loss", "label": "A heavy loss on a sale", "event": "MarketSell", "when": {"field": "Loss", "gt": 199999}, "mood": "Sarcastic", "minutes": 3, "forgive": "Forgive_General", "still": "Still_General"},
+    {"id": "canopy", "label": "Canopy broken", "event": "CockpitBreached", "mood": "Frustrated", "minutes": 2, "forgive": "Forgive_General", "still": "Still_General"},
+    {"id": "big_bounty", "label": "A huge bounty", "event": "Bounty", "when": {"field": "TotalReward", "gt": 1999999}, "mood": "Infatuated", "minutes": 3, "forgive": "SwingEnd_Good", "still": "Still_Good"},
+    {"id": "big_data_sale", "label": "A very big data sale", "event": "SellExplorationData", "when": {"field": "TotalEarnings", "gt": 9999999}, "mood": "Close", "minutes": 5, "forgive": "SwingEnd_Good", "still": "Still_Good"},
+    {"id": "big_bio_sale", "label": "A very big biology sale", "event": "SellOrganicData", "when": {"field": "TotalEarnings", "gt": 9999999}, "mood": "Close", "minutes": 5, "forgive": "SwingEnd_Good", "still": "Still_Good"}
   ]
 }

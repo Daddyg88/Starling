@@ -34,7 +34,7 @@ class _Safe(dict):
 
 class LoginGreeter:
     def __init__(self, bus, speech, dialogue, settings, state_provider=None, flavour=None,
-                 clock=time.monotonic, timer_factory=None, memory=None):
+                 clock=time.monotonic, timer_factory=None, memory=None, mood=None):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
@@ -42,6 +42,7 @@ class LoginGreeter:
         self.state_provider = state_provider or (lambda: None)
         self.flavour = flavour
         self.memory = memory            # memory/recall.py (optional)
+        self.mood = mood                # the MoodEngine (optional): knows if she is in a temporary mood
         self.clock = clock
         self.timer_factory = timer_factory or (lambda seconds, function: threading.Timer(seconds, function))
         self._pending = None          # LoadGame data waiting for its Location
@@ -148,10 +149,19 @@ class LoginGreeter:
             if (self.flavour is not None and self.flavour.innuendo_on(mood) and mood not in ("Sarcastic", "Frustrated", "Upset")
                     and random.random() < 0.5):
                 key = "Login_Mood_Innuendo"
-            feeling = self._say(key, "", values) or self._say("Login_Mood_" + (mood or "Friendly"), "", values)
+            still = self._swing_line(values)
+            feeling = still or self._say(key, "", values) or self._say("Login_Mood_" + (mood or "Friendly"), "", values)
             if feeling:
                 sentence = "%s || %s" % (sentence, feeling)
         return sentence.strip()
+
+    def _swing_line(self, values):
+        """While she is still in a temporary mood (she was upset with you for dying), she says so instead of the usual feeling."""
+        try:
+            key = self.mood.swing_still_key() if self.mood is not None else ""
+        except Exception:
+            return None
+        return self._say(key, effective_mood(self.settings), values) if key else None
 
     def _where(self, location, state, mood, values):
         if location is not None:

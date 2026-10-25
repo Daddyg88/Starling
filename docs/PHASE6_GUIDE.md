@@ -720,3 +720,7 @@ A worse swing is never replaced by a milder one; it just lasts longer.
 - Dumping cargo -1, being interdicted -1, losing your fighter -1, canopy broken -2, nearly out of fuel -2.
 
 Edit any number in config/mood_rules.json (rules and swings). Not tested in the live game: the real journal fields (AvgPricePaid on a sale, Cost on a rebuy). Also, the lines for medpack, energy cell and last grenade from 0.45 were never loaded by mistake, so she could not say them; fixed now.
+
+## 0.47.1 - Still upset at login
+
+If you load into the game while a mood swing is still running (for example you died 3 minutes ago and restarted), the login greeting says so instead of the usual "how she feels" line: "I'm still upset with you for dying, Commander." Each swing in config/mood_rules.json has a `still` line (Still_Died, Still_General, Still_Good in voicepacks/default/swings.json). A swing keeps counting down while Starling is closed, so after the full 5 minutes the greeting is back to normal.

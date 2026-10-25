@@ -214,7 +214,7 @@ class App:
         from memory.recall import MemoryRecall
         self.memory_recall = MemoryRecall(self.memory_store, self.dialogue, self.settings, speech=self.speech)
         self.greeter = LoginGreeter(self.bus, self.speech, self.dialogue, self.settings,
-                                    state_provider=lambda: self.state, flavour=flavour, memory=self.memory_recall)
+                                    state_provider=lambda: self.state, flavour=flavour, memory=self.memory_recall, mood=self.mood)
         self.greeter.attach()
 
         # Gets new lines ready in the background when the CPU is free (see tts/voice_warmer.py).

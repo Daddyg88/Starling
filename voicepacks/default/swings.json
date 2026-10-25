@@ -49,5 +49,27 @@
  ],
  "React_TradeLoss_Sarcastic": [
   "Selling at a loss. Bold strategy."
+ ],
+ "Still_Died": [
+  "I'm still upset with you for dying, Commander. Give me a few minutes.",
+  "Just so you know, I'm still upset with you for dying.",
+  "I haven't forgiven you for dying yet. Don't push it.",
+  "Still upset about the dying thing. I'll come round, eventually."
+ ],
+ "Still_Died_Close": [
+  "I'm still upset with you for dying, love. You frightened me. Give me a minute."
+ ],
+ "Still_Died_Sarcastic": [
+  "Oh, I'm still upset with you for dying. Thank you for asking."
+ ],
+ "Still_General": [
+  "I'm still a bit cross with you, Commander. It'll pass.",
+  "I haven't calmed down yet. Give me a few minutes.",
+  "Still annoyed, I'm afraid. Let's see how you behave."
+ ],
+ "Still_Good": [
+  "I'm still buzzing from that last win, Commander.",
+  "Still on a high from earlier. Don't mind me.",
+  "I'm still smiling about that. Anyway, welcome back."
  ]
 }

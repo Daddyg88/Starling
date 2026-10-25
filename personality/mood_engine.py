@@ -348,7 +348,7 @@ class MoodEngine:
                 swing = saved.get("swing")
                 if isinstance(swing, dict) and swing.get("mood") in BANDS and float(swing.get("until", 0)) > self.clock():
                     self._swing = {"mood": swing["mood"], "until": float(swing["until"]), "forgive": str(swing.get("forgive", "")),
-                                   "label": str(swing.get("label", ""))}
+                                   "still": str(swing.get("still", "")), "label": str(swing.get("label", ""))}
                 hours = max(0.0, float(self.options.get("offline_calm_hours", 0) or 0))
                 away = max(0.0, min(self.clock() - float(saved.get("saved_at", self.clock())), hours * 3600.0))
                 if away:
@@ -503,6 +503,11 @@ class MoodEngine:
     def _shown_level(self):
         return self.SWING_LEVEL if self._swing else self.level
 
+    def swing_still_key(self):
+        """Dialogue key for 'I am still upset with you...' while a swing lasts (used by the login greeting), else ''."""
+        swing = self._swing
+        return swing.get("still", "") if swing and self.clock() < swing["until"] else ""
+
     def swing_active(self):
         return self._swing is not None
 
@@ -514,7 +519,7 @@ class MoodEngine:
             if current and BANDS.index(current["mood"]) < BANDS.index(mood) <= BANDS.index("Neutral") and current["until"] > now:
                 current["until"] = max(current["until"], until)          # already in a worse mood: only stay in it longer
             else:
-                self._swing = {"mood": mood, "until": until, "forgive": swing.get("forgive", ""), "label": swing.get("label", swing.get("id", ""))}
+                self._swing = {"mood": mood, "until": until, "forgive": swing.get("forgive", ""), "still": swing.get("still", ""), "label": swing.get("label", swing.get("id", ""))}
         self.history.appendleft((datetime.fromtimestamp(now).strftime("%H:%M"), "Mood swing: %s for %g min (%s)" % (
             mood, swing["minutes"], swing.get("label", swing.get("id", ""))), 0.0))
         self._dirty = True
