@@ -42,6 +42,21 @@ _FALLBACK_GAP = 1.0
 STALE_SECONDS = 60
 
 
+ENERGY_KEYS = ("SuitEnergy", "Energy", "SuitPower", "Power", "SuitBattery", "Battery")
+_KNOWN_FOOT = {"Oxygen", "Health", "Temperature", "SelectedWeapon", "Gravity"}
+
+
+def suit_energy(status):
+    """Suit energy 0 to 1 if Status.json carries it, else None. The documented file does NOT list one; she looks for the
+    usual names in case the game has added it (a value above 1 is read as a percentage)."""
+    for key in ENERGY_KEYS:
+        value = status.get(key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            value = float(value)
+            return value / 100.0 if value > 1.0 else value
+    return None
+
+
 class StatusReader:
     def __init__(self, folder, processor, min_gap_seconds=None):
         self.path = Path(folder) / "Status.json" if folder else None
@@ -116,6 +131,8 @@ class StatusReader:
             state.gui_focus = int(status.get("GuiFocus") or 0)
             state.selected_weapon = str(status.get("SelectedWeapon") or "")
             state.health = float(status["Health"]) if isinstance(status.get("Health"), (int, float)) else None
+            state.suit_energy = suit_energy(status)
+            self._log_foot_fields(status, flags2)
             main = (status.get("Fuel") or {}).get("FuelMain")
             if isinstance(main, (int, float)):
                 state.fuel_main = float(main)
@@ -297,3 +314,16 @@ class StatusReader:
             return {}
         return {"temperature": int(round(facts["temperature"])), "gravity": "%.2f" % facts["gravity"],
                 "heavy": facts["gravity"] >= 2.0}
+
+    _foot_fields_logged = False
+
+    def _log_foot_fields(self, status, flags2):
+        """Once per run, write down every field Status.json has while you are on foot, so unknown ones (suit energy?) show up."""
+        if self._foot_fields_logged or not (flags2 & 1):
+            return
+        self._foot_fields_logged = True
+        extra = sorted(k for k in status if k not in _KNOWN_FOOT and k not in (
+            "timestamp", "event", "Flags", "Flags2", "Pips", "Firegroup", "GuiFocus", "Fuel", "Cargo", "LegalState", "Latitude",
+            "Altitude", "Longitude", "Heading", "BodyName", "PlanetRadius", "Balance", "Destination"))
+        log.info("Status.json on foot has these fields: %s. Extra (not in the manual): %s. Suit energy field: %s",
+                 ", ".join(sorted(status)), ", ".join(extra) or "none", "found" if suit_energy(status) is not None else "not found")

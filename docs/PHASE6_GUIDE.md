@@ -675,3 +675,7 @@ New switches on **On foot** (the medpack and energy cell ones are OFF until you 
 **Low ammo is NOT possible.** The game does not put your ammo in Status.json, the journal or any file. I will not guess.
 
 Not tested in the live game: the exact item names in Backpack.json (the log line "Backpack: ..." shows what she reads, please send it if grenades or packs are not noticed), whether the game writes Backpack.json straight away when you throw, and the key presses.
+
+## 0.45.1 - Energy cell uses suit energy
+
+The energy cell now follows your SUIT ENERGY (20% or lower), not shields. The game's manual lists no suit energy in Status.json (only Oxygen, Health, Temperature, SelectedWeapon, Gravity), so she looks for a field called SuitEnergy, Energy, SuitPower, Power or Battery in case your game has one, and the first time you are on foot she writes ALL the fields she sees to the log ("Status.json on foot has these fields: ..."). If one is found she uses it. If not, she falls back to the first loss of health as the sign that the shields are gone, and the log says "Suit energy field: not found". Please send me that log line if the cell does not use itself at the right time, and I will wire up the real field name.

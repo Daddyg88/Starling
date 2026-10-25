@@ -87,6 +87,26 @@ class CareTests(unittest.TestCase):
         c.check(foot("rifle", 0.9))
         self.assertEqual(self.sender.sent, ["HumanoidBattery"])
 
+    def test_real_suit_energy_is_used_when_the_game_gives_it(self):
+        c = self.make({"energycell": 2}, auto_battery=True)
+        st = foot("rifle", 1.0)
+        st.suit_energy = 0.5
+        c.check(st)
+        st = foot("rifle", 0.7)                                  # health loss alone does nothing now
+        st.suit_energy = 0.5
+        c.check(st)
+        self.assertEqual(self.sender.sent, [])
+        st = foot("rifle", 0.7)
+        st.suit_energy = 0.2
+        c.check(st)
+        self.assertEqual(self.sender.sent, ["HumanoidBattery"])
+
+    def test_suit_energy_field_is_found_by_its_usual_names(self):
+        from journal.status_reader import suit_energy
+        self.assertEqual(suit_energy({"SuitEnergy": 0.4}), 0.4)
+        self.assertEqual(suit_energy({"Energy": 35}), 0.35)
+        self.assertIsNone(suit_energy({"Health": 1.0, "Oxygen": 1.0}))
+
     def test_not_on_foot_does_nothing(self):
         c = self.make({"healthpack": 2}, auto_health=True)
         c.check(foot("", 0.05, on=False))
