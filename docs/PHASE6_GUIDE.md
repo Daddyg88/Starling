@@ -607,3 +607,8 @@ AUTO SHIELDS (Combat page, off by default): when you pull out a weapon, or your 
 * Several keys in a typical bindings file are shared between actions (for example W is Forward and Battery, E is Interact and Frag Grenade). The key Starling presses may therefore do something else too. Give the on-foot actions spare keys if that bites.
 
 NOT TESTED against the real game (only the logic): any key press, the emote slot numbers, the SelectedWeapon wording.
+
+
+## 0.41.1 - On foot page, and updates without asking
+* The dashboard has an **On foot** page. The auto-shields switch lives there now.
+* Updates: the "Update available - Update now / Not now" screen used to be on by default, so Starling.exe waited for a click. It is now OFF by default, and the first time this version runs it is switched off in your saved settings once. Switch "Ask me before updating" on (Updates page) if you want the question back. The update is still installed only when you close Starling and open Starling.exe again.

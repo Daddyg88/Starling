@@ -113,12 +113,12 @@ class Launcher:
         return self.l.app / "config" / "settings.json"
 
     def wants_question(self):
-        """True unless you chose 'always update automatically' (updates.ask = false in settings.json)."""
+        """False unless you switched on 'Ask me before updating' (updates.ask = true in settings.json)."""
         try:
             data = json.loads(self.settings_path().read_text(encoding="utf-8"))
-            return bool((data.get("updates") or {}).get("ask", True))
+            return bool((data.get("updates") or {}).get("ask", False))
         except (OSError, ValueError, AttributeError):
-            return True
+            return False
 
     def remember_always(self):
         """Saves updates.ask = false without touching anything else in settings.json."""

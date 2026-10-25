@@ -130,3 +130,16 @@ class ShieldTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PageTests(unittest.TestCase):
+    def test_on_foot_has_its_own_page(self):
+        from ui.settings_model import build_pages
+        pages = {p.id: p for p in build_pages()}
+        self.assertIn("onfoot", pages)
+        self.assertEqual([f.key for f in pages["onfoot"].fields], ["onfoot.auto_shields"])
+        self.assertNotIn("onfoot.auto_shields", [f.key for f in pages["combat"].fields])
+
+    def test_updates_install_by_themselves_by_default(self):
+        from core.settings import DEFAULTS
+        self.assertFalse(DEFAULTS["updates"]["ask"])

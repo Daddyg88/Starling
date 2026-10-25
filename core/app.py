@@ -96,6 +96,14 @@ class App:
 
         # Load settings first, because they say how chatty the log should be.
         self.settings = Settings(self._settings_path).load()
+        if not self.settings.get("updates.ask_reset", False):
+            # 0.41.1: updates install by themselves again. An older saved "ask me first" is switched off ONCE; switch it on again if you want it.
+            self.settings.set("updates.ask", False)
+            self.settings.set("updates.ask_reset", True)
+            try:
+                self.settings.save()
+            except OSError:
+                pass
         setup_logging(self.settings.get("app.log_level", "INFO"), self._logs_dir)
         self.log = get_logger("app")
         self.log.info("%s %s starting (Python %s)", APP_NAME, APP_VERSION, platform.python_version())

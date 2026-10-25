@@ -54,7 +54,7 @@ DEFAULTS = {
                "fav6": "musgravite", "fav7": "serendibite", "fav8": "grandidierite", "fav9": "alexandrite", "fav10": "rhodplumsite"},
     "chitchat": {"enabled": True, "frequency": "normal"},
     "memory": {"enabled": True, "recall_at_login": True},
-    "updates": {"repo": "", "auto_check": True, "ask": True, "token": ""},
+    "updates": {"repo": "", "auto_check": True, "ask": False, "ask_reset": False, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},
     "ptt": {"mode": "off", "button": "", "beep": True, "skip_wake": True},
     "personality": {"active_voicepack": "default", "mood": "Friendly", "style": "personality", "mood_mode": "auto", "login_greeting": True, "mood_live": "Friendly",

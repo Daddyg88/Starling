@@ -164,6 +164,9 @@ class CleanEnvTests(unittest.TestCase):
 
 
 class UpdatePromptTests(LauncherTests):
+    def test_no_question_by_default(self):
+        self.assertFalse(self.launcher.wants_question())
+
     """The 'Update available' screen: Update now / Not now / always."""
 
     def old_install(self):
@@ -183,6 +186,8 @@ class UpdatePromptTests(LauncherTests):
     def test_not_now_keeps_the_old_version(self):
         self.old_install()
         self.asking("later")
+        (self.layout.app / "config").mkdir()
+        (self.layout.app / "config" / "settings.json").write_text('{"updates": {"ask": true}}')   # asking is OFF unless switched on
         with mock.patch.object(updater.urllib.request, "urlopen", self.net()):
             self.launcher.get_newest(first_run=False)
         self.assertEqual(self.asked, [("0.12.0", "0.11.0")])

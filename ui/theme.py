@@ -46,7 +46,7 @@ STAR_COUNT = 110
 
 # small symbols on the menu buttons (all in Windows' standard symbol font)
 ICONS = {"home": "\u25C8", "voice": "\u25C9", "listening": "\u25CE", "controls": "\u25A3", "chat": "\u2726",
-         "combat": "\u271B", "exploration": "\u25CD", "exobiology": "\u2740", "mining": "\u2692", "trading": "\u21C4",
+         "combat": "\u271B", "onfoot": "\u2689", "exploration": "\u25CD", "exobiology": "\u2740", "mining": "\u2692", "trading": "\u21C4",
          "antixeno": "\u2620", "navigation": "\u25B2", "updates": "\u21E9", "bookmarks": "\u25C6", "personality": "\u25CF",
          "game": "\u25A7", "developer": "\u2699"}
 

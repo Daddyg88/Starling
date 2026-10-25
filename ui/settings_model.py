@@ -203,6 +203,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Buttons 1 and 2 of your flight stick (any make: X52, X56, Warthog, T16000M, VKB, Virpil...) (both trigger stages) always send pips to weapons, even if Elite's controls do not list them"),
             Field("combat_assist.heat_sink", "Combat: deploy a heat sink when overheating", "toggle",
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
+        ]),
+        Page("onfoot", "On foot", "Voice control for everything on foot. Say 'suit shields', 'torch', 'next grenade type', 'select EMP grenades', 'use a health pack', 'use a battery', 'helmet night vision', 'energy link', 'crouch', 'wave'... Each needs a keyboard key in Elite's on-foot controls. Emote words are in config/emotes.json (docs/PHASE6_GUIDE.md).", [
             Field("onfoot.auto_shields", "On foot: raise my suit shields when I draw a weapon or take damage", "toggle",
                   help="Presses your Toggle Shields key once. Elite has only a toggle and does not say if the shields are up, so if they were already up they go down (say 'suit shields' to flip them back). Needs a keyboard key for Toggle Shields"),
         ]),
@@ -290,7 +292,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("updates.auto_check", "Look for updates when Starling starts", "toggle",
                   help="A new version is downloaded in the background and installed the next time you open Starling.exe"),
             Field("updates.ask", "Ask me before updating when I open Starling.exe", "toggle",
-                  help="On: a separate 'Update available' screen appears before she loads (Update now / Not now). Off: updates install by themselves. Needs the newest Starling.exe"),
+                  help="On: a separate 'Update available' screen appears before she loads (Update now / Not now). Off (the default): updates install by themselves when you open Starling.exe"),
             Field("updates.token", "GitHub token (only for a private repository)", "text",
                   help="Leave empty for a public repository. A token lets Starling read a private one. Keep it secret"),
         ]),
