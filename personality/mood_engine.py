@@ -1,7 +1,8 @@
 """
 The MoodEngine: Starling's mood follows what you do in the game.
 
-A hidden score from -100 to +100 moves a little with each action (see config/mood_rules.json):
+A hidden score moves a little with each action (see config/mood_rules.json). The numbers below are in "base units";
+the score is really `scale` (5) times bigger, so she takes five times longer to reach the top than in 0.41:
     +60 or more   Infatuated    (head over heels)
     +30 .. +60    Close         (very happy, fond of you)
     +10 .. +30    Friendly
@@ -9,6 +10,8 @@ A hidden score from -100 to +100 moves a little with each action (see config/moo
     -35 .. -10    Sarcastic     (annoyed)
     -60 .. -35    Frustrated
     -60 or less   Upset         (really hurt and angry)
+Each mood is split into 5 LEVELS (1 = just arrived, 5 = about to move up). Going up a level makes her a little warmer
+(or, for the bad moods, going down makes her a little colder): see personality/flavour.py and the Tone_ lines in voicepacks.
 
 It cannot swing wildly, because of four brakes:
     1. SOFT CAP   repeating the same kind of action gives less each time
@@ -44,12 +47,33 @@ SKIP_PREFIXES = ("app.", "journal.", "speech.", "voice.", "personality.")
 
 DEFAULT_SETTINGS = {
     "start_score": 0, "close_at": 30, "friendly_at": 10, "sarcastic_at": -10, "frustrated_at": -35, "infatuated_at": 60, "upset_at": -60,
-    "hysteresis": 4,
+    "hysteresis": 4, "scale": 5,
     "hourly_cap": 15, "fatigue_factor": 0.6, "recovery_minutes": 10, "calm_minutes_per_point": 20, "offline_calm_hours": 0,
     "react_cooldown_seconds": 90, "react_min_effect": 0.9, "time_together_minutes": 25,
     "combat_grace_seconds": 45, "notoriety_points_per_hour": 6, "notoriety_floor": -25,
     "paint_worn_after_jumps": 150, "paint_points_per_hour": 3, "paint_floor": -20,
 }
+
+
+LEVELS = 5
+SCALE_OVERRIDE = None        # the older tests set this to 1 (tests/__init__.py) so they keep using the old -100..100 numbers
+
+
+def effective_level(settings):
+    """Which of her 5 levels inside the mood (1-5): automatic (from the score) or fixed (your dashboard choice)."""
+    try:
+        if settings.get("personality.mood_mode", "auto") == "fixed":
+            value = settings.get("personality.mood_level", 3)
+        else:
+            value = settings.get("personality.mood_level_live", 3)
+        return max(1, min(LEVELS, int(value)))
+    except (TypeError, ValueError):
+        return 3
+
+
+# The old (0.41 and earlier) mood lines, -100 .. +100, used to convert a saved score once.
+_OLD_EDGES = [-100.0, -60.0, -35.0, -10.0, 10.0, 30.0, 60.0, 100.0]
+LEGACY_LANDING = 0.3          # a converted score lands this far (0-1) into its mood, so a maxed-out saved mood starts the climb again
 
 
 def effective_mood(settings):
@@ -118,8 +142,11 @@ def matches(condition, data, ctx):
 
 
 class MoodEngine:
+    scale = 1.0                   # set properly in __init__ (class defaults keep objects built without it working)
+    max_score = 100.0
+
     def __init__(self, bus, settings, rules_path=None, save_path=None, dialogue=None, speak=None,
-                 clock=time.time, persist=True, wanted_provider=None):
+                 clock=time.time, persist=True, wanted_provider=None, scale=None):
         self.bus = bus
         self.settings = settings
         self.options, self.rules = load_rules(rules_path)
@@ -132,6 +159,10 @@ class MoodEngine:
         self.wanted_provider = wanted_provider or (lambda: False)   # True while the game says you are wanted
 
         now = self.clock()
+        if scale is None:
+            scale = SCALE_OVERRIDE if SCALE_OVERRIDE is not None else self.options["scale"]
+        self.scale = max(1.0, float(scale))
+        self.max_score = 100.0 * self.scale
         self.score = float(self.options["start_score"])
         self.updated = now
         self._fatigue = {}                 # category -> (value, time)
@@ -173,10 +204,10 @@ class MoodEngine:
         counted = min(now, self._last_event + ACTIVE_PLAY_SECONDS) - stamp
         if counted <= 0:
             return
-        floor = float(self.options["notoriety_floor"])
+        floor = float(self.options["notoriety_floor"]) * self.scale
         if self.score <= floor:
             return                                    # annoyed enough; notoriety alone can't push her lower
-        points = min(self.score - floor, counted / 3600.0 * float(self.options["notoriety_points_per_hour"]))
+        points = min(self.score - floor, counted / 3600.0 * float(self.options["notoriety_points_per_hour"]) * self._drain_factor())
         if points <= 0:
             return
         self.score -= points
@@ -191,6 +222,10 @@ class MoodEngine:
             self._publish_live()
             self._announce_shift()
 
+    def _drain_factor(self):
+        """The floors are `scale` times lower now, so the hourly drains are doubled to get there in a sensible time."""
+        return max(1.0, self.scale / 2.5)
+
     def paint_worn(self):
         return self.paint_jumps >= int(self.options["paint_worn_after_jumps"])
 
@@ -202,10 +237,10 @@ class MoodEngine:
         counted = min(now, self._last_event + ACTIVE_PLAY_SECONDS) - stamp
         if counted <= 0:
             return
-        floor = float(self.options["paint_floor"])
+        floor = float(self.options["paint_floor"]) * self.scale
         if self.score <= floor:
             return
-        points = min(self.score - floor, counted / 3600.0 * float(self.options["paint_points_per_hour"]))
+        points = min(self.score - floor, counted / 3600.0 * float(self.options["paint_points_per_hour"]) * self._drain_factor())
         if points <= 0:
             return
         self.score -= points
@@ -238,7 +273,7 @@ class MoodEngine:
         self._paint_told = False
         self._paint_stamp = now
         if given_back > 0.05:
-            self.score = min(100.0, self.score + given_back)     # everything it cost, straight back (no soft cap)
+            self.score = min(self.max_score, self.score + given_back)     # everything it cost, straight back (no soft cap)
             self.band = self._band_for(self.score, self.band)
             self.history.appendleft((datetime.fromtimestamp(now).strftime("%H:%M"), "Repainted the ship", given_back))
             self._publish_live()
@@ -259,10 +294,12 @@ class MoodEngine:
         if band != self.band:
             self.band = band
             self._publish_live()
+        else:
+            self._publish_level()
 
     def describe(self):
         self.refresh()
-        return "%s (%+d)" % (self.band, round(self.score))
+        return "%s %d/%d (%+d)" % (self.band, self.level, LEVELS, round(self.score))
 
     # ---- saving / loading ----
     def _load(self):
@@ -272,7 +309,7 @@ class MoodEngine:
             try:
                 with open(path, "r", encoding="utf-8") as handle:
                     saved = json.load(handle)
-                self.score = max(-100.0, min(100.0, float(saved.get("score", self.score))))
+                self.score = self._converted(float(saved.get("score", self.score)), saved.get("scale"))
                 self.paint_jumps = max(0, int(saved.get("paint_jumps", 0)))
                 self.paint_debt = max(0.0, float(saved.get("paint_debt", 0.0)))
                 hours = max(0.0, float(self.options.get("offline_calm_hours", 0) or 0))
@@ -294,7 +331,7 @@ class MoodEngine:
             self.save_path.parent.mkdir(parents=True, exist_ok=True)
             temp = self.save_path.with_suffix(".tmp")
             with open(temp, "w", encoding="utf-8") as handle:
-                json.dump({"score": round(self.score, 2), "saved_at": self.clock(),
+                json.dump({"score": round(self.score, 2), "scale": self.scale, "saved_at": self.clock(),
                            "paint_jumps": self.paint_jumps, "paint_debt": round(self.paint_debt, 2)}, handle)
             if self.save_path.exists():
                 try:
@@ -346,8 +383,48 @@ class MoodEngine:
         return max(0.0, value - (now - stamp) / recovery)
 
     def _bounds(self):
-        o = self.options
-        return [None, o["upset_at"], o["frustrated_at"], o["sarcastic_at"], o["friendly_at"], o["close_at"], o["infatuated_at"]]   # lower edge of each band
+        o, k = self.options, self.scale
+        return [None] + [o[name] * k for name in ("upset_at", "frustrated_at", "sarcastic_at", "friendly_at", "close_at", "infatuated_at")]   # lower edge of each band
+
+    def _converted(self, score, saved_scale):
+        """A saved score from an older version (no scale, -100..100) is moved onto the new scale ONCE: she keeps her mood but
+        lands near the start of it. A score saved with a scale is just rescaled if the scale changed."""
+        if saved_scale is not None:
+            try:
+                ratio = self.scale / max(1.0, float(saved_scale))
+            except (TypeError, ValueError):
+                ratio = 1.0
+            return max(-self.max_score, min(self.max_score, score * ratio))
+        if self.scale == 1.0:
+            return max(-100.0, min(100.0, score))
+        old = max(-100.0, min(100.0, score))
+        new_edges = [-self.max_score] + [b for b in self._bounds()[1:]] + [self.max_score]
+        for i in range(len(_OLD_EDGES) - 1):
+            if old <= _OLD_EDGES[i + 1] or i == len(_OLD_EDGES) - 2:
+                span = _OLD_EDGES[i + 1] - _OLD_EDGES[i]
+                share = (old - _OLD_EDGES[i]) / span if span else 0.0
+                share = min(1.0, max(0.0, share))
+                if i >= 4:                                   # Friendly, Close, Infatuated: land near the start (lowest level)
+                    share *= LEGACY_LANDING
+                elif i <= 2:                                 # Upset, Frustrated, Sarcastic: the start is the end nearest neutral
+                    share = 1.0 - (1.0 - share) * LEGACY_LANDING
+                return new_edges[i] + share * (new_edges[i + 1] - new_edges[i])
+        return 0.0
+
+    @property
+    def level(self):
+        """1-5: how far through her current mood she is (1 = just arrived, 5 = nearly the next mood)."""
+        return self.level_for(self.score, self.band)
+
+    def level_for(self, score, band=None):
+        band = band if band in BANDS else self._band_for(score, None)
+        index = BANDS.index(band)
+        bounds = self._bounds()
+        low = -self.max_score if index == 0 else bounds[index]
+        high = self.max_score if index == len(BANDS) - 1 else bounds[index + 1]
+        if high <= low:
+            return 3
+        return max(1, min(LEVELS, 1 + int(LEVELS * (score - low) / (high - low))))
 
     def _band_for(self, score, current):
         bounds, hys = self._bounds(), float(self.options["hysteresis"])
@@ -377,9 +454,19 @@ class MoodEngine:
         used = -sum(d for _t, d in self._window if d < 0)
         return -max(0.0, min(-delta, cap - used))
 
+    def _publish_level(self):
+        """The level can change without the mood changing: keep the published number up to date."""
+        try:
+            level = self.level
+            if self.settings.get("personality.mood_level_live") != level:
+                self.settings.set("personality.mood_level_live", level)
+        except Exception:
+            log.debug("Could not publish the mood level", exc_info=True)
+
     def _publish_live(self):
         try:
             self.settings.set("personality.mood_live", self.band)
+            self.settings.set("personality.mood_level_live", self.level)
         except Exception:
             log.debug("Could not publish the live mood", exc_info=True)
 
@@ -477,7 +564,7 @@ class MoodEngine:
             except Exception:
                 log.exception("The favourite ship counter failed")
         before = self.band
-        self.score = max(-100.0, min(100.0, self.score + applied))
+        self.score = max(-self.max_score, min(self.max_score, self.score + applied))
         self.band = self._band_for(self.score, self.band)
         self._dirty = True
         self._save_soon(now)
@@ -486,8 +573,10 @@ class MoodEngine:
         if self.band != before:
             self._publish_live()
             self._announce_shift()
-        elif event is not None:
-            self._react(rule, event, applied, now)
+        else:
+            self._publish_level()
+            if event is not None:
+                self._react(rule, event, applied, now)
 
     # ---- speaking about it ----
     def _can_speak(self):

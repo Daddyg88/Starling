@@ -118,6 +118,8 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "carriers.json"))      # routes to the fleet carrier and the squad carrier
             self._merge(_read_json(self.pack_dir / "launch.json"))        # "I have control", "checking systems", launch speech
             self._merge(_read_json(self.pack_dir / "moods.json"))         # lines for Infatuated and Upset
+            self._merge(_read_json(self.pack_dir / "tone.json"))          # mood + level asides (Tone_<Mood>_L1..L5)
+            self._merge(_read_json(self.pack_dir / "neutral.json"))       # more personality for Neutral
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
         elif self.pack_dir is not None:
             log.warning("Voice pack folder not found: %s", self.pack_dir)

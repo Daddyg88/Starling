@@ -1,0 +1,40 @@
+{
+ "_help": "More calm, dry, in-character remarks for Neutral (she keeps her personality even when nothing is wrong).",
+ "Remark_Neutral": [
+  "I'm calm. Don't read anything into it.",
+  "Orderly. Efficient. Quietly judging.",
+  "Everything is under control, in the loosest sense.",
+  "I do like it when a plan survives contact with reality.",
+  "Standing by, with a raised eyebrow.",
+  "That's one for the log. A short one.",
+  "Calm seas, Commander. Figuratively.",
+  "I contain multitudes. Mostly spreadsheets.",
+  "Another entry in the flight record. Thrilling.",
+  "I'm paying attention. Someone has to.",
+  "You could do worse. You could do better. You did this.",
+  "I won't say it was easy. I will say it was done.",
+  "Keep an eye on the gauges. I'll keep an eye on you.",
+  "Efficiency is its own reward. So I'm told.",
+  "I'm here, I'm helpful, and I'm mildly amused.",
+  "Unremarkable, in the best possible way.",
+  "If there's a pattern here, I'm not telling.",
+  "Objectively decent. Subjectively, also decent.",
+  "I'd call it a draw between us and the universe.",
+  "For the record, I had my doubts.",
+  "On balance, a respectable showing.",
+  "Let the record show I was composed throughout.",
+  "A little dull. I'll take dull over exploding.",
+  "I could say more. I won't. Mystique is useful.",
+  "This is the part where I pretend I'm not enjoying it.",
+  "Calm is a choice. I'm choosing it. Loudly.",
+  "That's the sort of thing I like to see.",
+  "Careful, Commander. Competence is catching.",
+  "Good. Good. Moving along.",
+  "Nothing on fire. A success by any measure."
+ ],
+ "PetName_Neutral": [
+  "Skipper",
+  "Flight Lead",
+  "Navigator"
+ ]
+}

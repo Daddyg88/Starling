@@ -21,7 +21,7 @@ import random
 import re
 
 from personality import moods
-from personality.mood_engine import effective_mood
+from personality.mood_engine import effective_level, effective_mood
 import time
 
 from core.identity import sex_label
@@ -34,6 +34,8 @@ _COMMANDER = re.compile(r"\bCommander\b(?!\s+[A-Z])")
 GOOD_MOODS = ("Friendly", "Close", "Infatuated")
 BAD_MOODS = ("Sarcastic", "Frustrated", "Upset")
 DRY_CHANCE = 0.35              # of the other remarks, about a third are plain and dry
+TONE_CHANCE = 0.45               # of the remarks she makes, this share come from her mood-and-level lines (Tone_<Mood>_L<1-5>)
+NEUTRAL_BOOST = 1.6              # she keeps her personality when calm: Neutral makes remarks this much more often
 DARK_HUMOUR_CHANCE = 0.2          # of the remarks she makes, about one in five is gallows humour
 
 
@@ -115,7 +117,24 @@ class Flavour:
         return self._pick("PetName_Snide")
 
     # ---- remarks ----
+    def level_factor(self, mood):
+        """How chatty her remarks are at this level: warmer = a bit more, and the bad moods are snippiest at level 1."""
+        level = effective_level(self.settings)
+        if mood in BAD_MOODS:
+            return 1.3 - 0.075 * (level - 1)           # level 1: 1.3, level 5: 1.0
+        if mood == "Neutral":
+            return NEUTRAL_BOOST
+        return 0.9 + 0.1 * (level - 1)                 # level 1: 0.9, level 5: 1.3
+
+    def _tone(self, mood):
+        """A short aside written for her mood AND level, so each of the 5 steps in a mood sounds a little different."""
+        return self._pick("Tone_%s_L%d" % (mood, effective_level(self.settings)))
+
     def _remark(self, mood):
+        if self.rng.random() < TONE_CHANCE:
+            tone = self._tone(mood)
+            if tone:
+                return tone
         if self.innuendo_on(mood) and self.rng.random() < self._innuendo_chance(mood, 0.55):
             remark = self._pick("Remark_Innuendo_Grumpy" if mood in BAD_MOODS else "Remark_Innuendo")
             if remark:
@@ -165,6 +184,8 @@ class Flavour:
         if "||" in text or len(text) > MAX_LINE_CHARS or "{" in text:
             return text
         chance = REMARK_CHANCE.get(str(self.settings.get("personality.remarks", "sometimes")).lower(), 0.18)
+        if chance > 0:
+            chance = min(0.7, chance * self.level_factor(mood))
         if self.rich():
             chance = min(0.6, chance * 2)
         now = self.clock()

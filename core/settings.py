@@ -57,7 +57,7 @@ DEFAULTS = {
     "updates": {"repo": "", "auto_check": True, "ask": False, "ask_reset": False, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},
     "ptt": {"mode": "off", "button": "", "beep": True, "skip_wake": True},
-    "personality": {"active_voicepack": "default", "mood": "Friendly", "style": "personality", "mood_mode": "auto", "login_greeting": True, "mood_live": "Friendly",
+    "personality": {"active_voicepack": "default", "mood": "Friendly", "style": "personality", "mood_mode": "auto", "login_greeting": True, "mood_live": "Friendly", "mood_level": 3, "mood_level_live": 3,
                     "remarks": "sometimes", "pet_names": True, "custom_pet_names": "", "innuendo": False, "dark_humour": True, "affection_credits": 500000000},
     "speech": {"enabled": True, "use_recordings": True, "allow_mature": False,
                "windows_emergency_voice": False},

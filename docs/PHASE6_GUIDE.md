@@ -612,3 +612,15 @@ NOT TESTED against the real game (only the logic): any key press, the emote slot
 ## 0.41.1 - On foot page, and updates without asking
 * The dashboard has an **On foot** page. The auto-shields switch lives there now.
 * Updates: the "Update available - Update now / Not now" screen used to be on by default, so Starling.exe waited for a click. It is now OFF by default, and the first time this version runs it is switched off in your saved settings once. Switch "Ask me before updating" on (Updates page) if you want the question back. The update is still installed only when you close Starling and open Starling.exe again.
+
+
+## 0.42.0 - Five levels in every mood, a bigger score range, more personality
+
+* **Score range x5.** The hidden score now goes from -500 to +500 (it was -100 to +100). Every action still gives the same points, so she takes about five times longer to reach the top (about 15 days of play instead of 3). The hourly cap, calming and soft cap work as before. Wanted/notoriety and worn paint pull her down towards floors that are five times lower, at twice the speed.
+* **5 levels in every mood.** Infatuated, Close, Friendly, Neutral, Sarcastic, Frustrated and Upset are each split into 5 steps. Level 1 is where she arrives in the mood, level 5 is just before the next mood up, so going up a step always makes her a bit friendlier and going down a bit colder. The Home page shows it ("Friendly 3/5 (+120)").
+  Ranges (score): Upset below -300, Frustrated -300 to -175, Sarcastic -175 to -50, Neutral -50 to +50, Friendly 50 to 150, Close 150 to 300, Infatuated 300 to 500.
+* **Your saved mood is converted once.** She keeps her mood but lands near the start of it (a maxed-out Infatuated becomes Infatuated level 2, so there is room to climb; a bad mood starts near its neutral end).
+* **What changes in her speech.** After lines she adds a short aside written for her mood AND level (Tone_<Mood>_L1 to L5 in voicepacks/default/tone.json, 245 lines). Her comments are a little more frequent the warmer she is, and the bad moods are snippiest at level 1. Neutral now makes comments about 1.6 times as often and has 30 new dry lines (neutral.json), so she keeps her personality when calm.
+* **Fixed mood** (Personality page) now also has a **Fixed mood level**.
+* I added to her lines rather than rewriting the thousands she already had. Tell me which mood or area sounds flat and I will rewrite those lines.
+* NOT tested: how the new lines sound spoken, and how it feels over days of real play.

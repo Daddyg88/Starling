@@ -128,7 +128,7 @@ def collect_status(app):
 
     mood = getattr(app, "mood", None)
     if app.settings.get("personality.mood_mode", "auto") == "fixed" or mood is None:
-        rows.append(("Mood", str(app.settings.get("personality.mood", "Friendly")) + " (fixed)", "muted"))
+        rows.append(("Mood", "%s %s/5 (fixed)" % (app.settings.get("personality.mood", "Friendly"), app.settings.get("personality.mood_level", 3)), "muted"))
     else:
         rows.append(("Mood", mood.describe(), "muted"))
         if mood.history:
@@ -210,7 +210,7 @@ def home_data(app, now=None):
         if mood is not None and app.settings.get("personality.mood_mode", "auto") != "fixed":
             mood_text = mood.describe()
         else:
-            mood_text = str(app.settings.get("personality.mood", "Friendly"))
+            mood_text = "%s %s/5" % (app.settings.get("personality.mood", "Friendly"), app.settings.get("personality.mood_level", 3))
     except Exception:
         mood_text = ""
     commander = get("commander") or ""

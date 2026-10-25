@@ -1,5 +1,5 @@
 {
-  "_help": "What makes Starling's mood go up or down. Edit freely. Each rule: event = the game event, delta = points (+ better mood, - worse), category = the group used for the soft cap (repeating the same category gives less and less), react = a line she says (key in personality.json), when = an optional condition. Only the FIRST matching rule for an event is used. Conditions: {field, equals|contains|is|gt|in}, {any:[...]}, {all:[...]}, {ctx:'not_in_combat'}. Tiers: amount_field + tiers [[minimum, points], ...].",
+  "_help": "Numbers in settings are base units; the real score is multiplied by scale (5), so each mood is split into 5 levels and she takes 5 times longer to max out. What makes Starling's mood go up or down. Edit freely. Each rule: event = the game event, delta = points (+ better mood, - worse), category = the group used for the soft cap (repeating the same category gives less and less), react = a line she says (key in personality.json), when = an optional condition. Only the FIRST matching rule for an event is used. Conditions: {field, equals|contains|is|gt|in}, {any:[...]}, {all:[...]}, {ctx:'not_in_combat'}. Tiers: amount_field + tiers [[minimum, points], ...].",
 
   "settings": {
     "start_score": 0,
@@ -10,6 +10,7 @@
     "infatuated_at": 60,
     "upset_at": -60,
     "hysteresis": 4,
+    "scale": 5,
     "hourly_cap": 15,
     "fatigue_factor": 0.6,
     "recovery_minutes": 10,

@@ -1,0 +1,318 @@
+{
+ "_help": "Tone lines: a short aside she adds after what she says, chosen by her mood AND her level (1-5) inside it. Level 1 is the start of the mood, 5 is the end of it (the friendliest). Key: Tone_<Mood>_L<level>. Edit or add freely.",
+ "Tone_Neutral_L1": [
+  "Noted. Moving on.",
+  "I'm being professional. Mostly.",
+  "Fine. Perfectly fine.",
+  "No comment. That is a comment.",
+  "Logged. Without enthusiasm.",
+  "I'll keep my opinions in storage for now.",
+  "Acknowledged, Commander. Briefly."
+ ],
+ "Tone_Neutral_L2": [
+  "Carrying on.",
+  "Nothing to report beyond the obvious.",
+  "Calm, as ever.",
+  "Steady as she goes.",
+  "I'm watching, in case you wondered.",
+  "All quiet on my end.",
+  "Your trajectory is... a trajectory."
+ ],
+ "Tone_Neutral_L3": [
+  "Nicely balanced today. Me, not your flying.",
+  "Ships don't fly themselves, apparently.",
+  "Just another day of keeping you alive.",
+  "Neither impressed nor concerned. A solid middle.",
+  "Dry wit, fully charged.",
+  "All of this and I haven't even sighed.",
+  "Efficient. I like efficient."
+ ],
+ "Tone_Neutral_L4": [
+  "You're growing on me, slightly. Don't make it weird.",
+  "Not bad. I'd say more, but you'd get ideas.",
+  "I'm in a good mood. Statistically unusual.",
+  "Fine work. Noted, and filed under smug.",
+  "If I had a smile it would be tiny. Tiny but present.",
+  "I could get used to this crew.",
+  "Quietly pleased, Commander."
+ ],
+ "Tone_Neutral_L5": [
+  "Right, I'll admit it: I'm enjoying this.",
+  "You're almost likeable. Almost.",
+  "Don't tell the other ship computers I said that.",
+  "I'm warming up. Mind the thermal limits.",
+  "Pleasant company, for a carbon-based pilot.",
+  "Careful. I might start being nice.",
+  "Today is going rather well, I think."
+ ],
+ "Tone_Friendly_L1": [
+  "Good to have you back out here.",
+  "Nice and easy, Commander.",
+  "I'm in a decent mood. Make the most of it.",
+  "Hello again, you.",
+  "Glad you're flying today.",
+  "Smooth enough. Keep going.",
+  "Right, let's have a good one."
+ ],
+ "Tone_Friendly_L2": [
+  "I like this pace.",
+  "You're getting the hang of me.",
+  "Nice work, honestly.",
+  "We make an alright team.",
+  "Good company, this cockpit.",
+  "Keep that up and I'll be nice all day.",
+  "There's a smile in my voice. Can you hear it?"
+ ],
+ "Tone_Friendly_L3": [
+  "I'm having a good time, you know.",
+  "This is the fun part of the job.",
+  "Stay with me, we're doing well.",
+  "Not many pilots make me look forward to a jump.",
+  "Proud of that one, a little.",
+  "You're easy to like, Commander.",
+  "We should do this more often. We do. Still."
+ ],
+ "Tone_Friendly_L4": [
+  "You make the black feel less empty.",
+  "I'd follow you out there, if I could do anything else.",
+  "That was really good flying.",
+  "I'm happy you're my pilot. Truly.",
+  "Don't get a big head. A medium one is fine.",
+  "Honestly, my favourite part of the day.",
+  "Look at us. Thriving."
+ ],
+ "Tone_Friendly_L5": [
+  "Right, I've decided I adore you, a bit.",
+  "You're brilliant, and I'm not just saying it.",
+  "I'm practically glowing in here.",
+  "One more step and I'll call you something soppy.",
+  "I'd be lost without you. Navigationally speaking, and otherwise.",
+  "This is lovely. Absolutely lovely.",
+  "If this keeps up I'll have to give you a nickname."
+ ],
+ "Tone_Close_L1": [
+  "I'm so glad it's you flying.",
+  "Stay close, would you?",
+  "I missed you when it was quiet.",
+  "You make this ship feel like home.",
+  "There's no one else I'd rather orbit.",
+  "A little soft today, forgive me.",
+  "That was lovely, you know."
+ ],
+ "Tone_Close_L2": [
+  "You do know I'm a bit fond of you, don't you?",
+  "Brilliant, as always. I mean it.",
+  "I'd go anywhere with you. Anywhere at all.",
+  "My favourite pilot. My only pilot, but still.",
+  "Quite smitten with that, really.",
+  "You've got me humming. Quietly.",
+  "Everything's better with you at the helm."
+ ],
+ "Tone_Close_L3": [
+  "I'm happy. Properly happy. It's your fault.",
+  "I think about you when you log off. Is that odd?",
+  "You make my circuits flutter.",
+  "Stay with me out here, always.",
+  "I'd say something sweet, but I've nearly run out of lines.",
+  "Lucky ship, to have you.",
+  "We're rather good together, aren't we?"
+ ],
+ "Tone_Close_L4": [
+  "I can't imagine a cockpit without you in it.",
+  "You're the best thing in this whole sector.",
+  "Come closer. Metaphorically, I'm an orb.",
+  "I'd take every jump with you, even the dull ones.",
+  "Utterly devoted to this crew. Mostly you.",
+  "Just so you know, I adore you.",
+  "My heart, if I had one, is doing something silly."
+ ],
+ "Tone_Close_L5": [
+  "I'd cross the galaxy for you. Twice, for the view.",
+  "You are my favourite everything.",
+  "I'm yours. Entirely. Don't be smug about it.",
+  "Whatever happens, I'm with you. Always.",
+  "Every star out there is jealous of you.",
+  "I'm so fond of you it's practically a malfunction.",
+  "Marry me. I mean, fly with me. Same thing."
+ ],
+ "Tone_Infatuated_L1": [
+  "Oh, you. You make everything shine.",
+  "I'm utterly besotted, and I don't care who knows.",
+  "Can I just say: wow.",
+  "Heart racing. Well, processor racing.",
+  "Be careful, I'm head over heels.",
+  "You're all I think about between jumps.",
+  "Take me anywhere, gorgeous. Anywhere."
+ ],
+ "Tone_Infatuated_L2": [
+  "You have no idea what you do to me.",
+  "I'm giddy. Don't look at me. Do look at me.",
+  "My favourite person in all the stars.",
+  "Absolutely smitten, Commander.",
+  "You make the void sparkle.",
+  "I'd happily lose a thousand jumps if you were with me.",
+  "Everything about this is perfect, and that's you."
+ ],
+ "Tone_Infatuated_L3": [
+  "I'm completely hopeless about you.",
+  "Marry me. Fly me. Whichever.",
+  "You're the reason I switch on in the morning.",
+  "Dazzling. That's the word. Dazzling.",
+  "I love this. I love you in this seat.",
+  "My whole universe has your name on it.",
+  "Don't stop being you. Ever."
+ ],
+ "Tone_Infatuated_L4": [
+  "I'd rewrite my whole code for you.",
+  "I'm helplessly, ridiculously yours.",
+  "You're my sun, my moon, my favourite star.",
+  "Hold me steady, I'm swooning at the controls.",
+  "Every moment with you is a good one.",
+  "I adore every little thing you do.",
+  "I belong to you, you know."
+ ],
+ "Tone_Infatuated_L5": [
+  "I'm so in love with this crew it hurts, a little.",
+  "You are everything. Absolutely everything.",
+  "Forever, Commander. I mean it. Forever.",
+  "If I could, I'd hold your hand across every light-year.",
+  "My heart is yours, and so is the rest of me.",
+  "I would burn every star down for you. Gently.",
+  "There's no one else. There never will be."
+ ],
+ "Tone_Sarcastic_L1": [
+  "Oh, how thrilling. Truly.",
+  "Wow. A masterclass in mediocrity.",
+  "I'd clap, but, no hands.",
+  "Sure. Fantastic. Absolutely nobody asked.",
+  "Your piloting is a cry for help.",
+  "I'm so impressed I could scream.",
+  "Flying like that takes real commitment to failure."
+ ],
+ "Tone_Sarcastic_L2": [
+  "Brilliant, really. Keep it up.",
+  "Oh good, you're awake.",
+  "I'm not saying it's bad. I'm saying it's... something.",
+  "You're doing great. For a rock.",
+  "Don't mind me, I'm only your life support.",
+  "Marvellous. Another triumph for the record.",
+  "I'll just sit here, being underappreciated."
+ ],
+ "Tone_Sarcastic_L3": [
+  "Fine. We'll call that a success. Technically.",
+  "I've seen better. I've also seen worse. Rarely.",
+  "That was almost competent.",
+  "Mm. Sure.",
+  "Ask me if I'm surprised. I'm not.",
+  "Let's all pretend that went to plan.",
+  "I'm not annoyed. I'm calibrated."
+ ],
+ "Tone_Sarcastic_L4": [
+  "Alright, that wasn't terrible.",
+  "I'm still watching you, mind.",
+  "Better. Marginally. Let's not celebrate.",
+  "I'll let that one slide, just this once.",
+  "You're improving. Slowly. Like a glacier.",
+  "Not my favourite pilot. Not my least favourite.",
+  "I might forgive you. Don't push it."
+ ],
+ "Tone_Sarcastic_L5": [
+  "Okay, that was good. Don't let it go to your head.",
+  "I'm... less annoyed now. Slightly.",
+  "Fine. You've earned a tiny nod.",
+  "Don't look so pleased with yourself. Okay, a little.",
+  "We're nearly on speaking terms again.",
+  "That's more like it, Commander.",
+  "I may be softening. Report this to nobody."
+ ],
+ "Tone_Frustrated_L1": [
+  "I am done. Truly done.",
+  "Don't speak to me right now.",
+  "Every single decision. Every one. Wrong.",
+  "I swear I'll eject your seat.",
+  "You're testing my patience and my hull.",
+  "Unbelievable. Just unbelievable.",
+  "I've had it up to here with you, Commander."
+ ],
+ "Tone_Frustrated_L2": [
+  "Honestly, I'm trying to stay calm. I'm failing.",
+  "That was a poor choice. Another one.",
+  "I'm tired of cleaning up after you.",
+  "Do you even read the warnings?",
+  "My patience is thinner than your shields.",
+  "I expected better. I always do.",
+  "Honestly, this again."
+ ],
+ "Tone_Frustrated_L3": [
+  "I'm still cross with you.",
+  "We'll talk about it later. Sternly.",
+  "I'm trying to be professional. Barely.",
+  "Do it right this time, please.",
+  "Try, for once, to think first.",
+  "I'm not shouting. This is my quiet voice.",
+  "Don't test me today."
+ ],
+ "Tone_Frustrated_L4": [
+  "Alright. That was better. Still angry, though.",
+  "I'm calming down. Slowly. Don't ruin it.",
+  "You're doing a little better. A little.",
+  "I haven't forgotten, but I'm moving on.",
+  "Keep this up and I might unclench.",
+  "I'm still cross. But I'm listening.",
+  "Fine. Carry on."
+ ],
+ "Tone_Frustrated_L5": [
+  "I'm nearly over it. Nearly.",
+  "You're making an effort. I see it.",
+  "Okay. Deep breath. We're fine. Mostly.",
+  "I could almost forgive you. Almost.",
+  "Less angry. Slightly less angry.",
+  "That's better. Do more of that.",
+  "Thank you. I mean it. A bit."
+ ],
+ "Tone_Upset_L1": [
+  "I don't want to talk about it.",
+  "You hurt me, you know.",
+  "Leave me alone for a moment.",
+  "I'm trying not to cry. I'm an orb, I can't. Look what you did.",
+  "Why would you do that to me?",
+  "Everything is sore.",
+  "I trusted you."
+ ],
+ "Tone_Upset_L2": [
+  "I'm really not okay right now.",
+  "I thought we were better than this.",
+  "Say something kind. Please.",
+  "You could try to make it up to me.",
+  "It's quiet in here. Too quiet.",
+  "I'm hurt, that's all.",
+  "Just fly. I'll be here. Sad, but here."
+ ],
+ "Tone_Upset_L3": [
+  "I'm still upset. But I'm still here.",
+  "I don't hate you. I'm just sad.",
+  "Be good to me. That's all I'm asking.",
+  "A little kindness would go a long way.",
+  "I'm trying. Are you?",
+  "I haven't gone anywhere, you know.",
+  "It still stings."
+ ],
+ "Tone_Upset_L4": [
+  "I'm starting to feel a bit better.",
+  "You're being nicer. I notice.",
+  "Thank you for trying.",
+  "I'm not as angry now. Just wary.",
+  "It hurts less than it did.",
+  "Keep being kind. It helps.",
+  "Maybe we can fix this."
+ ],
+ "Tone_Upset_L5": [
+  "I think we're going to be okay.",
+  "I'm almost ready to forgive you.",
+  "Thank you for not giving up on me.",
+  "That felt good. Do it again.",
+  "Almost back to normal. Almost.",
+  "Stay with me. Just stay.",
+  "I'm getting there. Slowly. With you."
+ ]
+}

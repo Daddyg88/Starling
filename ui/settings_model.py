@@ -51,6 +51,7 @@ class Page:
 # ---------------------------------------------------------------------------
 VOLUME = [("Mute", 0)] + [("%d%%" % v, v) for v in range(10, 101, 10)]
 SPEED = [("Very slow", -6), ("Slow", -3), ("Normal", 0), ("Fast", 3), ("Very fast", 6)]
+MOOD_LEVELS = [("1 - just arrived", 1), ("2", 2), ("3 - middle", 3), ("4", 4), ("5 - nearly the next mood", 5)]
 MOODS = [("Infatuated (head over heels)", "Infatuated"), ("Close (very happy, loving)", "Close"), ("Friendly", "Friendly"),
          ("Neutral (calm, professional)", "Neutral"), ("Sarcastic (sassy)", "Sarcastic"), ("Frustrated", "Frustrated"),
          ("Upset (really angry)", "Upset")]
@@ -320,6 +321,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Automatic: her mood changes with your actions (see Home)"),
             Field("personality.mood", "Fixed mood", "choice", MOODS,
                   help="Only used when Mood control is Fixed"),
+            Field("personality.mood_level", "Fixed mood level (1-5)", "choice", MOOD_LEVELS,
+                  help="Only used when Mood control is Fixed. Each mood has 5 steps: 1 = just arrived, 5 = nearly the next mood up (the friendliest)"),
             Field("personality.remarks", "Extra comments", "choice", REMARKS,
                   help="How often she adds a comment after a line"),
             Field("brain.enabled", "Her brain: answers to almost anything", "toggle",
