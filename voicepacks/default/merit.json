@@ -1,5 +1,5 @@
 {
- "_help": "Merit mining lines. Fields: {Power} {Station} {System} {Body} {Metal} {Tons} {Away}; option B uses {Station2} {System2} {Body2} {Metal2} {Tons2} {Away2}. || splits the line into sentences.",
+ "_help": "Merit mining lines. Fields: {Power} {Station} {System} {Body} {Metal} {Tons} {Away}; the second one uses {Station2} {System2} {Body2} {Metal2} {Tons2} {Away2}. || splits the line into sentences.",
  "Merit_Looking": [
   "Looking for merit mining spots for {Power}. One moment.",
   "Let me find somewhere for you to mine merits for {Power}.",
@@ -37,15 +37,15 @@
   "Nothing matches for {Power} right now. No pristine metallic ring with a hungry market. Ask me again later."
  ],
  "Merit_Options": [
-  "I found two merit mining spots for {Power}.||Option A is a pristine metallic ring at {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||Option B is {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}.",
-  "Two places for you, Commander.||Option A: {Body} in {System}, {Away}. Sell your {Metal} at {Station}, they want {Tons} tons.||Option B: {Body2} in {System2}, {Away2}. Sell at {Station2}, wanting {Tons2} tons of {Metal2}.",
-  "Here's what I have for {Power}.||Option A, {System}, {Away}. Pristine metallic ring at {Body}, and {Station} wants {Tons} tons of {Metal}.||Option B, {System2}, {Away2}. Ring at {Body2}, and {Station2} wants {Tons2} tons of {Metal2}."
+  "I found two merit mining spots for {Power}.||The first one is a pristine metallic ring at {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||The second one is {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}.",
+  "Two places for you, Commander.||The first one: {Body} in {System}, {Away}. Sell your {Metal} at {Station}, they want {Tons} tons.||The second one: {Body2} in {System2}, {Away2}. Sell at {Station2}, wanting {Tons2} tons of {Metal2}.",
+  "Here's what I have for {Power}.||The first one, {System}, {Away}. Pristine metallic ring at {Body}, and {Station} wants {Tons} tons of {Metal}.||The second one, {System2}, {Away2}. Ring at {Body2}, and {Station2} wants {Tons2} tons of {Metal2}."
  ],
  "Merit_Options_Sarcastic": [
-  "Two merit spots, since you asked.||Option A: {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||Option B: {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}."
+  "Two merit spots, since you asked.||The first one: {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||The second one: {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}."
  ],
  "Merit_Options_Close": [
-  "I found two for you, love.||Option A is {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||Option B is {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}."
+  "I found two for you, love.||The first one is {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.||The second one is {Body2} in {System2}, {Away2}. {Station2} wants {Tons2} tons of {Metal2}."
  ],
  "Merit_OneOption": [
   "I found one merit mining spot for {Power}.||A pristine metallic ring at {Body} in {System}, {Away}. {Station} wants {Tons} tons of {Metal}.",

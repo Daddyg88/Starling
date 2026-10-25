@@ -284,7 +284,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("talk.mining", "She comments on mining", "toggle",
                   help="Prospector results, refining, cracked cores and depleted rocks. Off = quiet"),
             Field("mining.merit", "Find merit mining spots (\"I want to go merit mining\")", "toggle",
-                  help="Looks on Spansh for a system your Power controls with a pristine metallic ring and a station wanting 2000+ tonnes, then asks A or B and plots the route"),
+                  help="Looks on Spansh for a system your Power controls with a pristine metallic ring and a station wanting 2000+ tonnes, then asks 'the first one or the second one?' and plots the route"),
             Field("merit.power", "Your Power for merit mining", "choice", MERIT_POWERS,
                   help="Leave on 'From the game' and she reads it from the journal when you load the game while pledged"),
             Field("mining.chatter", "How chatty she is while you refine", "choice", MINING_CHATTER,

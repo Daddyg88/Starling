@@ -384,7 +384,7 @@ class AskManager:
             self._say(self._line("Plan_Like_" + topic, values), "ask.reply")
             self._publish("plan.liked", "Chose %s and she was in the mood" % plans.SPOKEN[topic])
 
-    # ---- where to sell: "A or B?" then "shall I plot a route?" ----
+    # ---- where to sell: "the first one or the second one?" then "shall I plot a route?" ----
     @staticmethod
     def _option_values(option, suffix=""):
         tons = option.get("tons")

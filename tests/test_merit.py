@@ -214,7 +214,7 @@ class AskAB(unittest.TestCase):
         r = self.make()
         r.ask.offer_sale("", OPTIONS, "best", "merit")
         said = r.speech.said[-1]["text"]
-        for part in ("Option A", "Option B", "HR 5048 1", "Pharos", "204,166", "Platinum", "Visto A 2", "Dock", "3,000", "Osmium"):
+        for part in ("The first one", "The second one", "HR 5048 1", "Pharos", "204,166", "Platinum", "Visto A 2", "Dock", "3,000", "Osmium"):
             self.assertIn(part, said)
         r.finish_question()
         self.assertTrue(r.say("option b"))

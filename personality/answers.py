@@ -59,8 +59,8 @@ def wants_a_fact(text):
     return bool(FACT_REQUEST.search(text or ""))
 
 
-A_WORDS = {"a", "ay", "eh", "alpha", "first", "one", "1", "top", "best", "either", "whichever"}
-B_WORDS = {"b", "bee", "be", "bravo", "second", "two", "2", "other", "last"}
+A_WORDS = {"a", "ay", "eh", "alpha", "first", "1st", "one", "1", "top", "best", "either", "whichever"}
+B_WORDS = {"b", "bee", "be", "bravo", "second", "2nd", "two", "2", "other", "last"}
 
 
 def choose(text):
@@ -72,7 +72,7 @@ def choose(text):
     words = set(cleaned.replace("'", "").split()) | set(cleaned.split())
     if words & {"neither", "none", "cancel", "nevermind", "never"} or "never mind" in cleaned or "no thanks" in cleaned:
         return "no"
-    if "one" in words and words & {"first", "second", "last", "other", "top", "best"}:
+    if "one" in words and words & {"first", "1st", "second", "2nd", "last", "other", "top", "best"}:
         words.discard("one")                            # "the second one" means B, not A
     wants_a, wants_b = bool(words & A_WORDS), bool(words & B_WORDS)
     if wants_b and not wants_a:

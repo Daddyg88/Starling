@@ -72,7 +72,7 @@ class Brain:
         self.mining = mining         # mining/tracker.py: what you have refined this session
         self.prices = prices         # mining/prices.py: where to sell it
         self.merit = merit           # mining/merit.py: pristine metallic rings in your Power's systems
-        self.ask = ask               # personality/ask.py: asks 'A or B?' and 'shall I plot a route?'
+        self.ask = ask               # personality/ask.py: asks 'the first one or the second one?' and 'shall I plot a route?'
         self.facts = facts
         self.intents = intents if intents is not None else load_intents()
         self.clock = clock

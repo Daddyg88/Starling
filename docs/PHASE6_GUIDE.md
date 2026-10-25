@@ -747,3 +747,7 @@ Your three runs felt slow with long pauses. Causes I could find, all fixed:
 - She waited for each screen to open BEFORE talking, then waited again. Now she starts the sentence at the same moment as the key press, and flicks the tabs while she is still speaking; the only waits are for her to finish (`finish` step) before she closes a screen.
 - Her usual random extras ("by the way..." remarks) were added to these lines, which makes the voice build a new sentence on the spot (slow start). The show-off lines are now spoken exactly as written, so the prepared voice can play them at once.
 Macro steps changed: `talk Key` now queues a plain line and carries on; `finish` waits until she has said everything queued. If you still hear long gaps, send me the log: "Slow start: ... (made on the spot)" lines tell us which sentence was not prepared. Run "prepare her voice" once after this update so the new lines are ready.
+
+## 0.48.2: "the first one" / "the second one" instead of A / B
+Stream feedback: the microphone and the voice mishear "A", "B" and "Option A". Everything she SAYS now uses "the first one" and "the second one" (where to sell, where to buy, merit mining routes). She understands: "the first one", "the 1st one please", "first", "number one", "the second one please", "the 2nd one", "second", "number two", plus the old "A"/"B". "Either" picks the first (the better price); "neither" or "no thanks" cancels.
+Run "prepare her voice" once after this update so the reworded lines are ready.

@@ -1,18 +1,18 @@
 {
  "Sell_Options": [
-  "I found two places for your {Material}.||Option A pays {Price} credits a tonne for up to {Tons} tons, at||{Station}||in {System}.||Option B pays {Price2} credits a tonne for up to {Tons2} tons, at||{Station2}||in {System2}.",
+  "I found two places for your {Material}.||The first one pays {Price} credits a tonne for up to {Tons} tons, at||{Station}||in {System}.||The second one pays {Price2} credits a tonne for up to {Tons2} tons, at||{Station2}||in {System2}.",
   "Two good buyers for {Material}, Commander.||A: {Price} credits a tonne, {Tons} tons wanted, at||{Station}||in {System}.||B: {Price2} credits a tonne, {Tons2} tons wanted, at||{Station2}||in {System2}.",
-  "Right, here's who wants your {Material}.||Option A. {Station}||in {System}, paying {Price} credits a tonne, and they need {Tons} tons.||Option B. {Station2}||in {System2}, paying {Price2} credits, and they need {Tons2} tons.",
-  "I've got two large-pad buyers for {Material}.||Option A is||{Station}||in {System}. {Price} credits, {Tons} tons wanted.||Option B is||{Station2}||in {System2}. {Price2} credits, {Tons2} tons wanted.",
-  "Found some takers, Commander.||Option A, {Price} credits a tonne at||{Station}||in {System}, with room for {Tons} tons.||Option B, {Price2} credits a tonne at||{Station2}||in {System2}, with room for {Tons2} tons.",
-  "Two options for selling {Material}.||Option A: {Station}||in {System}. They pay {Price} and want {Tons} tons.||Option B: {Station2}||in {System2}. They pay {Price2} and want {Tons2} tons."
+  "Right, here's who wants your {Material}.||The first one. {Station}||in {System}, paying {Price} credits a tonne, and they need {Tons} tons.||The second one. {Station2}||in {System2}, paying {Price2} credits, and they need {Tons2} tons.",
+  "I've got two large-pad buyers for {Material}.||The first one is||{Station}||in {System}. {Price} credits, {Tons} tons wanted.||The second one is||{Station2}||in {System2}. {Price2} credits, {Tons2} tons wanted.",
+  "Found some takers, Commander.||The first one, {Price} credits a tonne at||{Station}||in {System}, with room for {Tons} tons.||The second one, {Price2} credits a tonne at||{Station2}||in {System2}, with room for {Tons2} tons.",
+  "Two options for selling {Material}.||The first one: {Station}||in {System}. They pay {Price} and want {Tons} tons.||The second one: {Station2}||in {System2}. They pay {Price2} and want {Tons2} tons."
  ],
  "Sell_Options_Sarcastic": [
-  "Fine, I looked. Two buyers for your {Material}.||Option A: {Price} credits a tonne, {Tons} tons wanted, at||{Station}||in {System}.||Option B: {Price2} credits a tonne, {Tons2} tons wanted, at||{Station2}||in {System2}.",
-  "Someone actually wants your {Material}. Two someones, in fact.||Option A is||{Station}||in {System}, {Price} a tonne for {Tons} tons.||Option B is||{Station2}||in {System2}, {Price2} a tonne for {Tons2} tons."
+  "Fine, I looked. Two buyers for your {Material}.||The first one: {Price} credits a tonne, {Tons} tons wanted, at||{Station}||in {System}.||The second one: {Price2} credits a tonne, {Tons2} tons wanted, at||{Station2}||in {System2}.",
+  "Someone actually wants your {Material}. Two someones, in fact.||The first one is||{Station}||in {System}, {Price} a tonne for {Tons} tons.||The second one is||{Station2}||in {System2}, {Price2} a tonne for {Tons2} tons."
  ],
  "Sell_Options_Close": [
-  "I found two lovely places for your {Material}, Commander.||Option A: {Station}||in {System}. {Price} credits a tonne, and they want {Tons} tons.||Option B: {Station2}||in {System2}. {Price2} credits a tonne, and they want {Tons2} tons."
+  "I found two lovely places for your {Material}, Commander.||The first one: {Station}||in {System}. {Price} credits a tonne, and they want {Tons} tons.||The second one: {Station2}||in {System2}. {Price2} credits a tonne, and they want {Tons2} tons."
  ],
  "Sell_OneOption": [
   "I found one place for your {Material}.||{Station}||in {System}, paying {Price} credits a tonne for up to {Tons} tons.",
@@ -21,19 +21,19 @@
   "One option for your {Material}.||{Station}||in {System}. They pay {Price} credits and need {Tons} tons."
  ],
  "Sell_WhichOne": [
-  "Which would you like, A or B?",
-  "A or B, Commander?",
-  "Which one suits you, A or B?",
-  "Shall it be A or B?",
+  "Which would you like, the first one or the second one?",
+  "the first one or the second one, Commander?",
+  "Which one suits you, the first one or the second one?",
+  "Shall it be the first one or the second one?",
   "Pick one for me. A, or B?",
-  "Which option do you fancy, A or B?"
+  "Which option do you fancy, the first one or the second one?"
  ],
  "Sell_WhichOne_Sarcastic": [
-  "Go on then. A or B?",
-  "A or B? Take your time. Actually, don't."
+  "Go on then. the first one or the second one?",
+  "the first one or the second one? Take your time. Actually, don't."
  ],
  "Sell_WhichOne_Close": [
-  "Which one would you like, A or B, Commander?"
+  "Which one would you like, the first one or the second one, Commander?"
  ],
  "Sell_RouteAsk": [
   "Would you like me to plot a route for you?",
@@ -86,14 +86,14 @@
   "No luck. Nobody in range wants a thousand tons of {Material} on a large pad, with prices from today."
  ],
  "Sell_NearOptions": [
-  "The closest buyers for your {Material}, Commander.||Option A is||{Station}||in {System}, {Away}. They pay {Price} credits a tonne and want {Tons} tons.||Option B is||{Station2}||in {System2}, {Away2}. They pay {Price2} credits a tonne and want {Tons2} tons.",
-  "Two places close by for {Material}.||Option A: {Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons wanted.||Option B: {Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons wanted.",
+  "The closest buyers for your {Material}, Commander.||The first one is||{Station}||in {System}, {Away}. They pay {Price} credits a tonne and want {Tons} tons.||The second one is||{Station2}||in {System2}, {Away2}. They pay {Price2} credits a tonne and want {Tons2} tons.",
+  "Two places close by for {Material}.||The first one: {Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons wanted.||The second one: {Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons wanted.",
   "Here's the nearest I can find.||A, {Station}||in {System}, {Away}, paying {Price} credits for {Tons} tons.||B, {Station2}||in {System2}, {Away2}, paying {Price2} credits for {Tons2} tons.",
-  "Not far at all. Two large-pad buyers for {Material}.||Option A, {Away}: {Station}||in {System}, {Price} credits a tonne, {Tons} tons.||Option B, {Away2}: {Station2}||in {System2}, {Price2} credits a tonne, {Tons2} tons.",
-  "I've found the two nearest for you.||Option A is {Away}. {Station}||in {System}. {Price} credits, {Tons} tons wanted.||Option B is {Away2}. {Station2}||in {System2}. {Price2} credits, {Tons2} tons wanted."
+  "Not far at all. Two large-pad buyers for {Material}.||The first one, {Away}: {Station}||in {System}, {Price} credits a tonne, {Tons} tons.||The second one, {Away2}: {Station2}||in {System2}, {Price2} credits a tonne, {Tons2} tons.",
+  "I've found the two nearest for you.||The first one is {Away}. {Station}||in {System}. {Price} credits, {Tons} tons wanted.||The second one is {Away2}. {Station2}||in {System2}. {Price2} credits, {Tons2} tons wanted."
  ],
  "Sell_NearOptions_Sarcastic": [
-  "You want the lazy option. Fine. The nearest two for {Material}.||Option A: {Station}||in {System}, {Away}. {Price} a tonne, {Tons} tons.||Option B: {Station2}||in {System2}, {Away2}. {Price2} a tonne, {Tons2} tons."
+  "You want the lazy option. Fine. The nearest two for {Material}.||The first one: {Station}||in {System}, {Away}. {Price} a tonne, {Tons} tons.||The second one: {Station2}||in {System2}, {Away2}. {Price2} a tonne, {Tons2} tons."
  ],
  "Sell_NearOne": [
   "The nearest buyer for your {Material} is||{Station}||in {System}, {Away}. {Price} credits a tonne, and they want {Tons} tons.",
@@ -101,17 +101,17 @@
   "Nearest place to sell is||{Station}||in {System}, {Away}, paying {Price} credits."
  ],
  "Buy_Options": [
-  "Two places selling {Material}, cheapest first.||Option A: {Price} credits a tonne at||{Station}||in {System}, {Away}. {Tons} tons in stock.||Option B: {Price2} credits a tonne at||{Station2}||in {System2}, {Away2}. {Tons2} tons in stock.",
-  "I found two sellers of {Material}.||Option A, the cheaper, is||{Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons available.||Option B is||{Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons available.",
+  "Two places selling {Material}, cheapest first.||The first one: {Price} credits a tonne at||{Station}||in {System}, {Away}. {Tons} tons in stock.||The second one: {Price2} credits a tonne at||{Station2}||in {System2}, {Away2}. {Tons2} tons in stock.",
+  "I found two sellers of {Material}.||The first one, the cheaper, is||{Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons available.||The second one is||{Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons available.",
   "Here's where to buy {Material}, Commander.||A: {Station}||in {System}, {Away}, at {Price} credits with {Tons} tons in stock.||B: {Station2}||in {System2}, {Away2}, at {Price2} credits with {Tons2} tons in stock.",
-  "Two good prices for {Material}.||Option A. {Station}||in {System}, {Price} credits a tonne, {Tons} tons for sale.||Option B. {Station2}||in {System2}, {Price2} credits a tonne, {Tons2} tons for sale.",
-  "Found some sellers.||Option A is||{Station}||in {System}, {Away}, {Price} credits a tonne with {Tons} tons in stock.||Option B is||{Station2}||in {System2}, {Away2}, {Price2} credits a tonne with {Tons2} tons in stock."
+  "Two good prices for {Material}.||The first one. {Station}||in {System}, {Price} credits a tonne, {Tons} tons for sale.||The second one. {Station2}||in {System2}, {Price2} credits a tonne, {Tons2} tons for sale.",
+  "Found some sellers.||The first one is||{Station}||in {System}, {Away}, {Price} credits a tonne with {Tons} tons in stock.||The second one is||{Station2}||in {System2}, {Away2}, {Price2} credits a tonne with {Tons2} tons in stock."
  ],
  "Buy_NearOptions": [
-  "The closest sellers of {Material}, Commander.||Option A: {Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons in stock.||Option B: {Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons in stock.",
+  "The closest sellers of {Material}, Commander.||The first one: {Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons in stock.||The second one: {Station2}||in {System2}, {Away2}. {Price2} credits a tonne, {Tons2} tons in stock.",
   "Two places close by selling {Material}.||A is {Away}: {Station}||in {System}, {Price} credits a tonne, {Tons} tons.||B is {Away2}: {Station2}||in {System2}, {Price2} credits a tonne, {Tons2} tons.",
-  "Nearest I can find for {Material}.||Option A, {Away}: {Station}||in {System}. {Price} credits, {Tons} tons available.||Option B, {Away2}: {Station2}||in {System2}. {Price2} credits, {Tons2} tons available.",
-  "Not far. Two sellers of {Material}.||Option A, {Station}||in {System}, {Away}, at {Price} credits a tonne with {Tons} tons.||Option B, {Station2}||in {System2}, {Away2}, at {Price2} credits a tonne with {Tons2} tons."
+  "Nearest I can find for {Material}.||The first one, {Away}: {Station}||in {System}. {Price} credits, {Tons} tons available.||The second one, {Away2}: {Station2}||in {System2}. {Price2} credits, {Tons2} tons available.",
+  "Not far. Two sellers of {Material}.||The first one, {Station}||in {System}, {Away}, at {Price} credits a tonne with {Tons} tons.||The second one, {Station2}||in {System2}, {Away2}, at {Price2} credits a tonne with {Tons2} tons."
  ],
  "Buy_OneOption": [
   "One seller of {Material} fits.||{Station}||in {System}, {Away}. {Price} credits a tonne, {Tons} tons in stock.",
