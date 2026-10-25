@@ -679,3 +679,9 @@ Not tested in the live game: the exact item names in Backpack.json (the log line
 ## 0.45.1 - Energy cell uses suit energy
 
 The energy cell now follows your SUIT ENERGY (20% or lower), not shields. The game's manual lists no suit energy in Status.json (only Oxygen, Health, Temperature, SelectedWeapon, Gravity), so she looks for a field called SuitEnergy, Energy, SuitPower, Power or Battery in case your game has one, and the first time you are on foot she writes ALL the fields she sees to the log ("Status.json on foot has these fields: ..."). If one is found she uses it. If not, she falls back to the first loss of health as the sign that the shields are gone, and the log says "Suit energy field: not found". Please send me that log line if the cell does not use itself at the right time, and I will wire up the real field name.
+
+## 0.45.2 - Request docking, your sequence
+
+Focus Left Panel, wait for it to open, Previous Panel Tab x3, Next Panel Tab x2 (Contacts), UI Up x5, UI Right (opens the station menu), UI Select (Request Docking), UI Left, Previous Panel Tab x2, Focus Left Panel (closes it). Every press is held 0.15 s with a pause after it. Your list had "Previous Panel Tab x2" twice (steps 7 and 8); I did it ONCE (x2). If the tabs end in the wrong place, tell me and I will make it four.
+
+Needs keyboard keys for UI Up, UI Right, UI Select, UI Left and both panel tabs. UI Right/Left often share a key with Yaw Right/Left: use Check my Elite keys, and give one a second key if it is listed as a clash. The log line "Macro request_docking trace" shows which screen the game was on after each wait, send it if it fails.

@@ -881,7 +881,11 @@ class NewMacros(unittest.TestCase):
         self.assertEqual(LAUNCH_MACRO[-3:], ("UI_Down", "wait 0.6", "UI_Select"))
         self.assertEqual([s for s in LAUNCH_MACRO if s.startswith("say ")], ["say Launch_Start", "say Launch_Systems", "say Launch_Go"])
         self.assertEqual(LAUNCH_MACRO.count("UI_Back"), 2)
-        self.assertEqual(DOCKING_MACRO[-1], "hold UI_Back 0.15")
+        self.assertEqual(DOCKING_MACRO[0], "FocusLeftPanel")
+        self.assertEqual(DOCKING_MACRO[-1], "FocusLeftPanel")
+        order = [s.split()[1] for s in DOCKING_MACRO if s.startswith("hold ")]
+        self.assertEqual(order, ["CyclePreviousPanel"] * 3 + ["CycleNextPanel"] * 2 + ["UI_Up"] * 5
+                         + ["UI_Right", "UI_Select", "UI_Left"] + ["CyclePreviousPanel"] * 2)
 
 
 class PreferUnsharedKey(unittest.TestCase):

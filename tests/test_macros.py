@@ -13,7 +13,7 @@ from tests.test_commands import FakeBook, FakeSender, FakeSpeech
 from tests.test_phase6b import dialogue, make_settings
 
 ALL = {name: (Keystroke("Key_%s" % i), "") for i, name in enumerate(
-    ["FocusLeftPanel", "FocusRightPanel", "FocusRadarPanel", "CycleNextPanel", "UI_Select", "UI_Right", "UI_Back", "UI_Down", "CyclePreviousPanel"])}
+    ["FocusLeftPanel", "FocusRightPanel", "FocusRadarPanel", "CycleNextPanel", "UI_Select", "UI_Right", "UI_Back", "UI_Down", "CyclePreviousPanel", "UI_Up", "UI_Left"])}
 
 
 class MacroTests(unittest.TestCase):
@@ -50,9 +50,10 @@ class MacroTests(unittest.TestCase):
         r = self.build()
         r.run_text("request docking")
         names = [s.key for s in self.sender.pressed]
-        # 0.34.9: the recording exactly: focus left panel, Next Tab x2, Select, Previous Tab x2, Back (no Right press)
-        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_4", "Key_8", "Key_8", "Key_6"])
-        self.assertNotIn("Key_7", names)
+        # 0.45.2: Focus, Previous Tab x3, Next Tab x2, Up x5, Right, Select, Left, Previous Tab x2, Focus (close)
+        self.assertEqual(names, ["Key_0"] + ["Key_8"] * 3 + ["Key_3"] * 2 + ["Key_9"] * 5 + ["Key_5", "Key_4", "Key_10"]
+                         + ["Key_8"] * 2 + ["Key_0"])
+        self.assertNotIn("Key_6", names)                         # no Back press any more
         self.assertIn(1.6, self.sleeps)
 
     def test_your_own_steps_replace_the_built_in_ones(self):
