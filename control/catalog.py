@@ -50,27 +50,14 @@ MACROS = {
 # 0.34.10: the commander's 12:38 recording (no Right press: Right shares a key with Yaw Right), with every key held 0.15 s
 # and much more patient waits. The 17:03 log showed the left panel was still not open (Status.json GuiFocus 0) when the first
 # Next Tab was pressed 0.85 s after Focus Left Panel, so that press, and the next, could land on the wrong tab.
-# 0.45.2: the commander's written sequence (Contacts tab, highlight the station with Up x5, Right opens its side menu, Select =
-# Request Docking, Left backs out). Every press is a short hold (0.15 s, as the recordings needed) with a pause after it.
-def _taps(action, times, gap=0.3):
-    steps = []
-    for _ in range(times):
-        steps += ["hold %s 0.15" % action, "wait %s" % gap]
-    return steps
-
-
-DOCKING_MACRO = tuple(
-    ["FocusLeftPanel", "wait 1.6"]
-    + _taps("CyclePreviousPanel", 3)                 # back to the first tab, wherever the panel was left
-    + _taps("CycleNextPanel", 2, 0.6)                # two tabs along from the first is Contacts
-    + ["wait 0.8"]
-    + _taps("UI_Up", 5)                              # make sure the station is the highlighted entry
-    + _taps("UI_Right", 1, 0.8)                      # opens the station's side menu
-    + ["hold UI_Select 0.15", "wait 2.0"]            # Request Docking
-    + _taps("UI_Left", 1, 0.6)                       # back out of the side menu
-    + _taps("CyclePreviousPanel", 2)                 # tabs back for next time
-    + ["wait 0.5", "FocusLeftPanel"]                 # close the panel
-)
+# 0.45.3: the commander's own recording of 15:13 (the game answered DockingGranted 0.2 s after Select): Focus Left Panel, Next Tab x2,
+# HOLD Up for 1.4 s (scrolls to the top so the station is highlighted), Right (opens the station menu), Select (Request Docking),
+# Left, Previous Tab x2, Back (closes the panel). Her pace, but with 0.15 s presses and a longer wait for the panel to open
+# (the 0.34.10 log showed 0.85 s was too short).
+DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "hold CycleNextPanel 0.15", "wait 0.5", "hold CycleNextPanel 0.15", "wait 1.15",
+                 "hold UI_Up 1.4", "wait 0.8", "hold UI_Right 0.15", "wait 0.8", "hold UI_Select 0.15", "wait 1.2",
+                 "hold UI_Left 0.15", "wait 0.8", "hold CyclePreviousPanel 0.15", "wait 0.7", "hold CyclePreviousPanel 0.15",
+                 "wait 0.85", "hold UI_Back 0.15")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
 # Auto launch from a station: Select on the Launch button of the station menu. Only works while docked (see core/app.py). If

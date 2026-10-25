@@ -685,3 +685,7 @@ The energy cell now follows your SUIT ENERGY (20% or lower), not shields. The ga
 Focus Left Panel, wait for it to open, Previous Panel Tab x3, Next Panel Tab x2 (Contacts), UI Up x5, UI Right (opens the station menu), UI Select (Request Docking), UI Left, Previous Panel Tab x2, Focus Left Panel (closes it). Every press is held 0.15 s with a pause after it. Your list had "Previous Panel Tab x2" twice (steps 7 and 8); I did it ONCE (x2). If the tabs end in the wrong place, tell me and I will make it four.
 
 Needs keyboard keys for UI Up, UI Right, UI Select, UI Left and both panel tabs. UI Right/Left often share a key with Yaw Right/Left: use Check my Elite keys, and give one a second key if it is listed as a clash. The log line "Macro request_docking trace" shows which screen the game was on after each wait, send it if it fails.
+
+## 0.45.3 - Request docking, from your recording
+
+Replaces the 0.45.2 written sequence. Your recording: Focus Left Panel, Next Tab x2, hold Up for 1.4 s, Right, Select (the game answered DockingGranted 0.2 s later), Left, Previous Tab x2, Back. She uses your pacing, with 0.15 s presses and 1.6 s for the panel to open (your recording has it open 0.6 s after the key, but earlier logs showed short waits failing). Change any step under `macros.request_docking` in config/settings.json. If it fails, send the log line "Macro request_docking trace".

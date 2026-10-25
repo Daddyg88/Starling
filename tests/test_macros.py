@@ -50,10 +50,8 @@ class MacroTests(unittest.TestCase):
         r = self.build()
         r.run_text("request docking")
         names = [s.key for s in self.sender.pressed]
-        # 0.45.2: Focus, Previous Tab x3, Next Tab x2, Up x5, Right, Select, Left, Previous Tab x2, Focus (close)
-        self.assertEqual(names, ["Key_0"] + ["Key_8"] * 3 + ["Key_3"] * 2 + ["Key_9"] * 5 + ["Key_5", "Key_4", "Key_10"]
-                         + ["Key_8"] * 2 + ["Key_0"])
-        self.assertNotIn("Key_6", names)                         # no Back press any more
+        # 0.45.3: Focus, Next Tab x2, Up (held), Right, Select, Left, Previous Tab x2, Back
+        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_9", "Key_5", "Key_4", "Key_10", "Key_8", "Key_8", "Key_6"])
         self.assertIn(1.6, self.sleeps)
 
     def test_your_own_steps_replace_the_built_in_ones(self):
