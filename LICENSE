@@ -1,0 +1,30 @@
+Starling licence
+
+Copyright (c) 2026 Daddyg88 (the "Author"). All rights reserved except as stated here.
+
+PERMISSION
+You may use, copy, change and share Starling free of charge for personal,
+non-commercial purposes. Playing, streaming and making videos with it is
+fine, including on monetised channels, as long as Starling itself is not
+what you are selling.
+
+CONDITIONS
+1. You may not sell Starling, or any part of it, or include it in anything
+   that is sold or that needs payment to use.
+2. Keep this file and the credits below with every copy.
+3. If you share a changed version, say that you changed it.
+
+NO WARRANTY
+Starling is provided "as is", without warranty of any kind. The Author is
+not liable for any claim or damage arising from its use.
+
+THIRD-PARTY MATERIAL (not covered by the permission above; their own terms apply)
+- config/bio_rules.json is a reduced copy of species data from the EDEXO
+  project (https://github.com/bahuckel/EDEXO), licensed CC BY-NC-SA 3.0
+  (https://creativecommons.org/licenses/by-nc-sa/3.0/). It stays under that
+  licence: credit, non-commercial, share alike. Remove it if you sell anything.
+- config/materials.json uses names from the EDCD FDevIDs project.
+- Elite Dangerous and its journal files belong to Frontier Developments plc.
+  Starling is a fan project, not affiliated with or endorsed by Frontier.
+- Python libraries (customtkinter, Kokoro, faster-whisper and others) keep
+  their own licences.

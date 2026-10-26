@@ -177,3 +177,47 @@ class Codex(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Learning(unittest.TestCase):
+    def saa(self, genus, name="Test A 1"):
+        return {"event": "SAASignalsFound", "BodyName": name, "BodyID": 5, "SystemAddress": 1,
+                "Signals": [{"Type_Localised": "Biological", "Count": 1}], "Genuses": [{"Genus_Localised": genus}]}
+
+    def setup_state(self, learned, entries):
+        from journal.bio_predict import BioLearned
+        bus, got = EventBus(), []
+        state = GameState()
+        state.system = "Test"
+        state.bio = BioPredictor(codex=BioCodex(), learned=learned)
+        state.bio.set_system("Test")
+        proc = EventProcessor(bus, {}, state, load_registry())
+        for e in entries:
+            proc.handle_entry(e)
+        return state
+
+    def test_missed_genus_is_learned_and_counted_once(self):
+        from journal.bio_predict import BioLearned
+        path = Path(tempfile.mkdtemp()) / "l.json"
+        learned = BioLearned(path)
+        base = [planet("Test A 1", k=177), fss("Test A 1", 1)]
+        state = self.setup_state(learned, base + [self.saa("Brain Tree")] + [self.saa("Brain Tree")])
+        self.assertEqual(learned.stats["braintree"]["hit"], 1)          # replayed line not counted twice
+        self.assertGreaterEqual(learned.stats["tussock"]["seen"], 1)
+        self.assertEqual(learned.stats["tussock"]["hit"], 0)
+        # a second, similar planet now lists Brain Trees as a candidate and Tussock counts for less
+        again = BioLearned(path)
+        state2 = self.setup_state(again, [planet("Test B 1", k=177), fss("Test B 1", 1)])
+        genera = state2.bio.bodies["Test B 1"].candidate_genera()
+        self.assertTrue(any("Brain" in g for g in genera))
+        self.assertLess(again.weight("Tussock"), again.weight("Brain Tree"))
+
+    def test_envelope_must_match(self):
+        from journal.bio_predict import BioLearned
+        learned = BioLearned()
+        self.setup_state(learned, [planet("Test A 1", k=177), fss("Test A 1", 1), self.saa("Brain Tree")])
+        state = self.setup_state(learned, [planet("Test B 1", k=700), fss("Test B 1", 1)])
+        self.assertFalse(any("Brain" in g for g in state.bio.bodies["Test B 1"].candidate_genera()))
+
+    def test_licence_exists(self):
+        self.assertTrue((Path(__file__).resolve().parent.parent / "LICENSE").exists())

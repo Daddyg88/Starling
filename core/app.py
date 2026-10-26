@@ -24,7 +24,7 @@ from personality.dialogue import DialogueManager
 from personality.speaker import EventSpeaker, load_rules
 from personality.voice_replies import VoiceReplies
 from journal.exobiology import ExobiologyTracker
-from journal.bio_predict import BioPredictor, BioCodex
+from journal.bio_predict import BioPredictor, BioCodex, BioLearned
 from tts.providers import build_providers
 from tts.speech_manager import SpeechManager
 
@@ -127,7 +127,8 @@ class App:
         # Game knowledge and event handling
         self.state = GameState()
         self.state.exobiology = ExobiologyTracker(paths.CONFIG_DIR / "exobiology_values.json", paths.DATA_DIR)
-        self.state.bio = BioPredictor(self.state.exobiology, BioCodex(paths.DATA_DIR / "bio_codex.json"), self.settings)
+        self.state.bio = BioPredictor(self.state.exobiology, BioCodex(paths.DATA_DIR / "bio_codex.json"), self.settings,
+                                     learned=BioLearned(paths.DATA_DIR / "bio_learned.json"))
         self.registry = load_registry()
         self.processor = EventProcessor(self.bus, self.event_config, self.state, self.registry)
         if record_events:

@@ -126,6 +126,81 @@ class BioCodex:
                 self.known.add(species)
 
 
+# ---------------------------------------------------------------- what she has learned
+class BioLearned:
+    """
+    What the surface scans have taught her (data/bio_learned.json). Two things:
+      * stats[genus] = how often a genus was a candidate ("seen") and how often it was really there ("hit").
+        The hit rate decides which genera she names first and how the value is averaged.
+      * envelopes[genus] = the kinds of planet the genus was REALLY found on (planet class, atmosphere, temperature, gravity,
+        volcanism). If the rules missed it, a planet inside that envelope now counts as a candidate too.
+    Each planet is counted once (a list of "system|planet" keys), so replaying a journal does not count twice.
+    """
+    MAX_SEEN = 3000
+
+    def __init__(self, path=None):
+        self.path = Path(path) if path else None
+        data = _read_json(self.path) if self.path else {}
+        self.stats = {k: v for k, v in (data.get("stats") or {}).items() if isinstance(v, dict)}
+        self.envelopes = {k: v for k, v in (data.get("envelopes") or {}).items() if isinstance(v, dict)}
+        self.seen = list(data.get("seen") or [])
+        self._seen_set = set(self.seen)
+
+    def save(self):
+        if self.path:
+            _write_json(self.path, {"stats": self.stats, "envelopes": self.envelopes, "seen": self.seen[-self.MAX_SEEN:]})
+
+    def weight(self, genus):
+        """0..1: how likely a candidate genus really turns up (starts at one half, learns from every surface scan)."""
+        s = self.stats.get(genus_key(genus)) or {}
+        return (s.get("hit", 0) + 1.0) / (s.get("seen", 0) + 2.0)
+
+    def observe(self, key, props, candidate_genera, real_genera):
+        """One surface scan: which genera were possible, which were there. Returns True if it was new."""
+        if not key or key in self._seen_set:
+            return False
+        self._seen_set.add(key)
+        self.seen.append(key)
+        for g in candidate_genera:
+            entry = self.stats.setdefault(genus_key(g), {"seen": 0, "hit": 0})
+            entry["seen"] += 1
+            if any(same_genus(g, r) for r in real_genera):
+                entry["hit"] += 1
+        for g in real_genera:
+            if not any(same_genus(g, c) for c in candidate_genera):        # one the rules did not expect: it was there, so count it
+                entry = self.stats.setdefault(genus_key(g), {"seen": 0, "hit": 0})
+                entry["seen"] += 1
+                entry["hit"] += 1
+            if props is None:
+                continue
+            env = self.envelopes.setdefault(genus_key(g), {"n": 0, "pc": [], "atm": [], "volc": [], "thin": []})
+            env["n"] += 1
+            for field, value in (("pc", props["pc"]), ("atm", props["atm"]), ("volc", bool(props["volc"])), ("thin", bool(props["thin"]))):
+                if value not in env[field]:
+                    env[field].append(value)
+            for field, value, pick in (("kmin", props["k"], min), ("kmax", props["k"], max), ("gmax", props["g"], max)):
+                if isinstance(value, (int, float)):
+                    env[field] = value if field not in env else pick(env[field], value)
+        self.save()
+        return True
+
+    def fits(self, genus, props):
+        """True when a planet looks like the ones this genus was really found on."""
+        env = self.envelopes.get(genus_key(genus))
+        if not env or not props:
+            return False
+        if props["pc"] not in env["pc"] or props["atm"] not in env["atm"] or bool(props["thin"]) not in env["thin"]:
+            return False
+        if bool(props["volc"]) not in env["volc"]:
+            return False
+        k, g = props["k"], props["g"]
+        if k is not None and "kmin" in env and not (env["kmin"] <= k <= env["kmax"]):
+            return False
+        if g is not None and "gmax" in env and g > env["gmax"] + 0.0005:
+            return False
+        return True
+
+
 # ---------------------------------------------------------------- one body
 class BioBody:
     def __init__(self, name, short, count):
@@ -147,9 +222,10 @@ class BioBody:
 
 
 class BioPredictor:
-    def __init__(self, tracker=None, codex=None, settings=None, rules=None):
+    def __init__(self, tracker=None, codex=None, settings=None, rules=None, learned=None):
         self._tracker = tracker
         self.codex = codex or BioCodex()
+        self.learned = learned or BioLearned()
         self.settings = settings
         self._rules = rules
         self.reset()
@@ -265,7 +341,14 @@ class BioPredictor:
         p = self.props.get(name)
         if p is None:
             return []
-        return [r for r in self.rules if self.fits(r, p, geo)]
+        found = [r for r in self.rules if self.fits(r, p, geo)]
+        have = {genus_key(r["g"]) for r in found}
+        for key in self.learned.envelopes:           # genera the rules missed but she has really seen on planets like this
+            if key not in have and self.learned.fits(key, p):
+                extra = [r for r in self.rules if same_genus(r["g"], key)]
+                found.extend(extra)
+                have.add(key)
+        return found
 
     # ---- values ----
     def species_value(self, rule_or_name):
@@ -287,7 +370,12 @@ class BioPredictor:
         lows = sorted((min(v) for v in groups.values()))
         highs = sorted((max(v) for v in groups.values()), reverse=True)
         count = max(1, min(body.count, len(means)))
-        expected = sum(means[:count]) if body.genera else sum(means) / len(means) * count
+        if body.genera:
+            expected = sum(means[:count])
+        else:        # before the surface scan: average, weighted by how often each genus has really been there
+            weights = {g: self.learned.weight(g) for g in groups}
+            total = sum(weights.values()) or 1.0
+            expected = sum(weights[g] * (sum(v) / len(v)) for g, v in groups.items()) / total * count
         return (sum(lows[:count]), expected, sum(highs[:count]))
 
     def worth(self, body):
@@ -389,6 +477,8 @@ class BioPredictor:
             body.candidates = self.candidates_for(name, geo=counts["Geological"] > 0)
             body.guessed_genera = body.candidate_genera()
         body.genera = genera
+        if genera and body.known_props:
+            self.learned.observe("%s|%s" % (self.system or state_system, name), self.props.get(name), body.guessed_genera, genera)
         if not genera or not self._on("exobiology.guess", True):
             return []
         right = all(any(same_genus(g, c) for c in body.guessed_genera) for g in genera)
@@ -460,5 +550,5 @@ def _top_genera(predictor, body, limit):
         value = predictor.species_value(r)
         if value:
             groups.setdefault(r["g"], []).append(value)
-    ranked = sorted(groups, key=lambda g: -(sum(groups[g]) / len(groups[g])))
+    ranked = sorted(groups, key=lambda g: -(sum(groups[g]) / len(groups[g])) * predictor.learned.weight(g))
     return ranked[:limit]
