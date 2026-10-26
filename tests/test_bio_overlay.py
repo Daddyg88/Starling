@@ -464,3 +464,28 @@ class Ranges(unittest.TestCase):
             line = ov.overlay_focus(state.bio.focus_view())["lives"][0]
             self.assertEqual(line["tone"], "never", extra)
         self.assertFalse(line["flag"])                       # finished: colour stays, flag goes
+
+
+class ManyFlags(DrawingTests):
+    ROW = {"body": "A 3", "count": 12, "value": 90_000_000, "low": 45_700_000, "high": 175_300_000, "new": 12,
+           "flags": ["never"] * 5 + ["elsewhere"] * 7, "known": False, "kind": "icy", "species": [], "genera": []}
+
+    def test_twelve_signals_and_long_range_go_on_two_lines(self):
+        line = ov.overlay_rows([self.ROW])[0][0]
+        self.assertEqual(line["flags"], 12)
+        self.assertTrue(line["two_line"])
+        self.assertEqual(line["value"], "~45.7-175.3M")
+        few = dict(self.ROW, count=3, flags=["never", "elsewhere"], new=2)
+        self.assertFalse(ov.overlay_rows([few])[0][0]["two_line"])
+
+    def test_draws_and_fits(self):
+        box = ov.BioOverlay(FakeRoot(), Settings(), lambda: GameState())
+        for size in ("Small", "Medium", "Large"):
+            if box.canvas is not None:
+                box.canvas.items.clear()           # the stand-in canvas does not clear itself
+            box._draw(*ov.overlay_rows([self.ROW, dict(self.ROW, count=2, flags=["never"], new=1)]), (3, 25, size, False))
+            flags = [a for n, a, _ in box.canvas.items if n == "create_polygon"]
+            self.assertEqual(len(flags), 13)
+            width = int(ov.SIZES[size] * 23)
+            for args in flags:
+                self.assertLess(max(args[0::2]), width - 10)          # every flag stays inside the box

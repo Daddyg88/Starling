@@ -899,3 +899,6 @@ Honest limits: not tried in the game; the colours were only tested with a stand-
 - The planet view shows a range for each life form until you take its first sample, then the exact price. With several life forms the list shows the sum of the lows and the sum of the highs.
 - Colour in the planet view: a form you have never found anywhere keeps its yellow text while you sample it and after you finish it (the codex line the game writes on the first sample used to turn it orange at once). Blue and orange forms keep their colour the same way. The flag still goes once the form is finished.
 Honest limits: not tried in the game. A wide range just means the conditions fit several species; check the planet view for the narrower one after mapping. The box is a little wider (23 instead of 21 text units) to fit the ranges.
+
+## 0.61.1: overlay fits up to twelve signals
+A planet can have up to twelve biological signals. The list now shows up to twelve flags (they squeeze closer together if needed), and when a planet has more than four flags its value goes on a second line underneath, so the long ranges ("~45.7-175.3M") are no longer squashed against the flags. Planets with four flags or fewer look the same as before. Honest limit: only drawn with a stand-in screen here; tell me if anything still overlaps on yours (and which text size you use).

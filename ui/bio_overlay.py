@@ -33,6 +33,7 @@ BLUE = "#3da5ff"            # found in another region but not in this one
 YELLOW = "#ffd42a"          # never found anywhere
 TONES = {"never": YELLOW, "elsewhere": BLUE, "here": ORANGE}      # text colour; flags use the first two
 MAX_ROWS = 8
+MAX_INLINE_FLAGS = 4         # up to this many flags the value sits on the same line
 CHECK_MS = 1000
 TEST_SECONDS = 10
 
@@ -78,11 +79,12 @@ def overlay_rows(rows, limit=MAX_ROWS):
     for row in list(rows)[:limit]:
         count = int(row.get("count") or 0)
         statuses = list(row["flags"]) if isinstance(row.get("flags"), list) else ["never"] * int(row.get("new") or 0)
-        statuses = [s for s in statuses if s in ("never", "elsewhere")][:max(0, min(count, 6))]
+        statuses = [s for s in statuses if s in ("never", "elsewhere")][:max(0, min(count, 12))]                # a planet can have up to twelve signals
         lines.append({
             "body": str(row.get("body") or "?"),
             "count": count,
             "flags": len(statuses),
+            "two_line": len(statuses) > MAX_INLINE_FLAGS,        # many flags: the value goes on a second line so nothing is squashed
             "flag_colors": [FLAG_COLORS[s] for s in statuses],
             "tone": "never" if "never" in statuses else ("elsewhere" if statuses else "here"),
             "value": short_credits(row.get("value")) if row.get("known") else (
@@ -258,7 +260,8 @@ class BioOverlay:
         pad = 10
         width = int(size * 23)
         title_h = int(size * 2.0)
-        height = title_h + row_h * len(lines) + (int(size * 1.6) if more else 0) + pad
+        extra_h = int(size * 1.5)         # the second line of a planet with many flags
+        height = title_h + sum(row_h + (extra_h if l.get("two_line") else 0) for l in lines) + (int(size * 1.6) if more else 0) + pad
         fill = DARK if dark else KEY
         canvas.configure(width=width, height=height)
         canvas.create_rectangle(1, 1, width - 2, height - 2, outline=ORANGE, width=2, fill=fill)
@@ -266,14 +269,20 @@ class BioOverlay:
         y = title_h
         for line in lines:
             mid = y + row_h // 2
+            two = bool(line.get("two_line"))
             self._planet(canvas, pad + size * 0.9, mid, size * 0.75, line["kind"])
             tone = TONES[line["tone"]]
             canvas.create_text(pad + size * 2.2, mid, text=line["body"], anchor="w", fill=tone, font=font)
             canvas.create_text(pad + size * 7.2, mid, text=str(line["count"]), anchor="w", fill=tone, font=font)
-            for n, colour in enumerate(line["flag_colors"]):
-                self._flag(canvas, pad + size * 8.6 + n * size * 1.2, mid, size, colour)
-            canvas.create_text(width - pad, mid, text=line["value"], anchor="e", fill=tone, font=font)
-            y += row_h
+            flags = line["flag_colors"]
+            step = min(size * 1.2, (width - 2 * pad - size * 8.6) / max(1, len(flags)))      # twelve flags still fit
+            for n, colour in enumerate(flags):
+                self._flag(canvas, pad + size * 8.6 + n * step, mid, size, colour)
+            if two:
+                canvas.create_text(width - pad, mid + row_h // 2 + extra_h // 2 - int(size * 0.5), text=line["value"], anchor="e", fill=tone, font=font)
+            else:
+                canvas.create_text(width - pad, mid, text=line["value"], anchor="e", fill=tone, font=font)
+            y += row_h + (extra_h if two else 0)
         if more:
             canvas.create_text(pad + 2, y + int(size * 0.8), text=more, anchor="w", fill=ORANGE, font=small)
         screen_w, screen_h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
