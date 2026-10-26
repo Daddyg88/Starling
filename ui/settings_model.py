@@ -288,7 +288,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("merit.power", "Your Power for merit mining", "choice", MERIT_POWERS,
                   help="Leave on 'From the game' and she reads it from the journal when you load the game while pledged"),
             Field("mining.limpet_reminder", "Remind me to buy limpets when I dock", "toggle",
-                  help="Only if the ship you are flying has a refinery, a collector limpet controller and cargo racks, and you carry fewer than 10 limpets"),
+                  help="Only if the ship you are flying has a refinery, a collector limpet controller and cargo racks, and you carry fewer than 100 limpets"),
             Field("mining.chatter", "How chatty she is while you refine", "choice", MINING_CHATTER,
                   help="She does not call out every tonne: the first of each good mineral, then every few tonnes"),
         ] + [Field("mining.fav%d" % n, "Excited about #%d" % n, "choice", MINERAL_CHOICES) for n in range(1, 11)]),

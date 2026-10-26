@@ -14,7 +14,7 @@ from core.logger import get_logger
 
 log = get_logger("limpets")
 
-ENOUGH = 10               # carrying this many limpets or more = no reminder
+ENOUGH = 100              # carrying this many limpets or more = no reminder
 
 
 def has_mining_kit(modules):

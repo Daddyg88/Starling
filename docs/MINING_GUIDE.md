@@ -86,5 +86,5 @@ Buying now works like selling: the first one and the second one (price, tons in 
   every button she is watching. If your mining trigger is not in it, add it in `config/settings.json` under `combat_assist` > `fire_buttons`.
 
 ## Limpet reminder (0.48.3)
-When you dock at a station with a market, she reminds you to buy limpets, but only if the ship you are flying RIGHT NOW has all three: a refinery, a collector limpet controller and cargo racks (any size). She reads this from the game's Loadout, so changing ship or modules is picked up by itself. She stays quiet if you already carry 10 or more limpets, or the station has no commodity market. Switch: Mining page > "Remind me to buy limpets when I dock".
+When you dock at a station with a market, she reminds you to buy limpets, but only if the ship you are flying RIGHT NOW has all three: a refinery, a collector limpet controller and cargo racks (any size). She reads this from the game's Loadout, so changing ship or modules is picked up by itself. She stays quiet if you already carry 100 or more limpets, or the station has no commodity market. Switch: Mining page > "Remind me to buy limpets when I dock".
 Honest limit: the module names were written from the journal manual, not tested in your game. If she never reminds you, send me the log and a line from your Loadout.

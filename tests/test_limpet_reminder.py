@@ -56,7 +56,7 @@ class Reminder(unittest.TestCase):
         self.assertEqual(narrator.said, ["Mining_LimpetReminder"])
 
     def test_silent_without_kit_or_when_off_or_stocked(self):
-        for kwargs in ({"modules": KIT[:2]}, {"modules": KIT, "on": False}, {"modules": KIT, "cargo": 12}):
+        for kwargs in ({"modules": KIT[:2]}, {"modules": KIT, "on": False}, {"modules": KIT, "cargo": 120}):
             bus, narrator = setup(**kwargs)
             dock(bus)
             self.assertEqual(narrator.said, [], kwargs)
