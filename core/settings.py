@@ -34,6 +34,7 @@ DEFAULTS = {
     "exobiology": {"distance_alert": True, "distance_beep": True, "guess": True, "top_hint": True},
     "merit": {"power": "", "commodities": ["Platinum", "Osmium", "Painite", "Palladium"]},
     "engineers": {"neutron_over_ly": 1000},
+    "dssa": {"neutron_over_ly": 1500},
     "guardian": {"auto_plot_key": True},
     "titans": {"talk": True},
     "materials": {"fill_callout": True, "fill_min_percent": 25},

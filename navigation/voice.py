@@ -23,7 +23,7 @@ from core.identity import personalise
 from core.logger import get_logger
 from navigation.edastro import EdAstro, EdAstroError, distance
 from navigation.engineers import EngineerBook, distance as engineer_distance
-from navigation import guardian, titans
+from navigation import dssa, guardian, titans
 from navigation.spansh import SpanshError
 from personality.mood_engine import effective_mood
 
@@ -184,6 +184,7 @@ class RouteVoice:
         self.guardian_sites = guardian.load()
         self.vessel_stage = 0            # 0 = not started, 1 = on the way to the beacon (waiting for the ancient key), 2 = key aboard, structure next
         self.titans = titans.load()
+        self.dssa = dssa.Dssa(paths.DATA_DIR / "dssa_cache.json", spansh)
         self.titan_goal = None           # the Titan she is taking you to (she tells the war story on the way)
         self.titan_told = 0              # how many pieces of the story she has told
         self.titan_last = -1e9
@@ -257,6 +258,9 @@ class RouteVoice:
         engineer = self._engineer_asked(said)
         if engineer is not None:
             return engineer
+        asked_dssa = dssa.parse_request(said)
+        if asked_dssa is not None:
+            return self.dssa_asked(asked_dssa)
         asked = guardian.parse(said)
         if asked is not None:
             return self.guardian_asked(asked[0], asked[1], guardian.wants_alternative(said))
@@ -412,6 +416,66 @@ class RouteVoice:
         self.narrator.say("EngineerFar" if miles is not None else "EngineerFarUnknown", fields)
         self.spawn(lambda: self._plot_now(engineer.system))
         return "Plotting a neutron route to %s in %s" % (engineer.name, engineer.system)
+
+    # ---- the Deep Space Support Array ----
+    def _dssa_limit(self):
+        try:
+            return float(self.settings.get("dssa.neutron_over_ly", 1500))
+        except (TypeError, ValueError):
+            return 1500.0
+
+    def dssa_asked(self, region_words):
+        """'Plot me a route to the nearest DSSA (in the Norma Expanse)'. The search runs in the background (it needs the internet)."""
+        region = None
+        if region_words:
+            region = dssa.find_region_named(region_words)
+            if region is None:
+                self.narrator.say("DssaRegionUnknown", {"region": region_words})
+                return "I don't know a region called %s." % region_words
+        if self._busy:
+            return "Already plotting."
+        self.narrator.say("DssaLooking", {"region": region or "the galaxy"})
+        self.spawn(lambda: self._dssa_go(region))
+        return "Looking for the nearest DSSA carrier%s" % (" in %s" % region if region else "")
+
+    def _dssa_go(self, region):
+        try:
+            state = self.state_provider()
+            here_pos = getattr(state, "star_pos", None)
+            here = str(getattr(state, "system", "") or "")
+            if here_pos is None:
+                self.narrator.say("RouteNoLocation")
+                return
+            if not self.dssa.refresh():
+                self.narrator.say("DssaUnavailable")
+                return
+            found = self.dssa.nearest(here_pos, region)
+            if found is None:
+                self.narrator.say("DssaNone", {"region": region or "the galaxy"})
+                return
+            carrier, miles = found
+            fields = {"carrier": carrier["name"], "system": carrier["system"], "ly": miles,
+                      "distance": "{:,}".format(int(round(miles))), "region": region or "the galaxy"}
+            if here.casefold() == carrier["system"].casefold():
+                self.narrator.say("DssaHere", fields)
+                return
+            if miles <= self._dssa_limit() and self.plot_macro is not None:
+                ok, reason = self.plot_macro(carrier["system"])
+                if not ok:
+                    fields["reason"] = reason or "the galaxy map macro is not available"
+                    self.narrator.say("DssaPlotOff", fields)
+                    return
+                self.narrator.say("DssaNear", fields)
+                return
+            if self._busy:
+                return
+            self._busy = True
+            self.narrator.say("DssaFar", fields)
+            self._plot_now(carrier["system"])         # clears the busy flag itself
+        except Exception:
+            self._busy = False
+            log.exception("The DSSA route failed")
+            self.narrator.say("RouteFailed", {"reason": "Something went wrong. The log has the details."})
 
     # ---- guardian blueprints ----
     def guardian_asked(self, kind, intent, alternative=False):

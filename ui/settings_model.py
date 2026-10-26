@@ -329,6 +329,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("neutron.enabled", "Neutron route plotter", "toggle"),
             Field("engineers.neutron_over_ly", "Engineer farther than this many light years: neutron route", "text", placeholder="1000",
                   help="\"Take me to Felicity Farseer\": closer than this she uses the galaxy map plotter, farther she asks Spansh for a neutron route"),
+            Field("dssa.neutron_over_ly", "DSSA carrier farther than this many light years: neutron route", "text", placeholder="1500",
+                  help="\"Plot me a route to the nearest DSSA in the Norma Expanse\": closer than this she uses the galaxy map plotter, farther she asks Spansh for a neutron route"),
             Field("titans.talk", "Titan routes: tell the Thargoid war story on the way", "toggle",
                   help="Say 'plot me a route to the nearest titan' or 'take me to Thor'. On each jump she tells a piece of the war, and on the last jump she says when that Titan was destroyed"),
             Field("guardian.auto_plot_key", "Guardian vessel blueprints: plot the structure when the ancient key is aboard", "toggle",

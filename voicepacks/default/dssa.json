@@ -1,0 +1,43 @@
+{
+ "DssaLooking": [
+  "One moment, I'm looking for the nearest DSSA carrier in {region}.",
+  "Let me find the nearest support carrier in {region}.",
+  "Searching for a DSSA carrier in {region}."
+ ],
+ "DssaNear": [
+  "Nearest DSSA carrier is {carrier} in {system}, {distance} light years away. Plotting it now.",
+  "{carrier}, in {system}. {distance} light years. I'm plotting it on the galaxy map.",
+  "Found one. {carrier} in {system}, {distance} light years. Plotting."
+ ],
+ "DssaNear_Close": [
+  "I found {carrier} in {system} for you, love. {distance} light years. Plotting it now."
+ ],
+ "DssaFar": [
+  "Nearest DSSA carrier is {carrier} in {system}, {distance} light years away. That's a long way, so I'm plotting a neutron route.",
+  "{carrier} in {system}, {distance} light years out. Neutron route coming up.",
+  "It's {distance} light years to {carrier} in {system}. I'll plot a neutron route."
+ ],
+ "DssaFar_Sarcastic": [
+  "{carrier}, {system}. {distance} light years. Bring snacks, I'm plotting a neutron route."
+ ],
+ "DssaHere": [
+  "The nearest DSSA carrier, {carrier}, is right here in {system}.",
+  "We're already in {system}. {carrier} should be right here."
+ ],
+ "DssaNone": [
+  "I couldn't find a DSSA carrier in {region}.",
+  "There's no DSSA carrier I know of in {region}. Sorry."
+ ],
+ "DssaUnavailable": [
+  "I can't reach the list of DSSA carriers. Check the internet connection and ask me again.",
+  "I couldn't get the DSSA list from EDAstro just now."
+ ],
+ "DssaRegionUnknown": [
+  "I don't know a region called {region}.",
+  "{region}? I don't know a region by that name."
+ ],
+ "DssaPlotOff": [
+  "I found {carrier} in {system}, but I couldn't plot it: {reason}.",
+  "{carrier} is in {system}, but the plotting failed: {reason}."
+ ]
+}
