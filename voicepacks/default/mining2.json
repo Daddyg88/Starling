@@ -1,4 +1,14 @@
 {
+ "Mining_LimpetReminder": [
+  "Don't forget limpets, Commander. You've got the refinery and the collector, so buy some before we leave.",
+  "Limpet check. You're fitted for mining, so pick up some limpets while we're docked.",
+  "Before you undock, Commander. Limpets. A mining ship with no limpets is just an expensive cargo box.",
+  "Reminder: buy limpets. Collector and prospector, both. I'll wait.",
+  "We're set up for mining and we have hardly any limpets. Shall we fix that before we leave?",
+  "Limpets, Commander. They're cheap, and I'd rather not watch you chase rocks by hand.",
+  "Quick thought while we're docked: limpets. Buy a good stack.",
+  "You've got the refinery, the collector and the racks. All you're missing is limpets. Go shopping."
+ ],
  "Prospected_Motherlode": [
   "Motherlode! And it's {Material}!",
   "A motherlode, Commander. {Material}. Don't waste it.",

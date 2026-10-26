@@ -26,6 +26,7 @@ class GameState:
     fuel_main: Optional[float] = None       # tonnes in the main tank now (Status.json), for the Home page
     cargo_tons: Optional[float] = None      # tonnes of cargo carried now (Status.json)
     cargo_capacity: Optional[float] = None  # from the Loadout event
+    modules: list = field(default_factory=list)   # item names of the ship you fly now (Loadout event), for the limpet reminder
     system_security: Optional[str] = None   # "Low Security" ... from FSDJump / Location
     system_allegiance: Optional[str] = None
     system_population: Optional[int] = None

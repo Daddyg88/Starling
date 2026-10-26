@@ -563,6 +563,22 @@ class App:
             self.auto_shields = None
         self.onfoot_care = None
 
+    def ensure_limpet_reminder(self):
+        """Reminds you to buy limpets when you dock in a mining ship. Safe to call twice."""
+        if getattr(self, "limpet_reminder", None) is not None:
+            return self.limpet_reminder
+        try:
+            from control.limpet_reminder import LimpetReminder
+            from navigation.voice import Narrator
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.limpet_reminder = LimpetReminder(self.bus, self.settings, narrator, lambda: self.state,
+                                                  lambda: self.journal_folder)
+            self.limpet_reminder.attach()
+        except Exception:
+            self.log.exception("The limpet reminder could not start")
+            self.limpet_reminder = None
+        return self.limpet_reminder
+
     def ensure_regions(self):
         """Announces the galaxy region you jump into (and the first time you are in it). Safe to call twice."""
         if getattr(self, "region_tracker", None) is not None:
@@ -665,6 +681,7 @@ class App:
         self.ensure_autohonk()
         self.bus.subscribe("NomadDocked", self.on_nomad_docked)
         self.ensure_combat_assist()
+        self.ensure_limpet_reminder()
         self.ensure_route()
         self.ensure_regions()
         poll = self.settings.get("journal.poll_seconds", 1.0)

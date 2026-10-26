@@ -8,7 +8,7 @@ from core.event_bus import NORMAL
 class Docked(BaseEvent):
     name = "Docked"
     priority = NORMAL
-    keep = ("StationName", "StationType", "StarSystem", "Wanted",)
+    keep = ("StationName", "StationType", "StarSystem", "Wanted", "StationServices",)
     summary = "Docked at {StationName} in {StarSystem}"
 
     def update_state(self, entry, state):

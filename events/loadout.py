@@ -16,6 +16,9 @@ class Loadout(BaseEvent):
         capacity = entry.get("FuelCapacity")
         if isinstance(capacity, dict) and isinstance(capacity.get("Main"), (int, float)):
             state.fuel_capacity = capacity["Main"]
+        mods = entry.get("Modules")
+        if isinstance(mods, list):
+            state.modules = [str(m.get("Item", "")) for m in mods if isinstance(m, dict)]
         cargo = entry.get("CargoCapacity")
         if isinstance(cargo, (int, float)):
             state.cargo_capacity = float(cargo)
