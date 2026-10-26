@@ -1,0 +1,85 @@
+{
+ "BioGuess": [
+  "{Signals} on {Body}. My guess is {Guess}, worth around {Worth} credits.",
+  "Life on {Body}: {Signals}. I'd say {Guess}. Roughly {Worth} credits.",
+  "{Body} has {Signals}. Going by the conditions, probably {Guess}. Maybe {Worth} credits.",
+  "I'm seeing {Signals} on {Body}. Best guess, {Guess}, around {Worth} credits.",
+  "{Signals} down on {Body}. It looks like {Guess} country. About {Worth} credits, if I'm right.",
+  "Ooh, {Body}. {Signals}. I'm guessing {Guess}, call it {Worth} credits."
+ ],
+ "BioGuess_Close": [
+  "{Body} has {Signals}, love. I think {Guess}, around {Worth} credits.",
+  "Life on {Body}, {Signals}. I'd guess {Guess}. Maybe {Worth} credits for you."
+ ],
+ "BioGuess_Sarcastic": [
+  "{Signals} on {Body}. I'll guess {Guess}. Around {Worth} credits. Don't hold me to it.",
+  "{Body}, {Signals}. Probably {Guess}, about {Worth} credits. I'm a genius, obviously."
+ ],
+ "BioGuess_Frustrated": [
+  "{Signals} on {Body}. Probably {Guess}. About {Worth} credits."
+ ],
+ "BioGuess_Upset": [
+  "{Signals} on {Body}. I think {Guess}. Around {Worth} credits."
+ ],
+ "BioGuess_Infatuated": [
+  "{Body} has {Signals}, and I think it's {Guess}! Around {Worth} credits. We'll be rich, Commander."
+ ],
+ "BioGuess_Unknown": [
+  "{Signals} on {Body}, but I can't work out what from the conditions.",
+  "{Body} has {Signals}. I have no idea what, I'm afraid. It's a surprise.",
+  "There's life on {Body}, {Signals}, and I can't guess what it is."
+ ],
+ "BioGuess_Unknown_Close": [
+  "{Body} has {Signals}, love, but I can't guess what. We'll have to look."
+ ],
+ "BioGuess_Unknown_Sarcastic": [
+  "{Signals} on {Body}. No idea what. Impressive, a planet that beats me."
+ ],
+ "BioTopHint": [
+  "You might find {Species} on {Body}. It might be worth a scan.",
+  "Commander, {Species} could be on {Body}. That's worth around {Worth} credits. Worth a scan.",
+  "Ooh, I think {Species} might be on {Body}. That's a valuable one. Worth a scan.",
+  "Conditions on {Body} fit {Species}. Worth around {Worth} credits. Might be worth a look.",
+  "{Species} is possible on {Body}, and it pays well. It might be worth a scan."
+ ],
+ "BioTopHint_Close": [
+  "Love, {Species} might be on {Body}. It might be worth a scan.",
+  "I think {Species} could be on {Body}, around {Worth} credits. Shall we look?"
+ ],
+ "BioTopHint_Sarcastic": [
+  "{Species} could be on {Body}. Worth {Worth} credits. I'm not saying go, I'm just saying it's money."
+ ],
+ "BioTopHint_Frustrated": [
+  "{Species} might be on {Body}. Worth a scan."
+ ],
+ "BioTopHint_Upset": [
+  "{Species} might be on {Body}. It's worth a scan, if you want."
+ ],
+ "BioTopHint_Infatuated": [
+  "{Species} might be on {Body}! About {Worth} credits! Let's go and find it, Commander."
+ ],
+ "BioRefined": [
+  "Surface scan done on {Body}. It's {Found}. I was right. Around {Worth} credits.",
+  "{Body} confirmed: {Found}. Worth around {Worth} credits.",
+  "The surface scan says {Found} on {Body}. Roughly {Worth} credits.",
+  "{Body} has {Found}. About {Worth} credits."
+ ],
+ "BioRefined_Close": [
+  "{Body} is {Found}, love. Around {Worth} credits."
+ ],
+ "BioRefined_Sarcastic": [
+  "{Found} on {Body}, just as I said. Around {Worth} credits. You're welcome."
+ ],
+ "BioRefined_Wrong": [
+  "Surface scan done on {Body}. It's {Found}, not what I guessed. Around {Worth} credits.",
+  "I was wrong about {Body}. It's {Found}. Around {Worth} credits.",
+  "{Body} turned out to be {Found}. I didn't see that coming. About {Worth} credits.",
+  "Well, I guessed wrong. {Body} has {Found}. Roughly {Worth} credits."
+ ],
+ "BioRefined_Wrong_Close": [
+  "I got {Body} wrong, love. It's {Found}. About {Worth} credits."
+ ],
+ "BioRefined_Wrong_Sarcastic": [
+  "{Found} on {Body}. Fine, I was wrong. Don't tell anyone. About {Worth} credits."
+ ]
+}

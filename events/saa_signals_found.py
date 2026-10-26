@@ -9,9 +9,18 @@ class SAASignalsFound(BaseEvent):
     name = "SAASignalsFound"
     priority = NORMAL
 
+    def update_state(self, entry, state):
+        self._refined = False
+        events = state.bio.note_saa(entry, state.system or "")
+        if events:
+            self._refined = True
+            state.pending_events.extend(events)
+
     def handle(self, entry):
         data = {"BodyName": entry.get("BodyName")}
         data.update(count_signals(entry.get("Signals")))
+        if getattr(self, "_refined", False):
+            data["_silent"] = True          # the corrected guess says it better
         return data
 
     def describe(self, data):

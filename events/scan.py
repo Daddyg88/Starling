@@ -12,6 +12,7 @@ class Scan(BaseEvent):
 
     def update_state(self, entry, state):
         state.exobiology.note_body(entry)
+        state.bio.note_scan(entry)
         name, gravity, kelvin = entry.get("BodyName"), entry.get("SurfaceGravity"), entry.get("SurfaceTemperature")
         if name and isinstance(gravity, (int, float)) and isinstance(kelvin, (int, float)):
             if len(state.bodies) > 400:

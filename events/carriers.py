@@ -52,6 +52,7 @@ class CarrierJump(BaseEvent):
 
     def update_state(self, entry, state):
         remember_carrier_visit(entry, state)
+        state.bio.set_system(entry.get("StarSystem") or state.system)
 
 
 class SquadronStartup(BaseEvent):

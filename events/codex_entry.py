@@ -13,6 +13,7 @@ class CodexEntry(BaseEvent):
 
     def update_state(self, entry, state):
         self._nsp = note_codex(entry, state)
+        state.bio.note_codex(entry)
 
     def handle(self, entry):
         data = super().handle(entry)

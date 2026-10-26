@@ -19,6 +19,7 @@ class FSDJump(BaseEvent):
 
     def update_state(self, entry, state):
         state.system = entry.get("StarSystem") or state.system
+        state.bio.set_system(state.system)          # forget the last system's planets
         state.wanted = bool(entry.get("Wanted", False))
         remember_system_facts(entry, state)
         state.docked = False

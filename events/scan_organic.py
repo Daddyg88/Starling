@@ -18,6 +18,7 @@ class ScanOrganic(BaseEvent):
     def update_state(self, entry, state):
         # Stash the extra facts on the entry so handle() can pass them on.
         entry["_exo"] = state.exobiology.on_scan_organic(entry)
+        state.bio.note_organic(entry)
 
     def handle(self, entry):
         data = super().handle(entry)

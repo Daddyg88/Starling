@@ -25,6 +25,7 @@ class Location(BaseEvent):
 
     def update_state(self, entry, state):
         state.system = entry.get("StarSystem") or state.system
+        state.bio.set_system(state.system)
         state.wanted = bool(entry.get("Wanted", False))
         remember_system_facts(entry, state)
         remember_star_pos(entry, state)

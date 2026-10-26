@@ -24,6 +24,7 @@ from personality.dialogue import DialogueManager
 from personality.speaker import EventSpeaker, load_rules
 from personality.voice_replies import VoiceReplies
 from journal.exobiology import ExobiologyTracker
+from journal.bio_predict import BioPredictor, BioCodex
 from tts.providers import build_providers
 from tts.speech_manager import SpeechManager
 
@@ -126,6 +127,7 @@ class App:
         # Game knowledge and event handling
         self.state = GameState()
         self.state.exobiology = ExobiologyTracker(paths.CONFIG_DIR / "exobiology_values.json", paths.DATA_DIR)
+        self.state.bio = BioPredictor(self.state.exobiology, BioCodex(paths.DATA_DIR / "bio_codex.json"), self.settings)
         self.registry = load_registry()
         self.processor = EventProcessor(self.bus, self.event_config, self.state, self.registry)
         if record_events:
@@ -544,6 +546,17 @@ class App:
             self.log.exception("The biology distance alert could not start")
             self.bio_distance = None
 
+    def start_bio_codex_scan(self):
+        """Once, in the background: reads your old journals to learn which species are already in your codex."""
+        try:
+            codex = self.state.bio.codex
+            if codex.history_done:
+                return
+            import threading
+            threading.Thread(target=codex.scan_history, args=(self.journal_folder,), name="bio-codex", daemon=True).start()
+        except Exception:
+            self.log.exception("The codex history scan could not start")
+
     def ensure_auto_shields(self):
         """Raises the suit shields when you draw a weapon or take damage on foot (dashboard setting, off by default)."""
         try:
@@ -705,6 +718,7 @@ class App:
         poll = self.settings.get("journal.poll_seconds", 1.0)
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
         self.ensure_bio_distance()
+        self.start_bio_codex_scan()
         self.ensure_auto_shields()
         self.monitor.start()
         return self.journal_folder

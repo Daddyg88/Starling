@@ -125,6 +125,11 @@ def _keys_for(event):
             return ["VehicleChanged_OnFoot"]
         return []
 
+    if name == "BioGuess":
+        return ["BioGuess_Unknown"] if data.get("Unknown") else ["BioGuess"]
+    if name == "BioRefined":
+        return ["BioRefined"] if data.get("Right") else ["BioRefined_Wrong"]
+
     if name in ("SAASignalsFound", "FSSBodySignals"):
         return ["%s_Biological" % name] if data.get("Biological") else [name]
 

@@ -30,7 +30,7 @@ DEFAULTS = {
     "facts": {"frequency": "sometimes", "topics": "all"},
     "ask": {"scan_prompts": True, "bio_prompts": True, "answer_seconds": 10},
     "plans": {"ask": True},
-    "exobiology": {"distance_alert": True, "distance_beep": True},
+    "exobiology": {"distance_alert": True, "distance_beep": True, "guess": True, "top_hint": True},
     "merit": {"power": "", "commodities": ["Platinum", "Osmium", "Painite", "Palladium"]},
     "engineers": {"neutron_over_ly": 1000},
     "guardian": {"auto_plot_key": True},
