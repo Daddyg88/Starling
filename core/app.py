@@ -581,6 +581,21 @@ class App:
             self.limpet_reminder = None
         return self.limpet_reminder
 
+    def ensure_material_fill(self):
+        """Says how full a material store is after you collect materials. Safe to call twice."""
+        if getattr(self, "material_fill", None) is not None:
+            return self.material_fill
+        try:
+            from control.material_fill import MaterialFill
+            from navigation.voice import Narrator
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.material_fill = MaterialFill(self.bus, self.settings, narrator, lambda: self.state)
+            self.material_fill.attach()
+        except Exception:
+            self.log.exception("The material callout could not start")
+            self.material_fill = None
+        return self.material_fill
+
     def ensure_regions(self):
         """Announces the galaxy region you jump into (and the first time you are in it). Safe to call twice."""
         if getattr(self, "region_tracker", None) is not None:
@@ -684,6 +699,7 @@ class App:
         self.bus.subscribe("NomadDocked", self.on_nomad_docked)
         self.ensure_combat_assist()
         self.ensure_limpet_reminder()
+        self.ensure_material_fill()
         self.ensure_route()
         self.ensure_regions()
         poll = self.settings.get("journal.poll_seconds", 1.0)

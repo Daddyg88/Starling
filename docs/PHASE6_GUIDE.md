@@ -784,3 +784,13 @@ Say "plot me a route to the nearest titan", "take me to Titan Thor" (or Cocijo, 
 - Switch: Navigation page "Titan routes: tell the Thargoid war story on the way".
 The Titans are in config/titans.json. All eight were destroyed in 3310: Taranis 2 March, Leigong 17 March, Oya April, Hadad 26 May, Indra 9 July, Thor August, Raijin 24 October, Cocijo 18 December (over Earth, after it moved from Col 285 Sector BA-P c6-18 to Sol).
 Honest limits: dates come from the Canonn memorial and the Elite wiki, which disagree by a day or a month for Oya and Thor, so those two are given as a month only. "Nearest" needs Spansh to give the systems' coordinates; if it does not, she asks you to name a Titan. The Titans are gone, so you are visiting the places where they were.
+
+## 0.49.2: how full are your material stores?
+After you pick up materials she says things like "you are 82 percent full on iron". Storage limits are 300 / 250 / 200 / 150 / 100 for grades 1 to 5 (raw materials stop at grade 4); every material's grade is in config/materials.json.
+So she does not nag:
+- She waits 4 seconds after the last pickup and treats everything you just collected as one batch, then says ONE line: the fullest material, the fullest two, or "several materials are filling up, the fullest is ...".
+- A material is only mentioned at 25 percent full or more (Exploration page box, 0 = all), and again only when it has grown by 10 more points. The same material at most every 2 minutes.
+- At least 25 seconds between lines, and at most 5 lines in any 10 minutes.
+- Hitting 100 percent is always said ("Iron is full"), once per material every 5 minutes.
+Switch: Exploration page "Tell me how full a material store is".
+Honest limits: she keeps the count from the game's "Materials" line at start-up plus every pickup, discard, synthesis, engineer upgrade, trade, technology broker and research hand-in. If she starts in the middle of a session the numbers may be a little off until the game writes the next "Materials" line (when you log in). The limits per grade are community knowledge (confirmed for grades 1, 2 and 5 in a Frontier forum post).

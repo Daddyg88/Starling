@@ -50,6 +50,7 @@ class GameState:
     power: Optional[str] = None                    # the Power you are pledged to (Powerplay events)
     squadron: Optional[str] = None                 # your squadron's name, if you are in one (SquadronStartup)
     hge_system: object = None       # the system she last called out High Grade Emissions in (once per system)
+    materials: dict = field(default_factory=dict)   # engineering materials held: {"iron": 120, ...} (journal/materials.py)
     pending_events: list = field(default_factory=list)   # (name, data) she should announce after this journal line
     gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     status_seen: bool = False               # True once Status.json has been read

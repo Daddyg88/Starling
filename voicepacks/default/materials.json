@@ -1,0 +1,22 @@
+{
+ "MaterialFill_One": [
+  "You are {Percent} percent full on {Material}.",
+  "{Material} is at {Percent} percent, Commander.",
+  "Your {Material} store is {Percent} percent full.",
+  "{Percent} percent full on {Material}."
+ ],
+ "MaterialFill_Two": [
+  "{Material} is {Percent} percent full, and {Material2} is {Percent2} percent.",
+  "You are {Percent} percent full on {Material} and {Percent2} percent on {Material2}.",
+  "Careful, Commander. {Material} at {Percent} percent, {Material2} at {Percent2}."
+ ],
+ "MaterialFill_Many": [
+  "Several materials are filling up. The fullest is {Material} at {Percent} percent.",
+  "{Count} of your materials are getting full. {Material} is the worst at {Percent} percent."
+ ],
+ "MaterialFill_Full": [
+  "{Material} is full, Commander. Anything more is wasted.",
+  "Your {Material} store is full. Don't bother collecting any more.",
+  "You're at the limit on {Material}. It's full."
+ ]
+}
