@@ -65,6 +65,12 @@ class MemoryStore:
             raise ValueError("unknown stat %r" % stat)
         self.db.execute("UPDATE lifetime_stats SET %s = %s + ? WHERE id = 1" % (stat, stat), (amount,))
 
+    def raise_stat(self, stat, value):
+        """Lifetime counters only ever go up: set it to `value` if that is more than it is now (used when she reads old journals)."""
+        if stat not in STATS:
+            raise ValueError("unknown stat %r" % stat)
+        self.db.execute("UPDATE lifetime_stats SET %s = MAX(%s, ?) WHERE id = 1" % (stat, stat), (value,))
+
     # ---- reading ----
     def stats(self):
         row = self.db.fetch_one("SELECT * FROM lifetime_stats WHERE id = 1")

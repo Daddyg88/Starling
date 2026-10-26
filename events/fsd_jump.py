@@ -29,6 +29,8 @@ class FSDJump(BaseEvent):
         remember_star_pos(entry, state)
         if str(state.fsd_target or "").casefold() == str(entry.get("StarSystem") or "").casefold():
             state.fsd_target = None            # we got there
+        if state.owned.has(entry.get("StarSystem")):
+            state.pending_events.append(("OwnSystemArrival", {"StarSystem": entry.get("StarSystem") or ""}))
         hint = likely_materials(entry)
         if hint:
             state.pending_events.append(("HighGradeHint", {"State": hint[0], "Materials": spoken_list(hint[1]),

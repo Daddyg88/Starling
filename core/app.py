@@ -25,6 +25,7 @@ from personality.speaker import EventSpeaker, load_rules
 from personality.voice_replies import VoiceReplies
 from journal.exobiology import ExobiologyTracker
 from journal.bio_predict import BioPredictor, BioCodex, BioLearned
+from journal.owned_systems import OwnedSystems
 from tts.providers import build_providers
 from tts.speech_manager import SpeechManager
 
@@ -127,6 +128,7 @@ class App:
         # Game knowledge and event handling
         self.state = GameState()
         self.state.exobiology = ExobiologyTracker(paths.CONFIG_DIR / "exobiology_values.json", paths.DATA_DIR)
+        self.state.owned = OwnedSystems(paths.DATA_DIR / "owned_systems.json")
         self.state.bio = BioPredictor(self.state.exobiology, BioCodex(paths.DATA_DIR / "bio_codex.json"), self.settings,
                                      learned=BioLearned(paths.DATA_DIR / "bio_learned.json"))
         self.registry = load_registry()
@@ -145,6 +147,8 @@ class App:
             from memory.keeper import MemoryKeeper
             self.memory_keeper = MemoryKeeper(self.bus, self.memory_store, self.settings, state_provider=lambda: self.state)
             self.memory_keeper.attach()
+            self.state.owned.on_claim = lambda name: self.memory_store.add(
+                "owned_system", "you claimed %s as your own system" % name, name, importance=3)
 
         self.bus.publish("app.started", {"session_id": self.session_id})
         self.log.info("%s online.", APP_NAME)
@@ -442,7 +446,8 @@ class App:
         bio = self.state.bio
         self.history_scan = HistoryScan(
             lambda: getattr(self, "journal_folder", None) or find_journal_folder(self.settings.get("journal.folder", "")),
-            bio.codex, bio.learned, self.state.exobiology, paths.DATA_DIR / "history_scan.json")
+            bio.codex, bio.learned, self.state.exobiology, paths.DATA_DIR / "history_scan.json",
+            store=self.memory_store, owned=self.state.owned)
         return self.history_scan
 
     def memory_text(self):

@@ -5,6 +5,7 @@ from typing import Optional
 
 from journal.exobiology import ExobiologyTracker
 from journal.bio_predict import BioPredictor
+from journal.owned_systems import OwnedSystems
 
 
 @dataclass
@@ -33,6 +34,7 @@ class GameState:
     system_population: Optional[int] = None
     exobiology: ExobiologyTracker = field(default_factory=ExobiologyTracker)   # replaced by a saving one in app.py
     bio: BioPredictor = field(default_factory=BioPredictor)   # guesses what lives on planets with biological signals (replaced in app.py)
+    owned: OwnedSystems = field(default_factory=OwnedSystems)   # colonies you own (replaced by a saving one in app.py)
     wanted: bool = False                    # the game says you are wanted where you are (notoriety)
     in_nomad: bool = False                  # the Nomad (a ship-launched vessel) is out; the game reports it as an SRV
     status_flags: int = 0                   # the raw "Flags" from Status.json (gear, lights...), used by voice commands

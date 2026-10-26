@@ -1,0 +1,26 @@
+{
+ "OwnSystemArrival": [
+  "Welcome back to {StarSystem}, Commander. Home sweet home.",
+  "{StarSystem}. Your system, Commander. It's good to be back.",
+  "We're in {StarSystem}, and it's yours. I do like it when you own the place.",
+  "Back in your own system, {StarSystem}. How does it feel to own a piece of the galaxy?",
+  "Welcome home, Commander. {StarSystem} is all yours."
+ ],
+ "OwnSystemArrival_Close": [
+  "Welcome home, love. {StarSystem} is ours, isn't it? I like it here.",
+  "Back at {StarSystem}, your very own system. I'm so proud of you."
+ ],
+ "OwnSystemArrival_Sarcastic": [
+  "Ah, {StarSystem}. Your little kingdom. Do try not to let it go to your head.",
+  "Welcome to {StarSystem}, Commander. Lord of all you survey. All of one system."
+ ],
+ "OwnSystemArrival_Frustrated": [
+  "{StarSystem}. Your system. Fine, it's nice."
+ ],
+ "OwnSystemArrival_Upset": [
+  "{StarSystem}. Your own system. I suppose you're proud of it."
+ ],
+ "OwnSystemArrival_Infatuated": [
+  "Welcome home, Commander! {StarSystem} is yours and I love it here with you."
+ ]
+}

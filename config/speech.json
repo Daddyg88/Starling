@@ -10,6 +10,7 @@
     "BioGuess": 3,
     "BioTopHint": 20,
     "BioRefined": 3,
+    "OwnSystemArrival": 120,
     "NSPNew": 2,
     "NSPSeen": 8,
     "NSPInSystem": 30,

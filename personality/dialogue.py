@@ -111,6 +111,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "ships.json"))         # ship comments, favourite ship, welcome home
             self._merge(_read_json(self.pack_dir / "callouts.json"))      # glide, scoopable star, undiscovered system, jumps left
             self._merge(_read_json(self.pack_dir / "exobiology.json"))    # guesses what lives on a planet and what it is worth
+            self._merge(_read_json(self.pack_dir / "colony.json"))        # welcome home to systems you own
             self._merge(_read_json(self.pack_dir / "nsp.json"))           # notable stellar phenomena (Lagrange clouds, molluscs, crystals...)
             self._merge(_read_json(self.pack_dir / "materials.json"))     # "you are 82 percent full on iron"
             self._merge(_read_json(self.pack_dir / "titans.json"))        # Thargoid Titans: routes, war story, how each one fell
