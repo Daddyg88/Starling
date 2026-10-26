@@ -829,3 +829,12 @@ Honest limits: I could not run this on a real screen (the machine I build on has
 - So the more planets you surface scan, the closer her guesses get. It only learns from planets whose own scan she saw. Delete data/bio_learned.json to make her forget.
 - Honest limits: it learns from your own scans only, a single odd planet can widen a genus' envelope (a lot of scans smooths that out), and "wrong" only means the genera differed, the species is not checked.
 - LICENSE: Starling is free to use, copy and change for personal, non-commercial use (including streaming), not to be sold; the file also lists the third-party credits (EDEXO data, CC BY-NC-SA 3.0, in config/bio_rules.json, and Frontier's game). I am not a lawyer; if the licence matters to you, have the text checked, or tell me which licence you want instead (MIT, GPL, PolyForm Noncommercial...).
+
+## 0.54.0: learn from all my old journals
+Memory page, button "Learn from all my old journals". She reads every Journal*.log in your Elite journal folder, one after another, in the background (you can keep playing and streaming; she pauses between files and reads line by line, so memory use stays tiny). The note at the bottom of the window shows "Reading journals: 12 of 340" and, when done, she says she has finished.
+What she learns:
+- Which biological species are in your codex (the white flags on the overlay) and which you have finished sampling.
+- The real prices from every biological data sale you ever made (later sales win), so value guesses are exact for those species.
+- Every surface scan you ever did: which genera were really on which kind of planet, so her exobiology guesses improve (same learning as 0.53.0).
+Nothing is spoken while she reads and nothing leaves your computer. Run it again any time: each planet is counted once, so it only adds what is new. A short summary is saved in data/history_scan.json.
+Honest limits: it only reads the journal files that still exist in the folder (Elite keeps old ones unless you delete them). A very big history can take several minutes. It does not touch the hours-together or milestone memories (those start from when she first ran); say if you want her to rebuild those from the journals too, or to learn other things (favourite ships, systems visited, first discoveries).

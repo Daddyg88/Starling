@@ -91,5 +91,16 @@
   "Biology list is back.",
   "There it is.",
   "Showing the biology list."
+ ],
+ "HistoryLearned": [
+  "Finished reading your journals. I know {Species} species in your codex now, and I've learned from your past, Commander.",
+  "All done. {Journals} journals read, and I know your codex a lot better now.",
+  "I've read your whole history, {Journals} journals. I feel like I know you properly now."
+ ],
+ "HistoryLearned_Sarcastic": [
+  "Finished your journals. {Species} codex species. You've been busy, haven't you."
+ ],
+ "HistoryLearned_Close": [
+  "I've read all your journals, love. {Species} species in your codex. I'm proud of you."
  ]
 }

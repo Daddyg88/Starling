@@ -724,6 +724,8 @@ class Dashboard:
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
+        if page.id == "memory":
+            extra.append(("Learn from all my old journals", self.learn_from_journals))
         if page.id == "exobiology":
             extra.append(("Show a test biology list for 10 seconds", self.test_bio_overlay))
         if page.id == "listening":
@@ -978,6 +980,28 @@ class Dashboard:
 
     def show_memories(self):
         self._controls_result(self.app.memory_text(), T.GOOD)
+
+    def learn_from_journals(self):
+        """Starts the one-off read of every old journal file, then keeps the screen note up to date until it is done."""
+        try:
+            scan = self.app.ensure_history_scan()
+            self._controls_result(scan.start(), T.GOOD)
+            self._poll_history(scan)
+        except Exception:
+            log.exception("The journal reader could not start")
+            self._controls_result("The journal reader could not start (details are in the log).", T.WARN)
+
+    def _poll_history(self, scan):
+        self._controls_result(scan.status(), T.GOOD if not scan.running else T.WARN)
+        if scan.running:
+            self.root.after(1500, lambda: self._poll_history(scan))
+        else:
+            try:
+                from navigation.voice import Narrator
+                Narrator(lambda: self.app.speech, lambda: self.app.dialogue, self.app.settings).say(
+                    "HistoryLearned", {"Species": scan.summary.get("species_total", 0), "Journals": scan.summary.get("journals", 0)})
+            except Exception:
+                log.exception("Could not say that the journals were read")
 
     def forget_memories(self):
         from tkinter import messagebox

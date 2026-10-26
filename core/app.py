@@ -434,6 +434,17 @@ class App:
                              name="auto-plot", daemon=True).start()
         follower.auto_plot = go
 
+    def ensure_history_scan(self):
+        """Reads all your old journals once so she learns your codex, real prices and what lives where. Safe to call twice."""
+        if getattr(self, "history_scan", None) is not None:
+            return self.history_scan
+        from journal.history_scan import HistoryScan
+        bio = self.state.bio
+        self.history_scan = HistoryScan(
+            lambda: getattr(self, "journal_folder", None) or find_journal_folder(self.settings.get("journal.folder", "")),
+            bio.codex, bio.learned, self.state.exobiology, paths.DATA_DIR / "history_scan.json")
+        return self.history_scan
+
     def memory_text(self):
         """Everything she remembers, as plain text for the Memory page."""
         store = self.memory_store
