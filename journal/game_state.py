@@ -51,6 +51,8 @@ class GameState:
     squadron: Optional[str] = None                 # your squadron's name, if you are in one (SquadronStartup)
     hge_system: object = None       # the system she last called out High Grade Emissions in (once per system)
     materials: dict = field(default_factory=dict)   # engineering materials held: {"iron": 120, ...} (journal/materials.py)
+    nsp_seen: set = field(default_factory=set)   # names of notable stellar phenomena she already told you about this session
+    nsp_system: object = None        # the system she last said "there is an NSP here" in
     pending_events: list = field(default_factory=list)   # (name, data) she should announce after this journal line
     gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     status_seen: bool = False               # True once Status.json has been read

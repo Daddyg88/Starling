@@ -50,6 +50,8 @@
     {"id": "organic_done", "label": "Finishing a biological sample", "event": "ScanOrganic", "delta": 1, "category": "exo_samples", "when": {"field": "Complete", "is": true}},
     {"id": "all_bodies", "label": "Finding every body in a system", "event": "FSSAllBodiesFound", "delta": 1, "category": "discovery"},
     {"id": "mapped", "label": "Mapping a body", "event": "SAAScanComplete", "delta": 1, "category": "discovery"},
+    {"id": "nsp_new", "label": "Finding a NEW notable stellar phenomenon (she loves it)", "event": "NSPNew", "delta": 3, "category": "nsp_new"},
+    {"id": "nsp_seen", "label": "Scanning a notable stellar phenomenon you have seen before", "event": "NSPSeen", "delta": 1, "category": "nsp_seen"},
     {"id": "codex", "label": "New codex entry", "event": "CodexEntry", "delta": 1, "category": "codex", "when": {"field": "IsNewEntry", "is": true}},
     {"id": "engineer", "label": "Engineer progress", "event": "EngineerProgress", "delta": 1, "category": "engineer", "when": {"field": "Engineer", "exists": true}},
     {"id": "fact_yes", "label": "Wanted to hear a fact", "event": "ask.fact_yes", "delta": 1, "category": "ask_fact_yes"},

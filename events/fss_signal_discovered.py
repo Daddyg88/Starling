@@ -3,6 +3,7 @@
 import re
 
 from events.base_event import BaseEvent
+from events.nsp import is_nsp_signal, note_signal
 from core.event_bus import LOW, NORMAL
 from core.logger import get_logger
 
@@ -26,12 +27,13 @@ class FSSSignalDiscovered(BaseEvent):
 
     def handle(self, entry):
         data = super().handle(entry)
-        if is_high_grade(entry):
+        if is_high_grade(entry) or is_nsp_signal(entry):
             data["_silent"] = True                        # the High Grade Emissions callout replaces "signal detected"
         return data
 
     def update_state(self, entry, state):
-        if not str(entry.get("SignalName", "")).lower().startswith("$uss") and not entry.get("USSType"):
+        note_signal(entry, state)
+        if not str(entry.get("SignalName", "")).lower().startswith(("$uss", "$fixed_event")) and not entry.get("USSType"):
             return
         log.info("FSS signal: %s / %s / %s", entry.get("SignalName"), entry.get("SignalName_Localised"), entry.get("USSType"))
         if not is_high_grade(entry):

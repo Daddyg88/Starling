@@ -1,0 +1,245 @@
+{
+ "_help": "Notable Stellar Phenomena (NSP) types: 'match' words must ALL appear in the codex entry name (lower case); more specific entries come first. 'fact' is the little description she says when you scan one. Add 'Name' variants freely: she says the full codex name too.",
+ "types": [
+  {
+   "key": "lagrange_storm",
+   "name": "Lagrange storm cloud",
+   "match": [
+    "lagrange",
+    "storm"
+   ],
+   "fact": "A Lagrange storm cloud is a Lagrange cloud with an electrical storm inside it. Some clouds react when you scan them or switch your lights on, so be careful."
+  },
+  {
+   "key": "lagrange",
+   "name": "Lagrange cloud",
+   "match": [
+    "lagrange"
+   ],
+   "fact": "A Lagrange cloud is a dense accumulation of gas fixed in place at a Lagrange point. There are thirteen known types, with Latin colour names like caeruleum for blue, roseum for rose and viride for green, and they can hide molluscs, crystals and spheres inside."
+  },
+  {
+   "key": "ice_crystal",
+   "name": "Ice crystal",
+   "match": [
+    "ice",
+    "crystal"
+   ],
+   "fact": "Ice crystals are named for looking like icicles, and they are grown by colonies of spacefaring microorganisms. They are bitterly cold, so raise your heating when you go near."
+  },
+  {
+   "key": "calcite_plate",
+   "name": "Calcite plate",
+   "match": [
+    "calcite"
+   ],
+   "fact": "Calcite is a form of calcium carbonate, the same stuff as chalk and limestone. This one is a flat plate of it, floating in the cloud."
+  },
+  {
+   "key": "metallic_crystal",
+   "name": "Metallic crystal",
+   "match": [
+    "metallic",
+    "crystal"
+   ],
+   "fact": "Metallic crystals are one of several kinds of crystal found in these phenomena, and one cloud can hold more than one kind."
+  },
+  {
+   "key": "silicate_crystal",
+   "name": "Silicate crystal",
+   "match": [
+    "silicate",
+    "crystal"
+   ],
+   "fact": "Silicates are the most common minerals in rock, and this is a crystal of one, grown in open space."
+  },
+  {
+   "key": "lattice_sphere",
+   "name": "Lattice mineral sphere",
+   "match": [
+    "lattice"
+   ],
+   "fact": "A lattice mineral sphere is a ball of mineral built like a latticework. They have been found drifting in the mist of an asteroid belt."
+  },
+  {
+   "key": "solid_sphere",
+   "name": "Solid mineral sphere",
+   "match": [
+    "solid",
+    "mineral"
+   ],
+   "fact": "A solid mineral sphere is exactly that, a smooth ball of mineral with no lattice, drifting in the cloud."
+  },
+  {
+   "key": "bell_mollusc",
+   "name": "Bell mollusc",
+   "match": [
+    "bell",
+    "mollusc"
+   ],
+   "fact": "Bell molluscs are named for their bell-shaped shell. They make energy from starlight with their tentacles, a bit like photosynthesis. Scan one with the data link scanner and it puffs out green gas and drifts towards you, but shoot it and it runs."
+  },
+  {
+   "key": "bulb_mollusc",
+   "name": "Bulb mollusc",
+   "match": [
+    "bulb",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. The bulb mollusc is named for its bulb shape."
+  },
+  {
+   "key": "bullet_mollusc",
+   "name": "Bullet mollusc",
+   "match": [
+    "bullet",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. Bullet molluscs have been seen reacting to a ship's shields, so don't be surprised if they notice you."
+  },
+  {
+   "key": "capsule_mollusc",
+   "name": "Capsule mollusc",
+   "match": [
+    "capsule",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. The capsule mollusc is named for its capsule shape."
+  },
+  {
+   "key": "globe_mollusc",
+   "name": "Globe mollusc",
+   "match": [
+    "globe",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. The globe mollusc is round, as the name suggests."
+  },
+  {
+   "key": "gourd_mollusc",
+   "name": "Gourd mollusc",
+   "match": [
+    "gourd",
+    "mollusc"
+   ],
+   "fact": "Gourd molluscs are tiny. They can show up on your radar as flickering dots with nothing in sight, and one kind has been reported to howl when hit with a burst of energy."
+  },
+  {
+   "key": "parasol_mollusc",
+   "name": "Parasol mollusc",
+   "match": [
+    "parasol",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. The parasol mollusc is shaped like a sunshade."
+  },
+  {
+   "key": "reel_mollusc",
+   "name": "Reel mollusc",
+   "match": [
+    "reel",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. The reel mollusc is shaped like a spool."
+  },
+  {
+   "key": "squid_mollusc",
+   "name": "Squid mollusc",
+   "match": [
+    "squid",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. The squid mollusc is named for its trailing tentacles."
+  },
+  {
+   "key": "torus_mollusc",
+   "name": "Torus mollusc",
+   "match": [
+    "torus",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. A torus is a doughnut shape, and that is the shape of this one."
+  },
+  {
+   "key": "umbrella_mollusc",
+   "name": "Umbrella mollusc",
+   "match": [
+    "umbrella",
+    "mollusc"
+   ],
+   "fact": "Molluscs are non-sapient creatures that live in space and make a living from starlight. The umbrella mollusc is shaped like an umbrella."
+  },
+  {
+   "key": "aster_pod",
+   "name": "Aster pod",
+   "match": [
+    "aster"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. Aster means star, so expect something star shaped."
+  },
+  {
+   "key": "chalice_pod",
+   "name": "Chalice pod",
+   "match": [
+    "chalice"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. A chalice is a cup, and this pod is shaped like one."
+  },
+  {
+   "key": "collared_pod",
+   "name": "Collared pod",
+   "match": [
+    "collared"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. Fire a research limpet at a collared pod and you can collect different kinds of pod tissue."
+  },
+  {
+   "key": "gyre_tree",
+   "name": "Gyre tree",
+   "match": [
+    "gyre"
+   ],
+   "fact": "A gyre tree is a big plant-like structure with a central core and twelve limbs. Every limb forks in two, and each fork ends in a gyre pod. The codex once mislabelled it as a stolon pod."
+  },
+  {
+   "key": "octahedral_pod",
+   "name": "Octahedral pod",
+   "match": [
+    "octahedral"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. Octahedral means eight faces, like two pyramids glued together."
+  },
+  {
+   "key": "peduncle_pod",
+   "name": "Peduncle pod",
+   "match": [
+    "peduncle"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. A peduncle is a flower stalk, and this plant grows on one."
+  },
+  {
+   "key": "quadripartite_pod",
+   "name": "Quadripartite pod",
+   "match": [
+    "quadripartite"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. Quadripartite means made of four parts, which is quite a mouthful for a pod."
+  },
+  {
+   "key": "rhizome_pod",
+   "name": "Rhizome pod",
+   "match": [
+    "rhizome"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. A rhizome is a root-like stem that spreads sideways."
+  },
+  {
+   "key": "stolon_pod",
+   "name": "Stolon pod",
+   "match": [
+    "stolon"
+   ],
+   "fact": "Seed pods and trees grow inside these phenomena. A stolon is a creeping stem that sends out new plants."
+  }
+ ]
+}

@@ -794,3 +794,10 @@ So she does not nag:
 - Hitting 100 percent is always said ("Iron is full"), once per material every 5 minutes.
 Switch: Exploration page "Tell me how full a material store is".
 Honest limits: she keeps the count from the game's "Materials" line at start-up plus every pickup, discard, synthesis, engineer upgrade, trade, technology broker and research hand-in. If she starts in the middle of a session the numbers may be a little off until the game writes the next "Materials" line (when you log in). The limits per grade are community knowledge (confirmed for grades 1, 2 and 5 in a Frontier forum post).
+
+## 0.50.0: Notable Stellar Phenomena (NSP)
+NSPs are the clouds at Lagrange points (and in rings) that hold molluscs, pods and trees, crystals and mineral spheres. She knows 28 kinds (config/nsp.json: 1 Lagrange cloud, 1 storm cloud, 6 mineral kinds, 11 molluscs, 9 pods and trees).
+- Scan one with the composition scanner: the game writes a codex entry and she says what it is, with a small fact. If the entry is NEW to your codex she is delighted (+3 mood, own mood category); if you have seen it before she is pleased (+1). She comments on the colours, even when it is plain white. The same already-seen kind is mentioned once per session so a cloud full of molluscs does not become a lecture.
+- When the system scanner (FSS) finds an NSP signal she tells you, once per system.
+- Switch: the Exploration "She comments on exploration" box covers all of it.
+Honest limits: she can only say "new" when the codex entry says so (IsNewEntry). The game does not say whether anyone else has found it, so "new" means new to YOUR codex. The FSS signal name for an NSP is not in any source I could open ("$Fixed_Event_Life_Cloud;" is my best knowledge); every "$Fixed_Event..." signal is written to the log as "FSS signal: ...", so if she never announces one, send me those lines. Honking alone does not list the signals, only opening the FSS does. The facts for the plainly shaped molluscs and pods are mostly the meaning of the name: nobody has documented more than that online.

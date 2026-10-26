@@ -3,7 +3,7 @@
   "combat": ["Bounty", "FactionKillBond", "CapShipBond", "PVPKill", "ShipTargeted", "Interdiction", "EscapeInterdiction", "CombatModeOn",
              "HardpointsDeployed", "HardpointsRetracted", "FighterDestroyed", "FighterRebuilt", "LaunchFighter", "DockFighter",
              "WingInvite", "WingAdd", "WingJoined", "WingLeft", "CommitCrime", "PayFines", "PayBounties", "RedeemVoucher"],
-  "exploration": ["FSSDiscoveryScan", "FSSSignalDiscovered", "HighGradeEmissions", "HighGradeHint", "FSSAllBodiesFound", "FSSBodySignals", "DiscoveryScan", "Scan", "UndiscoveredSystem", "JumpsLeft",
+  "exploration": ["FSSDiscoveryScan", "FSSSignalDiscovered", "HighGradeEmissions", "HighGradeHint", "NSPNew", "NSPSeen", "NSPInSystem", "FSSAllBodiesFound", "FSSBodySignals", "DiscoveryScan", "Scan", "UndiscoveredSystem", "JumpsLeft",
                   "SAAScanComplete", "SAASignalsFound", "CodexEntry", "SellExplorationData", "MultiSellExplorationData",
                   "FuelScoop", "FuelScoopComplete", "JetConeBoost", "MaterialCollected", "AnalysisModeOn"],
   "exobiology": ["ScanOrganic", "SellOrganicData"],

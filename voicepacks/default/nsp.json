@@ -1,0 +1,65 @@
+{
+ "NSPNew": [
+  "A brand new codex entry, and it's a notable stellar phenomenon! {Name}.||{Fact}",
+  "Oh, {Name}! That's new to the codex. I love a new one.||{Fact}",
+  "Commander, look at that colour! Well, it might be white, but it's the loveliest white I have ever seen. {Name}, and it's new.||{Fact}",
+  "A new {Name} for the codex. Pretty, isn't it? Even if it's plain.||{Fact}",
+  "Something nobody in your codex has seen before: {Name}. I'm thrilled.||{Fact}",
+  "New phenomenon, new codex entry, and I'm very happy. It's {Name}.||{Fact}",
+  "Ooh, shiny. Well, it's a bit dull, but I'm calling it shiny. {Name}, a new one.||{Fact}",
+  "That's {Name}, and it's a first for you. Frame it.||{Fact}",
+  "Finally, something beautiful. {Name}, brand new in the codex.||{Fact}",
+  "I'm not going to say I'm excited. I'm excited. {Name}, and it's new.||{Fact}"
+ ],
+ "NSPNew_Close": [
+  "Oh, love, {Name}, and it's new! You've made my day.||{Fact}",
+  "A new one for the codex, and I got to see it with you. {Name}.||{Fact}"
+ ],
+ "NSPNew_Sarcastic": [
+  "Well, well. A new {Name}. Fine, I'll admit it, that's actually good.||{Fact}",
+  "{Name}, new to the codex. Don't let it go to your head.||{Fact}"
+ ],
+ "NSPNew_Frustrated": [
+  "A new {Name}. Even I can't stay grumpy about that.||{Fact}"
+ ],
+ "NSPNew_Upset": [
+  "A new {Name}. Fine. It's lovely. I'm still cross with you, though.||{Fact}"
+ ],
+ "NSPNew_Infatuated": [
+  "{Name}! A new one, and you found it! You clever, clever Commander.||{Fact}"
+ ],
+ "NSPSeen": [
+  "{Name} again. I never get bored of these.||{Fact}",
+  "Another {Name}. Look at the colours. Even if it's just white, it's a pretty white.",
+  "{Name}. Not new, but still lovely.||{Fact}",
+  "Ah, a {Name}. An old friend.",
+  "Another notable stellar phenomenon. {Name}. I could look at these all day.",
+  "{Name}, scanned. It's not a first, but I still like it.||{Fact}",
+  "There it is, {Name}. Isn't space pretty when it tries?",
+  "{Name} again. Still plain, still lovely."
+ ],
+ "NSPSeen_Close": [
+  "{Name} again. Beautiful. Just like old times, Commander."
+ ],
+ "NSPSeen_Sarcastic": [
+  "{Name}. Seen it. It's still nice, though, I'll give it that."
+ ],
+ "NSPSeen_Frustrated": [
+  "{Name}. At least it's something pretty to look at."
+ ],
+ "NSPInSystem": [
+  "Commander, there's a notable stellar phenomenon in this system. Go and look, it'll be pretty.",
+  "The scanner shows a notable stellar phenomenon here. Shall we go and see what's in it?",
+  "There's a Lagrange cloud, or something like it, in this system. I do love those.",
+  "Something notable is hiding in this system. I'd like a closer look, please.",
+  "A notable stellar phenomenon, right here. Colours, creatures, crystals. Please can we go?",
+  "Detour time. There's a notable stellar phenomenon in this system.",
+  "I've found a notable stellar phenomenon on the scanner. Check the navigation panel and let's go and see."
+ ],
+ "NSPInSystem_Close": [
+  "Commander, I've found a notable stellar phenomenon here. Come on, take me to see it, please."
+ ],
+ "NSPInSystem_Sarcastic": [
+  "There's a notable stellar phenomenon in this system. I assume you'll want to look at it. I do."
+ ]
+}
