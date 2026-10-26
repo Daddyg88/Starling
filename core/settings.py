@@ -50,7 +50,7 @@ DEFAULTS = {
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True},
     "talk": {"combat": True, "exploration": True, "exobiology": True, "mining": True, "trading": True, "antixeno": True},
-    "mining": {"prices": True, "merit": True, "limpet_reminder": True, "chatter": "normal",
+    "mining": {"prices": True, "merit": True, "limpet_reminder": True, "destination_reminder": True, "chatter": "normal",
                "fav1": "platinum", "fav2": "painite", "fav3": "opal", "fav4": "lowtemperaturediamond", "fav5": "monazite",
                "fav6": "musgravite", "fav7": "serendibite", "fav8": "grandidierite", "fav9": "alexandrite", "fav10": "rhodplumsite"},
     "chitchat": {"enabled": True, "frequency": "normal"},

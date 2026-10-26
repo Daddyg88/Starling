@@ -1,4 +1,14 @@
 {
+ "Sell_Arrived": [
+  "We're here, Commander. You're heading for||{Station}.",
+  "{System}. Just so you don't forget, it's||{Station}.",
+  "Welcome to {System}. Your station is||{Station}.",
+  "This is the system. Now find||{Station}.",
+  "Right system, Commander. The station you want is||{Station}.",
+  "Arrived. Remember, it's||{Station}.",
+  "{System} at last. Head for||{Station}.",
+  "Destination system reached. Station:||{Station}."
+ ],
  "Sell_Options": [
   "I found two places for your {Material}.||The first one pays {Price} credits a tonne for up to {Tons} tons, at||{Station}||in {System}.||The second one pays {Price2} credits a tonne for up to {Tons2} tons, at||{Station2}||in {System2}.",
   "Two good buyers for {Material}, Commander.||A: {Price} credits a tonne, {Tons} tons wanted, at||{Station}||in {System}.||B: {Price2} credits a tonne, {Tons2} tons wanted, at||{Station2}||in {System2}.",

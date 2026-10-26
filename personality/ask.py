@@ -71,6 +71,7 @@ class AskManager:
         self.declines = 0                   # fact offers turned down or ignored in a row
         self._plan_asked = False            # 'What are we doing today?' is asked once per login
         self._midgame_tries = 0
+        self.destination = None             # {"system", "station"} she plotted a route to; she names the station on arrival
         self.today = None                   # the activity you chose today (exploring, mining, ...)
 
     # ---- wiring ----
@@ -134,6 +135,7 @@ class AskManager:
             elif name == "LoadGame":
                 self._logged_in()
             elif name == "FSDJump":
+                self._reached_destination(event.data)
                 self._arrived()
             elif name == "StartJump":
                 self._cancel_timer("arrival")
@@ -457,9 +459,23 @@ class AskManager:
                 values["Reason"] = reason or "the galaxy map macro is not available"
                 self._say(self._line("Sell_RouteOff", values), "ask.reply")
                 return
+            if option.get("system") and option.get("station"):
+                self.destination = {"system": str(option["system"]), "station": str(option["station"])}
             self._say(self._line("Sell_RouteYes", values), "ask.reply")
         elif answer == "no":
             self._say(self._line("Sell_RouteNo", values), "ask.reply")
+
+    def _reached_destination(self, data):
+        """You jumped into the system she plotted a route to (selling, buying or merit mining): she names the station."""
+        goal = self.destination
+        if not goal or not self.settings.get("mining.destination_reminder", True):
+            return
+        arrived = str((data or {}).get("StarSystem") or "").strip().lower()
+        if arrived and arrived == goal["system"].strip().lower():
+            self.destination = None
+            text = self._line("Sell_Arrived", {"Station": goal["station"], "System": goal["system"]})
+            if text:
+                self._say(text, "ask.reply")
 
     def _finish_fact(self, answer):
         if answer == "yes":

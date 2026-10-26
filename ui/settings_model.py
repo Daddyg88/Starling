@@ -287,6 +287,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Looks on Spansh for a system your Power controls with a pristine metallic ring and a station wanting 2000+ tonnes, then asks 'the first one or the second one?' and plots the route"),
             Field("merit.power", "Your Power for merit mining", "choice", MERIT_POWERS,
                   help="Leave on 'From the game' and she reads it from the journal when you load the game while pledged"),
+            Field("mining.destination_reminder", "Tell me the station when I reach the system she plotted", "toggle",
+                  help="After she plots a route for selling, buying or merit mining, she names the station when you jump into that system"),
             Field("mining.limpet_reminder", "Remind me to buy limpets when I dock", "toggle",
                   help="Only if the ship you are flying has a refinery, a collector limpet controller and cargo racks, and you carry fewer than 100 limpets"),
             Field("mining.chatter", "How chatty she is while you refine", "choice", MINING_CHATTER,

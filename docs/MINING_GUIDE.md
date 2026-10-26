@@ -88,3 +88,6 @@ Buying now works like selling: the first one and the second one (price, tons in 
 ## Limpet reminder (0.48.3)
 When you dock at a station with a market, she reminds you to buy limpets, but only if the ship you are flying RIGHT NOW has all three: a refinery, a collector limpet controller and cargo racks (any size). She reads this from the game's Loadout, so changing ship or modules is picked up by itself. She stays quiet if you already carry 100 or more limpets, or the station has no commodity market. Switch: Mining page > "Remind me to buy limpets when I dock".
 Honest limit: the module names were written from the journal manual, not tested in your game. If she never reminds you, send me the log and a line from your Loadout.
+
+## Station reminder on arrival (0.48.5)
+After you say yes to "would you like me to plot a route?" (selling, buying or merit mining), she remembers the station. When you jump into that system she says its name ("Welcome to ..., your station is ..."), once. Switch: Mining page > "Tell me the station when I reach the system she plotted". She forgets it when Starling closes, and a new route replaces the old one.

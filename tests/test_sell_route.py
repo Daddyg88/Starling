@@ -180,3 +180,36 @@ class SellFlowTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ArrivalTests(unittest.TestCase):
+    def plotted(self):
+        r = SellFlowTests.make(SellFlowTests(), FakeRoute())
+        r.ask.offer_sale("Platinum", OPTIONS)
+        r.finish_question()
+        r.say("the 1st one please")
+        r.finish_question()
+        r.say("yes")
+        return r
+
+    def jump(self, r, system):
+        from core.event_bus import Event
+        r.ask.on_event(Event("FSDJump", {"StarSystem": system}))
+
+    def test_she_names_the_station_in_the_plotted_system_once(self):
+        r = self.plotted()
+        before = len(r.speech.said)
+        self.jump(r, "Some Other System")
+        self.assertFalse(any("Smith Port" in s["text"] for s in r.speech.said[before:]))
+        self.jump(r, "Wregoe JU-E c25-18")
+        self.assertTrue(any("Smith Port" in s["text"] for s in r.speech.said[before:]))
+        count = sum("Smith Port" in s["text"] for s in r.speech.said)
+        self.jump(r, "Wregoe JU-E c25-18")
+        self.assertEqual(sum("Smith Port" in s["text"] for s in r.speech.said), count)
+
+    def test_switch_off_keeps_her_quiet(self):
+        r = self.plotted()
+        r.settings.set("mining.destination_reminder", False)
+        before = len(r.speech.said)
+        self.jump(r, "Wregoe JU-E c25-18")
+        self.assertFalse(any("Smith Port" in s["text"] for s in r.speech.said[before:]))
