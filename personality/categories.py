@@ -55,6 +55,12 @@ def allowed(event, settings):
     """False when the event's tab has "She comments on ..." switched off. Critical events are always allowed."""
     if getattr(event, "priority", "") == "critical":
         return True
+    if event.name == "HighGradeHint":
+        try:
+            if not settings.get("exploration.hge_hint", True):
+                return False
+        except Exception:
+            pass
     tab = category_of(event.name, event.data or {})
     if tab is None:
         return True

@@ -1,4 +1,12 @@
 {
+ "HighGradeHint": [
+  "{StarSystem} is in {State}. {Materials} are likely in the high grade emissions here.",
+  "This system is in {State}, Commander. High grade emissions here should give {Materials}.",
+  "{State} in {StarSystem}. If you find high grade emissions, expect {Materials}.",
+  "Note for later: {State} systems tend to drop {Materials} from high grade emissions.",
+  "Good news for material hunters. {State} here means {Materials} are likely.",
+  "{State}. That usually means {Materials} from high grade emissions, Commander."
+ ],
  "HighGradeEmissions": [
   "High grade emissions in this system, Commander. Worth a look for materials.",
   "The scanner shows a high grade emissions source here. That could be good materials.",

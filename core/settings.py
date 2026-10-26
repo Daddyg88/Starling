@@ -49,6 +49,7 @@ DEFAULTS = {
     "commands": {"enabled": True, "confirm": True, "require_game_focus": True, "key_hold": 0.06, "disabled": []},
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True},
+    "exploration": {"hge_hint": True},
     "talk": {"combat": True, "exploration": True, "exobiology": True, "mining": True, "trading": True, "antixeno": True},
     "mining": {"prices": True, "merit": True, "limpet_reminder": True, "destination_reminder": True, "chatter": "normal",
                "fav1": "platinum", "fav2": "painite", "fav3": "opal", "fav4": "lowtemperaturediamond", "fav5": "monazite",

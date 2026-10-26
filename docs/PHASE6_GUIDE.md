@@ -755,3 +755,13 @@ Run "prepare her voice" once after this update so the reworded lines are ready.
 ## 0.48.6: High Grade Emissions callout
 When the full spectrum scanner (FSS) finds a High Grade Emissions signal source she says so, once per system, instead of the plain "signal detected". It follows the Exploration "She comments on exploration" switch.
 Honest limit: the signal name was written from the journal manual. Every USS signal she sees in the FSS is written to the log ("FSS signal: ..."); if she never calls one out, send me those log lines and I will fix the name she looks for.
+
+## 0.48.7: which High Grade Emissions materials a system is likely to give
+On arrival she looks at the faction that controls the system (allegiance and state) and, when it matches the table, says what to expect. The table lives in journal/hge_states.py:
+- Independent or Alliance, Boom or Expansion: Proto Heat Radiators, Proto Light Alloys, Proto Radiolic Alloys
+- Empire, no state / Election / Boom / Expansion / Investment: Imperial Shielding
+- Federation, no state / Election: Core Dynamics Composites, Proprietary Composites
+- War or Civil War (any allegiance): Military Grade Alloys, Military Supercapacitors
+- Civil Unrest: Improvised Components, Military Grade Alloys. Outbreak: Pharmaceutical Isolators
+War, unrest and outbreak win over the allegiance rows. Switch: Exploration page "Tell me which High Grade Emissions materials a system is likely to give".
+Honest limits: the table is community knowledge (several guides agree on most rows but not all; "Expansion" is included because you asked) and only improves the odds, it never guarantees the material. Only populated systems have a controlling faction, so empty systems get no hint.

@@ -258,6 +258,8 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("exploration", "Exploration", "Scanning, discoveries, fuel scooping and the honk.", [
             Field("talk.exploration", "She comments on exploration", "toggle",
                   help="Scans of interesting bodies, signals, codex finds, exploration data sales and fuel scooping. Off = quiet, safety warnings are never silenced"),
+            Field("exploration.hge_hint", "Tell me which High Grade Emissions materials a system is likely to give", "toggle",
+                  help="When you arrive in a system she checks the controlling faction's allegiance and state (Boom, Expansion, War, Outbreak...) and says which materials are likely"),
             Field("regions.announce", "Announce the galaxy region I enter", "toggle",
                   help="Says the region's name when you jump into a new one, and when it is your first time there"),
             Field("ask.scan_prompts", "Ask if we should scan valuable planets", "toggle",
