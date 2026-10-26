@@ -1,0 +1,21 @@
+{
+ "_help": "The eight Thargoid Titans: where their maelstrom was, which Titan fell in which order, and when. 'aliases' are ways the microphone may hear the name. All eight were destroyed in 3310 (dates from the Canonn memorial and the Elite wiki).",
+ "titans": [
+  {"name": "Cocijo", "system": "Col 285 Sector BA-P c6-18", "body": "body 3", "arrival": "1,300", "order": 8, "destroyed": "the eighteenth of December 3310",
+   "aliases": ["cocijo", "co see yo", "cosijo", "kosijo", "kozijo", "cochijo", "co chee yo", "cosio"]},
+  {"name": "Hadad", "system": "HIP 30377", "body": "body B 8", "arrival": "39,230", "order": 4, "destroyed": "the twenty sixth of May 3310",
+   "aliases": ["hadad", "had ad", "haddad", "hadid", "hadard"]},
+  {"name": "Indra", "system": "HIP 20567", "body": "body 7", "arrival": "3,330", "order": 5, "destroyed": "the ninth of July 3310",
+   "aliases": ["indra", "indrah", "andra", "endra"]},
+  {"name": "Leigong", "system": "HIP 8887", "body": "body A 4", "arrival": "2,540", "order": 2, "destroyed": "the seventeenth of March 3310",
+   "aliases": ["leigong", "lay gong", "lee gong", "ligong", "legong", "lie gong", "lei gong"]},
+  {"name": "Oya", "system": "Cephei Sector BV-Y b4", "body": "body B 1", "arrival": "5,850", "order": 3, "destroyed": "April 3310",
+   "aliases": ["oya", "oia", "oh ya", "oyah", "oyo", "ooya"]},
+  {"name": "Raijin", "system": "Pegasi Sector IH-U b3-3", "body": "body 2", "arrival": "400", "order": 7, "destroyed": "the twenty fourth of October 3310",
+   "aliases": ["raijin", "rye jin", "rai jin", "raiden", "ryjin", "rajin", "ray jin"]},
+  {"name": "Taranis", "system": "Hyades Sector FB-N b7-6", "body": "body A 1", "arrival": "130", "order": 1, "destroyed": "the second of March 3310",
+   "aliases": ["taranis", "tarantis", "tarannis", "taranus", "tarinis"]},
+  {"name": "Thor", "system": "Col 285 Sector IG-O c6-5", "body": "body 3", "arrival": "820", "order": 6, "destroyed": "August 3310",
+   "aliases": ["thor"]}
+ ]
+}

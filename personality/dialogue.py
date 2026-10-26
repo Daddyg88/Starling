@@ -110,6 +110,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "jumps.json"))         # many more jump lines, plain and dry as well as warm
             self._merge(_read_json(self.pack_dir / "ships.json"))         # ship comments, favourite ship, welcome home
             self._merge(_read_json(self.pack_dir / "callouts.json"))      # glide, scoopable star, undiscovered system, jumps left
+            self._merge(_read_json(self.pack_dir / "titans.json"))        # Thargoid Titans: routes, war story, how each one fell
             self._merge(_read_json(self.pack_dir / "guardian.json"))      # guardian blueprint sites and spoken guides
             self._merge(_read_json(self.pack_dir / "engineers.json"))     # "take me to Felicity Farseer"
             self._merge(_read_json(self.pack_dir / "merit.json"))         # "I want to go merit mining"

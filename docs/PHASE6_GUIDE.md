@@ -775,3 +775,12 @@ Sites (config/guardian.json, edit it if you find a closer one): module = Synuefe
 Distance rule is the same as for the engineers: 1000 light years or less (setting "Engineer farther than this many light years") uses the galaxy map plotter, farther uses a Spansh neutron route.
 Vessel blueprint: she sends you to the beacon first. About 6 seconds after an Ancient Key lands in your cargo she says where to take it and plots the structure (switch on the Navigation page). Ask for the vessel blueprint again while you hold a key and she goes straight to the structure.
 Honest limits: not tested in the game. The key is recognised by the journal's cargo name "ancientkey"; if she never reacts, send me the log line "Collected ..." after you scoop it. The distance needs the system's coordinates from Spansh; if Spansh does not give them she asks for a neutron route (it always works, just slower for short trips). The guides were put together from community walkthroughs (Anti-Xeno Initiative wiki, the Frontier forum Vessel and Weapon walkthroughs, the Canonn module guide) and your notes.
+
+## 0.49.1: Thargoid Titans
+Say "plot me a route to the nearest titan", "take me to Titan Thor" (or Cocijo, Hadad, Indra, Leigong, Oya, Raijin, Taranis), "where is Titan Oya", or "what happened to Cocijo".
+- Up to 1000 light years she uses the galaxy map, farther a Spansh neutron route (same setting as the engineers).
+- On the way, each jump she tells the next piece of the Thargoid war (the first war, the Proteus Wave, the Maelstroms and Titans, the eight hearts, the thermal core, the meltdown, the last battle at Sol), with a piece about that Titan in third place. At most one piece every 40 seconds.
+- On the jump into the Titan's system she says when it was destroyed and which Titan it was to fall.
+- Switch: Navigation page "Titan routes: tell the Thargoid war story on the way".
+The Titans are in config/titans.json. All eight were destroyed in 3310: Taranis 2 March, Leigong 17 March, Oya April, Hadad 26 May, Indra 9 July, Thor August, Raijin 24 October, Cocijo 18 December (over Earth, after it moved from Col 285 Sector BA-P c6-18 to Sol).
+Honest limits: dates come from the Canonn memorial and the Elite wiki, which disagree by a day or a month for Oya and Thor, so those two are given as a month only. "Nearest" needs Spansh to give the systems' coordinates; if it does not, she asks you to name a Titan. The Titans are gone, so you are visiting the places where they were.

@@ -1,0 +1,108 @@
+{
+ "TitanNear": [
+  "Plotting {place} for Titan {titan}. {distance} light years away. Using the galaxy map.",
+  "Taking you to Titan {titan}: {place}, {distance} light years. Plotting it now.",
+  "Titan {titan}. {system}, {distance} light years. Setting the course."
+ ],
+ "TitanFar": [
+  "Titan {titan} is {distance} light years away, in {system}. Asking Spansh for a neutron route.",
+  "That's a long way, {distance} light years, to Titan {titan}. I'll plot a neutron route.",
+  "{system} for Titan {titan}. {distance} light years, so I'm working out a neutron route."
+ ],
+ "TitanFarUnknown": [
+  "I'm plotting a neutron route to Titan {titan} in {system}.",
+  "Neutron route to {system}, for Titan {titan}.",
+  "Off to see where Titan {titan} was. Asking Spansh for a neutron route."
+ ],
+ "TitanHere": [
+  "We're already in {system}. This is where Titan {titan} was.",
+  "No route needed. {system} is Titan {titan}'s system, and we're in it."
+ ],
+ "TitanPlotOff": [
+  "I can't plot to Titan {titan} just now: {reason}.",
+  "Sorry, Commander. I can't use the galaxy map right now: {reason}."
+ ],
+ "TitanWhere": [
+  "Titan {titan} was at {place}.",
+  "You'll find where Titan {titan} was in {system}, {body}, {arrival} light seconds from the star."
+ ],
+ "TitanNearestUnknown": [
+  "I can't work out which Titan is nearest right now. Tell me which one, Commander. Cocijo, Hadad, Indra, Leigong, Oya, Raijin, Taranis or Thor.",
+  "I can't measure the distances just now. Name a Titan and I'll take you there."
+ ],
+ "TitanTour_War_1": [
+  "While we fly, let me tell you about the Thargoid war. Humanity first met the Thargoids in 3125, and the first war lasted until 3151."
+ ],
+ "TitanTour_War_2": [
+  "The second war began when they came back. Our attempt to stop them, the Proteus Wave, failed, and eight Maelstroms were deployed over human space."
+ ],
+ "TitanTour_War_3": [
+  "At the heart of every Maelstrom there was a Titan. They were found in 3309, after the Thargoid Pulse Neutraliser let pilots see the Maelstrom cores up close."
+ ],
+ "TitanTour_War_4": [
+  "A Titan is a monster. Each one has eight hearts, and it only dies when its health reaches zero."
+ ],
+ "TitanTour_War_5": [
+  "To hurt one, Anti-Xeno pilots fired Guardian nanite torpedoes into its heat vents, to expose the thermal core."
+ ],
+ "TitanTour_War_6": [
+  "Damage the thermal core enough and the Titan melts down. About a day later it goes critical, loses its structure, and is destroyed."
+ ],
+ "TitanTour_War_7": [
+  "Between March and December 3310, all eight Titans fell, one at a time. Taranis was the first. Cocijo was the last."
+ ],
+ "TitanTour_War_8": [
+  "The last battle was at Sol. Cocijo left its home and flew to Earth, and now a memorial orbits the planet, about a hundred and fifty kilometres from its remains."
+ ],
+ "TitanTour_Intro_Cocijo": [
+  "We are heading for Cocijo. It was the eighth and last Titan, born in Col 285 Sector BA-P c6-18. It later left for Sol, and that is where it died."
+ ],
+ "TitanTour_Intro_Hadad": [
+  "We are heading for Hadad, in HIP 30377. It was the fourth Titan to fall, and its body is a very long way out from the star, nearly forty thousand light seconds."
+ ],
+ "TitanTour_Intro_Indra": [
+  "We are heading for Indra, in HIP 20567. It was the fifth Titan to be destroyed."
+ ],
+ "TitanTour_Intro_Leigong": [
+  "We are heading for Leigong, in HIP 8887. It was the second Titan to be destroyed, only two weeks after Taranis."
+ ],
+ "TitanTour_Intro_Oya": [
+  "We are heading for Oya, in Cephei Sector BV-Y b4. It was the third Titan to fall, and it launched Orthrus vessels when the community attacked it."
+ ],
+ "TitanTour_Intro_Raijin": [
+  "We are heading for Raijin, in Pegasi Sector IH-U b3-3. It was the seventh Titan to fall, just two months before the end of the war."
+ ],
+ "TitanTour_Intro_Taranis": [
+  "We are heading for Taranis, in Hyades Sector FB-N b7-6. It was the first Titan to arrive and the first to be destroyed."
+ ],
+ "TitanTour_Intro_Thor": [
+  "We are heading for Thor, in Col 285 Sector IG-O c6-5. It was the sixth Titan to be destroyed."
+ ],
+ "TitanArrive_Cocijo": [
+  "Welcome to Col 285 Sector BA-P c6-18, Commander. This is where Cocijo began. It left for Sol at the end of November 3310, arrived there on the fifth of December, and was destroyed over Earth on the eighteenth of December. The last Titan, and the end of the war."
+ ],
+ "TitanArrive_Hadad": [
+  "We have arrived at HIP 30377. Hadad was destroyed on the twenty sixth of May 3310. It was the fourth Titan to fall."
+ ],
+ "TitanArrive_Indra": [
+  "We have arrived at HIP 20567. Indra was destroyed on the ninth of July 3310. It was the fifth Titan to fall."
+ ],
+ "TitanArrive_Leigong": [
+  "We have arrived at HIP 8887. Leigong was destroyed on the seventeenth of March 3310. It was the second Titan to fall."
+ ],
+ "TitanArrive_Oya": [
+  "We have arrived at Cephei Sector BV-Y b4. Oya was destroyed in April 3310. It was the third Titan to fall."
+ ],
+ "TitanArrive_Raijin": [
+  "We have arrived at Pegasi Sector IH-U b3-3. Raijin was destroyed on the twenty fourth of October 3310. It was the seventh Titan to fall."
+ ],
+ "TitanArrive_Taranis": [
+  "We have arrived at Hyades Sector FB-N b7-6. Taranis was the first Titan to be destroyed, on the second of March 3310. Anti-Xeno teams battered its thermal core for several days, it melted down, and about a day later it broke apart."
+ ],
+ "TitanArrive_Thor": [
+  "We have arrived at Col 285 Sector IG-O c6-5. Thor was destroyed in August 3310. It was the sixth Titan to fall."
+ ],
+ "TitanArrive": [
+  "We have arrived. Titan {titan} was destroyed {destroyed}. It was the {order} Titan to fall."
+ ]
+}

@@ -23,7 +23,7 @@ from core.identity import personalise
 from core.logger import get_logger
 from navigation.edastro import EdAstro, EdAstroError, distance
 from navigation.engineers import EngineerBook, distance as engineer_distance
-from navigation import guardian
+from navigation import guardian, titans
 from navigation.spansh import SpanshError
 from personality.mood_engine import effective_mood
 
@@ -183,6 +183,11 @@ class RouteVoice:
         self.engineers = EngineerBook()
         self.guardian_sites = guardian.load()
         self.vessel_stage = 0            # 0 = not started, 1 = on the way to the beacon (waiting for the ancient key), 2 = key aboard, structure next
+        self.titans = titans.load()
+        self.titan_goal = None           # the Titan she is taking you to (she tells the war story on the way)
+        self.titan_told = 0              # how many pieces of the story she has told
+        self.titan_last = -1e9
+        self._titan_pos = {}
         self.key_delay = 6.0             # seconds she waits after the key arrives before telling you
         self.plot_macro = None           # the app sets this: plots a system with the galaxy map macro (the "auto plotter"): (system) -> (ok, reason)
         self.game_target = None          # the app sets this: a function giving the destination picked in the game's galaxy map
@@ -246,6 +251,9 @@ class RouteVoice:
         saved = self._save_bookmark(said)
         if saved is not None:
             return saved
+        asked_titan = titans.parse(self.titans, said)
+        if asked_titan is not None:
+            return self.titan_asked(*asked_titan)
         engineer = self._engineer_asked(said)
         if engineer is not None:
             return engineer
@@ -265,6 +273,7 @@ class RouteVoice:
         if _REPLOT.search(said):
             return self.plot(self.follower.destination or str(self.settings.get("neutron.destination", "")))
         if _CANCEL.search(said) and (self.follower.active or self._emergency or re.search(r"\b(route|root|course|emergency)\b", said)):
+            self.titan_goal = None
             had = self.follower.active or bool(self._emergency)
             self.follower.clear()
             self._set_emergency(None)
@@ -335,6 +344,7 @@ class RouteVoice:
 
     # ---- plotting (on its own thread: Spansh can take a while) ----
     def plot(self, destination_text):
+        self.titan_goal = None            # a different destination: the Titan story stops
         spoken = _TAIL.sub("", clean(destination_text)).strip()
         key = None if spoken in self._my_favourites() else slot_key(spoken)
         if key in ("fleet", "squad"):
@@ -433,7 +443,7 @@ class RouteVoice:
                 "place": ("%s in %s" % (body, step["system"])) if body else step["system"], "step": index + 1,
                 "distance": "{:,}".format(int(round(miles))) if miles is not None else "an unknown number of", "ly": miles}
 
-    def go_to_guardian(self, site, step, index):
+    def go_to_guardian(self, site, step, index, prefix="Guardian"):
         """Same rule as the engineers: 1000 light years or less = galaxy map macro, farther (or unknown) = Spansh neutron route."""
         state = self.state_provider()
         here = str(getattr(state, "system", "") or "")
@@ -443,23 +453,83 @@ class RouteVoice:
             pos = None
         fields = self._guardian_fields(site, step, index, pos)
         if here.casefold() == step["system"].casefold():
-            self.narrator.say("GuardianHere", fields)
+            self.narrator.say(prefix + "Here", fields)
             return "Already in %s" % here
         miles = fields["ly"]
         if miles is not None and miles <= self._engineer_limit() and self.plot_macro is not None:
             ok, reason = self.plot_macro(step["system"])
             if not ok:
                 fields["reason"] = reason or "the galaxy map macro is not available"
-                self.narrator.say("GuardianPlotOff", fields)
+                self.narrator.say(prefix + "PlotOff", fields)
                 return "Could not plot: %s" % fields["reason"]
-            self.narrator.say("GuardianNear", fields)
+            self.narrator.say(prefix + "Near", fields)
             return "Plotting %s with the galaxy map" % step["system"]
         if self._busy:
             return "Already plotting."
         self._busy = True
-        self.narrator.say("GuardianFar" if miles is not None else "GuardianFarUnknown", fields)
+        self.narrator.say(prefix + ("Far" if miles is not None else "FarUnknown"), fields)
         self.spawn(lambda: self._plot_now(step["system"]))
         return "Plotting a neutron route to %s" % step["system"]
+
+    # ---- thargoid titans ----
+    def _titan_position(self, titan):
+        if titan.name not in self._titan_pos:
+            try:
+                self._titan_pos[titan.name] = self.spansh.coordinates(titan.system)
+            except Exception:
+                self._titan_pos[titan.name] = None
+        return self._titan_pos[titan.name]
+
+    def nearest_titan(self):
+        """The Titan closest to you (needs your position and Spansh's coordinates), or None."""
+        here = getattr(self.state_provider(), "star_pos", None)
+        best, best_distance = None, None
+        for titan in self.titans:
+            miles = engineer_distance(here, self._titan_position(titan))
+            if miles is not None and (best_distance is None or miles < best_distance):
+                best, best_distance = titan, miles
+        return best
+
+    def titan_asked(self, who, intent):
+        if who == "nearest":
+            titan = self.nearest_titan()
+            if titan is None:
+                self.narrator.say("TitanNearestUnknown")
+                return "I can't work out which Titan is nearest."
+        else:
+            titan = who
+        fields = titan.fields()
+        if intent == "story":
+            self.narrator.say("TitanArrive_" + titan.name, fields)
+            return "%s was destroyed %s" % (titan.name, titan.destroyed)
+        if intent == "where":
+            self.narrator.say("TitanWhere", fields)
+            return "%s: %s" % (titan.name, fields["place"])
+        step = {"system": titan.system, "body": titan.body, "what": "Titan %s's system" % titan.name}
+        result = self.go_to_guardian({"title": "Thargoid Titan " + titan.name}, step, 0, prefix="Titan")
+        if str(result).startswith(("Plotting", "Already in")) and not str(result).startswith("Already plotting"):
+            self.titan_goal, self.titan_told, self.titan_last = titan, 0, -1e9
+        return result
+
+    def _titan_tour(self, system):
+        """On each jump while heading for a Titan: the next piece of the war story (at most one every 40 seconds); on the last jump, its fate."""
+        titan = self.titan_goal
+        if titan is None:
+            return
+        if system and system.casefold() == titan.system.casefold():
+            self.titan_goal = None
+            fields = titan.fields()
+            self.narrator.say("TitanArrive_" + titan.name, fields)
+            return
+        if not self.settings.get("titans.talk", True) or self.clock() - self.titan_last < 40:
+            return
+        sequence = ["TitanTour_War_1", "TitanTour_War_2", "TitanTour_Intro_" + titan.name] + ["TitanTour_War_%d" % n for n in range(3, 9)]
+        if self.titan_told >= len(sequence):
+            return
+        key = sequence[self.titan_told]
+        self.titan_told += 1
+        self.titan_last = self.clock()
+        self.narrator.say(key, titan.fields())
 
     def on_cargo(self, event):
         """CollectCargo: the ancient key came aboard on the way to the beacon. A few seconds later she says where to take it, and plots it."""
@@ -678,6 +748,7 @@ class RouteVoice:
         waiting = self._emergency
         system = str((getattr(event, "data", None) or {}).get("StarSystem") or "")
         self._welcome_home(system)
+        self._titan_tour(system)
         if not waiting or not system or system.casefold() != str(waiting.get("poi", "")).casefold():
             return
         self._set_emergency(None)
