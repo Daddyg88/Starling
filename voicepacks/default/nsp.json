@@ -2,11 +2,11 @@
  "NSPNew": [
   "A brand new codex entry, and it's a notable stellar phenomenon! {Name}.||{Fact}",
   "Oh, {Name}! That's new to the codex. I love a new one.||{Fact}",
-  "Commander, look at that colour! Well, it might be white, but it's the loveliest white I have ever seen. {Name}, and it's new.||{Fact}",
-  "A new {Name} for the codex. Pretty, isn't it? Even if it's plain.||{Fact}",
+  "Commander, look at that colour! I love it. {Name}, and it's new.||{Fact}",
+  "A new {Name} for the codex. Look at those colours. I love them.||{Fact}",
   "Something nobody in your codex has seen before: {Name}. I'm thrilled.||{Fact}",
   "New phenomenon, new codex entry, and I'm very happy. It's {Name}.||{Fact}",
-  "Ooh, shiny. Well, it's a bit dull, but I'm calling it shiny. {Name}, a new one.||{Fact}",
+  "Ooh, shiny. I do love the colour of that one. {Name}, a new one.||{Fact}",
   "That's {Name}, and it's a first for you. Frame it.||{Fact}",
   "Finally, something beautiful. {Name}, brand new in the codex.||{Fact}",
   "I'm not going to say I'm excited. I'm excited. {Name}, and it's new.||{Fact}"
@@ -30,13 +30,13 @@
  ],
  "NSPSeen": [
   "{Name} again. I never get bored of these.||{Fact}",
-  "Another {Name}. Look at the colours. Even if it's just white, it's a pretty white.",
+  "Another {Name}. Look at the colours. I just love them.",
   "{Name}. Not new, but still lovely.||{Fact}",
   "Ah, a {Name}. An old friend.",
   "Another notable stellar phenomenon. {Name}. I could look at these all day.",
   "{Name}, scanned. It's not a first, but I still like it.||{Fact}",
   "There it is, {Name}. Isn't space pretty when it tries?",
-  "{Name} again. Still plain, still lovely."
+  "{Name} again. Still lovely."
  ],
  "NSPSeen_Close": [
   "{Name} again. Beautiful. Just like old times, Commander."
