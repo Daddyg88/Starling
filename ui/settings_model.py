@@ -310,6 +310,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("neutron.enabled", "Neutron route plotter", "toggle"),
             Field("engineers.neutron_over_ly", "Engineer farther than this many light years: neutron route", "text", placeholder="1000",
                   help="\"Take me to Felicity Farseer\": closer than this she uses the galaxy map plotter, farther she asks Spansh for a neutron route"),
+            Field("guardian.auto_plot_key", "Guardian vessel blueprints: plot the structure when the ancient key is aboard", "toggle",
+                  help="Say 'plot me a route to the guardian vessel blueprint'. She sends you to the beacon, and a few seconds after the ancient key comes aboard she tells you and plots the second stop"),
             Field("neutron.destination", "My destination", "text", placeholder="e.g. Colonia",
                   help="Say 'plot a neutron route to my destination' and she uses this"),
             Field("neutron.jump_range", "Jump range in light years (0 = work it out)", "text", placeholder="0",

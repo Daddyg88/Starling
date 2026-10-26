@@ -1,0 +1,103 @@
+{
+ "GuardianNear": [
+  "Plotting {place} for the {title}. That's {what}, {distance} light years away. Using the galaxy map.",
+  "Taking you to {what}: {place}, {distance} light years. Plotting it in the galaxy map.",
+  "{place}, {distance} light years. That's {what}. Setting the course."
+ ],
+ "GuardianFar": [
+  "{place} is {distance} light years away. That's {what}. Asking Spansh for a neutron route.",
+  "That's a long way, {distance} light years, to {what} at {place}. I'll plot a neutron route.",
+  "{what}: {place}. {distance} light years, so I'm working out a neutron route."
+ ],
+ "GuardianFarUnknown": [
+  "I'm plotting a neutron route to {what}: {place}.",
+  "Neutron route to {place}. That's {what}.",
+  "Off to {place}, {what}. Asking Spansh for a neutron route."
+ ],
+ "GuardianHere": [
+  "We're already in {system}. That's {what}.",
+  "No route needed. {system} is this system, and it's {what}."
+ ],
+ "GuardianPlotOff": [
+  "I can't plot to {system} just now: {reason}.",
+  "Sorry, Commander. I can't use the galaxy map right now: {reason}."
+ ],
+ "GuardianWhere": [
+  "{what} is at {place}.",
+  "For the {title}, go to {place}. That's {what}."
+ ],
+ "GuardianKeyAboard": [
+  "Ancient key on board. Next I need to take you to {what}: {place}. Plotting it now.",
+  "You have the ancient key. The next stop is {what}, at {place}. I'll plot the course.",
+  "Got the key, Commander. Now we take it to {place}, {what}. Plotting."
+ ],
+ "GuardianGuide_Module_1": [
+  "Guardian module blueprints. Go to Synuefe NL-N C23-4, planet B 3. You need an S R V, a point defence turret on your ship, and an ancient relic. There is one near the landing zone. Solo or a private group is best."
+ ],
+ "GuardianGuide_Module_2": [
+  "Land and drive the S R V to the lower right corner. Put four pips to weapons and two to systems, and destroy the sentinel that appears there. Then do the same at the lower left corner."
+ ],
+ "GuardianGuide_Module_3": [
+  "Next, drive up to the middle structure and the trigger pylon. Two sentinels appear. Kill them one at a time from the turret, then shoot the trigger to start the timer."
+ ],
+ "GuardianGuide_Module_4": [
+  "Shoot the glowing balls on each pylon until a beam rises from it. The next two pylons are either side of the middle structure. Then the low centre pylon, then the lower right leg. Go to the lower left pylon last. The last one spawns four sentinels, so be ready, and snipe them one at a time."
+ ],
+ "GuardianGuide_Module_5": [
+  "When they are dead, pick up an ancient relic if you don't have one. Drive north to the machine and park on the marked spot. Jettison the relic. The machine opens and a blue orb rises."
+ ],
+ "GuardianGuide_Module_6": [
+  "Scan the orb with the data scanner, not the composition scanner. That gives you one module blueprint fragment. You need six in total to unlock every module, and you hand them in at a guardian technology broker. Two more sentinels appear, so kill the one at the machine first."
+ ],
+ "GuardianGuide_Module_7": [
+  "To do it again, drive a little way off, then log out and back in. Keep your ship parked nearby with point defence on."
+ ],
+ "GuardianGuide_Weapon_1": [
+  "Guardian weapon blueprints. Go to Synuefe EU-Q C21-10, planet A 3, about eight hundred light years from the bubble. Bring an S R V, two if you can, point defence in your utility slots, and S R V materials: sulphur, phosphorus, iron and nickel. Allow about twenty minutes a run, in solo or a private group."
+ ],
+ "GuardianGuide_Weapon_2": [
+  "Land near the site, in the upper left or lower right if you can. Drive to the machine at the top and park on the marked spot in front of it. That raises the first pylon."
+ ],
+ "GuardianGuide_Weapon_3": [
+  "Shoot the glowing balls on each pylon with the turret until a beam rises. The timer starts at your first shot, and every charged pylon adds time. Activate pylons three to six in order."
+ ],
+ "GuardianGuide_Weapon_4": [
+  "Expect sentinels at the pylons. Put four pips to weapons and two to systems. Their plasma discs can roll your S R V, and point defence shoots down their missiles. Pick up everything they drop."
+ ],
+ "GuardianGuide_Weapon_5": [
+  "You need an ancient relic. Approach a relic site to raise a tower, then shoot the glowing blue top to drop one."
+ ],
+ "GuardianGuide_Weapon_6": [
+  "Park on the marked spot in front of the machine and jettison the relic. A blue orb rises. Scan it with the data scanner, not the composition scanner, and you get one blueprint segment. Two more sentinels appear, so destroy them."
+ ],
+ "GuardianGuide_Weapon_7": [
+  "The obelisks nearby give you pattern data. Scan each one with the S R V data scanner."
+ ],
+ "GuardianGuide_Weapon_8": [
+  "To run it again, drive about five hundred metres away, then log out and back in. Every blueprint needs a fresh reset."
+ ],
+ "GuardianGuide_Vessel_1": [
+  "Guardian vessel and fighter blueprints take two stops. First the beacon, where you collect an ancient key. Then the structure, where you use it. Bring a ship with a decent jump range, an energy weapon, a cargo bay, an S R V and point defence, plus S R V materials. Allow about forty minutes a run, in solo or a private group. You need one key for each blueprint."
+ ],
+ "GuardianGuide_Vessel_2": [
+  "First stop is the beacon at Synuefe KU-F B44-4, about seven hundred and fifty light years out. Open the beacon from your navigation panel. Shoot the three energy balls on the wings with an energy weapon until they change. Beam lasers work, pulse lasers may not."
+ ],
+ "GuardianGuide_Vessel_3": [
+  "Then select the spinning sphere near the core and scan it with your data link scanner. An ancient key comes out of the far end. Scoop it up, using a collector limpet if you need to. When the key is on board, I'll tell you where to go next and plot it for you."
+ ],
+ "GuardianGuide_Vessel_4": [
+  "The second stop is Synuefe EU-Q C21-15, planet A 1. Land and drive the S R V to the machine at the top. Stay out of the plus mark areas on either side, because they spawn optional sentinels."
+ ],
+ "GuardianGuide_Vessel_5": [
+  "Charge the six pylons. Park on the marked X by the first pylon, then shoot the glowing balls with the turret until a beam rises. Do pylons three, four, five and six in that order. Expect up to sixteen sentinels, not all at once. Keep your ship parked nearby with point defence on, and put four pips to weapons."
+ ],
+ "GuardianGuide_Vessel_6": [
+  "Move the key from your ship to your S R V. Drive back to the X in front of the machine, park on the small recessed button, and jettison the key."
+ ],
+ "GuardianGuide_Vessel_7": [
+  "A blue orb rises. Scan it with the data scanner, not the composition scanner, and you get one blueprint segment. Two more sentinels appear, so destroy them."
+ ],
+ "GuardianGuide_Vessel_8": [
+  "To run it again, drive about five hundred metres away and log out and back in, otherwise the orb may not scan and you lose the key. You also need pattern data from the obelisks for these blueprints."
+ ]
+}

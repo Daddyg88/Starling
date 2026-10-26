@@ -765,3 +765,13 @@ On arrival she looks at the faction that controls the system (allegiance and sta
 - Civil Unrest: Improvised Components, Military Grade Alloys. Outbreak: Pharmaceutical Isolators
 War, unrest and outbreak win over the allegiance rows. Switch: Exploration page "Tell me which High Grade Emissions materials a system is likely to give".
 Honest limits: the table is community knowledge (several guides agree on most rows but not all; "Expansion" is included because you asked) and only improves the odds, it never guarantees the material. Only populated systems have a controlling faction, so empty systems get no hint.
+
+## 0.49.0: Guardian blueprints
+Say any of these (the word "blueprint" and "guardian" must be in it):
+- "plot me a route to the guardian weapon blueprint" / "...module blueprints" / "...vessel blueprint" (or "fighter")
+- "how do I get the guardian module blueprints" (also weapon, vessel, fighter): she talks you through the whole thing, one step at a time
+- "where is the guardian weapon blueprint"; add "alternative" to go to the other site
+Sites (config/guardian.json, edit it if you find a closer one): module = Synuefe NL-N C23-4 planet B 3 (other: HD 63154); weapon = Synuefe EU-Q C21-10 planet A 3 (other: Synuefe GV-T b50-4); vessel and fighter = beacon Synuefe KU-F B44-4, then the structure Synuefe EU-Q C21-15 planet A 1 (other: NGC 2451A Sector LX-D2-25, then NGC 2451A Sector VJ-RC4-225).
+Distance rule is the same as for the engineers: 1000 light years or less (setting "Engineer farther than this many light years") uses the galaxy map plotter, farther uses a Spansh neutron route.
+Vessel blueprint: she sends you to the beacon first. About 6 seconds after an Ancient Key lands in your cargo she says where to take it and plots the structure (switch on the Navigation page). Ask for the vessel blueprint again while you hold a key and she goes straight to the structure.
+Honest limits: not tested in the game. The key is recognised by the journal's cargo name "ancientkey"; if she never reacts, send me the log line "Collected ..." after you scoop it. The distance needs the system's coordinates from Spansh; if Spansh does not give them she asks for a neutron route (it always works, just slower for short trips). The guides were put together from community walkthroughs (Anti-Xeno Initiative wiki, the Frontier forum Vessel and Weapon walkthroughs, the Canonn module guide) and your notes.

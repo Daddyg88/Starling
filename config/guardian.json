@@ -1,0 +1,24 @@
+{
+ "_help": "Guardian blueprint sites nearest the bubble. 'steps' are the places to go in order (the vessel and fighter blueprints need the beacon first, then the structure). 'alt' is the other choice you can ask for by saying 'alternative'. Names are spelled as the game does.",
+ "module": {
+  "title": "guardian module blueprints",
+  "steps": [{"system": "Synuefe NL-N C23-4", "body": "planet B 3", "what": "the module site"}],
+  "alt": [{"system": "HD 63154", "body": "", "what": "the classic module site"}]
+ },
+ "weapon": {
+  "title": "guardian weapon blueprints",
+  "steps": [{"system": "Synuefe EU-Q C21-10", "body": "planet A 3", "what": "the weapon site"}],
+  "alt": [{"system": "Synuefe GV-T b50-4", "body": "planet B 1", "what": "the other weapon site"}]
+ },
+ "vessel": {
+  "title": "guardian vessel and fighter blueprints",
+  "steps": [
+   {"system": "Synuefe KU-F B44-4", "body": "", "what": "the guardian beacon, where you collect the ancient key"},
+   {"system": "Synuefe EU-Q C21-15", "body": "planet A 1", "what": "the guardian structure, where you use the key"}
+  ],
+  "alt": [
+   {"system": "NGC 2451A Sector LX-D2-25", "body": "", "what": "the other guardian beacon"},
+   {"system": "NGC 2451A Sector VJ-RC4-225", "body": "", "what": "the other guardian structure"}
+  ]
+ }
+}

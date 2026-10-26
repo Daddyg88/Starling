@@ -23,6 +23,7 @@ from core.identity import personalise
 from core.logger import get_logger
 from navigation.edastro import EdAstro, EdAstroError, distance
 from navigation.engineers import EngineerBook, distance as engineer_distance
+from navigation import guardian
 from navigation.spansh import SpanshError
 from personality.mood_engine import effective_mood
 
@@ -180,6 +181,9 @@ class RouteVoice:
         self.emergency_file = paths.DATA_DIR / "emergency_route.json"
         self._emergency = self._load_emergency()
         self.engineers = EngineerBook()
+        self.guardian_sites = guardian.load()
+        self.vessel_stage = 0            # 0 = not started, 1 = on the way to the beacon (waiting for the ancient key), 2 = key aboard, structure next
+        self.key_delay = 6.0             # seconds she waits after the key arrives before telling you
         self.plot_macro = None           # the app sets this: plots a system with the galaxy map macro (the "auto plotter"): (system) -> (ok, reason)
         self.game_target = None          # the app sets this: a function giving the destination picked in the game's galaxy map
 
@@ -245,6 +249,9 @@ class RouteVoice:
         engineer = self._engineer_asked(said)
         if engineer is not None:
             return engineer
+        asked = guardian.parse(said)
+        if asked is not None:
+            return self.guardian_asked(asked[0], asked[1], guardian.wants_alternative(said))
         found = _CARRIER_GO.search(said)
         if found:
             return self.plot(found.group("dest"))
@@ -395,6 +402,82 @@ class RouteVoice:
         self.narrator.say("EngineerFar" if miles is not None else "EngineerFarUnknown", fields)
         self.spawn(lambda: self._plot_now(engineer.system))
         return "Plotting a neutron route to %s in %s" % (engineer.name, engineer.system)
+
+    # ---- guardian blueprints ----
+    def guardian_asked(self, kind, intent, alternative=False):
+        site = self.guardian_sites.get(kind)
+        if not site:
+            return None
+        if intent == "guide":
+            for number in range(1, 20):
+                if not self.narrator.say("GuardianGuide_%s_%d" % (kind.capitalize(), number)):
+                    break
+            return "Told the guide for the %s" % site["title"]
+        steps = site["alt"] if alternative and site.get("alt") else site["steps"]
+        index = 0
+        if kind == "vessel":
+            has_key = self.vessel_stage >= 2 or guardian_key_in_cargo(getattr(self, "journal_folder_provider", lambda: None)())
+            index = 1 if has_key and len(steps) > 1 else 0
+            self.vessel_stage = 2 if index else 1
+        step = steps[min(index, len(steps) - 1)]
+        if intent == "where":
+            self.narrator.say("GuardianWhere", self._guardian_fields(site, step, index))
+            return "%s: %s in %s" % (site["title"], step["body"], step["system"])
+        return self.go_to_guardian(site, step, index)
+
+    def _guardian_fields(self, site, step, index, pos=None):
+        state = self.state_provider()
+        miles = engineer_distance(getattr(state, "star_pos", None), pos) if pos else None
+        body = step.get("body") or ""
+        return {"title": site["title"], "system": step["system"], "body": body, "what": step.get("what", ""),
+                "place": ("%s in %s" % (body, step["system"])) if body else step["system"], "step": index + 1,
+                "distance": "{:,}".format(int(round(miles))) if miles is not None else "an unknown number of", "ly": miles}
+
+    def go_to_guardian(self, site, step, index):
+        """Same rule as the engineers: 1000 light years or less = galaxy map macro, farther (or unknown) = Spansh neutron route."""
+        state = self.state_provider()
+        here = str(getattr(state, "system", "") or "")
+        try:
+            pos = self.spansh.coordinates(step["system"])
+        except Exception:
+            pos = None
+        fields = self._guardian_fields(site, step, index, pos)
+        if here.casefold() == step["system"].casefold():
+            self.narrator.say("GuardianHere", fields)
+            return "Already in %s" % here
+        miles = fields["ly"]
+        if miles is not None and miles <= self._engineer_limit() and self.plot_macro is not None:
+            ok, reason = self.plot_macro(step["system"])
+            if not ok:
+                fields["reason"] = reason or "the galaxy map macro is not available"
+                self.narrator.say("GuardianPlotOff", fields)
+                return "Could not plot: %s" % fields["reason"]
+            self.narrator.say("GuardianNear", fields)
+            return "Plotting %s with the galaxy map" % step["system"]
+        if self._busy:
+            return "Already plotting."
+        self._busy = True
+        self.narrator.say("GuardianFar" if miles is not None else "GuardianFarUnknown", fields)
+        self.spawn(lambda: self._plot_now(step["system"]))
+        return "Plotting a neutron route to %s" % step["system"]
+
+    def on_cargo(self, event):
+        """CollectCargo: the ancient key came aboard on the way to the beacon. A few seconds later she says where to take it, and plots it."""
+        if self.vessel_stage != 1 or not guardian.is_key((getattr(event, "data", None) or {}).get("Type")):
+            return
+        self.vessel_stage = 2
+        self.spawn(self._key_aboard)
+
+    def _key_aboard(self):
+        self.sleep(self.key_delay)
+        site = self.guardian_sites.get("vessel")
+        if not site or len(site["steps"]) < 2:
+            return
+        step = site["steps"][1]
+        fields = self._guardian_fields(site, step, 1)
+        self.narrator.say("GuardianKeyAboard", fields)
+        if self.settings.get("guardian.auto_plot_key", True):
+            self.go_to_guardian(site, step, 1)
 
     def _engineer_limit(self):
         try:
@@ -631,3 +714,16 @@ class RouteVoice:
             return data if isinstance(data, dict) and data.get("poi") and data.get("destination") else None
         except (OSError, ValueError):
             return None
+
+
+def guardian_key_in_cargo(folder):
+    """True when Cargo.json (in the journal folder) lists an Ancient Key."""
+    if not folder:
+        return False
+    try:
+        from pathlib import Path
+        data = json.loads((Path(folder) / "Cargo.json").read_text(encoding="utf-8", errors="ignore"))
+    except (OSError, ValueError):
+        return False
+    return any(guardian.is_key(item.get("Name")) and int(item.get("Count", 0) or 0) > 0
+               for item in data.get("Inventory") or [] if isinstance(item, dict))

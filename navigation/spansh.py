@@ -79,6 +79,21 @@ class Spansh:
             raise SpanshError("I couldn't find a system like %s." % name)
         return best
 
+    def coordinates(self, name):
+        """(x, y, z) of a system if Spansh's search shows them, else None (the caller then treats the distance as unknown)."""
+        name = " ".join(str(name or "").split())
+        try:
+            answer = self._request("%s/search/systems?%s" % (BASE, urllib.parse.urlencode({"q": name})))
+        except SpanshError:
+            return None
+        for row in answer.get("results") or []:
+            if isinstance(row, dict) and str(row.get("name") or "").casefold() == name.casefold():
+                try:
+                    return float(row["x"]), float(row["y"]), float(row["z"])
+                except (KeyError, TypeError, ValueError):
+                    return None
+        return None
+
     # ---- the route ----
     def neutron_route(self, start, destination, jump_range, efficiency=60, supercharge=4, max_wait=MAX_WAIT_SECONDS):
         """A list of waypoints: [{"system", "neutron", "jumps", "distance_left"}, ...]. The first is where you are."""

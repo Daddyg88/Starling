@@ -33,6 +33,7 @@ DEFAULTS = {
     "exobiology": {"distance_alert": True, "distance_beep": True},
     "merit": {"power": "", "commodities": ["Platinum", "Osmium", "Painite", "Palladium"]},
     "engineers": {"neutron_over_ly": 1000},
+    "guardian": {"auto_plot_key": True},
     "regions": {"announce": True},
     "onfoot": {"auto_shields": False, "preset": "", "auto_health": False, "auto_battery": False, "last_grenade_callout": True},
     "keybinds": {"ship": "", "srv": "", "fighter": "", "multicrew": ""},
