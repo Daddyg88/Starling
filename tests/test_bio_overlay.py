@@ -295,3 +295,43 @@ class Billions(unittest.TestCase):
         self.assertEqual(spoken_credits(999_000_000), "999 million")
         self.assertEqual(ov.short_credits(2_500_000_000), "2.5B")
         self.assertEqual(credits(3_000_000_000), "3 billion credits")
+
+
+class LandingAndValue(unittest.TestCase):
+    def mapped(self, extra=()):
+        return DetailedView().mapped(extra)
+
+    def test_value_does_not_collapse_after_the_first_sample(self):
+        _, state = self.mapped()
+        before = state.bio.rows()[0]["value"]
+        _, after_state = self.mapped([sample("Log", "Aleoida Arcus", "Aleoida")])
+        row = after_state.bio.rows()[0]
+        self.assertGreater(row["value"], before * 0.3)           # the second life form is still counted, not forgotten
+        self.assertFalse(row["known"])                           # one of two is still a guess
+        self.assertEqual(row["new"], 2)                          # both still new to the codex
+
+    def test_flags_drop_only_for_finished_forms(self):
+        _, state = self.mapped([sample("Log", "Aleoida Arcus", "Aleoida"), sample("Analyse", "Aleoida Arcus", "Aleoida")])
+        self.assertEqual(state.bio.rows()[0]["new"], 1)
+
+    def test_planet_view_stays_while_landing_and_landed(self):
+        _, state = self.mapped()
+        bio = state.bio
+        bio.note_target(5)                                     # targeted it
+        bio.note_target(None, near="Test A 1")                 # the game drops the target as you come down
+        self.assertIsNotNone(bio.focus_view())
+        bio.note_target(None, hold=True)                       # gear down / landed / SRV / on foot
+        bio.note_target(9, hold=True)
+        self.assertIsNotNone(bio.focus_view())
+        bio.note_target(None)                                  # taken off and cleared the target: back to the list
+        self.assertIsNone(bio.focus_view())
+
+    def test_status_flags_reach_it(self):
+        from journal.status_reader import StatusReader
+        from tests.helpers import make_processor
+        processor, _bus, _heard = make_processor()
+        processor.state.bio = self.mapped()[1].bio
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        reader.handle_status({"Flags": 1, "Destination": {"Body": 5}})
+        reader.handle_status({"Flags": 1 | 4})                 # landing gear down, target gone
+        self.assertIsNotNone(processor.state.bio.focus_view())

@@ -135,7 +135,8 @@ class StatusReader:
             self._log_foot_fields(status, flags2)
             dest = status.get("Destination")
             try:      # the body you have targeted (nav panel): the biology overlay follows it. No Destination = nothing targeted.
-                state.bio.note_target(dest.get("Body") if isinstance(dest, dict) else None)
+                state.bio.note_target(dest.get("Body") if isinstance(dest, dict) else None, near=status.get("BodyName") or "",
+                                      hold=bool(flags & (2 | 4 | 1 << 26)) or bool(flags2 & 1))   # landed, gear down, in the SRV, on foot
             except Exception:
                 log.exception("Could not pass the target to the biology overlay")
             main = (status.get("Fuel") or {}).get("FuelMain")

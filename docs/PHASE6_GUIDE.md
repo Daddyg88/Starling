@@ -875,3 +875,8 @@ Honest limits: not tried in the game. I rely on the game writing the target in S
 
 ## 0.59.1: billions
 When an amount reaches a thousand million she now says "1 billion" (like the game) instead of "1000 million", in her spoken values, memories and on the overlay (B).
+
+## 0.59.2: planet view stays while you land, and the value no longer collapses
+- Landing: the planet view now stays while you are landing, landed, in the SRV or on foot (the game drops your target when you come down, which used to bring the list back). It also stays while Status.json says you are near that planet. Once you have left the planet and the target is cleared (or you target something else) the list returns.
+- Value: after you sampled one life form of a planet with several, the list showed only that form's price (83 million became 6.8 million). Now the planet's value is every life form: real prices for the ones you have identified, an average for the rest. The white flags count the forms you have not finished. The "~" (guess) stays until every form is identified.
+Honest limit: still not tried in the game; the hold uses the Status.json flags (landed, gear down, SRV, on foot) and the planet name it reports.

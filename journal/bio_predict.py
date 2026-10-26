@@ -274,6 +274,7 @@ class BioPredictor:
         self.hidden = False        # "hide the bio overlay" (voice); shown again in the next system
         self.focus = ""            # the planet the overlay is showing in detail (after you map it), "" = show the list
         self.focus_targeted = False   # has the game's target been that planet since we focused it?
+        self.focus_held = False       # you are down at the planet (landed, gear down, SRV, on foot, or near it): the target no longer matters
 
     # ---- journal input ----
     def set_system(self, name):
@@ -414,6 +415,9 @@ class BioPredictor:
             return 1
 
     def worth(self, body):
+        """What the planet's life is worth: real prices for species you have identified, an average for each genus you have not."""
+        if body.genera:
+            return sum(life["value"] for life in self._lives(body))
         if body.species:
             return sum(self.species_value(s) or 0 for s in body.species) * self.footfall_multiplier(body)
         est = self.estimate(body)
@@ -431,6 +435,8 @@ class BioPredictor:
     # ---- codex flags ----
     def new_flags(self, body):
         """How many of the body's signals could be something you do not have in your codex yet."""
+        if body.genera:
+            return sum(1 for life in self._lives(body) if life["new"] and not life["done"])
         if body.species:
             return sum(1 for s in body.species if not self.codex.has(s))
         groups = {}
@@ -580,13 +586,18 @@ class BioPredictor:
         return data
 
     # ---- for the overlay ----
-    def note_target(self, body_id):
+    def note_target(self, body_id, near="", hold=False):
         """Status.json says which body is targeted now (None = nothing). The detailed view stays while that planet is the target,
         and also while the target does not change (you are landing). Targeting another body, or un-targeting it, goes back to the list."""
         body = self.bodies.get(self.focus) if self.focus else None
         if body is None:
             self.focus = ""
             return
+        if hold or (near and near == body.name):
+            self.focus_held = True          # landing or landed: keep the planet view up whatever the target does
+            return
+        if self.focus_held:
+            self.focus_held = False         # you have left the planet again: from now on the target rules apply
         if body.body_id is not None and body_id == body.body_id:
             self.focus_targeted = True
         elif body_id is None or body_id == 0:
@@ -595,16 +606,13 @@ class BioPredictor:
         else:
             self.focus = ""
 
-    def focus_view(self):
-        """What the detailed view shows: the planet and one line per life form, or None when the list should be shown."""
-        body = self.bodies.get(self.focus) if self.focus else None
-        if body is None or not body.genera:
-            return None
+    def _lives(self, body):
+        """One dictionary per life form on a mapped planet: name, new to the codex, finished, value (x5 on a first footfall)."""
         mult = self.footfall_multiplier(body)
         lives = []
         for genus in body.genera:
             species = next((s for s in body.species if same_genus(genus, self._genus_of(s))), "")
-            options = [r for r in self.rules if same_genus(r["g"], genus)]
+            options = [r for r in body.candidates if same_genus(r["g"], genus)] or [r for r in self.rules if same_genus(r["g"], genus)]
             if species:
                 base = self.species_value(species) or 0
                 new = not self.codex.has(species)
@@ -614,9 +622,15 @@ class BioPredictor:
                 base = sum(values) / len(values) if values else 0
                 new = any(not self.codex.has(r["n"]) for r in options) if options else True
                 done = False
-            lives.append({"name": species or genus, "new": bool(new), "done": done, "value": int(base * mult),
-                          "exact": bool(species)})
-        return {"body": body.short, "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "lives": lives}
+            lives.append({"name": species or genus, "new": bool(new), "done": done, "value": int(base * mult), "exact": bool(species)})
+        return lives
+
+    def focus_view(self):
+        """What the detailed view shows: the planet and one line per life form, or None when the list should be shown."""
+        body = self.bodies.get(self.focus) if self.focus else None
+        if body is None or not body.genera:
+            return None
+        return {"body": body.short, "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "lives": self._lives(body)}
 
     def _genus_of(self, species):
         for r in self.rules:
@@ -630,7 +644,7 @@ class BioPredictor:
         for body in self.bodies.values():
             est = self.estimate(body)
             out.append({"body": body.short, "count": body.count, "value": self.worth(body) or (int(est[1]) if est else 0),
-                        "new": self.new_flags(body), "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "known": bool(body.species or body.genera),
+                        "new": self.new_flags(body), "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "known": bool(body.genera) and all(life["exact"] for life in self._lives(body)),
                         "species": list(body.species), "genera": list(body.genera)})
         return out
 
