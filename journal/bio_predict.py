@@ -21,7 +21,7 @@ from pathlib import Path
 from core import paths
 from core.logger import get_logger
 from events._signals import count_signals
-from journal.exobiology import ExobiologyTracker, spoken_credits, _read_json, _write_json
+from journal.exobiology import ExobiologyTracker, spoken_credits, spoken_range, _read_json, _write_json
 
 log = get_logger("bio_predict")
 
@@ -318,6 +318,7 @@ class BioPredictor:
         self.spoken = 0
         self.hinted = set()
         self.hidden = False        # "hide the bio overlay" (voice); shown again in the next system
+        self.first_status = {}     # species (lower case) -> 'never'/'elsewhere'/'here' as it was BEFORE you found it this visit (the colour stays)
         self.focus = ""            # the planet the overlay is showing in detail (after you map it), "" = show the list
         self.focus_targeted = False   # has the game's target been that planet since we focused it?
         self.focus_held = False       # you are down at the planet (landed, gear down, SRV, on foot, or near it): the target no longer matters
@@ -367,7 +368,13 @@ class BioPredictor:
             return self._guess_events(body)
         return []
 
+    def _remember_first(self, species):
+        key = str(species or "").strip().lower()
+        if key and key not in self.first_status:
+            self.first_status[key] = self.codex.where(key, self.region)
+
     def note_codex(self, entry):
+        self._remember_first(str(entry.get("Name_Localised") or "").split(" - ")[0])
         self.codex._from_entry(entry, {r["n"].lower() for r in self.rules} | set(UNIQUE_SPECIES), region=self.region)
 
     # ---- fitting the rules ----
@@ -549,7 +556,7 @@ class BioPredictor:
             data["Unknown"] = True
         else:
             data["Guess"] = _join_or(genera)
-            data["Worth"] = spoken_credits(est[1])
+            data["Worth"] = spoken_range(est[0], est[2])
         events.append(("BioGuess", data))
         events.extend(self._top_hint(body))
         return events
@@ -598,7 +605,7 @@ class BioPredictor:
         data = {"Body": body.short, "Right": right or fresh, "Found": _join_and(genera)}
         est = self.estimate(body)
         if est:
-            data["Worth"] = spoken_credits(est[1])
+            data["Worth"] = spoken_range(est[0], est[2])
         if not est:
             return []
         events = [("BioRefined", data)]
@@ -614,6 +621,7 @@ class BioPredictor:
         body = self.bodies.get(name) if name else None
         if body is not None and species not in body.species:
             body.species.append(species)
+        self._remember_first(species)
         events = []
         if species.lower() in UNIQUE_SPECIES and entry.get("ScanType") == "Log":
             events.append(("UniqueBio", {"Species": species, "Body": body.short if body else ""}))
@@ -666,26 +674,38 @@ class BioPredictor:
             self.focus = ""
 
     def _lives(self, body):
-        """One dictionary per life form on a mapped planet: name, new to the codex, finished, value (x5 on a first footfall)."""
+        """One dictionary per life form on a mapped planet: name, colour (tone), flag status, finished, value and low/high (x5 on a first footfall).
+        Before a form is identified the value is a range over the species of that genus that fit the planet."""
         mult = self.footfall_multiplier(body)
         lives = []
         for genus in body.genera:
             species = next((s for s in body.species if same_genus(genus, self._genus_of(s))), "")
             options = [r for r in body.candidates if same_genus(r["g"], genus)] or [r for r in self.rules if same_genus(r["g"], genus)]
             if species:
-                base = self.species_value(species) or 0
-                status = self.codex.where(species, self.region)
+                base = low = high = self.species_value(species) or 0
+                tone = self.first_status.get(species.lower()) or self.codex.where(species, self.region)
                 done = species.lower() in body.done
             else:
                 values = [self.species_value(r) for r in options if self.species_value(r)]
                 base = sum(values) / len(values) if values else 0
-                status = self.group_status([r["n"] for r in options]) if options else "never"
+                low, high = (min(values), max(values)) if values else (0, 0)
+                tone = self.group_status([r["n"] for r in options]) if options else "never"
                 done = False
-            if done:
-                status = "here"
-            lives.append({"name": species or genus, "new": status != "here", "status": status, "done": done,
-                          "value": int(base * mult), "exact": bool(species)})
+            status = "here" if done else tone          # a finished form loses its flag but keeps its colour
+            lives.append({"name": species or genus, "new": status != "here", "status": status, "tone": tone, "done": done,
+                          "value": int(base * mult), "low": int(low * mult), "high": int(high * mult), "exact": bool(species)})
         return lives
+
+    def worth_range(self, body):
+        """(low, high) credits for the whole planet."""
+        if body.genera:
+            lives = self._lives(body)
+            return sum(l["low"] for l in lives), sum(l["high"] for l in lives)
+        est = self.estimate(body)
+        if est:
+            return int(est[0]), int(est[2])
+        value = self.worth(body)
+        return value, value
 
     def focus_view(self):
         """What the detailed view shows: the planet and one line per life form, or None when the list should be shown."""
@@ -706,7 +726,7 @@ class BioPredictor:
         for body in self.bodies.values():
             est = self.estimate(body)
             out.append({"body": body.short, "count": body.count, "value": self.worth(body) or (int(est[1]) if est else 0),
-                        "new": self.new_flags(body), "flags": self.body_statuses(body), "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "known": bool(body.genera) and all(life["exact"] for life in self._lives(body)),
+                        "low": self.worth_range(body)[0], "high": self.worth_range(body)[1], "new": self.new_flags(body), "flags": self.body_statuses(body), "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "known": bool(body.genera) and all(life["exact"] for life in self._lives(body)),
                         "species": list(body.species), "genera": list(body.genera)})
         return out
 

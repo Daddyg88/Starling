@@ -38,7 +38,7 @@ TEST_SECONDS = 10
 
 SIZES = {"Small": 10, "Medium": 12, "Large": 15}
 TEST_ROWS = [
-    {"body": "A 1", "count": 2, "value": 4200000, "new": 2, "flags": ["never", "elsewhere"], "known": False, "kind": "rocky", "species": [], "genera": []},
+    {"body": "A 1", "count": 2, "value": 4200000, "new": 2, "flags": ["never", "elsewhere"], "known": False, "low": 1000000, "high": 19000000, "kind": "rocky", "species": [], "genera": []},
     {"body": "B 3 a", "count": 1, "value": 19010800, "new": 1, "flags": ["elsewhere"], "known": True, "kind": "highmetalcontent", "species": ["Stratum Tectonicas"], "genera": ["Stratum"]},
     {"body": "C 2", "count": 3, "value": 5100000, "new": 0, "flags": [], "known": False, "kind": "icy", "species": [], "genera": []},
 ]
@@ -61,6 +61,17 @@ def short_credits(amount):
 FLAG_COLORS = {"never": YELLOW, "elsewhere": BLUE}
 
 
+def short_range(low, high, exact=False):
+    """'1M-19M' / '800K-19M' (a guess is marked ~); one number when the two are close or the price is exact."""
+    low, high = int(low or 0), int(high or 0)
+    if exact or high <= 0 or low <= 0 or high <= low * 1.15:
+        return ("" if exact else "~") + short_credits(high if exact else (low + high) // 2 or high)
+    a, b = short_credits(low), short_credits(high)
+    if a[-1] == b[-1] and a[-1] in "MKB":
+        a = a[:-1]
+    return "~%s-%s" % (a, b)
+
+
 def overlay_rows(rows, limit=MAX_ROWS):
     """Turns the predictor's rows into what is drawn: (text pieces per line, 'and N more' or '')."""
     lines = []
@@ -74,7 +85,8 @@ def overlay_rows(rows, limit=MAX_ROWS):
             "flags": len(statuses),
             "flag_colors": [FLAG_COLORS[s] for s in statuses],
             "tone": "never" if "never" in statuses else ("elsewhere" if statuses else "here"),
-            "value": ("" if row.get("known") else "~") + short_credits(row.get("value")),
+            "value": short_credits(row.get("value")) if row.get("known") else (
+                short_range(row.get("low"), row.get("high")) if row.get("high") else "~" + short_credits(row.get("value"))),
             "kind": str(row.get("kind") or "rocky"),
         })
     more = len(rows) - len(lines)
@@ -82,9 +94,9 @@ def overlay_rows(rows, limit=MAX_ROWS):
 
 
 TEST_FOCUS = {"body": "B 3 a", "kind": "icy", "lives": [
-    {"name": "Stratum Tectonicas", "new": True, "status": "never", "done": False, "value": 19010800, "exact": True},
-    {"name": "Fonticulua", "new": False, "status": "here", "done": True, "value": 3200000, "exact": False},
-    {"name": "Bacterium", "new": True, "status": "elsewhere", "done": False, "value": 1200000, "exact": False}]}
+    {"name": "Stratum Tectonicas", "new": True, "status": "never", "tone": "never", "done": False, "value": 19010800, "exact": True},
+    {"name": "Fonticulua", "new": False, "status": "here", "tone": "never", "done": True, "value": 3200000, "exact": True},
+    {"name": "Bacterium", "new": True, "status": "elsewhere", "tone": "elsewhere", "done": False, "value": 1200000, "low": 1000000, "high": 2800000, "exact": False}]}
 
 
 def overlay_focus(view):
@@ -94,7 +106,9 @@ def overlay_focus(view):
         status = "here" if life.get("done") else str(life.get("status") or ("never" if life.get("new") else "here"))
         lines.append({"name": str(life.get("name") or "?"), "flag": status in ("never", "elsewhere"), "status": status,
                       "done": bool(life.get("done")),
-                      "value": ("" if life.get("exact") else "~") + short_credits(life.get("value"))})
+                      "tone": str(life.get("tone") or status),
+                      "value": short_credits(life.get("value")) if life.get("exact") else (
+                          short_range(life.get("low"), life.get("high")) if life.get("high") else "~" + short_credits(life.get("value")))})
     return {"body": str(view.get("body") or "?"), "kind": str(view.get("kind") or "rocky"), "lives": lines}
 
 
@@ -177,7 +191,7 @@ class BioOverlay:
         view = wanted_focus(self.settings, state, test_until=self.test_until)
         if view is not None:
             focus = overlay_focus(view)
-            signature = ("focus", focus["body"], focus["kind"], tuple((l["name"], l["status"], l["done"], l["value"]) for l in focus["lives"]), settings)
+            signature = ("focus", focus["body"], focus["kind"], tuple((l["name"], l["status"], l["tone"], l["done"], l["value"]) for l in focus["lives"]), settings)
             if signature != self._signature:
                 self._signature = signature
                 self._draw_focus(focus, settings)
@@ -242,7 +256,7 @@ class BioOverlay:
         small = ("Segoe UI", max(8, size - 2), "bold")
         row_h = int(size * 2.3)
         pad = 10
-        width = int(size * 21)
+        width = int(size * 23)
         title_h = int(size * 2.0)
         height = title_h + row_h * len(lines) + (int(size * 1.6) if more else 0) + pad
         fill = DARK if dark else KEY
@@ -280,7 +294,7 @@ class BioOverlay:
         small = ("Segoe UI", max(8, size - 2), "bold")
         row_h = int(size * 2.3)
         pad = 10
-        width = int(size * 21)
+        width = int(size * 23)
         title_h = int(size * 2.4)
         lives = focus["lives"]
         height = title_h + row_h * len(lives) + pad
@@ -291,9 +305,9 @@ class BioOverlay:
         y = title_h
         for life in lives:
             mid = y + row_h // 2
-            tone = TONES.get(life["status"], ORANGE)
+            tone = TONES.get(life["tone"], ORANGE)             # a form never found anywhere stays yellow, even while you sample it
             if life["flag"]:
-                self._flag(canvas, pad + size * 0.6, mid, size, tone)
+                self._flag(canvas, pad + size * 0.6, mid, size, TONES.get(life["status"], ORANGE))
             x = pad + size * 2.0
             canvas.create_text(x, mid, text=life["name"], anchor="w", fill=tone, font=font)
             canvas.create_text(width - pad, mid, text=life["value"], anchor="e", fill=tone, font=font)

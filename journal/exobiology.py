@@ -42,6 +42,20 @@ def spoken_credits(amount):
     return str(amount)
 
 
+def spoken_range(low, high):
+    """(1000000, 19000000) -> '1 to 19 million'; (800000, 19000000) -> '800 thousand to 19 million'. One number when they are close."""
+    low, high = int(round(low or 0)), int(round(high or 0))
+    if high <= 0:
+        return spoken_credits(low)
+    if low <= 0 or high <= low * 1.15:
+        return spoken_credits((low + high) / 2.0 if low else high)
+    a, b = spoken_credits(low), spoken_credits(high)
+    wa, wb = a.split(" ", 1), b.split(" ", 1)
+    if len(wa) == 2 and len(wb) == 2 and wa[1] == wb[1]:
+        return "%s to %s" % (wa[0], b)                 # same unit: "1 to 19 million"
+    return "%s to %s" % (a, b)
+
+
 def _read_json(path):
     try:
         with open(path, "r", encoding="utf-8") as handle:

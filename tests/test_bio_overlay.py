@@ -214,8 +214,10 @@ class DetailedView(unittest.TestCase):
         self.assertTrue(lines[1]["flag"])
 
     def test_codex_known_species_has_no_flag(self):
-        _, state = self.mapped([sample("Log", "Aleoida Arcus", "Aleoida")])
-        state.bio.codex.add("Aleoida Arcus")
+        _, state = self.mapped()
+        state.bio.codex.add("Aleoida Arcus", state.bio.region)         # already in your codex before you sample it
+        for e in (sample("Log", "Aleoida Arcus", "Aleoida"),):
+            state.bio.note_organic(e)
         self.assertFalse(state.bio.focus_view()["lives"][0]["new"])
 
     def test_first_footfall_is_times_five(self):
@@ -410,3 +412,55 @@ class RegionColours(unittest.TestCase):
     def test_position_from_events(self):
         got, state = run([{"event": "FSDJump", "StarSystem": "Test", "StarPos": list(self.SOL), "SystemAddress": 1}])
         self.assertEqual(state.bio.region, "Inner Orion Spur")
+
+
+class Ranges(unittest.TestCase):
+    def test_spoken_range(self):
+        from journal.exobiology import spoken_range
+        self.assertEqual(spoken_range(1_000_000, 19_000_000), "1 to 19 million")
+        self.assertEqual(spoken_range(800_000, 19_000_000), "800 thousand to 19 million")
+        self.assertEqual(spoken_range(4_000_000, 4_200_000), "4.1 million")          # close together: one number
+        self.assertEqual(spoken_range(900_000_000, 1_500_000_000), "900 million to 1.5 billion")
+
+    def test_short_range(self):
+        self.assertEqual(ov.short_range(1_000_000, 19_000_000), "~1-19M")
+        self.assertEqual(ov.short_range(800_000, 19_000_000), "~800K-19M")
+        self.assertEqual(ov.short_range(4_000_000, 4_100_000), "~4M")
+        self.assertEqual(ov.short_range(0, 0), "~?")
+
+    def test_guess_is_a_range_from_the_cheapest_to_the_dearest_species(self):
+        rules = [{"n": "Bacterium Aurasus", "g": "Bacterium", "p": ["rocky"], "a": ["carbondioxide"]},
+                 {"n": "Stratum Tectonicas", "g": "Stratum", "p": ["rocky"], "a": ["carbondioxide"]}]
+        from journal.bio_predict import BioPredictor, BioCodex
+        from journal.exobiology import ExobiologyTracker
+        t = ExobiologyTracker(None)
+        t.seed = {"bacterium aurasus": 1_000_000, "stratum tectonicas": 19_000_000}
+        p = BioPredictor(t, BioCodex(), None, rules)
+        p.set_system("Test")
+        p.note_scan(planet("Test A 1", k=177, SystemAddress=1))
+        body = p._body("Test A 1", 1)
+        body.candidates = p.candidates_for("Test A 1")
+        low, expected, high = p.estimate(body)
+        self.assertEqual((low, high), (1_000_000, 19_000_000))
+        events = p._guess_events(body)
+        self.assertEqual(dict(events)["BioGuess"]["Worth"], "1 to 19 million")
+        row = p.rows()[0]
+        self.assertEqual(ov.overlay_rows([row])[0][0]["value"], "~1-19M")
+
+    def test_planet_view_shows_a_range_until_identified_then_the_price(self):
+        _, state = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"])])
+        line = ov.overlay_focus(state.bio.focus_view())["lives"][0]
+        self.assertTrue(line["value"].startswith("~"))
+        _, state = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"]), sample("Log", "Aleoida Arcus", "Aleoida")])
+        self.assertFalse(ov.overlay_focus(state.bio.focus_view())["lives"][0]["value"].startswith("~"))
+
+    def test_never_found_stays_yellow_while_you_sample_it_and_after(self):
+        base = [planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"])]
+        for extra in ([sample("Log", "Aleoida Arcus", "Aleoida")],
+                      [{"event": "CodexEntry", "Name_Localised": "Aleoida Arcus - Red", "Region_Localised": "Inner Orion Spur"}, sample("Log", "Aleoida Arcus", "Aleoida")],
+                      [sample("Log", "Aleoida Arcus", "Aleoida"), sample("Analyse", "Aleoida Arcus", "Aleoida")]):
+            _, state = run(base + extra)
+            state.bio.set_position((0.0, 0.0, 0.0))
+            line = ov.overlay_focus(state.bio.focus_view())["lives"][0]
+            self.assertEqual(line["tone"], "never", extra)
+        self.assertFalse(line["flag"])                       # finished: colour stays, flag goes
