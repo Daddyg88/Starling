@@ -46,6 +46,8 @@ def short_credits(amount):
     amount = int(amount or 0)
     if amount <= 0:
         return "?"
+    if amount >= 1_000_000_000:
+        return ("%.1f" % (amount / 1_000_000_000.0)).rstrip("0").rstrip(".") + "B"
     if amount >= 1_000_000:
         return ("%.1f" % (amount / 1_000_000.0)).rstrip("0").rstrip(".") + "M"
     if amount >= 1000:

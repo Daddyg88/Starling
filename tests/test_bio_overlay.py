@@ -284,3 +284,14 @@ class DetailedDrawing(DrawingTests):
         for dark in (True, False):
             for size in ("Small", "Large"):
                 box._draw_focus(ov.overlay_focus(ov.TEST_FOCUS), (3, 25, size, dark))
+
+
+class Billions(unittest.TestCase):
+    def test_a_thousand_million_is_a_billion(self):
+        from journal.exobiology import spoken_credits
+        from memory.keeper import credits
+        self.assertEqual(spoken_credits(1_000_000_000), "1 billion")
+        self.assertEqual(spoken_credits(1_300_000_000), "1.3 billion")
+        self.assertEqual(spoken_credits(999_000_000), "999 million")
+        self.assertEqual(ov.short_credits(2_500_000_000), "2.5B")
+        self.assertEqual(credits(3_000_000_000), "3 billion credits")

@@ -31,6 +31,8 @@ TOP_N = 10                       # "one of the ten most valuable species"
 def spoken_credits(amount):
     """8418000 -> '8.4 million', 426200 -> '426 thousand', 950 -> '950'. Easy to say aloud."""
     amount = int(round(amount or 0))
+    if amount >= 1_000_000_000:          # the game counts a thousand million as one billion
+        return "%s billion" % ("%.1f" % (amount / 1_000_000_000.0)).rstrip("0").rstrip(".")
     if amount >= 1_000_000:
         value = round(amount / 1_000_000.0, 1)
         text = ("%.1f" % value).rstrip("0").rstrip(".")

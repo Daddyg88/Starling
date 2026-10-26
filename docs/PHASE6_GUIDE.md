@@ -872,3 +872,6 @@ Honest limits: tested against real journal lines only, not live in the game. The
 - How long it stays: it follows the game's target (Status.json "Destination"). It stays while that planet is your target, and also while your target does not change at all (you are landing). If you target another body, or clear the target after having targeted the planet, the list comes back. It also goes back to the list in the next system. Voice "hide the bio overlay" and the settings switch still work, and the Test button now shows the list for 5 seconds and then the planet view.
 - Toned down: the "first discovery" lines are now only for Earth-like worlds and the rare giants (water giant, helium rich, class V). Water and ammonia worlds stay as before.
 Honest limits: not tried in the game. I rely on the game writing the target in Status.json; if the view disappears too early or never goes back to the list, tell me what you targeted and I will check. The drawing was only tested with a stand-in for the screen (no display here).
+
+## 0.59.1: billions
+When an amount reaches a thousand million she now says "1 billion" (like the game) instead of "1000 million", in her spoken values, memories and on the overlay (B).

@@ -17,6 +17,8 @@ BIG_MISSION = 5_000_000
 
 def credits(value):
     value = int(value or 0)
+    if value >= 1_000_000_000:
+        return ("%.1f" % (value / 1_000_000_000)).rstrip("0").rstrip(".") + " billion credits"
     if value >= 1_000_000:
         return ("%.1f" % (value / 1_000_000)).rstrip("0").rstrip(".") + " million credits"
     return format(value, ",") + " credits"
