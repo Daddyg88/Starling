@@ -1103,16 +1103,6 @@
     "Mission complete. Well done, Commander!",
     "Great job out there."
   ],
-  "Scan_GreenGasGiant": [
-    "Commander, that's a green gas giant! Those are incredibly rare.",
-    "Green gas giant detected! Do you know how rare that is?",
-    "I don't believe it. A green gas giant!",
-    "Wow. A green gas giant. We should stop and take a look at this one.",
-    "Green gas giant on the scanner. This is a rare find, Commander.",
-    "That's a green gas giant. Take a screenshot!",
-    "Rare, rare, rare! A green gas giant!",
-    "A gas giant with life. A green one. Commander, we've struck gold."
-  ],
   "GalaxyMapOpened": [
     "Galaxy map open.",
     "Opening the galaxy map.",

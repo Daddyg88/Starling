@@ -22,7 +22,7 @@ from memory.keeper import BIG_MISSION, credits
 
 log = get_logger("history_scan")
 
-WANTED = (b'"event":"Died"', b'"event":"MissionCompleted"', b'"event":"SellExplorationData"', b'"event":"MultiSellExplorationData"',
+WANTED = (b'"event":"Statistics"', b'"event":"Died"', b'"event":"MissionCompleted"', b'"event":"SellExplorationData"', b'"event":"MultiSellExplorationData"',
           b'"event":"ColonisationSystemClaim"', b'"event":"ColonisationSystemClaimRelease"', b'"event":"Scan"', b'"event":"FSDJump"', b'"event":"Location"', b'"event":"CarrierJump"', b'"event":"FSSBodySignals"',
           b'"event":"SAASignalsFound"', b'"event":"CodexEntry"', b'"event":"ScanOrganic"', b'"event":"SellOrganicData"')
 PAUSE_BETWEEN_FILES = 0.05
@@ -103,6 +103,8 @@ class HistoryScan:
             self.codex.history_done = True
         self.codex.save()
         self.learned.save()
+        if totals.get("played"):
+            totals["seconds"] = totals["played"]  # the game's own play time is exact; the file span can include a game left running
         self._remember(totals)
         out = {"journals": totals["journals"], "lines": totals["lines"], "stopped": self.stop_flag,
                "species": len(self.codex.known) - before[0], "species_total": len(self.codex.known),
@@ -142,6 +144,10 @@ class HistoryScan:
     def _entry(self, entry, predictor, names, prices, totals):
         self._bio(entry, predictor, names, prices)
         self._life(entry, predictor.system, totals)
+        if entry.get("event") == "Statistics":
+            played = (entry.get("Exploration") or {}).get("Time_Played")
+            if isinstance(played, (int, float)) and played > totals.get("played", 0):
+                totals["played"] = played
 
     def _life(self, entry, system, totals):
         """Her other memories: counters, records, deaths, big missions, first samples and the systems you own."""

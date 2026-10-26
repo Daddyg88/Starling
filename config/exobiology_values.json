@@ -112,7 +112,7 @@
     "Tussock Serrati": 4447100,
     "Tussock Stigmasis": 19010800,
     "Tussock Triticum": 7774700,
-    "Tussock Ventusa": 3277700,
+    "Tussock Ventusa": 3227700,
     "Tussock Virgam": 14313700,
     "Amphora Plant": 1628800,
     "Bark Mounds": 1471900,
@@ -140,6 +140,7 @@
     "Prasinum Sinuous Tubers": 1514500,
     "Roseum Sinuous Tubers": 1514500,
     "Violaceum Sinuous Tubers": 1514500,
-    "Viride Sinuous Tubers": 1514500
+    "Viride Sinuous Tubers": 1514500,
+    "Tussock Pennatis": 1000000
   }
 }

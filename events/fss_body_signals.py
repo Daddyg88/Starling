@@ -14,8 +14,9 @@ class FSSBodySignals(BaseEvent):
         self._guessed = False
         body, events = state.bio.note_fss(entry, state.system or "")
         if events:
-            self._guessed = True
             state.pending_events.extend(events)
+        if body is not None and (events or body.awaiting) and state.bio._on("exobiology.guess", True):
+            self._guessed = True
 
     def handle(self, entry):
         data = {"BodyName": entry.get("BodyName")}

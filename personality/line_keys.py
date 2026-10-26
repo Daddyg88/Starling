@@ -28,7 +28,9 @@ def scan_keys(data):
     if planet == "ammonia world":
         return ["Scan_AmmoniaWorld"]
     if "gas giant with" in planet and "life" in planet:
-        return ["Scan_GreenGasGiant"]      # very rare: it gets its own excited lines
+        return ["Scan_LifeGasGiant"]       # NOT a "green gas giant" (that is a codex entry, see events/codex_entry.py); about 1 in 120 planets in real journals
+    if planet in ("water giant", "helium rich gas giant", "sudarsky class v gas giant"):
+        return ["Scan_RareGiant"]          # about 3 in 10,000 planets in real journals each
     if data.get("TerraformState") == "Terraformable":
         return ["Scan_Terraformable"]
     if star == "N":
@@ -124,6 +126,9 @@ def _keys_for(event):
         if vehicle == "on foot":
             return ["VehicleChanged_OnFoot"]
         return []
+
+    if name == "GreenGasGiant":
+        return ["GreenGasGiant_New", "GreenGasGiant"] if data.get("New") else ["GreenGasGiant"]
 
     if name == "BioGuess":
         return ["BioGuess_Unknown"] if data.get("Unknown") else ["BioGuess"]

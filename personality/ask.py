@@ -36,7 +36,7 @@ SAFE_AFTER_CRITICAL_SECONDS = 60.0
 SCAN_COOLDOWN_SECONDS = 150.0
 NEVER_SPOKEN_SECONDS = 45.0          # the question was queued but never spoken: forget it, no penalty
 HARDPOINTS_BIT = 6
-WORTH_SCANNING = ("Scan_EarthLike", "Scan_WaterWorld", "Scan_AmmoniaWorld", "Scan_GreenGasGiant", "Scan_Terraformable")
+WORTH_SCANNING = ("Scan_EarthLike", "Scan_WaterWorld", "Scan_AmmoniaWorld", "Scan_LifeGasGiant", "Scan_RareGiant", "Scan_Terraformable")
 DECLINES_BEFORE_PENALTY = 3
 
 

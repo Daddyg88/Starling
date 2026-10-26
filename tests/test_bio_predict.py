@@ -124,9 +124,18 @@ class Speaking(unittest.TestCase):
         got, _ = run([planet("Test A 1", k=177), fss("Test A 1", 1)], settings=S())
         self.assertNotIn("BioGuess", [n for n, _ in got])
 
-    def test_no_scan_means_unknown_guess(self):
-        got, state = run([fss("Test A 1", 1)])
-        self.assertTrue(dict(got)["BioGuess"].get("Unknown"))
+    def test_real_journal_order_signals_first_then_scan(self):
+        # in real journals FSSBodySignals comes ONE LINE BEFORE the body's Scan: the guess waits for the scan
+        got, state = run([fss("Test A 1", 2)])
+        names = [n for n, _ in got]
+        self.assertNotIn("BioGuess", names)
+        self.assertNotIn("FSSBodySignals", names)           # the plain line stays quiet: the guess follows
+        got, state = run([fss("Test A 1", 2), planet("Test A 1", k=177)])
+        guess = dict(got)["BioGuess"]
+        self.assertEqual(guess["Body"], "A 1")
+        self.assertFalse(guess.get("Unknown"))
+        self.assertEqual(len([n for n, _ in got if n == "BioGuess"]), 1)
+        self.assertEqual(state.bio.rows()[0]["count"], 2)
 
     def test_forgets_when_leaving(self):
         _, state = run([planet("Test A 1", k=177), fss("Test A 1", 1),
@@ -221,3 +230,34 @@ class Learning(unittest.TestCase):
 
     def test_licence_exists(self):
         self.assertTrue((Path(__file__).resolve().parent.parent / "LICENSE").exists())
+
+
+class GreenGasGiants(unittest.TestCase):
+    """Real journals: a green gas giant is a codex entry named $Codex_Ent_Green_Sudarsky_Class_I_Name; (or ..._II_...), not a planet class."""
+
+    def codex(self, new=True):
+        return {"event": "CodexEntry", "Name": "$Codex_Ent_Green_Sudarsky_Class_I_Name;", "Name_Localised": "Green gas giant",
+                "SubCategory_Localised": "Gas giant planets", "IsNewEntry": new, "System": "Somewhere"}
+
+    def test_codex_entry_makes_the_event_and_replaces_the_plain_line(self):
+        got, _ = run([self.codex()])
+        names = [n for n, _ in got]
+        self.assertIn("GreenGasGiant", names)
+        self.assertNotIn("CodexEntry", names)
+        self.assertTrue(dict(got)["GreenGasGiant"]["New"])
+
+    def test_ordinary_codex_entries_are_not_green(self):
+        got, _ = run([{"event": "CodexEntry", "Name": "$Codex_Ent_Standard_Sudarsky_Class_I_Name;", "Name_Localised": "Standard gas giant"}])
+        self.assertNotIn("GreenGasGiant", [n for n, _ in got])
+
+    def test_gas_giant_with_life_is_not_called_green(self):
+        from personality.line_keys import scan_keys
+        self.assertEqual(scan_keys({"PlanetClass": "Gas giant with water based life"}), ["Scan_LifeGasGiant"])
+        self.assertEqual(scan_keys({"PlanetClass": "Water giant"}), ["Scan_RareGiant"])
+        self.assertEqual(scan_keys({"PlanetClass": "Sudarsky class II gas giant"}), [])
+
+    def test_lines_exist(self):
+        from tests.test_dialogue import real_dialogue
+        d = real_dialogue()
+        for key in ("GreenGasGiant", "GreenGasGiant_New", "Scan_LifeGasGiant", "Scan_RareGiant"):
+            self.assertTrue(d.pick(key, "Friendly", False, False), key)

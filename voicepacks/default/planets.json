@@ -1,0 +1,46 @@
+{
+ "GreenGasGiant": [
+  "Commander, that's a green gas giant! Those are incredibly rare.",
+  "Green gas giant detected! Do you know how rare that is?",
+  "I don't believe it. A green gas giant!",
+  "Wow. A green gas giant. We should stop and take a look at this one.",
+  "Green gas giant on the scanner. This is a rare find, Commander.",
+  "That's a green gas giant. Take a screenshot!",
+  "Rare, rare, rare! A green gas giant!",
+  "A gas giant with life. A green one. Commander, we've struck gold."
+ ],
+ "GreenGasGiant_New": [
+  "That's a green gas giant, and it's new to your codex! One in a couple of million systems, Commander.",
+  "A green gas giant, and a new codex entry. Take a screenshot, quickly.",
+  "A new green gas giant for the codex! I can't believe it. Look at those clouds."
+ ],
+ "GreenGasGiant_Close": [
+  "A green gas giant, love! Come and look at it with me.",
+  "Oh, it's a green gas giant. We found something special together."
+ ],
+ "GreenGasGiant_Infatuated": [
+  "A green gas giant! You find the most wonderful things, Commander."
+ ],
+ "Scan_LifeGasGiant": [
+  "A gas giant with life in its clouds, Commander. Not common, and worth a look.",
+  "That giant has life floating in it. Floating microbes in the sky, how lovely.",
+  "A gas giant with life. There are not many of those, Commander.",
+  "Life in the clouds of that gas giant. It's worth a scan.",
+  "Oh, a living gas giant. Take a moment to look at that one."
+ ],
+ "Scan_LifeGasGiant_Close": [
+  "A giant with life in its clouds, love. Isn't that beautiful?"
+ ],
+ "Scan_LifeGasGiant_Sarcastic": [
+  "A gas giant with life. Congratulations, you found a very large cloud with germs in it."
+ ],
+ "Scan_RareGiant": [
+  "That's an unusual giant, Commander. A rare one, worth a look.",
+  "A rare kind of giant, Commander. You don't see those often.",
+  "Now that is an uncommon giant. Take a good look at it.",
+  "This is a rare type of giant. Worth a screenshot."
+ ],
+ "Scan_RareGiant_Close": [
+  "That's a rare giant, love. Come and see."
+ ]
+}

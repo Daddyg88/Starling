@@ -141,3 +141,22 @@ class OwnedArrival(unittest.TestCase):
         self.assertTrue(reloaded.has("Home Sys"))                 # survives a restart
         proc.handle_entry({"event": "ColonisationSystemClaimRelease", "StarSystem": "Home Sys"})
         self.assertFalse(state.owned.has("Home Sys"))
+
+
+class StatisticsHours(unittest.TestCase):
+    def test_statistics_play_time_wins_over_file_span(self):
+        from database.db import Database
+        from memory.store import MemoryStore
+        tmp = Path(tempfile.mkdtemp())
+        db = Database(tmp / "t.db").initialise()
+        self.addCleanup(db.close)
+        store = MemoryStore(db)
+        journals = Path(tempfile.mkdtemp())
+        (journals / "Journal.2026-01-01T000000.01.log").write_text(
+            lines({"timestamp": "2026-01-01T10:00:00Z", "event": "LoadGame"},
+                  {"timestamp": "2026-01-01T10:01:00Z", "event": "Statistics", "Exploration": {"Time_Played": 7200}},
+                  {"timestamp": "2026-01-02T10:00:00Z", "event": "Shutdown"}))
+        scan = HistoryScan(lambda: journals, BioCodex(), BioLearned(), ExobiologyTracker(None, Path(tempfile.mkdtemp())), None, store, None)
+        scan.start()
+        scan._thread.join(10)
+        self.assertAlmostEqual(store.stats()["hours_together"], 2.0, places=2)

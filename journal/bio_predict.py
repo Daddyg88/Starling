@@ -212,6 +212,8 @@ class BioBody:
         self.species = []                  # real species, once you scanned them
         self.guessed_genera = []           # what she guessed from the FSS (to say "I was right/wrong")
         self.known_props = True            # False when she never saw this body's own scan
+        self.awaiting = False              # the FSS signals came first; the guess waits for the body's own Scan (it follows a line later)
+        self.geo = False
 
     def candidate_genera(self):
         seen = []
@@ -268,19 +270,20 @@ class BioPredictor:
             self.system = name
 
     def note_scan(self, entry):
+        """A body was scanned. Returns events to announce: the guess for a planet whose FSS signals came just before it."""
         name = entry.get("BodyName")
         if not name:
-            return
+            return []
         star = entry.get("StarType")
         if star:
             star = str(star).lower()
             self.stars.add("h" if star.startswith("ae") else star[0])
-            return
+            return []
         pc = entry.get("PlanetClass")
         if not pc:
-            return
+            return []
         if len(self.props) >= MAX_BODIES * 3:
-            return
+            return []
         self.classes.add(norm(pc))
         gravity = entry.get("SurfaceGravity")
         self.props[name] = {
@@ -294,6 +297,14 @@ class BioPredictor:
         }
         if entry.get("BodyID") is not None:
             self.ids[entry["BodyID"]] = name
+        body = self.bodies.get(name)
+        if body is not None and body.awaiting:
+            body.awaiting = False
+            body.known_props = True
+            body.candidates = self.candidates_for(name, geo=body.geo)
+            body.guessed_genera = body.candidate_genera()
+            return self._guess_events(body)
+        return []
 
     def note_codex(self, entry):
         self.codex._from_entry(entry, {r["n"].lower() for r in self.rules})
@@ -426,7 +437,13 @@ class BioPredictor:
         body = self._body(name, counts["Biological"], state_system)
         if entry.get("BodyID") is not None:
             self.ids[entry["BodyID"]] = name
-        body.candidates = self.candidates_for(name, geo=counts["Geological"] > 0)
+        body.geo = counts["Geological"] > 0
+        if name not in self.props:
+            # the game writes FSSBodySignals one line BEFORE the body's Scan (seen in real journals): wait for it
+            body.awaiting, body.candidates, body.guessed_genera = True, [], []
+            return body, []
+        body.awaiting = False
+        body.candidates = self.candidates_for(name, geo=body.geo)
         body.guessed_genera = body.candidate_genera()
         return body, self._guess_events(body)
 

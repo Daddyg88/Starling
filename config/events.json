@@ -26,6 +26,7 @@
     "ColonisationSystemClaim":     { "enabled": true, "priority": "low", "source": "journal" },
     "ColonisationSystemClaimRelease": { "enabled": true, "priority": "low", "source": "journal" },
     "OwnSystemArrival":            { "enabled": true, "priority": "normal", "source": "status" },
+    "GreenGasGiant":               { "enabled": true, "priority": "normal", "source": "status" },
     "NSPNew":                      { "enabled": true, "priority": "normal", "source": "status" },
     "NSPSeen":                     { "enabled": true, "priority": "normal", "source": "status" },
     "NSPInSystem":                 { "enabled": true, "priority": "normal", "source": "status" },

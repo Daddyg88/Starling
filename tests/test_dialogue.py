@@ -209,8 +209,10 @@ class SpeakerTests(unittest.TestCase):
         cases = ((dict(PlanetClass="Earthlike body"), "Scan_EarthLike"),
                  (dict(PlanetClass="Water world"), "Scan_WaterWorld"),
                  (dict(PlanetClass="Ammonia world"), "Scan_AmmoniaWorld"),
-                 (dict(PlanetClass="Gas giant with water based life"), "Scan_GreenGasGiant"),
-                 (dict(PlanetClass="Gas giant with ammonia based life"), "Scan_GreenGasGiant"),
+                 (dict(PlanetClass="Gas giant with water based life"), "Scan_LifeGasGiant"),
+                 (dict(PlanetClass="Gas giant with ammonia based life"), "Scan_LifeGasGiant"),
+                 (dict(PlanetClass="Water giant"), "Scan_RareGiant"),
+                 (dict(PlanetClass="Helium rich gas giant"), "Scan_RareGiant"),
                  (dict(PlanetClass="Rocky body", TerraformState="Terraformable"), "Scan_Terraformable"),
                  (dict(StarType="N"), "Scan_NeutronStar"),
                  (dict(StarType="H"), "Scan_BlackHole"))
@@ -222,7 +224,7 @@ class SpeakerTests(unittest.TestCase):
         self.assertEqual(len(self.speech.said), len(cases))
 
     def test_a_plain_gas_giant_is_not_a_green_one(self):
-        for cls in ("Sudarsky class I gas giant", "Sudarsky class II gas giant", "Helium rich gas giant"):
+        for cls in ("Sudarsky class I gas giant", "Sudarsky class II gas giant", "Sudarsky class III gas giant"):
             self.now[0] += 100
             self.speaker.on_event(self.event("Scan", "low", summary="x", PlanetClass=cls))
         self.assertEqual(self.speech.said, [])
