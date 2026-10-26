@@ -120,7 +120,7 @@ def wanted_focus(settings, state, now=None, test_until=0.0):
     if test_until and now < test_until:
         return TEST_FOCUS if now >= test_until - TEST_SECONDS / 2 else None
     try:
-        if not settings.get("overlay.bio_enabled", True):
+        if getattr(state, "game_quit", False) or not settings.get("overlay.bio_enabled", True):
             return None
         bio = getattr(state, "bio", None)
         if bio is None or getattr(bio, "hidden", False):
@@ -146,7 +146,7 @@ def wanted(settings, state, now=None, test_until=0.0):
     if test_until and now < test_until:
         return TEST_ROWS, True
     try:
-        if not settings.get("overlay.bio_enabled", True):
+        if getattr(state, "game_quit", False) or not settings.get("overlay.bio_enabled", True):
             return [], False
         bio = getattr(state, "bio", None)
         if bio is None or getattr(bio, "hidden", False):

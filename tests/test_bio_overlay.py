@@ -489,3 +489,34 @@ class ManyFlags(DrawingTests):
             width = int(ov.SIZES[size] * 23)
             for args in flags:
                 self.assertLess(max(args[0::2]), width - 10)          # every flag stays inside the box
+
+
+class GameQuits(DrawingTests):
+    def test_shutdown_hides_everything_and_forgets(self):
+        _, state = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"])])
+        self.assertIsNotNone(ov.wanted_focus(Settings(), state))
+        box = ov.BioOverlay(FakeRoot(), Settings(), lambda: state)
+        box._update()
+        self.assertIsNotNone(box.window)
+        got, state2 = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"]), {"event": "Shutdown"}])
+        self.assertTrue(state2.game_quit)
+        self.assertEqual(ov.wanted(Settings(), state2)[0], [])
+        self.assertIsNone(ov.wanted_focus(Settings(), state2))
+        self.assertEqual(state2.bio.rows(), [])                 # her memory of the system is gone too
+        box2 = ov.BioOverlay(FakeRoot(), Settings(), lambda: state2)
+        box2._update()
+        self.assertIsNone(box2.window)                          # never even drawn
+
+    def test_loading_in_again_clears_it(self):
+        got, state = run([{"event": "Shutdown"}, {"event": "LoadGame", "Commander": "X"}])
+        self.assertFalse(state.game_quit)
+        got, state = run([{"event": "Shutdown"}, {"event": "FSDJump", "StarSystem": "Test", "StarPos": [0, 0, 0]}])
+        self.assertFalse(state.game_quit)
+
+    def test_shown_overlay_is_withdrawn_on_shutdown(self):
+        _, state = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1)])
+        box = ov.BioOverlay(FakeRoot(), Settings(), lambda: state)
+        box._update()
+        state.game_quit = True
+        box._update()
+        self.assertIn("withdraw", [n for n, _, _ in box.window.items])

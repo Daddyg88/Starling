@@ -47,6 +47,7 @@ class GameState:
     bodies: dict = field(default_factory=dict)       # body name -> {"temperature": kelvin, "gravity": g} from Scan events
     current_body: Optional[str] = None      # the planet or moon you are near (ApproachBody / SupercruiseExit / Status.json)
     awaiting_discovery: bool = False        # just arrived: the first Scan tells us whether anyone discovered this system
+    game_quit: bool = False                 # the journal said Shutdown: the game is closed, so the overlay hides until you load in again
     star_pos: Optional[tuple] = None        # galaxy coordinates (x, y, z) of the system you are in, from FSDJump / Location
     favourite_ship: Optional[str] = None    # code name of the ship she likes best (personality/favourite_ship.py)
     fsd_target: Optional[str] = None        # the system selected as the jump target (FSDTarget): what "Set Target" does

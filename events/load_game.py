@@ -11,6 +11,7 @@ class LoadGame(BaseEvent):
     summary = "Game loaded. Flying the {Ship_Localised}"
 
     def update_state(self, entry, state):
+        state.game_quit = False
         state.commander = entry.get("Commander", state.commander)
         state.ship = entry.get("Ship_Localised") or entry.get("Ship") or state.ship
         state.ship_name = entry.get("ShipName") or state.ship_name

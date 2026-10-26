@@ -902,3 +902,7 @@ Honest limits: not tried in the game. A wide range just means the conditions fit
 
 ## 0.61.1: overlay fits up to twelve signals
 A planet can have up to twelve biological signals. The list now shows up to twelve flags (they squeeze closer together if needed), and when a planet has more than four flags its value goes on a second line underneath, so the long ranges ("~45.7-175.3M") are no longer squashed against the flags. Planets with four flags or fewer look the same as before. Honest limit: only drawn with a stand-in screen here; tell me if anything still overlaps on yours (and which text size you use).
+
+## 0.61.2: the overlay goes away when the game quits
+When the journal says the game is shutting down (the Shutdown line, written when you quit normally) the biology overlay disappears and she drops what she knew about the system. It comes back by itself once you load into the game again (login or a jump). The overlay is her only overlay window at the moment, so that is all of them.
+Honest limit: if Elite crashes or is killed, it never writes Shutdown, so the overlay stays until you load in again or leave the system. Tell me if you want her to also watch for the game's program closing.
