@@ -576,7 +576,7 @@ class App:
         """Once, in the background: reads your old journals to learn which species are already in your codex."""
         try:
             codex = self.state.bio.codex
-            if codex.history_done:
+            if codex.history_done and codex.regions_done:
                 return
             import threading
             threading.Thread(target=codex.scan_history, args=(self.journal_folder,), name="bio-codex", daemon=True).start()

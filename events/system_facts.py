@@ -19,3 +19,7 @@ def remember_star_pos(entry, state):
     pos = entry.get("StarPos")
     if isinstance(pos, (list, tuple)) and len(pos) == 3 and all(isinstance(v, (int, float)) for v in pos):
         state.star_pos = (float(pos[0]), float(pos[1]), float(pos[2]))
+        try:
+            state.bio.set_position(state.star_pos)       # the biology codex is kept per galaxy region
+        except Exception:
+            pass

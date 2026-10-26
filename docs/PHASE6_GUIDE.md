@@ -883,3 +883,12 @@ Honest limit: still not tried in the game; the hold uses the Status.json flags (
 
 ## 0.59.3: planet view goes back to the list when you leave orbit
 Once you have been down at the planet (landing, landed, SRV, on foot, or near it) the planet view now ends when you leave its orbit, meaning the game stops naming that planet in Status.json (or names another one). Taking off and staying in orbit keeps it up. Honest limit: not tried in the game; "leaving orbit" is whenever the game stops reporting that planet as the one you are near.
+
+## 0.60.0: overlay colours by galaxy region
+The game keeps your codex per galaxy region (Inner Orion Spur, Odin's Hold and so on; 42 in all), so the same species is new again in a new region. The overlay now shows that:
+- Yellow text and a yellow flag: you have never found that species in any region.
+- Blue text and a blue flag: you have found it in another region but not in this one.
+- Orange text and no flag: you already have it in this region (also any form you have just finished sampling).
+This is used in the list and in the planet view. Before a form is identified (only the genus is known) the colour follows the best chance: if any species of that genus on the planet would be yellow, it is yellow.
+How she knows: every codex line in the journal names its region, and your finished samples are filed under the region you are in (worked out from the system's coordinates). On the first start after this update she re-reads your old journals once in the background to fill the regions in (the "Learn from all my old journals" button does the same). Until a species has a recorded region she treats it as found here, so nothing is wrongly blue.
+Honest limits: not tried in the game; the colours were only tested with a stand-in screen. Region names come from the same map as the region announcer, so a system on a border could be filed under the neighbouring region.

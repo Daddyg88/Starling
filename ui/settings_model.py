@@ -289,7 +289,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("exobiology.progress", "Say how far my codex has got", "toggle",
                   help="After a species you had never logged is finished: how many species are in your codex and which kinds you have never sampled (named once only three or fewer are left)"),
             Field("overlay.bio_enabled", "Show the biology list on screen", "toggle",
-                  help="A small see-through box with an orange border: every planet in the system with life, how many signals, the estimated value (~ is a guess) and a white flag for each signal that could be new to your codex. It goes away when you leave the system, or say 'hide the bio overlay'. Elite must be in Borderless or Windowed mode"),
+                  help="A small see-through box with an orange border: every planet in the system with life, how many signals, the estimated value (~ is a guess) and a flag for each signal that could be new to your codex: yellow = never found anywhere, blue = found in another galaxy region but not this one. Text is yellow, blue or orange (already found in this region) to match. It goes away when you leave the system, or say 'hide the bio overlay'. Elite must be in Borderless or Windowed mode"),
             Field("overlay.bio_x", "Biology list: distance from the left of the screen", "choice", PERCENTS,
                   help="Percent of the screen width"),
             Field("overlay.bio_up", "Biology list: height above the bottom of the screen", "choice", PERCENTS,

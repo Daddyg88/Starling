@@ -29,15 +29,18 @@ ORANGE = "#ff8c1a"
 KEY = "#010101"             # this exact colour becomes see-through (Windows)
 DARK = "#0b0b0b"
 WHITE = "#ffffff"
+BLUE = "#3da5ff"            # found in another region but not in this one
+YELLOW = "#ffd42a"          # never found anywhere
+TONES = {"never": YELLOW, "elsewhere": BLUE, "here": ORANGE}      # text colour; flags use the first two
 MAX_ROWS = 8
 CHECK_MS = 1000
 TEST_SECONDS = 10
 
 SIZES = {"Small": 10, "Medium": 12, "Large": 15}
 TEST_ROWS = [
-    {"body": "A 1", "count": 2, "value": 4200000, "new": 2, "known": False, "kind": "rocky", "species": [], "genera": []},
-    {"body": "B 3 a", "count": 1, "value": 19010800, "new": 1, "known": True, "kind": "highmetalcontent", "species": ["Stratum Tectonicas"], "genera": ["Stratum"]},
-    {"body": "C 2", "count": 3, "value": 5100000, "new": 0, "known": False, "kind": "icy", "species": [], "genera": []},
+    {"body": "A 1", "count": 2, "value": 4200000, "new": 2, "flags": ["never", "elsewhere"], "known": False, "kind": "rocky", "species": [], "genera": []},
+    {"body": "B 3 a", "count": 1, "value": 19010800, "new": 1, "flags": ["elsewhere"], "known": True, "kind": "highmetalcontent", "species": ["Stratum Tectonicas"], "genera": ["Stratum"]},
+    {"body": "C 2", "count": 3, "value": 5100000, "new": 0, "flags": [], "known": False, "kind": "icy", "species": [], "genera": []},
 ]
 
 
@@ -55,14 +58,22 @@ def short_credits(amount):
     return str(amount)
 
 
+FLAG_COLORS = {"never": YELLOW, "elsewhere": BLUE}
+
+
 def overlay_rows(rows, limit=MAX_ROWS):
     """Turns the predictor's rows into what is drawn: (text pieces per line, 'and N more' or '')."""
     lines = []
     for row in list(rows)[:limit]:
+        count = int(row.get("count") or 0)
+        statuses = list(row["flags"]) if isinstance(row.get("flags"), list) else ["never"] * int(row.get("new") or 0)
+        statuses = [s for s in statuses if s in ("never", "elsewhere")][:max(0, min(count, 6))]
         lines.append({
             "body": str(row.get("body") or "?"),
-            "count": int(row.get("count") or 0),
-            "flags": max(0, min(int(row.get("new") or 0), int(row.get("count") or 0), 6)),
+            "count": count,
+            "flags": len(statuses),
+            "flag_colors": [FLAG_COLORS[s] for s in statuses],
+            "tone": "never" if "never" in statuses else ("elsewhere" if statuses else "here"),
             "value": ("" if row.get("known") else "~") + short_credits(row.get("value")),
             "kind": str(row.get("kind") or "rocky"),
         })
@@ -71,16 +82,17 @@ def overlay_rows(rows, limit=MAX_ROWS):
 
 
 TEST_FOCUS = {"body": "B 3 a", "kind": "icy", "lives": [
-    {"name": "Stratum Tectonicas", "new": True, "done": False, "value": 19010800, "exact": True},
-    {"name": "Fonticulua", "new": False, "done": True, "value": 3200000, "exact": False},
-    {"name": "Bacterium", "new": True, "done": False, "value": 1200000, "exact": False}]}
+    {"name": "Stratum Tectonicas", "new": True, "status": "never", "done": False, "value": 19010800, "exact": True},
+    {"name": "Fonticulua", "new": False, "status": "here", "done": True, "value": 3200000, "exact": False},
+    {"name": "Bacterium", "new": True, "status": "elsewhere", "done": False, "value": 1200000, "exact": False}]}
 
 
 def overlay_focus(view):
     """The detailed view as text pieces: the planet and one line per life form (flag = new to the codex, done = line through it)."""
     lines = []
     for life in (view.get("lives") or [])[:MAX_ROWS]:
-        lines.append({"name": str(life.get("name") or "?"), "flag": bool(life.get("new")) and not life.get("done"),
+        status = "here" if life.get("done") else str(life.get("status") or ("never" if life.get("new") else "here"))
+        lines.append({"name": str(life.get("name") or "?"), "flag": status in ("never", "elsewhere"), "status": status,
                       "done": bool(life.get("done")),
                       "value": ("" if life.get("exact") else "~") + short_credits(life.get("value"))})
     return {"body": str(view.get("body") or "?"), "kind": str(view.get("kind") or "rocky"), "lives": lines}
@@ -165,14 +177,14 @@ class BioOverlay:
         view = wanted_focus(self.settings, state, test_until=self.test_until)
         if view is not None:
             focus = overlay_focus(view)
-            signature = ("focus", focus["body"], focus["kind"], tuple((l["name"], l["flag"], l["done"], l["value"]) for l in focus["lives"]), settings)
+            signature = ("focus", focus["body"], focus["kind"], tuple((l["name"], l["status"], l["done"], l["value"]) for l in focus["lives"]), settings)
             if signature != self._signature:
                 self._signature = signature
                 self._draw_focus(focus, settings)
             return
         rows, _ = wanted(self.settings, state, test_until=self.test_until)
         lines, more = overlay_rows(rows)
-        signature = (tuple((l["body"], l["count"], l["flags"], l["value"], l["kind"]) for l in lines), more, settings)
+        signature = (tuple((l["body"], l["count"], tuple(l["flag_colors"]), l["value"], l["kind"]) for l in lines), more, settings)
         if not lines:
             if self._signature is not None:
                 self._signature = None
@@ -241,11 +253,12 @@ class BioOverlay:
         for line in lines:
             mid = y + row_h // 2
             self._planet(canvas, pad + size * 0.9, mid, size * 0.75, line["kind"])
-            canvas.create_text(pad + size * 2.2, mid, text=line["body"], anchor="w", fill=ORANGE, font=font)
-            canvas.create_text(pad + size * 7.2, mid, text=str(line["count"]), anchor="w", fill=ORANGE, font=font)
-            for n in range(line["flags"]):
-                self._flag(canvas, pad + size * 8.6 + n * size * 1.2, mid, size)
-            canvas.create_text(width - pad, mid, text=line["value"], anchor="e", fill=ORANGE, font=font)
+            tone = TONES[line["tone"]]
+            canvas.create_text(pad + size * 2.2, mid, text=line["body"], anchor="w", fill=tone, font=font)
+            canvas.create_text(pad + size * 7.2, mid, text=str(line["count"]), anchor="w", fill=tone, font=font)
+            for n, colour in enumerate(line["flag_colors"]):
+                self._flag(canvas, pad + size * 8.6 + n * size * 1.2, mid, size, colour)
+            canvas.create_text(width - pad, mid, text=line["value"], anchor="e", fill=tone, font=font)
             y += row_h
         if more:
             canvas.create_text(pad + 2, y + int(size * 0.8), text=more, anchor="w", fill=ORANGE, font=small)
@@ -278,15 +291,16 @@ class BioOverlay:
         y = title_h
         for life in lives:
             mid = y + row_h // 2
+            tone = TONES.get(life["status"], ORANGE)
             if life["flag"]:
-                self._flag(canvas, pad + size * 0.6, mid, size)
+                self._flag(canvas, pad + size * 0.6, mid, size, tone)
             x = pad + size * 2.0
-            canvas.create_text(x, mid, text=life["name"], anchor="w", fill=ORANGE, font=font)
-            canvas.create_text(width - pad, mid, text=life["value"], anchor="e", fill=ORANGE, font=font)
+            canvas.create_text(x, mid, text=life["name"], anchor="w", fill=tone, font=font)
+            canvas.create_text(width - pad, mid, text=life["value"], anchor="e", fill=tone, font=font)
             if life["done"]:      # finished (three samples): a line through the name and the value
                 reach = x + len(life["name"]) * size * 0.62
-                canvas.create_line(x - 2, mid, min(reach, width - pad - size * 3), mid, fill=ORANGE, width=2)
-                canvas.create_line(width - pad - len(life["value"]) * size * 0.62, mid, width - pad, mid, fill=ORANGE, width=2)
+                canvas.create_line(x - 2, mid, min(reach, width - pad - size * 3), mid, fill=tone, width=2)
+                canvas.create_line(width - pad - len(life["value"]) * size * 0.62, mid, width - pad, mid, fill=tone, width=2)
             y += row_h
         screen_w, screen_h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
         px, top = placement(screen_w, screen_h, width, height, left, up)
@@ -310,9 +324,9 @@ class BioOverlay:
                 canvas.create_oval(cx + r * (dx - rr), cy + r * (dy - rr), cx + r * (dx + rr), cy + r * (dy + rr), outline=ORANGE)
 
     @staticmethod
-    def _flag(canvas, x, cy, size):
-        """A small white flag on a pole (drawn, so no special font is needed)."""
+    def _flag(canvas, x, cy, size, colour=WHITE):
+        """A small flag on a pole (drawn, so no special font is needed): yellow = never found, blue = found in another region."""
         h = size * 0.9
         top = cy - h / 2
-        canvas.create_line(x, top, x, top + h, fill=WHITE, width=2)
-        canvas.create_polygon(x, top, x + size * 0.7, top + h * 0.28, x, top + h * 0.56, fill=WHITE, outline=WHITE)
+        canvas.create_line(x, top, x, top + h, fill=colour, width=2)
+        canvas.create_polygon(x, top, x + size * 0.7, top + h * 0.28, x, top + h * 0.56, fill=colour, outline=colour)

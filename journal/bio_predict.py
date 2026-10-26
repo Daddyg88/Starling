@@ -68,67 +68,103 @@ def short_body(name, system):
 
 # ---------------------------------------------------------------- codex knowledge
 class BioCodex:
-    """Which biological species are already in your codex. Kept in data/bio_codex.json."""
+    """
+    Which biological species are in your codex, and in which galaxy regions you found them (the game keeps a codex per region:
+    the same species found in a new region is a new entry again). Kept in data/bio_codex.json.
+    """
 
     def __init__(self, path=None):
         self.path = Path(path) if path else None
         data = _read_json(self.path) if self.path else {}
         self.known = {str(s).lower() for s in data.get("species", []) if s}
+        self.regions = {str(k).lower(): {str(r) for r in v if r} for k, v in (data.get("regions") or {}).items() if isinstance(v, list)}
         self.history_done = bool(data.get("history_done"))
+        self.regions_done = bool(data.get("regions_done"))      # False in files from before regions were kept: the old journals are read again once
         self._lock = threading.Lock()
 
     def has(self, species):
         return str(species or "").lower() in self.known
 
-    def add(self, species):
+    def add(self, species, region=""):
         key = str(species or "").lower().strip()
-        if key and key not in self.known:
-            self.known.add(key)
+        if not key:
+            return
+        changed = key not in self.known
+        self.known.add(key)
+        if region and region not in self.regions.setdefault(key, set()):
+            self.regions[key].add(region)
+            changed = True
+        if changed:
             self.save()
+
+    def where(self, species, region=""):
+        """'never' (not in your codex anywhere), 'elsewhere' (found, but not in this region) or 'here'.
+        When the region is not known (or old data has no regions) a species you have is 'here', so nothing is wrongly marked."""
+        key = str(species or "").lower()
+        if key not in self.known:
+            return "never"
+        seen = self.regions.get(key)
+        if not region or not seen:
+            return "here"
+        return "here" if region in seen else "elsewhere"
 
     def save(self):
         if self.path:
             with self._lock:
-                _write_json(self.path, {"species": sorted(self.known), "history_done": self.history_done})
+                _write_json(self.path, {"species": sorted(self.known), "history_done": self.history_done, "regions_done": self.regions_done,
+                                        "regions": {k: sorted(v) for k, v in sorted(self.regions.items()) if v}})
 
     def scan_history(self, folder, rules=None):
         """One-off: reads your old journal files for codex finds and finished samples. Run it in a background thread."""
-        if self.history_done or not folder:
+        if (self.history_done and self.regions_done) or not folder:
             return
         names = {r["n"].lower() for r in (rules if rules is not None else load_rules())} | set(UNIQUE_SPECIES)
         try:
             files = sorted(Path(folder).glob("Journal*.log"))
         except OSError:
             return
+        from navigation.regions import region_of
         for file in files:
+            region = ""
             try:
                 with open(file, "r", encoding="utf-8", errors="replace") as handle:
                     for line in handle:
+                        if '"StarPos"' in line and ("FSDJump" in line or "Location" in line or "CarrierJump" in line):
+                            try:
+                                found = region_of(json.loads(line).get("StarPos"))
+                            except ValueError:
+                                found = None
+                            region = found[1] if found else region
+                            continue
                         if "CodexEntry" not in line and "ScanOrganic" not in line:
                             continue
                         try:
                             entry = json.loads(line)
                         except ValueError:
                             continue
-                        self._from_entry(entry, names, save=False)
+                        self._from_entry(entry, names, save=False, region=region)
             except OSError:
                 continue
         self.history_done = True
+        self.regions_done = True
         self.save()
 
-    def _from_entry(self, entry, names, save=True):
+    def _from_entry(self, entry, names, save=True, region=""):
         kind = entry.get("event")
         if kind == "CodexEntry":
             species = str(entry.get("Name_Localised") or "").split(" - ")[0].strip().lower()
+            region = str(entry.get("Region_Localised") or "") or region      # the codex line names its own region
         elif kind == "ScanOrganic" and entry.get("ScanType") == "Analyse":
             species = str(entry.get("Species_Localised") or "").strip().lower()
         else:
             return
         if species in names:
             if save:
-                self.add(species)
+                self.add(species, region)
             else:
                 self.known.add(species)
+                if region:
+                    self.regions.setdefault(species, set()).add(region)
 
 
 # ---------------------------------------------------------------- what she has learned
@@ -240,6 +276,7 @@ class BioPredictor:
         self.learned = learned or BioLearned()
         self.settings = settings
         self._rules = rules
+        self.region = ""           # the galaxy region you are in (kept when you jump to a new system: set_position changes it)
         self.reset()
 
     # ---- helpers ----
@@ -260,6 +297,15 @@ class BioPredictor:
             return bool(self.settings.get(key, default)) if self.settings is not None else default
         except Exception:
             return default
+
+    def set_position(self, pos):
+        """Galaxy coordinates of the system you are in (the journal's StarPos): works out which of the 42 regions it is."""
+        try:
+            from navigation.regions import region_of
+            found = region_of(pos)
+            self.region = found[1] if found else ""
+        except Exception:
+            self.region = ""
 
     def reset(self):
         """Forget the system (called when you jump away)."""
@@ -322,7 +368,7 @@ class BioPredictor:
         return []
 
     def note_codex(self, entry):
-        self.codex._from_entry(entry, {r["n"].lower() for r in self.rules})
+        self.codex._from_entry(entry, {r["n"].lower() for r in self.rules} | set(UNIQUE_SPECIES), region=self.region)
 
     # ---- fitting the rules ----
     def fits(self, rule, p, geo=False):
@@ -433,19 +479,30 @@ class BioPredictor:
         return sorted(found, key=lambda r: -(self.species_value(r) or 0))
 
     # ---- codex flags ----
-    def new_flags(self, body):
-        """How many of the body's signals could be something you do not have in your codex yet."""
+    def group_status(self, names):
+        """'never' / 'elsewhere' / 'here' for a set of possible species: the best news wins (one never-found species makes it 'never')."""
+        states = [self.codex.where(n, self.region) for n in names]
+        if "never" in states:
+            return "never"
+        return "elsewhere" if "elsewhere" in states else "here"
+
+    def body_statuses(self, body):
+        """One entry per flag to show: 'never' (yellow) first, then 'elsewhere' (blue). Species you already have in this region show nothing."""
         if body.genera:
-            return sum(1 for life in self._lives(body) if life["new"] and not life["done"])
-        if body.species:
-            return sum(1 for s in body.species if not self.codex.has(s))
-        groups = {}
-        for r in body.candidates:
-            if body.genera and not any(same_genus(r["g"], g) for g in body.genera):
-                continue
-            groups.setdefault(r["g"], []).append(r["n"])
-        fresh = sum(1 for names in groups.values() if any(not self.codex.has(n) for n in names))
-        return min(fresh, body.count) if not body.genera else min(fresh, len(body.genera))
+            found = [life["status"] for life in self._lives(body) if life["status"] != "here" and not life["done"]]
+        else:
+            found = [s for s in (self.codex.where(sp, self.region) for sp in body.species) if s != "here"]
+            if not body.species:
+                groups = {}
+                for r in body.candidates:
+                    groups.setdefault(r["g"], []).append(r["n"])
+                found = [st for st in (self.group_status(names) for names in groups.values()) if st != "here"][:max(1, body.count)]
+        order = {"never": 0, "elsewhere": 1}
+        return sorted(found, key=lambda st: order.get(st, 2))
+
+    def new_flags(self, body):
+        """How many of the body's signals could be something you do not have in your codex (in this region) yet."""
+        return len(self.body_statuses(body))
 
     # ---- the journal events ----
     def _body(self, name, count, system=""):
@@ -566,7 +623,7 @@ class BioPredictor:
                 if entry.get("Genus_Localised"):
                     body.done_genera.append(str(entry["Genus_Localised"]))
             fresh = not self.codex.has(species)
-            self.codex.add(species)
+            self.codex.add(species, self.region)
             if fresh and species.lower() not in UNIQUE_SPECIES and self._on("exobiology.progress", True):
                 events.append(("BioProgress", self.progress(species)))
         return events
@@ -617,14 +674,17 @@ class BioPredictor:
             options = [r for r in body.candidates if same_genus(r["g"], genus)] or [r for r in self.rules if same_genus(r["g"], genus)]
             if species:
                 base = self.species_value(species) or 0
-                new = not self.codex.has(species)
+                status = self.codex.where(species, self.region)
                 done = species.lower() in body.done
             else:
                 values = [self.species_value(r) for r in options if self.species_value(r)]
                 base = sum(values) / len(values) if values else 0
-                new = any(not self.codex.has(r["n"]) for r in options) if options else True
+                status = self.group_status([r["n"] for r in options]) if options else "never"
                 done = False
-            lives.append({"name": species or genus, "new": bool(new), "done": done, "value": int(base * mult), "exact": bool(species)})
+            if done:
+                status = "here"
+            lives.append({"name": species or genus, "new": status != "here", "status": status, "done": done,
+                          "value": int(base * mult), "exact": bool(species)})
         return lives
 
     def focus_view(self):
@@ -646,7 +706,7 @@ class BioPredictor:
         for body in self.bodies.values():
             est = self.estimate(body)
             out.append({"body": body.short, "count": body.count, "value": self.worth(body) or (int(est[1]) if est else 0),
-                        "new": self.new_flags(body), "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "known": bool(body.genera) and all(life["exact"] for life in self._lives(body)),
+                        "new": self.new_flags(body), "flags": self.body_statuses(body), "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "known": bool(body.genera) and all(life["exact"] for life in self._lives(body)),
                         "species": list(body.species), "genera": list(body.genera)})
         return out
 

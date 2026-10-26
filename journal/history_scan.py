@@ -101,6 +101,7 @@ class HistoryScan:
             _write_json(self.tracker._learned_file, self.tracker.learned) if self.tracker._learned_file else None
         if not self.stop_flag:
             self.codex.history_done = True
+            self.codex.regions_done = True
         self.codex.save()
         self.learned.save()
         if totals.get("played"):
@@ -197,6 +198,7 @@ class HistoryScan:
         kind = entry.get("event")
         if kind in ("FSDJump", "Location", "CarrierJump"):
             predictor.set_system(entry.get("StarSystem"))
+            predictor.set_position(entry.get("StarPos"))
         elif kind == "Scan":
             predictor.note_scan(entry)
         elif kind == "FSSBodySignals":
@@ -204,7 +206,7 @@ class HistoryScan:
         elif kind == "SAASignalsFound":
             predictor.note_saa(entry, predictor.system)
         elif kind in ("CodexEntry", "ScanOrganic"):
-            self.codex._from_entry(entry, names, save=False)
+            self.codex._from_entry(entry, names, save=False, region=predictor.region)
         elif kind == "SellOrganicData":
             for item in entry.get("BioData") or []:
                 if isinstance(item, dict) and item.get("Species_Localised") and isinstance(item.get("Value"), (int, float)) and item["Value"] > 0:

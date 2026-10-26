@@ -337,3 +337,76 @@ class LandingAndValue(unittest.TestCase):
         reader.handle_status({"Flags": 1, "Destination": {"Body": 5}})
         reader.handle_status({"Flags": 1 | 4})                 # landing gear down, target gone
         self.assertIsNotNone(processor.state.bio.focus_view())
+
+
+class RegionColours(unittest.TestCase):
+    SOL = (0.0, 0.0, 0.0)               # Inner Orion Spur
+    COLONIA = (-9530.5, -910.3, 19808.1)
+
+    def test_codex_knows_where(self):
+        from journal.bio_predict import BioCodex
+        c = BioCodex()
+        self.assertEqual(c.where("Aleoida Arcus", "Inner Orion Spur"), "never")
+        c.add("Aleoida Arcus", "Inner Orion Spur")
+        self.assertEqual(c.where("Aleoida Arcus", "Inner Orion Spur"), "here")
+        self.assertEqual(c.where("Aleoida Arcus", "Odin's Hold"), "elsewhere")
+        c.add("Old One")                                    # old data without regions: never called "elsewhere"
+        self.assertEqual(c.where("Old One", "Odin's Hold"), "here")
+
+    def test_codex_entry_names_its_region_and_it_is_saved(self):
+        import tempfile, pathlib
+        from journal.bio_predict import BioCodex
+        p = pathlib.Path(tempfile.mkdtemp()) / "c.json"
+        c = BioCodex(p)
+        c._from_entry({"event": "CodexEntry", "Name_Localised": "Aleoida Arcus - Red", "Region_Localised": "Odin's Hold"}, {"aleoida arcus"})
+        again = BioCodex(p)
+        self.assertEqual(again.where("Aleoida Arcus", "Odin's Hold"), "here")
+        self.assertEqual(again.where("Aleoida Arcus", "Inner Orion Spur"), "elsewhere")
+
+    def test_history_scan_reads_regions_once(self):
+        import tempfile, pathlib, json
+        from journal.bio_predict import BioCodex
+        folder = pathlib.Path(tempfile.mkdtemp())
+        lines = [{"event": "FSDJump", "StarSystem": "S", "StarPos": list(self.COLONIA)},
+                 {"event": "ScanOrganic", "ScanType": "Analyse", "Species_Localised": "Aleoida Arcus"}]
+        (folder / "Journal.2026-01-01T000000.01.log").write_text("\n".join(json.dumps(l) for l in lines), encoding="utf-8")
+        c = BioCodex()
+        c.scan_history(folder)
+        self.assertTrue(c.regions_done)
+        from navigation.regions import region_of
+        far = region_of(self.COLONIA)[1]
+        self.assertEqual(c.where("Aleoida Arcus", far), "here")
+        self.assertEqual(c.where("Aleoida Arcus", "Inner Orion Spur"), "elsewhere")
+
+    def test_overlay_colours(self):
+        _, state = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 2), saa(["Aleoida", "Tussock"])])
+        bio = state.bio
+        bio.set_position(self.SOL)
+        self.assertEqual(bio.region, "Inner Orion Spur")
+        bio.codex.add("Tussock Albata", "Odin's Hold")
+        for r in bio.rules:
+            if r["g"] == "Tussock":
+                bio.codex.add(r["n"], "Odin's Hold")        # every Tussock found, but in another region
+        lives = bio.focus_view()["lives"]
+        self.assertEqual([l["status"] for l in lives], ["never", "elsewhere"])
+        lines = ov.overlay_focus(bio.focus_view())["lives"]
+        self.assertEqual([l["flag"] for l in lines], [True, True])
+        row = ov.overlay_rows(bio.rows())[0][0]
+        self.assertEqual(row["flag_colors"], [ov.YELLOW, ov.BLUE])
+        self.assertEqual(row["tone"], "never")
+        for r in bio.rules:
+            if r["g"] == "Tussock":
+                bio.codex.add(r["n"], "Inner Orion Spur")   # now found here too: orange, no flag
+        lines = ov.overlay_focus(bio.focus_view())["lives"]
+        self.assertEqual([l["status"] for l in lines], ["never", "here"])
+        self.assertFalse(lines[1]["flag"])
+
+    def test_finished_form_is_orange_and_flagless(self):
+        _, state = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"]),
+                        sample("Log", "Aleoida Arcus", "Aleoida"), sample("Analyse", "Aleoida Arcus", "Aleoida")])
+        line = ov.overlay_focus(state.bio.focus_view())["lives"][0]
+        self.assertEqual((line["status"], line["flag"], line["done"]), ("here", False, True))
+
+    def test_position_from_events(self):
+        got, state = run([{"event": "FSDJump", "StarSystem": "Test", "StarPos": list(self.SOL), "SystemAddress": 1}])
+        self.assertEqual(state.bio.region, "Inner Orion Spur")
