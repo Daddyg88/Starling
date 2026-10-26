@@ -183,6 +183,7 @@ class BioPredictor:
         self.system = ""
         self.spoken = 0
         self.hinted = set()
+        self.hidden = False        # "hide the bio overlay" (voice); shown again in the next system
 
     # ---- journal input ----
     def set_system(self, name):
@@ -425,7 +426,7 @@ class BioPredictor:
         for body in self.bodies.values():
             est = self.estimate(body)
             out.append({"body": body.short, "count": body.count, "value": self.worth(body) or (int(est[1]) if est else 0),
-                        "new": self.new_flags(body), "known": bool(body.species or body.genera),
+                        "new": self.new_flags(body), "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "known": bool(body.species or body.genera),
                         "species": list(body.species), "genera": list(body.genera)})
         return out
 

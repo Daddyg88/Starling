@@ -355,6 +355,13 @@ class App:
                 macro_hooks=self._macro_hooks(),
                 memory=self.memory_recall, smalltalk=self.smalltalk, brain=self.brain)
             # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
+            try:
+                from control.bio_voice import BioOverlayVoice
+                from navigation.voice import Narrator
+                self.commands.extra_helpers.append(BioOverlayVoice(
+                    lambda: self.state, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
+            except Exception:
+                self.log.exception("The biology overlay voice command could not start")
             self.commands.attach()
             self._connect_auto_plot()
             if self.settings.get("voidcompass.enabled", True):

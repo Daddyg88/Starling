@@ -73,6 +73,12 @@ class Dashboard:
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         self._build_layout()
+        try:
+            from ui.bio_overlay import BioOverlay
+            self.bio_overlay = BioOverlay(self.root, app.settings, lambda: app.state)
+        except Exception:
+            log.exception("The biology overlay could not start")
+            self.bio_overlay = None
         self.root.bind("<Configure>", self._window_moved, add="+")
         self.show("home")
         self.root.after(REFRESH_MS, self._tick)
@@ -718,6 +724,8 @@ class Dashboard:
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
+        if page.id == "exobiology":
+            extra.append(("Show a test biology list for 10 seconds", self.test_bio_overlay))
         if page.id == "listening":
             extra.append(("Refresh microphone list", lambda p=page: self.refresh_mics(p)))
         if page.id == "memory":
@@ -1211,6 +1219,13 @@ class Dashboard:
         except Exception:
             log.exception("Dashboard refresh failed")
         self.root.after(REFRESH_MS, self._tick)
+
+    def test_bio_overlay(self):
+        """Shows made-up planets for 10 seconds, so you can check where the box sits (save settings first)."""
+        if self.model.dirty():
+            self.model.save()
+        if getattr(self, "bio_overlay", None) is not None:
+            self.bio_overlay.show_test(10)
 
     def close(self):
         if self.model.dirty():

@@ -86,6 +86,7 @@ class CommandRunner:
         self.brain = brain               # personality/brain.py: answers anything that is not a command
         self.smalltalk = smalltalk       # personality/smalltalk.py: "how are you?", "tell me a joke"
         self.memory = memory             # memory/recall.py: "what do you remember"
+        self.extra_helpers = []          # more voice helpers (the biology overlay) that answer before anything else
         self.route = route               # navigation/voice.py: 'plot a neutron route to Colonia'
         self.voidcompass = voidcompass   # control/voidcompass.py (made on first use if not given)
         self.clock = clock
@@ -170,7 +171,7 @@ class CommandRunner:
         return outcomes
 
     def _run_text(self, text, speak_unknown=True, speak=True):
-        for helper in (self.smalltalk, self.memory, self.route):       # spoken questions and the route plotter answer for themselves
+        for helper in (*self.extra_helpers, self.smalltalk, self.memory, self.route):       # spoken questions and the route plotter answer for themselves
             if helper is None:
                 continue
             try:

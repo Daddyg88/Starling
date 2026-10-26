@@ -67,6 +67,8 @@ CHITCHAT = [("Rarely", "rarely"), ("Normal", "normal"), ("Often", "often"), ("Ch
 REMARKS = [("Never", "off"), ("Rarely", "rare"), ("Sometimes", "sometimes"), ("Often", "often")]
 AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million", 500000000),
              ("After 1 billion", 1000000000)]
+PERCENTS = [("%d%%" % v, v) for v in range(0, 96, 5)]
+OVERLAY_SIZES = [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]
 MINERAL_CHOICES = minerals.choices()      # every mineral, metal and ice you can mine (mining/minerals.py)
 MINING_CHATTER = [("Quiet (first of each, every 10 tonnes)", "quiet"), ("Normal (every 5 tonnes, a few cheers)", "normal"),
                   ("Chatty (every 3 tonnes, lots of cheers)", "chatty")]
@@ -284,6 +286,15 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="After the system scanner she guesses which species could be there (from temperature, gravity, atmosphere and so on) and what it might be worth. After the surface scan she corrects the guess"),
             Field("exobiology.top_hint", "Say when a top ten species might be there", "toggle",
                   help="'You might find Stratum Tectonicas on that planet, it might be worth a scan'. At most three times in a system"),
+            Field("overlay.bio_enabled", "Show the biology list on screen", "toggle",
+                  help="A small see-through box with an orange border: every planet in the system with life, how many signals, the estimated value (~ is a guess) and a white flag for each signal that could be new to your codex. It goes away when you leave the system, or say 'hide the bio overlay'. Elite must be in Borderless or Windowed mode"),
+            Field("overlay.bio_x", "Biology list: distance from the left of the screen", "choice", PERCENTS,
+                  help="Percent of the screen width"),
+            Field("overlay.bio_up", "Biology list: height above the bottom of the screen", "choice", PERCENTS,
+                  help="Percent of the screen height. 25% is about a quarter of the way up"),
+            Field("overlay.bio_size", "Biology list: size", "choice", OVERLAY_SIZES),
+            Field("overlay.bio_dark", "Biology list: dark background", "toggle",
+                  help="Off = fully see-through (only the orange shows). On = a dark box behind the writing, easier to read on a bright planet"),
             Field("ask.bio_prompts", "Wonder aloud about planets with life", "toggle",
                   help="She says 'shall we go and see what's down there?'. No answer is needed and it never changes her mood"),
             Field("personality.affection_credits", "Gets affectionate when rich", "choice", AFFECTION,

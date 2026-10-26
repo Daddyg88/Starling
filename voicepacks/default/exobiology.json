@@ -81,5 +81,15 @@
  ],
  "BioRefined_Wrong_Sarcastic": [
   "{Found} on {Body}. Fine, I was wrong. Don't tell anyone. About {Worth} credits."
+ ],
+ "BioOverlay_Hidden": [
+  "Biology list hidden.",
+  "Done, the biology list is gone.",
+  "Hidden."
+ ],
+ "BioOverlay_Shown": [
+  "Biology list is back.",
+  "There it is.",
+  "Showing the biology list."
  ]
 }
