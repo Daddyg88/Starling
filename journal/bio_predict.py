@@ -597,7 +597,9 @@ class BioPredictor:
             self.focus_held = True          # landing or landed: keep the planet view up whatever the target does
             return
         if self.focus_held:
-            self.focus_held = False         # you have left the planet again: from now on the target rules apply
+            self.focus_held = False         # you were down at the planet and now you have left its orbit: back to the list
+            self.focus = ""
+            return
         if body.body_id is not None and body_id == body.body_id:
             self.focus_targeted = True
         elif body_id is None or body_id == 0:

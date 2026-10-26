@@ -323,7 +323,9 @@ class LandingAndValue(unittest.TestCase):
         bio.note_target(None, hold=True)                       # gear down / landed / SRV / on foot
         bio.note_target(9, hold=True)
         self.assertIsNotNone(bio.focus_view())
-        bio.note_target(None)                                  # taken off and cleared the target: back to the list
+        bio.note_target(None, near="Test A 1")                 # took off but still in orbit: stays
+        self.assertIsNotNone(bio.focus_view())
+        bio.note_target(5, near="")                            # left orbit (the game no longer names the planet): back to the list
         self.assertIsNone(bio.focus_view())
 
     def test_status_flags_reach_it(self):
