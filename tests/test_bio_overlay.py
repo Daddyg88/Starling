@@ -177,3 +177,110 @@ class DrawingTests(unittest.TestCase):
         for dark in (True, False):
             for size in ("Small", "Large"):
                 box._draw(*ov.overlay_rows(ov.TEST_ROWS), (3, 25, size, dark))
+
+
+def saa(genera, name="Test A 1", body_id=5):
+    return {"event": "SAASignalsFound", "BodyName": name, "BodyID": body_id, "SystemAddress": 1,
+            "Signals": [{"Type_Localised": "Biological", "Count": len(genera)}], "Genuses": [{"Genus_Localised": g} for g in genera]}
+
+
+def sample(stage, species, genus, body_id=5):
+    return {"event": "ScanOrganic", "ScanType": stage, "Genus_Localised": genus, "Species_Localised": species,
+            "Variant_Localised": species, "Body": body_id, "SystemAddress": 1}
+
+
+class DetailedView(unittest.TestCase):
+    def mapped(self, extra=()):
+        entries = [planet("Test A 1", k=177, SystemAddress=1, WasFootfalled=True), fss("Test A 1", 2), saa(["Aleoida", "Tussock"])]
+        return run(entries + list(extra))
+
+    def test_view_appears_after_mapping(self):
+        _, state = self.mapped()
+        view = state.bio.focus_view()
+        self.assertEqual([l["name"] for l in view["lives"]], ["Aleoida", "Tussock"])
+        self.assertTrue(all(l["new"] and not l["done"] for l in view["lives"]))
+        self.assertTrue(all(not l["exact"] for l in view["lives"]))
+
+    def test_species_and_strike_through_and_codex_flag(self):
+        _, state = self.mapped([sample("Log", "Aleoida Arcus", "Aleoida"), sample("Analyse", "Aleoida Arcus", "Aleoida")])
+        lives = state.bio.focus_view()["lives"]
+        self.assertEqual(lives[0]["name"], "Aleoida Arcus")
+        self.assertTrue(lives[0]["done"])
+        self.assertFalse(lives[0]["new"] and False)
+        self.assertFalse(lives[1]["done"])
+        lines = ov.overlay_focus(state.bio.focus_view())["lives"]
+        self.assertTrue(lines[0]["done"])
+        self.assertFalse(lines[0]["flag"])             # finished: no flag any more
+        self.assertTrue(lines[1]["flag"])
+
+    def test_codex_known_species_has_no_flag(self):
+        _, state = self.mapped([sample("Log", "Aleoida Arcus", "Aleoida")])
+        state.bio.codex.add("Aleoida Arcus")
+        self.assertFalse(state.bio.focus_view()["lives"][0]["new"])
+
+    def test_first_footfall_is_times_five(self):
+        normal = self.mapped()[1].bio.focus_view()["lives"][0]["value"]
+        entries = [planet("Test A 1", k=177, SystemAddress=1, WasFootfalled=False), fss("Test A 1", 2), saa(["Aleoida", "Tussock"])]
+        first = run(entries)[1].bio.focus_view()["lives"][0]["value"]
+        self.assertEqual(first, normal * 5)
+        self.assertAlmostEqual(run(entries)[1].bio.rows()[0]["value"], 5 * self.mapped()[1].bio.rows()[0]["value"], delta=5)
+
+    def test_target_rules(self):
+        _, state = self.mapped()
+        bio = state.bio
+        bio.note_target(None)                 # never targeted it (yet): stays
+        self.assertIsNotNone(bio.focus_view())
+        bio.note_target(5)                    # target is the planet
+        bio.note_target(5)
+        self.assertIsNotNone(bio.focus_view())
+        bio.note_target(7)                    # another body: back to the list
+        self.assertIsNone(bio.focus_view())
+
+    def test_untargeting_after_targeting_goes_back(self):
+        _, state = self.mapped()
+        state.bio.note_target(5)
+        state.bio.note_target(None)
+        self.assertIsNone(state.bio.focus_view())
+
+    def test_new_system_clears_it(self):
+        _, state = self.mapped()
+        state.bio.set_system("Elsewhere")
+        self.assertIsNone(state.bio.focus_view())
+
+    def test_status_json_destination_reaches_the_overlay(self):
+        from journal.status_reader import StatusReader
+        from tests.helpers import make_processor
+        processor, _bus, _heard = make_processor()
+        processor.state.bio = self.mapped()[1].bio
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        reader.handle_status({"Flags": 1, "Destination": {"System": 1, "Body": 5, "Name": "Test A 1"}})
+        reader.handle_status({"Flags": 1, "Destination": {"System": 1, "Body": 9, "Name": "Other"}})
+        self.assertIsNone(processor.state.bio.focus_view())
+
+    def test_wanted_focus_respects_switches_and_test_mode(self):
+        _, state = self.mapped()
+        self.assertIsNotNone(ov.wanted_focus(Settings(), state))
+        self.assertIsNone(ov.wanted_focus(Settings(**{"overlay.bio_enabled": False}), state))
+        state.bio.hidden = True
+        self.assertIsNone(ov.wanted_focus(Settings(), state))
+        self.assertIsNone(ov.wanted_focus(Settings(), GameState(), now=1.0, test_until=10.0))       # first half of the test: the list
+        self.assertIsNotNone(ov.wanted_focus(Settings(), GameState(), now=7.0, test_until=10.0))    # second half: the planet view
+
+
+class DetailedDrawing(DrawingTests):
+    def test_draws_strike_and_flags_and_goes_back_to_list(self):
+        _, state = DetailedView().mapped([sample("Log", "Aleoida Arcus", "Aleoida"), sample("Analyse", "Aleoida Arcus", "Aleoida")])
+        box = ov.BioOverlay(FakeRoot(), Settings(), lambda: state)
+        box._update()
+        names = [n for n, _, _ in box.canvas.items]
+        self.assertIn("create_line", names)                    # the line through the finished one
+        self.assertIn("create_polygon", names)                 # a flag for the other
+        before = len(box.canvas.items)
+        box._update()
+        self.assertEqual(len(box.canvas.items), before)        # unchanged: no redraw
+        state.bio.note_target(99)
+        box._update()                                          # back to the list
+        self.assertGreater(len(box.canvas.items), 0)
+        for dark in (True, False):
+            for size in ("Small", "Large"):
+                box._draw_focus(ov.overlay_focus(ov.TEST_FOCUS), (3, 25, size, dark))

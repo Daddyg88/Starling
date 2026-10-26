@@ -21,13 +21,13 @@ def scan_keys(data):
     """
     planet = str(data.get("PlanetClass") or "").lower()
     star = str(data.get("StarType") or "")
-    first = data.get("WasDiscovered") is False      # nobody has scanned it before: the rare ones get an extra special line
+    first = data.get("WasDiscovered") is False      # nobody has scanned it before. Out exploring that is common, so only Earth-likes and rare giants get the extra line
     if "earth" in planet:
         return ["Scan_EarthLike_First", "Scan_EarthLike"] if first else ["Scan_EarthLike"]
     if planet == "water world":
-        return ["Scan_WaterWorld_First", "Scan_WaterWorld"] if first else ["Scan_WaterWorld"]
+        return ["Scan_WaterWorld"]
     if planet == "ammonia world":
-        return ["Scan_AmmoniaWorld_First", "Scan_AmmoniaWorld"] if first else ["Scan_AmmoniaWorld"]
+        return ["Scan_AmmoniaWorld"]
     if "gas giant with" in planet and "life" in planet:
         return ["Scan_LifeGasGiant"]       # NOT a "green gas giant" (that is a codex entry, see events/codex_entry.py); about 1 in 120 planets in real journals
     if planet in ("water giant", "helium rich gas giant", "sudarsky class v gas giant"):

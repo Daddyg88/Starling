@@ -221,6 +221,9 @@ class BioBody:
         self.known_props = True            # False when she never saw this body's own scan
         self.awaiting = False              # the FSS signals came first; the guess waits for the body's own Scan (it follows a line later)
         self.geo = False
+        self.body_id = None
+        self.done = []                     # species (lower case) you have finished sampling here: all three samples
+        self.done_genera = []
 
     def candidate_genera(self):
         seen = []
@@ -269,6 +272,8 @@ class BioPredictor:
         self.spoken = 0
         self.hinted = set()
         self.hidden = False        # "hide the bio overlay" (voice); shown again in the next system
+        self.focus = ""            # the planet the overlay is showing in detail (after you map it), "" = show the list
+        self.focus_targeted = False   # has the game's target been that planet since we focused it?
 
     # ---- journal input ----
     def set_system(self, name):
@@ -301,6 +306,8 @@ class BioPredictor:
             "k": entry.get("SurfaceTemperature") if isinstance(entry.get("SurfaceTemperature"), (int, float)) else None,
             "volc": str(entry.get("Volcanism") or "").lower(),
             "ls": entry.get("DistanceFromArrivalLS"),
+            "addr": entry.get("SystemAddress"),
+            "id": entry.get("BodyID"),
         }
         if entry.get("BodyID") is not None:
             self.ids[entry["BodyID"]] = name
@@ -394,11 +401,21 @@ class BioPredictor:
             weights = {g: self.learned.weight(g) for g in groups}
             total = sum(weights.values()) or 1.0
             expected = sum(weights[g] * (sum(v) / len(v)) for g, v in groups.items()) / total * count
-        return (sum(lows[:count]), expected, sum(highs[:count]))
+        mult = self.footfall_multiplier(body)
+        return (sum(lows[:count]) * mult, expected * mult, sum(highs[:count]) * mult)
+
+    def footfall_multiplier(self, body):
+        """5 when nobody had set foot on the planet before you (the game's first footfall bonus), otherwise 1."""
+        p = self.props.get(body.name) or {}
+        try:
+            first = self.tracker.footfall.get((p.get("addr"), p.get("id"))) is False
+            return self.tracker.multiplier if first else 1
+        except Exception:
+            return 1
 
     def worth(self, body):
         if body.species:
-            return sum(self.species_value(s) or 0 for s in body.species)
+            return sum(self.species_value(s) or 0 for s in body.species) * self.footfall_multiplier(body)
         est = self.estimate(body)
         return int(est[1]) if est else 0
 
@@ -501,6 +518,10 @@ class BioPredictor:
             body.candidates = self.candidates_for(name, geo=counts["Geological"] > 0)
             body.guessed_genera = body.candidate_genera()
         body.genera = genera
+        if entry.get("BodyID") is not None:
+            body.body_id = entry["BodyID"]
+        if genera:
+            self.focus, self.focus_targeted = name, False      # the overlay switches to this planet until you target something else
         if genera and body.known_props:
             self.learned.observe("%s|%s" % (self.system or state_system, name), self.props.get(name), body.guessed_genera, genera)
         if not genera or not self._on("exobiology.guess", True):
@@ -534,6 +555,10 @@ class BioPredictor:
         if species.lower() in UNIQUE_SPECIES and entry.get("ScanType") == "Log":
             events.append(("UniqueBio", {"Species": species, "Body": body.short if body else ""}))
         if entry.get("ScanType") == "Analyse":
+            if body is not None and species.lower() not in body.done:
+                body.done.append(species.lower())
+                if entry.get("Genus_Localised"):
+                    body.done_genera.append(str(entry["Genus_Localised"]))
             fresh = not self.codex.has(species)
             self.codex.add(species)
             if fresh and species.lower() not in UNIQUE_SPECIES and self._on("exobiology.progress", True):
@@ -555,6 +580,50 @@ class BioPredictor:
         return data
 
     # ---- for the overlay ----
+    def note_target(self, body_id):
+        """Status.json says which body is targeted now (None = nothing). The detailed view stays while that planet is the target,
+        and also while the target does not change (you are landing). Targeting another body, or un-targeting it, goes back to the list."""
+        body = self.bodies.get(self.focus) if self.focus else None
+        if body is None:
+            self.focus = ""
+            return
+        if body.body_id is not None and body_id == body.body_id:
+            self.focus_targeted = True
+        elif body_id is None or body_id == 0:
+            if self.focus_targeted:
+                self.focus = ""
+        else:
+            self.focus = ""
+
+    def focus_view(self):
+        """What the detailed view shows: the planet and one line per life form, or None when the list should be shown."""
+        body = self.bodies.get(self.focus) if self.focus else None
+        if body is None or not body.genera:
+            return None
+        mult = self.footfall_multiplier(body)
+        lives = []
+        for genus in body.genera:
+            species = next((s for s in body.species if same_genus(genus, self._genus_of(s))), "")
+            options = [r for r in self.rules if same_genus(r["g"], genus)]
+            if species:
+                base = self.species_value(species) or 0
+                new = not self.codex.has(species)
+                done = species.lower() in body.done
+            else:
+                values = [self.species_value(r) for r in options if self.species_value(r)]
+                base = sum(values) / len(values) if values else 0
+                new = any(not self.codex.has(r["n"]) for r in options) if options else True
+                done = False
+            lives.append({"name": species or genus, "new": bool(new), "done": done, "value": int(base * mult),
+                          "exact": bool(species)})
+        return {"body": body.short, "kind": (self.props.get(body.name) or {}).get("pc", "rocky"), "lives": lives}
+
+    def _genus_of(self, species):
+        for r in self.rules:
+            if r["n"].lower() == str(species).lower():
+                return r["g"]
+        return str(species).split(" ")[0]
+
     def rows(self):
         """One dictionary per body with life, in the order she found them."""
         out = []

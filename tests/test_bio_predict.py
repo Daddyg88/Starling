@@ -34,7 +34,10 @@ def run(entries, settings=None):
     bus.subscribe("*", lambda e: got.append((e.name, e.data)))
     state = GameState()
     state.system = "Test"
-    state.bio = BioPredictor(codex=BioCodex(), settings=settings)
+    from core import paths
+    from journal.exobiology import ExobiologyTracker
+    state.exobiology = ExobiologyTracker(paths.CONFIG_DIR / "exobiology_values.json")      # shared with the predictor, as in the app
+    state.bio = BioPredictor(state.exobiology, codex=BioCodex(), settings=settings)
     state.bio.set_system("Test")
     proc = EventProcessor(bus, {}, state, load_registry())
     for e in entries:
@@ -356,6 +359,11 @@ class Milestones(unittest.TestCase):
 
 
 class FirstDiscovery(unittest.TestCase):
+    def test_water_and_ammonia_worlds_stay_toned_down(self):
+        from personality.line_keys import scan_keys
+        self.assertEqual(scan_keys({"PlanetClass": "Water world", "WasDiscovered": False}), ["Scan_WaterWorld"])
+        self.assertEqual(scan_keys({"PlanetClass": "Ammonia world", "WasDiscovered": False}), ["Scan_AmmoniaWorld"])
+
     def test_rare_and_undiscovered_gets_first_line(self):
         from personality.line_keys import scan_keys
         self.assertEqual(scan_keys({"PlanetClass": "Earthlike body", "WasDiscovered": False}), ["Scan_EarthLike_First", "Scan_EarthLike"])
@@ -366,7 +374,7 @@ class FirstDiscovery(unittest.TestCase):
     def test_lines_exist(self):
         from tests.test_dialogue import real_dialogue
         d = real_dialogue()
-        for key in ("Scan_EarthLike_First", "Scan_WaterWorld_First", "Scan_AmmoniaWorld_First", "Scan_RareGiant_First", "UniqueBio",
+        for key in ("Scan_EarthLike_First", "Scan_RareGiant_First", "UniqueBio",
                     "BioProgress", "BioProgress_Missing", "BioProgress_Last", "GameMilestone_Hours", "GameMilestone_Jumps",
                     "GameMilestone_Footfalls", "GameMilestone_Species", "GameMilestone"):
             self.assertTrue(d.pick(key, "Friendly", False, False), key)

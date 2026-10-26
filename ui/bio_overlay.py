@@ -8,6 +8,11 @@ Shows one line per planet in the system that has life:
 The box is orange writing and an orange border on a see-through background (or a dark one, a setting).
 It ignores the mouse (you can click through it) and disappears when you leave the system or say "hide the bio overlay".
 
+After you map a planet with the detailed surface scanner the box changes to that one planet: one line per life form with a white
+flag when it would be new to your codex and the value (x5 on a first footfall). A life form you have finished (three samples) gets a
+line through it. It stays while that planet is your target or while the target does not change (you are landing); targeting something
+else, or un-targeting it, brings the list back.
+
 Two parts:
   * overlay_rows() / layout() are plain Python (tested). They decide WHAT is shown and WHERE.
   * BioOverlay is the tkinter window. It runs inside the dashboard window's loop and checks once a second.
@@ -26,6 +31,7 @@ DARK = "#0b0b0b"
 WHITE = "#ffffff"
 MAX_ROWS = 8
 CHECK_MS = 1000
+TEST_SECONDS = 10
 
 SIZES = {"Small": 10, "Medium": 12, "Large": 15}
 TEST_ROWS = [
@@ -60,6 +66,39 @@ def overlay_rows(rows, limit=MAX_ROWS):
         })
     more = len(rows) - len(lines)
     return lines, ("and %d more" % more if more > 0 else "")
+
+
+TEST_FOCUS = {"body": "B 3 a", "kind": "icy", "lives": [
+    {"name": "Stratum Tectonicas", "new": True, "done": False, "value": 19010800, "exact": True},
+    {"name": "Fonticulua", "new": False, "done": True, "value": 3200000, "exact": False},
+    {"name": "Bacterium", "new": True, "done": False, "value": 1200000, "exact": False}]}
+
+
+def overlay_focus(view):
+    """The detailed view as text pieces: the planet and one line per life form (flag = new to the codex, done = line through it)."""
+    lines = []
+    for life in (view.get("lives") or [])[:MAX_ROWS]:
+        lines.append({"name": str(life.get("name") or "?"), "flag": bool(life.get("new")) and not life.get("done"),
+                      "done": bool(life.get("done")),
+                      "value": ("" if life.get("exact") else "~") + short_credits(life.get("value"))})
+    return {"body": str(view.get("body") or "?"), "kind": str(view.get("kind") or "rocky"), "lives": lines}
+
+
+def wanted_focus(settings, state, now=None, test_until=0.0):
+    """The detailed single-planet view, or None to show the list."""
+    now = time.monotonic() if now is None else now
+    if test_until and now < test_until:
+        return TEST_FOCUS if now >= test_until - TEST_SECONDS / 2 else None
+    try:
+        if not settings.get("overlay.bio_enabled", True):
+            return None
+        bio = getattr(state, "bio", None)
+        if bio is None or getattr(bio, "hidden", False):
+            return None
+        return bio.focus_view()
+    except Exception:
+        log.exception("Could not read the detailed biology view")
+        return None
 
 
 def placement(screen_w, screen_h, box_w, box_h, left_percent, up_percent):
@@ -100,7 +139,7 @@ class BioOverlay:
         self._broken = False
         self.root.after(CHECK_MS, self._tick)
 
-    def show_test(self, seconds=10):
+    def show_test(self, seconds=TEST_SECONDS):
         self.test_until = time.monotonic() + seconds
         self._signature = None
 
@@ -118,9 +157,18 @@ class BioOverlay:
             pass
 
     def _update(self):
-        rows, _ = wanted(self.settings, self.state_provider(), test_until=self.test_until)
+        state = self.state_provider()
         settings = (self.settings.get("overlay.bio_x", 3), self.settings.get("overlay.bio_up", 25),
                     self.settings.get("overlay.bio_size", "Medium"), self.settings.get("overlay.bio_dark", False))
+        view = wanted_focus(self.settings, state, test_until=self.test_until)
+        if view is not None:
+            focus = overlay_focus(view)
+            signature = ("focus", focus["body"], focus["kind"], tuple((l["name"], l["flag"], l["done"], l["value"]) for l in focus["lives"]), settings)
+            if signature != self._signature:
+                self._signature = signature
+                self._draw_focus(focus, settings)
+            return
+        rows, _ = wanted(self.settings, state, test_until=self.test_until)
         lines, more = overlay_rows(rows)
         signature = (tuple((l["body"], l["count"], l["flags"], l["value"], l["kind"]) for l in lines), more, settings)
         if not lines:
@@ -202,6 +250,45 @@ class BioOverlay:
         screen_w, screen_h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
         x, top = placement(screen_w, screen_h, width, height, left, up)
         self.window.geometry("%dx%d+%d+%d" % (width, height, x, top))
+        self.window.deiconify()
+        self.window.attributes("-topmost", True)
+        self.window.lift()
+
+    def _draw_focus(self, focus, settings):
+        left, up, size_name, dark = settings
+        size = SIZES.get(str(size_name), 12)
+        if self.window is None:
+            self._make_window()
+        canvas = self.canvas
+        canvas.delete("all")
+        font = ("Segoe UI", size, "bold")
+        small = ("Segoe UI", max(8, size - 2), "bold")
+        row_h = int(size * 2.3)
+        pad = 10
+        width = int(size * 21)
+        title_h = int(size * 2.4)
+        lives = focus["lives"]
+        height = title_h + row_h * len(lives) + pad
+        canvas.configure(width=width, height=height)
+        canvas.create_rectangle(1, 1, width - 2, height - 2, outline=ORANGE, width=2, fill=DARK if dark else KEY)
+        self._planet(canvas, pad + size * 0.9, title_h // 2 + 2, size * 0.75, focus["kind"])
+        canvas.create_text(pad + size * 2.2, title_h // 2 + 2, text=focus["body"], anchor="w", fill=ORANGE, font=font)
+        y = title_h
+        for life in lives:
+            mid = y + row_h // 2
+            if life["flag"]:
+                self._flag(canvas, pad + size * 0.6, mid, size)
+            x = pad + size * 2.0
+            canvas.create_text(x, mid, text=life["name"], anchor="w", fill=ORANGE, font=font)
+            canvas.create_text(width - pad, mid, text=life["value"], anchor="e", fill=ORANGE, font=font)
+            if life["done"]:      # finished (three samples): a line through the name and the value
+                reach = x + len(life["name"]) * size * 0.62
+                canvas.create_line(x - 2, mid, min(reach, width - pad - size * 3), mid, fill=ORANGE, width=2)
+                canvas.create_line(width - pad - len(life["value"]) * size * 0.62, mid, width - pad, mid, fill=ORANGE, width=2)
+            y += row_h
+        screen_w, screen_h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
+        px, top = placement(screen_w, screen_h, width, height, left, up)
+        self.window.geometry("%dx%d+%d+%d" % (width, height, px, top))
         self.window.deiconify()
         self.window.attributes("-topmost", True)
         self.window.lift()
