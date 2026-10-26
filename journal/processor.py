@@ -61,7 +61,8 @@ class EventProcessor:
         data = handler.handle(entry)
         if getattr(handler, "tag_on_foot", False):
             data["OnFoot"] = bool(getattr(self.state, "status_flags2", 0) & 1)      # Status.json Flags2 bit 0
-        self._announce(handler, data)
+        if not data.pop("_silent", False):
+            self._announce(handler, data)
         for name, extra in pending:       # things this line made her notice (undiscovered system, jumps left)
             self.emit(name, extra)
 

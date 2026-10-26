@@ -751,3 +751,7 @@ Macro steps changed: `talk Key` now queues a plain line and carries on; `finish`
 ## 0.48.2: "the first one" / "the second one" instead of A / B
 Stream feedback: the microphone and the voice mishear "A", "B" and "Option A". Everything she SAYS now uses "the first one" and "the second one" (where to sell, where to buy, merit mining routes). She understands: "the first one", "the 1st one please", "first", "number one", "the second one please", "the 2nd one", "second", "number two", plus the old "A"/"B". "Either" picks the first (the better price); "neither" or "no thanks" cancels.
 Run "prepare her voice" once after this update so the reworded lines are ready.
+
+## 0.48.6: High Grade Emissions callout
+When the full spectrum scanner (FSS) finds a High Grade Emissions signal source she says so, once per system, instead of the plain "signal detected". It follows the Exploration "She comments on exploration" switch.
+Honest limit: the signal name was written from the journal manual. Every USS signal she sees in the FSS is written to the log ("FSS signal: ..."); if she never calls one out, send me those log lines and I will fix the name she looks for.

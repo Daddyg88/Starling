@@ -5,6 +5,7 @@
     "Scan": 4,
     "DiscoveryScan": 20,
     "FSSSignalDiscovered": 15,
+    "HighGradeEmissions": 30,
     "FSSAllBodiesFound": 15,
     "CodexEntry": 15,
     "SAAScanComplete": 10,

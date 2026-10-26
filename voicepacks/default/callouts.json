@@ -1,4 +1,12 @@
 {
+ "HighGradeEmissions": [
+  "High grade emissions in this system, Commander. Worth a look for materials.",
+  "The scanner shows a high grade emissions source here. That could be good materials.",
+  "Commander, there's a high grade emissions signal in {System}. Might be worth dropping in.",
+  "High grade emissions detected. Shall we go and see what's lying about?",
+  "Oh, a high grade emissions source. That's where the good materials hide.",
+  "There's a high grade emissions signal here. Just saying."
+ ],
  "_help": "Callouts added in 0.30.0: glide temperature and gravity, scoopable stars, undiscovered systems, jumps left, the Nomad. Placeholders: {temperature} kelvin, {gravity} g, {StarSystem}, {jumps}.",
  "GlideStarted_Info": [
   "Gliding in. Surface temperature {temperature} kelvin, gravity {gravity} g.",

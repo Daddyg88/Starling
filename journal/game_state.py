@@ -49,6 +49,7 @@ class GameState:
     fleet_carrier_system: Optional[str] = None     # where it is now (CarrierLocation, CarrierJump, or docking at it)
     power: Optional[str] = None                    # the Power you are pledged to (Powerplay events)
     squadron: Optional[str] = None                 # your squadron's name, if you are in one (SquadronStartup)
+    hge_system: object = None       # the system she last called out High Grade Emissions in (once per system)
     pending_events: list = field(default_factory=list)   # (name, data) she should announce after this journal line
     gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     status_seen: bool = False               # True once Status.json has been read

@@ -20,6 +20,7 @@
     "EjectCargo":                  { "enabled": true, "priority": "normal", "source": "journal" },
     "EscapeInterdiction":          { "enabled": true, "priority": "normal", "source": "journal" },
     "FSDJump":                     { "enabled": true, "priority": "normal", "source": "journal" },
+    "HighGradeEmissions":          { "enabled": true, "priority": "normal", "source": "journal" },
     "FSSAllBodiesFound":           { "enabled": true, "priority": "normal", "source": "journal" },
     "FSSBodySignals":              { "enabled": true, "priority": "normal", "source": "journal" },
     "FactionKillBond":             { "enabled": true, "priority": "normal", "source": "journal" },
