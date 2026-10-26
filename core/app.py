@@ -26,6 +26,7 @@ from personality.voice_replies import VoiceReplies
 from journal.exobiology import ExobiologyTracker
 from journal.bio_predict import BioPredictor, BioCodex, BioLearned
 from journal.owned_systems import OwnedSystems
+from journal.milestones import GameMilestones
 from tts.providers import build_providers
 from tts.speech_manager import SpeechManager
 
@@ -129,6 +130,7 @@ class App:
         self.state = GameState()
         self.state.exobiology = ExobiologyTracker(paths.CONFIG_DIR / "exobiology_values.json", paths.DATA_DIR)
         self.state.owned = OwnedSystems(paths.DATA_DIR / "owned_systems.json")
+        self.state.milestones = GameMilestones(paths.DATA_DIR / "game_milestones.json")
         self.state.bio = BioPredictor(self.state.exobiology, BioCodex(paths.DATA_DIR / "bio_codex.json"), self.settings,
                                      learned=BioLearned(paths.DATA_DIR / "bio_learned.json"))
         self.registry = load_registry()

@@ -21,16 +21,17 @@ def scan_keys(data):
     """
     planet = str(data.get("PlanetClass") or "").lower()
     star = str(data.get("StarType") or "")
+    first = data.get("WasDiscovered") is False      # nobody has scanned it before: the rare ones get an extra special line
     if "earth" in planet:
-        return ["Scan_EarthLike"]
+        return ["Scan_EarthLike_First", "Scan_EarthLike"] if first else ["Scan_EarthLike"]
     if planet == "water world":
-        return ["Scan_WaterWorld"]
+        return ["Scan_WaterWorld_First", "Scan_WaterWorld"] if first else ["Scan_WaterWorld"]
     if planet == "ammonia world":
-        return ["Scan_AmmoniaWorld"]
+        return ["Scan_AmmoniaWorld_First", "Scan_AmmoniaWorld"] if first else ["Scan_AmmoniaWorld"]
     if "gas giant with" in planet and "life" in planet:
         return ["Scan_LifeGasGiant"]       # NOT a "green gas giant" (that is a codex entry, see events/codex_entry.py); about 1 in 120 planets in real journals
     if planet in ("water giant", "helium rich gas giant", "sudarsky class v gas giant"):
-        return ["Scan_RareGiant"]          # about 3 in 10,000 planets in real journals each
+        return ["Scan_RareGiant_First", "Scan_RareGiant"] if first else ["Scan_RareGiant"]          # about 3 in 10,000 planets in real journals each
     if data.get("TerraformState") == "Terraformable":
         return ["Scan_Terraformable"]
     if star == "N":
@@ -129,6 +130,13 @@ def _keys_for(event):
 
     if name == "GreenGasGiant":
         return ["GreenGasGiant_New", "GreenGasGiant"] if data.get("New") else ["GreenGasGiant"]
+
+    if name == "GameMilestone":
+        return ["GameMilestone_%s" % data.get("Kind"), "GameMilestone"]
+    if name == "UniqueBio":
+        return ["UniqueBio"]
+    if name == "BioProgress":
+        return ["BioProgress_Last"] if data.get("Missing") and data.get("Left") == 1 else (["BioProgress_Missing"] if data.get("Missing") else []) + ["BioProgress"]
 
     if name == "BioGuess":
         return ["BioGuess_Unknown"] if data.get("Unknown") else ["BioGuess"]

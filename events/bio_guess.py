@@ -30,3 +30,17 @@ class BioRefined(BaseEvent):
     priority = NORMAL
     source = "status"
     summary = "Surface scan of {Body}: {Found}"
+
+
+class BioProgress(BaseEvent):
+    name = "BioProgress"
+    priority = LOW
+    source = "status"
+    summary = "{Count} species in the codex"
+
+
+class UniqueBio(BaseEvent):
+    name = "UniqueBio"
+    priority = NORMAL
+    source = "status"
+    summary = "{Species}: the one-of-a-kind species"

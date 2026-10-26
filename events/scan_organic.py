@@ -18,11 +18,15 @@ class ScanOrganic(BaseEvent):
     def update_state(self, entry, state):
         # Stash the extra facts on the entry so handle() can pass them on.
         entry["_exo"] = state.exobiology.on_scan_organic(entry)
-        state.bio.note_organic(entry)
+        extra = state.bio.note_organic(entry)
+        state.pending_events.extend(extra)
+        self._unique = any(name == "UniqueBio" for name, _ in extra)
 
     def handle(self, entry):
         data = super().handle(entry)
         data.update(entry.get("_exo") or {})
+        if getattr(self, "_unique", False):
+            data["_silent"] = True                  # the one-of-a-kind line replaces the ordinary first-sample line
         return data
 
     def describe(self, data):

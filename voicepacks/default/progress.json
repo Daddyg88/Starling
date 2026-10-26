@@ -1,0 +1,62 @@
+{
+ "GameMilestone": [
+  "That's {Number} for the game's own counter, Commander. Quite the milestone.",
+  "Milestone, Commander: {Number}. Well done us."
+ ],
+ "GameMilestone_Hours": [
+  "Commander, the game says you've now played {Number} hours. That's a lot of stars.",
+  "{Number} hours in the game. I'd say you're getting the hang of it.",
+  "{Number} hours of Elite, Commander. Remarkable dedication.",
+  "The game's clock just passed {Number} hours. Happy flying anniversary."
+ ],
+ "GameMilestone_Hours_Close": [
+  "{Number} hours in the game, love. I'm proud to be along for some of them."
+ ],
+ "GameMilestone_Hours_Sarcastic": [
+  "{Number} hours. Have you considered a window? Or sunlight?"
+ ],
+ "GameMilestone_Jumps": [
+  "That's {Number} hyperspace jumps, Commander. The drive must be tired.",
+  "{Number} jumps in your career. That's a lot of witch space.",
+  "The game counts {Number} hyperspace jumps for you now."
+ ],
+ "GameMilestone_Jumps_Sarcastic": [
+  "{Number} jumps. Still no idea where we're going, but we're going fast."
+ ],
+ "GameMilestone_Footfalls": [
+  "The game says you've set foot first on {Number} worlds. Explorer indeed.",
+  "{Number} first footfalls, Commander. Nobody has stood where you have."
+ ],
+ "GameMilestone_Species": [
+  "Your codex holds {Number} biological species now, Commander. Impressive.",
+  "{Number} species on the biology list. The planets can't hide from us."
+ ],
+ "BioProgress": [
+  "That's {Count} species in my codex now, Commander.",
+  "A new one for the codex. {Count} species so far.",
+  "{Count} species logged. The collection grows."
+ ],
+ "BioProgress_Close": [
+  "Another species for us, love. {Count} in the codex now."
+ ],
+ "BioProgress_Missing": [
+  "{Count} species logged. You've still never sampled {Missing}, Commander.",
+  "New species logged, {Count} in all. Still to find: {Missing}.",
+  "That makes {Count} in the codex. Never sampled yet: {Missing}."
+ ],
+ "BioProgress_Last": [
+  "{Count} species logged, Commander. Only {Missing} left that you've never sampled.",
+  "Nearly there. {Count} species, and just {Missing} still to find."
+ ],
+ "UniqueBio": [
+  "Commander, that's {Species}. It's one of a kind: only ever found in a single system in the whole galaxy. Take a deep breath, and finish the samples carefully.",
+  "That's {Species}! The only one known in the entire galaxy. Don't you dare lose this signal.",
+  "{Species}. A one-of-a-kind species. Careful with the samples, Commander."
+ ],
+ "UniqueBio_Close": [
+  "{Species}, love. It's the only one in the galaxy. Careful now, I'm so proud of you."
+ ],
+ "UniqueBio_Infatuated": [
+  "{Species}! The only one in the galaxy, and you found it. You're incredible."
+ ]
+}

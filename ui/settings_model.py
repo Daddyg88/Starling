@@ -286,6 +286,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="After the system scanner she guesses which species could be there (from temperature, gravity, atmosphere and so on) and what it might be worth. After the surface scan she corrects the guess"),
             Field("exobiology.top_hint", "Say when a top ten species might be there", "toggle",
                   help="'You might find Stratum Tectonicas on that planet, it might be worth a scan'. At most three times in a system"),
+            Field("exobiology.progress", "Say how far my codex has got", "toggle",
+                  help="After a species you had never logged is finished: how many species are in your codex and which kinds you have never sampled (named once only three or fewer are left)"),
             Field("overlay.bio_enabled", "Show the biology list on screen", "toggle",
                   help="A small see-through box with an orange border: every planet in the system with life, how many signals, the estimated value (~ is a guess) and a white flag for each signal that could be new to your codex. It goes away when you leave the system, or say 'hide the bio overlay'. Elite must be in Borderless or Windowed mode"),
             Field("overlay.bio_x", "Biology list: distance from the left of the screen", "choice", PERCENTS,

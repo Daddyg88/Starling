@@ -35,6 +35,11 @@ def norm(text):
     return re.sub(r"[^a-z]", "", text)
 
 
+# Species that exist in only one place in the galaxy (Radicoida Unica was found in a single system). They are never
+# guessed and never taught to the learner (it would only teach her wrong habits), but they count for the codex.
+UNIQUE_SPECIES = {"radicoida unica": "Radicoida"}
+
+
 def genus_key(text):
     key = re.sub(r"[^a-z]", "", str(text or "").lower())
     return key[:-1] if key.endswith("s") else key
@@ -90,7 +95,7 @@ class BioCodex:
         """One-off: reads your old journal files for codex finds and finished samples. Run it in a background thread."""
         if self.history_done or not folder:
             return
-        names = {r["n"].lower() for r in (rules if rules is not None else load_rules())}
+        names = {r["n"].lower() for r in (rules if rules is not None else load_rules())} | set(UNIQUE_SPECIES)
         try:
             files = sorted(Path(folder).glob("Journal*.log"))
         except OSError:
@@ -167,6 +172,8 @@ class BioLearned:
             if any(same_genus(g, r) for r in real_genera):
                 entry["hit"] += 1
         for g in real_genera:
+            if genus_key(g) in {genus_key(v) for v in UNIQUE_SPECIES.values()}:
+                continue                                                    # one-of-a-kind: nothing to learn from where it grew
             if not any(same_genus(g, c) for c in candidate_genera):        # one the rules did not expect: it was there, so count it
                 entry = self.stats.setdefault(genus_key(g), {"seen": 0, "hit": 0})
                 entry["seen"] += 1
@@ -515,16 +522,37 @@ class BioPredictor:
         return events
 
     def note_organic(self, entry):
-        """ScanOrganic: the first sample tells us the real species on that body."""
+        """ScanOrganic: the first sample tells us the real species on that body. Returns events to announce."""
         species = str(entry.get("Species_Localised") or "").strip()
         if not species:
-            return
+            return []
         name = self.ids.get(entry.get("Body"))
         body = self.bodies.get(name) if name else None
         if body is not None and species not in body.species:
             body.species.append(species)
+        events = []
+        if species.lower() in UNIQUE_SPECIES and entry.get("ScanType") == "Log":
+            events.append(("UniqueBio", {"Species": species, "Body": body.short if body else ""}))
         if entry.get("ScanType") == "Analyse":
+            fresh = not self.codex.has(species)
             self.codex.add(species)
+            if fresh and species.lower() not in UNIQUE_SPECIES and self._on("exobiology.progress", True):
+                events.append(("BioProgress", self.progress(species)))
+        return events
+
+    def progress(self, species):
+        """How far the codex has got: the number of species and the genera never sampled (named only when few are left)."""
+        known = {k for k in self.codex.known}
+        have = {genus_key(r["g"]) for r in self.rules if r["n"].lower() in known}
+        left = []
+        for r in self.rules:
+            if genus_key(r["g"]) not in have and r["g"] not in left:
+                left.append(r["g"])
+                have.add(genus_key(r["g"]))
+        data = {"Species": species, "Count": len(known), "Left": len(left)}
+        if 0 < len(left) <= 3:
+            data["Missing"] = _join_and(left)
+        return data
 
     # ---- for the overlay ----
     def rows(self):

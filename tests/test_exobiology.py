@@ -171,6 +171,7 @@ class EventTests(unittest.TestCase):
         for kind in ("Log", "Sample", "Sample", "Analyse"):
             processor.handle_entry({"event": "ScanOrganic", "ScanType": kind, "Species_Localised": "Bacterium Informem",
                                     "SystemAddress": 1, "Body": 4, "timestamp": "2026-10-14T21:0%d:00Z" % len(heard)})
+        heard = [h for h in heard if h.name == "ScanOrganic"]       # (a finished new species also makes a BioProgress line)
         numbers = [h.data["SampleNumber"] for h in heard]
         self.assertEqual(numbers, [1, 2, 3, 3])
         self.assertEqual(heard[3].data["worth"], "8.4 million")

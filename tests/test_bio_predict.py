@@ -261,3 +261,112 @@ class GreenGasGiants(unittest.TestCase):
         d = real_dialogue()
         for key in ("GreenGasGiant", "GreenGasGiant_New", "Scan_LifeGasGiant", "Scan_RareGiant"):
             self.assertTrue(d.pick(key, "Friendly", False, False), key)
+
+
+def organic(species, stage, genus="Radicoida", body=3):
+    return {"event": "ScanOrganic", "ScanType": stage, "Genus_Localised": genus, "Species_Localised": species, "Variant_Localised": species, "Body": body}
+
+
+class UniqueSpecies(unittest.TestCase):
+    def test_radicoida_unica_gets_its_own_line_and_nothing_else(self):
+        got, state = run([organic("Radicoida Unica", "Log")])
+        names = [n for n, _ in got]
+        self.assertIn("UniqueBio", names)
+        self.assertEqual(dict(got)["UniqueBio"]["Species"], "Radicoida Unica")
+
+    def test_unique_species_never_taught_to_learner(self):
+        from journal.bio_predict import BioLearned
+        learned = BioLearned()
+        learned.observe("sys|1", {"pc": "rocky", "atm": "none", "volc": "", "thin": 0, "k": 150, "g": 0.1}, ["Aleoida"], ["Radicoida"])
+        self.assertNotIn("radicoida", learned.stats)
+        self.assertNotIn("radicoida", learned.envelopes)
+
+    def test_it_counts_for_the_codex_without_a_progress_line(self):
+        got, state = run([organic("Radicoida Unica", "Analyse")])
+        self.assertTrue(state.bio.codex.has("Radicoida Unica"))
+        self.assertNotIn("BioProgress", [n for n, _ in got])
+
+    def test_price_is_known(self):
+        values = json.loads((Path(__file__).resolve().parent.parent / "config" / "exobiology_values.json").read_text(encoding="utf-8"))["values"]
+        self.assertGreater(values["Radicoida Unica"], 1000000)
+
+
+class CodexProgress(unittest.TestCase):
+    def test_new_species_gets_a_progress_line_once(self):
+        got, state = run([organic("Aleoida Arcus", "Analyse", genus="Aleoida")])
+        data = dict(got)["BioProgress"]
+        self.assertEqual(data["Count"], 1)
+        self.assertGreater(data["Left"], 5)
+        self.assertNotIn("Missing", data)
+        got, _ = run([organic("Aleoida Arcus", "Analyse", genus="Aleoida"), organic("Aleoida Arcus", "Analyse", genus="Aleoida")])
+        self.assertEqual([n for n, _ in got].count("BioProgress"), 1)
+
+    def test_few_genera_left_are_named(self):
+        _, state = run([])
+        names = {r["n"].lower() for r in state.bio.rules}
+        keep = [r for r in state.bio.rules if r["g"] not in ("Aleoida", "Tussock")]
+        state.bio.codex.known = {r["n"].lower() for r in keep}
+        data = state.bio.progress("Whatever")
+        self.assertEqual(data["Left"], 2)
+        self.assertIn("Aleoida", data["Missing"])
+        self.assertIn(" and ", data["Missing"])
+
+    def test_keys(self):
+        from personality.line_keys import _keys_for
+        from core.event_bus import Event
+        self.assertEqual(_keys_for(Event("BioProgress", {"Missing": "A", "Left": 1}))[0], "BioProgress_Last")
+        self.assertEqual(_keys_for(Event("BioProgress", {"Count": 3}))[0], "BioProgress")
+
+
+class Milestones(unittest.TestCase):
+    def stats(self, hours, jumps=100, foot=10, species=5):
+        return {"event": "Statistics", "Exploration": {"Time_Played": hours * 3600, "Total_Hyperspace_Jumps": jumps, "First_Footfalls": foot},
+                "Exobiology": {"Organic_Species_Encountered": species}}
+
+    def test_first_time_only_writes_numbers_down(self):
+        from journal.milestones import GameMilestones
+        m = GameMilestones()
+        self.assertEqual(m.check(self.stats(3789, 18265, 535, 78)), [])
+        self.assertEqual(m.last["Hours"], 3789)
+
+    def test_crossing_a_round_number_speaks_once(self):
+        from journal.milestones import GameMilestones
+        m = GameMilestones()
+        m.check(self.stats(3789, 18265, 535, 78))
+        self.assertEqual(m.check(self.stats(3790, 18300, 540, 78)), [])
+        got = m.check(self.stats(4010, 20001, 601, 81))
+        self.assertEqual(sorted(got), [("Footfalls", 600), ("Hours", 4000), ("Jumps", 20000), ("Species", 80)])
+        self.assertEqual(m.check(self.stats(4010, 20001, 601, 81)), [])
+
+    def test_statistics_line_makes_event(self):
+        from journal.milestones import GameMilestones
+        entries = [self.stats(499), self.stats(501)]
+        got, state = run(entries)
+        # run() uses a fresh GameMilestones that starts empty: the first line is the baseline, the second crosses 500 hours
+        found = [d for n, d in got if n == "GameMilestone"]
+        self.assertEqual([(d["Kind"], d["Value"], d["Number"]) for d in found], [("Hours", 500, "500")])
+        self.assertNotIn("Statistics", [n for n, _ in got])
+
+    def test_saved_between_runs(self):
+        import tempfile, pathlib
+        from journal.milestones import GameMilestones
+        p = pathlib.Path(tempfile.mkdtemp()) / "m.json"
+        GameMilestones(p).check(self.stats(100))
+        self.assertEqual(GameMilestones(p).check(self.stats(600)), [("Hours", 500)])
+
+
+class FirstDiscovery(unittest.TestCase):
+    def test_rare_and_undiscovered_gets_first_line(self):
+        from personality.line_keys import scan_keys
+        self.assertEqual(scan_keys({"PlanetClass": "Earthlike body", "WasDiscovered": False}), ["Scan_EarthLike_First", "Scan_EarthLike"])
+        self.assertEqual(scan_keys({"PlanetClass": "Earthlike body", "WasDiscovered": True}), ["Scan_EarthLike"])
+        self.assertEqual(scan_keys({"PlanetClass": "Water giant", "WasDiscovered": False})[0], "Scan_RareGiant_First")
+        self.assertEqual(scan_keys({"PlanetClass": "Rocky body", "WasDiscovered": False}), [])
+
+    def test_lines_exist(self):
+        from tests.test_dialogue import real_dialogue
+        d = real_dialogue()
+        for key in ("Scan_EarthLike_First", "Scan_WaterWorld_First", "Scan_AmmoniaWorld_First", "Scan_RareGiant_First", "UniqueBio",
+                    "BioProgress", "BioProgress_Missing", "BioProgress_Last", "GameMilestone_Hours", "GameMilestone_Jumps",
+                    "GameMilestone_Footfalls", "GameMilestone_Species", "GameMilestone"):
+            self.assertTrue(d.pick(key, "Friendly", False, False), key)
