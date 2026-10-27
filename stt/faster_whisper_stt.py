@@ -10,11 +10,12 @@ import threading
 
 from core.logger import get_logger
 from stt.base_stt import BaseSTT
+from stt.hints import build_hint
 
 log = get_logger("faster_whisper")
 
-# Gentle hints that help Whisper spell the words she will hear most.
-HINT = "Starling. Commander. Elite Dangerous. galaxy map, system map, supercruise, hyperspace, fuel scoop."
+# Gentle hints that help Whisper spell the words she will hear most (stt/hints.py builds them).
+HINT = build_hint()
 
 
 class FasterWhisperSTT(BaseSTT):
@@ -27,6 +28,8 @@ class FasterWhisperSTT(BaseSTT):
         self._model_factory = model_factory   # tests pass a fake here
         self._model = None
         self._lock = threading.Lock()
+        self.hint_words = None                # set by the app: returns (her name, [phrases this player says most])
+        self.beam_size = 1 if self.model_size.startswith("tiny") else 3      # bigger models can afford to think a little more
 
     def available(self):
         if self._model_factory is not None:
@@ -50,12 +53,21 @@ class FasterWhisperSTT(BaseSTT):
                                        cpu_threads=self.cpu_threads)
             log.info("Listening model ready.")
 
+    def current_hint(self):
+        if self.hint_words is None:
+            return HINT
+        try:
+            name, phrases = self.hint_words()
+            return build_hint(name, phrases)
+        except Exception:
+            return HINT                       # the hint is a bonus: never let it stop her listening
+
     def transcribe(self, audio):
         if self._model is None:
             self.load()
         segments, _info = self._model.transcribe(
-            audio, language="en", beam_size=1, vad_filter=False,
-            condition_on_previous_text=False, initial_prompt=HINT,
+            audio, language="en", beam_size=self.beam_size, vad_filter=False,
+            condition_on_previous_text=False, initial_prompt=self.current_hint(),
             temperature=0.0, no_speech_threshold=0.6,
         )
         text = " ".join(segment.text.strip() for segment in segments).strip()

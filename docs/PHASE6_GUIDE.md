@@ -913,3 +913,12 @@ Honest limit: if Elite crashes or is killed, it never writes Shutdown, so the ov
 - Her no-repeat memory used to remember at most the last 12 lines of a key. It now remembers up to three quarters of the pool (at most 60), so a big pool is used up before any line comes round again.
 - About 150 extra lines for the everyday events that had only 3 to 7 wordings: fuel scooping, supercruise in and out, approaching a planet, touchdown, liftoff, undocking, docking, landing gear, mass lock, honk, signals, codex, scans, map opened, system fully scanned.
 Honest limits: not heard in the game. Small pools that remain (for example warnings such as heat, low health, docking denied) are on purpose short and plain; tell me which lines you still hear too often and I will add more.
+
+## 0.63.0: hearing accents
+Step 1 of making her understand players all over the world.
+- Sound-alike repair (stt/sounds.py, control/matcher.py): when a sentence is not a command and not a close spelling, she looks at words she does not know and swaps each one for the command word that SOUNDS the same (b/p, d/t, g/k, w/v, th/t, vowels and a dropped r are treated as alike, because accents blur them). Safety rules: only unknown words are touched, only if exactly one command word sounds like it, never words under 3 letters (up, in, on, off), at most two words per sentence, and big actions (jumping, supercruise, hyperspace) are never guessed this way. A repair she makes twice becomes one of your learned phrases, as before (data/voice_learning.json).
+- Her name (stt/wake.py): "Sterling", "Shtarling", "Starlin" and "Stalling" now count as Starling.
+- The hint (stt/hints.py): the listening model is told her name, the phrases you say most (from your learned list) and the Elite words she hears (galaxy map, supercruise, neutron route, Void Compass...). That helps it spell them right.
+- Listening quality (Voice page): Fast / Balanced / Accurate / new "Best for accents (strong PC)" (medium.en, about 1.5 GB download once, more CPU and memory). Models other than Fast also think a little harder per sentence (beam 3).
+- The log shows `Heard: '...'` for every sentence, which is what to send me from a tester.
+Honest limits: tested with typed mishearings only, not real voices. Sound-alike repair fixes spelling-type mishearings; if the recogniser writes a completely different sentence, only a bigger model or the next steps (asking "did you mean...?" and a voice training session) will help. The bigger models are slower; try Accurate first on a weak PC.

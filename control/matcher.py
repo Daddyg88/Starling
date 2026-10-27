@@ -18,10 +18,14 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from control.catalog import CATALOG, MACROS
+from stt.sounds import sound_key
 
 FUZZY_NORMAL = 0.84
 LEARN_MIN_SCORE = 0.90        # only a near-certain match is remembered as "one of your phrases"
 FUZZY_STRICT = 0.97          # commands that do something big (jump, supercruise)
+SOUND_SCORE = 0.95           # a sentence made right by sound-alike repair (stays below FUZZY_STRICT: big actions never use it)
+SOUND_MIN_LETTERS = 3        # shorter words (up, in, on, off) are never 'repaired': they decide what happens
+SOUND_MAX_WORDS = 2          # and at most two words of a sentence are repaired
 
 # ---- tidying ----
 _POLITE = [
@@ -124,6 +128,7 @@ class Match:
     intent: str            # "on", "off", "toggle" or "press"
     phrase: str            # the template sentence it matched
     score: float           # 1.0 = exact
+    how: str = "exact"     # "exact", "learned", "close" (spelling) or "sound" (an accent-style mishearing, repaired)
 
 
 class Matcher:
@@ -135,6 +140,7 @@ class Matcher:
         for command in self.commands:
             self._index(command)
         self._sentences = list(self.index)
+        self._build_sounds()
 
     def _index(self, command):
         for intent, specs in command.phrases.items():
@@ -149,6 +155,38 @@ class Matcher:
                     elif owner[0].id != command.id or owner[1] != intent:
                         self.conflicts.append((clean, owner[0].id, command.id))
 
+    def _build_sounds(self):
+        """Every word she knows from her commands, filed under how it sounds (see stt/sounds.py)."""
+        self._vocab = set()
+        for sentence in self._sentences:
+            self._vocab.update(sentence.split())
+        self._by_sound = {}
+        for word in self._vocab:
+            if len(word) >= SOUND_MIN_LETTERS:
+                self._by_sound.setdefault(sound_key(word), set()).add(word)
+
+    def sound_repair(self, clean):
+        """
+        Fix words an accent made into some other word: 'blot galaxy map' -> 'plot galaxy map'.
+        Only a word she does not know is touched, only if exactly ONE word she knows sounds like it, and never more
+        than two words. Returns the repaired sentence, or None if nothing could be repaired.
+        """
+        words = clean.split()
+        repaired, changed = [], 0
+        for word in words:
+            if word in self._vocab or len(word) < SOUND_MIN_LETTERS or word.isdigit():
+                repaired.append(word)
+                continue
+            options = self._by_sound.get(sound_key(word), ())
+            if len(options) == 1:
+                repaired.append(next(iter(options)))
+                changed += 1
+            else:
+                repaired.append(word)
+        if not changed or changed > SOUND_MAX_WORDS:
+            return None
+        return " ".join(repaired)
+
     def add(self, command):
         """Teach the matcher one more command while she is running (used for new Void Compass overlays)."""
         if any(c.id == command.id for c in self.commands):
@@ -156,6 +194,7 @@ class Matcher:
         self.commands.append(command)
         self._index(command)
         self._sentences = list(self.index)
+        self._build_sounds()
         return True
 
     def match(self, text):
@@ -168,8 +207,10 @@ class Matcher:
         if self.learning is not None:
             known = self.learning.learned(clean)          # one of YOUR phrases she has learned
             if known in self.index:
-                return Match(self.index[known][0], self.index[known][1], known, 1.0)
+                return Match(self.index[known][0], self.index[known][1], known, 1.0, "learned")
         found = self._fuzzy(clean)
+        if found is None:
+            found = self._by_sound_match(clean)
         if (found is not None and self.learning is not None and not found.command.strict
                 and found.score >= LEARN_MIN_SCORE):
             self.learning.note(clean, found.phrase)
@@ -200,7 +241,21 @@ class Matcher:
         command, intent = self.index[best[1]]
         if command.strict and best[0] < FUZZY_STRICT:
             return None
-        return Match(command, intent, best[1], best[0])
+        return Match(command, intent, best[1], best[0], "close")
+
+    def _by_sound_match(self, clean):
+        """An accent-style mishearing: repair the unknown words by sound, then the sentence must match properly."""
+        fixed = self.sound_repair(clean)
+        if fixed is None:
+            return None
+        hit = self.index.get(fixed)
+        if hit is None:
+            close = self._fuzzy(fixed)
+            hit = (close.command, close.intent) if close is not None else None
+            fixed = close.phrase if close is not None else fixed
+        if hit is None or (hit[0].strict and SOUND_SCORE < FUZZY_STRICT):
+            return None                                   # big actions (jumping) are never guessed from a sound
+        return Match(hit[0], hit[1], fixed, SOUND_SCORE, "sound")
 
     def split(self, text):
         """'lower the gear and open the galaxy map' -> [Match, Match] (all parts must be understood)."""

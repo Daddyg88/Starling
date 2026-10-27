@@ -73,6 +73,14 @@ class VoiceLearning:
             self._dirty = True
         self.save()
 
+    def top_phrases(self, limit=8):
+        """The sentences this player's mishearings have turned into most often (used as a hint for the recogniser)."""
+        totals = {}
+        for options in self.seen.values():
+            for sentence, count in options.items():
+                totals[sentence] = totals.get(sentence, 0) + count
+        return [s for s, _ in sorted(totals.items(), key=lambda kv: -kv[1])[:limit]]
+
     def count(self):
         return sum(1 for heard in self.seen if self.learned(heard))
 

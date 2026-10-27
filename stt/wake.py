@@ -8,6 +8,8 @@ so the first word or two are compared loosely to her name.
 import difflib
 import re
 
+from stt.sounds import sound_key
+
 _FILLER = {"hey", "hi", "ok", "okay", "yo", "oi", "hello"}
 
 
@@ -18,7 +20,12 @@ def _words(text):
 def _close(candidate, wake):
     if not candidate:
         return False
-    return difflib.SequenceMatcher(None, candidate, wake).ratio() >= 0.72
+    if difflib.SequenceMatcher(None, candidate, wake).ratio() >= 0.72:
+        return True
+    # accents: "Sterling", "Shtarling", "Stalling" and "Starlin" all sound like Starling (stt/sounds.py)
+    if len(candidate) < 5:
+        return False
+    return difflib.SequenceMatcher(None, sound_key(candidate), sound_key(wake)).ratio() >= 0.85
 
 
 def parse_wake(text, wake_phrase="Starling"):

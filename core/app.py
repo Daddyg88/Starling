@@ -306,6 +306,10 @@ class App:
             return False, "No listening provider is available (%s)" % reasons
         device = find_microphone(self.settings.get("stt.microphone", ""))
         runner = self.ensure_commands()
+        if hasattr(stt, "hint_words"):          # give the recogniser her name and this player's own phrases
+            from core.identity import wake_phrase
+            stt.hint_words = lambda: (wake_phrase(self.settings),
+                                      self.learning.top_phrases() if self.learning is not None else [])
         gate = self.start_push_to_talk()
         self.listener = Listener(self.bus, stt, self.settings, lambda: MicrophoneStream(device), gate=gate)
         if self.ask is not None:

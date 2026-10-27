@@ -57,7 +57,8 @@ MOOD_LEVELS = [("1 - just arrived", 1), ("2", 2), ("3 - middle", 3), ("4", 4), (
 MOODS = [("Infatuated (head over heels)", "Infatuated"), ("Close (very happy, loving)", "Close"), ("Friendly", "Friendly"),
          ("Neutral (calm, professional)", "Neutral"), ("Sarcastic (sassy)", "Sarcastic"), ("Frustrated", "Frustrated"),
          ("Upset (really angry)", "Upset")]
-LISTEN_QUALITY = [("Fast (smallest)", "tiny.en"), ("Balanced", "base.en"), ("Accurate (slower)", "small.en")]
+LISTEN_QUALITY = [("Fast (smallest)", "tiny.en"), ("Balanced", "base.en"), ("Accurate (slower)", "small.en"),
+                  ("Best for accents (strong PC)", "medium.en")]
 SENSITIVITY = [("Automatic (recommended)", 0), ("Very sensitive (quiet room)", 0.008), ("Sensitive", 0.015),
                ("Normal", 0.025), ("Noisy room", 0.05)]
 LOG_DETAIL = [("Normal", "INFO"), ("Detailed (for fixing problems)", "DEBUG"), ("Errors only", "WARNING")]
@@ -192,7 +193,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("stt.microphone", "Microphone", "choice", lambda: microphone_choices(mic_lister), restart=True,
                   help="Pick the microphone you talk into"),
             Field("stt.model", "Listening quality", "choice", LISTEN_QUALITY, restart=True,
-                  help="Bigger understands better but uses more memory"),
+                  help="Bigger understands accents better but uses more memory and CPU (the Best one downloads about 1.5 GB once)"),
             Field("stt.energy_threshold", "Microphone sensitivity", "choice", SENSITIVITY, restart=True),
             Field("stt.wake_phrase", "Wake word", "text", restart=True,
                   placeholder="Leave empty to use her name",
