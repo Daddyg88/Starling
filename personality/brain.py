@@ -24,6 +24,7 @@ from core.logger import get_logger
 from core.ships import ship_name
 from mining import minerals
 from personality import freechat
+from personality.knowledge import Knowledge, convert, maths
 from personality.meaning import load_meaning
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
@@ -67,7 +68,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -82,6 +83,7 @@ class Brain:
         self.by_key = {item["key"]: item for item, _patterns in self.intents}
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
+        self.knowledge = knowledge if knowledge is not None else (Knowledge() if intents is None else None)   # personality/knowledge.py
         self.llm = llm               # personality/llm.py: optional small local AI model for open chat (off by default)
         self.profile = profile       # memory/profile.py: what you have told her about yourself (likes, pets...)
         self.topics = freechat.load_topics() if intents is None else freechat.Topics({})   # what a chatty sentence is about
@@ -133,7 +135,51 @@ class Brain:
                     break                      # that topic had nothing to say: try the next topic
         if spoke_for:
             return None
-        return self._by_meaning(tidy) or (self._free_chat(tidy) if deliberate else None)
+        return self._know(tidy, text) or self._by_meaning(tidy) or (self._free_chat(tidy) if deliberate else None)
+
+    def _know(self, tidy, raw):
+        """Sums, conversions and facts she is SURE about (personality/knowledge.py). Nothing is ever guessed."""
+        library = self.knowledge
+        if library is None or not self.settings.get("brain.knowledge", True):
+            return None
+        try:
+            style, rng = library.style, self.rng
+            for work, pool in ((maths, "maths"), (convert, "units")):
+                found = work(raw)
+                if found is None:
+                    continue
+                sentence, problem = found if isinstance(found, tuple) else (found, None)
+                if problem == "zero":
+                    reply = self._say(rng.choice(style.get("maths_zero", ["I can't divide by zero."])))
+                else:
+                    reply = self._say(rng.choice(style.get(pool, ["{sum}."])).format(sum=sentence))
+                self._remember("Know", tidy, reply)
+                return reply
+            hit = library.lookup(tidy)
+            if hit is None:
+                return None
+            kind, data = hit
+            if kind == "capital":
+                mode, place, city = data
+                if mode == "C":
+                    text = rng.choice(library.capital_answers or ["{capital}."]).format(place=place, capital=city)
+                else:
+                    text = "%s is the capital of %s." % (city, place)
+            elif kind == "language":
+                lang, word, spoken = data
+                text = rng.choice(library.lang_answers or ["{x}."]).format(lang=lang, word=word, x=spoken)
+            else:
+                text = data
+            mood = self.mood()
+            leads = style.get("leads_" + mood) or style.get("leads") or [""]
+            text = rng.choice(leads) + text
+            reply = self._say(text)
+            self._remember("Know", tidy, reply)
+            log.info("Brain: answered from what she knows (%s) %r", kind, tidy)
+            return reply
+        except Exception:
+            log.exception("Her knowledge failed; carrying on")
+            return None
 
     def _by_meaning(self, tidy):
         """No pattern fitted: is the sentence clearly a rephrasing of one of the chatty topics? (personality/meaning.py)"""

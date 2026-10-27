@@ -1,0 +1,696 @@
+{
+ "_help": "Elite Dangerous general knowledge (personality/knowledge.py). Only things that are stable across updates.",
+ "entries": [
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "center",
+     "galaxy"
+    ],
+    [
+     "what",
+     "is",
+     "centre",
+     "galaxy"
+    ],
+    [
+     "center",
+     "galaxy",
+     "called"
+    ],
+    [
+     "centre",
+     "galaxy",
+     "called"
+    ],
+    [
+     "sagittarius"
+    ]
+   ],
+   "a": "The centre of the galaxy is a supermassive black hole called Sagittarius A star. In Elite it sits about twenty five thousand nine hundred light years from Sol."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "far",
+     "galactic",
+     "centre"
+    ],
+    [
+     "how",
+     "far",
+     "galactic",
+     "center"
+    ],
+    [
+     "how",
+     "far",
+     "sagittarius"
+    ],
+    [
+     "distance",
+     "sagittarius"
+    ]
+   ],
+   "a": "Sagittarius A star is about twenty five thousand nine hundred light years from Sol."
+  },
+  {
+   "k": [
+    [
+     "beagle",
+     "point"
+    ]
+   ],
+   "a": "Beagle Point is the famous far edge of the galaxy, about sixty five thousand light years from Sol. Explorers go there to say they went."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "colonia"
+    ],
+    [
+     "where",
+     "is",
+     "colonia"
+    ],
+    [
+     "colonia"
+    ]
+   ],
+   "a": "Colonia is a cluster of systems about twenty two thousand light years from Sol, founded by the Colonia Council. It's a popular stop for explorers."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "star",
+     "systems"
+    ],
+    [
+     "how",
+     "many",
+     "systems",
+     "galaxy"
+    ],
+    [
+     "how",
+     "many",
+     "stars",
+     "elite"
+    ]
+   ],
+   "a": "The Elite galaxy is a full scale model of the Milky Way, with around four hundred billion star systems."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "sol"
+    ],
+    [
+     "where",
+     "is",
+     "earth",
+     "elite"
+    ],
+    [
+     "capital",
+     "federation"
+    ]
+   ],
+   "a": "Sol is our home system, and the Federation's capital. Earth is the third planet."
+  },
+  {
+   "k": [
+    [
+     "capital",
+     "empire"
+    ],
+    [
+     "empire",
+     "capital"
+    ],
+    [
+     "where",
+     "is",
+     "achenar"
+    ]
+   ],
+   "a": "The Empire's capital is Achenar."
+  },
+  {
+   "k": [
+    [
+     "capital",
+     "alliance"
+    ],
+    [
+     "alliance",
+     "capital"
+    ],
+    [
+     "where",
+     "is",
+     "alioth"
+    ]
+   ],
+   "a": "The Alliance's capital is Alioth."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "superpowers"
+    ],
+    [
+     "major",
+     "factions"
+    ],
+    [
+     "three",
+     "superpowers"
+    ]
+   ],
+   "a": "There are three major powers: the Federation, the Empire and the Alliance, plus the independents."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "elite"
+    ],
+    [
+     "who",
+     "makes",
+     "elite"
+    ],
+    [
+     "who",
+     "developed",
+     "elite"
+    ],
+    [
+     "who",
+     "created",
+     "elite"
+    ]
+   ],
+   "a": "Frontier Developments makes Elite Dangerous. The original Elite in 1984 was by David Braben and Ian Bell."
+  },
+  {
+   "k": [
+    [
+     "when",
+     "did",
+     "elite",
+     "dangerous",
+     "come"
+    ],
+    [
+     "when",
+     "was",
+     "elite",
+     "dangerous",
+     "released"
+    ],
+    [
+     "elite",
+     "dangerous",
+     "release"
+    ]
+   ],
+   "a": "Elite Dangerous was released in December 2014."
+  },
+  {
+   "k": [
+    [
+     "first",
+     "elite",
+     "game"
+    ],
+    [
+     "original",
+     "elite"
+    ]
+   ],
+   "a": "The original Elite came out in 1984, by David Braben and Ian Bell. It had a whole galaxy in about twenty two kilobytes."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "neutron",
+     "boost"
+    ],
+    [
+     "how",
+     "neutron",
+     "boost",
+     "work"
+    ],
+    [
+     "neutron",
+     "star",
+     "jump",
+     "range"
+    ],
+    [
+     "what",
+     "does",
+     "neutron",
+     "do"
+    ],
+    [
+     "neutron",
+     "boost"
+    ],
+    [
+     "neutron",
+     "boosting"
+    ],
+    [
+     "neutron",
+     "supercharge"
+    ]
+   ],
+   "a": "Fly into the jet cone of a neutron star in supercruise and your next hyperspace jump can go up to four times its normal range. Line up, stay in the cone, and watch the temperature."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "white",
+     "dwarf",
+     "boost"
+    ],
+    [
+     "white",
+     "dwarf",
+     "jump",
+     "range"
+    ]
+   ],
+   "a": "A white dwarf's jet cone gives your next jump one and a half times its normal range."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "stars",
+     "can",
+     "scoop"
+    ],
+    [
+     "which",
+     "stars",
+     "scoop"
+    ],
+    [
+     "scoopable",
+     "stars"
+    ],
+    [
+     "scoopable"
+    ]
+   ],
+   "a": "You can fuel scoop from O, B, A, F, G, K and M class stars. Remember the line, Oh Be A Fine Guy Kiss Me. Neutron stars, white dwarfs and black holes are not scoopable."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "honk"
+    ],
+    [
+     "honk"
+    ],
+    [
+     "discovery",
+     "scanner"
+    ]
+   ],
+   "a": "The honk is the discovery scanner pulse. It reveals what's in a system so you can see what's worth scanning."
+  },
+  {
+   "k": [
+    [
+     "explorer",
+     "ranks"
+    ],
+    [
+     "exploration",
+     "ranks"
+    ],
+    [
+     "highest",
+     "exploration",
+     "rank"
+    ]
+   ],
+   "a": "Exploration ranks run Aimless, Mostly Aimless, Scout, Surveyor, Trailblazer, Pathfinder, Ranger, Pioneer and finally Elite."
+  },
+  {
+   "k": [
+    [
+     "combat",
+     "ranks"
+    ],
+    [
+     "highest",
+     "combat",
+     "rank"
+    ]
+   ],
+   "a": "Combat ranks run Harmless, Mostly Harmless, Novice, Competent, Expert, Master, Dangerous, Deadly and Elite."
+  },
+  {
+   "k": [
+    [
+     "trade",
+     "ranks"
+    ],
+    [
+     "trading",
+     "ranks"
+    ],
+    [
+     "highest",
+     "trade",
+     "rank"
+    ]
+   ],
+   "a": "Trade ranks run Penniless, Mostly Penniless, Peddler, Dealer, Merchant, Broker, Entrepreneur, Tycoon and Elite."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "are",
+     "thargoids"
+    ],
+    [
+     "who",
+     "are",
+     "thargoids"
+    ],
+    [
+     "what",
+     "is",
+     "thargoid"
+    ]
+   ],
+   "a": "The Thargoids are a hostile insectoid alien species. Treat their ships very respectfully."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "are",
+     "guardians"
+    ],
+    [
+     "who",
+     "are",
+     "guardians"
+    ]
+   ],
+   "a": "The Guardians are an ancient, vanished alien civilisation. Their ruins and technology are scattered through the galaxy."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "fleet",
+     "carrier"
+    ],
+    [
+     "fleet",
+     "carrier"
+    ]
+   ],
+   "a": "A fleet carrier is a huge player owned ship that can jump across the galaxy and act as a mobile base. It costs a lot to run."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "far",
+     "fleet",
+     "carrier"
+    ],
+    [
+     "fleet",
+     "carrier",
+     "jump",
+     "range"
+    ]
+   ],
+   "a": "A fleet carrier can jump up to five hundred light years at a time."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "supercruise"
+    ]
+   ],
+   "a": "Supercruise is the in-system travel mode that lets you cross a system at many times the speed of light. Hyperspace is for jumping between systems."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "frame",
+     "shift"
+    ],
+    [
+     "what",
+     "is",
+     "fsd"
+    ]
+   ],
+   "a": "The frame shift drive is your ship's hyperspace engine. It's what lets you jump between star systems and fly in supercruise."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "powerplay"
+    ]
+   ],
+   "a": "Powerplay lets you pledge to one of the superpowers' leaders, and spread their influence by completing work in the galaxy."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "exobiology"
+    ],
+    [
+     "what",
+     "is",
+     "exobiologist"
+    ]
+   ],
+   "a": "Exobiology means finding, scanning and sampling alien plants and life on planets. Each species sold to Universal Cartographics earns a bonus."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "codex"
+    ]
+   ],
+   "a": "The codex is your in-game encyclopedia of everything you have discovered."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "engineer"
+    ],
+    [
+     "what",
+     "are",
+     "engineers"
+    ]
+   ],
+   "a": "Engineers are specialists who can upgrade your ship's modules with blueprints and experimental effects, if you gather the materials and earn their trust."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "cmdr"
+    ],
+    [
+     "what",
+     "does",
+     "cmdr",
+     "mean"
+    ]
+   ],
+   "a": "CMDR is short for Commander, which is what you are."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "pad",
+     "size"
+    ],
+    [
+     "landing",
+     "pad",
+     "sizes"
+    ]
+   ],
+   "a": "Landing pads come in three sizes: small, medium and large. Your ship must fit one of them."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "heat",
+     "sink"
+    ]
+   ],
+   "a": "A heat sink launcher ejects a canister that soaks up your ship's heat. It's useful when you need to go quiet or cool off."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "silent",
+     "running"
+    ]
+   ],
+   "a": "Silent running stops your ship's heat leaking out to sensors, but your heat builds up. It's useful for hiding, not for long."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "hardpoint"
+    ],
+    [
+     "what",
+     "are",
+     "hardpoints"
+    ]
+   ],
+   "a": "Hardpoints are the mounts for your weapons. Deploy them before a fight and retract them to save heat and speed."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "srv"
+    ],
+    [
+     "what",
+     "is",
+     "scarab"
+    ]
+   ],
+   "a": "The SRV is your planetary buggy, launched from your ship to drive on surfaces. The Scarab is the standard one."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "wing"
+    ],
+    [
+     "what",
+     "is",
+     "wing",
+     "mission"
+    ]
+   ],
+   "a": "A wing is a group of up to four commanders flying together."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "bounty"
+    ],
+    [
+     "what",
+     "is",
+     "bounty",
+     "hunting"
+    ]
+   ],
+   "a": "A bounty is a price on a pilot's head. Bounty hunting means killing wanted pilots and handing in the vouchers for credits."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "mining"
+    ],
+    [
+     "how",
+     "does",
+     "mining",
+     "work"
+    ]
+   ],
+   "a": "Mining means breaking up asteroids in a ring, for example with a mining laser or by prospecting, and collecting the metals and minerals to sell."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "platinum"
+    ],
+    [
+     "platinum",
+     "worth"
+    ]
+   ],
+   "a": "Platinum is a precious metal that you mine in rings, and it's one of the better earners. I can tell you where the nearest buyer is if you ask."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "painite"
+    ]
+   ],
+   "a": "Painite is a rare mineral you find in metallic rings, and one of the most valuable things you can mine."
+  }
+ ]
+}

@@ -965,3 +965,9 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 
 ## 0.67.1
 - `Matcher.sound_repair` now returns None for a one-word sentence (log showed 'Oli' -> heal, 'Milo' -> melee with the open microphone setting).
+
+## 0.68.0 - what she knows (`personality/knowledge.py`, `config/knowledge/*.json`)
+- Runs in `Brain.try_handle` after her exact patterns and BEFORE the meaning match and free chat. Setting `brain.knowledge` (default on).
+- Add a fact: open `config/knowledge/world.json` (or any entries file) and add `{"k": [["word", "word"], ["other", "way"]], "a": "The answer."}`. Every word in one list must be in the question (a trailing s is ignored); the biggest match wins. One-word keys only fire when the sentence starts like a question. A test fails if two answers share the same key words.
+- Capitals, greetings in other languages, sums (`maths`) and unit conversions (`convert`) are in code or their own JSON file. Sums need a leading "what is" style question, or numbers and an operator in a very short sentence, so "I did 3 jumps" is never a sum.
+- She answers nothing that changes with the news (leaders, prices, weather): those fall through to "I can't answer that".

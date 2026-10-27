@@ -1,0 +1,859 @@
+{
+ "_help": "Science and nature facts (personality/knowledge.py).",
+ "entries": [
+  {
+   "k": [
+    [
+     "boiling",
+     "point",
+     "water"
+    ],
+    [
+     "water",
+     "boil"
+    ]
+   ],
+   "a": "Water boils at a hundred degrees Celsius, two hundred and twelve Fahrenheit, at sea level."
+  },
+  {
+   "k": [
+    [
+     "freezing",
+     "point",
+     "water"
+    ],
+    [
+     "water",
+     "freeze"
+    ]
+   ],
+   "a": "Water freezes at zero degrees Celsius, thirty two Fahrenheit."
+  },
+  {
+   "k": [
+    [
+     "absolute",
+     "zero"
+    ]
+   ],
+   "a": "Absolute zero is minus two hundred and seventy three point one five degrees Celsius, the coldest anything can possibly be."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "gravity"
+    ],
+    [
+     "explain",
+     "gravity"
+    ]
+   ],
+   "a": "Gravity is the force that pulls objects with mass towards each other. It's why you stay on the ground and why planets orbit stars."
+  },
+  {
+   "k": [
+    [
+     "speed",
+     "sound"
+    ],
+    [
+     "fast",
+     "sound"
+    ]
+   ],
+   "a": "Sound travels at about three hundred and forty three metres per second in air."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "atom"
+    ]
+   ],
+   "a": "An atom is the tiny building block of matter, made of protons and neutrons in a nucleus with electrons around it."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "dna"
+    ]
+   ],
+   "a": "DNA is the molecule that carries the instructions for building and running a living thing."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "photosynthesis"
+    ]
+   ],
+   "a": "Photosynthesis is how plants use sunlight, water and carbon dioxide to make food, giving out oxygen."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "oxygen"
+    ],
+    [
+     "what",
+     "do",
+     "we",
+     "breathe"
+    ]
+   ],
+   "a": "Oxygen is the gas we need to breathe. It makes up about a fifth of the air."
+  },
+  {
+   "k": [
+    [
+     "most",
+     "common",
+     "gas",
+     "air"
+    ],
+    [
+     "air",
+     "made",
+     "of"
+    ],
+    [
+     "what",
+     "is",
+     "air"
+    ]
+   ],
+   "a": "Air is about seventy eight percent nitrogen and twenty one percent oxygen, with a little argon and other gases."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "water",
+     "made"
+    ],
+    [
+     "formula",
+     "water"
+    ],
+    [
+     "h2o"
+    ]
+   ],
+   "a": "Water is two hydrogen atoms and one oxygen atom, H two O."
+  },
+  {
+   "k": [
+    [
+     "periodic",
+     "table"
+    ]
+   ],
+   "a": "The periodic table lists all the known chemical elements in order of atomic number. There are a hundred and eighteen."
+  },
+  {
+   "k": [
+    [
+     "lightest",
+     "element"
+    ],
+    [
+     "first",
+     "element"
+    ]
+   ],
+   "a": "Hydrogen is the lightest element, and the most common in the universe."
+  },
+  {
+   "k": [
+    [
+     "hardest",
+     "natural",
+     "substance"
+    ],
+    [
+     "hardest",
+     "material"
+    ],
+    [
+     "hardest",
+     "thing"
+    ]
+   ],
+   "a": "Diamond is the hardest natural material."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "diamond"
+    ]
+   ],
+   "a": "Diamond is pure carbon with its atoms arranged in a very strong crystal structure."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "electricity"
+    ]
+   ],
+   "a": "Electricity is the flow of electric charge, usually electrons moving through a wire."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "magnet"
+    ],
+    [
+     "how",
+     "magnet",
+     "work"
+    ]
+   ],
+   "a": "A magnet is something that creates a magnetic field, which pulls on iron and a few other metals."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "energy"
+    ]
+   ],
+   "a": "Energy is the ability to do work or make something change. It comes as heat, light, motion, electricity and more."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "sound"
+    ]
+   ],
+   "a": "Sound is vibrations travelling through air, or water, or a solid, that our ears pick up."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "rainbow"
+    ],
+    [
+     "how",
+     "rainbow"
+    ]
+   ],
+   "a": "A rainbow is sunlight bent and split into colours by raindrops."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "lightning"
+    ],
+    [
+     "how",
+     "lightning"
+    ]
+   ],
+   "a": "Lightning is a huge spark of static electricity between clouds, or between a cloud and the ground."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "earthquake"
+    ],
+    [
+     "what",
+     "causes",
+     "earthquake"
+    ]
+   ],
+   "a": "Earthquakes happen when blocks of the Earth's crust, called tectonic plates, suddenly slip against each other."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "volcano"
+    ]
+   ],
+   "a": "A volcano is an opening in the Earth's crust where molten rock, ash and gas can escape."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "animal"
+    ],
+    [
+     "biggest",
+     "animal"
+    ]
+   ],
+   "a": "The blue whale is the biggest animal ever known, up to about thirty metres long."
+  },
+  {
+   "k": [
+    [
+     "fastest",
+     "animal"
+    ],
+    [
+     "fastest",
+     "land",
+     "animal"
+    ]
+   ],
+   "a": "The peregrine falcon is the fastest animal, over three hundred kilometres an hour in a dive. On land, it's the cheetah, at around a hundred."
+  },
+  {
+   "k": [
+    [
+     "tallest",
+     "animal"
+    ]
+   ],
+   "a": "The giraffe is the tallest animal, up to about five and a half metres."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "land",
+     "animal"
+    ],
+    [
+     "biggest",
+     "land",
+     "animal"
+    ]
+   ],
+   "a": "The African elephant is the largest land animal."
+  },
+  {
+   "k": [
+    [
+     "smartest",
+     "animal"
+    ],
+    [
+     "most",
+     "intelligent",
+     "animal"
+    ]
+   ],
+   "a": "It's hard to say, but chimpanzees, dolphins, crows and octopuses are all famously clever."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "legs",
+     "spider"
+    ]
+   ],
+   "a": "Spiders have eight legs."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "legs",
+     "insect"
+    ]
+   ],
+   "a": "Insects have six legs."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "hearts",
+     "octopus"
+    ]
+   ],
+   "a": "An octopus has three hearts."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "do",
+     "elephants",
+     "live"
+    ],
+    [
+     "elephant",
+     "lifespan"
+    ]
+   ],
+   "a": "Elephants live for about sixty to seventy years."
+  },
+  {
+   "k": [
+    [
+     "why",
+     "do",
+     "cats",
+     "purr"
+    ],
+    [
+     "cats",
+     "purr"
+    ]
+   ],
+   "a": "Cats purr when they are content, but also sometimes when they are stressed or hurt, to soothe themselves."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "do",
+     "cats",
+     "live"
+    ],
+    [
+     "cat",
+     "lifespan"
+    ]
+   ],
+   "a": "Indoor cats often live fifteen years or more, some into their twenties."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "do",
+     "dogs",
+     "live"
+    ],
+    [
+     "dog",
+     "lifespan"
+    ]
+   ],
+   "a": "Dogs usually live ten to fifteen years, with small breeds living longer than big ones."
+  },
+  {
+   "k": [
+    [
+     "are",
+     "dolphins",
+     "fish"
+    ],
+    [
+     "dolphin",
+     "mammal"
+    ]
+   ],
+   "a": "No, dolphins are mammals. They breathe air and feed their young milk."
+  },
+  {
+   "k": [
+    [
+     "is",
+     "tomato",
+     "fruit"
+    ],
+    [
+     "tomato",
+     "fruit"
+    ]
+   ],
+   "a": "Botanically a tomato is a fruit, though cooks treat it as a vegetable."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "biggest",
+     "ocean"
+    ],
+    [
+     "largest",
+     "ocean"
+    ]
+   ],
+   "a": "The Pacific Ocean is the largest, covering about a third of the planet."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "oceans"
+    ]
+   ],
+   "a": "There are five named oceans: Pacific, Atlantic, Indian, Southern and Arctic."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "continents"
+    ]
+   ],
+   "a": "There are seven continents: Africa, Antarctica, Asia, Australia, Europe, North America and South America."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "continent"
+    ],
+    [
+     "biggest",
+     "continent"
+    ]
+   ],
+   "a": "Asia is the largest continent."
+  },
+  {
+   "k": [
+    [
+     "smallest",
+     "continent"
+    ]
+   ],
+   "a": "Australia is the smallest continent."
+  },
+  {
+   "k": [
+    [
+     "longest",
+     "river"
+    ]
+   ],
+   "a": "The Nile and the Amazon are the two contenders, at roughly six and a half thousand kilometres each. The Nile is traditionally named the longest."
+  },
+  {
+   "k": [
+    [
+     "highest",
+     "mountain"
+    ],
+    [
+     "tallest",
+     "mountain"
+    ],
+    [
+     "mount",
+     "everest"
+    ]
+   ],
+   "a": "Mount Everest is the highest mountain above sea level, at 8,849 metres."
+  },
+  {
+   "k": [
+    [
+     "deepest",
+     "ocean"
+    ],
+    [
+     "deepest",
+     "point"
+    ],
+    [
+     "mariana",
+     "trench"
+    ]
+   ],
+   "a": "The Mariana Trench in the Pacific is the deepest place in the ocean, nearly eleven kilometres down."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "desert"
+    ],
+    [
+     "biggest",
+     "desert"
+    ]
+   ],
+   "a": "Antarctica is technically the largest desert, and the Sahara is the largest hot desert."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "country"
+    ],
+    [
+     "biggest",
+     "country"
+    ]
+   ],
+   "a": "Russia is the largest country by area."
+  },
+  {
+   "k": [
+    [
+     "smallest",
+     "country"
+    ]
+   ],
+   "a": "Vatican City is the smallest country in the world."
+  },
+  {
+   "k": [
+    [
+     "tallest",
+     "building"
+    ]
+   ],
+   "a": "The Burj Khalifa in Dubai is the tallest building, at about eight hundred and twenty eight metres."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "bones"
+    ],
+    [
+     "bones",
+     "human",
+     "body"
+    ]
+   ],
+   "a": "An adult human has two hundred and six bones."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "teeth"
+    ]
+   ],
+   "a": "Adults normally have thirty two teeth, including the wisdom teeth."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "chromosomes"
+    ]
+   ],
+   "a": "Humans have forty six chromosomes, in twenty three pairs."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "chambers",
+     "heart"
+    ],
+    [
+     "heart",
+     "chambers"
+    ]
+   ],
+   "a": "The human heart has four chambers."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "organ"
+    ],
+    [
+     "biggest",
+     "organ"
+    ]
+   ],
+   "a": "Your skin is the biggest organ of the human body."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "much",
+     "water",
+     "body"
+    ],
+    [
+     "body",
+     "made",
+     "water"
+    ]
+   ],
+   "a": "About sixty percent of an adult human body is water."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "much",
+     "sleep"
+    ],
+    [
+     "hours",
+     "sleep",
+     "need"
+    ]
+   ],
+   "a": "Most adults need seven to nine hours of sleep a night. And you, Commander, probably need more than you get."
+  },
+  {
+   "k": [
+    [
+     "normal",
+     "body",
+     "temperature"
+    ],
+    [
+     "body",
+     "temperature"
+    ]
+   ],
+   "a": "Normal human body temperature is around thirty seven degrees Celsius, ninety eight point six Fahrenheit."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "senses"
+    ]
+   ],
+   "a": "The classic answer is five: sight, hearing, smell, taste and touch. Scientists count more, such as balance."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "pi"
+    ],
+    [
+     "value",
+     "pi"
+    ],
+    [
+     "digits",
+     "pi"
+    ]
+   ],
+   "a": "Pi is the ratio of a circle's circumference to its diameter: three point one four one five nine, and it goes on forever."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "prime",
+     "number"
+    ]
+   ],
+   "a": "A prime number can only be divided by one and itself. Two, three, five, seven, eleven and so on."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "sides",
+     "triangle"
+    ]
+   ],
+   "a": "A triangle has three sides."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "sides",
+     "hexagon"
+    ]
+   ],
+   "a": "A hexagon has six sides."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "degrees",
+     "circle"
+    ]
+   ],
+   "a": "A circle has three hundred and sixty degrees."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "degrees",
+     "triangle"
+    ],
+    [
+     "angles",
+     "triangle"
+    ]
+   ],
+   "a": "The angles of a triangle add up to a hundred and eighty degrees."
+  },
+  {
+   "k": [
+    [
+     "square",
+     "root",
+     "of",
+     "hundred"
+    ]
+   ],
+   "a": "The square root of a hundred is ten."
+  },
+  {
+   "k": [
+    [
+     "colours",
+     "rainbow"
+    ],
+    [
+     "colors",
+     "rainbow"
+    ],
+    [
+     "colours",
+     "in",
+     "rainbow"
+    ]
+   ],
+   "a": "A rainbow has seven colours: red, orange, yellow, green, blue, indigo and violet."
+  }
+ ]
+}

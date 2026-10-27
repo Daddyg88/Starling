@@ -1,0 +1,160 @@
+{
+ "_help": "'How do you say hello in German'. Words are in the order of 'words'.",
+ "words": [
+  "hello",
+  "thank you",
+  "goodbye",
+  "please",
+  "yes",
+  "no",
+  "good night",
+  "sorry"
+ ],
+ "languages": {
+  "French": [
+   "bonjour",
+   "merci",
+   "au revoir",
+   "s'il vous plait",
+   "oui",
+   "non",
+   "bonne nuit",
+   "pardon"
+  ],
+  "German": [
+   "hallo",
+   "danke",
+   "auf wiedersehen",
+   "bitte",
+   "ja",
+   "nein",
+   "gute nacht",
+   "entschuldigung"
+  ],
+  "Spanish": [
+   "hola",
+   "gracias",
+   "adios",
+   "por favor",
+   "si",
+   "no",
+   "buenas noches",
+   "perdon"
+  ],
+  "Italian": [
+   "ciao",
+   "grazie",
+   "arrivederci",
+   "per favore",
+   "si",
+   "no",
+   "buona notte",
+   "scusa"
+  ],
+  "Portuguese": [
+   "ola",
+   "obrigado",
+   "adeus",
+   "por favor",
+   "sim",
+   "nao",
+   "boa noite",
+   "desculpa"
+  ],
+  "Dutch": [
+   "hallo",
+   "dank je",
+   "tot ziens",
+   "alsjeblieft",
+   "ja",
+   "nee",
+   "goede nacht",
+   "sorry"
+  ],
+  "Swedish": [
+   "hej",
+   "tack",
+   "hejda",
+   "snalla",
+   "ja",
+   "nej",
+   "god natt",
+   "ursakta"
+  ],
+  "Polish": [
+   "czesc",
+   "dziekuje",
+   "do widzenia",
+   "prosze",
+   "tak",
+   "nie",
+   "dobranoc",
+   "przepraszam"
+  ],
+  "Russian": [
+   "privet",
+   "spasibo",
+   "do svidaniya",
+   "pozhaluysta",
+   "da",
+   "nyet",
+   "spokoynoy nochi",
+   "izvinite"
+  ],
+  "Japanese": [
+   "konnichiwa",
+   "arigato",
+   "sayonara",
+   "onegai shimasu",
+   "hai",
+   "iie",
+   "oyasumi",
+   "sumimasen"
+  ],
+  "Mandarin": [
+   "ni hao",
+   "xie xie",
+   "zai jian",
+   "qing",
+   "shi",
+   "bu shi",
+   "wan an",
+   "dui bu qi"
+  ],
+  "Turkish": [
+   "merhaba",
+   "tesekkurler",
+   "hoscakal",
+   "lutfen",
+   "evet",
+   "hayir",
+   "iyi geceler",
+   "affedersiniz"
+  ],
+  "Welsh": [
+   "shwmae",
+   "diolch",
+   "hwyl",
+   "os gwelwch yn dda",
+   "ie",
+   "na",
+   "nos da",
+   "mae'n ddrwg gen i"
+  ],
+  "Irish": [
+   "dia duit",
+   "go raibh maith agat",
+   "slan",
+   "le do thoil",
+   "sea",
+   "ni hea",
+   "oiche mhaith",
+   "ta bron orm"
+  ]
+ },
+ "answers": [
+  "In {lang}, {word} is {x}.",
+  "{x}. That's {word} in {lang}.",
+  "You say {x}."
+ ]
+}

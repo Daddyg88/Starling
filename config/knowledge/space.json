@@ -1,0 +1,769 @@
+{
+ "_help": "Space facts (personality/knowledge.py). 'k' = lists of words that must ALL be in the question (any one list will do); 'a' = the answer.",
+ "entries": [
+  {
+   "k": [
+    [
+     "speed",
+     "light"
+    ],
+    [
+     "fast",
+     "light"
+    ],
+    [
+     "light",
+     "travel",
+     "fast"
+    ]
+   ],
+   "a": "Light travels at about three hundred thousand kilometres every second. Precisely, two hundred and ninety nine thousand, seven hundred and ninety two."
+  },
+  {
+   "k": [
+    [
+     "light",
+     "year"
+    ],
+    [
+     "lightyear"
+    ]
+   ],
+   "a": "A light year is the distance light travels in a year, about nine and a half trillion kilometres."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "planet"
+    ],
+    [
+     "number",
+     "planet"
+    ]
+   ],
+   "a": "There are eight planets in our solar system: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "planet"
+    ],
+    [
+     "biggest",
+     "planet"
+    ]
+   ],
+   "a": "Jupiter is the biggest planet. You could fit over a thousand Earths inside it."
+  },
+  {
+   "k": [
+    [
+     "smallest",
+     "planet"
+    ]
+   ],
+   "a": "Mercury is the smallest planet in our solar system."
+  },
+  {
+   "k": [
+    [
+     "hottest",
+     "planet"
+    ]
+   ],
+   "a": "Venus is the hottest planet, around four hundred and sixty degrees, thanks to its thick atmosphere. Mercury is closer to the Sun but cooler."
+  },
+  {
+   "k": [
+    [
+     "coldest",
+     "planet"
+    ]
+   ],
+   "a": "Uranus is the coldest planet, with temperatures dropping below minus two hundred degrees."
+  },
+  {
+   "k": [
+    [
+     "closest",
+     "planet",
+     "sun"
+    ],
+    [
+     "nearest",
+     "planet",
+     "sun"
+    ],
+    [
+     "first",
+     "planet",
+     "sun"
+    ]
+   ],
+   "a": "Mercury is the closest planet to the Sun."
+  },
+  {
+   "k": [
+    [
+     "red",
+     "planet"
+    ],
+    [
+     "which",
+     "planet",
+     "red"
+    ]
+   ],
+   "a": "Mars is called the red planet, because of the iron oxide, basically rust, on its surface."
+  },
+  {
+   "k": [
+    [
+     "planet",
+     "rings"
+    ],
+    [
+     "which",
+     "planet",
+     "ring"
+    ]
+   ],
+   "a": "Saturn has the famous rings, but Jupiter, Uranus and Neptune have faint ones too."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "earth"
+    ],
+    [
+     "earth",
+     "moon",
+     "have"
+    ],
+    [
+     "earth",
+     "moon"
+    ]
+   ],
+   "a": "Earth has one moon."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "mars"
+    ],
+    [
+     "mars",
+     "moon"
+    ]
+   ],
+   "a": "Mars has two small moons, Phobos and Deimos."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "jupiter"
+    ],
+    [
+     "jupiter",
+     "moon"
+    ]
+   ],
+   "a": "Jupiter has well over ninety known moons. The four big ones are Io, Europa, Ganymede and Callisto."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "saturn"
+    ],
+    [
+     "saturn",
+     "moon"
+    ]
+   ],
+   "a": "Saturn has well over a hundred known moons, and astronomers keep finding more. The biggest is Titan."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "moon"
+    ],
+    [
+     "biggest",
+     "moon"
+    ]
+   ],
+   "a": "Ganymede, one of Jupiter's moons, is the biggest moon in the solar system. It's even bigger than Mercury."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "far",
+     "moon"
+    ],
+    [
+     "distance",
+     "moon"
+    ],
+    [
+     "moon",
+     "away"
+    ]
+   ],
+   "a": "The Moon is about three hundred and eighty four thousand kilometres from Earth."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "far",
+     "sun"
+    ],
+    [
+     "distance",
+     "sun"
+    ],
+    [
+     "sun",
+     "away"
+    ],
+    [
+     "earth",
+     "sun",
+     "distance"
+    ]
+   ],
+   "a": "The Sun is about a hundred and fifty million kilometres from Earth. Its light takes a little over eight minutes to reach us."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "light",
+     "sun",
+     "reach"
+    ],
+    [
+     "light",
+     "sun",
+     "take"
+    ]
+   ],
+   "a": "Sunlight takes about eight minutes and twenty seconds to reach Earth."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "sun"
+    ],
+    [
+     "what",
+     "type",
+     "star",
+     "sun"
+    ]
+   ],
+   "a": "The Sun is an ordinary yellow dwarf star, about four and a half billion years old, holding ninety nine percent of the mass in our solar system."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "old",
+     "sun"
+    ],
+    [
+     "age",
+     "sun"
+    ]
+   ],
+   "a": "The Sun is about four and a half billion years old, roughly halfway through its life."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "old",
+     "earth"
+    ],
+    [
+     "age",
+     "earth"
+    ]
+   ],
+   "a": "Earth is about four and a half billion years old."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "old",
+     "universe"
+    ],
+    [
+     "age",
+     "universe"
+    ]
+   ],
+   "a": "The universe is about thirteen point eight billion years old."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "big",
+     "milky",
+     "way"
+    ],
+    [
+     "size",
+     "milky",
+     "way"
+    ],
+    [
+     "milky",
+     "way",
+     "wide"
+    ]
+   ],
+   "a": "The Milky Way is roughly a hundred thousand light years across."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "stars",
+     "milky",
+     "way"
+    ],
+    [
+     "stars",
+     "galaxy",
+     "how",
+     "many"
+    ]
+   ],
+   "a": "Somewhere between one hundred and four hundred billion stars, nobody can count them exactly."
+  },
+  {
+   "k": [
+    [
+     "nearest",
+     "galaxy"
+    ],
+    [
+     "closest",
+     "galaxy"
+    ],
+    [
+     "andromeda"
+    ]
+   ],
+   "a": "The Andromeda galaxy is the nearest big galaxy, about two and a half million light years away. It's heading our way and will merge with the Milky Way in a few billion years."
+  },
+  {
+   "k": [
+    [
+     "nearest",
+     "star"
+    ],
+    [
+     "closest",
+     "star"
+    ],
+    [
+     "alpha",
+     "centauri"
+    ]
+   ],
+   "a": "Apart from the Sun, the nearest star system is Alpha Centauri, about four point three light years away. Proxima Centauri, the closest member, is a little nearer."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "black",
+     "hole"
+    ],
+    [
+     "black",
+     "hole",
+     "mean"
+    ],
+    [
+     "explain",
+     "black",
+     "hole"
+    ]
+   ],
+   "a": "A black hole is a place where gravity is so strong that nothing, not even light, can escape once it gets too close."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "neutron",
+     "star"
+    ]
+   ],
+   "a": "A neutron star is the collapsed core of a huge star. It's only about twenty kilometres wide but heavier than our Sun. In Elite, flying through its jet cone can supercharge your next jump."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "white",
+     "dwarf"
+    ]
+   ],
+   "a": "A white dwarf is the small, hot, dense core left behind by a star like our Sun when it dies. In Elite, their jet cones give a smaller supercharge than neutron stars."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "supernova"
+    ]
+   ],
+   "a": "A supernova is the explosion of a massive star at the end of its life. It can briefly outshine a whole galaxy."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "galaxy"
+    ]
+   ],
+   "a": "A galaxy is a huge collection of stars, gas and dust held together by gravity. Ours is the Milky Way."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "nebula"
+    ]
+   ],
+   "a": "A nebula is a cloud of gas and dust in space, where new stars are often born."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "comet"
+    ]
+   ],
+   "a": "A comet is a ball of ice and dust that grows a glowing tail when it gets close to a star."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "asteroid"
+    ]
+   ],
+   "a": "An asteroid is a rocky leftover from the early solar system. Most live in the belt between Mars and Jupiter."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "dwarf",
+     "planet"
+    ]
+   ],
+   "a": "A dwarf planet is round like a planet but hasn't cleared other objects out of its orbit. Pluto is the most famous one."
+  },
+  {
+   "k": [
+    [
+     "pluto",
+     "planet"
+    ],
+    [
+     "why",
+     "pluto"
+    ]
+   ],
+   "a": "Pluto was reclassified as a dwarf planet in 2006, because it hasn't cleared its orbit of other objects."
+  },
+  {
+   "k": [
+    [
+     "first",
+     "man",
+     "moon"
+    ],
+    [
+     "first",
+     "person",
+     "moon"
+    ],
+    [
+     "who",
+     "walked",
+     "moon"
+    ]
+   ],
+   "a": "Neil Armstrong was the first person on the Moon, in July 1969, on the Apollo 11 mission. Buzz Aldrin followed him."
+  },
+  {
+   "k": [
+    [
+     "first",
+     "person",
+     "space"
+    ],
+    [
+     "first",
+     "man",
+     "space"
+    ]
+   ],
+   "a": "Yuri Gagarin of the Soviet Union was the first person in space, in April 1961."
+  },
+  {
+   "k": [
+    [
+     "first",
+     "woman",
+     "space"
+    ]
+   ],
+   "a": "Valentina Tereshkova of the Soviet Union, in 1963."
+  },
+  {
+   "k": [
+    [
+     "first",
+     "satellite"
+    ],
+    [
+     "sputnik"
+    ]
+   ],
+   "a": "Sputnik 1, launched by the Soviet Union in October 1957, was the first artificial satellite."
+  },
+  {
+   "k": [
+    [
+     "international",
+     "space",
+     "station"
+    ],
+    [
+     "what",
+     "is",
+     "iss"
+    ]
+   ],
+   "a": "The International Space Station is a laboratory orbiting Earth, about four hundred kilometres up. People have lived aboard it continuously since the year 2000."
+  },
+  {
+   "k": [
+    [
+     "hubble"
+    ],
+    [
+     "hubble",
+     "telescope"
+    ]
+   ],
+   "a": "The Hubble Space Telescope has orbited Earth since 1990 and taken some of the most famous pictures of the universe."
+  },
+  {
+   "k": [
+    [
+     "james",
+     "webb"
+    ],
+    [
+     "webb",
+     "telescope"
+    ]
+   ],
+   "a": "The James Webb Space Telescope launched in December 2021. It sees in infrared, so it can look through dust and back to the earliest galaxies."
+  },
+  {
+   "k": [
+    [
+     "voyager"
+    ],
+    [
+     "farthest",
+     "spacecraft"
+    ]
+   ],
+   "a": "Voyager 1, launched in 1977, is the most distant human-made object. It's now in interstellar space."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "day",
+     "mars"
+    ],
+    [
+     "mars",
+     "day"
+    ]
+   ],
+   "a": "A day on Mars, called a sol, is about twenty four hours and thirty nine minutes."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "year",
+     "mars"
+    ]
+   ],
+   "a": "A year on Mars lasts about 687 Earth days."
+  },
+  {
+   "k": [
+    [
+     "gravity",
+     "moon"
+    ],
+    [
+     "moon",
+     "gravity"
+    ]
+   ],
+   "a": "Gravity on the Moon is about one sixth of Earth's."
+  },
+  {
+   "k": [
+    [
+     "why",
+     "sky",
+     "blue"
+    ],
+    [
+     "sky",
+     "blue"
+    ]
+   ],
+   "a": "The sky is blue because air scatters blue light from the Sun more than red light."
+  },
+  {
+   "k": [
+    [
+     "why",
+     "sunset",
+     "red"
+    ],
+    [
+     "sunset",
+     "red"
+    ]
+   ],
+   "a": "Sunsets look red because the light has to pass through more air, which scatters the blue away and leaves the red."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "causes",
+     "tides"
+    ],
+    [
+     "why",
+     "tides"
+    ]
+   ],
+   "a": "Tides are caused mainly by the Moon's gravity pulling on the oceans."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "causes",
+     "seasons"
+    ],
+    [
+     "why",
+     "seasons"
+    ]
+   ],
+   "a": "Seasons happen because Earth's axis is tilted, so different parts get more direct sunlight as it orbits the Sun."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "day",
+     "earth"
+    ],
+    [
+     "how",
+     "long",
+     "earth",
+     "rotate"
+    ]
+   ],
+   "a": "Earth turns once every twenty four hours, or twenty three hours and fifty six minutes to be exact."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "fast",
+     "earth",
+     "orbit"
+    ],
+    [
+     "how",
+     "fast",
+     "earth",
+     "moving"
+    ]
+   ],
+   "a": "Earth orbits the Sun at about thirty kilometres every second."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "hours",
+     "day"
+    ]
+   ],
+   "a": "There are twenty four hours in a day."
+  }
+ ]
+}

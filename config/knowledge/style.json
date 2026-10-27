@@ -1,0 +1,49 @@
+{
+ "_help": "How she phrases what she knows (personality/knowledge.py). {a} is the answer. Maths: {sum} is e.g. '12 times 7 is 84'.",
+ "leads": [
+  "",
+  "",
+  "",
+  "",
+  "",
+  "Easy one. ",
+  "That one I know. ",
+  "Good question. ",
+  "I do know this one. ",
+  "Ooh, a proper question. "
+ ],
+ "leads_Sarcastic": [
+  "",
+  "",
+  "Honestly, Commander, ",
+  "Let me dust off my encyclopedia. ",
+  "You do know there's a search engine, don't you? "
+ ],
+ "leads_Close": [
+  "",
+  "",
+  "Anything for you. ",
+  "For you, darling. ",
+  "I love it when you ask me things. "
+ ],
+ "maths": [
+  "{sum}.",
+  "That's {sum}.",
+  "{sum}, Commander.",
+  "Easy: {sum}.",
+  "I make it {sum}."
+ ],
+ "maths_zero": [
+  "I can't divide by zero, Commander. Nobody can.",
+  "Dividing by zero breaks everything, so I'll pass."
+ ],
+ "units": [
+  "{sum}.",
+  "That's {sum}.",
+  "{sum}, Commander.",
+  "I make that {sum}."
+ ],
+ "unknown_unit": [
+  "I'm not sure how to convert that one."
+ ]
+}

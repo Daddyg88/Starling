@@ -1,0 +1,209 @@
+{
+ "_help": "Computers, games and everyday tech (personality/knowledge.py).",
+ "entries": [
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "cpu"
+    ]
+   ],
+   "a": "The CPU is the processor, the main chip that does the computing."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "gpu"
+    ],
+    [
+     "what",
+     "is",
+     "graphics",
+     "card"
+    ]
+   ],
+   "a": "The GPU is the graphics processor. It draws the pictures, and it's what your game leans on most."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "ram"
+    ]
+   ],
+   "a": "RAM is your computer's short term memory. More of it lets you run more things at once."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "ssd"
+    ]
+   ],
+   "a": "An SSD is a fast storage drive with no moving parts. Games load much quicker from one."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "fps"
+    ],
+    [
+     "frames",
+     "per",
+     "second"
+    ]
+   ],
+   "a": "FPS means frames per second. The higher it is, the smoother the game looks."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "vr"
+    ],
+    [
+     "what",
+     "is",
+     "virtual",
+     "reality"
+    ]
+   ],
+   "a": "Virtual reality uses a headset to put you inside the game, so you can look around the cockpit."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "ai"
+    ],
+    [
+     "what",
+     "is",
+     "artificial",
+     "intelligence"
+    ]
+   ],
+   "a": "Artificial intelligence is software that does things that normally need human thinking, like understanding speech. Like me, in a small way."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "wifi"
+    ],
+    [
+     "what",
+     "is",
+     "wi",
+     "fi"
+    ]
+   ],
+   "a": "Wi-Fi is wireless networking that connects your devices to the internet."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "internet"
+    ]
+   ],
+   "a": "The internet is a worldwide network of computers that talk to each other."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "bit",
+     "byte"
+    ],
+    [
+     "how",
+     "many",
+     "bits",
+     "byte"
+    ],
+    [
+     "bits",
+     "in",
+     "a",
+     "byte"
+    ]
+   ],
+   "a": "A byte is eight bits."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "bytes",
+     "kilobyte"
+    ],
+    [
+     "bytes",
+     "in",
+     "a",
+     "kilobyte"
+    ]
+   ],
+   "a": "A kilobyte is about a thousand bytes, and a megabyte about a thousand kilobytes."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "streaming"
+    ]
+   ],
+   "a": "Streaming means broadcasting your game live over the internet, like you do."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "twitch"
+    ]
+   ],
+   "a": "Twitch is a live streaming website, mostly for games."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "python"
+    ]
+   ],
+   "a": "Python is a programming language. I'm written in it, as it happens."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "programming"
+    ],
+    [
+     "what",
+     "is",
+     "coding"
+    ]
+   ],
+   "a": "Programming is writing instructions that a computer can follow."
+  }
+ ]
+}

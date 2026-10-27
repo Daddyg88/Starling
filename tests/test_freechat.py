@@ -69,9 +69,9 @@ class Talking(Base):
         self.assertTrue(self.brain.in_conversation())
 
     def test_she_does_not_make_up_answers(self):
-        reply = self.ask("what is the capital of france")
+        reply = self.ask("who won the football match last night")
         self.assertTrue(reply)
-        self.assertNotIn("Paris", reply)
+        self.assertNotIn("won", reply)
         self.assertTrue(self.brain.history)
 
     def test_a_worrying_sentence_gets_care_not_banter(self):

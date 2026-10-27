@@ -1,0 +1,924 @@
+{
+ "_help": "World, history and everyday facts (personality/knowledge.py). Nothing that changes with the news.",
+ "entries": [
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "days",
+     "year"
+    ]
+   ],
+   "a": "A normal year has three hundred and sixty five days, and a leap year has three hundred and sixty six."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "days",
+     "week"
+    ],
+    [
+     "days",
+     "in",
+     "a",
+     "week"
+    ]
+   ],
+   "a": "Seven days in a week."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "months",
+     "year"
+    ]
+   ],
+   "a": "Twelve months in a year."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "weeks",
+     "year"
+    ]
+   ],
+   "a": "Fifty two weeks in a year."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "minutes",
+     "hour"
+    ]
+   ],
+   "a": "Sixty minutes in an hour."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "seconds",
+     "minute"
+    ]
+   ],
+   "a": "Sixty seconds in a minute."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "seconds",
+     "hour"
+    ]
+   ],
+   "a": "Three thousand six hundred seconds in an hour."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "seconds",
+     "day"
+    ]
+   ],
+   "a": "Eighty six thousand four hundred seconds in a day."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "leap",
+     "year"
+    ],
+    [
+     "why",
+     "leap",
+     "year"
+    ]
+   ],
+   "a": "A leap year has an extra day, the twenty ninth of February, to keep the calendar in step with Earth's orbit. It comes round every four years, with a few exceptions."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "letters",
+     "alphabet"
+    ]
+   ],
+   "a": "There are twenty six letters in the English alphabet."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "players",
+     "football",
+     "team"
+    ],
+    [
+     "players",
+     "football",
+     "team"
+    ]
+   ],
+   "a": "Eleven players per side in football, soccer to some of you."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "players",
+     "basketball"
+    ]
+   ],
+   "a": "Five players per side on court in basketball."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "rings",
+     "olympic"
+    ],
+    [
+     "olympic",
+     "rings"
+    ]
+   ],
+   "a": "Five rings in the Olympic symbol, for the five inhabited continents."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "strings",
+     "guitar"
+    ]
+   ],
+   "a": "A standard guitar has six strings."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "keys",
+     "piano"
+    ]
+   ],
+   "a": "A full piano has eighty eight keys."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "colours",
+     "traffic",
+     "light"
+    ]
+   ],
+   "a": "Three: red, amber and green."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "sides",
+     "stop",
+     "sign"
+    ],
+    [
+     "sides",
+     "stop",
+     "sign"
+    ]
+   ],
+   "a": "A stop sign has eight sides."
+  },
+  {
+   "k": [
+    [
+     "world",
+     "war",
+     "one"
+    ],
+    [
+     "world",
+     "war",
+     "1"
+    ],
+    [
+     "first",
+     "world",
+     "war"
+    ],
+    [
+     "ww1"
+    ]
+   ],
+   "a": "The First World War began in 1914 and ended in 1918."
+  },
+  {
+   "k": [
+    [
+     "world",
+     "war",
+     "two"
+    ],
+    [
+     "world",
+     "war",
+     "2"
+    ],
+    [
+     "second",
+     "world",
+     "war"
+    ],
+    [
+     "ww2"
+    ]
+   ],
+   "a": "The Second World War ran from 1939 to 1945."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "invented",
+     "telephone"
+    ],
+    [
+     "invented",
+     "phone"
+    ]
+   ],
+   "a": "Alexander Graham Bell is usually credited with inventing the telephone, in 1876."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "invented",
+     "light",
+     "bulb"
+    ],
+    [
+     "invented",
+     "lightbulb"
+    ]
+   ],
+   "a": "Thomas Edison made the first practical light bulb, though others worked on the idea before him."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "invented",
+     "world",
+     "wide",
+     "web"
+    ],
+    [
+     "who",
+     "invented",
+     "web"
+    ]
+   ],
+   "a": "Tim Berners-Lee invented the World Wide Web in 1989."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "invented",
+     "internet"
+    ]
+   ],
+   "a": "Many people built it. The early network ARPANET appeared in the late 1960s, and Vint Cerf and Bob Kahn designed the key protocols."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "wrote",
+     "romeo",
+     "juliet"
+    ],
+    [
+     "who",
+     "wrote",
+     "hamlet"
+    ],
+    [
+     "who",
+     "is",
+     "shakespeare"
+    ]
+   ],
+   "a": "William Shakespeare, the English playwright who lived from 1564 to 1616."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "painted",
+     "mona",
+     "lisa"
+    ],
+    [
+     "mona",
+     "lisa"
+    ]
+   ],
+   "a": "Leonardo da Vinci painted the Mona Lisa, in the early 1500s."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "discovered",
+     "gravity"
+    ],
+    [
+     "who",
+     "discovered",
+     "gravity",
+     "apple"
+    ]
+   ],
+   "a": "Isaac Newton described gravity in the 1600s. The apple story may be a little embellished."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "albert",
+     "einstein"
+    ],
+    [
+     "who",
+     "is",
+     "einstein"
+    ],
+    [
+     "relativity"
+    ]
+   ],
+   "a": "Albert Einstein was the physicist behind the theory of relativity, which describes gravity, space and time. He also explained E equals M C squared."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "isaac",
+     "newton"
+    ]
+   ],
+   "a": "Isaac Newton was an English scientist who worked out the laws of motion and gravity."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "stephen",
+     "hawking"
+    ]
+   ],
+   "a": "Stephen Hawking was a British physicist famous for his work on black holes and the origin of the universe."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "marie",
+     "curie"
+    ]
+   ],
+   "a": "Marie Curie was a physicist and chemist who discovered radium and polonium, and won two Nobel Prizes."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "galileo"
+    ]
+   ],
+   "a": "Galileo was an Italian astronomer who used a telescope in the early 1600s to show that Jupiter has moons and Earth orbits the Sun."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "carl",
+     "sagan"
+    ]
+   ],
+   "a": "Carl Sagan was an American astronomer and writer who made space science famous, in books and the series Cosmos."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "napoleon"
+    ]
+   ],
+   "a": "Napoleon Bonaparte was a French general who became emperor of France in 1804."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "cleopatra"
+    ]
+   ],
+   "a": "Cleopatra was the last active pharaoh of ancient Egypt, who ruled until 30 BC."
+  },
+  {
+   "k": [
+    [
+     "when",
+     "did",
+     "titanic",
+     "sink"
+    ],
+    [
+     "titanic"
+    ]
+   ],
+   "a": "The Titanic sank on the fifteenth of April 1912 after hitting an iceberg."
+  },
+  {
+   "k": [
+    [
+     "when",
+     "did",
+     "humans",
+     "land",
+     "moon"
+    ],
+    [
+     "when",
+     "moon",
+     "landing"
+    ]
+   ],
+   "a": "The first Moon landing was on the twentieth of July 1969."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "currency",
+     "japan"
+    ],
+    [
+     "currency",
+     "japan"
+    ],
+    [
+     "japan",
+     "money"
+    ]
+   ],
+   "a": "The Japanese currency is the yen."
+  },
+  {
+   "k": [
+    [
+     "currency",
+     "uk"
+    ],
+    [
+     "currency",
+     "britain"
+    ],
+    [
+     "currency",
+     "england"
+    ],
+    [
+     "uk",
+     "money"
+    ]
+   ],
+   "a": "The pound sterling."
+  },
+  {
+   "k": [
+    [
+     "currency",
+     "europe"
+    ],
+    [
+     "currency",
+     "germany"
+    ],
+    [
+     "currency",
+     "france"
+    ],
+    [
+     "euro"
+    ]
+   ],
+   "a": "The euro is used by twenty countries, including Germany, France, Italy and Spain."
+  },
+  {
+   "k": [
+    [
+     "currency",
+     "america"
+    ],
+    [
+     "currency",
+     "usa"
+    ],
+    [
+     "currency",
+     "united",
+     "states"
+    ]
+   ],
+   "a": "The US dollar."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "language",
+     "brazil"
+    ],
+    [
+     "language",
+     "brazil"
+    ]
+   ],
+   "a": "Portuguese is spoken in Brazil."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "language",
+     "austria"
+    ],
+    [
+     "language",
+     "austria"
+    ]
+   ],
+   "a": "German is the official language of Austria."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "language",
+     "switzerland"
+    ],
+    [
+     "language",
+     "switzerland"
+    ]
+   ],
+   "a": "Switzerland has four national languages: German, French, Italian and Romansh."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "language",
+     "belgium"
+    ],
+    [
+     "language",
+     "belgium"
+    ]
+   ],
+   "a": "Belgium has three official languages: Dutch, French and German."
+  },
+  {
+   "k": [
+    [
+     "most",
+     "spoken",
+     "language"
+    ],
+    [
+     "language",
+     "most",
+     "speakers"
+    ]
+   ],
+   "a": "English has the most speakers overall, counting people who speak it as a second language. Mandarin Chinese has the most native speakers."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "countries"
+    ]
+   ],
+   "a": "There are 195 countries recognised in the world today: 193 United Nations members plus two observer states."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "states",
+     "america"
+    ],
+    [
+     "how",
+     "many",
+     "states",
+     "usa"
+    ],
+    [
+     "how",
+     "many",
+     "us",
+     "states"
+    ]
+   ],
+   "a": "Fifty states in the United States."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "oldest",
+     "language"
+    ]
+   ],
+   "a": "Hard to be sure, but Sumerian and Egyptian are among the oldest written languages, and Tamil and Greek are among the oldest still spoken."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "first",
+     "president",
+     "america"
+    ],
+    [
+     "first",
+     "us",
+     "president"
+    ],
+    [
+     "first",
+     "president",
+     "united",
+     "states"
+    ]
+   ],
+   "a": "George Washington."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "eiffel",
+     "tower"
+    ],
+    [
+     "eiffel",
+     "tower"
+    ]
+   ],
+   "a": "The Eiffel Tower is in Paris, France."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "big",
+     "ben"
+    ],
+    [
+     "big",
+     "ben"
+    ]
+   ],
+   "a": "Big Ben is in London, at the Houses of Parliament."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "statue",
+     "liberty"
+    ],
+    [
+     "statue",
+     "of",
+     "liberty"
+    ]
+   ],
+   "a": "The Statue of Liberty stands in New York Harbor."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "are",
+     "pyramids"
+    ],
+    [
+     "great",
+     "pyramid"
+    ],
+    [
+     "pyramids",
+     "egypt"
+    ]
+   ],
+   "a": "The great pyramids are at Giza, near Cairo in Egypt."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "great",
+     "wall"
+    ],
+    [
+     "great",
+     "wall",
+     "china"
+    ]
+   ],
+   "a": "The Great Wall is in northern China."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "taj",
+     "mahal"
+    ],
+    [
+     "taj",
+     "mahal"
+    ]
+   ],
+   "a": "The Taj Mahal is in Agra, India."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "machu",
+     "picchu"
+    ],
+    [
+     "machu",
+     "picchu"
+    ]
+   ],
+   "a": "Machu Picchu is in the Andes mountains of Peru."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "mount",
+     "fuji"
+    ],
+    [
+     "mount",
+     "fuji"
+    ]
+   ],
+   "a": "Mount Fuji is on the island of Honshu in Japan."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "kremlin"
+    ],
+    [
+     "kremlin"
+    ]
+   ],
+   "a": "The Kremlin is in Moscow."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "brandenburg",
+     "gate"
+    ],
+    [
+     "brandenburg",
+     "gate"
+    ]
+   ],
+   "a": "The Brandenburg Gate is in Berlin, Germany."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "colosseum"
+    ],
+    [
+     "colosseum"
+    ]
+   ],
+   "a": "The Colosseum is in Rome, Italy."
+  },
+  {
+   "k": [
+    [
+     "where",
+     "is",
+     "sydney",
+     "opera",
+     "house"
+    ],
+    [
+     "opera",
+     "house",
+     "sydney"
+    ]
+   ],
+   "a": "In Sydney, Australia."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "oktoberfest"
+    ],
+    [
+     "oktoberfest"
+    ]
+   ],
+   "a": "Oktoberfest is a huge beer festival held in Munich, Germany, starting in late September."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "hours",
+     "flight",
+     "london",
+     "new",
+     "york"
+    ]
+   ],
+   "a": "It's about eight hours from London to New York."
+  }
+ ]
+}

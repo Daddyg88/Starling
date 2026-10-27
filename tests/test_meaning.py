@@ -41,7 +41,7 @@ class Understanding(unittest.TestCase):
             self.assertEqual(self.key(said), expected, said)
 
     def test_unrelated_sentences_get_nothing(self):
-        for said in ("what is the capital of france", "open the galaxy map", "hello there", "how do i plot a route",
+        for said in ("who won the football match last night", "open the galaxy map", "hello there", "how do i plot a route",
                      "set a timer for ten minutes", "the cargo hold is almost full", "jump to the next system", "blah blah blah",
                      "do you reckon youre brainy"):
             self.assertIsNone(self.meaning.best(said), said)
@@ -96,7 +96,7 @@ class InTheBrain(Base):
         self.assertTrue(self.speech.said)
 
     def test_nonsense_is_still_not_answered(self):
-        self.assertIsNone(self.ask("what is the capital of france"))
+        self.assertIsNone(self.ask("who won the football match last night"))
 
     def test_an_exact_pattern_still_wins(self):
         self.ask("do you like me")

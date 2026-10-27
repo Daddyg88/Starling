@@ -411,6 +411,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="How often she adds a comment after a line"),
             Field("brain.enabled", "Her brain: answers to almost anything", "toggle",
                   help="Ask her about herself, the game, jokes, riddles, advice, or say hello to chat. Needs her name or push-to-talk"),
+            Field("brain.knowledge", "She answers facts and sums", "toggle",
+                  help="Capitals, space and science facts, Elite facts, hello in other languages, sums and unit conversions. She only answers what she is sure of"),
             Field("brain.freechat", "She chats back about anything", "toggle",
                   help="When you just talk to her (not a command, not a question she knows) she reacts, adds a remark and asks you something. She never makes up facts"),
             Field("brain.chat_followups", "Answer her questions without her name", "toggle",
