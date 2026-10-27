@@ -67,6 +67,7 @@ class App:
         self.warmer = None
         self.smalltalk = None
         self.brain = None
+        self.profile = None
         self.miner = None
         self.prices = None
         self.lore = None
@@ -257,8 +258,11 @@ class App:
         self.prices = PriceFinder(self.settings)
         from mining.merit import MeritFinder
         self.merit = MeritFinder(self.settings)
+        from memory.profile import PlayerProfile
+        self.profile = PlayerProfile(paths.DATA_DIR / "player_profile.json", enabled=lambda: bool(self.settings.get("brain.profile", True)))
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
-                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit)
+                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit,
+                           profile=self.profile)
         return True
 
     def cpu_is_free(self):
@@ -472,6 +476,8 @@ class App:
         return "\n".join(lines)
 
     def forget_memories(self):
+        if getattr(self, "profile", None) is not None:
+            self.profile.clear()                 # what you told her about yourself goes too
         if self.memory_store is None:
             return "Memory is not running."
         self.memory_store.forget_everything()

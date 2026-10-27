@@ -204,6 +204,8 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("controls", "Controls", "Voice commands, push-to-talk and your joystick.", [
             Field("commands.enabled", "Voice commands", "toggle",
                   help="Say things like 'lower the landing gear' and she presses your key"),
+            Field("commands.ask_guess", "Ask 'did you mean...?' when unsure", "toggle",
+                  help="When what she heard is close to a command but not sure enough to act, she asks. Say yes (no need for her name) and she does it and remembers"),
             Field("commands.confirm", "She says what she did", "toggle",
                   help="Off = she only speaks up when something goes wrong"),
             Field("commands.require_game_focus", "Only press keys while Elite is in front", "toggle",
@@ -413,6 +415,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="When you just talk to her (not a command, not a question she knows) she reacts, adds a remark and asks you something. She never makes up facts"),
             Field("brain.chat_followups", "Answer her questions without her name", "toggle",
                   help="For 25 seconds after she asks you something you can answer without saying her name. Never runs commands"),
+            Field("brain.profile", "She learns what you like (kept on this PC)", "toggle",
+                  help="Say 'I love pizza' or 'my dog is called Rex' and she remembers. Say 'forget what you know about me' to wipe it. Never sent anywhere"),
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.frequency", "How often she chats", "choice", CHITCHAT,

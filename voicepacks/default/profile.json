@@ -1,0 +1,169 @@
+{
+ "_help": "The player profile (memory/profile.py): what she says when she learns something about you, remembers it, and when you ask what she knows. Everything stays on your computer.",
+ "Profile_Learned_Like": [
+  "Noted, you like {x}. I'll remember that.",
+  "{X}. Good to know. I've written it down.",
+  "You like {x}. I'll keep that in mind, Commander.",
+  "Ah, {x}. Filed under things you love.",
+  "Right, {x} it is. I'll remember.",
+  "I like knowing that about you. {x}, noted."
+ ],
+ "Profile_Learned_Like_Close": [
+  "{X}. I'll remember that, love. I like learning what makes you happy.",
+  "Noted: you like {x}. I'm keeping it safe."
+ ],
+ "Profile_Learned_Like_Sarcastic": [
+  "{X}. Fascinating. Written down, against my better judgement.",
+  "Oh, {x}. How original. Noted."
+ ],
+ "Profile_Learned_Dislike": [
+  "Noted, you can't stand {x}. I'll steer clear of it.",
+  "No {x}. Understood, Commander.",
+  "{X}, not a fan. I've written that down.",
+  "Right, {x} is off the list. I'll remember.",
+  "Good to know. No {x}.",
+  "I'll keep {x} out of it. Noted."
+ ],
+ "Profile_Learned_Dislike_Sarcastic": [
+  "Oh, {x}, how terrible for you. Noted.",
+  "You hate {x}. I'll alert the authorities."
+ ],
+ "Profile_Learned_Pet": [
+  "{name}, your {kind}. What a lovely name. I'll remember.",
+  "Ah, {name}! I'll remember that you have a {kind} called {name}.",
+  "{name} the {kind}. Noted, and now I'm quite fond of them.",
+  "Say hello to {name} from me. I've written it down.",
+  "A {kind} called {name}. Lovely. I won't forget.",
+  "I'll remember {name}. Pets are important."
+ ],
+ "Profile_Learned_Fav": [
+  "Your favourite {cat} is {x}. Lovely, I'll remember.",
+  "{X}, your favourite {cat}. Noted.",
+  "Right, {x} for {cat}. I'll keep it in mind.",
+  "Good taste. {x} it is.",
+  "I'll remember that. {x} for {cat}."
+ ],
+ "Profile_Known_Like": [
+  "You've told me before, you like {x}. I do listen.",
+  "Yes, {x}. You've mentioned. It's on my list.",
+  "I know, I know. You love {x}.",
+  "Still true, then. You like {x}."
+ ],
+ "Profile_Known_Dislike": [
+  "You've told me before, {x} isn't your thing.",
+  "I remember. No {x}.",
+  "Yes, you can't stand {x}. I haven't forgotten.",
+  "Still not a fan of {x}, then."
+ ],
+ "Profile_Known_Pet": [
+  "I know {name}. Your {kind}. I haven't forgotten.",
+  "Yes, {name} the {kind}. I remember.",
+  "You've told me about {name}. I like that you did."
+ ],
+ "Profile_Known_Fav": [
+  "I remember. Your favourite {cat} is {x}.",
+  "Yes, {x} for {cat}. I've got it noted.",
+  "I know. {x} is your favourite {cat}."
+ ],
+ "Profile_Follow_Like": [
+  "What do you like most about {x}?",
+  "How long have you liked {x}?",
+  "What got you into {x}?",
+  "Do you get to do {x} much?",
+  "What's the best thing about {x}?"
+ ],
+ "Profile_Follow_Dislike": [
+  "What is it about {x} that gets to you?",
+  "Was there a bad experience with {x}?",
+  "Have you always felt that way about {x}?",
+  "Is there anything about {x} you can put up with?"
+ ],
+ "Profile_Follow_Pet": [
+  "How old is {name}?",
+  "What's {name} like?",
+  "Does {name} sit with you while you fly?",
+  "How long have you had {name}?",
+  "Is {name} well behaved?"
+ ],
+ "Profile_Follow_Fav": [
+  "What do you love about it?",
+  "How long has it been your favourite?",
+  "Do you have a runner up?",
+  "What made it your favourite?"
+ ],
+ "Profile_Sum_Likes": [
+  "You like {likes}.",
+  "I know you like {likes}.",
+  "Things you enjoy: {likes}."
+ ],
+ "Profile_Sum_Dislikes": [
+  "You can't stand {dislikes}.",
+  "And you don't like {dislikes}.",
+  "On the not-so-much list: {dislikes}."
+ ],
+ "Profile_Sum_Pets": [
+  "You've got {pets}.",
+  "I know about {pets}.",
+  "And there's {pets}, of course."
+ ],
+ "Profile_Sum_Favs": [
+  "And your favourites: {favs}.",
+  "Your favourite things: {favs}."
+ ],
+ "Profile_Empty": [
+  "You haven't told me much about yourself yet. Try saying 'I love pizza' or 'my dog is called Rex'.",
+  "Not much so far, Commander. Tell me what you like, or the name of your pet, and I'll remember.",
+  "I'm still getting to know you. Tell me something you love."
+ ],
+ "Profile_NoLikes": [
+  "You haven't told me what you like yet. Say 'I love' something and I'll remember.",
+  "Nothing on the likes list yet. Go on, tell me."
+ ],
+ "Profile_NoDislikes": [
+  "You haven't told me anything you hate. A rare gift.",
+  "Nothing on the dislikes list yet."
+ ],
+ "Profile_NoPet": [
+  "You haven't told me about a pet. What are they called?",
+  "I don't know about any pets yet. Tell me about them."
+ ],
+ "Profile_NoFav": [
+  "You haven't told me that one yet. What is it?",
+  "I don't know that yet. Tell me and I'll remember."
+ ],
+ "Profile_PetName": [
+  "Your {kind} is called {name}, of course.",
+  "{name}. Your {kind}. I remember.",
+  "That would be {name}."
+ ],
+ "Profile_FavIs": [
+  "Your favourite {cat} is {x}.",
+  "It's {x}. I remember.",
+  "{X}. You told me."
+ ],
+ "Profile_ForgotAll": [
+  "Done. I've forgotten everything you told me about yourself.",
+  "All gone. We can start again whenever you like.",
+  "Wiped. It's like we've only just met."
+ ],
+ "Profile_ForgotOne": [
+  "Forgotten. It never happened.",
+  "Done. I've taken it off the list.",
+  "Gone. I won't mention it again."
+ ],
+ "Chat_Known_Like": [
+  "{X}! You did tell me you like that.",
+  "Ah, {x}. One of your favourites, if I remember rightly.",
+  "{X} again. I remember you like it."
+ ],
+ "Chat_Known_Dislike": [
+  "{X}, hm. I remember you can't stand it.",
+  "Ah, {x}. Not your favourite, as I recall.",
+  "{X}. I haven't forgotten how you feel about it."
+ ],
+ "Chat_Known_Pet": [
+  "Is that {name}? Give the {kind} my regards.",
+  "{name}! Always a pleasure to hear about them.",
+  "Ah, {name} the {kind}. How are they?"
+ ]
+}

@@ -23,6 +23,8 @@ from stt.sounds import sound_key
 FUZZY_NORMAL = 0.84
 LEARN_MIN_SCORE = 0.90        # only a near-certain match is remembered as "one of your phrases"
 FUZZY_STRICT = 0.97          # commands that do something big (jump, supercruise)
+SUGGEST_MIN = 0.78           # not close enough to run, but close enough to ASK about ("did you mean...?")
+SUGGEST_MAX_WORDS = 7
 SOUND_SCORE = 0.95           # a sentence made right by sound-alike repair (stays below FUZZY_STRICT: big actions never use it)
 SOUND_MIN_LETTERS = 3        # shorter words (up, in, on, off) are never 'repaired': they decide what happens
 SOUND_MAX_WORDS = 2          # and at most two words of a sentence are repaired
@@ -216,7 +218,26 @@ class Matcher:
             self.learning.note(clean, found.phrase)
         return found
 
-    def _fuzzy(self, clean):
+    def suggest(self, text):
+        """
+        The command she half-recognised, to ask about: 'did you mean open galaxy map?'. Same safety as the fuzzy match
+        (never across an opposite word), but a lower bar, and big actions are allowed because YOU confirm them.
+        """
+        clean = normalise(text)
+        if not clean or len(clean.split()) > SUGGEST_MAX_WORDS:
+            return None
+        for sentence in (clean, self.sound_repair(clean)):
+            if sentence is None:
+                continue
+            hit = self.index.get(sentence)
+            if hit:
+                return Match(hit[0], hit[1], sentence, SOUND_SCORE, "suggest")      # a sound repair of a big action: ask first
+            found = self._fuzzy(sentence, floor=SUGGEST_MIN, ask=True)
+            if found is not None:
+                return found
+        return None
+
+    def _fuzzy(self, clean, floor=FUZZY_NORMAL, ask=False):
         words = set(clean.split())
         if len(clean) < 4:
             return None
@@ -225,12 +246,12 @@ class Matcher:
         best = None
         for sentence in self._sentences:
             sm.set_seq1(sentence)
-            if sm.real_quick_ratio() < FUZZY_NORMAL or sm.quick_ratio() < FUZZY_NORMAL:
+            if sm.real_quick_ratio() < floor or sm.quick_ratio() < floor:
                 continue
             score = sm.ratio()
             if best is not None and score <= best[0]:
                 continue
-            if score < FUZZY_NORMAL:
+            if score < floor:
                 continue
             different = words ^ set(sentence.split())
             if different & DIRECTION_WORDS:
@@ -239,6 +260,8 @@ class Matcher:
         if best is None:
             return None
         command, intent = self.index[best[1]]
+        if ask:
+            return Match(command, intent, best[1], best[0], "suggest")
         if command.strict and best[0] < FUZZY_STRICT:
             return None
         return Match(command, intent, best[1], best[0], "close")

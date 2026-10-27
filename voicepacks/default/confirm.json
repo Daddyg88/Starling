@@ -1,0 +1,32 @@
+{
+ "_help": "'Did you mean...?' (control/confirm.py). {phrase} is the command she half-recognised, for example 'open galaxy map'.",
+ "CommandConfirm": [
+  "Did you mean {phrase}?",
+  "Sorry, did you say {phrase}?",
+  "I think you said {phrase}. Is that right?",
+  "Not quite sure I caught that. {phrase}?",
+  "Was that {phrase}?",
+  "Did you want {phrase}?",
+  "I'd like to be sure. {phrase}?",
+  "Say yes if you meant {phrase}."
+ ],
+ "CommandConfirm_Sarcastic": [
+  "Was that {phrase}? Mumbling won't help.",
+  "I'm guessing {phrase}. Am I right, or shall I keep guessing?"
+ ],
+ "CommandConfirm_Close": [
+  "Did you mean {phrase}, love?",
+  "Was that {phrase}, Commander?"
+ ],
+ "CommandConfirmNo": [
+  "Okay, never mind. Say it again whenever you're ready.",
+  "No problem. Try me again.",
+  "Right, I'll drop it. Say it once more, maybe a bit slower.",
+  "Sorry about that. Go again.",
+  "Understood. Ask me again."
+ ],
+ "CommandConfirmNo_Close": [
+  "That's all right, love. Say it again.",
+  "No worries. I'll listen harder."
+ ]
+}

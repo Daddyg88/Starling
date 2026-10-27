@@ -62,7 +62,7 @@ class DataTests(Base):
 
     def test_placeholders_only_use_known_fields(self):
         known = {"system", "station", "ship", "shipname", "commander", "minutes", "jumps", "distance", "hull", "shields",
-                 "time", "period", "date", "result", "sides", "low", "high", "answer", "topic", "total", "best_text", "last", "topics"}
+                 "time", "period", "date", "result", "sides", "low", "high", "answer", "topic", "total", "best_text", "last", "topics", "x", "X"}
         for key, lines in self.dialogue.lines.items():
             if not key.startswith("Brain_"):
                 continue

@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from control import binds, sender as sender_module
+from control.confirm import Confirmer
 from control.matcher import Matcher, normalise
 from core.identity import personalise
 from core.logger import get_logger
@@ -91,6 +92,7 @@ class CommandRunner:
         self.voidcompass = voidcompass   # control/voidcompass.py (made on first use if not given)
         self.clock = clock
         self.sleep = sleep
+        self.confirmer = Confirmer(clock)       # "did you mean...?"
         self._last = {}
         self._clash_warned = set()
         self.last_outcomes: List[Outcome] = []
@@ -150,6 +152,11 @@ class CommandRunner:
         if not self.settings.get("commands.enabled", True):
             return
         data = event.data
+        if self.confirmer.active():                 # she just asked "did you mean...?": a yes or a no needs no wake word
+            answer = self.confirmer.answer((data.get("command") if data.get("wake") else data.get("text")) or "")
+            if answer:
+                self._confirm_answer(answer)
+                return
         if not self.addressed(data):
             self._chat_window(data)
             return
@@ -161,6 +168,24 @@ class CommandRunner:
             return                      # a plain "thank you" is not a command; Manners answers it
         deliberate = bool(data.get("wake") or data.get("ptt"))
         self.run_text(text, speak_unknown=deliberate)
+
+    def _confirm_answer(self, answer):
+        """You said yes or no to 'did you mean...?'."""
+        pending = self.confirmer.take()
+        if pending is None:
+            return
+        match, heard, _expires = pending
+        if answer == "no":
+            self.confirmer.refuse(normalise(heard), match.phrase)
+            self._speak("CommandConfirmNo", {}, fallback="Okay, never mind.")
+            return
+        outcome = self.execute(match, heard)
+        learning = getattr(self.matcher, "learning", None)
+        if learning is not None and not match.command.strict and outcome.status in ("done", "already"):
+            from control.learning import PROMOTE_AFTER
+            for _ in range(PROMOTE_AFTER):                      # you confirmed it: that is how YOU say it, so she learns it at once
+                learning.note(normalise(heard), match.phrase)
+        self._finish([outcome], True, heard)
 
     def _chat_window(self, data):
         """She just asked a question: an answer without her name is chat, never a command (free chat window)."""
@@ -211,6 +236,16 @@ class CommandRunner:
                 answer = None
             if answer is not None:
                 outcome = Outcome("route", text, None, "press", detail=answer)
+                self._finish([outcome], False, text)
+                return [outcome]
+        if not matches and speak and speak_unknown and self.settings.get("commands.ask_guess", True):
+            suggestion = self.matcher.suggest(text)
+            if (suggestion is not None and not self.confirmer.is_refused(normalise(text), suggestion.phrase)
+                    and suggestion.command.id not in (self.settings.get("commands.disabled", []) or [])):
+                self.confirmer.ask(suggestion, text)
+                question = "Did you mean %s?" % suggestion.phrase
+                self._speak("CommandConfirm", {"phrase": suggestion.phrase}, fallback=question)
+                outcome = Outcome("asked", text, suggestion.command, suggestion.intent, detail=question)
                 self._finish([outcome], False, text)
                 return [outcome]
         if not matches:

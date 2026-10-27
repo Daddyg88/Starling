@@ -67,7 +67,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -82,6 +82,7 @@ class Brain:
         self.by_key = {item["key"]: item for item, _patterns in self.intents}
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
+        self.profile = profile       # memory/profile.py: what you have told her about yourself (likes, pets...)
         self.topics = freechat.load_topics() if intents is None else freechat.Topics({})   # what a chatty sentence is about
         self.chat_until = 0.0        # free chat: until when you can answer her question without saying her name
         self.chat_turns = 0          # and how many exchanges the chat has had
@@ -108,6 +109,10 @@ class Brain:
             return None
         if deliberate and freechat.is_crisis(tidy):
             return self._say_pool("Chat_Concern", {})            # someone talking about hurting themselves gets care, never banter
+        if deliberate and self.profile is not None and self.settings.get("brain.profile", True):
+            reply = self._profile_turn(tidy)
+            if reply is not None:
+                return reply
         if self.waiting():
             reply = self._riddle_guess(tidy)
             if reply is not None:
@@ -143,6 +148,73 @@ class Brain:
             return None
         log.info("Brain: %r understood by meaning as %s (%.2f)", tidy, item["key"], hit[1])
         return self._answer(item, None, tidy)
+
+    # ---- what you have told her about yourself (memory/profile.py) ----
+    _ASK_ALL = re.compile(r"^(?:what do you know about me|what have you learned about me|what did i tell you about myself|"
+                          r"what do you remember about me|what have i told you|tell me what you know about me|what do you know)$")
+    _ASK_LIKES = re.compile(r"^(?:what do i (?:like|love|enjoy)|what things do i like|what am i into)$")
+    _ASK_DISLIKES = re.compile(r"^(?:what do i (?:hate|dislike)|what dont i like|what things do i hate)$")
+    _ASK_PET = re.compile(r"^(?:whats|what is|do you remember|remember) my (?:dog|cat|puppy|kitten|hamster|rabbit|parrot|horse|bird|tortoise|"
+                          r"guinea pig|goldfish|snake|lizard|budgie|ferret)(?:s name| called| named|s called)?$|^what(?:s| is) my pets? (?:name|called)$")
+    _ASK_FAV = re.compile(r"^(?:whats|what is|do you remember) my (?:favou?rite|fave) (?P<cat>[a-z ]{3,24})$")
+
+    @staticmethod
+    def _cap(values):
+        """Adds {X}: the same thing with a capital letter, for the start of a sentence."""
+        values = dict(values)
+        if values.get("x"):
+            values["X"] = values["x"][:1].upper() + values["x"][1:]
+        return values
+
+    def _profile_turn(self, tidy):
+        """Forget, recall and learn: 'forget that I like pizza', 'what do you know about me', 'I love pizza'."""
+        profile = self.profile
+        gone = profile.forget(tidy)
+        if gone:
+            return self._say_pool("Profile_ForgotAll" if gone == "all" else "Profile_ForgotOne", {})
+        if self._ASK_ALL.match(tidy):
+            values = profile.summary_values()
+            if not values:
+                return self._say_pool("Profile_Empty", {})
+            texts = [self._format("Profile_Sum_" + name, values) for name in ("Likes", "Dislikes", "Pets", "Favs")
+                     if name.lower() in values]
+            texts = [t for t in texts if t]
+            return self._say("||".join(texts)) if texts else self._say_pool("Profile_Empty", {})
+        if self._ASK_LIKES.match(tidy):
+            values = profile.summary_values()
+            return self._say_pool("Profile_Sum_Likes", values) if "likes" in values else self._say_pool("Profile_NoLikes", {})
+        if self._ASK_DISLIKES.match(tidy):
+            values = profile.summary_values()
+            return self._say_pool("Profile_Sum_Dislikes", values) if "dislikes" in values else self._say_pool("Profile_NoDislikes", {})
+        if self._ASK_PET.match(tidy):
+            if profile.pets:
+                pet = profile.pets[-1]
+                return self._say_pool("Profile_PetName", {"kind": pet["kind"], "name": pet["name"].capitalize()})
+            return self._say_pool("Profile_NoPet", {})
+        found = self._ASK_FAV.match(tidy)
+        if found:
+            category = found.group("cat").strip()
+            if category in profile.favourites:
+                return self._say_pool("Profile_FavIs", {"cat": category, "x": profile.favourites[category]})
+            return self._say_pool("Profile_NoFav", {})
+        learned = profile.learn(tidy)
+        if learned is None:
+            return None
+        kind, values, new = learned
+        values = self._cap(values)
+        name = {"like": "Like", "dislike": "Dislike", "pet": "Pet", "fav": "Fav"}[kind]
+        texts = [self._format("Profile_%s_%s" % ("Learned" if new else "Known", name), values)]
+        if new and self.rng.random() < 0.5:
+            texts.append(self._format("Profile_Follow_" + name, values))
+            self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS      # she asked: you can answer without her name
+            self.chat_turns = 1
+        texts = [t for t in texts if t]
+        if not texts:
+            return None
+        log.info("Profile: %s %s (%s)", "learned" if new else "already knew", kind, values)
+        reply = self._say("||".join(texts))
+        self._remember("Profile", tidy, reply)
+        return reply
 
     # ---- free chat (personality/freechat.py) ----
     def in_conversation(self):
@@ -205,6 +277,10 @@ class Brain:
             elif freechat.can_reflect(words) and not answering and rng.random() < 0.5:
                 echo = freechat.flip(words)
                 parts.append(("Chat_Reflect", {"echo": echo, "Echo": echo[:1].upper() + echo[1:]}))
+            elif self.profile is not None and self.settings.get("brain.profile", True) and not answering and self.profile.mentions(tidy) \
+                    and rng.random() < 0.6:
+                kind, known = self.profile.mentions(tidy)
+                parts.append(("Chat_Known_%s" % kind.capitalize(), self._cap(known)))        # "Is that Rex? Give the dog my regards."
             elif topic and rng.random() < (0.7 if sent >= 0 else 0.4):
                 parts.append(("Chat_%s_Own" % topic.capitalize(), {}))
             elif rng.random() < 0.35:
