@@ -30,6 +30,9 @@ MINING_SECONDS = 600.0           # she talks about mining for 10 minutes after t
 ALARMS = ("UnderAttack", "Interdicted", "InterdictionInProgress", "LowFuel", "Overheating", "HeatWarning", "HeatDamage",
           "HullDamage", "InDanger", "LowHealth", "LowOxygen", "Died", "CockpitBreached", "ShieldState")
 ALARM_QUIET_SECONDS = 75.0
+STATE_KEYS = ("ChitChat_Hull", "ChitChat_Wanted", "ChitChat_Long")
+STATE_REST = 1200.0              # and says the same kind of remark at most once in 20 minutes
+HULL_REMARK = 0.8                # below this much hull she mentions it (when it is quiet)
 CHECK_EVERY_SECONDS = 15.0
 
 
@@ -57,6 +60,7 @@ class ChitChat:
         self._stop = threading.Event()
         self._thread = None
         self.last_mining = None
+        self.state_said = {}             # when she last made each state remark (hull, bounty, long session)
 
     # ---- listening ----
     def attach(self):
@@ -116,6 +120,25 @@ class ChitChat:
         docked = bool(getattr(state, "docked", False))
         if self.mode == "combat":
             return ["ChitChat_Combat"]
+        extra = self.state_keys(state)
+        if extra:
+            return extra + self._normal_keys(state, docked)
+        return self._normal_keys(state, docked)
+
+    def state_keys(self, state):
+        """Things worth bringing up because of what is true right now (a damaged hull, a bounty, a long session)."""
+        keys = []
+        hull = getattr(state, "hull_health", None)
+        if isinstance(hull, (int, float)) and 0.0 < hull < HULL_REMARK:
+            keys.append("ChitChat_Hull")
+        if getattr(state, "wanted", False) is True:
+            keys.append("ChitChat_Wanted")
+        if int((self.clock() - self.started) / 3600) >= 2:
+            keys.append("ChitChat_Long")
+        now = self.clock()
+        return [k for k in keys if now - self.state_said.get(k, -STATE_REST) >= STATE_REST]
+
+    def _normal_keys(self, state, docked):
         if docked:
             return ["ChitChat_Docked", "ChitChat_Flying"]
         if self.last_mining is not None and self.clock() - self.last_mining < MINING_SECONDS:
@@ -145,6 +168,12 @@ class ChitChat:
             values["jumps"] = self.jumps
         if self.distance >= 50:
             values["distance"] = int(round(self.distance))
+        hull = getattr(state, "hull_health", None)
+        if isinstance(hull, (int, float)) and 0.0 < hull < HULL_REMARK:
+            values["hull"] = int(round(hull * 100))
+        values["hours"] = int((now - self.started) / 3600) if now - self.started >= 7200 else None
+        if values["hours"] is None:
+            del values["hours"]
         minutes = int((now - self.started) / 60)
         if minutes >= 20:
             values["minutes"] = minutes
@@ -161,7 +190,10 @@ class ChitChat:
                 if line is None:
                     break
                 try:
-                    return line.text.format(**values)       # needs every value it mentions
+                    text = line.text.format(**values)       # needs every value it mentions
+                    if key in STATE_KEYS:
+                        self.state_said[key] = now
+                    return text
                 except (KeyError, IndexError, ValueError):
                     continue
         return None

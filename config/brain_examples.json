@@ -48,7 +48,10 @@
   "do you get tired and nap",
   "when do you sleep",
   "do you have a bed somewhere",
-  "can you sleep at night"
+  "can you sleep at night",
+  "do you rest when im not playing",
+  "do you power down at night",
+  "do you get any downtime"
  ],
  "Brain_Dream": [
   "do you have dreams",
@@ -67,7 +70,10 @@
   "do you get scared in the dark",
   "are you frightened of the dark",
   "does the dark scare you",
-  "are you ever afraid out here"
+  "are you ever afraid out here",
+  "is anything frightening to you",
+  "what frightens you most",
+  "what scares you the most"
  ],
  "Brain_Feelings": [
   "can you feel things",
@@ -84,7 +90,9 @@
   "do you miss me when i am gone",
   "do you feel isolated",
   "are you ever lonely in the dark",
-  "do you ever feel alone in the dark"
+  "do you ever feel alone in the dark",
+  "is it lonely on your own out here",
+  "do you feel alone when im offline"
  ],
  "Brain_LikeMe": [
   "are you fond of me",
@@ -94,7 +102,9 @@
   "do you enjoy flying with me",
   "am i your favourite person",
   "are we friends",
-  "do you think i am nice"
+  "do you think i am nice",
+  "do you enjoy having me around",
+  "do you enjoy spending time with me"
  ],
  "Brain_LikeCombat": [
   "do you enjoy a good fight",
@@ -126,7 +136,10 @@
   "are the thargoids dangerous",
   "do you hate the bugs",
   "what are thargoids really",
-  "are you scared of the thargoid ships"
+  "are you scared of the thargoid ships",
+  "are thargoids frightening",
+  "are thargoids dangerous",
+  "what do you think about thargoids"
  ],
  "Brain_Guardians": [
   "what do you know about the guardians",
@@ -164,7 +177,9 @@
   "what would you like most",
   "what do you hope for",
   "what is your greatest desire",
-  "what are your dreams for the future"
+  "what are your dreams for the future",
+  "what do you wish for most",
+  "what do you want out of life"
  ],
  "Brain_Hobby": [
   "what do you do in your free time",
@@ -203,7 +218,11 @@
   "how smart are you really",
   "are you brilliant",
   "how clever are you really",
-  "are you good at thinking"
+  "are you good at thinking",
+  "are you really clever",
+  "how clever are you",
+  "are you very intelligent",
+  "are you a genius or what"
  ],
  "Brain_Weather": [
   "is it raining outside",
@@ -211,7 +230,9 @@
   "is it sunny where you are",
   "what is the temperature outside",
   "will it rain tomorrow",
-  "what is the forecast"
+  "what is the forecast",
+  "what is the weather like",
+  "what is the weather like out there"
  ],
  "Brain_GoodAt": [
   "what are you best at",
@@ -229,7 +250,10 @@
   "i need some encouragement",
   "i am feeling miserable",
   "say something nice to cheer me up",
-  "i am depressed today"
+  "i am depressed today",
+  "i feel rubbish",
+  "i feel terrible can you cheer me up",
+  "help me feel better"
  ],
  "Brain_Tired": [
   "i am exhausted",
@@ -339,7 +363,9 @@
   "tell me a pun",
   "say something to make me laugh",
   "i would like to hear a joke",
-  "know any good gags"
+  "know any good gags",
+  "make me smile",
+  "do you know any funny jokes"
  ],
  "Brain_Quote": [
   "give me some wisdom",
@@ -445,7 +471,11 @@
   "i am bored out of my mind",
   "this is tedious",
   "i am fed up of waiting",
-  "entertain me"
+  "entertain me",
+  "this is dull",
+  "this is so boring",
+  "nothing is going on",
+  "nothing ever happens"
  ],
  "Brain_ShowOff": [
   "what are you able to do",

@@ -1,0 +1,23 @@
+{
+ "_help": "Things she brings up on her own because of what is happening (0.75.0). Hull: her hull is under 80 percent. Wanted: you are wanted. Long: you have been playing a long time ({hours} hours). Each is only used when it is true.",
+
+ "ChitChat_Hull": [
+  "The hull is down to {hull} percent.||Might be worth a repair stop when it's convenient.",
+  "Just so you know, we're at {hull} percent hull.||I'd feel better with a visit to a station.",
+  "Hull integrity is {hull} percent.||Not terrible, but I'd like a few more rivets in place.",
+  "We've taken a few knocks. {hull} percent hull.||A repair would be a kindness to both of us.",
+  "{hull} percent hull. I'm not worried.||Well. A bit worried. Maybe repair soon?"
+ ],
+ "ChitChat_Wanted": [
+  "Just a reminder: you're wanted around here.||I'd keep an eye on the scanner.",
+  "You still have a bounty on your head.||Probably best to stay out of the busy stations.",
+  "We're wanted at the moment.||Let's not linger anywhere with a lot of security.",
+  "That bounty hasn't gone away, you know.||I'll watch for patrols."
+ ],
+ "ChitChat_Long": [
+  "We've been at this for {hours} hours.||Water, stretch, a bit of fresh air. I'll hold the fort.",
+  "That's {hours} hours in the seat.||Take a break if you need one. The stars aren't going anywhere.",
+  "{hours} hours today. I'm impressed.||Do remember to drink something that isn't coffee.",
+  "It's been {hours} hours.||Your chat will forgive a short break, and so will I."
+ ]
+}

@@ -1008,3 +1008,9 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `personality/context.py`: `piece_of` finds a sentence that is only part of a question ("and spain", "no i meant vienna"), `rewrite` puts it into the question before (after the last " in/of/for/at/to/is ", or swaps the first number). `Brain._follow_context` uses the last `Know` entry in `history` (within `TOPIC_SECONDS`) and only speaks if `_know_first`/`_know` can answer the rebuilt question.
 - `personality/people.py`: friends and family in `data/people.json` (gitignored). `Brain._people_turn` runs first for deliberate speech; wording is in `config/knowledge/style.json` (`people_*`). Names must start with a capital letter in the original text. `App.forget_memories` clears it.
 - Not done: "and the other one?" (no way to know which one), and corrections of profile facts.
+
+## 0.75.0 - remarks about the game, wider understanding
+- `personality/chitchat.py` `state_keys`: `ChitChat_Hull` (hull under `HULL_REMARK` = 0.8, value `{hull}` in percent), `ChitChat_Wanted`, `ChitChat_Long` (two hours or more, `{hours}`), lines in `voicepacks/default/state_talk.json`. Each key is used at most once per `STATE_REST` (20 min); the normal rules (quiet time, alarms, combat) still apply.
+- `config/brain_examples.json`: about 30 more example sentences; `tests/test_stage3.py` pins a few paraphrases and checks that commands match nothing. The matcher stays cautious on purpose, so some rephrasings ("make me laugh") still get no answer.
+- `config/knowledge/style.json`: more wordings for look-ups (`found_def`, `found_detail`, `remembered`).
+- Not done: rewriting a Wikipedia extract in her own words with a language model (needs the optional model; the text is still trimmed and prefixed in her voice).

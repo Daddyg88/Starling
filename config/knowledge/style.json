@@ -55,15 +55,26 @@
  "found_def": [
   "According to Wikipedia, {text}",
   "Wikipedia says: {text}",
-  "Here's what Wikipedia says. {text}"
+  "Here's what Wikipedia says. {text}",
+  "From what I can find, {text}",
+  "I looked it up. {text}",
+  "Online, it says: {text}",
+  "Quick answer from Wikipedia. {text}",
+  "Here's the short version. {text}"
  ],
  "found_detail": [
   "I don't have the exact answer, but this is what Wikipedia says about {title}. {text}",
-  "Not sure of the exact figure. Wikipedia says this about {title}. {text}"
+  "Not sure of the exact figure. Wikipedia says this about {title}. {text}",
+  "I couldn't find the exact figure, but here's what Wikipedia has on {title}. {text}",
+  "Nothing exact, but this is what I found about {title}. {text}",
+  "I don't have the precise answer. About {title}, Wikipedia says this. {text}"
  ],
  "remembered": [
   "I looked that one up before. {text}",
-  "I remember this one. {text}"
+  "I remember this one. {text}",
+  "I've looked this one up before. {text}",
+  "We've been here before. {text}",
+  "I kept this one. {text}"
  ],
  "not_found": [
   "I couldn't find anything reliable on that, Commander.",
