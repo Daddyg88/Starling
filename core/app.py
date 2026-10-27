@@ -262,10 +262,12 @@ class App:
         from memory.profile import PlayerProfile
         self.profile = PlayerProfile(paths.DATA_DIR / "player_profile.json", enabled=lambda: bool(self.settings.get("brain.profile", True)))
         from personality.llm import LocalLLM
+        from personality.lookup import LearnedFacts, OnlineLookup
+        self.lookup = OnlineLookup(self.settings, LearnedFacts(paths.DATA_DIR / "learned_facts.json"))
         self.llm = LocalLLM(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
                            facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit,
-                           profile=self.profile, llm=self.llm)
+                           profile=self.profile, llm=self.llm, lookup=self.lookup)
         return True
 
     def cpu_is_free(self):

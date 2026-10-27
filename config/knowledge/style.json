@@ -45,5 +45,37 @@
  ],
  "unknown_unit": [
   "I'm not sure how to convert that one."
+ ],
+ "looking": [
+  "Let me look that up.",
+  "Hold on, let me check.",
+  "I'm not sure. Let me look it up.",
+  "One moment, checking."
+ ],
+ "found_def": [
+  "According to Wikipedia, {text}",
+  "Wikipedia says: {text}",
+  "Here's what Wikipedia says. {text}"
+ ],
+ "found_detail": [
+  "I don't have the exact answer, but this is what Wikipedia says about {title}. {text}",
+  "Not sure of the exact figure. Wikipedia says this about {title}. {text}"
+ ],
+ "remembered": [
+  "I looked that one up before. {text}",
+  "I remember this one. {text}"
+ ],
+ "not_found": [
+  "I couldn't find anything reliable on that, Commander.",
+  "Nothing trustworthy turned up. Sorry.",
+  "I looked, but I couldn't find a good answer."
+ ],
+ "offline": [
+  "I can't reach the internet right now.",
+  "I couldn't get online to check that."
+ ],
+ "forgot": [
+  "Done. I've forgotten everything I looked up.",
+  "Okay, I've wiped what I learned from the internet."
  ]
 }

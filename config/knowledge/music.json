@@ -1,0 +1,553 @@
+{
+ "_help": "Music and musicians (personality/knowledge.py).",
+ "entries": [
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "notes",
+     "octave"
+    ],
+    [
+     "notes",
+     "in",
+     "an",
+     "octave"
+    ],
+    [
+     "how",
+     "many",
+     "notes",
+     "scale"
+    ]
+   ],
+   "a": "A major scale has seven notes, and with the sharps and flats an octave has twelve."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "octave"
+    ]
+   ],
+   "a": "An octave is the gap between one note and the next note with the same name, where the frequency doubles."
+  },
+  {
+   "k": [
+    [
+     "names",
+     "of",
+     "notes"
+    ],
+    [
+     "note",
+     "names"
+    ],
+    [
+     "what",
+     "are",
+     "musical",
+     "notes"
+    ]
+   ],
+   "a": "The natural notes are A, B, C, D, E, F and G, then it starts again."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "chord"
+    ]
+   ],
+   "a": "A chord is three or more notes played together."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "tempo"
+    ],
+    [
+     "what",
+     "is",
+     "bpm"
+    ]
+   ],
+   "a": "Tempo is the speed of a piece of music. BPM means beats per minute."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "treble",
+     "clef"
+    ]
+   ],
+   "a": "The treble clef is the symbol at the start of the staff for higher notes, like the right hand on a piano."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "symphony"
+    ]
+   ],
+   "a": "A symphony is a long piece for a full orchestra, usually in four parts, called movements."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "orchestra"
+    ]
+   ],
+   "a": "An orchestra is a large group of musicians in four sections: strings, woodwind, brass and percussion."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "jazz"
+    ]
+   ],
+   "a": "Jazz is a style born in New Orleans in the early 1900s, built on improvisation and swing."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "blues"
+    ]
+   ],
+   "a": "The blues is a style that grew out of African American communities in the Deep South, with twelve bar patterns and sad, honest lyrics."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "opera"
+    ]
+   ],
+   "a": "An opera is a play told entirely through singing, with an orchestra."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "cappella"
+    ]
+   ],
+   "a": "A cappella means singing without any instruments."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "strings",
+     "violin"
+    ]
+   ],
+   "a": "A violin has four strings."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "strings",
+     "bass"
+    ]
+   ],
+   "a": "A standard bass guitar has four strings."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "strings",
+     "cello"
+    ]
+   ],
+   "a": "A cello has four strings."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "strings",
+     "harp"
+    ]
+   ],
+   "a": "A concert harp has forty seven strings."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "beatles"
+    ],
+    [
+     "who",
+     "were",
+     "beatles"
+    ],
+    [
+     "who",
+     "are",
+     "beatles"
+    ],
+    [
+     "beatles",
+     "members"
+    ]
+   ],
+   "a": "The Beatles were four people from Liverpool: John Lennon, Paul McCartney, George Harrison and Ringo Starr."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "sang",
+     "bohemian",
+     "rhapsody"
+    ],
+    [
+     "who",
+     "wrote",
+     "bohemian",
+     "rhapsody"
+    ],
+    [
+     "bohemian",
+     "rhapsody"
+    ]
+   ],
+   "a": "Bohemian Rhapsody is by Queen, written by Freddie Mercury, released in 1975."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "freddie",
+     "mercury"
+    ]
+   ],
+   "a": "Freddie Mercury was the lead singer of Queen, famous for his four octave range and showmanship."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "mozart"
+    ],
+    [
+     "who",
+     "is",
+     "mozart"
+    ]
+   ],
+   "a": "Wolfgang Amadeus Mozart was an Austrian composer from the 1700s who wrote hundreds of works and started composing as a small child."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "beethoven"
+    ],
+    [
+     "who",
+     "is",
+     "beethoven"
+    ]
+   ],
+   "a": "Ludwig van Beethoven was a German composer, famous for nine symphonies. He kept composing after he went deaf."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "was",
+     "bach"
+    ],
+    [
+     "who",
+     "is",
+     "bach"
+    ]
+   ],
+   "a": "Johann Sebastian Bach was a German Baroque composer of the 1700s, famous for the Brandenburg Concertos and his organ music."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "wrote",
+     "four",
+     "seasons"
+    ],
+    [
+     "four",
+     "seasons",
+     "vivaldi"
+    ]
+   ],
+   "a": "The Four Seasons was composed by Antonio Vivaldi, an Italian, in the 1720s."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "wrote",
+     "moonlight",
+     "sonata"
+    ],
+    [
+     "moonlight",
+     "sonata"
+    ]
+   ],
+   "a": "The Moonlight Sonata is by Beethoven."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "king",
+     "of",
+     "pop"
+    ],
+    [
+     "king",
+     "of",
+     "pop"
+    ]
+   ],
+   "a": "Michael Jackson is known as the King of Pop."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "king",
+     "of",
+     "rock"
+    ],
+    [
+     "king",
+     "of",
+     "rock"
+    ]
+   ],
+   "a": "Elvis Presley is known as the King of Rock and Roll."
+  },
+  {
+   "k": [
+    [
+     "best",
+     "selling",
+     "album"
+    ],
+    [
+     "bestselling",
+     "album"
+    ]
+   ],
+   "a": "Michael Jackson's Thriller, from 1982, is usually named as the best selling album of all time."
+  },
+  {
+   "k": [
+    [
+     "best",
+     "selling",
+     "band"
+    ],
+    [
+     "best",
+     "selling",
+     "artist"
+    ]
+   ],
+   "a": "The Beatles are often listed among the best selling artists ever, with Elvis Presley and Michael Jackson close behind."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "taylor",
+     "swift"
+    ]
+   ],
+   "a": "Taylor Swift is an American singer-songwriter who began in country music and became one of the biggest pop stars in the world."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "adele"
+    ]
+   ],
+   "a": "Adele is an English singer-songwriter known for powerful ballads like Someone Like You and Hello."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "ed",
+     "sheeran"
+    ]
+   ],
+   "a": "Ed Sheeran is an English singer-songwriter famous for songs like Shape of You."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "are",
+     "abba"
+    ],
+    [
+     "what",
+     "is",
+     "abba"
+    ]
+   ],
+   "a": "ABBA were a Swedish pop group, famous for Dancing Queen. The name is the first letters of the band members' names."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "are",
+     "rammstein"
+    ],
+    [
+     "what",
+     "is",
+     "rammstein"
+    ]
+   ],
+   "a": "Rammstein is a German industrial metal band, famous for their big fiery stage shows."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "hans",
+     "zimmer"
+    ]
+   ],
+   "a": "Hans Zimmer is a German film composer who scored Inception, Interstellar and The Lion King."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "john",
+     "williams"
+    ],
+    [
+     "who",
+     "composed",
+     "star",
+     "wars"
+    ]
+   ],
+   "a": "John Williams is the American composer behind the Star Wars music, as well as Jaws, Indiana Jones and Harry Potter."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "guitar"
+    ]
+   ],
+   "a": "A guitar is a stringed instrument, usually with six strings, played by plucking or strumming."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "dubstep"
+    ]
+   ],
+   "a": "Dubstep is a style of electronic dance music with heavy bass and a slow, wobbling beat."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "edm"
+    ]
+   ],
+   "a": "EDM means electronic dance music, made for clubs and festivals."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "decibel"
+    ]
+   ],
+   "a": "A decibel is the unit used to measure how loud a sound is."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "metronome"
+    ]
+   ],
+   "a": "A metronome is a device that clicks at a steady speed to help musicians keep time."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "karaoke"
+    ]
+   ],
+   "a": "Karaoke is singing along to a backing track while the words appear on screen. The word is Japanese."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "acoustic"
+    ]
+   ],
+   "a": "Acoustic means played without electric amplification or electronics."
+  }
+ ]
+}

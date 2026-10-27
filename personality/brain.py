@@ -15,6 +15,7 @@ never steal a command. If nothing here fits, the normal "I didn't catch that" ha
 import json
 import random
 import re
+import threading
 import time
 from datetime import datetime
 
@@ -68,7 +69,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -84,6 +85,7 @@ class Brain:
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
         self.knowledge = knowledge if knowledge is not None else (Knowledge() if intents is None else None)   # personality/knowledge.py
+        self.lookup = lookup         # personality/lookup.py: optional Wikipedia lookup for questions she cannot answer (off by default)
         self.llm = llm               # personality/llm.py: optional small local AI model for open chat (off by default)
         self.profile = profile       # memory/profile.py: what you have told her about yourself (likes, pets...)
         self.topics = freechat.load_topics() if intents is None else freechat.Topics({})   # what a chatty sentence is about
@@ -135,11 +137,13 @@ class Brain:
                     break                      # that topic had nothing to say: try the next topic
         if spoke_for:
             return None
-        return self._know(tidy, text) or self._by_meaning(tidy) or (self._free_chat(tidy) if deliberate else None)
+        return self._know(tidy, text) or self._by_meaning(tidy) or self._look_up(tidy) or (self._free_chat(tidy) if deliberate else None)
 
     def _know(self, tidy, raw):
         """Sums, conversions and facts she is SURE about (personality/knowledge.py). Nothing is ever guessed."""
         library = self.knowledge
+        if self.lookup is not None and self.lookup.handle_forget(tidy) is not None:
+            return self._say(self._style_pick("forgot", "I've forgotten what I looked up."))
         if library is None or not self.settings.get("brain.knowledge", True):
             return None
         try:
@@ -179,6 +183,56 @@ class Brain:
             return reply
         except Exception:
             log.exception("Her knowledge failed; carrying on")
+            return None
+
+    def _style_pick(self, name, fallback):
+        pool = (self.knowledge.style.get(name) if self.knowledge is not None else None) or [fallback]
+        return self.rng.choice(pool)
+
+    def _look_up(self, tidy):
+        """A question she has no answer for: a fact saved earlier, or (if switched on) ask Wikipedia and remember the answer."""
+        look = self.lookup
+        if look is None:
+            return None
+        try:
+            known = look.known(tidy)
+            if known is not None:
+                reply = self._say(self._style_pick("remembered", "{text}").format(text=known[1]))
+                self._remember("Know", tidy, reply)
+                return reply
+            if self.knowledge is None or self.knowledge.looks_like_question(tidy) != "question":
+                return None
+            found = look.should_try(tidy)
+            if found is None:
+                return None
+            kind, subject = found
+
+            def work():
+                try:
+                    result = look.find(kind, subject)
+                    if result == "offline":
+                        text = self._style_pick("offline", "I can't reach the internet right now.")
+                    elif result is None:
+                        text = self._style_pick("not_found", "I couldn't find anything reliable on that.")
+                    else:
+                        title, body = result
+                        text = self._style_pick("found_" + kind, "{text}").format(title=title, text=body)
+                    spoken = self._say(text)
+                    self._remember("Know", tidy, spoken)
+                    log.info("Brain: looked up %r (%s): %s", subject, kind, "found" if isinstance(result, tuple) else result)
+                    return spoken
+                except Exception:
+                    log.exception("The online lookup failed")
+                    return None
+
+            filler = self._style_pick("looking", "Let me look that up.")
+            if look.background:
+                self._say(filler)
+                threading.Thread(target=work, name="lookup", daemon=True).start()
+                return filler
+            return work()
+        except Exception:
+            log.exception("Looking things up failed; carrying on")
             return None
 
     def _by_meaning(self, tidy):

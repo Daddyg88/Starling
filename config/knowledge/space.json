@@ -137,84 +137,6 @@
    "k": [
     [
      "how",
-     "many",
-     "moon",
-     "earth"
-    ],
-    [
-     "earth",
-     "moon",
-     "have"
-    ],
-    [
-     "earth",
-     "moon"
-    ]
-   ],
-   "a": "Earth has one moon."
-  },
-  {
-   "k": [
-    [
-     "how",
-     "many",
-     "moon",
-     "mars"
-    ],
-    [
-     "mars",
-     "moon"
-    ]
-   ],
-   "a": "Mars has two small moons, Phobos and Deimos."
-  },
-  {
-   "k": [
-    [
-     "how",
-     "many",
-     "moon",
-     "jupiter"
-    ],
-    [
-     "jupiter",
-     "moon"
-    ]
-   ],
-   "a": "Jupiter has well over ninety known moons. The four big ones are Io, Europa, Ganymede and Callisto."
-  },
-  {
-   "k": [
-    [
-     "how",
-     "many",
-     "moon",
-     "saturn"
-    ],
-    [
-     "saturn",
-     "moon"
-    ]
-   ],
-   "a": "Saturn has well over a hundred known moons, and astronomers keep finding more. The biggest is Titan."
-  },
-  {
-   "k": [
-    [
-     "largest",
-     "moon"
-    ],
-    [
-     "biggest",
-     "moon"
-    ]
-   ],
-   "a": "Ganymede, one of Jupiter's moons, is the biggest moon in the solar system. It's even bigger than Mercury."
-  },
-  {
-   "k": [
-    [
-     "how",
      "far",
      "moon"
     ],
@@ -764,6 +686,556 @@
     ]
    ],
    "a": "There are twenty four hours in a day."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "mercury"
+    ],
+    [
+     "mercury",
+     "moon"
+    ]
+   ],
+   "a": "Mercury has no moons."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "venus"
+    ],
+    [
+     "venus",
+     "moon"
+    ]
+   ],
+   "a": "Venus has no moons."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "earth"
+    ],
+    [
+     "earth",
+     "moon",
+     "have"
+    ],
+    [
+     "earth",
+     "moon"
+    ]
+   ],
+   "a": "Earth has one moon, simply called the Moon."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "mars"
+    ],
+    [
+     "mars",
+     "moon"
+    ]
+   ],
+   "a": "Mars has two small moons, Phobos and Deimos. Phobos is slowly spiralling inwards."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "jupiter"
+    ],
+    [
+     "jupiter",
+     "moon"
+    ]
+   ],
+   "a": "Jupiter has well over ninety known moons. The four big ones are Io, Europa, Ganymede and Callisto."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "saturn"
+    ],
+    [
+     "saturn",
+     "moon"
+    ]
+   ],
+   "a": "Saturn has well over a hundred known moons, and more are still being found. The famous ones are Titan, Enceladus, Rhea, Iapetus, Dione, Tethys and Mimas."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "uranus"
+    ],
+    [
+     "uranus",
+     "moon"
+    ]
+   ],
+   "a": "Uranus has more than twenty five known moons, named after characters from Shakespeare and Pope. The five big ones are Miranda, Ariel, Umbriel, Titania and Oberon."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "neptune"
+    ],
+    [
+     "neptune",
+     "moon"
+    ]
+   ],
+   "a": "Neptune has about sixteen known moons. The biggest by far is Triton."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "moon",
+     "pluto"
+    ],
+    [
+     "pluto",
+     "moon"
+    ]
+   ],
+   "a": "Pluto has five known moons: Charon, Styx, Nix, Kerberos and Hydra."
+  },
+  {
+   "k": [
+    [
+     "largest",
+     "moon"
+    ],
+    [
+     "biggest",
+     "moon"
+    ]
+   ],
+   "a": "Ganymede, one of Jupiter's moons, is the biggest moon in the solar system. It's even bigger than Mercury."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "titan"
+    ],
+    [
+     "tell",
+     "titan"
+    ]
+   ],
+   "a": "Titan is Saturn's biggest moon, and the only moon with a thick atmosphere. It has lakes and rivers of liquid methane."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "europa"
+    ],
+    [
+     "tell",
+     "europa"
+    ]
+   ],
+   "a": "Europa is a moon of Jupiter with an icy shell and a salty ocean underneath. It's a top target in the search for life."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "io"
+    ],
+    [
+     "tell",
+     "io"
+    ]
+   ],
+   "a": "Io is a moon of Jupiter, and the most volcanically active place in the solar system."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "enceladus"
+    ],
+    [
+     "tell",
+     "enceladus"
+    ]
+   ],
+   "a": "Enceladus is a small icy moon of Saturn that shoots geysers of water into space from an ocean under its surface."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "triton"
+    ],
+    [
+     "tell",
+     "triton"
+    ]
+   ],
+   "a": "Triton is Neptune's biggest moon. It orbits backwards, which suggests it was captured, and it has geysers of nitrogen."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "charon"
+    ],
+    [
+     "tell",
+     "charon"
+    ]
+   ],
+   "a": "Charon is Pluto's biggest moon, so big that Pluto and Charon orbit a point between them."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "ganymede"
+    ],
+    [
+     "tell",
+     "ganymede"
+    ]
+   ],
+   "a": "Ganymede is Jupiter's moon and the biggest in the solar system. It has its own magnetic field."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "phobos"
+    ],
+    [
+     "tell",
+     "phobos"
+    ]
+   ],
+   "a": "Phobos is the larger of Mars's two little moons, only about twenty two kilometres wide."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "mercury"
+    ],
+    [
+     "tell",
+     "mercury"
+    ]
+   ],
+   "a": "Mercury is the smallest planet and the closest to the Sun. A year there lasts just 88 Earth days."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "venus"
+    ],
+    [
+     "tell",
+     "venus"
+    ]
+   ],
+   "a": "Venus is the second planet from the Sun, wrapped in thick clouds, with a surface hot enough to melt lead. It spins backwards, very slowly."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "mars"
+    ],
+    [
+     "tell",
+     "mars"
+    ]
+   ],
+   "a": "Mars is the fourth planet, cold and dusty and red, with the biggest volcano in the solar system, Olympus Mons."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "jupiter"
+    ],
+    [
+     "tell",
+     "jupiter"
+    ]
+   ],
+   "a": "Jupiter is the biggest planet, a gas giant with a storm, the Great Red Spot, that's bigger than Earth."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "saturn"
+    ],
+    [
+     "tell",
+     "saturn"
+    ]
+   ],
+   "a": "Saturn is a gas giant famous for its bright rings, and it's light enough that it would float in water, if you found a big enough bath."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "uranus"
+    ],
+    [
+     "tell",
+     "uranus"
+    ]
+   ],
+   "a": "Uranus is an ice giant that rolls round the Sun tipped on its side."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "neptune"
+    ],
+    [
+     "tell",
+     "neptune"
+    ]
+   ],
+   "a": "Neptune is the most distant planet, a deep blue ice giant with the fastest winds in the solar system."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "year",
+     "jupiter"
+    ]
+   ],
+   "a": "A year on Jupiter lasts almost twelve Earth years."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "year",
+     "saturn"
+    ]
+   ],
+   "a": "A year on Saturn lasts about twenty nine Earth years."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "year",
+     "venus"
+    ]
+   ],
+   "a": "A year on Venus lasts about 225 Earth days, and a day there lasts longer than that."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "year",
+     "neptune"
+    ]
+   ],
+   "a": "A year on Neptune lasts about 165 Earth years."
+  },
+  {
+   "k": [
+    [
+     "great",
+     "red",
+     "spot"
+    ]
+   ],
+   "a": "The Great Red Spot is a storm on Jupiter that's been raging for centuries and is bigger than Earth."
+  },
+  {
+   "k": [
+    [
+     "olympus",
+     "mons"
+    ]
+   ],
+   "a": "Olympus Mons on Mars is the biggest volcano in the solar system, about two and a half times the height of Everest."
+  },
+  {
+   "k": [
+    [
+     "asteroid",
+     "belt"
+    ]
+   ],
+   "a": "The asteroid belt is the region between Mars and Jupiter full of rocky leftovers. Despite the movies, the rocks are very far apart."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "kuiper",
+     "belt"
+    ]
+   ],
+   "a": "The Kuiper belt is a ring of icy bodies beyond Neptune, home to Pluto."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "oort",
+     "cloud"
+    ]
+   ],
+   "a": "The Oort cloud is a huge, faint shell of icy objects far beyond Pluto, where many comets come from."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "event",
+     "horizon"
+    ]
+   ],
+   "a": "The event horizon is a black hole's point of no return, the boundary inside which not even light can escape."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "dark",
+     "matter"
+    ]
+   ],
+   "a": "Dark matter is invisible material that we can only detect through its gravity. It makes up about a quarter of the universe."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "big",
+     "bang"
+    ]
+   ],
+   "a": "The Big Bang is the moment, around 13.8 billion years ago, when the universe began expanding from an extremely hot, dense state."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "exoplanet"
+    ]
+   ],
+   "a": "An exoplanet is a planet orbiting a star other than our Sun. Thousands have been found."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "habitable",
+     "zone"
+    ],
+    [
+     "goldilocks",
+     "zone"
+    ]
+   ],
+   "a": "The habitable zone is the range of distances from a star where liquid water could exist on a planet's surface."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "solar",
+     "system"
+    ]
+   ],
+   "a": "Our solar system is the Sun and everything orbiting it: eight planets, their moons, dwarf planets, asteroids and comets."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "eclipse"
+    ]
+   ],
+   "a": "A solar eclipse is when the Moon passes in front of the Sun. A lunar eclipse is when Earth's shadow falls on the Moon."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "meteor"
+    ],
+    [
+     "shooting",
+     "star"
+    ]
+   ],
+   "a": "A meteor, or shooting star, is a space rock burning up in our atmosphere. If it lands, it's called a meteorite."
   }
  ]
 }

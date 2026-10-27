@@ -971,3 +971,10 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - Add a fact: open `config/knowledge/world.json` (or any entries file) and add `{"k": [["word", "word"], ["other", "way"]], "a": "The answer."}`. Every word in one list must be in the question (a trailing s is ignored); the biggest match wins. One-word keys only fire when the sentence starts like a question. A test fails if two answers share the same key words.
 - Capitals, greetings in other languages, sums (`maths`) and unit conversions (`convert`) are in code or their own JSON file. Sums need a leading "what is" style question, or numbers and an operator in a very short sentence, so "I did 3 jumps" is never a sum.
 - She answers nothing that changes with the news (leaders, prices, weather): those fall through to "I can't answer that".
+
+## 0.69.0 - more facts, and the online lookup (`personality/lookup.py`)
+- New fact files: `games.json`, `cooking.json`, `music.json`; `space.json` now has every planet's moons.
+- Lookup runs in `Brain._look_up` after her own facts and the meaning match, before free chat. Setting `brain.lookup` (default OFF). Only for questions that START like questions (what/who/where/when/how tall...). `subject_of` refuses personal, worrying and too-long questions, and only the topic words go to `https://en.wikipedia.org` (search, then the page summary). Results must share words with the question, must not be lists or disambiguation pages, and pass the same cleaner as the AI chat.
+- 'what is / who is' answers are saved to `data/learned_facts.json` (public text only). Copy good ones into `config/knowledge/*.json` to share them with everybody.
+- Lookups run on a background thread: she says 'let me look that up', then speaks the result. At most one per 8 seconds; a topic with no result is not retried for 10 minutes.
+- Tests use a fake Wikipedia. The real website was NOT reachable from the build machine, so the live response format is written from knowledge of the Wikipedia API and handled defensively.

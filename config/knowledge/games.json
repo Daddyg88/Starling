@@ -1,0 +1,715 @@
+{
+ "_help": "Video games and games in general (personality/knowledge.py).",
+ "entries": [
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "tetris"
+    ],
+    [
+     "who",
+     "invented",
+     "tetris"
+    ],
+    [
+     "what",
+     "is",
+     "tetris"
+    ]
+   ],
+   "a": "Tetris was created by Alexey Pajitnov, a Soviet engineer, in 1984."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "pac",
+     "man"
+    ],
+    [
+     "who",
+     "made",
+     "pac",
+     "man"
+    ],
+    [
+     "pacman"
+    ]
+   ],
+   "a": "Pac-Man is the arcade classic by Namco, released in 1980, where you eat dots and avoid four ghosts."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "mario"
+    ],
+    [
+     "who",
+     "created",
+     "mario"
+    ],
+    [
+     "who",
+     "invented",
+     "mario"
+    ],
+    [
+     "mario",
+     "creator"
+    ]
+   ],
+   "a": "Mario was created by Shigeru Miyamoto at Nintendo, first appearing in Donkey Kong in 1981."
+  },
+  {
+   "k": [
+    [
+     "mario",
+     "brother"
+    ],
+    [
+     "who",
+     "is",
+     "luigi"
+    ]
+   ],
+   "a": "Luigi is Mario's younger twin brother."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "minecraft"
+    ],
+    [
+     "who",
+     "created",
+     "minecraft"
+    ],
+    [
+     "who",
+     "invented",
+     "minecraft"
+    ]
+   ],
+   "a": "Minecraft was made by Markus Persson, known as Notch, and released in full in 2011. Mojang and later Microsoft took it over."
+  },
+  {
+   "k": [
+    [
+     "best",
+     "selling",
+     "game"
+    ],
+    [
+     "best",
+     "selling",
+     "video",
+     "game"
+    ],
+    [
+     "most",
+     "sold",
+     "game"
+    ]
+   ],
+   "a": "Minecraft is the best selling video game of all time, with over three hundred million copies sold."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "fortnite"
+    ],
+    [
+     "who",
+     "created",
+     "fortnite"
+    ]
+   ],
+   "a": "Fortnite was made by Epic Games. It came out in 2017."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "pokemon"
+    ],
+    [
+     "how",
+     "many",
+     "pokemon"
+    ],
+    [
+     "original",
+     "pokemon"
+    ]
+   ],
+   "a": "Pokémon started in 1996 in Japan from Game Freak. The original games had 151 Pokémon."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "doom"
+    ],
+    [
+     "when",
+     "did",
+     "doom",
+     "come"
+    ],
+    [
+     "what",
+     "is",
+     "doom"
+    ]
+   ],
+   "a": "Doom was made by id Software in 1993, and it pretty much invented the modern first person shooter."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "skyrim"
+    ],
+    [
+     "when",
+     "did",
+     "skyrim",
+     "come"
+    ],
+    [
+     "what",
+     "is",
+     "skyrim"
+    ]
+   ],
+   "a": "Skyrim is the 2011 open world role playing game from Bethesda. It has been released on almost everything that has a screen."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "no",
+     "man",
+     "sky"
+    ],
+    [
+     "when",
+     "did",
+     "no",
+     "man",
+     "sky",
+     "come"
+    ]
+   ],
+   "a": "No Man's Sky is by Hello Games, released in 2016, and updated massively since."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "half",
+     "life"
+    ],
+    [
+     "what",
+     "is",
+     "half",
+     "life"
+    ]
+   ],
+   "a": "Half-Life is the 1998 shooter by Valve. Its hero is Gordon Freeman."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "zelda"
+    ],
+    [
+     "what",
+     "is",
+     "zelda"
+    ],
+    [
+     "who",
+     "is",
+     "link"
+    ]
+   ],
+   "a": "The Legend of Zelda is Nintendo's adventure series. You play Link, and Zelda is the princess."
+  },
+  {
+   "k": [
+    [
+     "first",
+     "video",
+     "game"
+    ],
+    [
+     "oldest",
+     "video",
+     "game"
+    ]
+   ],
+   "a": "Tennis for Two in 1958 is often called the first video game, and Pong in 1972 was the first big commercial hit."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "pong"
+    ],
+    [
+     "what",
+     "is",
+     "pong"
+    ]
+   ],
+   "a": "Pong was made by Atari in 1972. It's a simple game of table tennis."
+  },
+  {
+   "k": [
+    [
+     "space",
+     "invaders"
+    ]
+   ],
+   "a": "Space Invaders is a 1978 arcade game by Taito, and it was a worldwide hit."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "playstation"
+    ],
+    [
+     "when",
+     "did",
+     "playstation",
+     "come"
+    ]
+   ],
+   "a": "The PlayStation is made by Sony, first released in 1994 in Japan."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "xbox"
+    ],
+    [
+     "when",
+     "did",
+     "xbox",
+     "come"
+    ]
+   ],
+   "a": "The Xbox is made by Microsoft, first released in 2001."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "nintendo",
+     "switch"
+    ],
+    [
+     "when",
+     "did",
+     "switch",
+     "come"
+    ]
+   ],
+   "a": "The Nintendo Switch came out in 2017. It works as a home console and a handheld."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "steam"
+    ],
+    [
+     "who",
+     "made",
+     "steam"
+    ]
+   ],
+   "a": "Steam is Valve's online store and game library for PC, launched in 2003."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "sonic"
+    ],
+    [
+     "what",
+     "is",
+     "sonic"
+    ]
+   ],
+   "a": "Sonic the Hedgehog is Sega's fast blue mascot, first appearing in 1991."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "made",
+     "elite",
+     "dangerous"
+    ]
+   ],
+   "a": "Frontier Developments makes Elite Dangerous."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "star",
+     "citizen"
+    ]
+   ],
+   "a": "Star Citizen is a huge, long in development space game from Cloud Imperium Games."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "eve",
+     "online"
+    ]
+   ],
+   "a": "EVE Online is an MMO space game famous for its player run economy and enormous battles."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "rpg"
+    ],
+    [
+     "what",
+     "does",
+     "rpg",
+     "mean"
+    ]
+   ],
+   "a": "RPG means role playing game, where you play a character who grows stronger as the story goes on."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "mmo"
+    ],
+    [
+     "what",
+     "does",
+     "mmo",
+     "mean"
+    ],
+    [
+     "what",
+     "is",
+     "mmorpg"
+    ]
+   ],
+   "a": "MMO means massively multiplayer online, a game world shared by thousands of players."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "first",
+     "person",
+     "shooter"
+    ]
+   ],
+   "a": "A first person shooter is a game where you see through your character's eyes and shoot things."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "roguelike"
+    ],
+    [
+     "what",
+     "is",
+     "rogue",
+     "like"
+    ]
+   ],
+   "a": "A roguelike is a game with random levels where, if you die, you start again."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "speedrun"
+    ],
+    [
+     "what",
+     "is",
+     "speedrunning"
+    ]
+   ],
+   "a": "Speedrunning means finishing a game as fast as possible, often using glitches and weeks of practice."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "nerf"
+    ]
+   ],
+   "a": "To nerf something in a game is to make it weaker. To buff it is to make it stronger."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "gg"
+    ],
+    [
+     "what",
+     "does",
+     "gg",
+     "mean"
+    ]
+   ],
+   "a": "GG means good game, said at the end of a match."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "afk"
+    ],
+    [
+     "what",
+     "does",
+     "afk",
+     "mean"
+    ]
+   ],
+   "a": "AFK means away from keyboard."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "npc"
+    ],
+    [
+     "what",
+     "does",
+     "npc",
+     "mean"
+    ]
+   ],
+   "a": "An NPC is a non player character, a character controlled by the game and not a person."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "dlc"
+    ],
+    [
+     "what",
+     "does",
+     "dlc",
+     "mean"
+    ]
+   ],
+   "a": "DLC means downloadable content, extra game content you get after release."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "lag"
+    ],
+    [
+     "what",
+     "is",
+     "ping"
+    ]
+   ],
+   "a": "Ping is how long a message takes to reach the game server and back, in milliseconds. High ping causes lag."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "esports"
+    ]
+   ],
+   "a": "Esports is organised competitive video gaming, with professional players, teams and big prizes."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "pieces",
+     "chess"
+    ],
+    [
+     "pieces",
+     "in",
+     "chess"
+    ]
+   ],
+   "a": "A chess set has thirty two pieces, sixteen for each player."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "squares",
+     "chess"
+    ],
+    [
+     "squares",
+     "chessboard"
+    ]
+   ],
+   "a": "A chessboard has sixty four squares."
+  },
+  {
+   "k": [
+    [
+     "strongest",
+     "chess",
+     "piece"
+    ],
+    [
+     "most",
+     "powerful",
+     "chess",
+     "piece"
+    ]
+   ],
+   "a": "The queen is the most powerful piece in chess."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "cards",
+     "deck"
+    ],
+    [
+     "cards",
+     "in",
+     "a",
+     "deck"
+    ]
+   ],
+   "a": "A standard deck has fifty two cards, plus jokers if you keep them."
+  },
+  {
+   "k": [
+    [
+     "rubik",
+     "cube",
+     "combinations"
+    ],
+    [
+     "how",
+     "many",
+     "combinations",
+     "rubik"
+    ]
+   ],
+   "a": "A Rubik's Cube has about 43 quintillion possible positions."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "invented",
+     "monopoly"
+    ],
+    [
+     "what",
+     "is",
+     "monopoly"
+    ]
+   ],
+   "a": "Monopoly's design goes back to Elizabeth Magie's The Landlord's Game in 1904. The version we know was sold by Parker Brothers in 1935."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "dungeons",
+     "dragons"
+    ],
+    [
+     "what",
+     "is",
+     "dnd"
+    ]
+   ],
+   "a": "Dungeons and Dragons is the classic tabletop role playing game, first published in 1974, played with dice and imagination."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "sides",
+     "dice"
+    ],
+    [
+     "how",
+     "many",
+     "sides",
+     "d20"
+    ]
+   ],
+   "a": "A normal die has six sides. Tabletop games also use four, eight, ten, twelve and twenty sided dice."
+  }
+ ]
+}

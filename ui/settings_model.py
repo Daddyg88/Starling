@@ -413,6 +413,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Ask her about herself, the game, jokes, riddles, advice, or say hello to chat. Needs her name or push-to-talk"),
             Field("brain.knowledge", "She answers facts and sums", "toggle",
                   help="Capitals, space and science facts, Elite facts, hello in other languages, sums and unit conversions. She only answers what she is sure of"),
+            Field("brain.lookup", "She can look things up online (Wikipedia)", "toggle",
+                  help="Off by default. When she is asked a what/who/where question she does not know, she asks the English Wikipedia (only the topic words are sent, e.g. 'quasar'), tells you what it says, and remembers it. Say 'forget what you looked up' to wipe it"),
             Field("brain.freechat", "She chats back about anything", "toggle",
                   help="When you just talk to her (not a command, not a question she knows) she reacts, adds a remark and asks you something. She never makes up facts"),
             Field("brain.chat_followups", "Answer her questions without her name", "toggle",

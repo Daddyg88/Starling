@@ -1,0 +1,596 @@
+{
+ "_help": "Cooking, baking and kitchen facts (personality/knowledge.py).",
+ "entries": [
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "boil",
+     "egg"
+    ],
+    [
+     "how",
+     "long",
+     "hard",
+     "boiled",
+     "egg"
+    ],
+    [
+     "how",
+     "long",
+     "soft",
+     "boiled",
+     "egg"
+    ]
+   ],
+   "a": "Lower the egg into boiling water. About six minutes gives a runny yolk, and ten to twelve minutes makes it hard boiled. Then cool it in cold water."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "cook",
+     "rice"
+    ],
+    [
+     "how",
+     "cook",
+     "rice"
+    ],
+    [
+     "how",
+     "make",
+     "rice"
+    ]
+   ],
+   "a": "For long grain white rice, use about two parts water to one part rice, bring it to the boil, then cover and simmer on low for around fifteen minutes. Leave it covered for five more."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "cook",
+     "pasta"
+    ],
+    [
+     "how",
+     "long",
+     "boil",
+     "pasta"
+    ],
+    [
+     "how",
+     "cook",
+     "pasta"
+    ]
+   ],
+   "a": "Boil pasta in plenty of salted water for eight to twelve minutes, depending on the shape. The packet will tell you the exact time. Taste it a minute early."
+  },
+  {
+   "k": [
+    [
+     "why",
+     "salt",
+     "pasta",
+     "water"
+    ],
+    [
+     "salt",
+     "pasta",
+     "water"
+    ]
+   ],
+   "a": "Salt in the pasta water seasons the pasta from the inside. It won't change the boiling point noticeably."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "al",
+     "dente"
+    ]
+   ],
+   "a": "Al dente is Italian for to the tooth. It means cooked but still firm when you bite."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "temperature",
+     "chicken",
+     "cooked"
+    ],
+    [
+     "chicken",
+     "safe",
+     "temperature"
+    ],
+    [
+     "cook",
+     "chicken",
+     "temperature"
+    ]
+   ],
+   "a": "Chicken is safe when the thickest part reaches 74 degrees Celsius, or 165 Fahrenheit."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "temperature",
+     "pork",
+     "cooked"
+    ],
+    [
+     "pork",
+     "safe",
+     "temperature"
+    ]
+   ],
+   "a": "Pork is safe at 63 degrees Celsius, 145 Fahrenheit, then let it rest for a few minutes."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "temperature",
+     "steak"
+    ],
+    [
+     "medium",
+     "rare",
+     "temperature"
+    ],
+    [
+     "steak",
+     "temperature"
+    ]
+   ],
+   "a": "For steak, rare is about 52 degrees Celsius, medium rare 57, medium 63 and well done 71 or more."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "teaspoons",
+     "tablespoon"
+    ],
+    [
+     "teaspoons",
+     "in",
+     "a",
+     "tablespoon"
+    ]
+   ],
+   "a": "There are three teaspoons in a tablespoon."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "tablespoons",
+     "cup"
+    ],
+    [
+     "tablespoons",
+     "in",
+     "a",
+     "cup"
+    ]
+   ],
+   "a": "There are sixteen tablespoons in a US cup."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "ml",
+     "cup"
+    ],
+    [
+     "millilitres",
+     "in",
+     "a",
+     "cup"
+    ],
+    [
+     "ml",
+     "in",
+     "a",
+     "cup"
+    ]
+   ],
+   "a": "A US cup is about 240 millilitres."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "ounces",
+     "pound"
+    ],
+    [
+     "ounces",
+     "in",
+     "a",
+     "pound"
+    ]
+   ],
+   "a": "There are sixteen ounces in a pound."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "grams",
+     "ounce"
+    ],
+    [
+     "grams",
+     "in",
+     "an",
+     "ounce"
+    ]
+   ],
+   "a": "An ounce is about 28 grams."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "grams",
+     "pound"
+    ],
+    [
+     "grams",
+     "in",
+     "a",
+     "pound"
+    ]
+   ],
+   "a": "A pound is about 454 grams."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "pints",
+     "quart"
+    ],
+    [
+     "pints",
+     "in",
+     "a",
+     "quart"
+    ]
+   ],
+   "a": "Two pints make a quart."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "cups",
+     "pint"
+    ],
+    [
+     "cups",
+     "in",
+     "a",
+     "pint"
+    ]
+   ],
+   "a": "Two US cups make a pint."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "ml",
+     "teaspoon"
+    ],
+    [
+     "ml",
+     "in",
+     "a",
+     "teaspoon"
+    ]
+   ],
+   "a": "A teaspoon is about five millilitres."
+  },
+  {
+   "k": [
+    [
+     "difference",
+     "baking",
+     "soda",
+     "powder"
+    ],
+    [
+     "baking",
+     "soda",
+     "baking",
+     "powder"
+    ]
+   ],
+   "a": "Baking soda needs an acid, like buttermilk or lemon, to make things rise. Baking powder already contains the acid."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "yeast"
+    ]
+   ],
+   "a": "Yeast is a tiny living fungus that eats sugar and gives off gas, which makes bread rise."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "roux"
+    ]
+   ],
+   "a": "A roux is flour cooked in fat, usually butter, used to thicken sauces and soups."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "umami"
+    ]
+   ],
+   "a": "Umami is the fifth basic taste, savoury and meaty, found in things like mushrooms, tomatoes and parmesan."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "many",
+     "basic",
+     "tastes"
+    ],
+    [
+     "basic",
+     "tastes"
+    ]
+   ],
+   "a": "There are five basic tastes: sweet, sour, salty, bitter and umami."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "simmer"
+    ],
+    [
+     "difference",
+     "simmer",
+     "boil"
+    ]
+   ],
+   "a": "Simmering is gentle cooking just below boiling, with small bubbles now and then. Boiling is the big rolling bubbles."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "sous",
+     "vide"
+    ]
+   ],
+   "a": "Sous vide means cooking food sealed in a bag in a water bath at a precise, low temperature for a long time."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "marinade"
+    ],
+    [
+     "what",
+     "is",
+     "marinate"
+    ]
+   ],
+   "a": "A marinade is a seasoned liquid you soak food in before cooking, for flavour and tenderness."
+  },
+  {
+   "k": [
+    [
+     "why",
+     "rest",
+     "meat"
+    ],
+    [
+     "rest",
+     "meat",
+     "after",
+     "cooking"
+    ]
+   ],
+   "a": "Resting cooked meat lets the juices settle back in, so it stays moist when you cut it. Five to ten minutes does it."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "stop",
+     "crying",
+     "onions"
+    ],
+    [
+     "onions",
+     "make",
+     "cry"
+    ],
+    [
+     "why",
+     "onions",
+     "cry"
+    ]
+   ],
+   "a": "Onions release a gas that stings your eyes. A sharp knife, a chilled onion, or a quick rinse all help."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "fridge",
+     "leftovers"
+    ],
+    [
+     "leftovers",
+     "last"
+    ]
+   ],
+   "a": "Cooked leftovers keep for three to four days in the fridge. Get them in there within two hours of cooking."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "tell",
+     "egg",
+     "fresh"
+    ],
+    [
+     "egg",
+     "fresh"
+    ]
+   ],
+   "a": "Put the egg in a bowl of water. Fresh eggs sink and lie flat, older ones tilt up, and a floating one is bad."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "long",
+     "boil",
+     "potato"
+    ],
+    [
+     "how",
+     "long",
+     "boil",
+     "potatoes"
+    ]
+   ],
+   "a": "Cut potatoes boil in about fifteen to twenty minutes. Whole ones take longer. They're done when a knife slides in easily."
+  },
+  {
+   "k": [
+    [
+     "how",
+     "make",
+     "tea"
+    ],
+    [
+     "how",
+     "make",
+     "cup",
+     "tea"
+    ]
+   ],
+   "a": "Boiling water on a tea bag, three to five minutes, then take the bag out. Milk and sugar are between you and your conscience."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "sourdough"
+    ]
+   ],
+   "a": "Sourdough is bread made with a fermented starter of wild yeast and bacteria, instead of packet yeast."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "gluten"
+    ]
+   ],
+   "a": "Gluten is a protein in wheat, barley and rye that makes dough stretchy."
+  },
+  {
+   "k": [
+    [
+     "who",
+     "is",
+     "gordon",
+     "ramsay"
+    ]
+   ],
+   "a": "Gordon Ramsay is a Scottish-born chef famous for his restaurants, his TV shows and his temper."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "vegan"
+    ]
+   ],
+   "a": "A vegan diet has no animal products at all, including meat, fish, dairy, eggs and honey."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "vegetarian"
+    ]
+   ],
+   "a": "Vegetarians don't eat meat or fish, though many still eat dairy and eggs."
+  },
+  {
+   "k": [
+    [
+     "hottest",
+     "chilli"
+    ],
+    [
+     "hottest",
+     "chili"
+    ],
+    [
+     "spiciest",
+     "pepper"
+    ]
+   ],
+   "a": "The record holders are bred chillies like Carolina Reaper and Pepper X, measured in millions of Scoville units. Please keep them away from your eyes."
+  },
+  {
+   "k": [
+    [
+     "what",
+     "is",
+     "scoville"
+    ]
+   ],
+   "a": "The Scoville scale measures how hot a chilli is. A jalapeño is a few thousand units, and the hottest are over two million."
+  }
+ ]
+}
