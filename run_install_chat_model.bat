@@ -3,7 +3,8 @@ rem Optional: installs the small AI chat model for open conversation. Needs abou
 rem Run this once, then turn on "Small AI model for open chat" in Starling's Personality settings.
 cd /d "%~dp0"
 if not exist .venv\Scripts\python.exe (
-  echo Please run setup.bat first.
+  echo This needs the full source install (setup.bat creates the .venv folder it uses).
+  echo If you only use Starling.exe, the optional AI chat cannot be added to it yet. Everything else works as normal.
   pause
   exit /b 1
 )
