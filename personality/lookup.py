@@ -145,15 +145,28 @@ def default_fetch(url):
         return None
 
 
+def _without_brackets(text):
+    """Takes out (brackets) and [notes], including brackets inside brackets: 'Tritium (from Greek (trítos) third) is...' -> 'Tritium is...'"""
+    text = text or ""
+    for _ in range(6):
+        shorter = re.sub(r"\([^()]*\)|\[[^\[\]]*\]", "", text)
+        if shorter == text:
+            break
+        text = shorter
+    return re.sub(r"[()\[\]]", "", text)
+
+
 def tidy_extract(text):
-    text = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", text or "")
+    """The start of a Wikipedia summary, ready to say aloud: brackets out, one or two sentences (at most about 220 letters), safe words only.
+    The cut comes first so a long paragraph full of numbers is not thrown away because of the ones she will never say."""
+    text = _without_brackets(text)
     text = re.sub(r"\s+([.,;:!?])", r"\1", re.sub(r"\s+", " ", text)).strip()
-    text = clean_reply(text, allow_mature=False)
-    if text and len(text) > 200:                              # long answers take ages to speak: keep the first sentence if it is a real one
-        first = re.match(r"^.{40,}?[.!?](?=\s|$)", text)
-        if first:
-            text = first.group(0)
-    return text
+    sentences = [part for part in re.split(r"(?<=[.!?])\s+", text) if part]
+    if sentences:
+        text = sentences[0]
+        if len(text) < 60 and len(sentences) > 1 and len(text) + len(sentences[1]) < 220:
+            text += " " + sentences[1]
+    return clean_reply(text, allow_mature=False)
 
 
 class OnlineLookup:

@@ -2,6 +2,7 @@
 
 from events.base_event import BaseEvent
 from core.event_bus import LOW
+from core.ships import is_ship
 
 
 class Loadout(BaseEvent):
@@ -10,6 +11,8 @@ class Loadout(BaseEvent):
     announce = False
 
     def update_state(self, entry, state):
+        if entry.get("Ship") and not is_ship(entry.get("Ship")):
+            return                                  # the Nomad or an SRV: not a ship, so nothing about your ship changes
         state.ship = entry.get("Ship") or state.ship
         state.ship_name = entry.get("ShipName") or state.ship_name
         state.ship_model = entry.get("Ship_Localised") or state.ship_model

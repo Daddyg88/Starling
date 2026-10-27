@@ -984,3 +984,14 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `knowledge.words_of`: 'what year/which date' = 'when'; man/men/people/person/astronaut = 'human'; colour = color.
 - `Knowledge.time_in` (zones in `config/knowledge/places.json`; needs `tzdata`, added to requirements.txt; without it she says she cannot work the time out) and `Knowledge.favourite`, both run BEFORE her general patterns (`Brain._know_first`), so 'what time is it in Australia' no longer gives the local time.
 - Recipes added to `cooking.json`; 'million/billion' in sums and conversions; Void Compass offline message throttled.
+
+## 0.71.0 - fixes from the 27 October stream
+- Overlay colours (`journal/bio_predict.py`): while you sample a form its colour stays (so it does not flip halfway), but once all three samples are done (`Analyse`) it is orange, and `first_status` is set to "here" so other planets in the system show it as no longer new. Before, a finished form kept its blue/yellow until you jumped.
+- `journal/monitor.py` `hide_if_game_closed`: after the quiet catch-up at start, if `Status.json` is older than 3 minutes (or missing) the game counts as closed (`state.game_quit`), so the overlays do not show the last journal's system. A jump or load-in shows them again.
+- `core/ships.py` `is_ship`: the Nomad, `lander01`, SRVs are not ships. `Loadout`, `LoadGame` ignore them, `FavouriteShip` earns no points for them and drops old ones from `data/favourite_ship.json` (the best real ship becomes the favourite if it has enough points).
+- Her full name is "Starling MoonFox": `Talk_FullName` in `personality/smalltalk.py` and `voicepacks/default/smalltalk.json`, plus `Talk_Name`, the lore intro and the stream hello.
+- `Knowledge._zone_for`: the city said first beats the country after it ("melbourne australia"), a longer name wins on a tie; two places ("melbourne and austria") get both answers; about 120 places (Vienna, Munich, Hamburg, Melbourne...).
+- `personality/lookup.py` `tidy_extract` cuts to the first sentence BEFORE the safety check (the check refuses 8 or more digits, which threw away whole summaries such as tritium) and removes nested brackets.
+- `core/crash.py`: `sys.excepthook`, `threading.excepthook` and `faulthandler` write to `logs/crash.log`; `logs/running.flag` is made at start and removed on a clean stop, so the next start can say the last run did not stop cleanly and copy the end of the crash report into `starling.log`. `main.py` now logs the traceback of the error it used to only print.
+- `core/updater.py` `_open`: on a TLS certificate error (Windows without GitHub's root certificate) it tries once more with the certifi list. The certificate is still verified.
+

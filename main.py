@@ -68,6 +68,9 @@ def main():
     args = options.parse_args()
 
     app = App()
+    from core import crash
+    from core.version import __version__
+    crash.install(version=__version__)          # so a sudden stop leaves its reason in logs/crash.log
     try:
         # Demo mode never saves its pretend events into your real history.
         app.start(record_events=not args.demo, show_events=not (args.check or args.voice_test or args.build_voice_cache or args.listen_test or args.controls_test or args.record_buttons or args.dashboard))
@@ -173,12 +176,15 @@ def main():
             print("The full list is saved in logs\\ignored_events.txt")
         return 0
     except Exception as error:  # show a friendly message instead of a scary crash
+        import logging as _logging
+        _logging.getLogger("starling.main").exception("STARLING stopped with an error")      # with the full traceback, in errors.log
         print("")
         print("STARLING could not start: %s" % error)
         print("Details were saved in the logs folder (errors.log).")
         return 1
     finally:
         app.stop()
+        crash.mark_clean_exit()          # reached on every normal stop and on every error that was logged; a real crash never gets here
 
 
 if __name__ == "__main__":

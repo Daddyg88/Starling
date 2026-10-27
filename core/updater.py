@@ -19,6 +19,7 @@ import json
 import os
 import re
 import shutil
+import ssl
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -49,12 +50,34 @@ def is_newer(latest, current):
     return a + (0,) * (width - len(a)) > b + (0,) * (width - len(b))
 
 
+def _is_certificate_problem(error):
+    return isinstance(error, ssl.SSLError) or isinstance(getattr(error, "reason", None), ssl.SSLError)
+
+
+def _certifi_context():
+    """A normal, fully checked TLS context that trusts the certificate list shipped with the 'certifi' package (or None)."""
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return None
+
+
 def _open(url, token="", opener=None, timeout=30):
+    """Opens the address. Some Windows PCs do not yet trust the certificate GitHub uses ("unable to get issuer certificate"), so on that
+    one error it tries again with the certifi certificate list. The certificate is still checked; it is never switched off."""
     opener = opener or urllib.request.urlopen
     headers = {"User-Agent": USER_AGENT, "Accept": "application/vnd.github+json"}
     if token:
         headers["Authorization"] = "Bearer " + token
-    return opener(urllib.request.Request(url, headers=headers), timeout=timeout)
+    request = urllib.request.Request(url, headers=headers)
+    try:
+        return opener(request, timeout=timeout)
+    except Exception as error:
+        context = _certifi_context() if _is_certificate_problem(error) else None
+        if context is None:
+            raise
+        return opener(request, timeout=timeout, context=context)
 
 
 def _valid_repo(repo):

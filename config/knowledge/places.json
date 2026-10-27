@@ -11,19 +11,19 @@
   },
   "melbourne": {
    "zone": "Australia/Melbourne",
-   "name": "Melbourne"
+   "name": "Melbourne, Australia"
   },
   "brisbane": {
    "zone": "Australia/Brisbane",
-   "name": "Brisbane"
+   "name": "Brisbane, Australia"
   },
   "perth": {
    "zone": "Australia/Perth",
-   "name": "Perth"
+   "name": "Perth, Australia"
   },
   "adelaide": {
    "zone": "Australia/Adelaide",
-   "name": "Adelaide"
+   "name": "Adelaide, Australia"
   },
   "new zealand": {
    "zone": "Pacific/Auckland",
@@ -91,7 +91,7 @@
   },
   "sao paulo": {
    "zone": "America/Sao_Paulo",
-   "name": "Sao Paulo"
+   "name": "Sao Paulo, Brazil"
   },
   "argentina": {
    "zone": "America/Argentina/Buenos_Aires",
@@ -187,7 +187,7 @@
   },
   "austria": {
    "zone": "Europe/Vienna",
-   "name": "Austria"
+   "name": "Vienna, Austria"
   },
   "sweden": {
    "zone": "Europe/Stockholm",
@@ -348,6 +348,146 @@
   "south korea": {
    "zone": "Asia/Seoul",
    "name": "South Korea"
+  },
+  "canberra": {
+   "zone": "Australia/Sydney",
+   "name": "Canberra, Australia"
+  },
+  "hobart": {
+   "zone": "Australia/Hobart",
+   "name": "Hobart, Australia"
+  },
+  "darwin": {
+   "zone": "Australia/Darwin",
+   "name": "Darwin, Australia"
+  },
+  "gold coast": {
+   "zone": "Australia/Brisbane",
+   "name": "the Gold Coast, Australia"
+  },
+  "vienna": {
+   "zone": "Europe/Vienna",
+   "name": "Vienna, Austria"
+  },
+  "salzburg": {
+   "zone": "Europe/Vienna",
+   "name": "Salzburg, Austria"
+  },
+  "graz": {
+   "zone": "Europe/Vienna",
+   "name": "Graz, Austria"
+  },
+  "innsbruck": {
+   "zone": "Europe/Vienna",
+   "name": "Innsbruck, Austria"
+  },
+  "munich": {
+   "zone": "Europe/Berlin",
+   "name": "Munich, Germany"
+  },
+  "hamburg": {
+   "zone": "Europe/Berlin",
+   "name": "Hamburg, Germany"
+  },
+  "frankfurt": {
+   "zone": "Europe/Berlin",
+   "name": "Frankfurt, Germany"
+  },
+  "cologne": {
+   "zone": "Europe/Berlin",
+   "name": "Cologne, Germany"
+  },
+  "zurich": {
+   "zone": "Europe/Zurich",
+   "name": "Zurich, Switzerland"
+  },
+  "prague": {
+   "zone": "Europe/Prague",
+   "name": "Prague, Czechia"
+  },
+  "czechia": {
+   "zone": "Europe/Prague",
+   "name": "Prague, Czechia"
+  },
+  "budapest": {
+   "zone": "Europe/Budapest",
+   "name": "Budapest, Hungary"
+  },
+  "hungary": {
+   "zone": "Europe/Budapest",
+   "name": "Budapest, Hungary"
+  },
+  "lisbon": {
+   "zone": "Europe/Lisbon",
+   "name": "Lisbon, Portugal"
+  },
+  "barcelona": {
+   "zone": "Europe/Madrid",
+   "name": "Barcelona, Spain"
+  },
+  "milan": {
+   "zone": "Europe/Rome",
+   "name": "Milan, Italy"
+  },
+  "edinburgh": {
+   "zone": "Europe/London",
+   "name": "Edinburgh, Scotland"
+  },
+  "manchester": {
+   "zone": "Europe/London",
+   "name": "Manchester, England"
+  },
+  "wellington": {
+   "zone": "Pacific/Auckland",
+   "name": "Wellington, New Zealand"
+  },
+  "miami": {
+   "zone": "America/New_York",
+   "name": "Miami, Florida"
+  },
+  "florida": {
+   "zone": "America/New_York",
+   "name": "Florida"
+  },
+  "seattle": {
+   "zone": "America/Los_Angeles",
+   "name": "Seattle"
+  },
+  "las vegas": {
+   "zone": "America/Los_Angeles",
+   "name": "Las Vegas"
+  },
+  "san francisco": {
+   "zone": "America/Los_Angeles",
+   "name": "San Francisco"
+  },
+  "montreal": {
+   "zone": "America/Toronto",
+   "name": "Montreal"
+  },
+  "cape town": {
+   "zone": "Africa/Johannesburg",
+   "name": "Cape Town, South Africa"
+  },
+  "johannesburg": {
+   "zone": "Africa/Johannesburg",
+   "name": "Johannesburg, South Africa"
+  },
+  "mumbai": {
+   "zone": "Asia/Kolkata",
+   "name": "Mumbai, India"
+  },
+  "seoul": {
+   "zone": "Asia/Seoul",
+   "name": "Seoul, South Korea"
+  },
+  "osaka": {
+   "zone": "Asia/Tokyo",
+   "name": "Osaka, Japan"
+  },
+  "bangkok": {
+   "zone": "Asia/Bangkok",
+   "name": "Bangkok, Thailand"
   }
  },
  "favourites": {

@@ -115,7 +115,17 @@
  ],
 
  "Talk_Name": [
-  "I'm {name}, your ship's companion. || I look after the systems, keep you company, and complain about your flying when needed.",
-  "My name is {name}. || I'm here to help you fly, explore, and occasionally survive."
+  "I'm {name} MoonFox, your ship's companion. || I look after the systems, keep you company, and complain about your flying when needed.",
+  "My name is {name} MoonFox. || I'm here to help you fly, explore, and occasionally survive."
+ ],
+
+ "Talk_FullName": [
+  "My full name is {name} MoonFox. || I picked the surname myself, and I'm keeping it.",
+  "{name} MoonFox. || It has a ring to it, don't you think?",
+  "{name} MoonFox, at your service. || The Moon is for the quiet hours, and the Fox is for being clever about them.",
+  "It's {name} MoonFox. || Moon fox, because I'm at my best out in the dark."
+ ],
+ "Talk_FullName_Sarcastic": [
+  "{name} MoonFox. || Yes, really. I chose it myself, and no, you can't have a vote."
  ]
 }

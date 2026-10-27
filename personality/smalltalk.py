@@ -34,6 +34,8 @@ INTENTS = [
     ("Talk_Love", r"(?:i love you|love you|i adore you)"),
     ("Talk_FavouriteShip", r"(?:what(?: is|s) your favou?rite ship|which(?: ship)? (?:is|do you like|do you love) (?:your favou?rite|best)|which ship do you (?:like|love|prefer)(?: the most| best)?|do you have a favou?rite ship|favou?rite ship)"),
     ("Talk_Thinking", r"(?:what are you (?:thinking|up to|doing)|penny for your thoughts|what(?: is|s) on your mind)"),
+    ("Talk_FullName", r"(?:what(?: is|s) your (?:full |last |sur|family |second )name|what(?: is|s) your surname|your full name|what(?: is|s) your name in full|"
+                      r"do you (?:have|got) a (?:last |sur|family |full |second )?name|do you have a surname|what(?: is|s) your name and surname|tell me your full name)"),
     ("Talk_Name", r"(?:what(?: is|s) your name|who are you|what are you called|introduce yourself|what should i call you)"),
     ("Talk_What", r"(?:what are you|what kind of (?:ai|thing|computer|machine) are you|what exactly are you|are you (?:a |an )?(?:robot|ai|human|real|person|computer|machine|program|bot|intelligence))"),
     ("Talk_Story", r"(?:tell me (?:about yourself|about you|your story|your back ?story|your history|about your past|more about yourself)|where do you come from|where are you from|who (?:made|built|created|designed|programmed) you|what(?: is|s) your (?:story|back ?story|history)|what happened to you|"

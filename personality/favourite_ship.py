@@ -13,7 +13,7 @@ import json
 
 from core import paths
 from core.logger import get_logger
-from core.ships import ship_name
+from core.ships import is_ship, ship_name
 
 log = get_logger("favourite")
 
@@ -40,7 +40,7 @@ class FavouriteShip:
         """Called with every mood gain. Credits the ship you are flying."""
         state = self.state_provider()
         ship = str(getattr(state, "ship", "") or "").strip().lower()
-        if not ship or points <= 0:
+        if not ship or points <= 0 or not is_ship(ship):        # the Nomad and the SRVs are vehicles, not ships
             return
         if ship not in self.points and len(self.points) >= MAX_SHIPS:
             return
@@ -93,8 +93,14 @@ class FavouriteShip:
                 data = json.load(handle)
             self.points = {str(k): float(v) for k, v in (data.get("points") or {}).items()}
             self.labels = {str(k): str(v) for k, v in (data.get("labels") or {}).items()}
+            for code in [c for c in self.points if not is_ship(c)]:       # an older file may have counted the Nomad: drop it
+                self.points.pop(code, None)
+                self.labels.pop(code, None)
             fav = data.get("favourite")
-            self.favourite = fav if fav in self.points else None
+            if fav not in self.points:
+                best = max(self.points, key=self.points.get) if self.points else None
+                fav = best if best is not None and self.points[best] >= self.threshold else None
+            self.favourite = fav
         except FileNotFoundError:
             pass
         except (OSError, ValueError, TypeError, AttributeError):

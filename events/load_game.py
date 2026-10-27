@@ -2,6 +2,7 @@
 
 from events.base_event import BaseEvent
 from core.event_bus import LOW
+from core.ships import is_ship
 
 
 class LoadGame(BaseEvent):
@@ -13,9 +14,10 @@ class LoadGame(BaseEvent):
     def update_state(self, entry, state):
         state.game_quit = False
         state.commander = entry.get("Commander", state.commander)
-        state.ship = entry.get("Ship_Localised") or entry.get("Ship") or state.ship
-        state.ship_name = entry.get("ShipName") or state.ship_name
-        state.ship_model = entry.get("Ship_Localised") or state.ship_model
+        if not entry.get("Ship") or is_ship(entry.get("Ship")):      # logging in inside the Nomad or an SRV does not change which ship is yours
+            state.ship = entry.get("Ship_Localised") or entry.get("Ship") or state.ship
+            state.ship_name = entry.get("ShipName") or state.ship_name
+            state.ship_model = entry.get("Ship_Localised") or state.ship_model
         capacity = entry.get("FuelCapacity")
         if isinstance(capacity, (int, float)):
             state.fuel_capacity = capacity

@@ -68,6 +68,20 @@ def _from_code(code):
     return " ".join(words)
 
 
+# Vehicles that are not ships: the Nomad and the SRVs. The journal can name them where it names a ship, so they are never "your ship"
+# and never her favourite ship.
+NOT_SHIPS = {"nomad", "lander01", "testbuggy", "srv", "scarab", "scorpion", "combat_multicrew_srv_01", "vessel"}
+
+
+def is_ship(raw):
+    """False for a name that is a vehicle rather than a ship ('Nomad', 'SRV Scarab'...). An empty name is not a ship either."""
+    key = re.sub(r"[$;]|_name$", "", str(raw or "").strip().lower())
+    if not key:
+        return False
+    plain = re.sub(r"^srv[\s_\-]+", "", key)
+    return key not in NOT_SHIPS and plain not in NOT_SHIPS
+
+
 def ship_name(raw, localised=None):
     """The name she says. Never fails; an empty input gives ''."""
     if localised and str(localised).strip():

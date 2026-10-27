@@ -174,3 +174,22 @@ class InTheBrain(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TidyExtract(unittest.TestCase):
+    """'what is tritium' came back empty on her PC: the long summary had too many digits, and a bracket inside a bracket left junk."""
+
+    TRITIUM = ("Tritium (from Ancient Greek τρίτος (trítos) 'third') or hydrogen-3 (symbol T or ³H) is a rare and radioactive isotope of "
+               "hydrogen with a half-life of ~12.3 years. The tritium nucleus (t, sometimes called a triton) contains one proton and two "
+               "neutrons, whereas the nucleus of the common isotope hydrogen-1 (protium) contains one proton and that of hydrogen-2 "
+               "(deuterium) contains one proton and one neutron.")
+
+    def test_a_summary_full_of_numbers_still_gives_its_first_sentence(self):
+        self.assertEqual(tidy_extract(self.TRITIUM),
+                         "Tritium or hydrogen-3 is a rare and radioactive isotope of hydrogen with a half-life of 12.3 years.")
+
+    def test_brackets_inside_brackets_are_removed(self):
+        self.assertEqual(tidy_extract("Zorp (from the Greek (zorpos) word for fish) is a fish."), "Zorp is a fish.")
+
+    def test_a_short_first_sentence_gets_the_second_one_too(self):
+        self.assertEqual(tidy_extract("A quasar is a bright thing. It is far away and very old."), "A quasar is a bright thing. It is far away and very old.")

@@ -1,4 +1,5 @@
 import tempfile
+import urllib.error as urllib_error
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -223,3 +224,45 @@ class UpdatePromptTests(LauncherTests):
             self.launcher.get_newest(first_run=False)
         self.assertEqual(self.asked, [])
         self.assertEqual(self.launcher.current_version(), "0.12.0")
+
+
+class CertificateRetry(unittest.TestCase):
+    """Some Windows PCs fail with 'unable to get issuer certificate' for GitHub: the check tries again with the certifi list."""
+
+    def test_retries_once_with_a_checked_context_on_a_certificate_error(self):
+        import ssl
+        from unittest import mock
+        calls = []
+
+        def opener(request, timeout=0, context=None):
+            calls.append(context)
+            if context is None:
+                raise urllib_error.URLError(ssl.SSLCertVerificationError("unable to get issuer certificate"))
+            return "ok"
+        with mock.patch.object(updater, "_certifi_context", return_value=object()):
+            self.assertEqual(updater._open("https://api.github.com/x", opener=opener), "ok")
+        self.assertEqual(len(calls), 2)
+        self.assertIsNone(calls[0])
+        self.assertIsNotNone(calls[1])
+
+    def test_other_errors_are_not_retried(self):
+        from unittest import mock
+        calls = []
+
+        def opener(request, timeout=0, context=None):
+            calls.append(1)
+            raise urllib_error.URLError("no internet")
+        with mock.patch.object(updater, "_certifi_context", return_value=object()):
+            with self.assertRaises(urllib_error.URLError):
+                updater._open("https://api.github.com/x", opener=opener)
+        self.assertEqual(len(calls), 1)
+
+    def test_without_certifi_the_original_error_comes_back(self):
+        import ssl
+        from unittest import mock
+
+        def opener(request, timeout=0, context=None):
+            raise urllib_error.URLError(ssl.SSLCertVerificationError("unable to get issuer certificate"))
+        with mock.patch.object(updater, "_certifi_context", return_value=None):
+            with self.assertRaises(urllib_error.URLError):
+                updater._open("https://api.github.com/x", opener=opener)

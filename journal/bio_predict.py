@@ -632,6 +632,7 @@ class BioPredictor:
                     body.done_genera.append(str(entry["Genus_Localised"]))
             fresh = not self.codex.has(species)
             self.codex.add(species, self.region)
+            self.first_status[species.lower()] = "here"      # finished: it is in your codex for this region now, so every planet shows it orange
             if fresh and species.lower() not in UNIQUE_SPECIES and self._on("exobiology.progress", True):
                 events.append(("BioProgress", self.progress(species)))
         return events
@@ -683,15 +684,16 @@ class BioPredictor:
             options = [r for r in body.candidates if same_genus(r["g"], genus)] or [r for r in self.rules if same_genus(r["g"], genus)]
             if species:
                 base = low = high = self.species_value(species) or 0
-                tone = self.first_status.get(species.lower()) or self.codex.where(species, self.region)
                 done = species.lower() in body.done
+                # While you sample it the colour it had stays (it does not flip halfway). Once all three samples are done it is orange.
+                tone = "here" if done else (self.first_status.get(species.lower()) or self.codex.where(species, self.region))
             else:
                 values = [self.species_value(r) for r in options if self.species_value(r)]
                 base = sum(values) / len(values) if values else 0
                 low, high = (min(values), max(values)) if values else (0, 0)
                 tone = self.group_status([r["n"] for r in options]) if options else "never"
                 done = False
-            status = "here" if done else tone          # a finished form loses its flag but keeps its colour
+            status = "here" if done else tone          # a finished form loses its flag and turns orange
             lives.append({"name": species or genus, "new": status != "here", "status": status, "tone": tone, "done": done,
                           "value": int(base * mult), "low": int(low * mult), "high": int(high * mult), "exact": bool(species)})
         return lives

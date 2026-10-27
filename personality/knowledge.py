@@ -16,6 +16,7 @@ She only answers when sure. No match -> None, and the brain carries on (she says
 import json
 import math
 import re
+from datetime import datetime
 
 from core import paths
 from core.logger import get_logger
@@ -333,25 +334,49 @@ class Knowledge:
     # ---- the time somewhere else ----
     TIME_IN = re.compile(r"\b(?:what(?:s| is) the time|what time is it|what time|time)\b.*?\bin (?:the )?(?P<place>[a-z ]+?)(?: right now| now| at the moment| today)?$")
 
+    def _zone_for(self, place):
+        """The place named in the sentence. The city said first wins over the country after it: 'melbourne australia' is Melbourne,
+        not Sydney. A longer name wins when two start in the same place ('south africa', not 'africa')."""
+        padded = " " + place + " "
+        if len(place.split()) > 5:
+            return None
+        hits = [(padded.find(" " + name + " "), -len(name), name) for name in self.zones if (" " + name + " ") in padded]
+        return self.zones[min(hits)[2]] if hits else None
+
+    @staticmethod
+    def _clock(zone, here):
+        """'04:30 tomorrow in Melbourne, Australia' for one zone, or None when the time zone data is missing (tzdata on Windows)."""
+        try:
+            from zoneinfo import ZoneInfo
+            there = here.astimezone(ZoneInfo(zone["zone"]))
+        except Exception:
+            return None
+        day = "" if there.date() == here.date() else (" tomorrow" if there.date() > here.date() else " yesterday")
+        return "%s%s in %s" % (there.strftime("%H:%M"), day, zone["name"])
+
     def time_in(self, tidy, now=None):
         """'what time is it in Australia' -> 'It's 02:17 in Sydney, Australia.' None if not that kind of question or place unknown.
-        Returns (text, True) when it was that kind of question, with text None if she cannot work it out."""
+        Returns (text, True) when it was that kind of question, with text None if she cannot work it out.
+        Two places ('Melbourne and Austria') get both answers."""
         found = self.TIME_IN.search(tidy)
         if not found:
             return None
         place = found.group("place").strip()
-        zone = next((self.zones[name] for name in sorted(self.zones, key=len, reverse=True) if place == name or place.endswith(" " + name)), None)
-        if zone is None:
-            return None, True
         try:
-            from datetime import datetime
-            from zoneinfo import ZoneInfo
             here = (now or datetime.now()).astimezone()
-            there = here.astimezone(ZoneInfo(zone["zone"]))
         except Exception:
             return None, True
-        day = "" if there.date() == here.date() else (" tomorrow" if there.date() > here.date() else " yesterday")
-        return "It's %s%s in %s." % (there.strftime("%H:%M"), day, zone["name"]), True
+        parts = [part.strip() for part in re.split(r"\band\b|,", place) if part.strip()]
+        zones = [self._zone_for(part) for part in parts] if len(parts) > 1 else []
+        if len(zones) > 1 and all(zones) and len({z["zone"] + z["name"] for z in zones}) == len(zones):
+            clocks = [self._clock(zone, here) for zone in zones[:3]]
+            if all(clocks):
+                return "It's " + ". And it's ".join(clocks) + ".", True
+        zone = self._zone_for(place)
+        if zone is None:
+            return None, True
+        clock = self._clock(zone, here)
+        return ("It's %s." % clock if clock else None), True
 
     def favourite(self, thing):
         return self.favourites.get((thing or "").strip().lower())

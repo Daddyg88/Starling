@@ -2,6 +2,7 @@
 
 import json
 import unittest
+from datetime import datetime, timezone
 
 from core import paths
 from personality.knowledge import Knowledge, convert, digits, maths
@@ -162,6 +163,35 @@ class FromARealLog(Base):
 
     def test_what_do_you_know_of_me(self):
         self.assertTrue(self.ask("what do you know of me"))
+
+
+class TimeInPlaces(unittest.TestCase):
+    """The streamer asked for Melbourne and Austria (28 October)."""
+    NOW = datetime(2026, 10, 27, 17, 30, tzinfo=timezone.utc)
+
+    def says(self, sentence):
+        return Knowledge().time_in(sentence, self.NOW)[0]
+
+    def test_the_city_before_the_country_wins(self):
+        self.assertEqual(self.says("what time is it in melbourne australia"), "It's 04:30 tomorrow in Melbourne, Australia.")
+        self.assertEqual(self.says("what time is it in sydney australia"), "It's 04:30 tomorrow in Sydney, Australia.")
+        self.assertEqual(self.says("what time is it in perth australia"), "It's 01:30 tomorrow in Perth, Australia.")
+
+    def test_a_country_on_its_own_still_works(self):
+        self.assertEqual(self.says("what time is it in australia"), "It's 04:30 tomorrow in Sydney, Australia.")
+        self.assertEqual(self.says("what time is it in south africa"), "It's 19:30 in South Africa.")
+        self.assertEqual(self.says("what time is it in austria"), "It's 18:30 in Vienna, Austria.")
+        self.assertEqual(self.says("what time is it in vienna"), "It's 18:30 in Vienna, Austria.")
+
+    def test_melbourne_austria_is_still_melbourne(self):
+        self.assertEqual(self.says("what time is it in melbourne austria"), "It's 04:30 tomorrow in Melbourne, Australia.")
+
+    def test_two_places_get_both_answers(self):
+        self.assertEqual(self.says("what time is it in melbourne and austria"),
+                         "It's 04:30 tomorrow in Melbourne, Australia. And it's 18:30 in Vienna, Austria.")
+
+    def test_a_place_she_does_not_know_gives_no_time(self):
+        self.assertIsNone(self.says("what time is it in the kitchen"))
 
 
 if __name__ == "__main__":

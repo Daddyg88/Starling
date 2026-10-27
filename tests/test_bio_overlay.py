@@ -454,16 +454,43 @@ class Ranges(unittest.TestCase):
         _, state = run([planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"]), sample("Log", "Aleoida Arcus", "Aleoida")])
         self.assertFalse(ov.overlay_focus(state.bio.focus_view())["lives"][0]["value"].startswith("~"))
 
-    def test_never_found_stays_yellow_while_you_sample_it_and_after(self):
+    def test_never_found_stays_yellow_while_you_sample_it(self):
         base = [planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"])]
         for extra in ([sample("Log", "Aleoida Arcus", "Aleoida")],
                       [{"event": "CodexEntry", "Name_Localised": "Aleoida Arcus - Red", "Region_Localised": "Inner Orion Spur"}, sample("Log", "Aleoida Arcus", "Aleoida")],
-                      [sample("Log", "Aleoida Arcus", "Aleoida"), sample("Analyse", "Aleoida Arcus", "Aleoida")]):
+                      [sample("Log", "Aleoida Arcus", "Aleoida"), sample("Vital", "Aleoida Arcus", "Aleoida")]):
             _, state = run(base + extra)
             state.bio.set_position((0.0, 0.0, 0.0))
             line = ov.overlay_focus(state.bio.focus_view())["lives"][0]
-            self.assertEqual(line["tone"], "never", extra)
-        self.assertFalse(line["flag"])                       # finished: colour stays, flag goes
+            self.assertEqual(line["tone"], "never", extra)       # the colour does not flip halfway through the three samples
+
+    def test_finished_form_turns_orange_whatever_colour_it_had(self):
+        base = [planet("Test A 1", k=177, SystemAddress=1), fss("Test A 1", 1), saa(["Aleoida"])]
+        _, state = run(base + [sample("Log", "Aleoida Arcus", "Aleoida"), sample("Analyse", "Aleoida Arcus", "Aleoida")])
+        state.bio.set_position((0.0, 0.0, 0.0))
+        line = ov.overlay_focus(state.bio.focus_view())["lives"][0]
+        self.assertEqual((line["tone"], line["flag"], line["done"]), ("here", False, True))
+        self.assertEqual(ov.TONES[line["tone"]], ov.ORANGE)
+
+    def test_found_in_another_region_is_blue_until_you_finish_it_then_orange(self):
+        """She said: scanned it three times and it stayed blue until she scanned it on another planet."""
+        _, state = run([planet("Test A 1", k=177, SystemAddress=1, body_id=5), fss("Test A 1", 1, body_id=5), saa(["Aleoida"], body_id=5)])
+        bio = state.bio
+        bio.set_position((0.0, 0.0, 0.0))                                   # Inner Orion Spur
+        bio.codex.add("Aleoida Arcus", "Odin's Hold")                       # found before, but in another region
+        bio.note_organic(sample("Log", "Aleoida Arcus", "Aleoida"))
+        self.assertEqual(bio.focus_view()["lives"][0]["tone"], "elsewhere")  # still blue while sampling
+        bio.note_organic(sample("Analyse", "Aleoida Arcus", "Aleoida"))
+        line = bio.focus_view()["lives"][0]
+        self.assertEqual((line["tone"], line["status"], line["done"]), ("here", "here", True))
+        # the very next planet in the system that has the same species: no longer new, so orange with no flag
+        bio.note_scan(planet("Test A 2", k=177, SystemAddress=1, body_id=6))
+        bio.note_fss(fss("Test A 2", 1, body_id=6))
+        bio.note_saa(saa(["Aleoida"], name="Test A 2", body_id=6))
+        bio.note_organic(dict(sample("Log", "Aleoida Arcus", "Aleoida"), Body=6))
+        bio.focus = "Test A 2"
+        other = bio.focus_view()["lives"][0]
+        self.assertEqual((other["tone"], other["new"]), ("here", False))
 
 
 class ManyFlags(DrawingTests):

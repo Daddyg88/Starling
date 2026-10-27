@@ -26,6 +26,15 @@ class IntentTests(unittest.TestCase):
         for text, key in cases.items():
             self.assertEqual(intent_for(text), key, text)
 
+    def test_her_full_name_is_starling_moonfox(self):
+        for text in ("what's your full name", "what is your last name", "do you have a surname", "what's your surname"):
+            self.assertEqual(intent_for(text), "Talk_FullName", text)
+        self.assertEqual(intent_for("what's your name"), "Talk_Name")
+        import json
+        lines = json.loads((paths.ROOT / "voicepacks" / "default" / "smalltalk.json").read_text(encoding="utf-8"))
+        for key in ("Talk_Name", "Talk_FullName"):
+            self.assertTrue(all("MoonFox" in (l if isinstance(l, str) else l.get("t", l.get("text", str(l)))) for l in lines[key]), key)
+
     def test_commands_are_never_mistaken_for_chat(self):
         for text in ("open the galaxy map", "deploy landing gear", "request docking", "plot a route to Sol", "good", "target wingman 2",
                      "hello please open the cargo scoop", "how are you going to get there", "say something to the station"):

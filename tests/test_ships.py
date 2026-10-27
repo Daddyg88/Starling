@@ -59,3 +59,32 @@ class ThroughTheJournal(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NotShips(unittest.TestCase):
+    """The Nomad and the SRVs are vehicles, never her favourite ship."""
+
+    def test_vehicles_are_not_ships(self):
+        for name in ("Nomad", "nomad", "TestBuggy", "SRV Scarab", "combat_multicrew_srv_01", "", None):
+            self.assertFalse(ships.is_ship(name), name)
+        for name in ("anaconda", "CobraMkIII", "type9_military", "Python_NX", "Anaconda"):
+            self.assertTrue(ships.is_ship(name), name)
+
+    def test_the_nomad_earns_no_points_and_an_old_file_is_cleaned(self):
+        import tempfile
+        from pathlib import Path
+        from types import SimpleNamespace
+        from personality.favourite_ship import FavouriteShip
+        folder = Path(tempfile.mkdtemp())
+        path = folder / "favourite_ship.json"
+        path.write_text(json.dumps({"points": {"nomad": 40.0, "anaconda": 25.0}, "labels": {"nomad": "Nomad", "anaconda": "Anaconda"},
+                                    "favourite": "nomad"}), encoding="utf-8")
+        state = SimpleNamespace(ship="nomad", ship_model=None, favourite_ship=None)
+        fav = FavouriteShip(lambda: state, path=path)
+        self.assertEqual(fav.favourite, "anaconda")            # the Nomad is dropped; the best real ship is next
+        self.assertNotIn("nomad", fav.points)
+        fav.add(5)                                              # flying the Nomad: no points
+        self.assertNotIn("nomad", fav.points)
+        state.ship = "python"
+        fav.add(5)
+        self.assertEqual(fav.points["python"], 5)
