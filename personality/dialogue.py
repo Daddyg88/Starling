@@ -99,6 +99,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "smalltalk.json"))     # answers when you chat to her
             self._merge(_read_json(self.pack_dir / "brain.json"))         # her "brain": opinions, game answers, streaming, riddles
             self._merge(_read_json(self.pack_dir / "confirm.json"))       # "did you mean...?" when she is nearly sure
+            self._merge(_read_json(self.pack_dir / "rings.json"))         # ring hotspots
             self._merge(_read_json(self.pack_dir / "profile.json"))       # what she learns about you, and says she has learned
             self._merge(_read_json(self.pack_dir / "freechat.json"))      # free chat: reactions, remarks and questions back
             self._merge(_read_json(self.pack_dir / "brain2.json"))        # "say that again", "what were we talking about"

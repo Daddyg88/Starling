@@ -995,3 +995,7 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `core/crash.py`: `sys.excepthook`, `threading.excepthook` and `faulthandler` write to `logs/crash.log`; `logs/running.flag` is made at start and removed on a clean stop, so the next start can say the last run did not stop cleanly and copy the end of the crash report into `starling.log`. `main.py` now logs the traceback of the error it used to only print.
 - `core/updater.py` `_open`: on a TLS certificate error (Windows without GitHub's root certificate) it tries once more with the certifi list. The certificate is still verified.
 
+## 0.72.0 - ring hotspots
+- `events/_signals.py` `ring_hotspots` / `ring_data` / `ring_once`: a body whose name ends in " Ring" with mineral signals (`SAASignalsFound`, also `FSSBodySignals`) gives `Hotspots`, `Total`, `Word`, `Summary`, `Favourite` (first mineral on the Mining page's favourites). `personality/line_keys.py` turns that into `RingHotspots_Favourite` / `RingHotspots` (lines in `voicepacks/default/rings.json`). A ring is said once even if the game repeats the event.
+- Written from knowledge of the journal format (ring signals are mineral names with a Count). It could not be tried against the real game here; if she says nothing after you map a ring, send the SAASignalsFound line for that ring from the journal.
+

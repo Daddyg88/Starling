@@ -149,6 +149,8 @@ def _keys_for(event):
         return ["BioRefined"] if data.get("Right") else ["BioRefined_Wrong"]
 
     if name in ("SAASignalsFound", "FSSBodySignals"):
+        if data.get("Summary"):                                   # a mapped ring: how many hotspots and of what
+            return ["RingHotspots_Favourite", "RingHotspots"] if data.get("Favourite") else ["RingHotspots"]
         return ["%s_Biological" % name] if data.get("Biological") else [name]
 
     if name == "ScanOrganic":

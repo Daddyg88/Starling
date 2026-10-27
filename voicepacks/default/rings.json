@@ -1,0 +1,15 @@
+{
+ "_help": "Ring hotspots (0.72.0): said after you map a ring with the detailed surface scanner. Placeholders: {Total} the number in words, {Word} hotspot or hotspots, {Summary} 'two platinum, one painite and one monazite', {Favourite} the first mineral on your favourites list.",
+ "RingHotspots": [
+  "That ring has {Total} {Word}: {Summary}.",
+  "Ring mapped. {Total} {Word}: {Summary}.",
+  "{Total} {Word} in that ring. {Summary}.",
+  "Hotspots found: {Total}. That's {Summary}.",
+  "The ring has {Total} {Word}, Commander. {Summary}."
+ ],
+ "RingHotspots_Favourite": [
+  "That ring has {Total} {Word}: {Summary}. {Favourite} is one of your favourites.",
+  "{Total} {Word}: {Summary}. Worth a look, {Favourite} is on your list.",
+  "Ring mapped. {Total} {Word}: {Summary}. And there's {Favourite}, one of your favourites."
+ ]
+}
