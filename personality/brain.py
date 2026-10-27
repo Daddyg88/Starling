@@ -30,6 +30,7 @@ from personality.meaning import load_meaning
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
 from personality.unanswered import ASK as ASK_UNANSWERED
+from personality import context
 
 log = get_logger("brain")
 
@@ -70,7 +71,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None, people=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -86,6 +87,7 @@ class Brain:
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
         self.knowledge = knowledge if knowledge is not None else (Knowledge() if intents is None else None)   # personality/knowledge.py
+        self.people = people  # personality/people.py: friends and family she has been told about (private)
         self.unanswered = unanswered  # personality/unanswered.py: the questions she could not answer, counted
         self.lookup = lookup         # personality/lookup.py: optional Wikipedia lookup for questions she cannot answer (off by default)
         self.llm = llm               # personality/llm.py: optional small local AI model for open chat (off by default)
@@ -120,6 +122,10 @@ class Brain:
             reply = self._profile_turn(tidy)
             if reply is not None:
                 return reply
+        if deliberate and self.people is not None:
+            reply = self._people_turn(tidy, text)
+            if reply is not None:
+                return reply
         if self.waiting():
             reply = self._riddle_guess(tidy)
             if reply is not None:
@@ -130,6 +136,9 @@ class Brain:
         if reply is not None:
             return reply
         reply = self._unanswered_report(tidy)
+        if reply is not None:
+            return reply
+        reply = self._follow_context(tidy)
         if reply is not None:
             return reply
         spoke_for = False                      # a follow-up ("tell me more") with nothing to follow up must not turn into chat
@@ -146,6 +155,68 @@ class Brain:
         if spoke_for:
             return None
         return self._know(tidy, text) or self._by_meaning(tidy) or self._look_up(tidy) or (self._free_chat(tidy) if deliberate else None)
+
+    def _people_turn(self, tidy, raw):
+        """'My friend Andrew is from Germany' (learn), 'who is Andrew?', 'where is Andrew from?', 'who do you know?', 'forget Andrew'."""
+        try:
+            learned = self.people.learn(tidy, raw)
+            if learned is not None:
+                name, relation, place, new = learned
+                pool = ("people_learned_place" if place else "people_learned") if new else "people_known"
+                reply = self._say(self._style_pick(pool, "{name}.").format(name=name, relation=relation, place=place))
+                self._remember("People", tidy, reply)
+                log.info("People: %s %s", "learned" if new else "already knew", relation)
+                return reply
+            asked = self.people.who(tidy)
+            if asked is None:
+                return None
+            kind, data = asked
+            if kind in ("who", "where"):
+                if kind == "where" and not data["place"]:
+                    pool = "people_where_none"
+                elif kind == "where":
+                    pool = "people_where"
+                else:
+                    pool = "people_who_place" if data["place"] else "people_who"
+                text = self._style_pick(pool, "{name}.").format(**data)
+            elif kind == "all":
+                if not data:
+                    text = self._style_pick("people_none", "Nobody yet.")
+                else:
+                    bits = ["%s (%s)" % (d["name"], d["relation"]) for d in data[:6]]
+                    listed = bits[0] if len(bits) == 1 else ", ".join(bits[:-1]) + " and " + bits[-1]
+                    text = self._style_pick("people_all", "{list}.").format(list=listed)
+            elif kind == "forgot":
+                text = self._style_pick("people_forgot", "Forgotten.").format(name=data)
+            else:
+                text = self._style_pick("people_forgot_all" if data else "people_forgot_none", "Forgotten.")
+            reply = self._say(text)
+            self._remember("People", tidy, reply)
+            return reply
+        except Exception:
+            log.exception("The address book failed; carrying on")
+            return None
+
+    def _follow_context(self, tidy):
+        """'And in Vienna?' / 'no, I meant Austria': rebuild the question before it with the new piece (personality/context.py)."""
+        try:
+            piece = context.piece_of(tidy)
+            if piece is None:
+                return None
+            now = self.clock()
+            last = self.history[-1] if self.history else None
+            if last is None or last[1] != "Know" or now - last[0] > TOPIC_SECONDS:
+                return None
+            rebuilt = context.rewrite(last[2], piece)
+            if rebuilt is None or rebuilt == last[2]:
+                return None
+            reply = self._know_first(rebuilt) or self._know(rebuilt, rebuilt)
+            if reply is not None:
+                log.info("Brain: follow-up %r became %r", tidy, rebuilt)
+            return reply
+        except Exception:
+            log.exception("Follow-up failed; carrying on")
+            return None
 
     def _note_unanswered(self, tidy):
         if self.unanswered is not None:

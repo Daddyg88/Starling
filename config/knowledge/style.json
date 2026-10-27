@@ -96,5 +96,61 @@
   "The ones I couldn't answer: {list}.",
   "I got stuck on these: {list}.",
   "Questions I couldn't answer: {list}. Teach me, Commander."
+ ],
+ "people_learned": [
+  "Got it. {name}, your {relation}.",
+  "Noted. {name} is your {relation}.",
+  "Right, {name}, your {relation}. I'll remember.",
+  "Nice. {name}, your {relation}. Filed away."
+ ],
+ "people_learned_place": [
+  "Got it. {name}, your {relation}, from {place}.",
+  "Noted. {name} is your {relation}, and lives in {place}.",
+  "Right, {name} from {place}, your {relation}. I'll remember.",
+  "Nice. Your {relation} {name}, in {place}. Filed away."
+ ],
+ "people_known": [
+  "I know. {name}, your {relation}.",
+  "You told me. {name} is your {relation}.",
+  "Yes, {name}. Your {relation}."
+ ],
+ "people_who": [
+  "{name} is your {relation}.",
+  "That's your {relation}, {name}.",
+  "{name}. Your {relation}."
+ ],
+ "people_who_place": [
+  "{name} is your {relation}, from {place}.",
+  "That's your {relation} {name}, in {place}.",
+  "{name}. Your {relation}, from {place}."
+ ],
+ "people_where": [
+  "{name} is from {place}.",
+  "You said {name} is from {place}.",
+  "{place}. That's where {name} is from."
+ ],
+ "people_where_none": [
+  "You haven't told me where {name} is from.",
+  "I don't know where {name} is from. You didn't say."
+ ],
+ "people_all": [
+  "You've told me about {list}.",
+  "I know {list}.",
+  "So far: {list}."
+ ],
+ "people_none": [
+  "You haven't told me about anyone yet.",
+  "Nobody yet. Tell me about your friends."
+ ],
+ "people_forgot": [
+  "Forgotten. {name} is gone from my notes.",
+  "Done. I've forgotten {name}."
+ ],
+ "people_forgot_all": [
+  "All forgotten.",
+  "Done. I've forgotten everyone you told me about."
+ ],
+ "people_forgot_none": [
+  "There was nobody to forget."
  ]
 }

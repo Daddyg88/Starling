@@ -78,6 +78,7 @@ class App:
         self.learning = None
         self.trainer = None
         self.unanswered = None
+        self.people = None
         self.flavour = None
         from control.echo import Echo
         self.echo = Echo()
@@ -267,10 +268,12 @@ class App:
         self.lookup = OnlineLookup(self.settings, LearnedFacts(paths.DATA_DIR / "learned_facts.json"))
         from personality.unanswered import Unanswered
         self.unanswered = Unanswered(paths.DATA_DIR / "unanswered_questions.json")
+        from personality.people import People
+        self.people = People(paths.DATA_DIR / "people.json")
         self.llm = LocalLLM(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
                            facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit,
-                           profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered)
+                           profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered, people=self.people)
         return True
 
     def cpu_is_free(self):
@@ -493,6 +496,8 @@ class App:
     def forget_memories(self):
         if getattr(self, "profile", None) is not None:
             self.profile.clear()                 # what you told her about yourself goes too
+        if getattr(self, "people", None) is not None:
+            self.people.clear()                  # and the people you told her about
         if self.memory_store is None:
             return "Memory is not running."
         self.memory_store.forget_everything()

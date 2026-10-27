@@ -1003,3 +1003,8 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `voicepacks/default/more.json` (merged in `personality/dialogue.py`) adds wordings to the most-said keys; `MemoryStore.least_mentioned(rest_hours=)` skips memories mentioned in the last `MemoryRecall.REST_HOURS` (6) hours.
 - `tts/speech_manager.py` logs `Said [event]: text` for every spoken line (first 160 characters), so repeats can be measured from `starling.log`.
 - `personality/unanswered.py`: counts the questions she answered with "I don't know" in `data/unanswered_questions.json` (gitignored). "What couldn't you answer?" reads the top three (`Brain._unanswered_report`).
+
+## 0.74.0 - follow-ups and the address book
+- `personality/context.py`: `piece_of` finds a sentence that is only part of a question ("and spain", "no i meant vienna"), `rewrite` puts it into the question before (after the last " in/of/for/at/to/is ", or swaps the first number). `Brain._follow_context` uses the last `Know` entry in `history` (within `TOPIC_SECONDS`) and only speaks if `_know_first`/`_know` can answer the rebuilt question.
+- `personality/people.py`: friends and family in `data/people.json` (gitignored). `Brain._people_turn` runs first for deliberate speech; wording is in `config/knowledge/style.json` (`people_*`). Names must start with a capital letter in the original text. `App.forget_memories` clears it.
+- Not done: "and the other one?" (no way to know which one), and corrections of profile facts.
