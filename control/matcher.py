@@ -174,6 +174,8 @@ class Matcher:
         than two words. Returns the repaired sentence, or None if nothing could be repaired.
         """
         words = clean.split()
+        if len(words) < 2:
+            return None          # one word on its own is far too easy to confuse: a pet's name ("Oli") must never become "heal"
         repaired, changed = [], 0
         for word in words:
             if word in self._vocab or len(word) < SOUND_MIN_LETTERS or word.isdigit():

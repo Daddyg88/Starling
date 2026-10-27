@@ -131,3 +131,13 @@ class Models(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OneWordTests(unittest.TestCase):
+    def test_a_name_on_its_own_is_never_repaired_into_a_command(self):
+        from control.matcher import Matcher
+        matcher = Matcher()
+        for name in ("Oli", "Ali", "Milo", "Rex"):
+            self.assertIsNone(matcher.match(name), name)
+            self.assertIsNone(matcher.suggest(name), name)
+        self.assertIsNotNone(matcher.match("opun the galaxy map"))

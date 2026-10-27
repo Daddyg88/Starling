@@ -962,3 +962,6 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - Setting `llm.enabled` (default off). `llm.model_file` can point at any chat GGUF; `llm.threads`, `llm.max_seconds` (default 8) cap the cost.
 - Used only inside `Brain._free_chat`, after the crisis check, the command-look check and her own sentence shapes ("do you like pizza"). Replies pass `clean_reply` (no emojis, links, leaks, loops, bad words unless mature is on; two sentences at most). Any problem or timeout = her normal template chat.
 - Tests use a fake model, so the real model, the Windows wheel and the download were NOT run here.
+
+## 0.67.1
+- `Matcher.sound_repair` now returns None for a one-word sentence (log showed 'Oli' -> heal, 'Milo' -> melee with the open microphone setting).
