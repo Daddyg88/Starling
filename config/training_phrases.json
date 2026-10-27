@@ -1,0 +1,28 @@
+{
+ "_help": "The phrases of the voice training session (stt/training.py). Each must be an exact, non-strict command phrase (a test checks).",
+ "phrases": [
+  "lower the landing gear",
+  "raise the landing gear",
+  "open the galaxy map",
+  "open the system map",
+  "turn on the lights",
+  "turn off the lights",
+  "deploy hardpoints",
+  "retract hardpoints",
+  "deploy cargo scoop",
+  "retract cargo scoop",
+  "boost",
+  "open the comms panel",
+  "open the navigation panel",
+  "set speed to zero",
+  "turn on night vision",
+  "turn on silent running",
+  "deploy heat sink",
+  "open the codex",
+  "fire chaff",
+  "turn on the flight assist",
+  "switch to analysis mode",
+  "switch to combat mode",
+  "open the contacts panel"
+ ]
+}

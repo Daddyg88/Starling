@@ -93,6 +93,7 @@ class CommandRunner:
         self.clock = clock
         self.sleep = sleep
         self.confirmer = Confirmer(clock)       # "did you mean...?"
+        self.trainer = None                     # stt/training.py: 'teach me your voice' (set by the app)
         self._last = {}
         self._clash_warned = set()
         self.last_outcomes: List[Outcome] = []
@@ -152,6 +153,12 @@ class CommandRunner:
         if not self.settings.get("commands.enabled", True):
             return
         data = event.data
+        if self.trainer is not None and self.trainer.active():      # voice training: every sentence is an answer, no name needed
+            try:
+                if self.trainer.hear((data.get("command") if data.get("wake") else data.get("text")) or ""):
+                    return
+            except Exception:
+                log.exception("Voice training failed")
         if self.confirmer.active():                 # she just asked "did you mean...?": a yes or a no needs no wake word
             answer = self.confirmer.answer((data.get("command") if data.get("wake") else data.get("text")) or "")
             if answer:

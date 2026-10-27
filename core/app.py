@@ -76,6 +76,7 @@ class App:
         self.voice_replies = None
         self.manners = None
         self.learning = None
+        self.trainer = None
         self.flavour = None
         from control.echo import Echo
         self.echo = Echo()
@@ -260,9 +261,11 @@ class App:
         self.merit = MeritFinder(self.settings)
         from memory.profile import PlayerProfile
         self.profile = PlayerProfile(paths.DATA_DIR / "player_profile.json", enabled=lambda: bool(self.settings.get("brain.profile", True)))
+        from personality.llm import LocalLLM
+        self.llm = LocalLLM(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
                            facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit,
-                           profile=self.profile)
+                           profile=self.profile, llm=self.llm)
         return True
 
     def cpu_is_free(self):
@@ -377,6 +380,13 @@ class App:
                     lambda: self.state, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
             except Exception:
                 self.log.exception("The biology overlay voice command could not start")
+            try:
+                from stt.training import VoiceTrainer, load_phrases
+                self.trainer = VoiceTrainer(load_phrases(), self.learning, self.commands._speak, self.settings)
+                self.commands.trainer = self.trainer
+                self.commands.extra_helpers.append(self.trainer)
+            except Exception:
+                self.log.exception("Voice training could not start")
             self.commands.attach()
             self._connect_auto_plot()
             if self.settings.get("voidcompass.enabled", True):

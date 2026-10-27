@@ -948,3 +948,17 @@ Honest limits: this is a clever set of pieces, not understanding. The remarks fi
 - When what she heard is close to a command but not close enough to run (for example "opn galaxi map" or "hyperspace jum") she asks "Did you mean galaxy map?" and waits 10 seconds. Say yes (no wake word needed) and she does it, and she remembers that this is how you say it (so next time it simply works). Say no and she drops it and does not ask that same thing again. Anything else cancels the question.
 - Big actions (jumping, supercruise) can now be offered this way too, and are only done after a clear yes. They are never remembered as shortcuts. Background talk without her name is never questioned. Switch: Controls page, "Ask 'did you mean...?' when unsure".
 Honest limits: typed tests only. The question appears only when the sentence is fairly close to a command; for a sentence that is nowhere near, she still says she did not catch it. Learning from a yes needs only one yes.
+
+
+## 0.67.0 - teach her your voice, and the optional small AI
+
+**Voice training** (`stt/training.py`, phrases in `config/training_phrases.json`, her lines in `voicepacks/default/training.json`)
+- "Starling, teach me your voice" starts it. Each heard sentence during the session is an answer (the runner checks `trainer.active()` first), so no wake word and no command runs.
+- Same as asked = fine. Close (difflib ratio 0.45 or more) = a mishearing: `VoiceLearning.note` is called twice at once so it is trusted immediately. Far = unclear, never learned.
+- Only exact, non-strict phrases are used (a test checks every phrase), so jumping and other big actions can never be learned this way.
+- "Starling, hearing report" writes `data/hearing_report.txt` (also written when a session ends). No game data in it.
+
+**Optional AI** (`personality/llm.py`, `core/model_download.py`, `run_install_chat_model.bat`)
+- Setting `llm.enabled` (default off). `llm.model_file` can point at any chat GGUF; `llm.threads`, `llm.max_seconds` (default 8) cap the cost.
+- Used only inside `Brain._free_chat`, after the crisis check, the command-look check and her own sentence shapes ("do you like pizza"). Replies pass `clean_reply` (no emojis, links, leaks, loops, bad words unless mature is on; two sentences at most). Any problem or timeout = her normal template chat.
+- Tests use a fake model, so the real model, the Windows wheel and the download were NOT run here.

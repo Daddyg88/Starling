@@ -115,6 +115,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "ships.json"))         # ship comments, favourite ship, welcome home
             self._merge(_read_json(self.pack_dir / "callouts.json"))      # glide, scoopable star, undiscovered system, jumps left
             self._merge(_read_json(self.pack_dir / "exobiology.json"))    # guesses what lives on a planet and what it is worth
+            self._merge(_read_json(self.pack_dir / "training.json"))      # the voice training session
             self._merge(_read_json(self.pack_dir / "variety.json"))       # long-session variety: jet cone boosts, neutron and white dwarf jumps
             self._merge(_read_json(self.pack_dir / "progress.json"))      # milestones, codex progress, the one-of-a-kind species
             self._merge(_read_json(self.pack_dir / "planets.json"))       # green gas giants, gas giants with life, rare giants

@@ -1,0 +1,32 @@
+{
+ "_help": "Voice training and the hearing report (stt/training.py). {n} {total} {phrase} {where} {ok} {fixed} {unclear}.",
+ "Training_Start": [
+  "Okay, let's train your voice. I'll give you {total} phrases. Say each one, naturally, the way you normally would. Say stop at any time.",
+  "Voice training. {total} short phrases, one at a time. Speak normally, no need to say my name. Say stop to quit."
+ ],
+ "Training_Prompt": [
+  "Number {n}. Say: {phrase}.",
+  "{n} of {total}. {phrase}.",
+  "Next, {n}. Say: {phrase}.",
+  "Say: {phrase}."
+ ],
+ "Training_Skip": [
+  "Skipping that one.",
+  "No problem, next."
+ ],
+ "Training_Done": [
+  "That's all of them. I understood {ok} straight away, learned {fixed} of your own ways of saying things, and {unclear} I couldn't make out. I saved a hearing report: {where}.",
+  "Finished. {ok} perfect, {fixed} learned, {unclear} unclear. The hearing report is saved: {where}."
+ ],
+ "Training_Cancel": [
+  "Okay, training stopped. Whatever I learned so far is kept.",
+  "Stopped. I kept what I'd learned."
+ ],
+ "Training_Expired": [
+  "Training timed out, so I stopped. Say teach me your voice whenever you like."
+ ],
+ "Training_Report": [
+  "I've saved a hearing report: {where}. It has what I heard against what you meant, nothing else.",
+  "Hearing report saved: {where}."
+ ]
+}

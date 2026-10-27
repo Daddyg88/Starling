@@ -417,6 +417,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="For 25 seconds after she asks you something you can answer without saying her name. Never runs commands"),
             Field("brain.profile", "She learns what you like (kept on this PC)", "toggle",
                   help="Say 'I love pizza' or 'my dog is called Rex' and she remembers. Say 'forget what you know about me' to wipe it. Never sent anywhere"),
+            Field("llm.enabled", "Small AI model for open chat (advanced, off)", "toggle",
+                  help="Optional. Runs a small model on this PC (no internet, nothing sent) for open conversation. Needs run_install_chat_model.bat first. Uses about 1 GB RAM while chatting. She falls back to her normal lines if it is slow"),
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.frequency", "How often she chats", "choice", CHITCHAT,

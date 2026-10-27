@@ -67,7 +67,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -82,6 +82,7 @@ class Brain:
         self.by_key = {item["key"]: item for item, _patterns in self.intents}
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
+        self.llm = llm               # personality/llm.py: optional small local AI model for open chat (off by default)
         self.profile = profile       # memory/profile.py: what you have told her about yourself (likes, pets...)
         self.topics = freechat.load_topics() if intents is None else freechat.Topics({})   # what a chatty sentence is about
         self.chat_until = 0.0        # free chat: until when you can answer her question without saying her name
@@ -263,6 +264,15 @@ class Brain:
             sent = 1
         parts, asked = [], False
         shaped = freechat.shape(tidy)
+        ai = None if shaped else self._ai_reply(tidy, words)
+        if ai:
+            self.chat_turns = turns
+            self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS
+            self.topic = ("Chat_Generic", self.clock())
+            reply = self._say(ai)
+            self._remember("Chat", tidy, reply)
+            log.info("Brain: AI chat reply to %r (exchange %d)", tidy, turns)
+            return reply
         if shaped:
             parts.append(shaped)
             asked = True
@@ -308,6 +318,27 @@ class Brain:
         self._remember("Chat", tidy, reply)
         log.info("Brain: free chat reply to %r (topic=%s, feeling=%d, exchange %d)", tidy, topic, sent, turns)
         return reply
+
+    def _ai_reply(self, tidy, words):
+        """The optional small local AI model. None unless it is switched on, ready and gave a clean answer."""
+        llm = self.llm
+        if llm is None or len(words) < 3:
+            return None
+        try:
+            if not llm.ready():
+                return None
+            state = self.state_provider()
+            likes = None
+            if self.profile is not None and self.settings.get("brain.profile", True):
+                likes = [str(x) for x in list(getattr(self.profile, "likes", []))[-5:]] or None
+            from personality.llm import build_messages
+            history = [(h[2], h[3]) for h in self._recent() if h[1] == "Chat"]
+            messages = build_messages(tidy, self.mood(), getattr(state, "system", "") or "", getattr(state, "ship_model", "") or "",
+                                      likes, history)
+            return llm.reply(messages, allow_mature=self._allow())
+        except Exception:
+            log.exception("The AI chat failed; using her normal chat lines")
+            return None
 
     # ---- answering ----
     def mood(self):
