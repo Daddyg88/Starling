@@ -906,3 +906,10 @@ A planet can have up to twelve biological signals. The list now shows up to twel
 ## 0.61.2: the overlay goes away when the game quits
 When the journal says the game is shutting down (the Shutdown line, written when you quit normally) the biology overlay disappears and she drops what she knew about the system. It comes back by itself once you load into the game again (login or a jump). The overlay is her only overlay window at the moment, so that is all of them.
 Honest limit: if Elite crashes or is killed, it never writes Shutdown, so the overlay stays until you load in again or leave the system. Tell me if you want her to also watch for the game's program closing.
+
+## 0.62.0: less repeating on long sessions
+- Jet cone boosts: the "Wheee / Woo" lines are removed. Every boost is still noticed (the neutron route follower needs that), but she only speaks on the first boost of a run, on the 10th, 25th, 50th, 75th and 100th (then every 25th, with the count in the line, for example "That's 25 boosts on this run"), and otherwise about one boost in five, from 40 plain lines. A run ends after 30 minutes without a boost. The lines are in voicepacks/default/variety.json (JetConeBoost, JetConeBoost_First, JetConeBoost_Milestone, plus Sarcastic and Close wordings).
+- Neutron and white dwarf jumps: 70 neutron lines (8 before) and 40 white dwarf lines (8 before), many short ones, so a run of 50+ neutron jumps does not repeat.
+- Her no-repeat memory used to remember at most the last 12 lines of a key. It now remembers up to three quarters of the pool (at most 60), so a big pool is used up before any line comes round again.
+- About 150 extra lines for the everyday events that had only 3 to 7 wordings: fuel scooping, supercruise in and out, approaching a planet, touchdown, liftoff, undocking, docking, landing gear, mass lock, honk, signals, codex, scans, map opened, system fully scanned.
+Honest limits: not heard in the game. Small pools that remain (for example warnings such as heat, low health, docking denied) are on purpose short and plain; tell me which lines you still hear too often and I will add more.

@@ -111,6 +111,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "ships.json"))         # ship comments, favourite ship, welcome home
             self._merge(_read_json(self.pack_dir / "callouts.json"))      # glide, scoopable star, undiscovered system, jumps left
             self._merge(_read_json(self.pack_dir / "exobiology.json"))    # guesses what lives on a planet and what it is worth
+            self._merge(_read_json(self.pack_dir / "variety.json"))       # long-session variety: jet cone boosts, neutron and white dwarf jumps
             self._merge(_read_json(self.pack_dir / "progress.json"))      # milestones, codex progress, the one-of-a-kind species
             self._merge(_read_json(self.pack_dir / "planets.json"))       # green gas giants, gas giants with life, rare giants
             self._merge(_read_json(self.pack_dir / "dssa.json"))          # "plot me a route to the nearest DSSA"
@@ -193,7 +194,7 @@ class DialogueManager:
         found = self.pool(key, mood, allow_mature, prefer_recorded)
         if not found:
             return None
-        size = max(3, min(12, len(found) // 2))              # big pools remember more, so a line is not heard again soon
+        size = max(3, min(60, int(len(found) * 0.75)))        # big pools remember more (three quarters of the pool), so a line is not heard again soon
         recent = self._recent.get(key)
         if recent is None or recent.maxlen != size:
             recent = self._recent[key] = deque(recent or (), maxlen=size)

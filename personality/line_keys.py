@@ -60,6 +60,11 @@ def _keys_for(event):
         return {"thargoid": ["ShipTargeted_Thargoid"], "ship": ["ShipTargeted_Ship"], "bounty": ["ShipTargeted_Bounty", "ShipTargeted_Wanted"],
                 "wanted": ["ShipTargeted_Wanted"]}.get(said, [])
 
+    if name == "JetConeBoost":
+        said = data.get("Announce")
+        return {"first": ["JetConeBoost_First", "JetConeBoost"], "milestone": ["JetConeBoost_Milestone"],
+                "plain": ["JetConeBoost"]}.get(said, [])
+
     if name == "ProspectedAsteroid":
         said = data.get("Announce")
         return ["Prospected_" + said.capitalize()] if said else []
