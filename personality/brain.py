@@ -23,6 +23,7 @@ from core.identity import personalise
 from core.logger import get_logger
 from core.ships import ship_name
 from mining import minerals
+from personality import freechat
 from personality.meaning import load_meaning
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
@@ -81,6 +82,10 @@ class Brain:
         self.by_key = {item["key"]: item for item, _patterns in self.intents}
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
+        self.topics = freechat.load_topics() if intents is None else freechat.Topics({})   # what a chatty sentence is about
+        self.chat_until = 0.0        # free chat: until when you can answer her question without saying her name
+        self.chat_turns = 0          # and how many exchanges the chat has had
+        self.command_vocab = None    # set of words her game commands use (so a garbled command is never answered with chat)
         self.clock = clock
         self.rng = rng or random.Random()
         self.now = now
@@ -101,12 +106,15 @@ class Brain:
         tidy = strip_address(clean(text))
         if not tidy:
             return None
+        if deliberate and freechat.is_crisis(tidy):
+            return self._say_pool("Chat_Concern", {})            # someone talking about hurting themselves gets care, never banter
         if self.waiting():
             reply = self._riddle_guess(tidy)
             if reply is not None:
                 return reply
         if not deliberate:
             return None
+        spoke_for = False                      # a follow-up ("tell me more") with nothing to follow up must not turn into chat
         for item, patterns in self.intents:
             for pattern in patterns:
                 found = pattern.search(tidy)
@@ -114,8 +122,12 @@ class Brain:
                     reply = self._answer(item, found, tidy)
                     if reply is not None:
                         return reply
+                    if item.get("kind") in FOLLOW_UPS + ("riddle_answer", "repeat", "recap"):
+                        spoke_for = True
                     break                      # that topic had nothing to say: try the next topic
-        return self._by_meaning(tidy)
+        if spoke_for:
+            return None
+        return self._by_meaning(tidy) or (self._free_chat(tidy) if deliberate else None)
 
     def _by_meaning(self, tidy):
         """No pattern fitted: is the sentence clearly a rephrasing of one of the chatty topics? (personality/meaning.py)"""
@@ -131,6 +143,95 @@ class Brain:
             return None
         log.info("Brain: %r understood by meaning as %s (%.2f)", tidy, item["key"], hit[1])
         return self._answer(item, None, tidy)
+
+    # ---- free chat (personality/freechat.py) ----
+    def in_conversation(self):
+        """True for a short while after she asked you something: you can answer without saying her name."""
+        return (self.clock() < self.chat_until and bool(self.settings.get("brain.chat_followups", True))
+                and bool(self.settings.get("brain.freechat", True)))
+
+    def chat_window_turn(self, text):
+        """Something said WITHOUT her name while she waits for an answer. Never a command. None = say nothing."""
+        if not self.in_conversation() or self.dialogue is None or not self.settings.get("brain.enabled", True):
+            return None
+        tidy = strip_address(clean(text))
+        words = freechat.words_of(tidy)
+        if not words or freechat.looks_like_command(words, self._vocab()):
+            return None
+        return self.try_handle(text, deliberate=True)
+
+    def _vocab(self):
+        if self.command_vocab is None:
+            try:
+                from control.matcher import Matcher
+                self.command_vocab = set(Matcher()._vocab)
+            except Exception:
+                log.exception("Could not load the command words for free chat")
+                self.command_vocab = set()
+        return self.command_vocab
+
+    SHORT_YES = {"yes", "yeah", "yep", "yup", "sure", "definitely", "absolutely", "ok", "okay", "fine", "good", "great", "lovely"}
+    SHORT_NO = {"no", "nope", "nah", "not really", "no thanks"}
+
+    def _free_chat(self, tidy):
+        """No pattern and no topic fitted: just talk. A reaction, sometimes your own words, a remark and a question back."""
+        if not self.settings.get("brain.freechat", True):
+            return None
+        answering = self.in_conversation()
+        words = freechat.words_of(tidy)
+        if len(words) < (1 if answering else freechat.MIN_WORDS):
+            return None
+        if freechat.looks_like_command(words, self._vocab()):
+            return None
+        turns = self.chat_turns + 1 if answering else 1
+        closing = turns > freechat.MAX_EXCHANGES
+        rng, topic = self.rng, self.topics.find(tidy)
+        sent = freechat.sentiment(words)
+        if len(words) <= 2 and tidy in self.SHORT_YES:
+            sent = 1
+        parts, asked = [], False
+        shaped = freechat.shape(tidy)
+        if shaped:
+            parts.append(shaped)
+            asked = True
+        elif freechat.is_question(words):
+            parts.append(("Chat_Question_Unknown", {}))
+            asked = True
+        else:
+            word = {1: "Pos", -1: "Neg", 0: "Neu"}[sent]
+            parts.append(("Chat_%s_%s" % ("Answer" if answering else "Ack", word), {}))
+            if len(words) >= freechat.LONG_WORDS and not answering:
+                parts[0] = ("Chat_Long", {})
+            elif freechat.can_reflect(words) and not answering and rng.random() < 0.5:
+                echo = freechat.flip(words)
+                parts.append(("Chat_Reflect", {"echo": echo, "Echo": echo[:1].upper() + echo[1:]}))
+            elif topic and rng.random() < (0.7 if sent >= 0 else 0.4):
+                parts.append(("Chat_%s_Own" % topic.capitalize(), {}))
+            elif rng.random() < 0.35:
+                parts.append(("Chat_Own_Generic", {}))
+            if not closing:
+                ask = "Chat_%s_Ask" % topic.capitalize() if topic and rng.random() < 0.8 else "Chat_Ask_Generic"
+                parts.append((ask, {}))
+                asked = True
+        if closing:
+            parts = parts[:2] if len(parts) > 2 else parts
+            parts.append(("Chat_Close", {}))
+            asked = False
+        texts = []
+        values = self._values()
+        for key, extra in parts:
+            text = self._format(key, dict(values, **extra))
+            if text:
+                texts.append(text)
+        if not texts:
+            return None
+        self.chat_turns = turns if asked else 0
+        self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS if asked else 0.0
+        self.topic = ("Chat_%s" % (topic.capitalize() if topic else "Generic"), self.clock())
+        reply = self._say("||".join(texts))
+        self._remember("Chat", tidy, reply)
+        log.info("Brain: free chat reply to %r (topic=%s, feeling=%d, exchange %d)", tidy, topic, sent, turns)
+        return reply
 
     # ---- answering ----
     def mood(self):

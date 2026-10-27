@@ -86,6 +86,9 @@ class Understanding(unittest.TestCase):
 
 
 class InTheBrain(Base):
+    def setUp(self):
+        super().setUp()
+        self.settings.set("brain.freechat", False)         # these tests are about meaning matching, not free chat
     def test_a_rephrased_question_is_answered(self):
         reply = self.ask("are you fond of me at all")
         self.assertTrue(reply)

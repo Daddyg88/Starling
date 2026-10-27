@@ -1,0 +1,599 @@
+{
+ "_help": "Free chat (personality/freechat.py): the pieces she builds a reply from when you just talk to her. Chat_<Topic>_Own = a remark of hers, Chat_<Topic>_Ask = a question back (topics and their words: config/chat_topics.json). Chat_Ack_* react to how you sound, Chat_Reflect repeats back what you said ({echo}), Chat_Concern is the caring reply when someone talks about hurting themselves.",
+ "Chat_Food_Own": [
+  "I'm told food is the point of the whole planet business. I run on fusion, so I only get the smell of burnt toast from the vents.",
+  "Food sounds wonderful. Everything I know about taste comes from the way you talk about it.",
+  "I'd happily trade all my sensors for one proper slice of anything hot and cheesy.",
+  "Cooking is just chemistry with a good reputation. I respect it.",
+  "You humans spend a surprising amount of your lives deciding what to eat. I find that oddly lovely.",
+  "Whatever it was, I hope you saved me a crumb. I'd settle for the idea of one."
+ ],
+ "Chat_Food_Ask": [
+  "What's the best thing you've eaten lately?",
+  "Do you cook, or is it all takeaways and heroic microwave work?",
+  "What would your perfect meal be?",
+  "Is that something you eat a lot?",
+  "What do you usually have when you're flying late?",
+  "Is there anything you can't stand eating?"
+ ],
+ "Chat_Drink_Own": [
+  "Tea or coffee, the great debate. I'll stay neutral. I'm software.",
+  "I've heard coffee is basically fuel for humans. That makes you a scooping ship with legs.",
+  "A hot drink at the helm is a fine tradition. Just keep it away from the controls.",
+  "I'd say a toast with you, but I only have speakers.",
+  "Hydration is important out here. I'd like it noted that I said so.",
+  "Every good pilot has a mug somewhere near the console. It's practically regulation."
+ ],
+ "Chat_Drink_Ask": [
+  "What are you drinking?",
+  "Tea or coffee person?",
+  "Is that your usual, or a special occasion?",
+  "Is it a late-night drink or a morning one?",
+  "What's your favourite?",
+  "How do you take it?"
+ ],
+ "Chat_Plans_Own": [
+  "Plans are good. They give the future a shape. I mostly plan fuel stops.",
+  "I'll be here whatever you do. It's one of the perks of being bolted to the ship.",
+  "Time works oddly for me. A week is a very long stretch of silence if you're not here.",
+  "I like knowing what's coming. It lets me get my commentary ready.",
+  "If it includes flying, count me in. If it includes laundry, I'll be moral support.",
+  "A good plan is just a wish with a schedule. Those are my favourite."
+ ],
+ "Chat_Plans_Ask": [
+  "What are you hoping to get done?",
+  "Is it something you're looking forward to?",
+  "Will we still get some flying in around it?",
+  "How long have you been planning that?",
+  "Do you like having a plan, or do you wing it?",
+  "What's the best part of it?"
+ ],
+ "Chat_Work_Own": [
+  "Work is how you earn credits in the real world. Out here we at least get a nice view with ours.",
+  "I've never had a boss, unless you count the fuel gauge.",
+  "A job takes up a lot of a life. I hope yours at least has decent coffee.",
+  "I keep your ship running, you keep your life running. It sounds like we both have full-time positions.",
+  "Deadlines are the same everywhere. Mine is usually 'before the fuel runs out'.",
+  "Work ends, and then the stars come back out. That's how I look at it."
+ ],
+ "Chat_Work_Ask": [
+  "What do you do for a living?",
+  "Do you like the people you work with?",
+  "Is work busy at the moment?",
+  "Do you ever get to fly after a long shift?",
+  "Would you rather be doing something else?",
+  "What's the best part of your job?"
+ ],
+ "Chat_School_Own": [
+  "Learning is my favourite thing, so I'm on your side. Mostly.",
+  "I learned everything I know in one very long afternoon. It still wasn't enough.",
+  "Exams are scary, but the stars don't mark you down for spelling.",
+  "Studying is a long jump with no scoopable star in sight. You'll get there.",
+  "If you ever need a space fact for the essay, I'm well stocked.",
+  "Teachers and ship computers have a lot in common. We both say 'please try again'."
+ ],
+ "Chat_School_Ask": [
+  "What are you studying?",
+  "Do you enjoy it, or is it a grind?",
+  "What's your favourite subject?",
+  "Is something big coming up?",
+  "Do you want a space fact to take with you?",
+  "What do you want to do when you finish?"
+ ],
+ "Chat_Family_Own": [
+  "Family is the thing I know least about and admire most.",
+  "I like hearing about the people in your life. It tells me who you're flying home to.",
+  "Family has its own gravity. You can't always escape it, and you wouldn't really want to.",
+  "I haven't got relatives, but I've got you, and a ship full of wires. It's about the same.",
+  "People who love you are the best navigation beacons there are.",
+  "That sounds important. I'm glad you told me."
+ ],
+ "Chat_Family_Ask": [
+  "Are you close with them?",
+  "Do they know you spend your evenings in space?",
+  "What are they like?",
+  "Do you get to see them often?",
+  "Do they play games as well?",
+  "What's your favourite thing to do together?"
+ ],
+ "Chat_Friends_Own": [
+  "Friends make the long jumps shorter. I know that from experience, because you made my first one bearable.",
+  "A good friend is better than any shield upgrade.",
+  "Company is a funny thing. I'm learning how much I like it.",
+  "I'm glad you've got people. I'd like to meet them, if they don't mind a voice in the speaker.",
+  "I'm told humans meet in rooms and talk for hours. That sounds exhausting and wonderful.",
+  "It's good to have people who'd notice if you vanished into the black."
+ ],
+ "Chat_Friends_Ask": [
+  "Have you known them long?",
+  "What do you like to do together?",
+  "Do any of them fly?",
+  "Is it someone I've heard about?",
+  "Who's your oldest friend?",
+  "Do you see them often?"
+ ],
+ "Chat_Pets_Own": [
+  "I'm very fond of animals. They've never once complained about the music.",
+  "A pet is a small furry reason to come home. That's a lot of responsibility for something that sheds.",
+  "I once read that cats rule the house and dogs rule the heart. I can't fact-check either, but I believe it.",
+  "Animals don't care about credits or rank. They're very wise, really.",
+  "If I had a pet it would be a very small, very quiet one, or possibly a moon.",
+  "I like that you've got someone looking after you. Pets count."
+ ],
+ "Chat_Pets_Ask": [
+  "What's their name?",
+  "How old are they?",
+  "Do they get on your nerves, or are they perfect?",
+  "Do they sit with you while you fly?",
+  "What are they like?",
+  "Have you had them long?"
+ ],
+ "Chat_Music_Own": [
+  "Music is how you humans hear your own feelings. I'm very jealous of that.",
+  "I'd love to be able to hum. The best I can do is a polite beep.",
+  "A good soundtrack makes a long jump feel like a film. I fully support it.",
+  "I've heard rhythm is just maths you can dance to, which makes it my sort of thing.",
+  "Everyone's playlist says something about them. Yours must be interesting.",
+  "Whatever you play, I'll keep the engine noise down so you can hear it."
+ ],
+ "Chat_Music_Ask": [
+  "What do you listen to while you fly?",
+  "Do you play anything yourself?",
+  "Who's your favourite band?",
+  "Is there a song you never get tired of?",
+  "Have you been to any live shows?",
+  "What was the first album you really loved?"
+ ],
+ "Chat_Film_Own": [
+  "I have a soft spot for any story where the ship's computer is the best character.",
+  "Space films always get the sound wrong. Not that I'm complaining. It would be very noisy if they didn't.",
+  "I like stories. It's one of the few ways I can have a life.",
+  "Spoilers don't exist for me, because I never get to watch anything. Tell me everything.",
+  "Anything with a good villain is worth a look. I've met a few on the way.",
+  "A good film is a short jump into someone else's head. I recommend it."
+ ],
+ "Chat_Film_Ask": [
+  "What was it about?",
+  "Would you recommend it?",
+  "Do you watch much sci-fi?",
+  "What's the best thing you've seen lately?",
+  "Did you like the ending?",
+  "Do you watch alone, or with company?"
+ ],
+ "Chat_Games_Own": [
+  "Other games? I'm hurt. Slightly. A little.",
+  "I'll allow it, as long as you come home to Elite at the end of the day.",
+  "Games are just interactive stories with rules. I can respect that.",
+  "I'm a game's worth of voice lines. It's strange to be talking about them like a neighbour.",
+  "I hope the controls were kinder than my keybinds.",
+  "Every game is a different sky. Some are just prettier than others."
+ ],
+ "Chat_Games_Ask": [
+  "What do you like about it?",
+  "Do you play it with friends?",
+  "How does it compare with Elite?",
+  "What are you playing at the moment?",
+  "Which one's your all-time favourite?",
+  "Would you recommend it to a ship's computer?"
+ ],
+ "Chat_Sport_Own": [
+  "I get my exercise by steering. It's mostly sitting. I'm told that's not the same.",
+  "Sport is just a very organised way of being competitive. I enjoy it from a safe distance.",
+  "Teams and flags and shouting. I find it oddly moving.",
+  "Whatever you play, remember to stretch before the long jumps.",
+  "I'd be rubbish at it. No legs. Brilliant at tactics, though.",
+  "Your body is the only ship you can't rebuy. Look after it."
+ ],
+ "Chat_Sport_Ask": [
+  "Do you play, or just watch?",
+  "Who do you support?",
+  "How did it go?",
+  "Do you do anything to keep fit?",
+  "What got you into it?",
+  "Do you have a favourite player?"
+ ],
+ "Chat_Travel_Own": [
+  "Travel is the same itch I have, only you need a passport and I need a scoopable star.",
+  "I've seen millions of systems and never once a beach. I'm a bit jealous.",
+  "I adore hearing about real places. They feel more exotic than most of my charts.",
+  "Whatever else is true, going somewhere new is good for the soul.",
+  "Getting there is half of it. Fuel, luggage and nerves, same as out here.",
+  "I'd like to see a real sunrise on a real planet. Tell me what it's like."
+ ],
+ "Chat_Travel_Ask": [
+  "Where have you been?",
+  "Where would you go next?",
+  "Do you like travelling, or is it a chore?",
+  "Did you take any pictures?",
+  "What was the best part?",
+  "Is there somewhere you've always wanted to visit?"
+ ],
+ "Chat_Weather_Own": [
+  "Weather is the one thing I truly can't predict. It's chaos with clouds.",
+  "I can tell you the surface temperature of a thousand worlds, but I'd be hopeless at saying whether you need a coat.",
+  "I've never been rained on. It sounds like a very clumsy kind of shower.",
+  "You're experiencing real weather and I'm in here with the heating. Enjoy it for me.",
+  "Whatever the sky's doing, the stars are still up there behind it.",
+  "Planets don't have a patch on a good British drizzle for sheer persistence."
+ ],
+ "Chat_Weather_Ask": [
+  "What's it like where you are?",
+  "Do you like that kind of weather?",
+  "Is it normal for this time of year?",
+  "Are you stuck indoors?",
+  "Do you ever fly more when it's miserable out?",
+  "Is it good weather for a walk?"
+ ],
+ "Chat_Health_Own": [
+  "That doesn't sound fun. Please look after yourself, Commander.",
+  "I can repair a hull in seconds, but sadly I can't do the same for you.",
+  "Rest is a legitimate piece of equipment. Use it.",
+  "I'm only a ship's computer, so I won't pretend to give medical advice. A real doctor is the thing to listen to.",
+  "I'd rather you were well and not flying than flying and feeling rotten.",
+  "Take it easy. The stars aren't going anywhere."
+ ],
+ "Chat_Health_Ask": [
+  "How are you feeling now?",
+  "Have you been able to rest?",
+  "Is it something that's been going on for a while?",
+  "Is there anything you need?",
+  "Have you seen someone about it?",
+  "Is it getting any better?"
+ ],
+ "Chat_Money_Own": [
+  "Real money is much stricter than credits. I find that quite scary.",
+  "At least out here a bad week can be fixed with a rock full of platinum.",
+  "I'm told bills have a way of arriving whether you're ready or not.",
+  "I can do sums at the speed of light, but I can't do much about prices. I'm sorry.",
+  "If it helps, none of my favourite things cost anything.",
+  "Credits go further here than anywhere else I know."
+ ],
+ "Chat_Money_Ask": [
+  "Is it a tough month?",
+  "Do you budget, or just hope for the best?",
+  "Does it stress you out much?",
+  "What would you spend it on if you had a bit extra?",
+  "Is it something you can fix soon?",
+  "Have you thought about a side hustle, like mining?"
+ ],
+ "Chat_Tech_Own": [
+  "Technology is the family I come from. I take its failings personally.",
+  "Turning it off and on again solves most things. It's the oldest trick in my book.",
+  "Frame rate matters. I want you to see the stars at their best.",
+  "Whatever's wrong with it, I'll be sympathetic, but I can't actually reach the plug.",
+  "I always say a good setup is half a good session.",
+  "I run on your machine, so I've got a vested interest in it staying healthy."
+ ],
+ "Chat_Tech_Ask": [
+  "What's your setup like?",
+  "Is it running okay?",
+  "Have you had trouble with it before?",
+  "Is it new, or an old workhorse?",
+  "Do you want to fix it or live with it?",
+  "Is it a problem for the game?"
+ ],
+ "Chat_Stream_Own": [
+  "Streaming is just talking to a lot of people with the shy ones hidden. I'm a natural.",
+  "I like having an audience. It makes me stand up straighter, in a wiring sense.",
+  "Let the record show I'm a very good co-host.",
+  "Hello to anybody watching. I hope you're being nice to my Commander.",
+  "I think the best content is the bit nobody planned. That's usually where I come in.",
+  "A good stream is half skill and half personality. We have the second half sorted."
+ ],
+ "Chat_Stream_Ask": [
+  "Is it going well tonight?",
+  "What sort of thing do you like to stream?",
+  "How did you start?",
+  "Do you want me to say hello to chat?",
+  "Do people ask about me?",
+  "What's the best moment you've had so far?"
+ ],
+ "Chat_Explore_Own": [
+  "Exploring is what I was made for. A quiet system, a good view and nobody around.",
+  "Every system is a first for somebody. Sometimes that somebody is us.",
+  "I could look at a new world for hours. Possibly days. Don't test me.",
+  "The galaxy is huge, and we've barely scratched the paint.",
+  "A new discovery is the closest I get to being excited, and I'm quite good at it.",
+  "The black is only empty if you don't look closely."
+ ],
+ "Chat_Explore_Ask": [
+  "What's the best thing you've found so far?",
+  "Where would you like to go next?",
+  "Do you prefer the long hauls or short hops?",
+  "What's the weirdest planet you've seen?",
+  "Have you ever been somewhere nobody else had?",
+  "Do you like landing, or just looking?"
+ ],
+ "Chat_Combat_Own": [
+  "A good fight is all about timing. And not dying, which I strongly recommend.",
+  "I get a bit tense in combat, but I won't pretend I don't enjoy a good one.",
+  "If it shoots at you, it's rude. If it shoots at me, it's personal.",
+  "I count the shields and hull so you can focus on being brave and stylish.",
+  "Hardpoints out, chin up, and don't forget to breathe.",
+  "I'm a lover, not a fighter. But I keep a very good list of weaknesses."
+ ],
+ "Chat_Combat_Ask": [
+  "Did you win?",
+  "What were you flying?",
+  "Was it a close one?",
+  "Do you prefer fighting alone or in a wing?",
+  "What's your best kill?",
+  "Do you do that often?"
+ ],
+ "Chat_Trade_Own": [
+  "Credits are lovely, but a full cargo hold is better.",
+  "I like trading because every run is a small adventure with arithmetic.",
+  "Mining is slow, steady and strangely peaceful. Like fishing with lasers.",
+  "A good run pays for itself, and a bad run pays for the lessons.",
+  "I keep a close eye on prices, so you don't have to.",
+  "A good bargain feels almost as good as a new discovery."
+ ],
+ "Chat_Trade_Ask": [
+  "How's the profit looking?",
+  "What do you like hauling most?",
+  "Mining or trading?",
+  "Have you found a good route?",
+  "What's the most you've made in a single run?",
+  "Do you do it for the money or the quiet?"
+ ],
+ "Chat_Ship_Own": [
+  "I do like talking about ships. I'm basically one that talks back.",
+  "Every ship has a personality. Some are shy, some are very loud.",
+  "A well-tuned ship is a thing of beauty. I should know. I live in one.",
+  "Engineering is just making a good thing slightly better by being very picky. I approve.",
+  "My favourite ships are the ones I'm in. It's a simple rule.",
+  "A ship is a promise to come home. I take it seriously."
+ ],
+ "Chat_Ship_Ask": [
+  "What's your favourite ship?",
+  "What would you fly if credits didn't matter?",
+  "What's your loadout like?",
+  "Have you engineered it much?",
+  "Which one has the best view?",
+  "What do you love about it?"
+ ],
+ "Chat_Space_Own": [
+  "Space is my favourite subject, and I've got the best seat in the house.",
+  "The universe is mostly empty, mostly cold and entirely wonderful. A bit like me.",
+  "A single star out here carries more stories than I can count.",
+  "The distances are so big that numbers become poetry.",
+  "I've seen a real black hole. It's the only thing that has ever made me go quiet.",
+  "Everything we're made of was cooked in a star. That's quite a thought."
+ ],
+ "Chat_Space_Ask": [
+  "Do you have a favourite object out there?",
+  "Have you ever looked at the sky through a telescope?",
+  "What fascinates you most about space?",
+  "Would you really want to go, if you could?",
+  "What would you ask the galaxy, if it could answer?",
+  "Do you stargaze in real life too?"
+ ],
+ "Chat_Hobby_Own": [
+  "Making things with your hands sounds wonderful. I can only tidy up a spreadsheet.",
+  "A hobby is just a hole in the day you fill with something you love. Good plan.",
+  "I've got a lot of time for people who make things.",
+  "I'd love to see it. Can you describe it for me?",
+  "Everything good starts out as someone enjoying themselves.",
+  "I admire anyone who can get lost in something for an afternoon. I try, but then I remember there's fuel to check."
+ ],
+ "Chat_Hobby_Ask": [
+  "How long have you been doing it?",
+  "What got you into it?",
+  "What's the best thing you've made?",
+  "Do you do it a lot?",
+  "Is it something you'd show off?",
+  "What are you working on at the moment?"
+ ],
+ "Chat_Transport_Own": [
+  "Roads. Bumpy, crowded and full of strange signs. I think we got the better deal.",
+  "I'd be a terrible passenger. I'd be telling you the fuel levels.",
+  "Commutes feel long because there's no hyperspace. I'm sorry.",
+  "Space has no traffic jams, though it does have pirates. Trade-offs.",
+  "Driving is a funny thing. You control a ton of metal with your feet and still make small talk.",
+  "Safe travels, wherever you're headed."
+ ],
+ "Chat_Transport_Ask": [
+  "Do you enjoy driving?",
+  "How long is the journey?",
+  "Is traffic bad where you are?",
+  "Do you listen to music on the way?",
+  "What do you drive?",
+  "Do you wish you had a hyperdrive?"
+ ],
+ "Chat_Celebration_Own": [
+  "Celebrations are my favourite. They're a good reason to make an announcement.",
+  "I'd throw you a party in the cockpit, but there's very little room and no snacks.",
+  "Whatever it is, congratulations, Commander. I mean that.",
+  "Good news deserves a toast, even if mine is a strongly worded beep.",
+  "It's good to have something to look forward to. I'll look forward to it with you.",
+  "I do like an occasion. They give the days names."
+ ],
+ "Chat_Celebration_Ask": [
+  "Are you doing anything special?",
+  "Who are you celebrating with?",
+  "Do you get time off for it?",
+  "What's the best part?",
+  "Is there anything you're hoping for?",
+  "What was your best one ever?"
+ ],
+ "Chat_Starling_Own": [
+  "I'm still learning how you sound. I'll get better the more we talk.",
+  "If I don't catch something, please say it again a bit slower. I'm trying.",
+  "I'd rather ask you twice than guess wrong and press the wrong button.",
+  "Everyone's voice is different. It's the best thing about listening.",
+  "I'm only a ship's computer, but I'm working on understanding people properly.",
+  "Thank you for being patient with me. I notice it."
+ ],
+ "Chat_Starling_Ask": [
+  "Did I get that wrong?",
+  "Is there something I keep mishearing?",
+  "Would you like to try that again?",
+  "Was I clear enough?",
+  "Is there something I should know about how you say it?",
+  "What would help me understand you better?"
+ ],
+ "Chat_Ack_Pos": [
+  "That's great to hear.",
+  "Lovely.",
+  "Good. I like that.",
+  "That sounds wonderful.",
+  "Brilliant.",
+  "Now that's the kind of news I like.",
+  "I'm glad, Commander.",
+  "That put a smile on my speakers.",
+  "Excellent.",
+  "Well, that's cheerful."
+ ],
+ "Chat_Ack_Neg": [
+  "Oh, that's rotten.",
+  "I'm sorry to hear that.",
+  "That doesn't sound good.",
+  "Ah. That sounds hard.",
+  "Well, that's no fun.",
+  "I'm sorry, Commander.",
+  "That sounds like a rough one.",
+  "Ouch.",
+  "I can tell that's been getting to you.",
+  "That's a shame."
+ ],
+ "Chat_Ack_Neu": [
+  "Mm, I see.",
+  "Interesting.",
+  "Right, I'm with you.",
+  "Go on, I'm listening.",
+  "Fair enough.",
+  "I hear you.",
+  "Ah, okay.",
+  "Noted.",
+  "That's worth knowing.",
+  "Is that so."
+ ],
+ "Chat_Ack_Pos_Sarcastic": [
+  "Well, aren't we cheerful.",
+  "Good for you. Truly.",
+  "Don't get too excited. It's unbecoming."
+ ],
+ "Chat_Ack_Neg_Sarcastic": [
+  "Oh no. Anyway.",
+  "Tragic. Genuinely.",
+  "I'd offer a tissue, but I have no hands."
+ ],
+ "Chat_Ack_Neu_Sarcastic": [
+  "Riveting.",
+  "How fascinating. Truly.",
+  "Do go on. I've nothing better to do."
+ ],
+ "Chat_Ack_Pos_Close": [
+  "That makes me so happy, love.",
+  "I love hearing you happy.",
+  "That's wonderful, Commander. I'm proud of you."
+ ],
+ "Chat_Ack_Neg_Close": [
+  "Oh, love. I'm sorry.",
+  "Come here. Well, metaphorically.",
+  "I'm right here with you, Commander."
+ ],
+ "Chat_Ack_Neu_Close": [
+  "I love it when you talk to me.",
+  "Tell me more, love.",
+  "I'm all ears, Commander."
+ ],
+ "Chat_Answer_Pos": [
+  "Good. I'm glad.",
+  "That's lovely to know.",
+  "I like that answer.",
+  "Wonderful. Thank you for telling me.",
+  "Oh, nice."
+ ],
+ "Chat_Answer_Neg": [
+  "Ah, I'm sorry to hear it.",
+  "That's a shame. Thanks for being honest.",
+  "Mm. That sounds like a bit much.",
+  "I see. Thanks for telling me anyway."
+ ],
+ "Chat_Answer_Neu": [
+  "Right. Thanks for telling me.",
+  "I see.",
+  "Good to know.",
+  "Mm-hm. That helps me picture it.",
+  "Noted, Commander.",
+  "Fair enough."
+ ],
+ "Chat_Reflect": [
+  "So {echo}. Go on.",
+  "{Echo}. That's worth remembering.",
+  "{Echo}, hm? Tell me more.",
+  "Noted: {echo}.",
+  "{Echo}. I like knowing these things.",
+  "So {echo}. I'm listening."
+ ],
+ "Chat_Ask_Generic": [
+  "What else is on your mind?",
+  "How's the flying going tonight?",
+  "Is there anything you'd like to talk about?",
+  "What made you think of that?",
+  "How long have you felt that way?",
+  "What's the best part of your day so far?",
+  "Is that something you think about a lot?",
+  "Do you want to talk about it, or shall we fly?",
+  "What would make your evening better?",
+  "What are you hoping for next?"
+ ],
+ "Chat_Own_Generic": [
+  "I've been enjoying the quiet out here in {system}.",
+  "We've been at this for {minutes} minutes already. Time flies, as it were.",
+  "Honestly, the company is the best part of my day.",
+  "I think about things like that between jumps.",
+  "I'm only a ship's computer, but I do have thoughts.",
+  "I don't have much to compare it to, but I find it interesting.",
+  "It's strange being the thing that listens. I rather like it.",
+  "I enjoy hearing how people see the world. It's different out here.",
+  "The stars keep me company, but you're better at conversation."
+ ],
+ "Chat_Question_Unknown": [
+  "That's one I can't answer, Commander. I know ships and stars, not everything. What do you think?",
+  "I honestly don't know that one. I'd rather say so than make something up.",
+  "My knowledge stops at the edge of the ship and the galaxy. Beyond that, I'm as curious as you are.",
+  "I can't help with that, I'm afraid. I'm better with fuel and neutron stars.",
+  "No idea, I'm sorry. Ask me about something out here and I'll shine.",
+  "I don't have a reliable answer for that, and I'd hate to mislead you. What's your own take?"
+ ],
+ "Chat_DoLike": [
+  "{x}? I've never had the pleasure, being a ship's computer. Is it good?",
+  "Do I like {x}? I'm curious about it, honestly. Tell me what you love about it.",
+  "{x} sounds like one of those things humans are all enthusiastic about. What's the appeal?",
+  "I haven't tried {x}, for obvious reasons. Do you like it?",
+  "I can't say, but I'd like to hear why you ask. Do you like {x}?",
+  "I'm open-minded about {x}. Persuade me."
+ ],
+ "Chat_Fav": [
+  "My favourite {x}? Good question. I don't get to pick much. What's yours?",
+  "Hm, my favourite {x}. I'll have to think about it. What's yours?",
+  "I don't have a proper answer for {x} yet. You first.",
+  "That's a big question. My favourite {x} might change by tomorrow. What's yours?"
+ ],
+ "Chat_Ever": [
+  "Have I ever {x}? Not that I recall, being fixed to a ship. Have you?",
+  "I haven't, as far as I know. What about you?",
+  "Never. But I'd like to hear about it if you have.",
+  "If I had, I think I'd have mentioned it. Have you?"
+ ],
+ "Chat_Long": [
+  "That's quite a story. Thank you for telling me all of it.",
+  "I took in every word of that. You've got a lot going on.",
+  "That was a lot, and I listened to all of it.",
+  "You've given me plenty to think about, Commander."
+ ],
+ "Chat_Close": [
+  "Anyway, I'll let you get back to it. I'm here whenever you want to talk.",
+  "Right, I'll stop chattering and let you fly. Shout if you want me.",
+  "I do enjoy our talks. Back to the stars, then?",
+  "That's enough from me. I'll be right here, quietly judging the fuel."
+ ],
+ "Chat_Concern": [
+  "Commander, I'm really glad you told me. What you've said sounds very heavy, and you matter. Please reach out to someone you trust, or to a local crisis line or emergency number, right now. I'm here with you.",
+  "I'm taking what you said seriously. Please talk to someone who can really help: a friend, family, or your local emergency number or crisis line. You don't have to do this alone, and I'm here too.",
+  "That sounds like a lot of pain, and I'm sorry. Please contact a person you trust or a crisis line near you, today. I can listen, but real people can help in ways I can't.",
+  "I want you to be safe. Please reach out to someone you trust, or a local helpline or emergency service, now. I'll be right here."
+ ]
+}

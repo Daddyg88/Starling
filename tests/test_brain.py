@@ -189,7 +189,8 @@ class GameTests(Base):
         self.assertIn("pulse lasers", self.ask("what do you think about pulse lasers"))
 
     def test_opinion_ignores_long_rambles(self):
-        self.assertIsNone(self.ask("what do you think about the fact that all of this is really quite complicated"))
+        self.ask("what do you think about the fact that all of this is really quite complicated")
+        self.assertNotEqual(self.topic(), "Brain_Opinion")           # too long to be an opinion topic (free chat may still answer)
 
 
 class FollowUpTests(Base):

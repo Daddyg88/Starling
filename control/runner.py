@@ -151,6 +151,7 @@ class CommandRunner:
             return
         data = event.data
         if not self.addressed(data):
+            self._chat_window(data)
             return
         text = data.get("command") if data.get("wake") else data.get("text")
         if not normalise(text or ""):
@@ -160,6 +161,19 @@ class CommandRunner:
             return                      # a plain "thank you" is not a command; Manners answers it
         deliberate = bool(data.get("wake") or data.get("ptt"))
         self.run_text(text, speak_unknown=deliberate)
+
+    def _chat_window(self, data):
+        """She just asked a question: an answer without her name is chat, never a command (free chat window)."""
+        brain = self.brain
+        if brain is None or data.get("wake") or not brain.in_conversation():
+            return
+        text = data.get("text") or ""
+        if not text.strip() or self.matcher.match(text) is not None:
+            return                      # a real command needs her name; this one is ignored
+        try:
+            brain.chat_window_turn(text)
+        except Exception:
+            log.exception("The chat window failed")
 
     # ---- doing ----
     def run_text(self, text, speak_unknown=True, speak=True):
