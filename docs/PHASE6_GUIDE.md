@@ -999,3 +999,7 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `events/_signals.py` `ring_hotspots` / `ring_data` / `ring_once`: a body whose name ends in " Ring" with mineral signals (`SAASignalsFound`, also `FSSBodySignals`) gives `Hotspots`, `Total`, `Word`, `Summary`, `Favourite` (first mineral on the Mining page's favourites). `personality/line_keys.py` turns that into `RingHotspots_Favourite` / `RingHotspots` (lines in `voicepacks/default/rings.json`). A ring is said once even if the game repeats the event.
 - Written from knowledge of the journal format (ring signals are mineral names with a Count). It could not be tried against the real game here; if she says nothing after you map a ring, send the SAASignalsFound line for that ring from the journal.
 
+## 0.73.0 - less repetition, spoken-lines log, unanswered list
+- `voicepacks/default/more.json` (merged in `personality/dialogue.py`) adds wordings to the most-said keys; `MemoryStore.least_mentioned(rest_hours=)` skips memories mentioned in the last `MemoryRecall.REST_HOURS` (6) hours.
+- `tts/speech_manager.py` logs `Said [event]: text` for every spoken line (first 160 characters), so repeats can be measured from `starling.log`.
+- `personality/unanswered.py`: counts the questions she answered with "I don't know" in `data/unanswered_questions.json` (gitignored). "What couldn't you answer?" reads the top three (`Brain._unanswered_report`).

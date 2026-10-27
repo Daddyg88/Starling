@@ -16,6 +16,7 @@ FORGET_ALL = re.compile(r"\b(forget everything|forget all (of )?your memories|wi
 # the kinds of memory she may bring up by herself, in the order she likes them
 STORY_KINDS = ("record:longest_jump", "record:biggest_organic_sale", "record:biggest_exploration_sale",
                "death", "big_mission", "first_species")
+REST_HOURS = 6          # a memory she has just mentioned is left alone for this long (asking her "what do you remember" ignores it)
 SAYINGS = {"record:": "Memory_Record", "death": "Memory_Death", "big_mission": "Memory_Mission", "first_species": "Memory_First"}
 
 
@@ -57,7 +58,7 @@ class MemoryRecall:
         """One memory for the login greeting (the one she has mentioned least), or None."""
         if not (self.enabled() and self.settings.get("memory.recall_at_login", True)):
             return None
-        found = self.store.least_mentioned(STORY_KINDS, 1)
+        found = self.store.least_mentioned(STORY_KINDS, 1, rest_hours=REST_HOURS)       # not the one she brought up a moment ago
         if not found:
             return None
         memory = found[0]

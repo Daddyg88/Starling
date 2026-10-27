@@ -91,12 +91,19 @@ class MemoryStore:
     def count(self):
         return self.db.fetch_one("SELECT COUNT(*) AS n FROM memories")["n"]
 
-    def least_mentioned(self, kinds, limit=1):
-        """The memories of these kinds that she has talked about least (so she doesn't repeat herself)."""
+    def least_mentioned(self, kinds, limit=1, rest_hours=0):
+        """The memories of these kinds that she has talked about least (so she doesn't repeat herself).
+        rest_hours: leave out any memory she mentioned in the last so many hours."""
         marks = ",".join("?" for _ in kinds)
+        rest = ""
+        args = list(kinds)
+        if rest_hours and rest_hours > 0:
+            rest = " AND (last_mentioned_at IS NULL OR last_mentioned_at < datetime('now', ?))"
+            args.append("-%d minutes" % int(rest_hours * 60))
+        args.append(limit)
         return [dict(r) for r in self.db.fetch_all(
-            "SELECT * FROM memories WHERE memory_type IN (%s) ORDER BY times_mentioned ASC, importance DESC, id DESC LIMIT ?" % marks,
-            (*kinds, limit))]
+            "SELECT * FROM memories WHERE memory_type IN (%s)%s ORDER BY times_mentioned ASC, importance DESC, id DESC LIMIT ?" % (marks, rest),
+            tuple(args))]
 
     def mentioned(self, memory_id):
         self.db.execute("UPDATE memories SET times_mentioned = times_mentioned + 1, last_mentioned_at = CURRENT_TIMESTAMP "

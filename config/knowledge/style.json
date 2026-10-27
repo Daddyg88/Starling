@@ -87,5 +87,14 @@
   "And yours?",
   "What's yours?",
   "Your turn."
+ ],
+ "unanswered_none": [
+  "Nothing yet. I've answered everything you've asked.",
+  "Not a thing. Either I'm brilliant or you haven't tried hard enough."
+ ],
+ "unanswered_some": [
+  "The ones I couldn't answer: {list}.",
+  "I got stuck on these: {list}.",
+  "Questions I couldn't answer: {list}. Teach me, Commander."
  ]
 }

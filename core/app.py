@@ -77,6 +77,7 @@ class App:
         self.manners = None
         self.learning = None
         self.trainer = None
+        self.unanswered = None
         self.flavour = None
         from control.echo import Echo
         self.echo = Echo()
@@ -264,10 +265,12 @@ class App:
         from personality.llm import LocalLLM
         from personality.lookup import LearnedFacts, OnlineLookup
         self.lookup = OnlineLookup(self.settings, LearnedFacts(paths.DATA_DIR / "learned_facts.json"))
+        from personality.unanswered import Unanswered
+        self.unanswered = Unanswered(paths.DATA_DIR / "unanswered_questions.json")
         self.llm = LocalLLM(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
                            facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit,
-                           profile=self.profile, llm=self.llm, lookup=self.lookup)
+                           profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered)
         return True
 
     def cpu_is_free(self):

@@ -1,0 +1,141 @@
+{
+ "_help": "More lines for the call-outs she says most often (0.73.0), so the same few do not come round again and again. They are added to the lines she already has.",
+
+ "ScanOrganic_Log": [
+  "Sample one logged: {Species_Localised}.||Worth about {worth} credits.||Get {distance} metres away before the second.",
+  "{Species_Localised}, first sample taken.||That's around {worth} credits.||Next one needs {distance} metres of distance.",
+  "Got it. {Species_Localised}, one down.||Roughly {worth} credits.||Walk {distance} metres, then go again.",
+  "First sample of {Species_Localised} is in.||Valued at about {worth} credits.||Give it {distance} metres before the next sample.",
+  "One of three on {Species_Localised}.||About {worth} credits when it's done.||Keep {distance} metres between samples.",
+  "{Species_Localised}. First sample safe.||It should fetch around {worth} credits.||Move {distance} metres and take the second."
+ ],
+ "ScanOrganic_Sample": [
+  "Second one done: {Species_Localised}.",
+  "{Species_Localised}, sample two in the bag.",
+  "That's two samples of {Species_Localised}.",
+  "Halfway there. {Species_Localised}.",
+  "Two of three on {Species_Localised}. One more.",
+  "Sample two safe: {Species_Localised}. Nearly there.",
+  "{Species_Localised}, second sample logged. Almost done."
+ ],
+ "ScanOrganic_Third": [
+  "{Species_Localised}, the third and last sample.",
+  "Three out of three: {Species_Localised}.",
+  "That's all three samples of {Species_Localised}.",
+  "Last sample of {Species_Localised} taken.",
+  "Final sample is in. {Species_Localised}.",
+  "{Species_Localised}: sample three done. Analysing.",
+  "Third one collected. {Species_Localised}. That's the set."
+ ],
+ "ScanOrganic_Analyse": [
+  "{Species_Localised} is done.||You're holding {carried} credits of exobiology data.",
+  "All finished on {Species_Localised}.||That brings your unsold exobiology to {carried} credits.",
+  "{Species_Localised} fully scanned.||Carrying {carried} credits' worth of it now.",
+  "That's {Species_Localised} complete.||Your exobiology haul stands at {carried} credits.",
+  "Done with {Species_Localised}.||{carried} credits of data in the hold, so to speak.",
+  "{Species_Localised} analysed, Commander.||You have {carried} credits of exobiology waiting to be sold."
+ ],
+ "ScanOrganic_AnalyseNoValue": [
+  "{Species_Localised} is done.||I've no price for it yet, but I'll learn it when you sell.",
+  "All three samples of {Species_Localised}.||I don't know what it's worth yet. Sell it and I will.",
+  "Finished {Species_Localised}.||No price on that one yet. I'll pick it up from the sale."
+ ],
+ "ScanOrganic_SampleAbout": [
+  "Second sample done: {Species_Localised}.||{About}",
+  "Two samples of {Species_Localised}.||Here's a little about it.||{About}",
+  "Halfway on {Species_Localised}.||{About}"
+ ],
+ "BioRefined": [
+  "Scan finished on {Body}: {Found}. Right again. About {Worth} credits.",
+  "{Body} is {Found}, as I thought. Around {Worth} credits.",
+  "That's {Body} confirmed. {Found}, worth about {Worth} credits.",
+  "I called {Body} correctly: {Found}. Roughly {Worth} credits."
+ ],
+ "Memory_First_Login": [
+  "{memory}. I think about that more than I admit.",
+  "I haven't forgotten {memory}.",
+  "Do you remember {memory}? I do.",
+  "Sometimes I replay {memory}."
+ ],
+ "Memory_First_Ask": [
+  "{memory}. I'd happily do that again.",
+  "I still think about {memory}.",
+  "{memory}. One of my favourites."
+ ],
+ "Memory_Mission_Login": [
+  "{memory}. That was a proper payday.",
+  "I remember {memory}. We did well.",
+  "Nice work on that one: {memory}."
+ ],
+ "Memory_Record_Login": [
+  "{memory}. Still our best.",
+  "I'm still proud of {memory}.",
+  "That record, {memory}. Can we beat it?"
+ ],
+ "Memory_Death_Login": [
+  "{memory}. Let's not do that again.",
+  "I keep that one safe so we learn from it. {memory}.",
+  "Remember: {memory}. Fly carefully."
+ ],
+ "Chat_Question_Unknown": [
+  "You've got me there, Commander. I don't know that one.",
+  "That's beyond me. Ask me about the ship, the stars or Elite and I'm much better.",
+  "I'd be guessing, and I'd rather not. That's one I don't know.",
+  "I'm not sure. I'll leave it unsaid rather than get it wrong.",
+  "No answer for that one. Try the planets, the ships or the game itself.",
+  "I wish I knew. It isn't something I've learned yet."
+ ],
+ "Chat_Answer_Neu": [
+  "Okay, I'll remember that.",
+  "Thanks, that's useful.",
+  "Understood.",
+  "Alright, that's filed away.",
+  "Good to hear it from you.",
+  "That tells me a bit more about you."
+ ],
+ "Chat_Ack_Neu": [
+  "Hm, go on.",
+  "I see what you mean.",
+  "That's fair.",
+  "Right, right.",
+  "Interesting thought.",
+  "I'm following you."
+ ],
+ "VehicleChanged_OnFoot": [
+  "Feet on the ground.",
+  "Off the ship.",
+  "Heading out on foot.",
+  "Stay close, Commander.",
+  "Out you go.",
+  "Mind your step."
+ ],
+ "Scan_Terraformable": [
+  "Terraformable. That's one to note.",
+  "A terraformable world, Commander.",
+  "This one could be made habitable.",
+  "That's a terraformable planet. Worth remembering."
+ ],
+ "SystemMapOpened": [
+  "System map on screen.",
+  "Here's the system map.",
+  "Map's open."
+ ],
+ "CommandNotInGame": [
+  "Elite isn't in front, so I've pressed nothing.",
+  "I only press keys when Elite is the active window, Commander.",
+  "The game isn't the window in front. Click on it and ask again."
+ ],
+ "CommandUnknown": [
+  "I don't know that command yet, Commander.",
+  "Not one I recognise. Try it another way?",
+  "I heard you, but that isn't a command I have."
+ ],
+ "DssaLooking": [
+  "Looking for the closest DSSA carrier in {region}.",
+  "Checking where the nearest support carrier is in {region}."
+ ],
+ "DssaNear": [
+  "The closest is {carrier} in {system}, {distance} light years. I'm plotting it.",
+  "{carrier} in {system} is nearest at {distance} light years. Route going in."
+ ]
+}

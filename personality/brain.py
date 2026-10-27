@@ -29,6 +29,7 @@ from personality.knowledge import Knowledge, convert, maths
 from personality.meaning import load_meaning
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
+from personality.unanswered import ASK as ASK_UNANSWERED
 
 log = get_logger("brain")
 
@@ -69,7 +70,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -85,6 +86,7 @@ class Brain:
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
         self.knowledge = knowledge if knowledge is not None else (Knowledge() if intents is None else None)   # personality/knowledge.py
+        self.unanswered = unanswered  # personality/unanswered.py: the questions she could not answer, counted
         self.lookup = lookup         # personality/lookup.py: optional Wikipedia lookup for questions she cannot answer (off by default)
         self.llm = llm               # personality/llm.py: optional small local AI model for open chat (off by default)
         self.profile = profile       # memory/profile.py: what you have told her about yourself (likes, pets...)
@@ -127,6 +129,9 @@ class Brain:
         reply = self._know_first(tidy)
         if reply is not None:
             return reply
+        reply = self._unanswered_report(tidy)
+        if reply is not None:
+            return reply
         spoke_for = False                      # a follow-up ("tell me more") with nothing to follow up must not turn into chat
         for item, patterns in self.intents:
             for pattern in patterns:
@@ -141,6 +146,23 @@ class Brain:
         if spoke_for:
             return None
         return self._know(tidy, text) or self._by_meaning(tidy) or self._look_up(tidy) or (self._free_chat(tidy) if deliberate else None)
+
+    def _note_unanswered(self, tidy):
+        if self.unanswered is not None:
+            try:
+                self.unanswered.add(tidy)
+            except Exception:
+                log.exception("Could not note the unanswered question")
+
+    def _unanswered_report(self, tidy):
+        """'What couldn't you answer?' She reads out the three questions she has been asked most that she did not know."""
+        if self.unanswered is None or not ASK_UNANSWERED.search(tidy):
+            return None
+        top = self.unanswered.top(3)
+        if not top:
+            return self._say(self._style_pick("unanswered_none", "Nothing yet. I've answered everything you've asked."))
+        listed = "; ".join(top)
+        return self._say(self._style_pick("unanswered_some", "The ones I couldn't answer: {list}.").format(list=listed))
 
     def _know(self, tidy, raw):
         """Sums, conversions and facts she is SURE about (personality/knowledge.py). Nothing is ever guessed."""
@@ -244,6 +266,7 @@ class Brain:
                         text = self._style_pick("offline", "I can't reach the internet right now.")
                     elif result is None:
                         text = self._style_pick("not_found", "I couldn't find anything reliable on that.")
+                        self._note_unanswered(tidy)
                     else:
                         title, body = result
                         text = self._style_pick("found_" + kind, "{text}").format(title=title, text=body)
@@ -408,6 +431,7 @@ class Brain:
             asked = True
         elif freechat.is_question(words):
             parts.append(("Chat_Question_Unknown", {}))
+            self._note_unanswered(tidy)
             asked = True
         else:
             word = {1: "Pos", -1: "Neg", 0: "Neu"}[sent]

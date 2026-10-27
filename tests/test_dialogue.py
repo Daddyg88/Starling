@@ -301,7 +301,9 @@ class SpeakerTests(unittest.TestCase):
     def test_exobiology_analysis_complete(self):
         self.settings.set("personality.mood", "")
         self.speaker.on_event(self.event("ScanOrganic", ScanType="Analyse", Species_Localised="Bacterium", summary="x"))
-        self.assertIn("Analysis complete", self.speech.said[0]["text"])
+        text = self.speech.said[0]["text"]                  # several wordings now (more.json), all name the species
+        self.assertIn("Bacterium", text)
+        self.assertNotIn("{", text)
 
     def test_biological_signals_use_their_own_lines(self):
         self.speaker.on_event(self.event("SAASignalsFound", Biological=3, summary="x"))

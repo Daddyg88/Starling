@@ -196,6 +196,8 @@ class SpeechManager:
 
     def _speak(self, item):
         voice = VoiceSettings.from_settings(self.settings)
+        if item.text:
+            log.info("Said [%s]: %s", item.event_name or "?", item.text.replace("||", " ")[:160])     # so a log shows every line, for spotting repeats
         self._announce("speech.started", item)
         spoke = False
 
