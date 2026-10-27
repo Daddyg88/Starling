@@ -481,15 +481,30 @@
    "k": [
     [
      "when",
-     "did",
-     "humans",
-     "land",
+     "human",
      "moon"
     ],
     [
      "when",
      "moon",
      "landing"
+    ],
+    [
+     "when",
+     "first",
+     "land",
+     "moon"
+    ],
+    [
+     "when",
+     "human",
+     "land",
+     "moon"
+    ],
+    [
+     "when",
+     "apollo",
+     "11"
     ]
    ],
    "a": "The first Moon landing was on the twentieth of July 1969."

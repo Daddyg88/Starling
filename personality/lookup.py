@@ -148,7 +148,12 @@ def default_fetch(url):
 def tidy_extract(text):
     text = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", text or "")
     text = re.sub(r"\s+([.,;:!?])", r"\1", re.sub(r"\s+", " ", text)).strip()
-    return clean_reply(text, allow_mature=False)
+    text = clean_reply(text, allow_mature=False)
+    if text and len(text) > 200:                              # long answers take ages to speak: keep the first sentence if it is a real one
+        first = re.match(r"^.{40,}?[.!?](?=\s|$)", text)
+        if first:
+            text = first.group(0)
+    return text
 
 
 class OnlineLookup:

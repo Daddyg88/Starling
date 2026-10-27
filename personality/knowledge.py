@@ -23,7 +23,7 @@ from core.logger import get_logger
 log = get_logger("knowledge")
 
 QUESTION_START = {"what", "whats", "who", "whos", "where", "wheres", "when", "whens", "which", "how", "why", "is", "are", "does", "do", "can",
-                  "did", "was", "were", "name", "explain", "define", "describe", "tell", "give", "calculate", "work", "convert"}
+                  "did", "was", "were", "name", "explain", "define", "describe", "tell", "give", "calculate", "work", "convert", "find", "show", "recipe"}
 LEADS = ("do you know ", "can you tell me ", "could you tell me ", "tell me ", "i was wondering ", "quick question ", "just wondering ",
          "i wonder ", "hey ", "ok ", "okay ", "so ", "right ", "um ", "erm ", "uh ")
 SHORT_ANSWER_WORDS = 6
@@ -35,8 +35,14 @@ def stem(word):
     return word
 
 
+SAME_WORD = {"man": "human", "men": "human", "humans": "human", "people": "human", "person": "human", "astronaut": "human", "astronauts": "human",
+             "colour": "color", "colours": "color", "colors": "color", "centre": "center", "favourite": "favorite"}
+WHEN = re.compile(r"\b(?:what|which) (?:year|date|day)\b")
+
+
 def words_of(text):
-    return [stem(w) for w in re.findall(r"[a-z0-9]+", (text or "").lower().replace("'", ""))]
+    text = WHEN.sub("when", (text or "").lower().replace("'", ""))
+    return [SAME_WORD.get(w) or stem(w) for w in re.findall(r"[a-z0-9]+", text)]
 
 
 _ONES = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
@@ -101,9 +107,18 @@ def _num(text):
     return int(value) if value == int(value) and "." not in text else value
 
 
+BIG = {"thousand": 1e3, "million": 1e6, "billion": 1e9, "trillion": 1e12}
+BIG_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(thousand|million|billion|trillion)\b")
+
+
+def big_numbers(text):
+    """'1.6 billion' -> '1600000000'."""
+    return BIG_RE.sub(lambda m: str(int(round(float(m.group(1)) * BIG[m.group(2)]))), text)
+
+
 def maths(raw):
     """(sentence, None) or (None, 'zero') or None if this is not a sum."""
-    text = digits((raw or "").lower().replace(",", ""))
+    text = big_numbers(digits((raw or "").lower().replace(",", "")))
     text = re.sub(r"\s+", " ", text.replace("what's", "what is").replace("whats", "what is")).strip(" ?.!")
     if not re.search(r"\d", text):
         return None
@@ -179,7 +194,7 @@ def _temperature(value, src, dst):
 
 def convert(raw):
     """'convert 20 celsius to fahrenheit' -> '20 degrees Celsius is 68 degrees Fahrenheit', or None."""
-    text = digits((raw or "").lower().replace(",", ""))
+    text = big_numbers(digits((raw or "").lower().replace(",", "")))
     text = re.sub(r"\s+", " ", text).strip(" ?.!")
     value = src = dst = None
     found = CONVERT.search(text)
@@ -209,6 +224,7 @@ class Knowledge:
         self.languages, self.lang_words, self.lang_answers = {}, [], []
         self.style = {}
         self.capital_answers = []
+        self.zones, self.favourites = {}, {}
         if folder.is_dir():
             for path in sorted(folder.glob("*.json")):
                 try:
@@ -237,6 +253,10 @@ class Knowledge:
             self.lang_answers = data.get("answers", [])
         if "leads" in data:
             self.style = data
+        if "zones" in data:
+            self.zones = {k.lower(): v for k, v in data["zones"].items()}
+        if "favourites" in data:
+            self.favourites = {k.lower(): v for k, v in data["favourites"].items()}
 
     # ---- asking ----
     def looks_like_question(self, tidy):
@@ -309,3 +329,29 @@ class Knowledge:
             return None
         spoken = self.languages[lang][self.lang_words.index(word)]
         return (lang.title(), word, spoken)
+
+    # ---- the time somewhere else ----
+    TIME_IN = re.compile(r"\b(?:what(?:s| is) the time|what time is it|what time|time)\b.*?\bin (?:the )?(?P<place>[a-z ]+?)(?: right now| now| at the moment| today)?$")
+
+    def time_in(self, tidy, now=None):
+        """'what time is it in Australia' -> 'It's 02:17 in Sydney, Australia.' None if not that kind of question or place unknown.
+        Returns (text, True) when it was that kind of question, with text None if she cannot work it out."""
+        found = self.TIME_IN.search(tidy)
+        if not found:
+            return None
+        place = found.group("place").strip()
+        zone = next((self.zones[name] for name in sorted(self.zones, key=len, reverse=True) if place == name or place.endswith(" " + name)), None)
+        if zone is None:
+            return None, True
+        try:
+            from datetime import datetime
+            from zoneinfo import ZoneInfo
+            here = (now or datetime.now()).astimezone()
+            there = here.astimezone(ZoneInfo(zone["zone"]))
+        except Exception:
+            return None, True
+        day = "" if there.date() == here.date() else (" tomorrow" if there.date() > here.date() else " yesterday")
+        return "It's %s%s in %s." % (there.strftime("%H:%M"), day, zone["name"]), True
+
+    def favourite(self, thing):
+        return self.favourites.get((thing or "").strip().lower())

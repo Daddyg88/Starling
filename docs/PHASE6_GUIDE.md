@@ -978,3 +978,9 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - 'what is / who is' answers are saved to `data/learned_facts.json` (public text only). Copy good ones into `config/knowledge/*.json` to share them with everybody.
 - Lookups run on a background thread: she says 'let me look that up', then speaks the result. At most one per 8 seconds; a topic with no result is not retried for 10 minutes.
 - Tests use a fake Wikipedia. The real website was NOT reachable from the build machine, so the live response format is written from knowledge of the Wikipedia API and handled defensively.
+
+## 0.70.0 - fixes from the 27 October test log
+- `freechat.looks_like_command` ignores everyday words (`COMMON`) when counting command words. Before, 'where did you come from' counted you/come/from as command words and was dropped.
+- `knowledge.words_of`: 'what year/which date' = 'when'; man/men/people/person/astronaut = 'human'; colour = color.
+- `Knowledge.time_in` (zones in `config/knowledge/places.json`; needs `tzdata`, added to requirements.txt; without it she says she cannot work the time out) and `Knowledge.favourite`, both run BEFORE her general patterns (`Brain._know_first`), so 'what time is it in Australia' no longer gives the local time.
+- Recipes added to `cooking.json`; 'million/billion' in sums and conversions; Void Compass offline message throttled.

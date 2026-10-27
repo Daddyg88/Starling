@@ -16,3 +16,5 @@ numpy
 faster-whisper
 customtkinter>=5.2.2
 pillow>=10.0.0
+# Time zones ("what time is it in Australia"); Windows has no built-in time zone database
+tzdata

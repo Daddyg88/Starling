@@ -441,19 +441,27 @@
   {
    "k": [
     [
+     "who",
      "first",
-     "man",
-     "moon"
-    ],
-    [
-     "first",
-     "person",
+     "human",
      "moon"
     ],
     [
      "who",
      "walked",
      "moon"
+    ],
+    [
+     "name",
+     "first",
+     "human",
+     "moon"
+    ],
+    [
+     "first",
+     "human",
+     "moon",
+     "walk"
     ]
    ],
    "a": "Neil Armstrong was the first person on the Moon, in July 1969, on the Apollo 11 mission. Buzz Aldrin followed him."

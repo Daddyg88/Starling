@@ -31,7 +31,7 @@
   "That's {sum}.",
   "{sum}, Commander.",
   "Easy: {sum}.",
-  "I make it {sum}."
+  "{sum}. You're welcome."
  ],
  "maths_zero": [
   "I can't divide by zero, Commander. Nobody can.",
@@ -41,7 +41,7 @@
   "{sum}.",
   "That's {sum}.",
   "{sum}, Commander.",
-  "I make that {sum}."
+  "In other words, {sum}."
  ],
  "unknown_unit": [
   "I'm not sure how to convert that one."
@@ -77,5 +77,15 @@
  "forgot": [
   "Done. I've forgotten everything I looked up.",
   "Okay, I've wiped what I learned from the internet."
+ ],
+ "time_unknown": [
+  "I don't know that place's time zone yet, Commander.",
+  "I can't work out the time there, sorry."
+ ],
+ "favourite_ask": [
+  "What about you?",
+  "And yours?",
+  "What's yours?",
+  "Your turn."
  ]
 }

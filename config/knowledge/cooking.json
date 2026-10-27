@@ -591,6 +591,300 @@
     ]
    ],
    "a": "The Scoville scale measures how hot a chilli is. A jalapeño is a few thousand units, and the hottest are over two million."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "brownie"
+    ],
+    [
+     "make",
+     "brownie"
+    ],
+    [
+     "bake",
+     "brownie"
+    ]
+   ],
+   "a": "For brownies, melt 175 grams of butter with 200 grams of dark chocolate. Stir in 250 grams of sugar, then three eggs, then 100 grams of flour and a pinch of salt. Bake in a lined tin at 180 degrees Celsius for twenty to twenty five minutes. They should still wobble slightly in the middle."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "pancake"
+    ],
+    [
+     "make",
+     "pancake"
+    ]
+   ],
+   "a": "For pancakes, whisk 100 grams of flour, two eggs and 300 millilitres of milk into a smooth batter. Pour a thin layer into a hot, lightly oiled pan, cook until golden underneath, then flip. Lemon and sugar is the traditional topping."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "scrambled",
+     "egg"
+    ],
+    [
+     "make",
+     "scrambled",
+     "egg"
+    ]
+   ],
+   "a": "For scrambled eggs, beat three eggs with a pinch of salt. Melt a knob of butter in a pan on low heat, add the eggs and stir slowly until just set. Take them off while they still look a little wet, because they keep cooking."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "omelette"
+    ],
+    [
+     "make",
+     "omelette"
+    ],
+    [
+     "make",
+     "omelet"
+    ]
+   ],
+   "a": "For an omelette, beat two or three eggs with salt and pepper. Pour into a hot buttered pan, pull the edges inwards as it sets, add your filling, then fold it over and slide it onto a plate."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "chocolate",
+     "chip",
+     "cookie"
+    ],
+    [
+     "make",
+     "cookie"
+    ],
+    [
+     "recipe",
+     "cookie"
+    ]
+   ],
+   "a": "For cookies, cream 115 grams of butter with 100 grams of sugar and 100 grams of brown sugar. Beat in an egg, then mix in 190 grams of flour, half a teaspoon of baking soda and a pinch of salt, and fold in chocolate chips. Bake spoonfuls at 180 degrees Celsius for ten to twelve minutes."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "spaghetti",
+     "bolognese"
+    ],
+    [
+     "make",
+     "bolognese"
+    ],
+    [
+     "recipe",
+     "bolognese"
+    ]
+   ],
+   "a": "For bolognese, fry an onion, a carrot and some garlic, then brown 500 grams of beef mince. Add a tin of tomatoes, a spoonful of tomato puree and herbs, and simmer for at least forty five minutes. Serve over spaghetti with parmesan."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "mashed",
+     "potato"
+    ],
+    [
+     "make",
+     "mashed",
+     "potato"
+    ],
+    [
+     "make",
+     "mash"
+    ]
+   ],
+   "a": "For mashed potato, peel and cut potatoes and boil them in salted water until soft, about twenty minutes. Drain well, then mash with butter and a splash of warm milk, and season with salt and pepper."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "cheese",
+     "toast"
+    ],
+    [
+     "make",
+     "cheese",
+     "toast"
+    ]
+   ],
+   "a": "For cheese on toast, toast one side of the bread, pile grated cheese on the other side with a dash of Worcestershire sauce, and grill until it bubbles and browns."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "hot",
+     "chocolate"
+    ],
+    [
+     "make",
+     "hot",
+     "chocolate"
+    ]
+   ],
+   "a": "For hot chocolate, warm a mug of milk gently, whisk in two spoonfuls of cocoa and a spoonful of sugar, and don't let it boil. Marshmallows are not optional."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "guacamole"
+    ],
+    [
+     "make",
+     "guacamole"
+    ]
+   ],
+   "a": "For guacamole, mash two ripe avocados with lime juice, salt, finely chopped red onion, coriander and a little chilli. Taste and add more lime."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "pizza",
+     "dough"
+    ],
+    [
+     "make",
+     "pizza",
+     "dough"
+    ],
+    [
+     "recipe",
+     "pizza"
+    ],
+    [
+     "make",
+     "pizza"
+    ]
+   ],
+   "a": "For pizza dough, mix 500 grams of flour, a teaspoon of salt, a sachet of dried yeast and 300 millilitres of warm water. Knead for ten minutes, let it rise for an hour, then roll it thin, top it and bake as hot as your oven goes, for about ten minutes."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "mojito"
+    ],
+    [
+     "make",
+     "mojito"
+    ]
+   ],
+   "a": "For a mojito, muddle mint leaves with two teaspoons of sugar and the juice of a lime, add 50 millilitres of white rum and ice, top with soda water and stir."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "margarita"
+    ],
+    [
+     "make",
+     "margarita"
+    ]
+   ],
+   "a": "For a margarita, shake 50 millilitres of tequila, 25 of lime juice and 25 of orange liqueur with ice, and strain into a glass with a salted rim."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "old",
+     "fashioned"
+    ],
+    [
+     "make",
+     "old",
+     "fashioned"
+    ]
+   ],
+   "a": "For an old fashioned, stir a sugar cube with a few dashes of bitters, add 50 millilitres of bourbon and ice, stir until cold and finish with an orange peel."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "cocktail"
+    ],
+    [
+     "good",
+     "cocktail"
+    ],
+    [
+     "make",
+     "cocktail"
+    ],
+    [
+     "cocktail",
+     "recipe"
+    ]
+   ],
+   "a": "If you like it fresh, make a mojito. If you like it sharp, a margarita. If you like it strong, an old fashioned. Ask me for the recipe of any of those by name. Please enjoy responsibly, Commander."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "smoothie"
+    ],
+    [
+     "make",
+     "smoothie"
+    ]
+   ],
+   "a": "For a smoothie, blend a banana, a handful of berries, a cup of milk or yoghurt and a few ice cubes until smooth. Add a spoonful of honey if you want it sweeter."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "pasta",
+     "sauce"
+    ],
+    [
+     "make",
+     "tomato",
+     "sauce"
+    ],
+    [
+     "recipe",
+     "tomato",
+     "sauce"
+    ]
+   ],
+   "a": "For a simple tomato sauce, fry two cloves of garlic in olive oil, add a tin of chopped tomatoes, salt, and a pinch of sugar, and simmer for twenty minutes. Finish with fresh basil."
+  },
+  {
+   "k": [
+    [
+     "recipe",
+     "fried",
+     "rice"
+    ],
+    [
+     "make",
+     "fried",
+     "rice"
+    ]
+   ],
+   "a": "For fried rice, use cold cooked rice. Stir fry some vegetables and garlic in a hot pan, push them aside, scramble an egg, then add the rice and a splash of soy sauce and toss everything together."
   }
  ]
 }

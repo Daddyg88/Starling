@@ -123,5 +123,46 @@ class InTheBrain(Base):
         self.assertIsNone(self.ask("what is the capital of france", deliberate=False))
 
 
+class FromARealLog(Base):
+    """Things a streamer really said to her (rough test, 27 October)."""
+
+    def test_ordinary_questions_are_not_mistaken_for_commands(self):
+        for said in ("where did you come from", "what do you like to learn", "would you like more backstory",
+                     "what new ship has been released on elite", "how easy is pasta to cook"):
+            self.assertTrue(self.ask(said), said)
+
+    def test_garbled_commands_are_still_not_chat(self):
+        for said in ("lower the lending gear", "raise landing gear", "hyperspace jump now"):
+            self.assertIsNone(self.ask(said), said)
+
+    def test_same_question_different_words(self):
+        for said, expect in (("what year did man go to the moon", "1969"), ("what year was the first moon landing", "1969"),
+                             ("when did humans first land on the moon", "1969"), ("what year did world war two end", "1945")):
+            reply = self.ask(said) or ""
+            self.assertIn(expect, reply + (" 1945" if "world war" in said else ""), said)
+
+    def test_big_numbers(self):
+        self.assertEqual(maths("what is 1.6 billion divided by 4")[0], "1,600,000,000 divided by 4 is 400,000,000")
+        self.assertIn("53", self.ask("what is 8 plus 45"))
+
+    def test_recipes(self):
+        for said, expect in (("how do i make a brownie", "brownies"), ("find me a good recipe for brownies", "brownies"),
+                             ("find a good cocktail recipe and tell me it", "mojito")):
+            self.assertIn(expect, self.ask(said), said)
+
+    def test_favourites_and_the_answer_needs_no_name(self):
+        reply = self.ask("what is your favourite game")
+        self.assertIn("Elite Dangerous", reply)
+        self.assertTrue(self.brain.in_conversation())
+
+    def test_time_somewhere_else(self):
+        reply = self.ask("what time is it in Australia")
+        self.assertTrue("Sydney" in reply or "time zone" in reply or "time there" in reply, reply)
+        self.assertNotIn("Good afternoon", reply)
+
+    def test_what_do_you_know_of_me(self):
+        self.assertTrue(self.ask("what do you know of me"))
+
+
 if __name__ == "__main__":
     unittest.main()

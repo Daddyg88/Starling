@@ -98,13 +98,21 @@ def can_reflect(words):
     return words[0] in ("i", "im", "ive", "my", "id", "ill")
 
 
+# everyday words that happen to be in some command phrase ("what", "you", "from"...): they say nothing about whether a sentence is a command
+COMMON = set("""a about after again all also am an and any are as at be been before but by can come could did do does down for from get go going
+good got had has have he her here him his how i if in into is it its just know let like look make me more most much my new no not now of off on
+one or other our out over please said say see she should so some than that the their them then there these they thing think this those time to too
+two up us very was way we well were what when where which who why will with would yes you your yours tell find give want need take tried try use
+used who whose whom while yeah yep okay""".split())
+
+
 def looks_like_command(words, vocabulary=()):
     """A garbled game command ('lower the lending gear') must not be answered with chat."""
     if not words:
         return True
     if words[0] in COMMAND_OPENERS:
         return True
-    hits = sum(1 for w in words if len(w) >= 3 and w in vocabulary)
+    hits = sum(1 for w in words if len(w) >= 3 and w in vocabulary and w not in COMMON)
     return hits >= 2 and hits / len(words) >= 0.4          # mostly command words ("lower the lending gear"), not just a chatty sentence
 
 

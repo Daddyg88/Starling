@@ -124,6 +124,9 @@ class Brain:
                 return reply
         if not deliberate:
             return None
+        reply = self._know_first(tidy)
+        if reply is not None:
+            return reply
         spoke_for = False                      # a follow-up ("tell me more") with nothing to follow up must not turn into chat
         for item, patterns in self.intents:
             for pattern in patterns:
@@ -184,6 +187,33 @@ class Brain:
         except Exception:
             log.exception("Her knowledge failed; carrying on")
             return None
+
+    _FAVOURITE = re.compile(r"^(?:what(?:s| is)|tell me) your (?:favou?rite|fave) (?P<x>[a-z ]{2,24})$")
+
+    def _know_first(self, tidy):
+        """Things that must beat her general patterns: the time somewhere else, and her favourites."""
+        library = self.knowledge
+        if library is None or not self.settings.get("brain.knowledge", True):
+            return None
+        try:
+            elsewhere = library.time_in(tidy, self.now())
+            if elsewhere is not None:
+                text = elsewhere[0] or self._style_pick("time_unknown", "I can't work out the time there.")
+                reply = self._say(text)
+                self._remember("Know", tidy, reply)
+                return reply
+            found = self._FAVOURITE.match(tidy)
+            if found:
+                mine = library.favourite(found.group("x"))
+                if mine:
+                    reply = self._say(mine + " " + self._style_pick("favourite_ask", "What about you?"))
+                    self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS            # so your answer needs no name
+                    self.chat_turns = 1
+                    self._remember("Know", tidy, reply)
+                    return reply
+        except Exception:
+            log.exception("Her knowledge failed; carrying on")
+        return None
 
     def _style_pick(self, name, fallback):
         pool = (self.knowledge.style.get(name) if self.knowledge is not None else None) or [fallback]
@@ -251,7 +281,7 @@ class Brain:
         return self._answer(item, None, tidy)
 
     # ---- what you have told her about yourself (memory/profile.py) ----
-    _ASK_ALL = re.compile(r"^(?:what do you know about me|what have you learned about me|what did i tell you about myself|"
+    _ASK_ALL = re.compile(r"^(?:what do you know about me|what do you know of me|what can you tell me about me|do you know anything about me|what have you learned about me|what did i tell you about myself|"
                           r"what do you remember about me|what have i told you|tell me what you know about me|what do you know)$")
     _ASK_LIKES = re.compile(r"^(?:what do i (?:like|love|enjoy)|what things do i like|what am i into)$")
     _ASK_DISLIKES = re.compile(r"^(?:what do i (?:hate|dislike)|what dont i like|what things do i hate)$")

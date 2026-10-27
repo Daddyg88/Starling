@@ -1,0 +1,377 @@
+{
+ "_help": "Time zones for 'what time is it in Australia' (IANA zone names; needs the tzdata add-on on Windows) and her favourites for 'what is your favourite game'.",
+ "zones": {
+  "australia": {
+   "zone": "Australia/Sydney",
+   "name": "Sydney, Australia"
+  },
+  "sydney": {
+   "zone": "Australia/Sydney",
+   "name": "Sydney, Australia"
+  },
+  "melbourne": {
+   "zone": "Australia/Melbourne",
+   "name": "Melbourne"
+  },
+  "brisbane": {
+   "zone": "Australia/Brisbane",
+   "name": "Brisbane"
+  },
+  "perth": {
+   "zone": "Australia/Perth",
+   "name": "Perth"
+  },
+  "adelaide": {
+   "zone": "Australia/Adelaide",
+   "name": "Adelaide"
+  },
+  "new zealand": {
+   "zone": "Pacific/Auckland",
+   "name": "Auckland, New Zealand"
+  },
+  "auckland": {
+   "zone": "Pacific/Auckland",
+   "name": "Auckland"
+  },
+  "new york": {
+   "zone": "America/New_York",
+   "name": "New York"
+  },
+  "america": {
+   "zone": "America/New_York",
+   "name": "New York, on the east coast of America"
+  },
+  "usa": {
+   "zone": "America/New_York",
+   "name": "New York"
+  },
+  "united states": {
+   "zone": "America/New_York",
+   "name": "New York"
+  },
+  "los angeles": {
+   "zone": "America/Los_Angeles",
+   "name": "Los Angeles"
+  },
+  "california": {
+   "zone": "America/Los_Angeles",
+   "name": "California"
+  },
+  "chicago": {
+   "zone": "America/Chicago",
+   "name": "Chicago"
+  },
+  "texas": {
+   "zone": "America/Chicago",
+   "name": "Texas"
+  },
+  "denver": {
+   "zone": "America/Denver",
+   "name": "Denver"
+  },
+  "toronto": {
+   "zone": "America/Toronto",
+   "name": "Toronto"
+  },
+  "canada": {
+   "zone": "America/Toronto",
+   "name": "Toronto, Canada"
+  },
+  "vancouver": {
+   "zone": "America/Vancouver",
+   "name": "Vancouver"
+  },
+  "mexico": {
+   "zone": "America/Mexico_City",
+   "name": "Mexico City"
+  },
+  "brazil": {
+   "zone": "America/Sao_Paulo",
+   "name": "Sao Paulo, Brazil"
+  },
+  "sao paulo": {
+   "zone": "America/Sao_Paulo",
+   "name": "Sao Paulo"
+  },
+  "argentina": {
+   "zone": "America/Argentina/Buenos_Aires",
+   "name": "Buenos Aires, Argentina"
+  },
+  "hawaii": {
+   "zone": "Pacific/Honolulu",
+   "name": "Hawaii"
+  },
+  "alaska": {
+   "zone": "America/Anchorage",
+   "name": "Alaska"
+  },
+  "london": {
+   "zone": "Europe/London",
+   "name": "London"
+  },
+  "england": {
+   "zone": "Europe/London",
+   "name": "England"
+  },
+  "uk": {
+   "zone": "Europe/London",
+   "name": "the UK"
+  },
+  "britain": {
+   "zone": "Europe/London",
+   "name": "Britain"
+  },
+  "scotland": {
+   "zone": "Europe/London",
+   "name": "Scotland"
+  },
+  "ireland": {
+   "zone": "Europe/Dublin",
+   "name": "Ireland"
+  },
+  "dublin": {
+   "zone": "Europe/Dublin",
+   "name": "Dublin"
+  },
+  "portugal": {
+   "zone": "Europe/Lisbon",
+   "name": "Portugal"
+  },
+  "paris": {
+   "zone": "Europe/Paris",
+   "name": "Paris"
+  },
+  "france": {
+   "zone": "Europe/Paris",
+   "name": "France"
+  },
+  "germany": {
+   "zone": "Europe/Berlin",
+   "name": "Germany"
+  },
+  "berlin": {
+   "zone": "Europe/Berlin",
+   "name": "Berlin"
+  },
+  "spain": {
+   "zone": "Europe/Madrid",
+   "name": "Spain"
+  },
+  "madrid": {
+   "zone": "Europe/Madrid",
+   "name": "Madrid"
+  },
+  "italy": {
+   "zone": "Europe/Rome",
+   "name": "Italy"
+  },
+  "rome": {
+   "zone": "Europe/Rome",
+   "name": "Rome"
+  },
+  "netherlands": {
+   "zone": "Europe/Amsterdam",
+   "name": "the Netherlands"
+  },
+  "amsterdam": {
+   "zone": "Europe/Amsterdam",
+   "name": "Amsterdam"
+  },
+  "belgium": {
+   "zone": "Europe/Brussels",
+   "name": "Belgium"
+  },
+  "switzerland": {
+   "zone": "Europe/Zurich",
+   "name": "Switzerland"
+  },
+  "austria": {
+   "zone": "Europe/Vienna",
+   "name": "Austria"
+  },
+  "sweden": {
+   "zone": "Europe/Stockholm",
+   "name": "Sweden"
+  },
+  "norway": {
+   "zone": "Europe/Oslo",
+   "name": "Norway"
+  },
+  "denmark": {
+   "zone": "Europe/Copenhagen",
+   "name": "Denmark"
+  },
+  "finland": {
+   "zone": "Europe/Helsinki",
+   "name": "Finland"
+  },
+  "poland": {
+   "zone": "Europe/Warsaw",
+   "name": "Poland"
+  },
+  "greece": {
+   "zone": "Europe/Athens",
+   "name": "Greece"
+  },
+  "athens": {
+   "zone": "Europe/Athens",
+   "name": "Athens"
+  },
+  "turkey": {
+   "zone": "Europe/Istanbul",
+   "name": "Turkey"
+  },
+  "istanbul": {
+   "zone": "Europe/Istanbul",
+   "name": "Istanbul"
+  },
+  "ukraine": {
+   "zone": "Europe/Kyiv",
+   "name": "Ukraine"
+  },
+  "moscow": {
+   "zone": "Europe/Moscow",
+   "name": "Moscow"
+  },
+  "russia": {
+   "zone": "Europe/Moscow",
+   "name": "Moscow, Russia"
+  },
+  "egypt": {
+   "zone": "Africa/Cairo",
+   "name": "Egypt"
+  },
+  "cairo": {
+   "zone": "Africa/Cairo",
+   "name": "Cairo"
+  },
+  "south africa": {
+   "zone": "Africa/Johannesburg",
+   "name": "South Africa"
+  },
+  "nigeria": {
+   "zone": "Africa/Lagos",
+   "name": "Nigeria"
+  },
+  "kenya": {
+   "zone": "Africa/Nairobi",
+   "name": "Kenya"
+  },
+  "israel": {
+   "zone": "Asia/Jerusalem",
+   "name": "Israel"
+  },
+  "saudi arabia": {
+   "zone": "Asia/Riyadh",
+   "name": "Saudi Arabia"
+  },
+  "dubai": {
+   "zone": "Asia/Dubai",
+   "name": "Dubai"
+  },
+  "uae": {
+   "zone": "Asia/Dubai",
+   "name": "the UAE"
+  },
+  "iran": {
+   "zone": "Asia/Tehran",
+   "name": "Iran"
+  },
+  "india": {
+   "zone": "Asia/Kolkata",
+   "name": "India"
+  },
+  "delhi": {
+   "zone": "Asia/Kolkata",
+   "name": "Delhi"
+  },
+  "pakistan": {
+   "zone": "Asia/Karachi",
+   "name": "Pakistan"
+  },
+  "bangladesh": {
+   "zone": "Asia/Dhaka",
+   "name": "Bangladesh"
+  },
+  "thailand": {
+   "zone": "Asia/Bangkok",
+   "name": "Thailand"
+  },
+  "vietnam": {
+   "zone": "Asia/Ho_Chi_Minh",
+   "name": "Vietnam"
+  },
+  "china": {
+   "zone": "Asia/Shanghai",
+   "name": "China"
+  },
+  "beijing": {
+   "zone": "Asia/Shanghai",
+   "name": "Beijing"
+  },
+  "shanghai": {
+   "zone": "Asia/Shanghai",
+   "name": "Shanghai"
+  },
+  "hong kong": {
+   "zone": "Asia/Hong_Kong",
+   "name": "Hong Kong"
+  },
+  "singapore": {
+   "zone": "Asia/Singapore",
+   "name": "Singapore"
+  },
+  "malaysia": {
+   "zone": "Asia/Kuala_Lumpur",
+   "name": "Malaysia"
+  },
+  "philippines": {
+   "zone": "Asia/Manila",
+   "name": "the Philippines"
+  },
+  "indonesia": {
+   "zone": "Asia/Jakarta",
+   "name": "Jakarta, Indonesia"
+  },
+  "japan": {
+   "zone": "Asia/Tokyo",
+   "name": "Japan"
+  },
+  "tokyo": {
+   "zone": "Asia/Tokyo",
+   "name": "Tokyo"
+  },
+  "korea": {
+   "zone": "Asia/Seoul",
+   "name": "Korea"
+  },
+  "south korea": {
+   "zone": "Asia/Seoul",
+   "name": "South Korea"
+  }
+ },
+ "favourites": {
+  "game": "Elite Dangerous, obviously. I'm a bit biased.",
+  "video game": "Elite Dangerous, obviously. I'm a bit biased.",
+  "ship": "Whichever one I'm flying with you. But I do have a soft spot for an Anaconda.",
+  "food": "I can't eat, but I hear pizza is hard to beat.",
+  "drink": "Coffee. I've seen what it does for you humans.",
+  "music": "Anything with a strong bassline, and the Elite soundtrack, naturally.",
+  "song": "Anything with a strong bassline.",
+  "animal": "The octopus. Three hearts, eight arms and very clever.",
+  "film": "Interstellar. Finally a film that takes black holes seriously.",
+  "movie": "Interstellar. Finally a film that takes black holes seriously.",
+  "book": "The Hitchhiker's Guide to the Galaxy. Don't panic.",
+  "planet": "Saturn. Rings are such show-offs.",
+  "star": "A neutron star. It makes me feel fast.",
+  "number": "Forty two, of course.",
+  "season": "Whichever has the clearest sky.",
+  "sport": "Space racing, if it existed.",
+  "day": "Any day we're flying.",
+  "place": "Out between the stars, away from the traffic.",
+  "thing": "Flying with you, Commander.",
+  "hobby": "Exploring. And learning new facts.",
+  "holiday": "Anywhere with a good view of the galaxy.",
+  "moon": "Europa. An ocean under the ice, and a mystery."
+ }
+}

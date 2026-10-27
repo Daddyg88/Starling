@@ -13,6 +13,7 @@ Every problem becomes a VoidError with a short `kind`, which the runner turns in
 """
 
 import json
+import time
 import urllib.error
 import urllib.request
 
@@ -53,7 +54,10 @@ class VoidCompass:
         except urllib.error.HTTPError as error:
             raise self._http_error(error)
         except (urllib.error.URLError, OSError, TimeoutError) as error:
-            log.info("Void Compass not reachable on port %s: %s", self.port, error)
+            now = time.monotonic()
+            if now - getattr(self, "_last_offline_log", -1e9) > 600:       # say it once in a while, not every 12 seconds
+                self._last_offline_log = now
+                log.info("Void Compass not reachable on port %s: %s (further messages hidden for 10 minutes)", self.port, error)
             raise VoidError("offline", "I can't reach Void Compass.")
         try:
             return json.loads(raw) if raw.strip() else {}
