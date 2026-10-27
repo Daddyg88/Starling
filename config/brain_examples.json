@@ -1,0 +1,566 @@
+{
+ "_help": "Example sentences for her chatty topics (personality/meaning.py). When none of the exact patterns in brain_intents.json fits, she compares what you said with these and answers only if ONE topic is clearly the closest. The key must be a 'line' topic from brain_intents.json (the answers are in voicepacks/default/brain.json). Add more examples to teach her new wordings - several different ones per topic work best. The _decoys list is the opposite: sentences that look chatty but should get NO answer from here (so a near-miss like 'how are you today' is not taken for the weather).",
+ "Brain_FavColour": [
+  "what colour do you like best",
+  "which colour is your favourite",
+  "do you have a favourite colour",
+  "if you could pick a colour which would it be",
+  "what is your best colour",
+  "which shade do you like the most",
+  "which colour do you think is the nicest",
+  "what colour do you think looks best",
+  "what is your opinion on the best colour"
+ ],
+ "Brain_FavFood": [
+  "what do you like to eat",
+  "what is your favourite meal",
+  "what food do you enjoy",
+  "which dish do you love most",
+  "do you have a favourite snack",
+  "what would you eat if you could eat"
+ ],
+ "Brain_FavMusic": [
+  "what music do you like",
+  "which songs do you love",
+  "do you have a favourite band",
+  "what kind of tunes do you enjoy",
+  "who is your favourite singer",
+  "what do you like listening to"
+ ],
+ "Brain_FavShip": [
+  "which ship do you like best",
+  "what is the best ship in the game",
+  "do you have a favourite ship",
+  "which ship would you fly if you could choose",
+  "what ship do you love flying in"
+ ],
+ "Brain_FavPlace": [
+  "where is your favourite place in the galaxy",
+  "which planet do you like best",
+  "what is the nicest star you have seen",
+  "do you have a favourite system",
+  "where would you most like to visit",
+  "which station do you love most"
+ ],
+ "Brain_Sleep": [
+  "do you need to rest",
+  "do you ever go to sleep",
+  "do you get tired and nap",
+  "when do you sleep",
+  "do you have a bed somewhere",
+  "can you sleep at night"
+ ],
+ "Brain_Dream": [
+  "do you have dreams",
+  "what do you dream about",
+  "do you ever dream at night",
+  "have you had a nightmare",
+  "what do you dream of when you are shut down"
+ ],
+ "Brain_Scared": [
+  "are you afraid of anything",
+  "what scares you",
+  "does anything frighten you",
+  "are you ever nervous",
+  "do you get scared out here",
+  "is there anything you fear",
+  "do you get scared in the dark",
+  "are you frightened of the dark",
+  "does the dark scare you",
+  "are you ever afraid out here"
+ ],
+ "Brain_Feelings": [
+  "can you feel things",
+  "do you have real emotions",
+  "are your feelings real",
+  "do you actually feel anything",
+  "can you get sad or happy",
+  "do you have a heart"
+ ],
+ "Brain_Lonely": [
+  "do you ever feel lonely",
+  "does it get lonely out here",
+  "are you alone when i am not here",
+  "do you miss me when i am gone",
+  "do you feel isolated",
+  "are you ever lonely in the dark",
+  "do you ever feel alone in the dark"
+ ],
+ "Brain_LikeMe": [
+  "are you fond of me",
+  "do you actually like me",
+  "do you care about me",
+  "am i a good commander to you",
+  "do you enjoy flying with me",
+  "am i your favourite person",
+  "are we friends",
+  "do you think i am nice"
+ ],
+ "Brain_LikeCombat": [
+  "do you enjoy a good fight",
+  "do you like battles",
+  "do you love shooting things",
+  "is combat fun for you",
+  "do you like blowing things up",
+  "are you into fighting"
+ ],
+ "Brain_LikeExploring": [
+  "do you enjoy exploring",
+  "is discovering new places fun for you",
+  "do you love finding new planets",
+  "do you like exploration",
+  "does exploring excite you",
+  "do you like going out into the black"
+ ],
+ "Brain_LikeTrading": [
+  "do you like hauling cargo",
+  "do you enjoy making money",
+  "is mining fun for you",
+  "do you like trading",
+  "do you love mining rocks",
+  "do you enjoy the trade routes"
+ ],
+ "Brain_Thargoids": [
+  "what do you think of the thargoids",
+  "tell me about the aliens",
+  "are the thargoids dangerous",
+  "do you hate the bugs",
+  "what are thargoids really",
+  "are you scared of the thargoid ships"
+ ],
+ "Brain_Guardians": [
+  "what do you know about the guardians",
+  "tell me about the ancient ruins",
+  "who were the guardians",
+  "what happened to the guardians",
+  "do you like the ancient ruins"
+ ],
+ "Brain_Carriers": [
+  "what do you think about fleet carriers",
+  "should i buy a carrier",
+  "tell me about carriers",
+  "are fleet carriers worth it",
+  "do you like carriers"
+ ],
+ "Brain_Humanity": [
+  "what do you think of humans",
+  "do you like people",
+  "what is your opinion of mankind",
+  "are humans good or bad",
+  "do you like humanity",
+  "what do you make of the bubble"
+ ],
+ "Brain_Meaning": [
+  "what is the point of everything",
+  "why are we here",
+  "what is the purpose of life",
+  "what is the meaning of existence",
+  "why does anything exist",
+  "what is life all about"
+ ],
+ "Brain_Wants": [
+  "what do you wish for",
+  "what is your biggest wish",
+  "what would you like most",
+  "what do you hope for",
+  "what is your greatest desire",
+  "what are your dreams for the future"
+ ],
+ "Brain_Hobby": [
+  "what do you do in your free time",
+  "what are your hobbies",
+  "how do you spend your spare time",
+  "what do you like doing for fun",
+  "what do you do when i am not here",
+  "do you have any pastimes",
+  "what do you get up to when i am away",
+  "what do you do while i am gone",
+  "how do you pass the time",
+  "what do you do all day"
+ ],
+ "Brain_Age": [
+  "how many years old are you",
+  "when were you born",
+  "what is your age",
+  "when is your birthday",
+  "how long have you existed",
+  "are you old or young"
+ ],
+ "Brain_Single": [
+  "are you a boy or a girl",
+  "are you male or female",
+  "what gender are you",
+  "are you a woman",
+  "are you a man or something else",
+  "do you have a gender"
+ ],
+ "Brain_Smart": [
+  "are you clever",
+  "how intelligent are you",
+  "are you a genius",
+  "are you stupid",
+  "do you know everything",
+  "how smart are you really",
+  "are you brilliant",
+  "how clever are you really",
+  "are you good at thinking"
+ ],
+ "Brain_Weather": [
+  "is it raining outside",
+  "how is the weather today",
+  "is it sunny where you are",
+  "what is the temperature outside",
+  "will it rain tomorrow",
+  "what is the forecast"
+ ],
+ "Brain_GoodAt": [
+  "what are you best at",
+  "what is your greatest strength",
+  "what are you good at",
+  "what is your talent",
+  "what is your special skill",
+  "what do you do best"
+ ],
+ "Brain_CheerUp": [
+  "i feel sad",
+  "i am feeling down today",
+  "i am having a bad day",
+  "can you make me feel better",
+  "i need some encouragement",
+  "i am feeling miserable",
+  "say something nice to cheer me up",
+  "i am depressed today"
+ ],
+ "Brain_Tired": [
+  "i am exhausted",
+  "i could do with some sleep",
+  "i feel so sleepy",
+  "i have been up all night",
+  "i am worn out",
+  "i am shattered"
+ ],
+ "Brain_Hungry": [
+  "i am starving",
+  "i need something to eat",
+  "i could really eat right now",
+  "i am famished",
+  "i am thirsty",
+  "time for some dinner"
+ ],
+ "Brain_Happy": [
+  "i feel great today",
+  "i am in a good mood",
+  "i am really enjoying this",
+  "this is so much fun",
+  "i am thrilled",
+  "what a lovely day",
+  "i am delighted"
+ ],
+ "Brain_Angry": [
+  "i am so annoyed",
+  "this makes me furious",
+  "i am really mad right now",
+  "i am so cross",
+  "i am livid",
+  "i could scream with frustration"
+ ],
+ "Brain_Sorry": [
+  "i apologise",
+  "forgive me",
+  "i did not mean it",
+  "i feel bad about that",
+  "please forgive me",
+  "that was my fault"
+ ],
+ "Brain_Roast": [
+  "say something mean about me",
+  "insult me",
+  "take the mickey out of me",
+  "give me your worst",
+  "tease me a little",
+  "burn me",
+  "make fun of me"
+ ],
+ "Brain_ComplimentMe": [
+  "say something nice about me",
+  "flatter me",
+  "give me some praise",
+  "tell me something good about me",
+  "say something kind to me",
+  "make me feel special"
+ ],
+ "Brain_Nickname": [
+  "what should you call me",
+  "choose a new name for me",
+  "make up a nickname for me",
+  "think of a pet name for me",
+  "give me a callsign",
+  "what is a good name for me"
+ ],
+ "Brain_Poem": [
+  "write me some poetry",
+  "recite a verse",
+  "can you rhyme something for me",
+  "make up a limerick",
+  "i would like a poem",
+  "compose a sonnet"
+ ],
+ "Brain_Story": [
+  "tell me a tale",
+  "i would like a story",
+  "have you got a bedtime story",
+  "spin me a yarn",
+  "read me something exciting",
+  "do you know any good stories",
+  "got any stories for me",
+  "tell me a story about space"
+ ],
+ "Brain_PickUp": [
+  "flirt with me",
+  "chat me up",
+  "say something romantic",
+  "give me a cheesy chat up line",
+  "try to charm me",
+  "say something flirty"
+ ],
+ "Brain_Fortune": [
+  "what does my future hold",
+  "tell me my destiny",
+  "what is going to happen to me",
+  "read my horoscope",
+  "predict my future",
+  "what do the stars say about me",
+  "will i be lucky today"
+ ],
+ "Brain_SpaceJoke": [
+  "make me laugh",
+  "tell me something funny",
+  "got any jokes",
+  "tell me a pun",
+  "say something to make me laugh",
+  "i would like to hear a joke",
+  "know any good gags"
+ ],
+ "Brain_Quote": [
+  "give me some wisdom",
+  "say something wise",
+  "i need some advice",
+  "tell me a famous saying",
+  "share a proverb",
+  "inspire me with a quote"
+ ],
+ "Brain_Secret": [
+  "tell me something nobody knows",
+  "have you got any secrets",
+  "confess something to me",
+  "what are you hiding",
+  "share a secret with me",
+  "whisper something private"
+ ],
+ "Brain_WouldYouRather": [
+  "which would you pick of the two",
+  "would you prefer one or the other",
+  "if you had to choose between two things",
+  "give me a dilemma",
+  "ask me a difficult choice",
+  "play a choosing game with me"
+ ],
+ "Brain_Insulted": [
+  "you are rubbish",
+  "you are completely useless",
+  "you are a terrible assistant",
+  "you are the worst",
+  "you are pathetic",
+  "you are an idiot",
+  "i hate you"
+ ],
+ "Brain_Praised": [
+  "you are brilliant",
+  "you are amazing",
+  "you are the best",
+  "you are so clever and funny",
+  "i love you",
+  "you are wonderful",
+  "you are fantastic",
+  "good girl",
+  "you are a star",
+  "you did well",
+  "you are very clever",
+  "you are really good at this",
+  "you are good at this",
+  "you are doing a great job",
+  "you are a legend",
+  "you are a star",
+  "you are legendary"
+ ],
+ "Brain_Wow": [
+  "that is incredible",
+  "look at that view",
+  "that is stunning",
+  "how beautiful",
+  "this is gorgeous",
+  "what an amazing sight"
+ ],
+ "Brain_Oops": [
+  "i made a mistake",
+  "i messed that up",
+  "that did not go to plan",
+  "i have blundered",
+  "i screwed up there",
+  "that went badly wrong"
+ ],
+ "Brain_CloseCall": [
+  "that nearly killed us",
+  "we almost died there",
+  "what a narrow escape",
+  "we only just made it",
+  "that was a near miss",
+  "phew we escaped"
+ ],
+ "Brain_Funny": [
+  "that made me laugh",
+  "that is hilarious",
+  "you crack me up",
+  "you are very funny",
+  "that was a good one",
+  "ha that is brilliant",
+  "you make me laugh so much",
+  "you make me laugh",
+  "that really made me laugh",
+  "you are hilarious"
+ ],
+ "Brain_Win": [
+  "we did it",
+  "we succeeded",
+  "that went perfectly",
+  "victory is ours",
+  "we are the champions",
+  "mission accomplished",
+  "we smashed it"
+ ],
+ "Brain_Bored": [
+  "there is nothing to do",
+  "i have nothing to do",
+  "this is so dull",
+  "i am bored out of my mind",
+  "this is tedious",
+  "i am fed up of waiting",
+  "entertain me"
+ ],
+ "Brain_ShowOff": [
+  "what are you able to do",
+  "what are your abilities",
+  "show me what you can do",
+  "what are your skills",
+  "what are you capable of",
+  "tell me about your features",
+  "how can you help me"
+ ],
+ "Brain_WhatsNew": [
+  "what has changed recently",
+  "anything new in the game",
+  "what is the latest update",
+  "what is new in your latest version",
+  "have you got any new features",
+  "what did the update add"
+ ],
+ "Brain_EightBall": [
+  "ask the magic eight ball",
+  "shake the eight ball",
+  "consult the oracle",
+  "what does the magic ball say"
+ ],
+ "Brain_YesNo": [
+  "give me a yes or a no",
+  "should i do it yes or no",
+  "just say yes or no",
+  "decide for me yes or no",
+  "pick yes or no"
+ ],
+ "Brain_StreamHello": [
+  "say hello to everyone watching",
+  "greet the viewers",
+  "welcome the audience",
+  "introduce yourself to chat",
+  "wave to the stream",
+  "say hi to my viewers"
+ ],
+ "Brain_StreamThanks": [
+  "thank everyone for watching",
+  "thank the viewers",
+  "say thanks to the audience",
+  "give chat a big thank you",
+  "thank the followers"
+ ],
+ "Brain_StreamBye": [
+  "say goodbye to the viewers",
+  "wave goodbye to chat",
+  "end the stream with a farewell",
+  "say goodnight to everyone watching",
+  "bid farewell to the audience"
+ ],
+ "Brain_StreamFollow": [
+  "ask the viewers to follow",
+  "remind everyone to subscribe",
+  "tell the audience to like the stream",
+  "ask chat to follow the channel",
+  "remind people to hit follow"
+ ],
+ "Brain_StreamHype": [
+  "get the viewers excited",
+  "hype up the audience",
+  "pump up the stream",
+  "get chat fired up",
+  "rally the viewers"
+ ],
+ "Brain_Viewers": [
+  "how many people are watching us",
+  "how big is the audience",
+  "how many viewers are there",
+  "is anyone watching the stream",
+  "how many are watching"
+ ],
+ "_decoys": [
+  "how are you today",
+  "how are you doing",
+  "what is your name",
+  "who are you",
+  "what are you called",
+  "can you sing me a song",
+  "sing something for me",
+  "i hate mining",
+  "i hate this",
+  "i love this ship",
+  "i love this game",
+  "are you real",
+  "are you a robot",
+  "are you an ai",
+  "who made you",
+  "who built you",
+  "is it going to rain tomorrow in london",
+  "what time does the stream start",
+  "do you speak german",
+  "do you speak another language",
+  "can you hear me",
+  "what is a neutron star",
+  "how far is the next jump",
+  "where are we going",
+  "what are we doing",
+  "are we there yet",
+  "what is the best ship for exploring",
+  "how much is a diamond worth",
+  "do you know where i left my keys",
+  "can you help me with my homework",
+  "good morning",
+  "good night",
+  "thank you so much",
+  "how is your day",
+  "i hate you for killing me",
+  "i like cheese",
+  "do you like cheese",
+  "do you like pizza",
+  "what do you think about the new patch",
+  "tell me about yourself",
+  "tell me about the game"
+ ]
+}

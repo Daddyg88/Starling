@@ -23,6 +23,7 @@ from core.identity import personalise
 from core.logger import get_logger
 from core.ships import ship_name
 from mining import minerals
+from personality.meaning import load_meaning
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
 
@@ -31,6 +32,8 @@ log = get_logger("brain")
 TOPIC_SECONDS = 150.0          # how long "why?" and "tell me more" still refer to the last answer
 RIDDLE_SECONDS = 120.0
 FOLLOW_UPS = ("why", "more", "you", "really")
+HISTORY_SIZE = 6               # how many of the last answers she remembers (for "say that again", "what were we talking about")
+HISTORY_SECONDS = 900.0        # and for how long
 HARDPOINTS_BIT = 6
 
 
@@ -63,7 +66,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -75,6 +78,9 @@ class Brain:
         self.ask = ask               # personality/ask.py: asks 'the first one or the second one?' and 'shall I plot a route?'
         self.facts = facts
         self.intents = intents if intents is not None else load_intents()
+        self.by_key = {item["key"]: item for item, _patterns in self.intents}
+        self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
+        self.history = []            # [(time, key, what you said, what she said)], newest last
         self.clock = clock
         self.rng = rng or random.Random()
         self.now = now
@@ -109,7 +115,22 @@ class Brain:
                     if reply is not None:
                         return reply
                     break                      # that topic had nothing to say: try the next topic
-        return None
+        return self._by_meaning(tidy)
+
+    def _by_meaning(self, tidy):
+        """No pattern fitted: is the sentence clearly a rephrasing of one of the chatty topics? (personality/meaning.py)"""
+        if self.meaning is None:
+            return None
+        try:
+            hit = self.meaning.best(tidy)
+        except Exception:
+            log.exception("Meaning matching failed")
+            return None
+        item = self.by_key.get(hit[0]) if hit else None
+        if item is None or item.get("kind", "line") != "line":
+            return None
+        log.info("Brain: %r understood by meaning as %s (%.2f)", tidy, item["key"], hit[1])
+        return self._answer(item, None, tidy)
 
     # ---- answering ----
     def mood(self):
@@ -126,8 +147,51 @@ class Brain:
             return self._follow_up(kind)
         handler = getattr(self, "_do_" + kind, None)
         if handler is None:
-            return self._say_pool(key, {}, remember=True)
-        return handler(item, found, tidy)
+            reply = self._say_pool(key, {}, remember=True)
+        else:
+            reply = handler(item, found, tidy)
+        if reply and kind not in ("repeat", "recap"):
+            self._remember(key, tidy, reply)
+        return reply
+
+    # ---- the last few things said ----
+    def _remember(self, key, tidy, reply):
+        now = self.clock()
+        self.history = [h for h in self.history if now - h[0] < HISTORY_SECONDS][-(HISTORY_SIZE - 1):]
+        self.history.append((now, key, tidy, reply))
+
+    def _recent(self):
+        now = self.clock()
+        return [h for h in self.history if now - h[0] < HISTORY_SECONDS]
+
+    def _do_repeat(self, item, found, tidy):
+        """'Say that again' / 'what did you say'."""
+        recent = self._recent()
+        if not recent:
+            return self._say_pool("Brain_Repeat_Nothing", {})
+        return self._say(self._format("Brain_Repeat", {"last": recent[-1][3]}) or recent[-1][3])
+
+    @staticmethod
+    def topic_name(key):
+        """'Brain_FavColour' -> 'your favourite colour'; kept simple: split the capital letters."""
+        words = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", key.replace("Brain_", "")).lower().split()
+        words = ["favourite" if w == "fav" else w for w in words]
+        return " ".join(words)
+
+    def _do_recap(self, item, found, tidy):
+        """'What were we talking about?'"""
+        topics = []
+        for _t, key, _said, _reply in reversed(self._recent()):
+            name = self.topic_name(key)
+            if name not in topics:
+                topics.append(name)
+        if not topics:
+            return self._say_pool("Brain_Recap_None", {})
+        if len(topics) == 1:
+            listing = topics[0]
+        else:
+            listing = ", ".join(topics[:3][:-1]) + " and " + topics[:3][-1]
+        return self._say_pool("Brain_Recap", {"topics": listing})
 
     def _format(self, key, values, mood=None):
         """A line from the pool that she has every value for (None if there isn't one)."""

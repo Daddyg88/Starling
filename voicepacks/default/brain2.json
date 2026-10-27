@@ -1,0 +1,45 @@
+{
+ "_help": "Brain: 'say that again' and 'what were we talking about'.",
+ "Brain_Repeat": [
+  "Of course. {last}",
+  "I said: {last}",
+  "Once more, then. {last}",
+  "Happy to repeat it. {last}",
+  "Listen closely this time. {last}",
+  "{last}"
+ ],
+ "Brain_Repeat_Sarcastic": [
+  "Again? Fine. {last}",
+  "Pay attention this time. {last}",
+  "Since you ask so nicely. {last}"
+ ],
+ "Brain_Repeat_Close": [
+  "Of course, love. {last}",
+  "Let me say it again for you. {last}",
+  "Anything for you, Commander. {last}"
+ ],
+ "Brain_Repeat_Nothing": [
+  "I haven't said anything yet, Commander.",
+  "There's nothing to repeat. I've been quiet.",
+  "I'd happily repeat myself, but I haven't said a thing."
+ ],
+ "Brain_Recap": [
+  "We've been talking about {topics}.",
+  "Let me think. {topics}, mostly.",
+  "So far it's been {topics}.",
+  "You asked me about {topics}."
+ ],
+ "Brain_Recap_Sarcastic": [
+  "You really don't remember? {topics}. Keep up.",
+  "{topics}. Try to keep up, Commander."
+ ],
+ "Brain_Recap_Close": [
+  "We've been chatting about {topics}, love. I enjoyed it.",
+  "{topics}. I could talk to you about anything, you know."
+ ],
+ "Brain_Recap_None": [
+  "We haven't really talked about anything yet.",
+  "Nothing yet. Say something interesting, Commander.",
+  "We've only just started."
+ ]
+}
