@@ -1023,3 +1023,6 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `personality/smalltalk.py`: a plain name question no longer starts her back story; more ways to ask for another joke. `config/brain_intents.json` `Brain_Suggest`: "what shall we do", "where shall we go". `Brain._do_opinion`: "do you like it?" refers to her last answer (`Brain_OpinionIt` in `voicepacks/default/chat2.json`).
 - `personality/people.py` `greet`: "say hello to my wife Marie" (learns Marie), "say hello to my wife" (uses the wife she knows).
 - `tts/kokoro_tts.py` `split_sentences`: parts longer than 90 letters are made one sentence at a time, so speech starts after the first sentence.
+
+## 0.76.1 - ship wiki: more robust and easier to diagnose
+- `personality/lookup.py` `_wiki_intro`: after the MediaWiki extract and the Fandom abstract, a third fallback reads the page HTML (`action=parse`, `first_paragraph` skips boxes and tables). `_search_ship` logs what the search found and why a page was skipped (look for "Elite wiki:" in `starling.log`).

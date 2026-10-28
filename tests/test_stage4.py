@@ -141,3 +141,29 @@ class SentenceSplitTests(unittest.TestCase):
         self.assertGreaterEqual(len(parts), 2)
         self.assertEqual(" ".join(parts), long_text)                       # nothing lost, nothing added
         self.assertTrue(all(len(p) >= 25 for p in parts[:-1]))              # no tiny first piece
+
+
+class WikiFallbackTests(unittest.TestCase):
+    def test_reads_the_page_html_when_the_wiki_has_no_extracts(self):
+        from personality.lookup import first_paragraph
+        page = ("<aside class='infobox'><p>Manufacturer: Faulcon DeLacy and a lot of other infobox words here</p></aside>"
+                "<p>\n</p><p>The <b>Python</b> is a medium multipurpose ship built by Faulcon DeLacy &amp; popular with traders.</p>")
+        self.assertIn("Faulcon DeLacy & popular", first_paragraph(page))
+        self.assertNotIn("infobox", first_paragraph(page))
+        self.assertIsNone(first_paragraph("<p>short</p>"))
+
+    def test_ship_found_through_the_html_fallback(self):
+        from core.settings import Settings
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+
+        def fetch(url):
+            if "list=search" in url:
+                return {"query": {"search": [{"title": "Python"}]}}
+            if "action=parse" in url:
+                return {"parse": {"text": {"*": "<p>The Python is a medium multipurpose ship built by Faulcon DeLacy and loved by traders.</p>"}}}
+            return {"query": {"pages": {"-1": {"missing": ""}}}}                # no extracts, no abstract: the older ways fail
+
+        settings = Settings(Path(tmp.name) / "s.json").load()
+        look = OnlineLookup(settings, LearnedFacts(Path(tmp.name) / "l.json"), fetch=fetch, background=False)
+        self.assertIn("Faulcon", look.find("ship", "Python")[1])

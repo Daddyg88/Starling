@@ -16,6 +16,7 @@ sent; at most one lookup every 8 seconds; failed topics are not retried for 10 m
 the saved facts. data/ is private to your PC. The saved facts are plain public text, so you can send the file to be added
 to everyone's config/knowledge.
 """
+import html
 import json
 import math
 import os
@@ -153,6 +154,17 @@ def ship_in(tidy, names):
     return None
 
 
+def first_paragraph(page_html):
+    """The first real paragraph of a wiki page's HTML (the boxes, tables and scripts around it are skipped), as plain text."""
+    text = re.sub(r"(?is)<(script|style|aside|table|figure|sup)\b.*?</\1>", " ", page_html or "")
+    for paragraph in re.findall(r"(?is)<p\b[^>]*>(.*?)</p>", text):
+        plain = html.unescape(re.sub(r"(?s)<[^>]+>", "", paragraph))
+        plain = re.sub(r"\s+", " ", plain).strip()
+        if len(plain) >= 60:
+            return plain
+    return None
+
+
 def covers(wanted, title, extract):
     """Does the page really talk about the subject? 'green gas giant' must not be answered with 'Giant squid':
     at least 60 percent of the subject's words have to be in the title or the start of the article."""
@@ -175,7 +187,7 @@ def default_fetch(url):
             return None
         return json.loads(data.decode("utf-8"))
     except Exception as exc:
-        log.info("Lookup could not reach Wikipedia: %s", exc)
+        log.info("Lookup could not fetch %s: %s", url.split("?")[0], exc)
         return None
 
 
@@ -274,22 +286,27 @@ class OnlineLookup:
         query = urllib.parse.urlencode({"action": "query", "list": "search", "srsearch": name, "srlimit": 4, "format": "json", "srnamespace": 0})
         data = self.fetch("%s/api.php?%s" % (FANDOM, query))
         if data is None:
+            log.info("Elite wiki: could not reach %s (no answer to the search for %r)", FANDOM, name)
             return "offline"
         try:
             hits = data["query"]["search"]
         except (TypeError, KeyError):
+            log.info("Elite wiki: the search for %r came back in a shape I did not expect: %.200s", name, str(data))
             return None
+        titles = [str(hit.get("title", "")) for hit in hits]
+        log.info("Elite wiki: search for %r found %s", name, titles)
         first = norm_ship(name).split()[0]
-        for hit in hits:
-            title = str(hit.get("title", ""))
+        for title in titles:
             if not norm_ship(title).startswith(first) or ":" in title:
                 continue
             extract = self._wiki_intro(title)
             if not extract:
+                log.info("Elite wiki: found the page %r but could not read its first paragraph", title)
                 continue
             text = tidy_extract(extract)
             if text:
                 return title, text
+            log.info("Elite wiki: the first paragraph of %r was not usable: %.120s", title, extract)
         return None
 
     def _wiki_intro(self, title):
@@ -311,7 +328,13 @@ class OnlineLookup:
                     return item["abstract"]
         except (TypeError, KeyError, AttributeError):
             pass
-        return None
+        query = urllib.parse.urlencode({"action": "parse", "page": title, "prop": "text", "section": 0, "redirects": 1, "format": "json",
+                                        "disableeditsection": 1})
+        page = self.fetch("%s/api.php?%s" % (FANDOM, query))
+        try:
+            return first_paragraph(page["parse"]["text"]["*"])
+        except (TypeError, KeyError, AttributeError):
+            return None
 
     def _search(self, subject):
         query = urllib.parse.urlencode({"action": "query", "list": "search", "srsearch": subject, "srlimit": 3, "format": "json",
