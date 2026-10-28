@@ -1,0 +1,138 @@
+{
+ "_help": "How Starling answers questions about Elite ships (0.77.0). {ship} is the ship's name; the other words in {braces} are filled in from config/ships_specs.json. A line is only used when she has every value in it. 'heard_as' fixes ships the listening model often mishears.",
+
+ "heard_as": {
+  "crate": "krait", "krate": "krait", "krayt": "krait", "arconda": "anaconda", "amaconda": "anaconda", "an aconda": "anaconda",
+  "pie thon": "python", "pythin": "python", "doll fin": "dolphin", "dolfin": "dolphin", "doll thing": "dolphin", "ass": "asp",
+  "fur de lance": "fer de lance", "fair de lance": "fer de lance", "ferdelance": "fer de lance", "fer delance": "fer de lance",
+  "key lback": "keelback", "keel back": "keelback", "dimond back": "diamondback", "diamond back": "diamondback",
+  "side winder": "sidewinder", "hall er": "hauler", "holler": "hauler"
+ },
+
+ "cost": [
+  "The {ship} costs {cost}.",
+  "A {ship} will set you back {cost}.",
+  "{cost} for a {ship}."
+ ],
+ "cost_insurance": [
+  "The {ship} costs {cost}. The insurance is {insurance}.",
+  "A {ship} is {cost}, and the rebuy is {insurance}."
+ ],
+ "insurance": [
+  "The insurance on a {ship} is {insurance}.",
+  "If you lose a {ship}, the rebuy is {insurance}."
+ ],
+ "jump": [
+  "The {ship} jumps {jump_stock} light years as it comes, and {jump_best} fully upgraded.",
+  "{jump_stock} light years stock. {jump_best} once it is fully upgraded."
+ ],
+ "hardpoints": [
+  "The {ship} has {weapons} weapon hardpoints: {weapon_breakdown}. It also has {utility} utility mounts.",
+  "{weapons} hardpoints on the {ship}: {weapon_breakdown}. Plus {utility} utility mounts."
+ ],
+ "utility": [
+  "The {ship} has {utility} utility mounts.",
+  "{utility} utility mounts on the {ship}."
+ ],
+ "internal": [
+  "The {ship} has {internal_count} internal compartments: {internal_breakdown}.{reserved_sentence}",
+  "{internal_count} internal slots on the {ship}: {internal_breakdown}.{reserved_sentence}"
+ ],
+ "cargo": [
+  "The {ship} carries {cargo_stock} tonnes as it comes, and up to {cargo_max} tonnes fully fitted.",
+  "{cargo_max} tonnes at most on the {ship}. {cargo_stock} stock."
+ ],
+ "speed": [
+  "The {ship}'s top speed is {speed_stock} metres per second, or {speed_best} upgraded.",
+  "{speed_stock} metres per second stock, {speed_best} upgraded."
+ ],
+ "boost": [
+  "The {ship} boosts at {boost_stock} metres per second, or {boost_best} upgraded.",
+  "{boost_stock} metres per second on a boost, {boost_best} upgraded."
+ ],
+ "mass": [
+  "The {ship} has a hull mass of {mass} tonnes.",
+  "A {ship} weighs {mass} tonnes before you load it."
+ ],
+ "armour": [
+  "The {ship} has {armour} armour, with a hardness of {hardness}.",
+  "Armour on the {ship} is {armour}, hardness {hardness}."
+ ],
+ "shields": [
+  "The {ship} has {shields} megajoules of shield.",
+  "{shields} megajoules of shield on the {ship}."
+ ],
+ "fuel": [
+  "The {ship} holds {fuel} tonnes of fuel.",
+  "{fuel} tonnes of fuel in the {ship}."
+ ],
+ "manufacturer": [
+  "{manufacturer} makes the {ship}.",
+  "The {ship} is built by {manufacturer}."
+ ],
+ "pad": [
+  "The {ship} needs a {pad} landing pad.",
+  "It's a {pad} pad for the {ship}."
+ ],
+ "seats": [
+  "The {ship} has {seats} pilot seats. {multicrew_sentence}",
+  "{seats} seats on the {ship}. {multicrew_sentence}"
+ ],
+ "fighter": [
+  "{fighter_sentence}"
+ ],
+ "manoeuvre": [
+  "The {ship}'s manoeuvrability rating is {manoeuvrability}. The higher the number, the nimbler it is.",
+  "Manoeuvrability {manoeuvrability} for the {ship}. Higher means nimbler."
+ ],
+ "heat": [
+  "The {ship} has a heat capacity of {heat}.",
+  "Heat capacity on the {ship} is {heat}."
+ ],
+ "sco": [
+  "{sco_sentence}"
+ ],
+ "role": [
+  "The {ship} is a {role} ship.",
+  "{role}, mostly. That's the {ship}'s role."
+ ],
+ "year": [
+  "The {ship} has been built since {years_start}.",
+  "{years_start} is when the {ship} first came out."
+ ],
+ "dimensions": [
+  "The {ship} measures {dimensions}.",
+  "{dimensions}. That's the {ship}."
+ ],
+ "summary": [
+  "The {ship} is a {role} ship from {manufacturer}. It needs a {pad} pad, costs {cost}, jumps up to {jump_best} light years and carries up to {cargo_max} tonnes. It has {weapons} weapon hardpoints.",
+  "{ship}: {role}, built by {manufacturer}. {pad} landing pad, {cost}. Up to {jump_best} light years a jump, up to {cargo_max} tonnes of cargo, and {weapons} weapon hardpoints."
+ ],
+ "summary_more": [
+  "Ask me about its cost, jump range, hardpoints or cargo if you want more."
+ ],
+ "unknown": [
+  "I don't have that for the {ship}.",
+  "That one isn't in my notes for the {ship}."
+ ],
+ "count": [
+  "I have {count} ships in my notes, from the Sidewinder to the newest Odyssey ones.",
+  "{count} ships in my notes."
+ ],
+ "super_max": [
+  "{names[0]} leads with {values[0]}, then {names[1]} with {values[1]} and {names[2]} with {values[2]}."
+ ],
+ "super_min": [
+  "{names[0]} is lowest at {values[0]}, then {names[1]} at {values[1]} and {names[2]} at {values[2]}."
+ ],
+ "super_cost_max": [
+  "The most expensive is the {names[0]} at {values[0]}, then the {names[1]} at {values[1]} and the {names[2]} at {values[2]}."
+ ],
+ "super_cost_min": [
+  "The cheapest is the {names[0]} at {values[0]}, then the {names[1]} at {values[1]} and the {names[2]} at {values[2]}."
+ ],
+ "no_my_ship": [
+  "I don't know which ship you're in yet. Load into the game and ask me again.",
+  "I can't tell which ship you're flying right now."
+ ]
+}

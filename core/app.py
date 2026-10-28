@@ -271,11 +271,12 @@ class App:
         from personality.unanswered import Unanswered
         self.unanswered = Unanswered(paths.DATA_DIR / "unanswered_questions.json")
         from personality.people import People
+        from personality.ships_info import ShipInfo
         self.people = People(paths.DATA_DIR / "people.json")
         self.llm = LocalLLM(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
                            facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit,
-                           profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered, people=self.people)
+                           profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered, people=self.people, ships=ShipInfo())
         return True
 
     def cpu_is_free(self):

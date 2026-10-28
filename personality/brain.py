@@ -72,7 +72,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None, people=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None, people=None, ships=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -88,6 +88,8 @@ class Brain:
         self.meaning = meaning if meaning is not None else (load_meaning() if intents is None else None)   # rephrased questions
         self.history = []            # [(time, key, what you said, what she said)], newest last
         self.knowledge = knowledge if knowledge is not None else (Knowledge() if intents is None else None)   # personality/knowledge.py
+        self.ships = ships           # personality/ships_info.py: ship stats she knows offline
+        self.ship_topic = None       # (ship name, time) of the last ship she talked about
         self.people = people  # personality/people.py: friends and family she has been told about (private)
         self.unanswered = unanswered  # personality/unanswered.py: the questions she could not answer, counted
         self.lookup = lookup         # personality/lookup.py: optional Wikipedia lookup for questions she cannot answer (off by default)
@@ -137,6 +139,9 @@ class Brain:
         if reply is not None:
             return reply
         reply = self._unanswered_report(tidy)
+        if reply is not None:
+            return reply
+        reply = self._ship_turn(tidy)
         if reply is not None:
             return reply
         reply = self._follow_context(tidy)
@@ -205,6 +210,28 @@ class Brain:
             return reply
         except Exception:
             log.exception("The address book failed; carrying on")
+            return None
+
+    def _ship_turn(self, tidy):
+        """'How many hardpoints does the Anaconda have?', 'which ship has the biggest cargo?' (personality/ships_info.py)."""
+        if self.ships is None or not self.ships.available() or not self.settings.get("brain.knowledge", True):
+            return None
+        try:
+            now = self.clock()
+            last = self.ship_topic[0] if self.ship_topic and now - self.ship_topic[1] <= TOPIC_SECONDS else None
+            state = self._state()
+            current = ship_name(getattr(state, "ship", None)) if getattr(state, "ship", None) else None
+            found = self.ships.answer(tidy, current=current, last=last)
+            if found is None or not found[0]:
+                return None
+            text, ship = found
+            if ship:
+                self.ship_topic = (ship, now)
+            reply = self._say(text)
+            self._remember("Ship", tidy, reply)
+            return reply
+        except Exception:
+            log.exception("Ship notes failed; carrying on")
             return None
 
     def _follow_context(self, tidy):

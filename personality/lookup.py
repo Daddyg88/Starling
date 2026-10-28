@@ -104,6 +104,9 @@ class LearnedFacts:
             log.exception("Could not save the learned facts")
 
 
+JUNK_SUBJECT = {"the", "a", "an", "it", "that", "this", "to", "of", "and", "is", "in", "on", "for", "with", "some", "one", "my", "your", "you", "me", "them", "those", "these", "all", "about", "thing", "things", "stuff"}
+
+
 def subject_of(tidy):
     """('def' or 'detail', 'quasar') for a lookup-able question, or None. Personal or worrying questions are never lookup-able."""
     match = DEFINE.match(tidy)
@@ -123,6 +126,8 @@ def subject_of(tidy):
     words = subject.split()
     if not words or len(words) > MAX_SUBJECT_WORDS:
         return None
+    if len(subject) < 3 or all(w in JUNK_SUBJECT for w in words):
+        return None                                   # 'tell me about the' (the rest was not heard)
     if any(w in PERSONAL or w in BLOCKED for w in words) or any(w in BLOCKED for w in tidy.split()):
         return None
     if sum(c.isdigit() for c in subject) > 4 or freechat.is_crisis(tidy):
@@ -295,9 +300,10 @@ class OnlineLookup:
             return None
         titles = [str(hit.get("title", "")) for hit in hits]
         log.info("Elite wiki: search for %r found %s", name, titles)
-        first = norm_ship(name).split()[0]
+        wanted = norm_ship(name)
         for title in titles:
-            if not norm_ship(title).startswith(first) or ":" in title:
+            plain = norm_ship(title)
+            if not (plain == wanted or plain.startswith(wanted + " ")) or ":" in title:
                 continue
             extract = self._wiki_intro(title)
             if not extract:

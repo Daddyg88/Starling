@@ -1,0 +1,2573 @@
+{
+ "_help": "Ship stats for Starling, from the Elite Dangerous wiki (CC BY-SA). Rebuilt by tools/build_ship_specs.py.",
+ "ships": [
+  {
+   "name": "Anaconda",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "2856-Present",
+   "role": "Multirole",
+   "cost": "128,965,694 CR",
+   "insurance": "7,348,473 CR",
+   "pad": "Large",
+   "dimensions": "155m x 62m x 32m",
+   "seats": "3-4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "400 t",
+   "mass_lock": "23",
+   "armour": "945",
+   "hardness": "65",
+   "shields": "362 MJ",
+   "heat": "334",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "1",
+   "speed": [
+    "183 m/s (default)",
+    "209 m/s (upgraded)"
+   ],
+   "boost": [
+    "244 m/s (default)",
+    "279 m/s (upgraded)"
+   ],
+   "jump": [
+    "9.66 ly (default)",
+    "41.45 ly (upgraded)"
+   ],
+   "cargo": [
+    "114 t (default)",
+    "470 t (max)"
+   ],
+   "hardpoints": [
+    "8× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints",
+    "3× Large Hardpoints",
+    "1× Huge Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "3× Class 4 Compartments",
+    "3× Class 5 Compartments",
+    "3× Class 6 Compartments",
+    "1× Class 7 Compartment"
+   ],
+   "reserved": [
+    "1× Class 5 Military Compartment"
+   ]
+  },
+  {
+   "name": "Adder",
+   "manufacturer": "Zorgon Peterson",
+   "years": "2914-Present",
+   "role": "Multirole",
+   "cost": "87,808 CR",
+   "insurance": "4,390 CR",
+   "pad": "Small",
+   "dimensions": "31.5m x 28.8m x 9.6m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "35 t",
+   "mass_lock": "7",
+   "armour": "162",
+   "hardness": "35",
+   "shields": "78 MJ",
+   "heat": "170",
+   "fuel": "8 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "221 m/s (default)",
+    "255 m/s (upgraded)"
+   ],
+   "boost": [
+    "321 m/s (default)",
+    "372 m/s (upgraded)"
+   ],
+   "jump": [
+    "10.28 ly (default)",
+    "32.96 ly (upgraded)"
+   ],
+   "cargo": [
+    "6 t (default)",
+    "30 t (max)"
+   ],
+   "hardpoints": [
+    "2× Utility Mounts",
+    "2× Small Hardpoints",
+    "1× Medium Hardpoint"
+   ],
+   "internal": [
+    "3× Class 1 Compartments",
+    "2× Class 2 Compartments",
+    "2× Class 3 Compartments"
+   ]
+  },
+  {
+   "name": "Alliance Challenger",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3304-Present",
+   "role": "Combat",
+   "cost": "30,472,265 CR",
+   "insurance": "1,523,613 CR",
+   "faction": "Alliance",
+   "rank": "None",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Medium",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "450 t",
+   "mass_lock": "13",
+   "armour": "540",
+   "hardness": "65",
+   "shields": "208 MJ",
+   "heat": "316",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "204 m/s (default)",
+    "251 m/s (upgraded)"
+   ],
+   "boost": [
+    "316 m/s (default)",
+    "360 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.61 ly (default)",
+    "23.87 ly (upgraded)"
+   ],
+   "cargo": [
+    "40 t (default)",
+    "152 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "3× Small Hardpoints",
+    "3× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "2× Class 3 Compartments",
+    "2× Class 6 Compartments"
+   ],
+   "reserved": [
+    "3× Class 4 Military Compartments"
+   ]
+  },
+  {
+   "name": "Alliance Chieftain",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3304-Present",
+   "role": "Combat",
+   "cost": "19,382,250 CR",
+   "insurance": "969,113 CR",
+   "faction": "Alliance",
+   "rank": "None",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Medium",
+   "dimensions": "68.1m x 58.5m x 19.9m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "400 t",
+   "mass_lock": "13",
+   "armour": "504",
+   "hardness": "65",
+   "shields": "162 MJ",
+   "heat": "289",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "235 m/s (default)",
+    "267 m/s (upgraded)"
+   ],
+   "boost": [
+    "338 m/s (default)",
+    "383 m/s (upgraded)"
+   ],
+   "jump": [
+    "9.62 ly (default)",
+    "27.83 ly (upgraded)"
+   ],
+   "cargo": [
+    "40 t (default)",
+    "120 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "3× Small Hardpoints",
+    "1× Medium Hardpoint",
+    "2× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "1× Class 4 Compartment",
+    "1× Class 5 Compartment",
+    "1× Class 6 Compartment"
+   ],
+   "reserved": [
+    "3× Class 4 Military Compartments"
+   ]
+  },
+  {
+   "name": "Alliance Crusader",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3304-Present",
+   "role": "Combat",
+   "cost": "25,367,279 CR",
+   "insurance": "1,268,364 CR",
+   "faction": "Alliance",
+   "rank": "None",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Medium",
+   "dimensions": "68.1m x 58.5m x 19.8m",
+   "seats": "3-4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "500 t",
+   "mass_lock": "13",
+   "armour": "540",
+   "hardness": "65",
+   "shields": "126 MJ",
+   "heat": "316",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "183 m/s (default)",
+    "209 m/s (upgraded)"
+   ],
+   "boost": [
+    "305 m/s (default)",
+    "348 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.24 ly (default)",
+    "21.76 ly (upgraded)"
+   ],
+   "cargo": [
+    "40 t (default)",
+    "122 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "3× Small Hardpoints",
+    "2× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "2× Class 3 Compartments",
+    "1× Class 5 Compartment",
+    "1× Class 6 Compartment"
+   ],
+   "reserved": [
+    "3× Class 4 Military Compartments"
+   ]
+  },
+  {
+   "name": "Anaconda Mk II",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3312-Present",
+   "role": "Multirole",
+   "cost": "384,958,850 CR",
+   "arx": "19,020 ARX",
+   "insurance": "19,247,943 CR",
+   "expansion": "Odyssey",
+   "pad": "Large",
+   "dimensions": "167.9m x 74.2m x 27.3m",
+   "seats": "4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "940 t",
+   "armour": "1341",
+   "hardness": "65",
+   "shields": "403 MJ",
+   "fuel": "64 t",
+   "sco": "yes",
+   "manoeuvrability": "2",
+   "speed": [
+    "185 m/s (default)",
+    "218 m/s (upgraded)"
+   ],
+   "boost": [
+    "243 m/s (default)",
+    "287 m/s (upgraded)"
+   ],
+   "jump": [
+    "20.48 ly (default)",
+    "49.01 ly (upgraded)"
+   ],
+   "cargo": [
+    "208 t (default)",
+    "750 t (max)"
+   ],
+   "hardpoints": [
+    "8× Utility Mounts",
+    "2× Small Hardpoints",
+    "4× Large Hardpoints",
+    "1× Huge Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment",
+    "2× Class 4 Compartments",
+    "5× Class 5 Compartments",
+    "1× Class 6 Compartment",
+    "2× Class 7 Compartments",
+    "1× Class 8 Compartment"
+   ],
+   "reserved": [
+    "2× Class 5 Military Compartment",
+    "1× Class 6 Cargo Compartment"
+   ]
+  },
+  {
+   "name": "Asp Explorer",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3300-Present",
+   "role": "Multirole",
+   "cost": "6,661,153 CR",
+   "insurance": "333,058 CR",
+   "pad": "Medium",
+   "dimensions": "56.5m x 51.3m x 19.7m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "280 t",
+   "mass_lock": "11",
+   "armour": "378",
+   "hardness": "52",
+   "shields": "152 MJ",
+   "heat": "272",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "254 m/s (default)",
+    "290 m/s (upgraded)"
+   ],
+   "boost": [
+    "345 m/s (default)",
+    "395 m/s (upgraded)"
+   ],
+   "jump": [
+    "14.10 ly (default)",
+    "38.19 ly (upgraded)"
+   ],
+   "cargo": [
+    "38 t (default)",
+    "130 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "4× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "3× Class 3 Compartments",
+    "1× Class 5 Compartment",
+    "1× Class 6 Compartment"
+   ]
+  },
+  {
+   "name": "Asp Scout",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3301-Present",
+   "role": "Multirole",
+   "cost": "3,961,150 CR",
+   "insurance": "198,058 CR",
+   "pad": "Medium",
+   "dimensions": "54.8m x 59.4m x 17.0m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "140 t",
+   "mass_lock": "8",
+   "armour": "324",
+   "hardness": "52",
+   "shields": "105 MJ",
+   "heat": "210",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "5",
+   "speed": [
+    "223 m/s (default)",
+    "225 m/s (upgraded)"
+   ],
+   "boost": [
+    "304 m/s (default)",
+    "348 m/s (upgraded)"
+   ],
+   "jump": [
+    "13.05 ly (default)",
+    "32.07 ly (upgraded)"
+   ],
+   "cargo": [
+    "16 t (default)",
+    "74 t (max)"
+   ],
+   "hardpoints": [
+    "3× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "2× Class 3 Compartments",
+    "1× Class 4 Compartment",
+    "1× Class 5 Compartment"
+   ]
+  },
+  {
+   "name": "Beluga Liner",
+   "manufacturer": "Saud Kruger",
+   "years": "3302-Present",
+   "role": "Passenger Liner",
+   "cost": "84,532,780 CR",
+   "insurance": "4,226,639 CR",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Large",
+   "dimensions": "209.1m x 131.6m x 38.6m",
+   "seats": "3-4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "950 t",
+   "mass_lock": "18",
+   "armour": "504",
+   "hardness": "60",
+   "shields": "110 MJ",
+   "heat": "283",
+   "fuel": "128 t",
+   "sco": "No",
+   "manoeuvrability": "2",
+   "speed": [
+    "197 m/s (default)",
+    "230 m/s (upgraded)"
+   ],
+   "boost": [
+    "276 m/s (default)",
+    "322 m/s (upgraded)"
+   ],
+   "jump": [
+    "10.62 ly (default)",
+    "30.09 ly (upgraded)"
+   ],
+   "cargo": [
+    "44 t (default)",
+    "370 t (max)"
+   ],
+   "hardpoints": [
+    "6× Utility Mounts",
+    "5× Medium Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "4× Class 3 Compartments",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "4× Class 6 Compartments"
+   ]
+  },
+  {
+   "name": "Caspian Explorer",
+   "manufacturer": "Zorgon Peterson",
+   "years": "3311-Present",
+   "role": "Explorer",
+   "cost": "194,861,290 CR",
+   "arx": "19,020 ARX",
+   "expansion": "Odyssey",
+   "pad": "Large",
+   "dimensions": "126.7m x 104.5m x 27.6m",
+   "seats": "4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "950 t",
+   "armour": "621",
+   "hardness": "60",
+   "shields": "196 MJ",
+   "fuel": "128 t",
+   "sco": "Yes",
+   "manoeuvrability": "2",
+   "speed": [
+    "205 m/s (default)",
+    "237 m/s (upgraded)"
+   ],
+   "boost": [
+    "283 m/s (default)",
+    "326 m/s (upgraded)"
+   ],
+   "jump": [
+    "21.83 ly (default)",
+    "44.68 ly (upgraded)"
+   ],
+   "cargo": [
+    "96 t (default)",
+    "434 t (max)"
+   ],
+   "hardpoints": [
+    "6× Utility Mounts",
+    "6× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "3× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment",
+    "2× Class 4 Compartments",
+    "4× Class 5 Compartments",
+    "2× Class 6 Compartments",
+    "1× Class 7 Compartment"
+   ]
+  },
+  {
+   "name": "Cobra Mk III",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3100-Present",
+   "role": "Multirole",
+   "cost": "306,879 CR",
+   "insurance": "17,486 CR",
+   "pad": "Small",
+   "dimensions": "27.1m x 44.0m x 7.9m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "180 t",
+   "mass_lock": "8",
+   "armour": "216",
+   "hardness": "35",
+   "shields": "92 MJ",
+   "heat": "225",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "5",
+   "speed": [
+    "282 m/s (default)",
+    "325 m/s (upgraded)"
+   ],
+   "boost": [
+    "403 m/s (default)",
+    "464 m/s (upgraded)"
+   ],
+   "jump": [
+    "11.16 ly (default)",
+    "28.55 ly (upgraded)"
+   ],
+   "cargo": [
+    "18 t (default)",
+    "64 t (max)"
+   ],
+   "hardpoints": [
+    "2× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "3× Class 2 Compartments",
+    "3× Class 4 Compartments"
+   ]
+  },
+  {
+   "name": "Cobra Mk IV",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3301-Present",
+   "role": "Multirole, Combat",
+   "cost": "671,041 CR",
+   "insurance": "38,236 CR",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Small",
+   "dimensions": "33.1m x 48.1m x 8.6m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "210 t",
+   "mass_lock": "8",
+   "armour": "216",
+   "hardness": "35",
+   "shields": "125 MJ",
+   "heat": "228",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "200 m/s (default)",
+    "228 m/s (upgraded)"
+   ],
+   "boost": [
+    "300 m/s (default)",
+    "342 m/s (upgraded)"
+   ],
+   "jump": [
+    "9.92 ly (default)",
+    "24.91 ly (upgraded)"
+   ],
+   "cargo": [
+    "34 t (default)",
+    "92 t (max)"
+   ],
+   "hardpoints": [
+    "2× Utility Mounts",
+    "3× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "2× Class 2 Compartments",
+    "2× Class 3 Compartments",
+    "4× Class 4 Compartments"
+   ]
+  },
+  {
+   "name": "Cobra Mk V",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3310-Present",
+   "role": "Multirole",
+   "cost": "1,989,461 CR",
+   "arx": "16,520 ARX",
+   "insurance": "99,473 CR",
+   "expansion": "Odyssey",
+   "pad": "Small",
+   "dimensions": "41.2m x 55.1m x 9.47m",
+   "seats": "3",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "150 t",
+   "mass_lock": "8",
+   "armour": "324",
+   "hardness": "40",
+   "shields": "235 MJ",
+   "heat": "245",
+   "fuel": "16 t",
+   "sco": "Yes",
+   "manoeuvrability": "5",
+   "speed": [
+    "294 m/s (default)",
+    "336 m/s (upgraded)"
+   ],
+   "boost": [
+    "415 m/s (default)",
+    "476 m/s (upgraded)"
+   ],
+   "jump": [
+    "16.79 ly (default)",
+    "34.55 ly (upgraded)"
+   ],
+   "cargo": [
+    "12 t (default)",
+    "110 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Small Hardpoints",
+    "3× Medium Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "3× Class 3 Compartments",
+    "3× Class 4 Compartments",
+    "1× Class 5 Compartment"
+   ]
+  },
+  {
+   "name": "Corsair",
+   "manufacturer": "Gutamaya",
+   "years": "3311-Present",
+   "role": "Multirole",
+   "cost": "79,304,750 CR",
+   "arx": "16,520 ARX",
+   "insurance": "3,965,238 CR",
+   "expansion": "Odyssey",
+   "pad": "Medium",
+   "dimensions": "86.8m x 69.4m x 16m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "265 t",
+   "mass_lock": "17",
+   "armour": "486",
+   "hardness": "65",
+   "shields": "264 MJ",
+   "heat": "280",
+   "fuel": "32 t",
+   "sco": "Yes",
+   "manoeuvrability": "4",
+   "speed": [
+    "288 m/s (default)",
+    "325 m/s (upgraded)"
+   ],
+   "boost": [
+    "366 m/s (default)",
+    "412 m/s (upgraded)"
+   ],
+   "jump": [
+    "12.96 ly (default)",
+    "39.58 ly (upgraded)"
+   ],
+   "cargo": [
+    "48 t (default)",
+    "318 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "3× Medium Hardpoints",
+    "3× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "3× Class 5 Compartments",
+    "3× Class 6 Compartments"
+   ]
+  },
+  {
+   "name": "Diamondback Explorer",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3300-Present",
+   "role": "Combat Explorer",
+   "cost": "1,894,760 CR",
+   "insurance": "94,738 CR",
+   "pad": "Small",
+   "dimensions": "45.0m x 27.3m x 13.6m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "260 t",
+   "mass_lock": "10",
+   "armour": "270",
+   "hardness": "42",
+   "shields": "131 MJ",
+   "heat": "351",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "251 m/s (default)",
+    "282 m/s (upgraded)"
+   ],
+   "boost": [
+    "328 m/s (default)",
+    "369 m/s (upgraded)"
+   ],
+   "jump": [
+    "17.03 ly (default)",
+    "41.61 ly (upgraded)"
+   ],
+   "cargo": [
+    "12 t (default)",
+    "60 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "2× Class 2 Compartments",
+    "2× Class 3 Compartments",
+    "2× Class 4 Compartments"
+   ]
+  },
+  {
+   "name": "Diamondback Scout",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3300-Present",
+   "role": "Combat Explorer",
+   "cost": "564,320 CR",
+   "insurance": "28,216 CR",
+   "pad": "Small",
+   "dimensions": "39.0m x 24.3m x 12.3m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "170 t",
+   "mass_lock": "8",
+   "armour": "216",
+   "hardness": "40",
+   "shields": "92 MJ",
+   "heat": "346",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "5",
+   "speed": [
+    "283 m/s (default)",
+    "329 m/s (upgraded)"
+   ],
+   "boost": [
+    "384 m/s (default)",
+    "441 m/s (upgraded)"
+   ],
+   "jump": [
+    "12.17 ly (default)",
+    "30.4 ly (upgraded)"
+   ],
+   "cargo": [
+    "0 t (default)",
+    "32 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "3× Class 3 Compartments"
+   ]
+  },
+  {
+   "name": "Dolphin",
+   "manufacturer": "Saud Kruger",
+   "years": "3303-Present",
+   "role": "Passenger Liner",
+   "cost": "1,337,330 CR",
+   "insurance": "66,867 CR",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Small",
+   "dimensions": "51.8m x 20.8m x 8.8m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "140 t",
+   "mass_lock": "9",
+   "armour": "198",
+   "hardness": "35",
+   "shields": "143 MJ",
+   "heat": "245",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "258 m/s (default)",
+    "290 m/s (upgraded)"
+   ],
+   "boost": [
+    "361 m/s (default)",
+    "406 m/s (upgraded)"
+   ],
+   "jump": [
+    "11.39 ly (default)",
+    "35.10 ly (upgraded)"
+   ],
+   "cargo": [
+    "14 t (default)",
+    "88 t (max)"
+   ],
+   "hardpoints": [
+    "3× Utility Mounts",
+    "2× Small Hardpoints"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "3× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "2× Class 4 Compartments",
+    "1× Class 5 Compartment"
+   ]
+  },
+  {
+   "name": "Eagle",
+   "manufacturer": "Core Dynamics",
+   "years": "3199-3300",
+   "role": "Combat",
+   "cost": "44,800 CR",
+   "insurance": "2,240 CR",
+   "pad": "Small",
+   "dimensions": "31.2m x 29.7m x 7.1m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "50 t",
+   "mass_lock": "6",
+   "armour": "72",
+   "hardness": "28",
+   "shields": "78 MJ",
+   "heat": "165",
+   "fuel": "4 t",
+   "sco": "No",
+   "manoeuvrability": "6",
+   "speed": [
+    "240 m/s (default)",
+    "272 m/s (upgraded)"
+   ],
+   "boost": [
+    "350 m/s (default)",
+    "397 m/s (upgraded)"
+   ],
+   "jump": [
+    "9.15 ly (default)",
+    "25.47 ly (upgraded)"
+   ],
+   "cargo": [
+    "2 t (default)",
+    "20 t (max)"
+   ],
+   "hardpoints": [
+    "1× Utility Mount",
+    "3× Small Hardpoints"
+   ],
+   "internal": [
+    "4× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment"
+   ],
+   "reserved": [
+    "1× Class 2 Military Compartment"
+   ]
+  },
+  {
+   "name": "Federal Assault Ship",
+   "manufacturer": "Core Dynamics",
+   "years": "3300-Present",
+   "role": "Combat",
+   "cost": "19,814,210 CR",
+   "insurance": "990,710 CR",
+   "faction": "Federation",
+   "rank": "Chief Petty Officer",
+   "pad": "Medium",
+   "dimensions": "73.8m x 49.5m x 22.8m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "480 t",
+   "mass_lock": "14",
+   "armour": "540",
+   "hardness": "60",
+   "shields": "133 MJ",
+   "heat": "286",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "215 m/s (default)",
+    "244 m/s (upgraded)"
+   ],
+   "boost": [
+    "358 m/s (default)",
+    "406 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.33 ly (default)",
+    "23.05 ly (upgraded)"
+   ],
+   "cargo": [
+    "32 t (default)",
+    "98 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Medium Hardpoints",
+    "2× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments"
+   ],
+   "reserved": [
+    "2× Class 4 Military Compartments"
+   ]
+  },
+  {
+   "name": "Federal Corvette",
+   "manufacturer": "Core Dynamics",
+   "years": "3301-Present",
+   "role": "Combat",
+   "cost": "187,969,450 CR",
+   "insurance": "9,398,473 CR",
+   "faction": "Federation",
+   "rank": "Rear Admiral",
+   "pad": "Large",
+   "dimensions": "167.8m x 87.2m x 28.3m",
+   "seats": "3-4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "900 t",
+   "mass_lock": "24",
+   "armour": "666",
+   "hardness": "70",
+   "shields": "519 MJ",
+   "heat": "333",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "2",
+   "speed": [
+    "198 m/s (default)",
+    "232 m/s (upgraded)"
+   ],
+   "boost": [
+    "257 m/s (default)",
+    "302 m/s (upgraded)"
+   ],
+   "jump": [
+    "6.31 ly (default)",
+    "21.15 ly (upgraded)"
+   ],
+   "cargo": [
+    "76 t (default)",
+    "618 t (max)"
+   ],
+   "hardpoints": [
+    "8× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints",
+    "1× Large Hardpoint",
+    "2× Huge Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 3 Compartment",
+    "2× Class 4 Compartments",
+    "2× Class 5 Compartments",
+    "2× Class 6 Compartments",
+    "3× Class 7 Compartments"
+   ],
+   "reserved": [
+    "2× Class 5 Military Compartments"
+   ]
+  },
+  {
+   "name": "Federal Dropship",
+   "manufacturer": "Core Dynamics",
+   "years": "3300-Present",
+   "role": "Combat, Freighter",
+   "cost": "14,314,210 CR",
+   "insurance": "715,710 CR",
+   "faction": "Federation",
+   "rank": "Midshipman",
+   "pad": "Medium",
+   "dimensions": "73.9m x 52.3m x 21.7m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "500 t",
+   "mass_lock": "14",
+   "armour": "540",
+   "hardness": "60",
+   "shields": "126 MJ",
+   "heat": "331",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "203 m/s (default)",
+    "232 m/s (upgraded)"
+   ],
+   "boost": [
+    "305 m/s (default)",
+    "348 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.09 ly (default)",
+    "19.66 ly (upgraded)"
+   ],
+   "cargo": [
+    "56 t (default)",
+    "230 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "4× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "2× Class 6 Compartments"
+   ],
+   "reserved": [
+    "2× Class 4 Military Compartments"
+   ]
+  },
+  {
+   "name": "Federal Gunship",
+   "manufacturer": "Core Dynamics",
+   "years": "3301-Present",
+   "role": "Combat",
+   "cost": "35,658,297 CR",
+   "insurance": "1,782,915 CR",
+   "faction": "Federation",
+   "rank": "Ensign",
+   "pad": "Medium",
+   "dimensions": "75.5m x 53.3m x 22.5m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "580 t",
+   "mass_lock": "14",
+   "armour": "630",
+   "hardness": "60",
+   "shields": "186 MJ",
+   "heat": "325",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "1",
+   "speed": [
+    "171 m/s (default)",
+    "197 m/s (upgraded)"
+   ],
+   "boost": [
+    "282 m/s (default)",
+    "325 m/s (upgraded)"
+   ],
+   "jump": [
+    "6.66 ly (default)",
+    "19.40 ly (upgraded)"
+   ],
+   "cargo": [
+    "16 t (default)",
+    "170 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Small Hardpoints",
+    "4× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "1× Class 5 Compartment",
+    "2× Class 6 Compartments"
+   ],
+   "reserved": [
+    "3× Class 4 Military Compartments"
+   ]
+  },
+  {
+   "name": "Fer-de-Lance",
+   "manufacturer": "Zorgon Peterson",
+   "years": "3100-Present",
+   "role": "Combat",
+   "cost": "51,567,040 CR",
+   "insurance": "2,578,352 CR",
+   "pad": "Medium",
+   "dimensions": "73.6m x 51.6m x 15.4m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "250 t",
+   "mass_lock": "12",
+   "armour": "405",
+   "hardness": "70",
+   "shields": "271 MJ",
+   "heat": "224",
+   "fuel": "8 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "265 m/s (default)",
+    "302 m/s (upgraded)"
+   ],
+   "boost": [
+    "357 m/s (default)",
+    "407 m/s (upgraded)"
+   ],
+   "jump": [
+    "6.79 ly (default)",
+    "20.94 ly (upgraded)"
+   ],
+   "cargo": [
+    "24 t (default)",
+    "72 t (max)"
+   ],
+   "hardpoints": [
+    "6× Utility Mounts",
+    "4× Medium Hardpoints",
+    "1× Huge Hardpoint"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "2× Class 4 Compartments",
+    "1× Class 5 Compartment"
+   ]
+  },
+  {
+   "name": "Hauler",
+   "manufacturer": "Zorgon Peterson",
+   "years": "3300-Present",
+   "role": "Freighter",
+   "cost": "52,720 CR",
+   "insurance": "2,636 CR",
+   "pad": "Small",
+   "dimensions": "28.6m x 26.2m x 10.4m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "14 t",
+   "mass_lock": "6",
+   "armour": "180",
+   "hardness": "20",
+   "shields": "65 MJ",
+   "heat": "123",
+   "fuel": "4 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "204 m/s (default)",
+    "232 m/s (upgraded)"
+   ],
+   "boost": [
+    "306 m/s (default)",
+    "348 m/s (upgraded)"
+   ],
+   "jump": [
+    "11.62 ly (default)",
+    "37.29 ly (upgraded)"
+   ],
+   "cargo": [
+    "8 t (default)",
+    "26 t (max)"
+   ],
+   "hardpoints": [
+    "2× Utility Mounts",
+    "1× Small Hardpoint"
+   ],
+   "internal": [
+    "3× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments"
+   ]
+  },
+  {
+   "name": "Imperial Clipper",
+   "manufacturer": "Gutamaya",
+   "years": "3300-Present",
+   "role": "Multirole",
+   "cost": "22,295,860 CR",
+   "insurance": "1,114,793 CR",
+   "faction": "Empire",
+   "rank": "Baron",
+   "pad": "Large",
+   "dimensions": "106.7m x 103.7m x 24.8m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "400 t",
+   "mass_lock": "12",
+   "armour": "486",
+   "hardness": "60",
+   "shields": "186 MJ",
+   "heat": "304",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "5",
+   "speed": [
+    "306 m/s (default)",
+    "341 m/s (upgraded)"
+   ],
+   "boost": [
+    "388 m/s (default)",
+    "445 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.98 ly (default)",
+    "27.52 ly (upgraded)"
+   ],
+   "cargo": [
+    "74 t (default)",
+    "250 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Medium Hardpoints",
+    "2× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "2× Class 3 Compartments",
+    "2× Class 4 Compartments",
+    "1× Class 6 Compartment",
+    "1× Class 7 Compartment"
+   ]
+  },
+  {
+   "name": "Imperial Courier",
+   "manufacturer": "Gutamaya",
+   "years": "3145-Present",
+   "role": "Multirole",
+   "cost": "2,542,931 CR",
+   "insurance": "127,147 CR",
+   "faction": "Empire",
+   "rank": "Master",
+   "pad": "Small",
+   "dimensions": "42.1m x 27.4m x 7.1m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "35 t",
+   "mass_lock": "7",
+   "armour": "144",
+   "hardness": "30",
+   "shields": "230 MJ",
+   "heat": "230",
+   "fuel": "8 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "277 m/s (default)",
+    "325 m/s (upgraded)"
+   ],
+   "boost": [
+    "380 m/s (default)",
+    "441 m/s (upgraded)"
+   ],
+   "jump": [
+    "7.81 ly (default)",
+    "33.68 ly (upgraded)"
+   ],
+   "cargo": [
+    "12 t (default)",
+    "34 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "3× Medium Hardpoints"
+   ],
+   "internal": [
+    "3× Class 1 Compartments",
+    "3× Class 2 Compartments",
+    "2× Class 3 Compartments"
+   ]
+  },
+  {
+   "name": "Imperial Cutter",
+   "manufacturer": "Gutamaya",
+   "years": "3301-Present",
+   "role": "Multirole",
+   "cost": "208,969,451 CR",
+   "insurance": "10,448,473 CR",
+   "faction": "Empire",
+   "rank": "Duke",
+   "pad": "Large",
+   "dimensions": "192.6m x 111.1m x 33.4m",
+   "seats": "3-4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "1,100 t",
+   "mass_lock": "26",
+   "armour": "720",
+   "hardness": "70",
+   "shields": "704 MJ",
+   "heat": "327",
+   "fuel": "64 t",
+   "sco": "No",
+   "manoeuvrability": "0",
+   "speed": [
+    "202 m/s (default)",
+    "232 m/s (upgraded)"
+   ],
+   "boost": [
+    "323 m/s (default)",
+    "372 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.21 ly (default)",
+    "25.70 ly (upgraded)"
+   ],
+   "cargo": [
+    "164 t (default)",
+    "794 t (max)"
+   ],
+   "hardpoints": [
+    "8× Utility Mounts",
+    "4× Medium Hardpoints",
+    "2× Large Hardpoints",
+    "1× Huge Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "3× Class 6 Compartments",
+    "2× Class 8 Compartments"
+   ],
+   "reserved": [
+    "2× Class 5 Military Compartments"
+   ]
+  },
+  {
+   "name": "Imperial Eagle",
+   "manufacturer": "Gutamaya",
+   "years": "3199-Present",
+   "role": "Combat",
+   "cost": "110,830 CR",
+   "insurance": "5,542 CR",
+   "faction": "Empire",
+   "rank": "None",
+   "pad": "Small",
+   "dimensions": "31.2m x 34.7m x 7.1m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "50 t",
+   "mass_lock": "6",
+   "armour": "108",
+   "hardness": "28",
+   "shields": "104 MJ",
+   "heat": "163",
+   "fuel": "4 t",
+   "sco": "No",
+   "manoeuvrability": "5",
+   "speed": [
+    "302 m/s (default)",
+    "347 m/s (upgraded)"
+   ],
+   "boost": [
+    "403 m/s (default)",
+    "462 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.22 ly (default)",
+    "25.37 ly (upgraded)"
+   ],
+   "cargo": [
+    "2 t (default)",
+    "20 t (max)"
+   ],
+   "hardpoints": [
+    "1× Utility Mount",
+    "2× Small Hardpoints",
+    "1× Medium Hardpoint"
+   ],
+   "internal": [
+    "4× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment"
+   ],
+   "reserved": [
+    "1× Class 2 Military Compartment"
+   ]
+  },
+  {
+   "name": "Keelback",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3301-Present",
+   "role": "Combat Freighter",
+   "cost": "3,126,150 CR",
+   "insurance": "156,308 CR",
+   "pad": "Medium",
+   "dimensions": "49.7m x 40.3m x 14.9m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "180 t",
+   "mass_lock": "8",
+   "armour": "486",
+   "hardness": "45",
+   "shields": "99 MJ",
+   "heat": "215",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "2",
+   "speed": [
+    "202 m/s (default)",
+    "231 m/s (upgraded)"
+   ],
+   "boost": [
+    "303 m/s (default)",
+    "344 m/s (upgraded)"
+   ],
+   "jump": [
+    "11.70 ly (default)",
+    "27.19 ly (upgraded)"
+   ],
+   "cargo": [
+    "38 t (default)",
+    "98 t (max)"
+   ],
+   "hardpoints": [
+    "3× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments"
+   ]
+  },
+  {
+   "name": "Kestrel Mk II",
+   "manufacturer": "Core Dynamics",
+   "years": "3312-Present",
+   "role": "Combat",
+   "cost": "12,525,276 CR",
+   "arx": "16,520 ARX",
+   "insurance": "713,691 CR",
+   "expansion": "Odyssey",
+   "pad": "Small",
+   "dimensions": "49.4 m x 40.01 m x 9.07 m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "190 t",
+   "armour": "126",
+   "hardness": "55",
+   "shields": "293 MJ",
+   "heat": "276",
+   "fuel": "16 t",
+   "sco": "Yes",
+   "manoeuvrability": "8",
+   "speed": [
+    "278 m/s (default)",
+    "313 m/s (upgraded)"
+   ],
+   "boost": [
+    "342 m/s (default)",
+    "418 m/s (upgraded)"
+   ],
+   "jump": [
+    "13.32 ly (default)",
+    "30.49 ly (upgraded)"
+   ],
+   "cargo": [
+    "4 t (default)",
+    "70 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Small Hardpoints",
+    "3× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "3× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "1× Class 5 Compartment"
+   ],
+   "reserved": [
+    "1× Class 4 Military Compartment"
+   ]
+  },
+  {
+   "name": "Krait Mk II",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3304-Present",
+   "role": "Combat, Multirole",
+   "cost": "40,201,966 CR",
+   "insurance": "2,290,710 CR",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Medium",
+   "dimensions": "73.3m x 72m x 13.5m",
+   "seats": "3",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "320 t",
+   "mass_lock": "17",
+   "armour": "396",
+   "hardness": "55",
+   "shields": "262 MJ",
+   "heat": "300",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "245 m/s (default)",
+    "274 m/s (upgraded)"
+   ],
+   "boost": [
+    "337 m/s (default)",
+    "383 m/s (upgraded)"
+   ],
+   "jump": [
+    "9.01 ly (default)",
+    "30.79-60~ ly (upgraded)"
+   ],
+   "cargo": [
+    "82 t (default)",
+    "230 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Medium Hardpoints",
+    "3× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "2× Class 6 Compartments"
+   ]
+  },
+  {
+   "name": "Krait Phantom",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3304-Present",
+   "role": "Multirole",
+   "cost": "37,472,254 CR",
+   "insurance": "1,873,613 CR",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Medium",
+   "dimensions": "73.3m x 72.0m x 14.6m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "270 t",
+   "mass_lock": "17",
+   "armour": "324",
+   "hardness": "55",
+   "shields": "260 MJ",
+   "heat": "300",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "256 m/s (default)",
+    "290 m/s (upgraded)"
+   ],
+   "boost": [
+    "358 m/s (default)",
+    "406 m/s (upgraded)"
+   ],
+   "jump": [
+    "9.78 ly (default)",
+    "34.79 ly (upgraded)"
+   ],
+   "cargo": [
+    "82 t (default)",
+    "190 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Medium Hardpoints",
+    "2× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "3× Class 3 Compartments",
+    "3× Class 5 Compartments",
+    "1× Class 6 Compartment"
+   ]
+  },
+  {
+   "name": "Lynx Highliner",
+   "manufacturer": "Zorgon Peterson",
+   "years": "3312-Present",
+   "role": "Passenger liner",
+   "cost": "69,289,470 CR",
+   "arx": "0 ARX",
+   "insurance": "3,464,474 CR",
+   "expansion": "Odyssey",
+   "pad": "Medium",
+   "dimensions": "89.3 m x 45.2 m x 18.8 m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "260 t",
+   "armour": "630",
+   "hardness": "55",
+   "shields": "228 MJ",
+   "fuel": "32 t",
+   "sco": "Yes",
+   "manoeuvrability": "3",
+   "speed": [
+    "293 m/s (default)",
+    "331 m/s (upgraded)"
+   ],
+   "boost": [
+    "360 m/s (default)",
+    "406 m/s (upgraded)"
+   ],
+   "jump": [
+    "15.70 ly (default)",
+    "16.61 ly (upgraded)"
+   ],
+   "cargo": [
+    "0 t (default)",
+    "142 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "4× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment",
+    "2× Class 4 Compartments",
+    "1× Class 5 Compartment",
+    "1× Class 6 Compartment"
+   ],
+   "reserved": [
+    "1× Class 5 Passenger Cabin",
+    "2× Class 6 Passenger Cabin"
+   ]
+  },
+  {
+   "name": "Mamba",
+   "manufacturer": "Zorgon Peterson",
+   "years": "3304-Present",
+   "role": "Combat",
+   "cost": "55,867,041 CR",
+   "insurance": "2,793,352 CR",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Medium",
+   "dimensions": "72.2m x 50.1m x 11.4m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "250 t",
+   "mass_lock": "12",
+   "armour": "414",
+   "hardness": "70",
+   "shields": "244 MJ",
+   "heat": "165",
+   "fuel": "8 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "316 m/s (default)",
+    "361 m/s (upgraded)"
+   ],
+   "boost": [
+    "387 m/s (default)",
+    "445 m/s (upgraded)"
+   ],
+   "jump": [
+    "6.79 ly (default)",
+    "20.53 ly (upgraded)"
+   ],
+   "cargo": [
+    "20 t (default)",
+    "66 t (max)"
+   ],
+   "hardpoints": [
+    "6× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Large Hardpoints",
+    "1× Huge Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "1× Class 5 Compartment"
+   ]
+  },
+  {
+   "name": "Mandalay",
+   "manufacturer": "Zorgon Peterson",
+   "years": "3310-Present",
+   "role": "Explorer",
+   "cost": "17,639,220 CR",
+   "arx": "16,520 ARX",
+   "insurance": "881,961 CR",
+   "expansion": "Odyssey",
+   "pad": "Medium",
+   "dimensions": "49.6m x 74.4m x 14.9m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "230 t",
+   "mass_lock": "11",
+   "armour": "414",
+   "hardness": "55",
+   "shields": "268 MJ",
+   "heat": "250",
+   "fuel": "32 t",
+   "sco": "Yes",
+   "manoeuvrability": "5",
+   "speed": [
+    "286 m/s (default)",
+    "325 m/s (upgraded)"
+   ],
+   "boost": [
+    "358 m/s (default)",
+    "406 m/s (upgraded)"
+   ],
+   "jump": [
+    "31.10 ly (default)",
+    "45.26 ly (upgraded)"
+   ],
+   "cargo": [
+    "40 t (default)",
+    "154 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Small Hardpoints",
+    "4× Medium Hardpoints"
+   ],
+   "internal": [
+    "3× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments",
+    "2× Class 4 Compartments",
+    "1× Class 5 Compartment",
+    "1× Class 6 Compartment"
+   ]
+  },
+  {
+   "name": "Orca",
+   "manufacturer": "Saud Kruger",
+   "years": "3300-Present",
+   "role": "Passenger Liner",
+   "cost": "48,539,887 CR",
+   "insurance": "2,426,994 CR",
+   "pad": "Large",
+   "dimensions": "130.4m x 50.8m x 22.7m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "290 t",
+   "mass_lock": "13",
+   "armour": "396",
+   "hardness": "55",
+   "shields": "233 MJ",
+   "heat": "262",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "1",
+   "speed": [
+    "308 m/s (default)",
+    "348 m/s (upgraded)"
+   ],
+   "boost": [
+    "390 m/s (default)",
+    "441 m/s (upgraded)"
+   ],
+   "jump": [
+    "11.10 ly (default)",
+    "36.17 ly (upgraded)"
+   ],
+   "cargo": [
+    "72 t (default)",
+    "194 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Medium Hardpoints",
+    "1× Large Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "3× Class 5 Compartments",
+    "1× Class 6 Compartment"
+   ]
+  },
+  {
+   "name": "Panther Clipper Mk II",
+   "manufacturer": "Zorgon Peterson",
+   "years": "3311-Present",
+   "role": "Freighter",
+   "cost": "301,348,586 CR",
+   "arx": "19,020 ARX",
+   "insurance": "15,067,429 CR",
+   "expansion": "Odyssey",
+   "pad": "Large",
+   "dimensions": "146.86m x 117.09m x 33.8m",
+   "seats": "4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "1200 t",
+   "mass_lock": "25",
+   "armour": "1116",
+   "hardness": "70",
+   "shields": "245 MJ",
+   "heat": "329",
+   "fuel": "128 t",
+   "sco": "Yes",
+   "manoeuvrability": "0",
+   "speed": [
+    "182 m/s (default)",
+    "206 m/s (upgraded)"
+   ],
+   "boost": [
+    "252 m/s (default)",
+    "286 m/s (upgraded)"
+   ],
+   "jump": [
+    "12.52 ly (default)",
+    "25.71 ly (upgraded)"
+   ],
+   "cargo": [
+    "192 t (default)",
+    "1238 t (max)"
+   ],
+   "hardpoints": [
+    "6× Utility Mounts",
+    "4× Small Hardpoints",
+    "4× Medium Hardpoints",
+    "2× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "3× Class 6 Compartments",
+    "1× Class 7 Compartment",
+    "1× Class 8 Compartment"
+   ],
+   "reserved": [
+    "1× Class 7 Cargo Compartment",
+    "1× Class 8 Cargo Compartment"
+   ]
+  },
+  {
+   "name": "Python",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "2700-Present",
+   "role": "Multirole",
+   "cost": "49,998,353 CR",
+   "insurance": "2,848,909 CR",
+   "pad": "Medium",
+   "dimensions": "87.9m x 58.1m x 18.0m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "350 t",
+   "mass_lock": "17",
+   "armour": "468",
+   "hardness": "65",
+   "shields": "294 MJ",
+   "heat": "300",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "2",
+   "speed": [
+    "234 m/s (default)",
+    "267 m/s (upgraded)"
+   ],
+   "boost": [
+    "306 m/s (default)",
+    "348 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.61 ly (default)",
+    "30.45 ly (upgraded)"
+   ],
+   "cargo": [
+    "82 t (default)",
+    "294 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Medium Hardpoints",
+    "3× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "3× Class 6 Compartments"
+   ]
+  },
+  {
+   "name": "Python Mk II",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3310-Present",
+   "role": "Combat",
+   "cost": "59,255,259 CR",
+   "arx": "16,520 ARX",
+   "insurance": "3,376,368 CR",
+   "expansion": "Odyssey",
+   "pad": "Medium",
+   "dimensions": "88.4m x 67.5m x 17.3m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "450 t",
+   "mass_lock": "17",
+   "armour": "504",
+   "hardness": "70",
+   "shields": "316 MJ",
+   "heat": "260",
+   "fuel": "16 t",
+   "sco": "Yes",
+   "manoeuvrability": "4",
+   "speed": [
+    "261 m/s (default)",
+    "297 m/s (upgraded)"
+   ],
+   "boost": [
+    "352 m/s (default)",
+    "400 m/s (upgraded)"
+   ],
+   "jump": [
+    "18.11 ly (default)",
+    "26.71 ly (upgraded)"
+   ],
+   "cargo": [
+    "10 t (default)",
+    "96 t (max)"
+   ],
+   "hardpoints": [
+    "6× Utility Mounts",
+    "2× Medium Hardpoints",
+    "4× Large Hardpoints"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "1× Class 6 Compartment"
+   ]
+  },
+  {
+   "name": "Sidewinder",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "2982-Present",
+   "role": "Multirole",
+   "cost": "28,080 CR",
+   "insurance": "1,600 CR",
+   "pad": "Small",
+   "dimensions": "14.9m x 21.3m x 5.4m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "25 t",
+   "mass_lock": "6",
+   "armour": "108",
+   "hardness": "20",
+   "shields": "52 MJ",
+   "heat": "140",
+   "fuel": "2 t",
+   "sco": "No",
+   "manoeuvrability": "6",
+   "speed": [
+    "221 m/s (default)",
+    "229 m/s (upgraded)"
+   ],
+   "boost": [
+    "322 m/s (default)",
+    "334 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.15 ly (default)",
+    "24.43 ly (upgraded)"
+   ],
+   "cargo": [
+    "4 t (default)",
+    "16 t (max)"
+   ],
+   "hardpoints": [
+    "2× Utility Mounts",
+    "2× Small Hardpoints"
+   ],
+   "internal": [
+    "4× Class 1 Compartments",
+    "2× Class 2 Compartments"
+   ]
+  },
+  {
+   "name": "Type-10 Defender",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3303-Present",
+   "role": "Combat Freighter",
+   "cost": "124,755,342 CR",
+   "insurance": "6,237,767 CR",
+   "expansion": "Elite Dangerous: Horizons",
+   "pad": "Large",
+   "dimensions": "135.1m x 118.4m x 39.3m",
+   "seats": "3-4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "1,200 t",
+   "mass_lock": "26",
+   "armour": "1,044",
+   "hardness": "75",
+   "shields": "99 MJ",
+   "heat": "335",
+   "fuel": "64 t",
+   "sco": "No",
+   "manoeuvrability": "0",
+   "speed": [
+    "179 m/s (default)",
+    "200 m/s (upgraded)"
+   ],
+   "boost": [
+    "219 m/s (default)",
+    "245 m/s (upgraded)"
+   ],
+   "jump": [
+    "6.98 ly (default)",
+    "25.75 ly (upgraded)"
+   ],
+   "cargo": [
+    "220 t (default)",
+    "534 t (max)"
+   ],
+   "hardpoints": [
+    "8× Utility Mounts",
+    "2× Small Hardpoints",
+    "3× Medium Hardpoints",
+    "4× Large Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments",
+    "2× Class 4 Compartments",
+    "1× Class 5 Compartment",
+    "1× Class 6 Compartment",
+    "1× Class 7 Compartment",
+    "1× Class 8 Compartment"
+   ],
+   "reserved": [
+    "2× Class 5 Military Compartments"
+   ]
+  },
+  {
+   "name": "Type-11 Prospector",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3311-Present",
+   "role": "Miner",
+   "cost": "67,861,850 CR",
+   "arx": "16,520 ARX",
+   "insurance": "3,393,093 CR",
+   "pad": "Medium",
+   "dimensions": "78.6m x 78.3m x 28.7m",
+   "seats": "3",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "320 t",
+   "armour": "630",
+   "hardness": "58",
+   "shields": "271 MJ",
+   "fuel": "32 t",
+   "sco": "Yes",
+   "manoeuvrability": "2",
+   "speed": [
+    "271 m/s (default)",
+    "313 m/s (upgraded)"
+   ],
+   "boost": [
+    "366 m/s (default)",
+    "423 m/s (upgraded)"
+   ],
+   "jump": [
+    "15.81 ly (default)",
+    "38.11 ly (upgraded)"
+   ],
+   "cargo": [
+    "64 t (default)",
+    "288 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "3× Small Hardpoints",
+    "1× Medium Hardpoint",
+    "1× Large Hardpoint"
+   ],
+   "reserved_hardpoints": [
+    "1× Small Mining Tool",
+    "2× Medium Mining Tools",
+    "1x Large Mining Tool"
+   ],
+   "internal": [
+    "2× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "1× Class 3 Compartment",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "3× Class 6 Compartments"
+   ],
+   "reserved": [
+    "1× Class 5 Fighter Hangar",
+    "1× Class 5 Limpet Controller"
+   ]
+  },
+  {
+   "name": "Type-6 Transporter",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3200-Present",
+   "role": "Freighter",
+   "cost": "1,045,945 CR",
+   "insurance": "52,297 CR",
+   "pad": "Medium",
+   "dimensions": "48.4m x 27.2m x 15.0m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "155 t",
+   "mass_lock": "8",
+   "armour": "324",
+   "hardness": "35",
+   "shields": "125 MJ",
+   "heat": "179",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "223 m/s (default)",
+    "255 m/s (upgraded)"
+   ],
+   "boost": [
+    "356 m/s (default)",
+    "406 m/s (upgraded)"
+   ],
+   "jump": [
+    "13.38 ly (default)",
+    "30.73 ly (upgraded)"
+   ],
+   "cargo": [
+    "50 t (default)",
+    "178 t (max)"
+   ],
+   "hardpoints": [
+    "3× Utility Mounts",
+    "2× Small Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "2× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "2× Class 4 Compartments",
+    "2× Class 5 Compartments",
+    "1× Class 6 Compartment"
+   ]
+  },
+  {
+   "name": "Type-7 Transporter",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3290-Present",
+   "role": "Freighter",
+   "cost": "15,331,902 CR",
+   "insurance": "873,613 CR",
+   "pad": "Large",
+   "dimensions": "81.6m x 56.1m x 25.4m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "300 t",
+   "mass_lock": "10",
+   "armour": "612",
+   "hardness": "54",
+   "shields": "99 MJ",
+   "heat": "232",
+   "fuel": "32 t",
+   "sco": "No",
+   "manoeuvrability": "1",
+   "speed": [
+    "183 m/s (default)",
+    "209 m/s (upgraded)"
+   ],
+   "boost": [
+    "305 m/s (default)",
+    "348 m/s (upgraded)"
+   ],
+   "jump": [
+    "14.83 ly (default)",
+    "29.75 ly (upgraded)"
+   ],
+   "cargo": [
+    "128 t (default)",
+    "502 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "4× Small Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments",
+    "3× Class 5 Compartments",
+    "4× Class 6 Compartments",
+    "1× Class 7 Compartment"
+   ]
+  },
+  {
+   "name": "Type-8 Transporter",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3310-Present",
+   "role": "Freighter",
+   "cost": "38,453,970 CR",
+   "arx": "16,520 ARX",
+   "insurance": "1,922,699 CR",
+   "expansion": "Odyssey",
+   "pad": "Medium",
+   "dimensions": "99.34 m x 59.96 m x 25.63 m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "400 t",
+   "mass_lock": "18",
+   "armour": "792",
+   "hardness": "58",
+   "shields": "122 MJ",
+   "heat": "236",
+   "fuel": "32 t",
+   "sco": "Yes",
+   "manoeuvrability": "1",
+   "speed": [
+    "201 m/s (default)",
+    "228 m/s (upgraded)"
+   ],
+   "boost": [
+    "342 m/s (default)",
+    "387 m/s (upgraded)"
+   ],
+   "jump": [
+    "23.42 ly (default)",
+    "29.37 ly (upgraded)"
+   ],
+   "cargo": [
+    "176 t (default)",
+    "406 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "5× Small Hardpoints",
+    "1× Medium Hardpoint"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "1× Class 4 Compartment",
+    "2× Class 5 Compartments",
+    "3× Class 6 Compartments",
+    "1× Class 7 Compartment"
+   ]
+  },
+  {
+   "name": "Type-9 Heavy",
+   "manufacturer": "Lakon Spaceways",
+   "years": "3300-Present",
+   "role": "Freighter",
+   "cost": "76,555,842 CR",
+   "insurance": "3,827,792 CR",
+   "pad": "Large",
+   "dimensions": "117.4m x 115.3m x 33.2m",
+   "seats": "3-4",
+   "multicrew": "Yes",
+   "fighter_bay": "Yes",
+   "mass": "850 t",
+   "mass_lock": "16",
+   "armour": "864",
+   "hardness": "65",
+   "shields": "110 MJ",
+   "heat": "289",
+   "fuel": "64 t",
+   "sco": "No",
+   "manoeuvrability": "0",
+   "speed": [
+    "132 m/s (default)",
+    "151 m/s (upgraded)"
+   ],
+   "boost": [
+    "202 m/s (default)",
+    "232 m/s (upgraded)"
+   ],
+   "jump": [
+    "9.15 ly (default)",
+    "22.12 ly (upgraded)"
+   ],
+   "cargo": [
+    "348 t (default)",
+    "790 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Small Hardpoints",
+    "3× Medium Hardpoints"
+   ],
+   "internal": [
+    "1× Class 1 Compartment",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments",
+    "2× Class 4 Compartments",
+    "1× Class 5 Compartment",
+    "1× Class 6 Compartment",
+    "1× Class 7 Compartment",
+    "2× Class 8 Compartments"
+   ]
+  },
+  {
+   "name": "Viper Mk III",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3300-Present",
+   "role": "Combat",
+   "cost": "125,423 CR",
+   "insurance": "7,147 CR",
+   "pad": "Small",
+   "dimensions": "29.8m x 24.0m x 8.6m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "50 t",
+   "mass_lock": "7",
+   "armour": "126",
+   "hardness": "35",
+   "shields": "137 MJ",
+   "heat": "195",
+   "fuel": "4 t",
+   "sco": "No",
+   "manoeuvrability": "4",
+   "speed": [
+    "316 m/s (default)",
+    "361 m/s (upgraded)"
+   ],
+   "boost": [
+    "395 m/s (default)",
+    "451 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.09 ly (default)",
+    "21.28 ly (upgraded)"
+   ],
+   "cargo": [
+    "4 t (default)",
+    "26 t (max)"
+   ],
+   "hardpoints": [
+    "2× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "3× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "2× Class 3 Compartments"
+   ],
+   "reserved": [
+    "1× Class 3 Military Compartment"
+   ]
+  },
+  {
+   "name": "Viper Mk IV",
+   "manufacturer": "Faulcon DeLacy",
+   "years": "3301-Present",
+   "role": "Combat",
+   "cost": "384,285 CR",
+   "insurance": "21,897 CR",
+   "pad": "Small",
+   "dimensions": "29.9m x 24.7m x 8.7m",
+   "seats": "1",
+   "multicrew": "No",
+   "fighter_bay": "No",
+   "mass": "190 t",
+   "mass_lock": "7",
+   "armour": "270",
+   "hardness": "35",
+   "shields": "103 MJ",
+   "heat": "209",
+   "fuel": "16 t",
+   "sco": "No",
+   "manoeuvrability": "3",
+   "speed": [
+    "272 m/s (default)",
+    "314 m/s (upgraded)"
+   ],
+   "boost": [
+    "342 m/s (default)",
+    "395 m/s (upgraded)"
+   ],
+   "jump": [
+    "11.04 ly (default)",
+    "27.38 ly (upgraded)"
+   ],
+   "cargo": [
+    "18 t (default)",
+    "54 t (max)"
+   ],
+   "hardpoints": [
+    "2× Utility Mounts",
+    "2× Small Hardpoints",
+    "2× Medium Hardpoints"
+   ],
+   "internal": [
+    "3× Class 1 Compartments",
+    "2× Class 2 Compartments",
+    "1× Class 3 Compartment",
+    "2× Class 4 Compartments"
+   ],
+   "reserved": [
+    "1× Class 3 Military Compartment"
+   ]
+  },
+  {
+   "name": "Vulture",
+   "manufacturer": "Core Dynamics",
+   "years": "3301-Present",
+   "role": "Combat",
+   "cost": "4,925,615 CR",
+   "insurance": "246,280 CR",
+   "pad": "Small",
+   "dimensions": "43.1m x 34.7m x 12.3m",
+   "seats": "2",
+   "multicrew": "Yes",
+   "fighter_bay": "No",
+   "mass": "230 t",
+   "mass_lock": "10",
+   "armour": "288",
+   "hardness": "55",
+   "shields": "293 MJ",
+   "heat": "237",
+   "fuel": "8 t",
+   "sco": "No",
+   "manoeuvrability": "5",
+   "speed": [
+    "215 m/s (default)",
+    "244 m/s (upgraded)"
+   ],
+   "boost": [
+    "349 m/s (default)",
+    "397 m/s (upgraded)"
+   ],
+   "jump": [
+    "8.12 ly (default)",
+    "22.36 ly (upgraded)"
+   ],
+   "cargo": [
+    "8 t (default)",
+    "60 t (max)"
+   ],
+   "hardpoints": [
+    "4× Utility Mounts",
+    "2× Large Hardpoints"
+   ],
+   "internal": [
+    "4× Class 1 Compartments",
+    "1× Class 2 Compartment",
+    "1× Class 4 Compartment",
+    "1× Class 5 Compartment"
+   ],
+   "reserved": [
+    "1× Class 5 Military Compartment"
+   ]
+  }
+ ]
+}

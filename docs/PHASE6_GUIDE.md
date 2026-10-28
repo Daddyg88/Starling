@@ -1026,3 +1026,11 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 
 ## 0.76.1 - ship wiki: more robust and easier to diagnose
 - `personality/lookup.py` `_wiki_intro`: after the MediaWiki extract and the Fandom abstract, a third fallback reads the page HTML (`action=parse`, `first_paragraph` skips boxes and tables). `_search_ship` logs what the search found and why a page was skipped (look for "Elite wiki:" in `starling.log`).
+
+
+## 0.77.0 - the ship database
+
+- `config/ships_specs.json`: 49 ships with cost, insurance, jump range, hardpoints, internals, cargo, speed, mass, armour, shields and more. The source is the Elite Dangerous wiki (CC BY-SA). To rebuild it from a newer text file: `python tools/build_ship_specs.py path\to\all_ships_and_specs.TXT`.
+- `config/ship_answers.json`: the wordings she uses ("The {ship} costs {cost}"), plus `heard_as`, the ship names the listening model often mishears (add more there).
+- `personality/ships_info.py` finds the ship (full names, short names like "type 9", mishearings, "my ship", "its" after a ship question), the stat asked for, and the "which ship has the most..." questions. She says "stock" for the default fitting and "upgraded" for the best.
+- Known oddity: the Krait Mk II upgraded jump range is a range on the wiki ("30.79-60~"), so she says "about 30.8 to 60".
