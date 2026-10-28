@@ -95,7 +95,9 @@ class OnFootCare:
         self._mtime = mtime
         self._counts = new
         if new is not None:
-            log.info("Backpack: %s", ", ".join("%s x%d" % kv for kv in sorted(new.items()) if kv[1]) or "empty")
+            text = ", ".join("%s x%d" % kv for kv in sorted(new.items()) if kv[1]) or "empty"
+            (log.info if text != getattr(self, "_logged_backpack", None) else log.debug)("Backpack: %s", text)     # only when it changed
+            self._logged_backpack = text
         return new
 
     def _grenades(self, before, after, armed):

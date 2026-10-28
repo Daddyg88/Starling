@@ -22,3 +22,10 @@ class StartJump(BaseEvent):
             elif star[:1].upper() == "D":
                 data["Boost"] = "whitedwarf"        # white dwarfs (D, DA, DB...) give a smaller supercharge
         return data
+
+    def update_state(self, entry, state):
+        if str(entry.get("JumpType") or "").lower() == "hyperspace":
+            try:
+                state.bio.start_leaving()          # the biology overlay goes now, not when you arrive
+            except Exception:
+                pass

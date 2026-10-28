@@ -86,6 +86,9 @@ SUPPRESS_IN_SUPERCRUISE = frozenset({"HardpointsDeployed"})
 # (stops a flicker from announcing "fuel scoop disengaged").
 MIN_ON_SECONDS = {"FuelScoopDisengaged": 3.0}
 
+# Switches she keeps quiet about while you are mining (see journal/status_reader.py _mining_now).
+MINING_QUIET = frozenset({"CargoScoopDeployed", "InDanger"})
+
 # Names of every bit, used by the debug tool (run_debug.bat).
 FLAGS_NAMES = {
     0: "Docked", 1: "Landed", 2: "LandingGearDown", 3: "ShieldsUp", 4: "Supercruise",

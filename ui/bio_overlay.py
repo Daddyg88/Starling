@@ -114,6 +114,12 @@ def overlay_focus(view):
     return {"body": str(view.get("body") or "?"), "kind": str(view.get("kind") or "rocky"), "lives": lines}
 
 
+def _leaving(bio):
+    """True from the moment a hyperspace jump starts (not when you arrive), so the box is gone before the screen goes white."""
+    check = getattr(bio, "is_leaving", None)
+    return bool(check()) if check is not None else False
+
+
 def wanted_focus(settings, state, now=None, test_until=0.0):
     """The detailed single-planet view, or None to show the list."""
     now = time.monotonic() if now is None else now
@@ -123,7 +129,7 @@ def wanted_focus(settings, state, now=None, test_until=0.0):
         if getattr(state, "game_quit", False) or not settings.get("overlay.bio_enabled", True):
             return None
         bio = getattr(state, "bio", None)
-        if bio is None or getattr(bio, "hidden", False):
+        if bio is None or getattr(bio, "hidden", False) or _leaving(bio):
             return None
         return bio.focus_view()
     except Exception:
@@ -149,7 +155,7 @@ def wanted(settings, state, now=None, test_until=0.0):
         if getattr(state, "game_quit", False) or not settings.get("overlay.bio_enabled", True):
             return [], False
         bio = getattr(state, "bio", None)
-        if bio is None or getattr(bio, "hidden", False):
+        if bio is None or getattr(bio, "hidden", False) or _leaving(bio):
             return [], False
         return bio.rows(), False
     except Exception:

@@ -19,6 +19,9 @@ class HullDamage(BaseEvent):
         return data
 
     def update_state(self, entry, state):
+        if entry.get("PlayerPilot", True) and not entry.get("Fighter", False):
+            import time
+            state.attacked_at = time.monotonic()
         health = entry.get("Health")
         if isinstance(health, (int, float)) and entry.get("PlayerPilot", True) \
                 and not entry.get("Fighter", False):

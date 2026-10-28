@@ -701,19 +701,30 @@ class App:
         return self.autohonk
 
     def on_nomad_docked(self, _event=None):
-        """The Nomad is back aboard: put the hardpoints away (only if they are out, and only if the setting is on)."""
+        """The Nomad is back aboard: put the hardpoints away. The game switches the ship's hardpoints back out a little AFTER you
+        sit down, so she keeps watching for half a minute and sends 'weapons away' (at most 3 times) as soon as they are out."""
         if not self.settings.get("nomad.stow_hardpoints", True):
             return
         runner = self.ensure_commands()
         if runner is None:
+            self.log.info("Nomad is home but voice commands are off, so the hardpoints stay as they are")
             return
         import threading
         import time
 
         def go():
-            time.sleep(2.5)                                   # let the game finish switching you back to the ship
-            if (getattr(self.state, "status_flags", 0) or 0) & (1 << 6):      # bit 6 = hardpoints deployed
-                runner.run_text("weapons away", speak_unknown=False)
+            self.log.info("Nomad is back aboard: watching the hardpoints for 30 seconds")
+            sent, last_sent, end = 0, 0.0, time.monotonic() + 30.0
+            while time.monotonic() < end and sent < 3:
+                time.sleep(0.5)
+                flags = getattr(self.state, "status_flags", 0) or 0
+                if not flags & (1 << 24):                         # not in the main ship (any more)
+                    continue
+                if flags & (1 << 6) and time.monotonic() - last_sent > 4.0:
+                    self.log.info("Hardpoints are out after the Nomad came home: sending 'weapons away' (try %d)", sent + 1)
+                    runner.run_text("weapons away", speak_unknown=False)
+                    sent += 1
+                    last_sent = time.monotonic()
         threading.Thread(target=go, name="nomad-stow", daemon=True).start()
 
     def _say_line(self, key, fields=None):

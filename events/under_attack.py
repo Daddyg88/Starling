@@ -10,3 +10,7 @@ class UnderAttack(BaseEvent):
     tag_on_foot = True
     keep = ("Target",)
     summary = "Under attack (target: {Target})"
+
+    def update_state(self, entry, state):
+        import time
+        state.attacked_at = time.monotonic()

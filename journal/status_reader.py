@@ -16,7 +16,7 @@ from pathlib import Path
 from core.event_bus import CRITICAL
 from core.logger import get_logger
 from events.status_flags import (
-    FLAG_ROWS, FUEL_SCOOP_COMPLETE, MIN_ON_SECONDS, ROW_CONTEXT, SCREEN_CLOSED, SCREENS,
+    FLAG_ROWS, FUEL_SCOOP_COMPLETE, MIN_ON_SECONDS, MINING_QUIET, ROW_CONTEXT, SCREEN_CLOSED, SCREENS,
     SUPPRESS_IN_SUPERCRUISE, VEHICLE_CHANGED,
 )
 
@@ -157,7 +157,8 @@ class StatusReader:
         if state is not None and isinstance(status.get("BodyName"), str) and status.get("BodyName"):
             state.current_body = status["BodyName"]       # present while you are near a planet
         vehicle = self._work_out_vehicle(flags, flags2)
-        if vehicle == "main ship" and self._vehicle == "Nomad" and not baseline_only and not initial:
+        came_from_nomad = self._vehicle == "Nomad" or (self._vehicle == "other vehicle" and self.processor.state.in_nomad)
+        if vehicle == "main ship" and came_from_nomad and not baseline_only and not initial:
             self._announce("NomadDocked", status)             # the Nomad came home: the app puts the hardpoints away
         if vehicle == "main ship":
             self.processor.state.in_nomad = False   # back aboard: the Nomad is stowed
@@ -207,6 +208,8 @@ class StatusReader:
             allowed = ROW_CONTEXT.get(on_name)
             if allowed is not None and vehicle not in allowed:
                 continue
+            if on_name in MINING_QUIET and self._mining_now(on_name):
+                continue                                   # limpets and mining lasers set these off all the time
             if on_name in SUPPRESS_IN_SUPERCRUISE:
                 if moving_fast:
                     if now_on != was_on:
@@ -229,6 +232,22 @@ class StatusReader:
         if changed and not (baseline_only or initial):
             self._announce(VEHICLE_CHANGED, status, {"vehicle": vehicle, "previous": previous_vehicle})
         self._check_screen(status, quiet=baseline_only or initial)
+
+    def _mining_now(self, name):
+        """True while you are mining: the cargo scoop opens for every limpet and the mining lasers can flicker the Danger switch.
+        Real danger still gets through: Danger is only held back if nothing has attacked you in the last minute."""
+        state = getattr(self.processor, "state", None)
+        if state is None:
+            return False
+        now = time.monotonic()
+        mining = now < getattr(state, "mining_until", 0.0)
+        if not mining and name == "InDanger":
+            mining = bool(getattr(state, "status_flags", 0) & (1 << 6)) and any("mining" in str(m).lower() for m in (getattr(state, "modules", None) or []))
+        if not mining:
+            return False
+        if name == "InDanger" and now - getattr(state, "attacked_at", -999.0) < 60.0:
+            return False
+        return True
 
     def _work_out_vehicle(self, flags, flags2):
         """Which vehicle are you in? None means unknown (for example, a menu)."""

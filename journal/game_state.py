@@ -38,6 +38,8 @@ class GameState:
     milestones: GameMilestones = field(default_factory=GameMilestones)   # round numbers from the Statistics event (saving one in app.py)
     owned: OwnedSystems = field(default_factory=OwnedSystems)   # colonies you own (replaced by a saving one in app.py)
     wanted: bool = False                    # the game says you are wanted where you are (notoriety)
+    mining_until: float = 0.0               # time.monotonic() until which she treats you as mining (set by limpet / prospector / refinery events)
+    attacked_at: float = -999.0             # time.monotonic() of the last UnderAttack or hull damage
     in_nomad: bool = False                  # the Nomad (a ship-launched vessel) is out; the game reports it as an SRV
     status_flags: int = 0                   # the raw "Flags" from Status.json (gear, lights...), used by voice commands
     status_flags2: int = 0

@@ -721,6 +721,7 @@ class Dashboard:
 
         extra = []
         if page.id == "voice":
+            extra.append(("Test her voice", self.test_voice))
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
@@ -739,7 +740,7 @@ class Dashboard:
             extra += [("Plot neutron route to my destination", lambda: self.nav_plot(use_entry=False)),
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
                       ("Clear the route", self.nav_clear)]
-        if page.id == "controls":
+        if page.id == "listening":
             extra += [("Learn push-to-talk button", self.learn_button)]
         if page.id == "developer":
             extra += [("Test her voice", self.test_voice),

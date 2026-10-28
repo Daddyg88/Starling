@@ -26,6 +26,9 @@ DEFAULT_PORT = 7380
 TIMEOUT_SECONDS = 3.0
 
 
+_OFFLINE_LOGGED = {}      # port -> when 'not reachable' was last written to the log
+
+
 class VoidError(Exception):
     def __init__(self, kind, message=""):
         super().__init__(message or kind)
@@ -55,8 +58,8 @@ class VoidCompass:
             raise self._http_error(error)
         except (urllib.error.URLError, OSError, TimeoutError) as error:
             now = time.monotonic()
-            if now - getattr(self, "_last_offline_log", -1e9) > 600:       # say it once in a while, not every 12 seconds
-                self._last_offline_log = now
+            if now - _OFFLINE_LOGGED.get(self.port, -1e9) > 600:       # say it once in a while, not every 12 seconds (also when a new client is made each time)
+                _OFFLINE_LOGGED[self.port] = now
                 log.info("Void Compass not reachable on port %s: %s (further messages hidden for 10 minutes)", self.port, error)
             raise VoidError("offline", "I can't reach Void Compass.")
         try:

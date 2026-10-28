@@ -16,6 +16,7 @@ The rules are a guess, not a promise: the game does not say what lives where, an
 import json
 import re
 import threading
+import time
 from pathlib import Path
 
 from core import paths
@@ -322,6 +323,16 @@ class BioPredictor:
         self.focus = ""            # the planet the overlay is showing in detail (after you map it), "" = show the list
         self.focus_targeted = False   # has the game's target been that planet since we focused it?
         self.focus_held = False       # you are down at the planet (landed, gear down, SRV, on foot, or near it): the target no longer matters
+        self.leaving_at = 0.0         # time.monotonic() when a hyperspace jump started: the overlay hides at once, not on arrival
+
+    LEAVING_SECONDS = 60.0
+
+    def start_leaving(self):
+        """A hyperspace jump has started (StartJump): hide the overlay now. If the jump never happens it comes back after a minute."""
+        self.leaving_at = time.monotonic()
+
+    def is_leaving(self):
+        return bool(self.leaving_at) and time.monotonic() - self.leaving_at < self.LEAVING_SECONDS
 
     # ---- journal input ----
     def set_system(self, name):
@@ -658,6 +669,9 @@ class BioPredictor:
         body = self.bodies.get(self.focus) if self.focus else None
         if body is None:
             self.focus = ""
+            back = self._mapped_body(body_id, near if hold else "")
+            if back is not None:                                  # you came back to a planet you already mapped: show it again
+                self.focus, self.focus_targeted, self.focus_held = back.name, body_id == back.body_id and body_id not in (None, 0), bool(hold)
             return
         if hold or (near and near == body.name):
             self.focus_held = True          # landing or landed: keep the planet view up whatever the target does
@@ -673,6 +687,17 @@ class BioPredictor:
                 self.focus = ""
         else:
             self.focus = ""
+
+    def _mapped_body(self, body_id, near=""):
+        """A planet with life that you have already mapped (its life forms are known) and that is targeted or right beneath you."""
+        for body in self.bodies.values():
+            if not body.genera:
+                continue
+            if body_id not in (None, 0) and body.body_id == body_id:
+                return body
+            if near and near == body.name:
+                return body
+        return None
 
     def _lives(self, body):
         """One dictionary per life form on a mapped planet: name, colour (tone), flag status, finished, value and low/high (x5 on a first footfall).

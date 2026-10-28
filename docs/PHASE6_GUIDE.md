@@ -1034,3 +1034,14 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `config/ship_answers.json`: the wordings she uses ("The {ship} costs {cost}"), plus `heard_as`, the ship names the listening model often mishears (add more there).
 - `personality/ships_info.py` finds the ship (full names, short names like "type 9", mishearings, "my ship", "its" after a ship question), the stat asked for, and the "which ship has the most..." questions. She says "stock" for the default fitting and "upgraded" for the best.
 - Known oddity: the Krait Mk II upgraded jump range is a range on the wiki ("30.79-60~"), so she says "about 30.8 to 60".
+
+
+## 0.77.1 - fixes from the evening log
+
+- `control/combat_assist.py`: `fighting()` is False while `state.in_nomad` (the Nomad reports hardpoints out all the time).
+- `core/app.py` `on_nomad_docked`: watches 30 s, sends "weapons away" up to 3 times when the hardpoints flag is on in the main ship. The status reader also treats "other vehicle" then main ship as the Nomad coming home when `in_nomad` is set. The log says "Nomad is back aboard..." so the next log shows if it ran.
+- Mining quiet: `events/mining_events.py` sets `state.mining_until` (10 minutes); `journal/status_reader.py` `_mining_now` skips CargoScoopDeployed/Retracted and InDanger (unless `state.attacked_at` is within 60 s).
+- Overlay: `BioPredictor.start_leaving()` (called by StartJump with JumpType Hyperspace) hides it for up to 60 s or until the next system; `note_target` re-focuses a mapped planet.
+- Settings: push-to-talk fields moved to the Listening page; Test her voice button on Voice.
+- Launcher: first run asks for the install folder and remembers it in `%LOCALAPPDATA%\Starling\install_location.txt`. Existing installs are not asked.
+- Log noise: Void Compass offline message throttled across clients, backpack/fire/auto-honk lines only when new, listener timing only when over 2.5 s.

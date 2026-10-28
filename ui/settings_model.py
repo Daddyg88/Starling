@@ -188,7 +188,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("tts.voice", "Voice", "choice", VOICES,
                   help="All free and offline. A new voice downloads once (small) the first time you use it"),
         ]),
-        Page("listening", "Listening", "How she hears you.", [
+        Page("listening", "Listening", "How she hears you, including push-to-talk (use the Learn button at the bottom to pick your button).", [
             Field("stt.enabled", "Listen when the app starts", "toggle", restart=True),
             Field("stt.microphone", "Microphone", "choice", lambda: microphone_choices(mic_lister), restart=True,
                   help="Pick the microphone you talk into"),
@@ -200,8 +200,14 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="What you say to get her attention. Empty = her name"),
             Field("stt.require_wake", "Only react when I say her name", "toggle"),
             Field("stt.reply", "She answers when she hears me", "toggle"),
+            Field("ptt.mode", "Push-to-talk", "choice", PTT_MODES,
+                  help="With push-to-talk you do not need to say her name"),
+            Field("ptt.button", "Push-to-talk button", "text", placeholder="Use the Learn button below",
+                  help="A keyboard key, mouse side button or joystick button (your X52)"),
+            Field("ptt.beep", "Beep when the microphone opens", "toggle"),
+            Field("ptt.skip_wake", "No need to say her name with push-to-talk", "toggle"),
         ]),
-        Page("controls", "Controls", "Voice commands, push-to-talk and your joystick.", [
+        Page("controls", "Controls", "Voice commands and your joystick. (Push-to-talk is on the Listening page, under Voice.)", [
             Field("commands.enabled", "Voice commands", "toggle",
                   help="Say things like 'lower the landing gear' and she presses your key"),
             Field("commands.ask_guess", "Ask 'did you mean...?' when unsure", "toggle",
@@ -221,15 +227,9 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Needs a recent Void Compass (it has a 'hush' call). If your version has none she notices and stops asking"),
             Field("watcher.wait_for_calm", "Make the Watcher wait for a calm moment", "toggle",
                   help="If he speaks while she is talking, during a warning, in a fight or while jumping, she cuts him off and he repeats it later"),
-            Field("ptt.mode", "Push-to-talk", "choice", PTT_MODES,
-                  help="With push-to-talk you do not need to say her name"),
-            Field("ptt.button", "Push-to-talk button", "text", placeholder="Use the Learn button below",
-                  help="A keyboard key, mouse side button or joystick button (your X52)"),
             Field("recorder.seconds", "Button recorder: how long it records", "choice", RECORD_SECONDS,
                   help="Use the Record my buttons button below. It watches your HOTAS and writes down what you press and when"),
             Field("recorder.countdown", "Button recorder: countdown before it starts", "choice", RECORD_COUNTDOWN),
-            Field("ptt.beep", "Beep when the microphone opens", "toggle"),
-            Field("ptt.skip_wake", "No need to say her name with push-to-talk", "toggle"),
         ]),
         Page("chat", "Chat and facts", "She asks you questions and shares things she has read. She needs listening switched on to hear your answers.", [
             Field("facts.frequency", "How often she offers a fact", "choice", FACT_FREQUENCY,

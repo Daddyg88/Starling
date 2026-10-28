@@ -10,6 +10,15 @@ from core.event_bus import NORMAL, LOW
 from events.base_event import BaseEvent
 from mining import minerals
 
+MINING_SECONDS = 600      # after any mining event she treats you as mining for this long (no cargo scoop / danger chatter)
+
+
+def note_mining(state):
+    try:
+        state.mining_until = time.monotonic() + MINING_SECONDS
+    except Exception:
+        pass
+
 SESSION_GAP_SECONDS = 3 * 3600
 RANK = {"top": 2, "good": 1, "low": 0}
 DEPLETED_PERCENT = 1.0        # Remaining (percent of the rock left) at or below this = depleted
@@ -74,6 +83,9 @@ class ProspectedAsteroid(BaseEvent):
             data["Announce"] = "poor"
         return data
 
+    def update_state(self, entry, state):
+        note_mining(state)
+
 
 class MiningRefined(BaseEvent):
     """
@@ -126,6 +138,9 @@ class MiningRefined(BaseEvent):
         return {"Material": minerals.spoken(kind, entry.get("Type_Localised")), "Commodity": key, "Tier": tier,
                 "Count": count, "Total": self.total, "Announce": say}
 
+    def update_state(self, entry, state):
+        note_mining(state)
+
 
 class AsteroidCracked(BaseEvent):
     """A core was cracked open with an explosive charge."""
@@ -133,6 +148,9 @@ class AsteroidCracked(BaseEvent):
     priority = LOW
     keep = ("Body",)
     summary = "Cracked an asteroid core"
+
+    def update_state(self, entry, state):
+        note_mining(state)
 
 
 class LaunchDrone(BaseEvent):
@@ -153,3 +171,5 @@ class LaunchDrone(BaseEvent):
             data["Announce"] = kind
         return data
 
+    def update_state(self, entry, state):
+        note_mining(state)

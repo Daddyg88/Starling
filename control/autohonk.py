@@ -143,7 +143,8 @@ class AutoHonk:
             hold = float(self.settings.get("autohonk.hold_seconds", DEFAULT_HOLD_SECONDS))
             problem = self.sender.send(stroke, hold=hold)
             self.last_result = problem or "done"
-            log.info("Auto honk: %s", explain(self.last_result))
+            (log.info if self.last_result != "done" or not getattr(self, "_logged_done", False) else log.debug)("Auto honk: %s", explain(self.last_result))
+            self._logged_done = self.last_result == "done"          # the long 'if nothing was scanned...' text only the first time
             if problem:
                 log.warning("Auto honk did not press the key: %s (if this says game_not_active, another window was in front of Elite)", problem)
         except Exception:

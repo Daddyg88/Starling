@@ -174,7 +174,7 @@ class Listener:
                 log.exception("Transcription failed")
                 continue
             took = self.clock() - started
-            (log.info if took > 1.5 else log.debug)("Understanding that took %.2f s", took)
+            (log.info if took > 2.5 else log.debug)("Understanding that took %.2f s", took)
             self.handle_text(text, ptt)
 
     def handle_text(self, text, ptt=False):

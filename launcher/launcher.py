@@ -11,7 +11,7 @@ Double-click it and it does everything, showing one small progress window, then 
 When a newer version exists it first shows a separate "Update available" screen (Update now / Not now / always update
 automatically) before Starling loads. "Always update automatically" is saved as updates.ask = false in config/settings.json.
 
-Everything lives in  %LOCALAPPDATA%\\Starling   (app\\, updates\\, .venv\\, launcher.log).
+Everything lives in  %LOCALAPPDATA%\\Starling  (or the folder you pick the first time you run it)  (app\\, updates\\, .venv\\, launcher.log).
 Your settings, mood and data live in app\\data and app\\config and survive every update.
 """
 import hashlib
@@ -54,11 +54,81 @@ def clean_env(extra=None):
     return env
 
 
+def default_home():
+    return Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "Starling"
+
+
+def pointer_file():
+    """A tiny note that always lives in the default folder and says where Starling was installed."""
+    return default_home() / "install_location.txt"
+
+
+def saved_home():
+    """The folder you chose the first time, or None."""
+    try:
+        text = pointer_file().read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    return Path(text) if text else None
+
+
+def save_home(path):
+    try:
+        pointer_file().parent.mkdir(parents=True, exist_ok=True)
+        pointer_file().write_text(str(path), encoding="utf-8")
+    except OSError:
+        pass
+
+
 def install_home():
     override = os.environ.get("STARLING_HOME")
     if override:
         return Path(override)
-    return Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "Starling"
+    return saved_home() or default_home()
+
+
+def needs_choice():
+    """True only on a brand new install: nothing installed yet, no choice saved, no STARLING_HOME. Existing installs are never asked."""
+    if os.environ.get("STARLING_HOME") or saved_home() is not None:
+        return False
+    return not (default_home() / "app" / "main.py").exists()
+
+
+def choose_folder(root, tk, filedialog):
+    """The first-run question: where to install Starling. Returns the folder (the default if the window is closed)."""
+    default = str(default_home())
+    box = tk.Toplevel(root)
+    box.title("Install Starling")
+    box.geometry("560x200")
+    box.resizable(False, False)
+    box.attributes("-topmost", True)
+    tk.Label(box, text="Where should Starling be installed?", font=("Segoe UI", 12, "bold")).pack(padx=16, pady=(14, 2), anchor="w")
+    tk.Label(box, text="A folder called Starling is made inside it. It needs a few GB (Python and the voice add-ons).",
+             wraplength=520, justify="left").pack(padx=16, anchor="w")
+    value = tk.StringVar(value=default)
+    row = tk.Frame(box)
+    row.pack(padx=16, pady=10, fill="x")
+    tk.Entry(row, textvariable=value, width=58).pack(side="left", fill="x", expand=True)
+
+    def browse():
+        picked = filedialog.askdirectory(parent=box, title="Choose where to install Starling", initialdir=str(Path(value.get()).parent))
+        if picked:
+            picked = Path(picked)
+            value.set(str(picked if picked.name.lower() == "starling" else picked / "Starling"))
+    tk.Button(row, text="Browse...", command=browse).pack(side="left", padx=(8, 0))
+    result = []
+
+    def done(use_default=False):
+        result.append(default if use_default or not value.get().strip() else value.get().strip())
+        box.destroy()
+    buttons = tk.Frame(box)
+    buttons.pack(pady=6)
+    tk.Button(buttons, text="Install here", width=16, command=done).pack(side="left", padx=8)
+    tk.Button(buttons, text="Use the default", width=16, command=lambda: done(True)).pack(side="left", padx=8)
+    box.protocol("WM_DELETE_WINDOW", lambda: done(True))
+    box.grab_set()
+    root.wait_window(box)
+    return Path(result[0] if result else default)
 
 
 class Layout:
@@ -294,11 +364,10 @@ class Launcher:
 
 
 def main():
-    layout = Layout(install_home())
     problem = []
     try:
         import tkinter as tk
-        from tkinter import ttk
+        from tkinter import filedialog, ttk
         root = tk.Tk()
         root.title("Starling")
         root.geometry("460x120")
@@ -311,6 +380,12 @@ def main():
         say = lambda text: root.after(0, lambda: label.config(text=text))
     except Exception:
         root, say = None, (lambda text: None)
+    if root is not None and needs_choice():
+        try:
+            save_home(choose_folder(root, tk, filedialog))
+        except Exception:
+            save_home(default_home())
+    layout = Layout(install_home())
 
     def ask(info, current):
         """The separate 'Update available' screen. Runs the question on the window thread and waits for the answer."""

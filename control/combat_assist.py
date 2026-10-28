@@ -152,6 +152,8 @@ class CombatAssist:
     def fighting(self):
         """Weapons are in use: hardpoints out, or (mining, scanning, limpets) the cockpit is in analysis mode."""
         state = self.state_provider()
+        if getattr(state, "in_nomad", False):
+            return False                      # the Nomad reports "hardpoints out" all the time: no auto pips there
         armed = hardpoints_out(state) or (bool(self.option("pips_analysis", True)) and _flag(state, ANALYSIS_BIT))
         return armed and not _flag(state, DOCKED_BIT) and not _flag(state, LANDED_BIT) and not _flag(state, SUPERCRUISE_BIT)
 
@@ -224,7 +226,9 @@ class CombatAssist:
             if not self._boosted:
                 self._boosted = True
                 self._topped_at = now
-                log.info("Fire button down (%s): pips to weapons", "hardpoints" if hardpoints_out(self.state_provider()) else "analysis mode")
+                (log.info if now - getattr(self, "_logged_fire_at", -999.0) > 60.0 else log.debug)(
+                    "Fire button down (%s): pips to weapons", "hardpoints" if hardpoints_out(self.state_provider()) else "analysis mode")
+                self._logged_fire_at = now
                 self._run_steps(self.option("pips_firing", DEFAULT_PIPS_UP))
                 return "up"
             # Mining lasers are held for a long time: now and then top the weapons up again (it does nothing when already full)
