@@ -36,6 +36,7 @@ log = get_logger("brain")
 
 TOPIC_SECONDS = 150.0          # how long "why?" and "tell me more" still refer to the last answer
 RIDDLE_SECONDS = 120.0
+TELL_ABOUT = re.compile(r"^(?:tell me about|explain|describe|what do you know about) ")        # these are also questions for a look-up
 FOLLOW_UPS = ("why", "more", "you", "really")
 HISTORY_SIZE = 6               # how many of the last answers she remembers (for "say that again", "what were we talking about")
 HISTORY_SECONDS = 900.0        # and for how long
@@ -166,6 +167,15 @@ class Brain:
                 reply = self._say(self._style_pick(pool, "{name}.").format(name=name, relation=relation, place=place))
                 self._remember("People", tidy, reply)
                 log.info("People: %s %s", "learned" if new else "already knew", relation)
+                return reply
+            hello = self.people.greet(tidy, raw)
+            if hello is not None:
+                if hello["name"]:
+                    pool = "people_greet_again" if hello["known"] else "people_greet_name"
+                else:
+                    pool = "people_greet_plain"
+                reply = self._say(self._style_pick(pool, "Hello.").format(name=hello["name"], relation=hello["relation"]))
+                self._remember("People", tidy, reply)
                 return reply
             asked = self.people.who(tidy)
             if asked is None:
@@ -323,7 +333,7 @@ class Brain:
                 reply = self._say(self._style_pick("remembered", "{text}").format(text=known[1]))
                 self._remember("Know", tidy, reply)
                 return reply
-            if self.knowledge is None or self.knowledge.looks_like_question(tidy) != "question":
+            if self.knowledge is None or (self.knowledge.looks_like_question(tidy) != "question" and not TELL_ABOUT.match(tidy)):
                 return None
             found = look.should_try(tidy)
             if found is None:
@@ -349,7 +359,7 @@ class Brain:
                     log.exception("The online lookup failed")
                     return None
 
-            filler = self._style_pick("looking", "Let me look that up.")
+            filler = self._style_pick("looking_ship" if kind == "ship" else "looking", "Let me look that up.")
             if look.background:
                 self._say(filler)
                 threading.Thread(target=work, name="lookup", daemon=True).start()
@@ -942,6 +952,9 @@ class Brain:
 
     def _do_opinion(self, item, found, tidy):
         thing = (found.groupdict().get("t") or "").strip()
+        if thing in ("it", "that", "this", "them", "that one", "this one"):
+            # "do you like it?" means the thing she just said; with nothing just said there is nothing to have an opinion on
+            return self._say_pool("Brain_OpinionIt", {}, remember=True) if self._recent() else None
         thing = re.sub(r"^(?:the|a|an|my|your|this|that) ", "", thing)
         if not thing or len(thing) > 40 or len(thing.split()) > 5:
             return None

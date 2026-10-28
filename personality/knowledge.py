@@ -46,6 +46,22 @@ def words_of(text):
     return [SAME_WORD.get(w) or stem(w) for w in re.findall(r"[a-z0-9]+", text)]
 
 
+# Little words say nothing about WHAT is being asked. Before a fact is used, the thing the question is really about (the words before
+# "in / to / of / from ...": "the nearest star" in "the nearest star to our solar system") must all be in the fact's key words.
+LITTLE_WORDS = frozenset(words_of("is are was were be been am what whats which who whom where when why how the a an and or our your my me you it its "
+                                  "this that these those there their do does did have has had can could will would should tell about please many "
+                                  "much some any find show give say know want need like good great nice easy simple quick s take make go get long happen become call work first i we us one only ever still just really also im ive start begin end finish stop")) | {"doe", "ha", "wa"}
+_NUMBER_WORDS_SET = frozenset("zero one two three four five six seven eight nine ten eleven twelve hundred thousand million first second third".split())
+PREPOSITIONS = frozenset(words_of("in to of from on at around near by for within with than into between across inside outside"))
+
+
+def question_focus(tidy):
+    """The content words of what is being asked, leaving out the 'where' part: 'nearest star to our solar system' -> {nearest, star}."""
+    words = words_of(tidy)
+    cut = next((i for i, w in enumerate(words) if i >= 2 and w in PREPOSITIONS), len(words))
+    return {w for w in words[:cut] if w not in LITTLE_WORDS and not w.isdigit() and w not in _NUMBER_WORDS_SET}
+
+
 _ONES = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
          "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
          "nineteen": 19}
@@ -285,11 +301,12 @@ class Knowledge:
         if found:
             return "language", found
         have = set(words_of(tidy))
+        focus = question_focus(tidy)
         best, best_size = None, 0
         for alternatives, answer in self.entries:
             for alt in alternatives:
-                if len(alt) > best_size and alt <= have and (shape == "question" or len(alt) >= 2):
-                    best, best_size = answer, len(alt)
+                if len(alt) > best_size and alt <= have and (shape == "question" or len(alt) >= 2) and focus <= alt | LITTLE_WORDS:
+                    best, best_size = answer, len(alt)           # a fact that misses a word of the focus ("dwarf") would be a guess
         return ("fact", best) if best else None
 
     def _find_place(self, tidy):

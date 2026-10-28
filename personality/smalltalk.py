@@ -24,7 +24,7 @@ _FILL = r"(?:\s+(?:please|starling|commander|then|today|there|now))*"
 # (key, regex). The text is lower case with punctuation removed.
 INTENTS = [
     ("Talk_HowAreYou", r"(?:how are you(?: doing| feeling| today| holding up)?|how(?: is|s) it going|are you (?:ok|okay|alright|all right|well|good)|you (?:ok|okay|alright)|how do you feel)"),
-    ("Talk_Joke", r"(?:tell me a joke|got any jokes|do you know any jokes|make me laugh|say something funny|tell a joke|joke)"),
+    ("Talk_Joke", r"(?:tell me a joke|got any jokes|do you know any jokes|make me laugh|say something funny|tell a joke|joke|tell me (?:another|a different|one more|a new) joke|tell me another|another joke|one more joke|do you have another joke|got another joke|any more jokes|more jokes|a different joke)"),
     ("Talk_Chat", r"(?:talk to me|chat to me|chat with me|say something|keep me company|tell me something|i(?: am|m) bored|im bored|entertain me|speak to me)"),
     ("Talk_Here", r"(?:are you (?:there|listening|awake|still there|with me)|you there|can you hear me)"),
     ("Talk_Hello", r"(?:hello|hi|hey|hiya|howdy|good (?:morning|afternoon|evening)|morning|evening)"),
@@ -43,6 +43,7 @@ INTENTS = [
     ("Talk_More", r"(?:tell me more|go on|carry on|and then|what happened next|what happened then|then what|continue|more)"),
 ]
 LORE_KEYS = ("Talk_Name", "Talk_What", "Talk_Story", "Talk_More")
+JUST_THE_NAME = re.compile(r"^(?:what(?: is|s) your name|what are you called|what should i call you)")         # these get her name, not her story
 _COMPILED = [(key, re.compile(r"^" + body + _FILL + r"$")) for key, body in INTENTS]
 KIND = ("Talk_Compliment", "Talk_Love", "Talk_Back")
 
@@ -90,7 +91,8 @@ class SmallTalk:
             told = self.eoc.try_handle(text)              # before her back story: the company has its own answers
             if told:
                 return told
-        if key in LORE_KEYS and self.lore is not None:
+        plain_name = key == "Talk_Name" and bool(JUST_THE_NAME.match(re.sub(r"^(?:hey |hi |ok |okay )?(?:starling )", "", clean(text))))
+        if key in LORE_KEYS and self.lore is not None and not plain_name:
             if key == "Talk_More" and not self.lore.recent():
                 return None                                  # "more" on its own means nothing unless she was just telling a story
             told = self.lore.tell()

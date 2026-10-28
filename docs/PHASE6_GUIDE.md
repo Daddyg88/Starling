@@ -1014,3 +1014,12 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `config/brain_examples.json`: about 30 more example sentences; `tests/test_stage3.py` pins a few paraphrases and checks that commands match nothing. The matcher stays cautious on purpose, so some rephrasings ("make me laugh") still get no answer.
 - `config/knowledge/style.json`: more wordings for look-ups (`found_def`, `found_detail`, `remembered`).
 - Not done: rewriting a Wikipedia extract in her own words with a language model (needs the optional model; the text is still trimmed and prefixed in her voice).
+
+## 0.76.0 - fixes from the 28 October log
+- `personality/knowledge.py` `question_focus`: a fact is only used when every important word before the first "in / to / of / from..." of the question is one of the fact's key words (little words and fillers in `LITTLE_WORDS` are ignored). This stopped "nearest star to our solar system" and "how many dwarf planets" matching the solar-system facts. New facts in `config/knowledge/space2.json`.
+- `personality/lookup.py` `covers`: a Wikipedia page is only used when at least 60 percent of the subject's words are in its title or first 500 letters.
+- `personality/lookup.py` ship questions: `ship_in` / `norm_ship` find an Elite ship name (Mk III, mark three, Fer-de-Lance), `_search_ship` searches `https://elite-dangerous.fandom.com/api.php` and `_wiki_intro` reads the page start (MediaWiki extracts, then the Fandom `Articles/Details` abstract). Saved in `learned_facts.json` as `ship:<name>`. Lines in `style.json` (`found_ship`, `looking_ship`).
+- WRITTEN WITHOUT BEING ABLE TO REACH THE WIKI. The two address forms above are standard for Fandom wikis but have only been tested with a pretend wiki. If ship questions answer "I couldn't find anything reliable" or "I can't reach the internet", send the log line.
+- `personality/smalltalk.py`: a plain name question no longer starts her back story; more ways to ask for another joke. `config/brain_intents.json` `Brain_Suggest`: "what shall we do", "where shall we go". `Brain._do_opinion`: "do you like it?" refers to her last answer (`Brain_OpinionIt` in `voicepacks/default/chat2.json`).
+- `personality/people.py` `greet`: "say hello to my wife Marie" (learns Marie), "say hello to my wife" (uses the wife she knows).
+- `tts/kokoro_tts.py` `split_sentences`: parts longer than 90 letters are made one sentence at a time, so speech starts after the first sentence.

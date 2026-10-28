@@ -163,5 +163,32 @@
  ],
  "people_forgot_none": [
   "There was nobody to forget."
+ ],
+ "people_greet_name": [
+  "Hello, {name}! Lovely to meet you.",
+  "Hi {name}! Welcome aboard. Any friend of the Commander is a friend of mine.",
+  "Hello {name}. It's nice to meet you. I'm Starling.",
+  "Hello {name}! Don't mind the ship. Make yourself at home."
+ ],
+ "people_greet_again": [
+  "Hello again, {name}!",
+  "{name}! Good to hear from you again.",
+  "Hi {name}. Nice to see you again."
+ ],
+ "people_greet_plain": [
+  "Hello to your {relation}! Lovely to meet you.",
+  "Hello! Welcome aboard. I'm Starling.",
+  "Hi there! Any friend of the Commander is a friend of mine."
+ ],
+ "found_ship": [
+  "From the Elite Dangerous wiki. {text}",
+  "Here's what the Elite wiki says about the {title}. {text}",
+  "The Elite Dangerous wiki says this. {text}",
+  "Checking the Elite wiki. {text}"
+ ],
+ "looking_ship": [
+  "Let me check the Elite wiki.",
+  "One moment, checking the ship database.",
+  "Let me look that ship up."
  ]
 }

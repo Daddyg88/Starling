@@ -1,0 +1,82 @@
+{
+ "_help": "More space facts (0.76.0), added after a real log showed wrong answers for these.",
+ "entries": [
+  {
+   "k": [
+    [
+     "dwarf",
+     "planet"
+    ]
+   ],
+   "a": "There are five recognised dwarf planets: Pluto, Eris, Haumea, Makemake and Ceres."
+  },
+  {
+   "k": [
+    [
+     "constellation",
+     "how",
+     "many"
+    ],
+    [
+     "constellation",
+     "sky"
+    ]
+   ],
+   "a": "Astronomers recognise eighty eight constellations covering the whole sky. Orion, Ursa Major and Scorpius are among the best known."
+  },
+  {
+   "k": [
+    [
+     "nebula"
+    ],
+    [
+     "nebulae"
+    ]
+   ],
+   "a": "A nebula is a giant cloud of gas and dust in space. Some are where new stars are born, and some are the glowing leftovers of dead ones."
+  },
+  {
+   "k": [
+    [
+     "neutron",
+     "star"
+    ]
+   ],
+   "a": "A neutron star is what is left when a massive star explodes. It's only about twenty kilometres across but heavier than the Sun, so a spoonful would weigh billions of tonnes."
+  },
+  {
+   "k": [
+    [
+     "brown",
+     "dwarf"
+    ]
+   ],
+   "a": "A brown dwarf is a failed star: too big to be a planet, too small to burn hydrogen like a star. In Elite these are the L, T and Y class stars."
+  },
+  {
+   "k": [
+    [
+     "t",
+     "class",
+     "star"
+    ],
+    [
+     "t",
+     "type",
+     "star"
+    ],
+    [
+     "l",
+     "class",
+     "star"
+    ],
+    [
+     "y",
+     "class",
+     "star"
+    ]
+   ],
+   "a": "L, T and Y class stars are brown dwarfs, failed stars that are cool and very dim. They are hard to spot, and you cannot scoop fuel from them."
+  }
+ ]
+}

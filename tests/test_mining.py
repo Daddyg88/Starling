@@ -87,7 +87,7 @@ class EventTests(unittest.TestCase):
         self.assertEqual(line_keys.keys_for(heard[0]), ["Refined_First"])
         self.assertLess(sum(1 for x in said if x), 8)
         low = self.feed({"event": "MiningRefined", "Type": "bertrandite", "Type_Localised": "Bertrandite"})
-        self.assertEqual(line_keys.keys_for(low), [])
+        self.assertIn(line_keys.keys_for(low), ([], ["Refined_Plain"]))          # a low-value mineral is only sometimes mentioned (random)
 
     def test_gold_and_silver_are_ignored_entirely(self):
         for kind in ("Gold", "Silver"):

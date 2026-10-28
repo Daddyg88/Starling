@@ -264,8 +264,10 @@ class App:
         from memory.profile import PlayerProfile
         self.profile = PlayerProfile(paths.DATA_DIR / "player_profile.json", enabled=lambda: bool(self.settings.get("brain.profile", True)))
         from personality.llm import LocalLLM
+        from core import ships as ship_table
         from personality.lookup import LearnedFacts, OnlineLookup
-        self.lookup = OnlineLookup(self.settings, LearnedFacts(paths.DATA_DIR / "learned_facts.json"))
+        self.lookup = OnlineLookup(self.settings, LearnedFacts(paths.DATA_DIR / "learned_facts.json"),
+                                    ships=lambda: sorted(set(ship_table.known().values())))
         from personality.unanswered import Unanswered
         self.unanswered = Unanswered(paths.DATA_DIR / "unanswered_questions.json")
         from personality.people import People

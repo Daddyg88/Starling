@@ -17,6 +17,7 @@ the saved facts. data/ is private to your PC. The saved facts are plain public t
 to everyone's config/knowledge.
 """
 import json
+import math
 import os
 import re
 import tempfile
@@ -34,6 +35,7 @@ from personality.llm import clean_reply
 log = get_logger("lookup")
 
 HOST = "https://en.wikipedia.org"
+FANDOM = "https://elite-dangerous.fandom.com"          # the Elite Dangerous wiki: used for questions about Elite ships
 USER_AGENT = "Starling/0.68 (Elite Dangerous ship companion; https://github.com/Daddyg88/Starling)"
 TIMEOUT = 4
 MAX_BYTES = 300_000
@@ -129,9 +131,41 @@ def subject_of(tidy):
     return kind, subject
 
 
+_NUMBER_NAMES = {"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "i": "1", "ii": "2", "iii": "3", "iv": "4",
+                 "v": "5", "vi": "6"}
+
+
+def norm_ship(text):
+    """'Cobra Mk III', 'cobra mark three' and 'Cobra Mark 3' all become 'cobra mark 3'; 'Fer-de-Lance' becomes 'fer de lance'."""
+    text = re.sub(r"['\u2019]", "", (text or "").lower())
+    text = re.sub(r"[^a-z0-9 ]+", " ", text)
+    text = re.sub(r"\bmk\s*(?=[a-z0-9])", "mark ", text)
+    text = re.sub(r"\bmark\s*(one|two|three|four|five|six|vi|iv|v|iii|ii|i|[1-6])\b", lambda m: "mark " + _NUMBER_NAMES.get(m.group(1), m.group(1)), text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def ship_in(tidy, names):
+    """The display name of the Elite ship a sentence is about ('Anaconda', 'Cobra Mark 3'), longest name first, or None."""
+    padded = " %s " % norm_ship(tidy)
+    for name in sorted(set(names), key=len, reverse=True):
+        if (" %s " % norm_ship(name)) in padded:
+            return name
+    return None
+
+
+def covers(wanted, title, extract):
+    """Does the page really talk about the subject? 'green gas giant' must not be answered with 'Giant squid':
+    at least 60 percent of the subject's words have to be in the title or the start of the article."""
+    wanted = {w for w in wanted if len(w) > 1}
+    if not wanted:
+        return True
+    have = set(words_of("%s %s" % (title, (extract or "")[:500])))
+    return len(wanted & have) >= math.ceil(0.6 * len(wanted))
+
+
 def default_fetch(url):
-    """GET a Wikipedia JSON address. Only https://en.wikipedia.org, short timeout, small answers, None on any problem."""
-    if not url.startswith(HOST + "/"):
+    """GET a Wikipedia (or Elite Dangerous wiki) JSON address. Only those two sites, short timeout, small answers, None on any problem."""
+    if not (url.startswith(HOST + "/") or url.startswith(FANDOM + "/")):
         return None
     try:
         request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
@@ -170,7 +204,8 @@ def tidy_extract(text):
 
 
 class OnlineLookup:
-    def __init__(self, settings, learned, fetch=default_fetch, clock=time.monotonic, background=True):
+    def __init__(self, settings, learned, fetch=default_fetch, clock=time.monotonic, background=True, ships=None):
+        self.ships = ships                    # a function giving the ship names she knows (core/ships.py), or None
         self.settings = settings
         self.learned = learned
         self.fetch = fetch
@@ -182,14 +217,22 @@ class OnlineLookup:
     def enabled(self):
         return bool(self.settings.get("brain.lookup", False))
 
-    @staticmethod
-    def key(kind, subject):
-        return "%s:%s" % (kind, " ".join(words_of(subject)))
+    QUESTION_START = re.compile(r"^(?:what|how|tell me|explain|describe|is|does|can|which|who|why|do)\b")
+
+    def ship_subject(self, tidy):
+        """('ship', 'Anaconda') when the question is about an Elite ship, else None. Ships come from the Elite Dangerous wiki."""
+        if self.ships is None or not self.QUESTION_START.match(tidy):
+            return None
+        words = tidy.split()
+        if len(words) > 14 or any(w in BLOCKED for w in words) or freechat.is_crisis(tidy):
+            return None
+        name = ship_in(tidy, self.ships())
+        return ("ship", name) if name else None
 
     def known(self, tidy):
         """A fact saved earlier: (title, text) or None. Works offline."""
-        found = subject_of(tidy)
-        if not found or found[0] != "def":
+        found = self.ship_subject(tidy) or subject_of(tidy)
+        if not found or found[0] not in ("def", "ship"):
             return None
         item = self.learned.get(self.key(*found))
         return (item.get("title", ""), item["text"]) if item else None
@@ -198,7 +241,7 @@ class OnlineLookup:
         """(kind, subject) if a live lookup is allowed right now, else None."""
         if not self.enabled():
             return None
-        found = subject_of(tidy)
+        found = self.ship_subject(tidy) or subject_of(tidy)
         if not found:
             return None
         now = self.clock()
@@ -212,13 +255,63 @@ class OnlineLookup:
         """(title, text) from Wikipedia, or None. Marks the topic failed when nothing reliable turns up."""
         self._last = self.clock()
         key = self.key(kind, subject)
-        result = self._search(subject)
+        result = self._search_ship(subject) if kind == "ship" else self._search(subject)
         if result is None or result == "offline":
             self._failed[key] = self.clock() if result is None else self.clock() - RETRY_AFTER_FAIL + 60
             return result
-        if kind == "def":
+        if kind in ("def", "ship"):
             self.learned.add(key, result[0], result[1])
         return result
+
+    @staticmethod
+    def key(kind, subject):
+        if kind == "ship":
+            return "ship:%s" % norm_ship(subject)
+        return "%s:%s" % (kind, " ".join(words_of(subject)))
+
+    def _search_ship(self, name):
+        """(title, text) from the Elite Dangerous wiki, or None / 'offline'. The page title must start with the ship's first word."""
+        query = urllib.parse.urlencode({"action": "query", "list": "search", "srsearch": name, "srlimit": 4, "format": "json", "srnamespace": 0})
+        data = self.fetch("%s/api.php?%s" % (FANDOM, query))
+        if data is None:
+            return "offline"
+        try:
+            hits = data["query"]["search"]
+        except (TypeError, KeyError):
+            return None
+        first = norm_ship(name).split()[0]
+        for hit in hits:
+            title = str(hit.get("title", ""))
+            if not norm_ship(title).startswith(first) or ":" in title:
+                continue
+            extract = self._wiki_intro(title)
+            if not extract:
+                continue
+            text = tidy_extract(extract)
+            if text:
+                return title, text
+        return None
+
+    def _wiki_intro(self, title):
+        """The first paragraph of a wiki page: the plain-text extract, or the short abstract if the wiki does not offer extracts."""
+        query = urllib.parse.urlencode({"action": "query", "prop": "extracts", "exintro": 1, "explaintext": 1, "redirects": 1, "format": "json",
+                                        "titles": title})
+        page = self.fetch("%s/api.php?%s" % (FANDOM, query))
+        try:
+            for item in (page["query"]["pages"] or {}).values():
+                if item.get("extract"):
+                    return item["extract"]
+        except (TypeError, KeyError, AttributeError):
+            pass
+        query = urllib.parse.urlencode({"titles": title, "abstract": 400})
+        page = self.fetch("%s/api/v1/Articles/Details?%s" % (FANDOM, query))
+        try:
+            for item in (page["items"] or {}).values():
+                if item.get("abstract"):
+                    return item["abstract"]
+        except (TypeError, KeyError, AttributeError):
+            pass
+        return None
 
     def _search(self, subject):
         query = urllib.parse.urlencode({"action": "query", "list": "search", "srsearch": subject, "srlimit": 3, "format": "json",
@@ -243,6 +336,8 @@ class OnlineLookup:
                 continue
             extract = page.get("extract") or ""
             if not extract or "may refer to" in extract[:200] or "disambiguation" in str(page.get("description", "")).lower():
+                continue
+            if not covers(wanted, title, extract):
                 continue
             text = tidy_extract(extract)
             if text:

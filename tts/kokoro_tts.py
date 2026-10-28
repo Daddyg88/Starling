@@ -13,6 +13,7 @@ How it works, in plain words:
 """
 
 import hashlib
+import re
 import queue
 import threading
 import time
@@ -27,12 +28,28 @@ log = get_logger("kokoro")
 SAMPLE_RATE = 24000
 BLOCK_SECONDS = 0.1          # play in 100 ms pieces so stop() reacts quickly
 QUEUE_PIECES = 8             # how much finished sound may wait (keeps memory tiny)
+LONG_PART = 90                  # a part longer than this many letters is made one sentence at a time
 PAUSE_MARK = "||"            # in a line: "Four.||Three." means 'one beat between these'
 BEAT_SECONDS = 0.95          # each part STARTS about this long after the previous one (just under 1 s)
 MIN_GAP_SECONDS = 0.15
 MAX_CACHED_CHARS = 200       # longer texts are not cached
 SLOW_START_SECONDS = 1.0       # a line that takes longer than this to start is logged as slow
 DEFAULT_WAIT_FOR_READY = 45  # seconds a line will wait for the engine to finish loading
+
+
+def split_sentences(part):
+    """['One. Two. Three.'] -> ['One.', 'Two. Three.'] for long text, so the voice can start after the first sentence.
+    Short parts are left whole, and a very short sentence is joined to the next one."""
+    if len(part) <= LONG_PART:
+        return [part]
+    pieces = [p.strip() for p in re.split(r"(?<=[.!?])\s+", part) if p.strip()]
+    merged = []
+    for piece in pieces:
+        if merged and len(merged[-1]) < 25:
+            merged[-1] += " " + piece
+        else:
+            merged.append(piece)
+    return merged or [part]
 
 
 def speed_from_rate(rate):
@@ -343,13 +360,14 @@ class KokoroTTS(BaseTTS):
                 self._put(pieces, cached * gain)
                 return cached.size
             made = []
-            for piece in self.pipeline(part, voice=self._voice_arg(), speed=speed):
-                if self._stop_flag.is_set():
-                    return 0
-                audio = to_float32_array(piece)
-                if audio.size:
-                    made.append(audio)
-                    self._put(pieces, audio * gain)
+            for sentence in split_sentences(part):                 # a long answer starts after its FIRST sentence is made, not after all of it
+                for piece in self.pipeline(sentence, voice=self._voice_arg(), speed=speed):
+                    if self._stop_flag.is_set():
+                        return 0
+                    audio = to_float32_array(piece)
+                    if audio.size:
+                        made.append(audio)
+                        self._put(pieces, audio * gain)
             if made and not self._stop_flag.is_set():
                 self._cache_save(part, speed, np.concatenate(made))
             return sum(a.size for a in made)

@@ -37,6 +37,10 @@ LEARN = [
 ]
 WHO = re.compile(r"^(?:who is|whos|who was|do you know|do you remember|remember|tell me about|what do you know about) (?:my (?:%s) )?%s$" % ("|".join(RELATIONS), _NAME))
 WHERE = re.compile(r"^where (?:is|does|was) %s (?:from|live|come from)$" % _NAME)
+GREET = re.compile(r"^(?:please |can you |could you |will you )?(?:say |give )?(?:a )?(?:hello|hi|hey|good (?:morning|afternoon|evening|night)) to "
+                   r"(?:my (?P<rel>%s)(?: (?P<name>[a-z]{2,15}))?|(?P<only>[a-z]{2,15}))$" % "|".join(RELATIONS))
+NOT_GREETED = {"everyone", "everybody", "chat", "stream", "viewers", "guys", "folks", "all", "them", "him", "her", "us", "the", "my", "your",
+               "starling", "yourself", "me", "you", "team", "squad", "wing", "wingmen", "crew", "friends"}
 ALL = re.compile(r"^(?:who do you know|who have i told you about|who are my friends|who are the people (?:you know|i(?:ve| have) told you about)|what people do you know)$")
 FORGET = re.compile(r"^(?:forget|please forget|forget about) (?:my (?:%s) )?(?P<who>everyone|everybody|all (?:of )?my (?:friends|people)|%s)$" % ("|".join(RELATIONS), r"[a-z]{2,15}"))
 
@@ -92,6 +96,38 @@ class People:
                     self._save()
             return _pretty(name), relation, item.get("place", ""), is_new
         return None
+
+    def greet(self, tidy, raw=None):
+        """'Say hello to my wife Marie' / 'say hello to Andrew'. Returns a dict (name, relation, place, new) or None.
+        A new name is remembered too (when it starts with a capital letter in what she heard)."""
+        found = GREET.match(tidy)
+        if not found:
+            return None
+        relation = found.group("rel") or ""
+        name = found.group("name") or found.group("only") or ""
+        if name in NOT_GREETED or name in NOT_NAMES or name in RELATIONS:
+            name = ""
+        if name and name not in self.items and raw is not None and not re.search(r"\b" + name[:1].upper() + re.escape(name[1:]) + r"\b", raw):
+            name = ""                                      # no capital letter: probably not a name
+        if not name and not relation:
+            return None
+        if not name:
+            mine = [n for n, item in self.items.items() if item.get("relation") == relation]
+            if len(mine) == 1:
+                name = mine[0]                           # "say hello to my wife" when she already knows who the wife is
+        new = False
+        if name and relation:
+            new = name not in self.items
+            learned = self.learn("my %s %s" % (relation, name), raw.replace(",", " ") if raw else None) if new else None
+            if learned is None and new:
+                new = False
+        elif name and name in self.items:
+            relation = self.items[name].get("relation", "")
+        elif name:
+            relation = ""
+        info = self.items.get(name, {}) if name else {}
+        return {"name": _pretty(name) if name else "", "relation": relation or info.get("relation", ""), "place": info.get("place", ""), "new": new,
+                "known": bool(name) and name in self.items and not new}
 
     # ---- recalling ----
     def who(self, tidy):

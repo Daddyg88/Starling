@@ -6,7 +6,7 @@
   "You like {x}. I'll keep that in mind, Commander.",
   "Ah, {x}. Filed under things you love.",
   "Right, {x} it is. I'll remember.",
-  "I like knowing that about you. {x}, noted."
+  "I like knowing that about you. {X}, noted."
  ],
  "Profile_Learned_Like_Close": [
   "{X}. I'll remember that, love. I like learning what makes you happy.",
@@ -40,8 +40,8 @@
   "Your favourite {cat} is {x}. Lovely, I'll remember.",
   "{X}, your favourite {cat}. Noted.",
   "Right, {x} for {cat}. I'll keep it in mind.",
-  "Good taste. {x} it is.",
-  "I'll remember that. {x} for {cat}."
+  "Good taste. {X} it is.",
+  "I'll remember that. {X} for {cat}."
  ],
  "Profile_Known_Like": [
   "You've told me before, you like {x}. I do listen.",
@@ -63,7 +63,7 @@
  "Profile_Known_Fav": [
   "I remember. Your favourite {cat} is {x}.",
   "Yes, {x} for {cat}. I've got it noted.",
-  "I know. {x} is your favourite {cat}."
+  "I know. {X} is your favourite {cat}."
  ],
  "Profile_Follow_Like": [
   "What do you like most about {x}?",
