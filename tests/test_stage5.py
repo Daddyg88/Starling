@@ -26,7 +26,7 @@ class ShipInfoTests(unittest.TestCase):
         self.assertEqual(say_number(470.0), "470")
 
     def test_hardpoints_and_cost(self):
-        self.assertIn("8 hardpoints", self.text("how many hardpoints does the anaconda have"))
+        self.assertRegex(self.text("how many hardpoints does the anaconda have"), r"8 (weapon )?hardpoints")
         self.assertIn("129 million", self.text("how much does the anaconda cost"))
 
     def test_mark_names_and_mass(self):
