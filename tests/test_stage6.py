@@ -26,6 +26,7 @@ class MiningQuietTests(unittest.TestCase):
     def setUp(self):
         self.processor, _bus, self.heard = make_processor()
         self.reader = StatusReader(None, self.processor, min_gap_seconds={})
+        self.reader.danger_hold = 0
         self.reader.handle_status({"Flags": MAIN_SHIP}, initial=True)
 
     def names(self):
@@ -61,6 +62,49 @@ class NomadPipsTests(unittest.TestCase):
         state.in_nomad = False
         state.status_flags = HARDPOINTS | MAIN_SHIP
         self.assertTrue(assist.fighting())
+
+
+class NyxLogTests(unittest.TestCase):
+    def test_fire_key_is_ignored_while_a_panel_is_open(self):
+        from control.combat_assist import CombatAssist
+        state = SimpleNamespace(status_flags=HARDPOINTS | MAIN_SHIP, in_nomad=False, gui_focus=2)
+        assist = CombatAssist(None, SimpleNamespace(get=lambda k, d=None: d), None, None, None, lambda: state)
+        self.assertFalse(assist.fighting())
+        state.gui_focus = 0
+        self.assertTrue(assist.fighting())
+
+    def test_engage_fsd_is_the_jump_not_the_scanner(self):
+        from control.matcher import Matcher
+        m = Matcher()
+        for text in ("Engage FSD.", "Engage frame shift drive.", "charge the fsd"):
+            self.assertEqual(m.match(text).command.id, "hyperspace", text)
+        self.assertEqual(m.match("engage fss").command.id, "fss_enter")
+
+    def test_danger_must_stay_on_and_is_quiet_just_after_a_jump(self):
+        processor, _bus, heard = make_processor()
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        now = [100.0]
+        reader._clock = lambda: now[0]
+        reader.handle_status({"Flags": MAIN_SHIP}, initial=True)
+        reader.handle_status({"Flags": MAIN_SHIP | IN_DANGER})
+        reader.handle_status({"Flags": MAIN_SHIP})                       # flickered off at once: nothing said
+        self.assertNotIn("InDanger", [e.name for e in heard])
+        reader.handle_status({"Flags": MAIN_SHIP | IN_DANGER})
+        now[0] += 4
+        reader.handle_status({"Flags": MAIN_SHIP | IN_DANGER})           # stayed on 4 s
+        self.assertIn("InDanger", [e.name for e in heard])
+
+    def test_no_danger_call_right_after_entering_supercruise(self):
+        processor, _bus, heard = make_processor()
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        now = [100.0]
+        reader._clock = lambda: now[0]
+        reader.handle_status({"Flags": MAIN_SHIP}, initial=True)
+        reader.handle_status({"Flags": MAIN_SHIP | (1 << 4)})            # supercruise
+        reader.handle_status({"Flags": MAIN_SHIP | (1 << 4) | IN_DANGER})
+        now[0] += 4
+        reader.handle_status({"Flags": MAIN_SHIP | (1 << 4) | IN_DANGER})
+        self.assertNotIn("InDanger", [e.name for e in heard])
 
 
 class OverlayTests(unittest.TestCase):

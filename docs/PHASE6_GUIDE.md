@@ -1049,3 +1049,10 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 ## 0.77.2
 
 - `app.smooth_window` (default on): `ui/dashboard.py` turns off customtkinter's automatic DPI handling so dragging across monitors of different scaling does not re-draw every widget. Not measured on a real screen; ask for feedback.
+
+## 0.77.3 - Nyx's log
+
+- `control/combat_assist.py`: `fighting()` is False while `state.gui_focus` is non-zero. In the log every docking request showed "Fire button down" and then a 14 s macro with the panel closing itself: Elite's default pips keys are the arrow keys, which are also the panel's Up/Left/Right.
+- `control/catalog.py`: "engage fsd", "charge the frame shift drive", "frame shift drive jump" are the hyperspace jump.
+- `journal/status_reader.py`: Danger (`danger_hold` 3 s, 25 s grace after supercruise/jump changes). Seen false in supercruise entry, after a jump and while approaching a station.
+- Not done: "honk the system" and "B-scan" are not commands yet (no honk key in the catalog).

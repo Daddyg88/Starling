@@ -152,6 +152,8 @@ class CombatAssist:
     def fighting(self):
         """Weapons are in use: hardpoints out, or (mining, scanning, limpets) the cockpit is in analysis mode."""
         state = self.state_provider()
+        if getattr(state, "gui_focus", 0):
+            return False                      # a panel or map is open (docking request, galaxy map...): the fire key is only a menu key there
         if getattr(state, "in_nomad", False):
             return False                      # the Nomad reports "hardpoints out" all the time: no auto pips there
         armed = hardpoints_out(state) or (bool(self.option("pips_analysis", True)) and _flag(state, ANALYSIS_BIT))

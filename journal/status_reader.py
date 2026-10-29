@@ -79,6 +79,10 @@ class StatusReader:
         self._tank_full_said = False
         self._fuel_said = set()       # which fuel warnings ("half", "panic") were already given for this tank
         self._clock = time.monotonic
+        self.danger_hold = 3.0        # the Danger switch must stay on this many seconds before she says "Danger" (it flickers around jumps and stations)
+        self._danger_since = None
+        self._danger_grace = 0.0      # no Danger call-out until this time (after a jump or entering/leaving supercruise)
+        self._prev_flags = None
         self.listeners = []         # functions called with the game state after every Status.json read (the biology distance check)
 
     # ---- watching the file ----
@@ -125,6 +129,9 @@ class StatusReader:
         """
         flags = int(status.get("Flags") or 0)
         flags2 = int(status.get("Flags2") or 0)
+        previous_flags, self._prev_flags = self._prev_flags, flags
+        if previous_flags is not None and (previous_flags ^ flags) & ((1 << 4) | (1 << 30)):
+            self._danger_grace = self._clock() + 25.0          # the game flips Danger around jumps and supercruise changes: not news
         state = getattr(self.processor, "state", None)
         if state is not None:
             state.status_flags, state.status_flags2, state.status_seen = flags, flags2, flags != 0
@@ -220,6 +227,9 @@ class StatusReader:
             if now_on and not was_on:
                 if initial and on_prio != CRITICAL:
                     continue
+                if on_name == "InDanger" and self.danger_hold > 0:
+                    self._danger_since = self._clock()          # wait and see whether it stays on (see _release_danger)
+                    continue
                 self._announce(on_name, status)
             elif was_on and not now_on and off_name and off_text:
                 needed = MIN_ON_SECONDS.get(off_name, 0)
@@ -227,11 +237,28 @@ class StatusReader:
                     continue
                 self._announce(off_name, status)
 
+        self._release_danger(status, flags)
         if not moving_fast:
             self._suppressed.clear()
         if changed and not (baseline_only or initial):
             self._announce(VEHICLE_CHANGED, status, {"vehicle": vehicle, "previous": previous_vehicle})
         self._check_screen(status, quiet=baseline_only or initial)
+
+    def _release_danger(self, status, flags):
+        """Says "Danger" only if the switch has stayed on for danger_hold seconds, and not just after a jump or a supercruise change."""
+        since = self._danger_since
+        if since is None:
+            return
+        if not flags & FLAG_IN_DANGER:
+            self._danger_since = None
+            return
+        now = self._clock()
+        if now - since < self.danger_hold:
+            return
+        self._danger_since = None
+        if now < self._danger_grace or self._mining_now("InDanger"):
+            return
+        self._announce("InDanger", status)
 
     def _mining_now(self, name):
         """True while you are mining: the cargo scoop opens for every limpet and the mining lasers can flicker the Danger switch.

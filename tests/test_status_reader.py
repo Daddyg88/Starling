@@ -32,6 +32,7 @@ class StatusReaderTests(unittest.TestCase):
 
     def test_flicker_is_limited_by_minimum_gap(self):
         reader = StatusReader(None, self.processor, min_gap_seconds={"InDanger": 3600})
+        reader.danger_hold = 0
         for flags in (FLAG_IN_DANGER, 0, FLAG_IN_DANGER):
             reader.handle_status({"Flags": flags})
         self.assertEqual(len(self.heard), 1)
