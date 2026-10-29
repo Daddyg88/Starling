@@ -37,6 +37,15 @@ class Dashboard:
         import customtkinter as ctk
         self.ctk = ctk
         self.app = app
+        if app.settings.get("app.smooth_window", True):
+            # customtkinter re-measures and redraws every widget whenever the window crosses to a screen with a different
+            # Windows scaling, which makes dragging between monitors laggy. Fixed scaling avoids that (text can look a little soft on a high-DPI screen).
+            try:
+                ctk.deactivate_automatic_dpi_awareness()
+                ctk.set_widget_scaling(1.0)
+                ctk.set_window_scaling(1.0)
+            except Exception:
+                log.exception("Could not switch the window to fixed scaling")
         self.model = SettingsModel(app.settings)
         self.feed = EventFeed(app.bus)
         self.page_frames = {}

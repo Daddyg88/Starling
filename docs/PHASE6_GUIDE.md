@@ -1045,3 +1045,7 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - Settings: push-to-talk fields moved to the Listening page; Test her voice button on Voice.
 - Launcher: first run asks for the install folder and remembers it in `%LOCALAPPDATA%\Starling\install_location.txt`. Existing installs are not asked.
 - Log noise: Void Compass offline message throttled across clients, backpack/fire/auto-honk lines only when new, listener timing only when over 2.5 s.
+
+## 0.77.2
+
+- `app.smooth_window` (default on): `ui/dashboard.py` turns off customtkinter's automatic DPI handling so dragging across monitors of different scaling does not re-draw every widget. Not measured on a real screen; ask for feedback.

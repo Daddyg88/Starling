@@ -441,6 +441,8 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("game", "Game", "How she watches Elite Dangerous.", [
             Field("journal.folder", "Journal folder", "text", restart=True,
                   placeholder="Leave empty to find it automatically"),
+            Field("app.smooth_window", "Smooth dashboard (no lag when dragging between screens)", "toggle", restart=True,
+                  help="On = the window ignores Windows display scaling, so dragging is smooth. Text can look slightly soft on a high-resolution screen. Turn it off if the dashboard looks blurry"),
             Field("app.log_level", "Log detail", "choice", LOG_DETAIL, restart=True,
                   help="Only change this if you are fixing a problem"),
         ]),

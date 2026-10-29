@@ -19,7 +19,7 @@ from core.logger import get_logger
 log = get_logger("settings")
 
 DEFAULTS = {
-    "app": {"log_level": "INFO", "first_run_done": False, "name": "Starling"},
+    "app": {"log_level": "INFO", "first_run_done": False, "name": "Starling", "smooth_window": True},
     "player": {"sex": "neutral"},
     "journal": {"folder": "", "poll_seconds": 1.0},
     "tts": {"provider": "kokoro", "voice": "", "volume": 100, "rate": 0, "pitch": 0, "warm_cache": "idle",
