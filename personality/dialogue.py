@@ -143,6 +143,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "swings.json"))        # mood swings: forgiving you, data lost, rebuy, trade loss
             self._merge(_read_json(self.pack_dir / "showoff.json"))       # "show off": she talks while she opens the maps and panels
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
+            self._merge(_read_json(self.pack_dir / "dockjokes.json"))     # funny lines when you are back aboard from the Nomad or the SRV
         elif self.pack_dir is not None:
             log.warning("Voice pack folder not found: %s", self.pack_dir)
         for path in self.extra_files:

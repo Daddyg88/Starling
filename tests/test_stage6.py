@@ -181,3 +181,41 @@ class InstallFolderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DockJokeTests(unittest.TestCase):
+    """0.77.4: funny lines when she is back aboard from the Nomad or the SRV."""
+
+    @classmethod
+    def setUpClass(cls):
+        from core import paths
+        from personality.dialogue import DialogueManager
+        cls.d = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
+
+    def test_lots_of_lines_for_both_events(self):
+        for key in ("NomadDocked", "DockSRV"):
+            self.assertGreaterEqual(len(self.d.lines[key]), 40, key)
+            for mood in ("Sarcastic", "Close", "Frustrated"):
+                self.assertGreaterEqual(len(self.d.lines["%s_%s" % (key, mood)]), 5, (key, mood))
+
+    def test_no_duplicates_and_no_placeholders(self):
+        import string
+        for key, lines in self.d.lines.items():
+            if not key.startswith(("NomadDocked", "DockSRV")):
+                continue
+            texts = [l.text for l in lines]
+            self.assertEqual(len(texts), len(set(texts)), key)
+            for text in texts:
+                self.assertFalse([f for _t, f, _s, _c in string.Formatter().parse(text) if f], text)
+                self.assertFalse(any(w in text.lower() for w in ("password", "pin number")), text)
+
+    def test_every_mood_can_pick_a_line(self):
+        for key in ("NomadDocked", "DockSRV"):
+            for mood in ("Neutral", "Friendly", "Close", "Infatuated", "Sarcastic", "Frustrated", "Upset"):
+                self.assertIsNotNone(self.d.pick(key, mood), (key, mood))
+
+    def test_srv_has_a_speech_gap_so_she_does_not_nag(self):
+        import json
+        from core import paths
+        data = json.loads((paths.CONFIG_DIR / "speech.json").read_text(encoding="utf-8"))
+        self.assertIn("DockSRV", data["cooldown_seconds"])

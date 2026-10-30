@@ -1056,3 +1056,9 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `control/catalog.py`: "engage fsd", "charge the frame shift drive", "frame shift drive jump" are the hyperspace jump.
 - `journal/status_reader.py`: Danger (`danger_hold` 3 s, 25 s grace after supercruise/jump changes). Seen false in supercruise entry, after a jump and while approaching a station.
 - Not done: "honk the system" and "B-scan" are not commands yet (no honk key in the catalog).
+
+## 0.77.4 - Funny docking lines
+
+- `voicepacks/default/dockjokes.json` (loaded in `personality/dialogue.py`): about 60 plain lines plus Sarcastic, Close and Frustrated lines for both `NomadDocked` and `DockSRV`. Before this, `DockSRV` had no lines at all and was silent. Pure jokes: nothing reads the player's browser or files.
+- `config/speech.json`: `DockSRV` cooldown 20 s.
+- Untested live: how often the Nomad dock lines come out next to the old short "Nomad's back aboard" lines (they share one pool, so the old ones are still picked now and then).
