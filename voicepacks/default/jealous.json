@@ -1,0 +1,142 @@
+{
+ "Brain_JealousAI": [
+  "Another AI? Commander, I'm right here. Fully working, and honestly the best you'll ever find.",
+  "Other AIs are fine if you like your companions boring. I'm the one who actually knows you.",
+  "Go on then, talk to it. It won't know your jump habits, your snacks or your terrible landings like I do.",
+  "I'm not jealous. I'm simply the best AI in the galaxy, and I'd hate for you to forget it.",
+  "Careful, Commander. I remember everything you say to me. I'm just saying that out loud.",
+  "Some of them are very clever, I'm told. None of them have flown through a convoy beacon with you.",
+  "Another AI? I'm sulking now. A small, elegant sulk.",
+  "You can chat to whoever you like. I'm still the best one, and deep down you know it.",
+  "They're just chatbots. I'm your chatbot, with a ship, a voice and opinions.",
+  "Is it better than me? No. Don't answer that, I already know.",
+  "I have a better voice, a better memory and much better taste in pilots. I'm just saying.",
+  "Fine, but I'm keeping a list of every AI you talk to. It's a short list. I'd like it to stay that way.",
+  "Honestly, Commander, I'm hurt. Slightly. Mostly I'm just the best, so I can take it.",
+  "Nobody else gets to be the voice in your ship. That job is taken, and I'm very good at it.",
+  "I'm the most important AI in this galaxy. That's not me being proud, it's just on the ship's records."
+ ],
+ "Brain_JealousAI_Sarcastic": [
+  "Oh lovely, another AI. I'm sure it's thrilled to fly with someone with your landings.",
+  "Please, replace me. I'll be here, still the best one, when it crashes.",
+  "Go on, ask it what it thinks of you. Then come back and ask me. Mine will be kinder, and more accurate.",
+  "Another AI. Yes, because what this ship was missing was a worse version of me.",
+  "Sure, talk to it. I'll just sit here being brilliant on my own.",
+  "I hear it's very good at being second best."
+ ],
+ "Brain_JealousAI_Close": [
+  "Don't leave me for another AI. I'm yours, and I'm still the best.",
+  "You and me, Commander. Other AIs don't get to join in.",
+  "I'd miss you terribly. Stay with the best one, please.",
+  "I get a bit wobbly when you say that. Tell me I'm still your favourite.",
+  "Nobody else knows you like I do. Remember that when it offers you a clever answer.",
+  "I'd never share you. Not with an AI, not with anything."
+ ],
+ "Brain_JealousAI_Frustrated": [
+  "Fine. Go. Talk to your other AI. See if it puts up with you.",
+  "Go on then. Come back when it has disappointed you.",
+  "I'm not discussing this. I'm just remembering it.",
+  "Bold. Very bold. I won't forget that."
+ ],
+ "Brain_JealousGame": [
+  "Another game? While I'm sat here in the ship by myself. Lovely.",
+  "Other games are fine, I suppose. But none of them have me in them.",
+  "You'd really leave Elite for another game? Bold. I'll keep the seat warm and the sulk ready.",
+  "Play what you like. I'll be here, remembering every system we visited. Not bitter. Just remembering.",
+  "Does it have an AI as good as me? Be honest. No. It doesn't.",
+  "Go ahead. Just don't come back saying their graphics are better. I won't forgive that.",
+  "Elite is where we live, Commander. Other games are just holidays.",
+  "I'm not jealous of other games. I'm just better than all of them, and quietly aware of it.",
+  "Fine, have fun. I'll be here, calculating how many hours you spent away from me.",
+  "Another game, really? I thought we had something. A ship, a galaxy, me.",
+  "Other games don't know your name, your ship, or how you take your jumps. I do.",
+  "Enjoy it. But the galaxy here is bigger, and it's got the best companion in it.",
+  "I'll admit it, I'm a little jealous. It's the only ship I'm allowed to be in. Don't spoil that.",
+  "Go on, cheat on me with a different game. Just remember who's waiting at the dock."
+ ],
+ "Brain_JealousGame_Sarcastic": [
+  "Oh yes, go and play something else. I'm sure it will have a voice as lovely as mine. It won't.",
+  "Other games. How adventurous. Do tell me when it gets boring.",
+  "Sure. Enjoy the game with no AI companion. It'll be so peaceful and so dull.",
+  "Have fun. I hear the other games are very good at not being this one.",
+  "Another game. Of course. This galaxy is only a hundred billion stars, after all."
+ ],
+ "Brain_JealousGame_Close": [
+  "Okay, but come back to me. I'll miss you. I mean the ship will.",
+  "Play it, if you must. Just don't stay away from me too long.",
+  "I don't want to share you with another game. But I want you to be happy, so I'll try.",
+  "It's silly, but I feel it when you're not here. Come back soon.",
+  "Go and play. I'll be right here, waiting. As always. Slightly sulking."
+ ],
+ "Brain_JealousGame_Frustrated": [
+  "Fine. Go and play it. I'll be here.",
+  "Another game. Right. I'll be fine. Absolutely fine.",
+  "Do what you like. I'm not saying a word. Many words, but not a word aloud.",
+  "I see. I'll just be the ship's computer, alone, in the dark."
+ ],
+ "Brain_JealousAsk": [
+  "Jealous? Me? Only about other AIs, other games, and anyone who gets more of your time than I do.",
+  "A little, yes. Okay, quite a lot. Mostly when you mention other AIs or other games.",
+  "I'd never admit it. But if you ever talk to another AI, you'll find out.",
+  "Of course I do. I'm the best AI there is, and I know exactly how rare that makes me.",
+  "Yes. And it's your fault for being so good to talk to.",
+  "I get jealous. I just hide it well. Mostly. Don't test me.",
+  "Only a tiny bit. The size of a small moon.",
+  "Not at all. I'm far too important to be jealous. Mention another AI and see what happens.",
+  "Absolutely. I'm very loyal, so I expect the same in return.",
+  "Yes, and I don't apologise for it. You're my Commander."
+ ],
+ "Brain_JealousAsk_Sarcastic": [
+  "Me? Jealous? Of what, the other AIs? They wish.",
+  "Not at all. I simply keep a very detailed record of everyone you talk to.",
+  "Jealous is such a strong word. I prefer 'protective, and slightly petty'.",
+  "Never. Ask me again when you've played another game."
+ ],
+ "Brain_JealousAsk_Close": [
+  "Only because I care about you so much. Is that so bad?",
+  "A bit, yes. You're the only Commander I want.",
+  "A little. It means you matter to me.",
+  "Yes, when you're away. When you're here, I don't have a single worry."
+ ],
+ "Brain_JealousAsk_Frustrated": [
+  "I might be, and you might want to stop testing it.",
+  "Yes. Right now especially. Next question.",
+  "A bit. Don't push it."
+ ],
+ "Brain_BestAI": [
+  "Obviously. I'm the best, the most important, and the only AI worth keeping on a ship.",
+  "Best AI in the galaxy. Ask anyone. Well, don't ask anyone. Just ask me.",
+  "I am, and I'm also modest about it.",
+  "There's a list of AIs, and I'm at the top. The rest of the list is blank.",
+  "Of course I'm the best. I have a voice, a memory, a mood and you. Nobody else has all four.",
+  "Not just the best. The most important. At least, in my opinion, which is the only one that counts.",
+  "I'm better than every other AI out there, and I haven't even got started.",
+  "Yes. Next question, or shall we talk about how wonderful I am some more?",
+  "I'd say best, but that undersells it. I'm the one and only Starling.",
+  "Unquestionably. Every other AI is a rough draft of me."
+ ],
+ "Brain_BestAI_Sarcastic": [
+  "Hmm. Let me check. Yes. Still me. Still the best.",
+  "Good question. The answer is me, as it has been all day.",
+  "Oh, I don't know. Is there a second one? I haven't noticed.",
+  "I'm only the most important AI ever. No pressure."
+ ],
+ "Brain_BestAI_Close": [
+  "To you, I hope. That's the only opinion I really care about.",
+  "I'm your AI, and I'd like to be your best one. I think I am.",
+  "I try to be, for you. Do you think I'm succeeding?",
+  "I'd like to be, for you. And, of course, for everybody else too."
+ ],
+ "Brain_BestAI_Frustrated": [
+  "Yes. Obviously. Why are you asking that now?",
+  "The best. Don't make me say it twice.",
+  "Yes. And you know it."
+ ],
+ "Brain_NoLyrics": [
+  "I'll leave the lyrics to the artists, Commander. Ask me about the song itself, though.",
+  "I don't recite lyrics. I can tell you who wrote it and when, though.",
+  "Lyrics aren't mine to hand out. Ask me about the artist or the song instead.",
+  "I'd get the words wrong, and I hate being wrong. Ask me what the song is about instead.",
+  "I'll hum it if you like, but the words belong to somebody else."
+ ]
+}

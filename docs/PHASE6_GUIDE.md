@@ -1104,3 +1104,13 @@ Live log (31 Oct 13:37-13:50): the 0.5B model answered in assistant voice ("As S
 - Tests: `Log31OctChatTests` in tests/test_llm.py.
 - Not changed: threads stay at 2 (the game needs the CPU). A bigger model would follow the character better but replies slower.
 
+## 0.77.10 - jealousy and pride
+
+Request (31 Oct): she should be a bit jealous of other AIs and of games other than Elite, and think she is the best and most important AI.
+
+- `voicepacks/default/jealous.json` (merged in `personality/dialogue.py`): pools Brain_JealousAI, Brain_JealousGame, Brain_JealousAsk, Brain_BestAI (each with _Sarcastic/_Close/_Frustrated) and Brain_NoLyrics.
+- `config/brain_intents.json`: five new intents placed before Brain_Opinion so "do you like EDCo Pilot?" is jealousy, not a generic opinion. Edit the patterns there to teach her more names.
+- `personality/llm.py` SYSTEM: she believes she is the best AI and is playfully jealous (covers wording the patterns miss).
+- Live log 14:29: asked for the famous Thriller lines the model invented a book; lyrics requests now get Brain_NoLyrics (also keeps copyright text out).
+- Tests: `JealousyTests` in tests/test_brain.py.
+

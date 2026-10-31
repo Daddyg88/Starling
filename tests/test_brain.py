@@ -320,3 +320,47 @@ class RunnerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class JealousyTests(Base):
+    """31 Oct: she should be jealous of other AIs and other games, and think she is the best AI."""
+
+    CASES = {
+        "Do you get jealous?": "Brain_JealousAsk", "are you jealous": "Brain_JealousAsk",
+        "I'm thinking about talking to another AI, do you like that?": "Brain_JealousAI",
+        "I might use ChatGPT instead": "Brain_JealousAI", "Do you like EDCo Pilot?": "Brain_JealousAI",
+        "are you better than ED copilot?": "Brain_BestAI", "are you the best AI?": "Brain_BestAI",
+        "who is the best AI": "Brain_BestAI",
+        "I'm going to play another game tonight": "Brain_JealousGame", "I started playing Star Citizen": "Brain_JealousGame",
+        "Can you tell me the famous lines from Thriller, please?": "Brain_NoLyrics", "what are the lyrics to that song": "Brain_NoLyrics",
+    }
+
+    def test_phrases_find_the_right_topic(self):
+        for text, key in self.CASES.items():
+            self.brain.topic = None
+            self.assertIsNotNone(self.ask(text), text)
+            self.assertEqual(self.topic(), key, text)
+
+    def test_normal_questions_are_not_taken_for_jealousy(self):
+        for text in ("what do you think about pulse lasers", "what's the best ship", "do you like me"):
+            self.brain.topic = None
+            self.ask(text)
+            self.assertNotIn(self.topic(), ("Brain_JealousAI", "Brain_JealousGame", "Brain_JealousAsk", "Brain_BestAI"), text)
+
+    def test_every_jealous_pool_has_plenty_of_lines_and_no_placeholders(self):
+        for key in ("Brain_JealousAI", "Brain_JealousGame", "Brain_JealousAsk", "Brain_BestAI"):
+            lines = self.dialogue.lines.get(key, [])
+            self.assertGreaterEqual(len(lines), 10, key)
+            for mood in ("Sarcastic", "Close", "Frustrated"):
+                self.assertGreaterEqual(len(self.dialogue.lines.get(key + "_" + mood, [])), 3, key + mood)
+        for key, lines in self.dialogue.lines.items():
+            if key.startswith(("Brain_Jealous", "Brain_BestAI", "Brain_NoLyrics")):
+                for line in lines:
+                    self.assertNotIn("{", line.text)
+                    self.assertNotIn("—", line.text)
+
+    def test_the_chat_brain_is_told_to_be_jealous_and_proud(self):
+        from personality.llm import build_messages
+        system = build_messages("hello there", "Close")[0]["content"]
+        self.assertIn("best and most important AI", system)
+        self.assertIn("jealous", system)
