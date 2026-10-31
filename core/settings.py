@@ -25,7 +25,7 @@ DEFAULTS = {
     "tts": {"provider": "kokoro", "voice": "", "volume": 100, "rate": 0, "pitch": 0, "warm_cache": "idle",
             "clone_reference": "voicepacks/default/clone/Tetko_Issued_Notice.mp3",
             "clone_pack": "custom_covas.pt"},
-    "stt": {"enabled": False, "provider": "faster_whisper", "model": "tiny.en", "microphone": "",
+    "stt": {"enabled": False, "provider": "faster_whisper", "model": "base.en", "microphone": "",
             "wake_phrase": "", "require_wake": True, "reply": True, "energy_threshold": 0, "learning": True, "end_silence_ms": 550},
     "facts": {"frequency": "sometimes", "topics": "all"},
     "ask": {"scan_prompts": True, "bio_prompts": True, "answer_seconds": 10},

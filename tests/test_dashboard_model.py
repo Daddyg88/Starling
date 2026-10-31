@@ -81,9 +81,9 @@ class ModelTests(unittest.TestCase):
 
     def test_changing_back_clears_restart_flag(self):
         f = self.model.field("stt.model")
-        self.model.set_choice(f, "Balanced")
-        self.assertTrue(self.model.restart_needed())
         self.model.set_choice(f, "Fast (smallest)")
+        self.assertTrue(self.model.restart_needed())
+        self.model.set_choice(f, "Balanced")                      # Balanced (base.en) is the default for new installs
         self.assertFalse(self.model.restart_needed())
 
     def test_voicepack_default_when_folder_empty(self):

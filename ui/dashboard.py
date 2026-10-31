@@ -12,7 +12,7 @@ import time
 
 from core.identity import assistant_name
 from core.logger import get_logger
-from ui import portraits, ship_pictures
+from ui import portraits, setup_check, ship_pictures
 from ui import theme as T
 from ui.settings_model import SettingsModel
 from ui.status import EventFeed, collect_status, header_data, home_data
@@ -89,7 +89,7 @@ class Dashboard:
             log.exception("The biology overlay could not start")
             self.bio_overlay = None
         self.root.bind("<Configure>", self._window_moved, add="+")
-        self.show("home")
+        self.show("home" if app.settings.get("app.first_run_done", False) else "setup")      # first time: the checklist
         self.root.after(REFRESH_MS, self._tick)
 
     # ------------------------------------------------------------------ layout
@@ -720,6 +720,8 @@ class Dashboard:
         row += 1
         if page.id == "bookmarks":
             return self._build_bookmarks(frame, page, row)
+        if page.id == "setup":
+            return self._build_setup(frame, row)
         if page.fields:
             card = self._card(frame)
             card.grid(row=row, column=0, sticky="ew")
@@ -788,6 +790,117 @@ class Dashboard:
                          wraplength=720).grid(row=row + 1, column=0, sticky="w", pady=(8, 0))
             row += 2
         return row
+
+    # ---- the Get started checklist (what is on it lives in ui/setup_check.py) ----
+    SETUP_COLOURS = {"ok": T.GOOD, "wait": T.WARN, "todo": T.WARN, "bad": T.BAD, "optional": T.MUTED}
+    SETUP_MARKS = {"ok": "\u2714", "wait": "\u25CC", "todo": "\u25CF", "bad": "\u2716", "optional": "\u25CB"}
+
+    def _build_setup(self, frame, row):
+        ctk = self.ctk
+        self._setup_keys = None                                   # the last key check: (working, missing, clashes)
+        self._setup_shown = None
+        self.setup_headline = ctk.CTkLabel(frame, text="", font=self._font(T.BODY_SIZE + 1, True, head=True), text_color=T.ACCENT,
+                                           anchor="w", justify="left", wraplength=720)
+        self.setup_headline.grid(row=row, column=0, sticky="w", pady=(0, 8))
+        self.setup_holder = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
+        self.setup_holder.grid(row=row + 1, column=0, sticky="ew")
+        self.setup_holder.grid_columnconfigure(0, weight=1)
+        bar = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
+        bar.grid(row=row + 2, column=0, sticky="w", pady=(14, 0))
+        ctk.CTkButton(bar, text="Check again", width=140, font=self._font(), fg_color=T.PANEL, border_width=1, corner_radius=8,
+                      border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT,
+                      command=lambda: self._refresh_setup(force=True)).grid(row=0, column=0, padx=(0, 10))
+        ctk.CTkButton(bar, text="I'm done - go to Home", width=190, font=self._font(), fg_color=T.PANEL, border_width=1, corner_radius=8,
+                      border_color=T.ACCENT, hover_color=T.PANEL_HOVER, text_color=T.ACCENT,
+                      command=self.finish_setup).grid(row=0, column=1)
+        self.setup_result = ctk.CTkLabel(frame, text="", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w",
+                                         justify="left", wraplength=720)
+        self.setup_result.grid(row=row + 3, column=0, sticky="w", pady=(10, 0))
+        ctk.CTkLabel(frame, text="You can open this page again any time from the menu on the left.", font=self._font(T.SMALL_SIZE),
+                     text_color=T.MUTED, anchor="w").grid(row=row + 4, column=0, sticky="w", pady=(6, 0))
+        return row + 5
+
+    def _refresh_setup(self, force=False):
+        """Redraws the checklist, but only when something on it changed (so the window stays calm)."""
+        holder = getattr(self, "setup_holder", None)
+        if holder is None:
+            return
+        try:
+            items = setup_check.setup_items(self.app, getattr(self, "_setup_keys", None))
+        except Exception:
+            log.exception("The Get started checklist failed")
+            return
+        signature = tuple((i["id"], i["state"], i["text"]) for i in items)
+        if not force and signature == getattr(self, "_setup_shown", None):
+            return
+        self._setup_shown = signature
+        ctk = self.ctk
+        for child in holder.winfo_children():
+            child.destroy()
+        self.setup_headline.configure(text=setup_check.headline(items))
+        for index, item in enumerate(items):
+            colour = self.SETUP_COLOURS.get(item["state"], T.MUTED)
+            card = self._card(holder)
+            card.grid(row=index, column=0, sticky="ew", pady=(0, 8))
+            card.grid_columnconfigure(1, weight=1)
+            ctk.CTkLabel(card, text=self.SETUP_MARKS.get(item["state"], "\u25CB"), font=self._font(T.TITLE_SIZE, True), text_color=colour,
+                         width=40).grid(row=0, column=0, rowspan=2, padx=(10, 4), pady=10)
+            ctk.CTkLabel(card, text=item["title"], font=self._font(T.BODY_SIZE, True, head=True), text_color=T.TEXT,
+                         anchor="w").grid(row=0, column=1, sticky="w", pady=(10, 0))
+            ctk.CTkLabel(card, text=item["text"], font=self._font(T.SMALL_SIZE + 1), text_color=T.MUTED, anchor="w", justify="left",
+                         wraplength=480).grid(row=1, column=1, sticky="w", pady=(2, 10), padx=(0, 10))
+            if item["action"]:
+                words, action = item["action"]
+                ctk.CTkButton(card, text=words, width=200, font=self._font(), fg_color=T.PANEL, border_width=1, corner_radius=8,
+                              border_color=colour, hover_color=T.PANEL_HOVER, text_color=T.TEXT,
+                              command=lambda a=action: self._setup_action(a)).grid(row=0, column=2, rowspan=2, padx=(0, 12), pady=10)
+
+    def _setup_action(self, action):
+        """One button on the checklist."""
+        try:
+            if action.startswith("page:"):
+                self.show(action[5:])
+            elif action == "test_voice":
+                self.test_voice()
+            elif action == "prepare_voice":
+                self.prepare_voice()
+            elif action == "listen_on":
+                self._setup_set("stt.enabled", True, "Listening is on. Close Starling and open it again, and she will start listening.")
+            elif action == "listen_balanced":
+                self._setup_set("stt.model", setup_check.BETTER_MODEL,
+                                "Saved. Close Starling and open it again; she downloads the better listening model once.")
+            elif action == "check_keys":
+                self._setup_check_keys()
+        except Exception:
+            log.exception("A Get started button failed: %s", action)
+            self._controls_result("That didn't work. Open the Developer page and copy the log to send to Claude.", T.BAD, target="setup_result")
+
+    def _setup_set(self, key, value, message):
+        field = self.model.field(key)
+        self._changed(self.model.set_value(field, value))
+        ok, why = self.model.save()
+        self._controls_result(message if ok else why, T.GOOD if ok else T.BAD, target="setup_result")
+        self.root.after(120, lambda: self._refresh_setup(force=True))      # not inside the button's own click (it gets rebuilt)
+
+    def _setup_check_keys(self):
+        runner = self.app.ensure_commands()
+        if runner is None:
+            self._controls_result("Voice commands could not start. Check the log.", T.BAD, target="setup_result")
+            return
+        working, problems = runner.binding_report()
+        clashes = runner.binding_conflicts()
+        self._setup_keys = (working, len(problems), len(clashes))
+        self._controls_result("Key check done. The full list is on the Keybinds page (press Check my Elite keys there).", T.MUTED,
+                              target="setup_result")
+        self.root.after(120, lambda: self._refresh_setup(force=True))
+
+    def finish_setup(self):
+        self.app.settings.set("app.first_run_done", True)
+        try:
+            self.app.settings.save()
+        except Exception:
+            log.exception("Could not remember that the checklist is done")
+        self.show("home")
 
     def _build_bookmarks(self, frame, page, row=1):
         """Eleven boxes in two columns: Home and Bookmark 1-10. Each holds a system name."""
@@ -1167,6 +1280,8 @@ class Dashboard:
         self.nav_buttons[page_id].configure(fg_color=T.PANEL, text_color=T.ACCENT, border_color=T.ACCENT)
         if page_id == "home":
             self._refresh_home()
+        if page_id == "setup":
+            self._refresh_setup(force=True)
         self._draw_stars()
         if page_id == "voice":
             self._start_voice_poll()
@@ -1286,6 +1401,8 @@ class Dashboard:
                 self._refresh_home()
             elif self.current == "navigation":
                 self._sync_bookmarks()
+            elif self.current == "setup":
+                self._refresh_setup()
         except Exception:
             log.exception("Dashboard refresh failed")
         self.root.after(REFRESH_MS, self._tick)

@@ -247,7 +247,7 @@ class OnFootPresetTests(unittest.TestCase):
 class KeybindsPageTests(unittest.TestCase):
     def test_keybinds_page_comes_first_and_has_a_box_per_group(self):
         from ui.settings_model import build_pages
-        pages = build_pages()
+        pages = [p for p in build_pages() if p.id != "setup"]       # the Get started checklist sits above it
         self.assertEqual(pages[0].id, "keybinds")
         self.assertEqual([f.key for f in pages[0].fields],
                          ["keybinds.ship", "onfoot.preset", "keybinds.srv", "keybinds.fighter", "keybinds.multicrew"])

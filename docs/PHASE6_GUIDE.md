@@ -1114,3 +1114,14 @@ Request (31 Oct): she should be a bit jealous of other AIs and of games other th
 - Live log 14:29: asked for the famous Thriller lines the model invented a book; lyrics requests now get Brain_NoLyrics (also keeps copyright text out).
 - Tests: `JealousyTests` in tests/test_brain.py.
 
+## 0.77.11 - Get started page
+
+Testers who are not computer-literate got no hint of what to do after Starling.exe opened (listening is off by default, keys need keyboard bindings, the default listening model was the smallest).
+
+- `ui/setup_check.py` (no window code, tested in tests/test_setup_check.py): works out the checklist items and their buttons.
+- `ui/dashboard.py`: new page `setup` ("Get started", first in the menu). `_build_setup`, `_refresh_setup`, `_setup_action`. It opens on start while `app.first_run_done` is false; "I'm done" sets it.
+- Buttons: Say hello, Turn listening on (sets `stt.enabled`, needs a restart), Use Balanced (sets `stt.model` to base.en), Check my Elite keys (counts only; full report stays on the Keybinds page), Prepare her voice, links to Game/Voice/Listening/Keybinds pages.
+- `core/settings.py`: new installs default `stt.model` to `base.en` (existing settings are unchanged).
+- `docs/START_HERE.md`: plain install guide with the SmartScreen / antivirus steps.
+- Not tested in a real window (the sandbox has no customtkinter). If a row looks wrong, send a screenshot.
+
