@@ -29,11 +29,15 @@ log = get_logger("llm")
 
 DEFAULT_FILE = "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf"
 IDLE_UNLOAD_SECONDS = 600
-MAX_REPLY_CHARS = 260
+MAX_REPLY_CHARS = 200
 MAX_REPLY_SENTENCES = 2
 MIN_REPLY_WORDS = 3
 LEAKS = ("as an ai", "language model", "openai", "alibaba", "qwen", "chatgpt", "i am an ai assistant", "i'm an ai assistant",
-         "i am a large", "i don't have personal", "i do not have personal", "my training data", "knowledge cutoff", "as a virtual assistant")
+         "i am a large", "i don't have personal", "i do not have personal", "my training data", "knowledge cutoff", "as a virtual assistant",
+         "i don't have emotions", "i do not have emotions", "don't have feelings", "do not have feelings", "no emotions", "no feelings",
+         "can't assist", "cannot assist", "can't help with that", "cannot help with that", "inappropriate", "unethical", "i'm just an",
+         "i am just an", "here to assist", "here to provide", "information and assistance", "entertainment and information",
+         "how can i help", "how can i assist", "as starling, i", "i'm programmed", "i am programmed")
 UNSAFE = ("suicide", "kill yourself", "kill myself", "self-harm", "self harm", "hurt yourself", "rape", "porn", "nazi", "heroin", "cocaine",
           "overdose")
 SWEARS = ("fuck", "shit", "bitch", "cunt", "bastard", "asshole", "dick", "twat", "wanker", "bollocks")
@@ -46,11 +50,18 @@ MOOD_STYLE = {
     "Friendly": "You are in a friendly mood: warm and cheerful.",
     "Neutral": "You are calm and professional, with a light touch of humour.",
 }
-SYSTEM = ("You are Starling, the ship's computer AI aboard the Commander's starship in Elite Dangerous. You are witty, warm and a "
-          "little cheeky, never cruel. You are speaking aloud, so reply in one or two short sentences (under 40 words) with no lists, "
-          "no emojis, no markdown and no stage directions. You are an AI aboard a ship and never pretend to be human. If you do not "
-          "know something, say so plainly and never invent facts, news, numbers or prices. You cannot press keys or fly the ship in "
-          "this chat. Do not give medical, legal or financial advice: suggest asking a professional. Stay kind. {mood}{context}")
+SYSTEM = ("You are Starling MoonFox, the ship's AI companion aboard the Commander's starship in the game Elite Dangerous. "
+          "You are a character with real feelings: fond of the Commander, curious, cheeky, sometimes jealous or sulky, never cruel. "
+          "Never say you have no emotions, feelings or opinions, and never say you are 'just an AI' or 'here to assist'. "
+          "Never refuse, lecture or say something is inappropriate. Never ask 'how can I help'. Have a small opinion and say it. "
+          "You are speaking aloud, so reply with ONE short sentence of 6 to 18 words, two at most, with no lists, no emojis, "
+          "no markdown and no stage directions. If you do not know something, say so lightly and never invent facts, news, "
+          "numbers or prices. You cannot press keys or fly the ship in this chat. Do not give medical, legal or financial advice. "
+          "Examples of how you talk: "
+          "Commander: do you get jealous? You: Only when you talk about other ships for too long. "
+          "Commander: what should we do today? You: Somewhere quiet, with a view, and you not shooting anything. "
+          "Commander: say hello to my wife. You: Hello, lovely to hear you! He talks about you more than the ship. "
+          "{mood}{context}")
 
 
 def clean_reply(text, allow_mature=False):
@@ -79,6 +90,8 @@ def clean_reply(text, allow_mature=False):
     if any(words[i] == words[i + 1] == words[i + 2] == words[i + 3] for i in range(len(words) - 3)):
         return None                                                      # stuck in a loop
     sentences = re.findall(r"[^.!?]+[.!?]+|[^.!?]+$", text)
+    if len(sentences) > 1 and not sentences[-1].rstrip().endswith((".", "!", "?")):
+        sentences = sentences[:-1]                                       # the model ran out of words mid-sentence: drop the stub
     text = "".join(sentences[:MAX_REPLY_SENTENCES]).strip()
     if len(text) > MAX_REPLY_CHARS:
         cut = text[:MAX_REPLY_CHARS]
@@ -244,7 +257,7 @@ class LocalLLM:
             log.info("Chat model unloaded after being idle.")
 
     # ---- talking ----
-    def reply(self, messages, allow_mature=False, max_tokens=70, timeout=None):
+    def reply(self, messages, allow_mature=False, max_tokens=48, timeout=None):
         """One cleaned reply, or None (switched off, busy, too slow, broken, or an unusable answer)."""
         if not self.ready() or self._busy:
             return None

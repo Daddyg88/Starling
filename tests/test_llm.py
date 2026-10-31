@@ -480,3 +480,26 @@ class FindAssetTests(unittest.TestCase):
         found, _why = llm_server.find_asset(self.opener_for({llm_server.RELEASE_API: {"assets": []}, llm_server.RELEASE_LIST_API: []},
                                                             page_url="https://github.com/ggml-org/llama.cpp/releases/tag/../../evil"))
         self.assertIsNone(found)
+
+
+class Log31OctChatTests(unittest.TestCase):
+    """The first live chat (31 Oct): the small model broke character and refused; those replies must fall back to her own lines."""
+
+    def test_assistant_style_replies_are_rejected(self):
+        for bad in ("I don't have emotions or feelings like jealousy.", "Sorry, but I can't assist with that.",
+                    "As Starling, I'm just an AI aboard a ship and don't have personal preferences.",
+                    "Lying is inappropriate and unethical, Commander.", "I am here to provide information and assistance.",
+                    "I'm just here to assist, so no need for that."):
+            self.assertIsNone(clean_reply(bad), bad)
+
+    def test_in_character_replies_still_pass(self):
+        self.assertEqual(clean_reply("Only when you talk about other ships for too long."),
+                         "Only when you talk about other ships for too long.")
+
+    def test_unfinished_stub_is_dropped(self):
+        self.assertEqual(clean_reply("Sounds lovely, Commander. We could drift past the nebula and then"), "Sounds lovely, Commander.")
+
+    def test_prompt_says_she_has_feelings(self):
+        system = build_messages("do you get jealous", "Close")[0]["content"]
+        self.assertIn("real feelings", system)
+        self.assertIn("Never say you have no emotions", system)

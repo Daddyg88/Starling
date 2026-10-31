@@ -1094,3 +1094,13 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `llm_server.find_asset()`: (1) `releases/latest`, (2) `releases?per_page=8` and the first one with the file, (3) the plain `github.com/.../releases/latest` redirect to get the tag and build the download address (tag must look like `b1234`). Each step is logged with what GitHub said (`_describe`). If every step is a certificate error that error is re-raised so the plain-words message is shown.
 - Next log line to look for: `AI chat engine: no Windows CPU zip in the latest release (...)`.
 
+## 0.77.9 - the AI chat stays in character
+
+Live log (31 Oct 13:37-13:50): the 0.5B model answered in assistant voice ("As Starling, I'm just an AI...", "Sorry, but I can't assist with that", "lying is inappropriate and unethical"), wandered off-topic, and replies of 20+ words made the voice start 3-4 s late.
+
+- `personality/llm.py` `SYSTEM`: Starling MoonFox with real feelings, never "no emotions", never refuse/lecture, never "how can I help", 6-18 words, three example answers.
+- `LEAKS` gained assistant/refusal phrases; any match makes `clean_reply` return None so Brain uses her normal free-chat line.
+- `clean_reply` drops an unfinished last fragment; `MAX_REPLY_CHARS` 200; `max_tokens` 48.
+- Tests: `Log31OctChatTests` in tests/test_llm.py.
+- Not changed: threads stay at 2 (the game needs the CPU). A bigger model would follow the character better but replies slower.
+
