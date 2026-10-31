@@ -1088,3 +1088,9 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - Confirmed in the same log: the FSS signal spam is gone (3 lines at start-up instead of 30), and "Prepare her voice" ran (109 made, 5485 already there).
 - Untested live: whether certifi's list is enough for github.com and huggingface.co on that PC (it was for the update check).
 
+## 0.77.8 - finding the engine download
+
+- Log 31 Oct 13:14: the certifi retry worked ("trying again with the certifi list") but `pick_asset()` found nothing in the answer. Cause not known (the llama.cpp release workflow and a 2026 package list both give `llama-b<tag>-bin-win-cpu-x64.zip`, which the pattern matches). Guesses: GitHub's API rate limit message, or the newest release having no files yet.
+- `llm_server.find_asset()`: (1) `releases/latest`, (2) `releases?per_page=8` and the first one with the file, (3) the plain `github.com/.../releases/latest` redirect to get the tag and build the download address (tag must look like `b1234`). Each step is logged with what GitHub said (`_describe`). If every step is a certificate error that error is re-raised so the plain-words message is shown.
+- Next log line to look for: `AI chat engine: no Windows CPU zip in the latest release (...)`.
+

@@ -35,6 +35,8 @@ from core.secure_open import is_certificate_problem, open_url
 log = get_logger("llm")
 
 RELEASE_API = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
+RELEASE_LIST_API = "https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=8"
+RELEASE_PAGE = "https://github.com/ggml-org/llama.cpp/releases/latest"          # no API limit: it just redirects to .../releases/tag/<tag>
 DOWNLOAD_PREFIX = "https://github.com/ggml-org/llama.cpp/releases/download/"
 ASSET_RE = re.compile(r"^llama-[A-Za-z0-9._-]+-bin-win-cpu-x64\.zip$")       # the plain CPU build for 64-bit Windows
 EXE_NAME = "llama-server.exe"
@@ -81,6 +83,59 @@ def _read_json(opener, url):
     return json.loads(raw.decode("utf-8"))
 
 
+def _describe(release):
+    """A short sentence about a release answer, for the log and for error messages."""
+    if isinstance(release, dict) and release.get("message"):
+        return "GitHub said: %s" % str(release.get("message"))[:120]
+    if isinstance(release, dict):
+        names = [str(a.get("name")) for a in (release.get("assets") or [])]
+        return "release %s has %d files%s" % (release.get("tag_name"), len(names), (": " + ", ".join(names[:6])) if names else "")
+    return "unexpected answer"
+
+
+def find_asset(opener):
+    """(asset, reason). Three ways, in order: the 'latest' release record, the last few release records, and the plain release page
+    (which has no API limit). The asset is (name, url, size, sha256) or None."""
+    reasons = []
+    errors = []
+    try:
+        release = _read_json(opener, RELEASE_API)
+        found = pick_asset(release)
+        if found:
+            return found, ""
+        reasons.append(_describe(release))
+        log.warning("AI chat engine: no Windows CPU zip in the latest release (%s)", reasons[-1])
+    except Exception as exc:
+        errors.append(exc)
+        reasons.append("the release record could not be read (%s)" % exc)
+        log.warning("AI chat engine: %s", reasons[-1])
+    try:
+        for release in _read_json(opener, RELEASE_LIST_API) or []:
+            found = pick_asset(release)
+            if found:
+                return found, ""
+        reasons.append("none of the last releases had it")
+    except Exception as exc:
+        errors.append(exc)
+        reasons.append("the release list could not be read (%s)" % exc)
+    try:
+        request = urllib.request.Request(RELEASE_PAGE, headers={"User-Agent": "Starling"})
+        with opener(request, timeout=30) as response:
+            address = str(getattr(response, "geturl", lambda: "")() or "")
+        tag = address.rstrip("/").rsplit("/", 1)[-1]
+        if re.fullmatch(r"b\d{3,6}", tag):
+            name = "llama-%s-bin-win-cpu-x64.zip" % tag
+            return (name, "%s%s/%s" % (DOWNLOAD_PREFIX, tag, name), 0, ""), ""
+        reasons.append("the release page did not name a version")
+    except Exception as exc:
+        errors.append(exc)
+        reasons.append("the release page could not be read (%s)" % exc)
+    log.warning("AI chat engine: could not find the download (%s)", "; ".join(reasons))
+    if len(errors) == len(reasons) and errors and any(is_certificate_problem(e) or is_certificate_problem(getattr(e, "reason", None)) for e in errors):
+        raise next(e for e in errors if is_certificate_problem(e) or is_certificate_problem(getattr(e, "reason", None)))   # install_engine explains this one in plain words
+    return None, "; ".join(reasons)
+
+
 def _safe_members(archive):
     """The zip entries that are safe to unpack (no absolute paths, no '..'), or None if any entry is not."""
     total = 0
@@ -105,9 +160,9 @@ def install_engine(folder=None, opener=None, progress=print, platform_name=None)
     part = None
     try:
         progress("Looking for the newest llama.cpp release on GitHub...")
-        asset = pick_asset(_read_json(opener, RELEASE_API))
+        asset, why = find_asset(opener)
         if asset is None:
-            return False, "I could not find the Windows CPU download in the latest llama.cpp release."
+            return False, "I could not find the Windows CPU download for the AI chat engine on GitHub (%s)." % why
         name, url, size, sha256 = asset
         folder.parent.mkdir(parents=True, exist_ok=True)
         part = folder.parent / (name + ".part")

@@ -430,3 +430,53 @@ class CertificateRetryTests(unittest.TestCase):
         import inspect
         self.assertIs(model_download.download.__defaults__[2], secure_open.open_url)
         self.assertIn("open_url", inspect.getsource(llm_server.install_engine))
+
+
+class FindAssetTests(unittest.TestCase):
+    NAME = "llama-b9999-bin-win-cpu-x64.zip"
+
+    def opener_for(self, answers, page_url=None):
+        """answers: {url: python object to send as JSON}. page_url: where the plain release page redirects to."""
+        def opener(request, timeout=None):
+            url = request if isinstance(request, str) else request.full_url
+            if url == llm_server.RELEASE_PAGE:
+                if page_url is None:
+                    raise OSError("no page")
+                reply = Reply(b"<html>")
+                reply.geturl = lambda: page_url
+                return reply
+            if url not in answers:
+                raise OSError("unexpected " + url)
+            return Reply(json.dumps(answers[url]).encode())
+        return opener
+
+    def good(self, tag="b9999"):
+        name = "llama-%s-bin-win-cpu-x64.zip" % tag
+        return {"tag_name": tag, "assets": [{"name": name, "size": 5, "browser_download_url": llm_server.DOWNLOAD_PREFIX + tag + "/" + name}]}
+
+    def test_latest_release_is_used_when_it_has_the_file(self):
+        found, _why = llm_server.find_asset(self.opener_for({llm_server.RELEASE_API: self.good()}))
+        self.assertEqual(found[0], self.NAME)
+
+    def test_falls_back_to_the_release_list_when_latest_has_no_files_yet(self):
+        answers = {llm_server.RELEASE_API: {"tag_name": "b10000", "assets": []}, llm_server.RELEASE_LIST_API: [{"tag_name": "b10000", "assets": []}, self.good()]}
+        found, _why = llm_server.find_asset(self.opener_for(answers))
+        self.assertEqual(found[0], self.NAME)
+
+    def test_falls_back_to_the_plain_release_page_when_the_api_is_limited(self):
+        limited = {"message": "API rate limit exceeded for 1.2.3.4"}
+        answers = {llm_server.RELEASE_API: limited, llm_server.RELEASE_LIST_API: limited}
+        found, _why = llm_server.find_asset(self.opener_for(answers, page_url="https://github.com/ggml-org/llama.cpp/releases/tag/b8863"))
+        self.assertEqual(found[0], "llama-b8863-bin-win-cpu-x64.zip")
+        self.assertTrue(found[1].startswith(llm_server.DOWNLOAD_PREFIX + "b8863/"))
+
+    def test_when_nothing_works_the_reason_is_in_the_message(self):
+        answers = {llm_server.RELEASE_API: {"message": "API rate limit exceeded"}, llm_server.RELEASE_LIST_API: []}
+        found, why = llm_server.find_asset(self.opener_for(answers))
+        self.assertIsNone(found)
+        self.assertIn("rate limit", why)
+
+    def test_a_page_that_names_a_strange_tag_is_not_trusted(self):
+        found, _why = llm_server.find_asset(self.opener_for({llm_server.RELEASE_API: {"assets": []}, llm_server.RELEASE_LIST_API: []},
+                                                            page_url="https://github.com/ggml-org/llama.cpp/releases/tag/../../evil"))
+        self.assertIsNone(found)
