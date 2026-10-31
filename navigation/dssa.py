@@ -17,6 +17,7 @@ import re
 import time
 import urllib.error
 import urllib.request
+from core.secure_open import open_url
 from pathlib import Path
 
 from core.logger import get_logger
@@ -143,7 +144,7 @@ class Dssa:
     def __init__(self, cache_file=None, spansh=None, opener=None, clock=time.time):
         self.cache_file = Path(cache_file) if cache_file else None
         self.spansh = spansh
-        self._open = opener or urllib.request.urlopen
+        self._open = opener or open_url
         self.clock = clock
         self.carriers = []
         self.loaded_at = 0.0

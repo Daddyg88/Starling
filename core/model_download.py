@@ -10,6 +10,7 @@ import sys
 import urllib.request
 
 from core import paths
+from core.secure_open import is_certificate_problem, open_url
 
 URL = "https://huggingface.co/bartowski/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf"
 FILE_NAME = "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf"
@@ -29,7 +30,7 @@ def looks_like_model(path):
         return False
 
 
-def download(url=URL, target=None, opener=urllib.request.urlopen, progress=print):
+def download(url=URL, target=None, opener=open_url, progress=print):
     """Returns (ok, message)."""
     if not url.lower().startswith("https://"):
         return False, "Only https downloads are allowed."
@@ -64,6 +65,9 @@ def download(url=URL, target=None, opener=urllib.request.urlopen, progress=print
             part.unlink(missing_ok=True)
         except OSError:
             pass
+        if is_certificate_problem(exc) or is_certificate_problem(getattr(exc, "reason", None)):
+            return False, ("Your PC does not trust Hugging Face's security certificate, so the model download was refused. Antivirus "
+                           "'web shield' or 'HTTPS scanning' is the usual cause: pause it for a few minutes and try again.")
         return False, "The download failed: %s" % exc
 
 

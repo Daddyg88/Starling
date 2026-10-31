@@ -17,6 +17,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from core.secure_open import open_url
 
 from core.logger import get_logger
 
@@ -35,7 +36,7 @@ class SpanshError(Exception):
 
 class Spansh:
     def __init__(self, opener=None, sleep=time.sleep, clock=time.monotonic):
-        self._open = opener or urllib.request.urlopen
+        self._open = opener or open_url
         self.sleep = sleep
         self.clock = clock
 

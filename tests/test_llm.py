@@ -371,3 +371,62 @@ class LocalLLMEngineTests(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---------------------------------------------------------------- 0.77.7: GitHub certificate not trusted on some PCs
+import ssl
+import urllib.error
+
+from core import secure_open
+
+
+class CertificateRetryTests(unittest.TestCase):
+    def failing_then_ok(self, calls):
+        def opener(request, timeout=None, context=None):
+            calls.append(context)
+            if context is None:
+                raise urllib.error.URLError(ssl.SSLCertVerificationError("unable to get issuer certificate"))
+            return "reply"
+        return opener
+
+    def test_retries_once_with_the_certifi_list_and_still_checks_the_certificate(self):
+        calls = []
+        original = secure_open.certifi_context
+        secure_open.certifi_context = lambda: "fake-context"
+        try:
+            self.assertEqual(secure_open.open_url("https://x.test/a", 5, opener=self.failing_then_ok(calls)), "reply")
+        finally:
+            secure_open.certifi_context = original
+        self.assertEqual(calls, [None, "fake-context"])
+
+    def test_other_errors_are_not_retried(self):
+        calls = []
+
+        def opener(request, timeout=None, context=None):
+            calls.append(context)
+            raise urllib.error.URLError(OSError("no internet"))
+        with self.assertRaises(urllib.error.URLError):
+            secure_open.open_url("https://x.test/a", 5, opener=opener)
+        self.assertEqual(calls, [None])
+
+    def test_without_certifi_the_original_error_is_raised(self):
+        original = secure_open.certifi_context
+        secure_open.certifi_context = lambda: None
+        try:
+            with self.assertRaises(urllib.error.URLError):
+                secure_open.open_url("https://x.test/a", 5, opener=self.failing_then_ok([]))
+        finally:
+            secure_open.certifi_context = original
+
+    def test_install_explains_a_certificate_problem_in_plain_words(self):
+        def opener(request, timeout=None):
+            raise urllib.error.URLError(ssl.SSLCertVerificationError("unable to get issuer certificate"))
+        ok, message = llm_server.install_engine(Path(tempfile.mkdtemp()) / "engine", opener=opener, progress=lambda *_: None, platform_name="win32")
+        self.assertFalse(ok)
+        self.assertIn("security certificate", message)
+        self.assertIn("Antivirus", message)
+
+    def test_the_engine_and_model_downloads_use_the_retrying_opener(self):
+        import inspect
+        self.assertIs(model_download.download.__defaults__[2], secure_open.open_url)
+        self.assertIn("open_url", inspect.getsource(llm_server.install_engine))

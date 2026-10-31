@@ -13,6 +13,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from core.secure_open import open_url
 
 from core.logger import get_logger
 
@@ -105,7 +106,7 @@ def parse(raw, limit=3, mode="sell", large_only=None, order="best"):
 def fetch_json(url, timeout=TIMEOUT_SECONDS):
     request = urllib.request.Request(url, headers={"User-Agent": "Starling/1.0 (Elite Dangerous companion)",
                                                   "Accept": "application/json"})
-    with urllib.request.urlopen(request, timeout=timeout) as reply:
+    with open_url(request, timeout=timeout) as reply:
         return json.loads(reply.read().decode("utf-8"))
 
 

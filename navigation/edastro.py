@@ -12,6 +12,7 @@ import json
 import math
 import urllib.error
 import urllib.request
+from core.secure_open import open_url
 
 from core.logger import get_logger
 
@@ -32,7 +33,7 @@ def distance(a, b):
 
 class EdAstro:
     def __init__(self, opener=None):
-        self._open = opener or urllib.request.urlopen
+        self._open = opener or open_url
 
     def nearest(self, position, min_rating=None):
         """The nearest point of interest: {"system", "poi", "coords", "rating"} or None. Raises EdAstroError if EDAstro can't be reached."""

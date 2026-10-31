@@ -26,6 +26,7 @@ import threading
 import time
 import urllib.parse
 import urllib.request
+from core.secure_open import open_url
 from datetime import date
 
 from core.logger import get_logger
@@ -186,7 +187,7 @@ def default_fetch(url):
         return None
     try:
         request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+        with open_url(request, timeout=TIMEOUT) as response:
             data = response.read(MAX_BYTES + 1)
         if len(data) > MAX_BYTES:
             return None

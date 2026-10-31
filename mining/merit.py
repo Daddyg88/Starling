@@ -19,6 +19,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from core.secure_open import open_url
 
 from core.logger import get_logger
 
@@ -114,7 +115,7 @@ def post_json(path, body, timeout=TIMEOUT_SECONDS):
     request = urllib.request.Request(BASE_URL + path, data=json.dumps(body).encode("utf-8"), method="POST",
                                      headers={"User-Agent": "Starling/1.0 (Elite Dangerous companion)",
                                               "Content-Type": "application/json", "Accept": "application/json"})
-    with urllib.request.urlopen(request, timeout=timeout) as reply:
+    with open_url(request, timeout=timeout) as reply:
         return json.loads(reply.read().decode("utf-8"))
 
 

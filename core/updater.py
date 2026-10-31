@@ -50,17 +50,7 @@ def is_newer(latest, current):
     return a + (0,) * (width - len(a)) > b + (0,) * (width - len(b))
 
 
-def _is_certificate_problem(error):
-    return isinstance(error, ssl.SSLError) or isinstance(getattr(error, "reason", None), ssl.SSLError)
-
-
-def _certifi_context():
-    """A normal, fully checked TLS context that trusts the certificate list shipped with the 'certifi' package (or None)."""
-    try:
-        import certifi
-        return ssl.create_default_context(cafile=certifi.where())
-    except Exception:
-        return None
+from core.secure_open import certifi_context as _certifi_context, is_certificate_problem as _is_certificate_problem   # shared with the AI chat download
 
 
 def _open(url, token="", opener=None, timeout=30):

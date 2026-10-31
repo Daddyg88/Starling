@@ -1080,3 +1080,11 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - Seen in the log and NOT changed: 1.3 to 5 s "Slow start" on lines with system names (they cannot be pre-recorded; the cache only helps fixed lines, and the new docking jokes need "Prepare her voice now" once), Void Compass offline messages (already throttled), repeated "Danger" + "Scanned" at the convoy/USS site (the game's danger flag was really on).
 - The log has no AI chat lines: the Install button had not been pressed, or the log was cut before it.
 
+## 0.77.7 - certificate retry for downloads
+
+- Log of 31 Oct 12:48: `SSLCertVerificationError ... unable to get issuer certificate` on `api.github.com` from `install_engine`. `core/updater.py` already retried once with certifi's certificate list; `llm_server.py` (0.77.5) used plain urlopen.
+- `core/secure_open.py` (new): `open_url()` = urlopen plus that one retry (only on an SSL error, only with certifi, certificate still verified). `updater.py` imports the helpers from it. Now used by `llm_server.install_engine`, `model_download.download`, `navigation/spansh.py`, `edastro.py`, `dssa.py`, `personality/lookup.py`, `mining/merit.py`, `mining/prices.py`. Void Compass is local and unchanged.
+- Plain-words error when it still fails (antivirus web shield / HTTPS scanning).
+- Confirmed in the same log: the FSS signal spam is gone (3 lines at start-up instead of 30), and "Prepare her voice" ran (109 made, 5485 already there).
+- Untested live: whether certifi's list is enough for github.com and huggingface.co on that PC (it was for the update check).
+

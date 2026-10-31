@@ -30,6 +30,7 @@ from pathlib import Path, PurePosixPath
 
 from core import paths
 from core.logger import get_logger
+from core.secure_open import is_certificate_problem, open_url
 
 log = get_logger("llm")
 
@@ -92,10 +93,11 @@ def _safe_members(archive):
     return archive.infolist() if total <= MAX_UNPACKED_BYTES else None
 
 
-def install_engine(folder=None, opener=urllib.request.urlopen, progress=print, platform_name=None):
+def install_engine(folder=None, opener=None, progress=print, platform_name=None):
     """Downloads and unpacks llama-server.exe. Returns (ok, message)."""
     if (platform_name or sys.platform) != "win32":
         return False, "The AI chat engine can only be installed on Windows."
+    opener = opener or open_url                      # open_url retries once with the certifi certificate list (a common Windows problem)
     folder = Path(folder) if folder else engine_dir()
     if engine_exe(folder) is not None:
         return True, "The AI chat engine is already installed."
@@ -151,6 +153,9 @@ def install_engine(folder=None, opener=urllib.request.urlopen, progress=print, p
         return True, "The AI chat engine is installed."
     except Exception as exc:
         log.exception("Installing the AI chat engine failed")
+        if is_certificate_problem(exc) or is_certificate_problem(getattr(exc, "reason", None)):
+            return False, ("Your PC does not trust GitHub's security certificate, so the download was refused. Antivirus 'web shield' or "
+                           "'HTTPS scanning' is the usual cause: pause it for a few minutes, or allow Starling, and try again.")
         return False, "The engine download failed: %s" % exc
     finally:
         for leftover in (part,):
