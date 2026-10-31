@@ -734,6 +734,8 @@ class Dashboard:
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
+            extra.append(("Install AI chat (downloads about 450 MB)", self.install_ai_chat))
+            extra.append(("Test the AI chat", self.test_ai_chat))
         if page.id == "memory":
             extra.append(("Learn from all my old journals", self.learn_from_journals))
         if page.id == "exobiology":
@@ -1030,6 +1032,40 @@ class Dashboard:
             self.save_note.configure(text="Copied the last %d log lines. Paste them into the chat." % len(lines), text_color=T.GOOD)
         except OSError:
             self.save_note.configure(text="I could not find the log file yet.", text_color=T.WARN)
+
+    def install_ai_chat(self):
+        """Personality page: download the AI chat engine and model in the background and show the progress."""
+        import threading
+        if getattr(self, "_ai_busy", False):
+            self._controls_result("The AI chat is already being installed. Please wait.", T.WARN)
+            return
+        self._ai_busy = True
+        say = lambda text, colour=None: self.root.after(0, lambda: self._controls_result(text, colour))
+        say("Installing the AI chat. This can take a few minutes. You can keep using Starling.", T.WARN)
+
+        def work():
+            try:
+                ok, message = self.app.install_ai_chat(progress=lambda text: say(str(text).strip(), T.WARN))
+            except Exception as exc:
+                ok, message = False, "The install failed: %s" % exc
+            finally:
+                self._ai_busy = False
+            say(message + ("" if ok else " Nothing else is affected."), T.GOOD if ok else T.BAD)
+        threading.Thread(target=work, name="install-ai-chat", daemon=True).start()
+
+    def test_ai_chat(self):
+        """Personality page: start the AI chat and ask it for one sentence."""
+        import threading
+        say = lambda text, colour=None: self.root.after(0, lambda: self._controls_result(text, colour))
+        say("Testing the AI chat. The first time it has to load the model, so give it a few seconds...", T.WARN)
+
+        def work():
+            try:
+                ok, message = self.app.test_ai_chat()
+            except Exception as exc:
+                ok, message = False, "The test failed: %s" % exc
+            say(message, T.GOOD if ok else T.BAD)
+        threading.Thread(target=work, name="test-ai-chat", daemon=True).start()
 
     def check_updates(self):
         """Updates page: look on GitHub (in the background) and say what was found."""

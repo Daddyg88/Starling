@@ -1062,3 +1062,12 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `voicepacks/default/dockjokes.json` (loaded in `personality/dialogue.py`): about 60 plain lines plus Sarcastic, Close and Frustrated lines for both `NomadDocked` and `DockSRV`. Before this, `DockSRV` had no lines at all and was silent. Pure jokes: nothing reads the player's browser or files.
 - `config/speech.json`: `DockSRV` cooldown 20 s.
 - Untested live: how often the Nomad dock lines come out next to the old short "Nomad's back aboard" lines (they share one pool, so the old ones are still picked now and then).
+
+## 0.77.5 - AI chat install from the dashboard
+
+- Why: `run_install_chat_model.bat` needs `.venv` (a source install) and llama-cpp-python, so it cannot work for Starling.exe.
+- `personality/llm_server.py` (new): `install_engine()` reads the latest ggml-org/llama.cpp release from the GitHub API, takes the `llama-<tag>-bin-win-cpu-x64.zip` asset (checked against the official download address and, if GitHub gives one, the sha256), unpacks `llama-server.exe` into `data/llm/engine`. `ServerModel` runs it on 127.0.0.1 on a free port (`-np 1 --no-webui`), waits for `/health`, and has the same `create_chat_completion()` as llama-cpp-python so `LocalLLM` did not need a new code path. A pid file lets the next start stop a leftover engine after a crash.
+- `personality/llm.py`: engine preferred, llama-cpp-python still used if there is no engine, `problem()` says what is missing, `test()` for the dashboard, `unload()` stops the engine, first reply gets 12 extra seconds because it has to start the engine.
+- `core/app.py`: `install_ai_chat()` (engine, model, then switches `llm.enabled` on) and `test_ai_chat()`; `stop()` unloads. `ui/dashboard.py`: two buttons on the Personality page.
+- Untested live (the sandbox cannot reach GitHub downloads or Hugging Face, and there is no Windows here): the real download, the asset name in today's release, starting llama-server.exe on Windows, how long the first reply takes on a Ryzen 7 2700, and whether Windows Defender or a firewall asks about llama-server.exe. The release workflow in the llama.cpp repo names the asset `llama-<tag>-bin-win-cpu-x64.zip`, which is what the code looks for.
+

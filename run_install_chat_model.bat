@@ -1,10 +1,11 @@
 @echo off
-rem Optional: installs the small AI chat model for open conversation. Needs about 400 MB of disk and an internet connection.
+rem Starling.exe users: you do not need this file. Press 'Install AI chat' on the Personality page instead.
+rem Optional (source install only): installs the small AI chat model for open conversation. Needs about 400 MB of disk and an internet connection.
 rem Run this once, then turn on "Small AI model for open chat" in Starling's Personality settings.
 cd /d "%~dp0"
 if not exist .venv\Scripts\python.exe (
   echo This needs the full source install (setup.bat creates the .venv folder it uses).
-  echo If you only use Starling.exe, the optional AI chat cannot be added to it yet. Everything else works as normal.
+  echo If you use Starling.exe, open the dashboard, go to the Personality page and press 'Install AI chat' instead.
   pause
   exit /b 1
 )

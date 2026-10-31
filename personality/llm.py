@@ -11,7 +11,11 @@ that looks like a game command. Its reply is cleaned (no emojis, no stage direct
 silently uses her normal chat lines instead. So switching it on can only add to her, never break her.
 
 Cost: about 0.5 to 1 GB of memory while loaded (it unloads itself after 10 idle minutes) and some CPU for a few seconds
-per reply, so it is best for people who do not stream demanding games on a weak PC. Install: run_install_chat_model.bat.
+per reply, so it is best for people who do not stream demanding games on a weak PC.
+
+Install: the "Install AI chat" button on the Personality page (works in Starling.exe: it downloads llama.cpp's ready-made
+llama-server.exe and the model, see personality/llm_server.py). In a source install, run_install_chat_model.bat (the
+llama-cpp-python add-on) still works too. If both are there she uses the downloaded engine.
 """
 import re
 import threading
@@ -105,9 +109,11 @@ def build_messages(user_text, mood="", system_name="", ship="", likes=None, hist
 
 
 class LocalLLM:
-    def __init__(self, settings, loader=None, clock=time.monotonic):
+    def __init__(self, settings, loader=None, clock=time.monotonic, engine_finder=None, server_factory=None):
         self.settings = settings
-        self._loader = loader                 # tests give a fake; None = the real llama-cpp-python
+        self._loader = loader                 # tests give a fake; None = the downloaded engine, or llama-cpp-python
+        self._engine_finder = engine_finder   # tests: where llama-server.exe is (None = the real data/llm/engine folder)
+        self._server_factory = server_factory
         self.clock = clock
         self._model = None
         self._lock = threading.Lock()
@@ -134,14 +140,28 @@ class LocalLLM:
                 self._import_ok = False
         return self._import_ok
 
+    def _engine(self):
+        """The downloaded llama-server.exe, or None."""
+        from personality import llm_server
+        return (self._engine_finder or llm_server.engine_exe)()
+
+    def problem(self):
+        """What is missing (a sentence), or '' if the model could be used. Ignores the on/off switch."""
+        if self._loader is not None:
+            return ""
+        if self._engine() is None and not self._can_import():
+            return "The AI chat is not installed yet. Press 'Install AI chat' on the Personality page"
+        if not self.model_path().is_file():
+            return "The model file is missing. Press 'Install AI chat' on the Personality page"
+        return ""
+
     def status(self):
         """A sentence for the dashboard."""
         if not self.enabled():
             return "Off"
-        if self._loader is None and not self._can_import():
-            return "Switched on, but the add-on is not installed. Run run_install_chat_model.bat"
-        if self._loader is None and not self.model_path().is_file():
-            return "Switched on, but the model file is missing. Run run_install_chat_model.bat"
+        problem = self.problem()
+        if problem:
+            return "Switched on, but " + problem[0].lower() + problem[1:]
         return "Ready" if self._model is not None else "Ready (loads on first use)"
 
     def ready(self):
@@ -154,8 +174,13 @@ class LocalLLM:
                 return True
             try:
                 threads = max(1, min(8, int(self.settings.get("llm.threads", 2) or 2)))
+                engine = None if self._loader is not None else self._engine()
                 if self._loader is not None:
                     self._model = self._loader(str(self.model_path()), threads)
+                elif engine is not None:
+                    from personality import llm_server
+                    log.info("Starting the small chat model (%s)...", self.model_path().name)
+                    self._model = (self._server_factory or llm_server.ServerModel)(engine, self.model_path(), threads).start()
                 else:
                     from llama_cpp import Llama
                     log.info("Loading the small chat model (%s)...", self.model_path().name)
@@ -169,7 +194,42 @@ class LocalLLM:
 
     def unload(self):
         with self._lock:
-            self._model = None
+            model, self._model = self._model, None
+        close = getattr(model, "close", None)                 # the engine program is stopped, so its memory comes back
+        if close is not None:
+            try:
+                close()
+            except Exception:
+                log.debug("Closing the chat model failed", exc_info=True)
+
+    def test(self):
+        """For the dashboard's test button (works even when the switch is off). Returns (ok, sentence for the screen)."""
+        problem = self.problem()
+        if problem:
+            return False, problem
+        started = time.monotonic()
+        messages = build_messages("Say hello to me in one short sentence.", "Friendly")
+        holder = {}
+
+        def work():
+            try:
+                if self._load():
+                    holder["text"] = self._model.create_chat_completion(messages=messages, max_tokens=60, temperature=0.8)["choices"][0]["message"]["content"]
+            except Exception as exc:
+                log.exception("The AI chat test failed")
+                holder["error"] = str(exc)
+        thread = threading.Thread(target=work, name="llm-test", daemon=True)
+        thread.start()
+        thread.join(60)
+        seconds = time.monotonic() - started
+        if thread.is_alive():
+            return False, "The AI chat took more than a minute. This PC may be too slow for it."
+        text = clean_reply(holder.get("text")) or (holder.get("text") or "").strip()
+        if not text:
+            return False, "The AI chat started but gave no answer. %s" % holder.get("error", "Check the log.")
+        self._last_used = self.clock()
+        self._schedule_unload()
+        return True, "It works (%.1f seconds). She said: %s" % (seconds, text)
 
     def _schedule_unload(self):
         if self._timer is not None:
@@ -189,6 +249,8 @@ class LocalLLM:
         if not self.ready() or self._busy:
             return None
         timeout = float(timeout if timeout is not None else self.settings.get("llm.max_seconds", 8) or 8)
+        if self._model is None and self._loader is None:
+            timeout += 12                                      # the first reply also has to start the engine and load the model
         holder = {}
 
         def work():

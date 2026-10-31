@@ -506,6 +506,24 @@ class App:
         self.memory_store.forget_everything()
         return "Done. She has forgotten everything."
 
+    # ---- the optional AI chat (Personality page buttons) ----
+    def install_ai_chat(self, progress=print):
+        """Downloads the engine and the small model, then switches the AI chat on. Returns (ok, sentence for the screen)."""
+        from personality import llm_server
+        ok, message = llm_server.install_all(progress=progress)
+        if ok:
+            self.settings.set("llm.enabled", True)
+            self.settings.save()
+            if getattr(self, "llm", None) is not None:
+                self.llm.unload()
+        return ok, message
+
+    def test_ai_chat(self):
+        """Starts the AI chat and asks for one sentence. Returns (ok, sentence for the screen)."""
+        from personality.llm import LocalLLM
+        llm = getattr(self, "llm", None) or LocalLLM(self.settings)
+        return llm.test()
+
     def ensure_updates(self):
         if getattr(self, "updates", None) is None:
             from core.update_service import UpdateService
@@ -795,6 +813,8 @@ class App:
 
     # ---- shutting down ----
     def stop(self):
+        if getattr(self, "llm", None) is not None:
+            self.llm.unload()                              # stops the AI chat engine program too
         if self.chitchat is not None:
             self.chitchat.stop()
             self.chitchat = None
