@@ -145,5 +145,17 @@
  "EmergencyNoPosition": [
   "I don't know where in the galaxy we are yet. Make a jump and ask me again.",
   "I need our coordinates, and the game hasn't given me any yet. Make a jump first."
+ ],
+ "RouteNeedNumber": [
+  "Which {destination}, Commander? There are lots of them. Say the whole name with the number.",
+  "{destination} on its own isn't a system. Tell me the number too.",
+  "I need the number as well. Which {destination}?",
+  "Sorry, I only caught {destination}. What's the number after it?"
+ ],
+ "RouteNeedNumber_Sarcastic": [
+  "{destination}. Just that. There are thousands of them. Number, please."
+ ],
+ "RouteNeedNumber_Close": [
+  "Which {destination}, love? Give me the number and I'll plot it straight away."
  ]
 }

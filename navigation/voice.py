@@ -47,7 +47,7 @@ FAVOURITES = {
 
 _FILLER = re.compile(r"\b(please|starling|commander|cmdr|could you|can you|would you|will you|for me|hey|ok|okay|now|just|quickly)\b")
 _PLOT = re.compile(r"\b(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart)\b"
-                   r".*?\b(neutron|route|course|highway|trail)\b.*?\bto\b\s+(?P<dest>.+)$")
+                   r".*?\b(neutron|route|course|highway|trail)\b.*?\b(?:to|2|too)\b\s+(?P<dest>.+)$")      # the microphone often writes "to" as "2"
 # "plot a neutron route" with no place named: use the destination set in the game
 _PLOT_BARE = re.compile(r"^(?:\w+ ){0,3}?(plot|set|work out|find|calculate|create|make|give me|get me|map out|lay in|plan|chart|start|use|run|do)\b"
                         r".*\bneutron\b.*\b(route|course|highway|trail|plotter|plot)\b(?!.*\bto\b)|^neutron (route|course|plotter|plot|highway)$|^(plot|start) neutron$")
@@ -77,6 +77,30 @@ _MISHEARD = (
     (re.compile(r"^(touch|blot|plod|plots|plat|lot|clot|pilot|plant|flat|plug|plop) "), "plot "),
     (re.compile(r"\byour neutron\b"), "a neutron"),
 )
+
+
+# Catalogue names that are written in capitals in system names ("LFT 509", "HIP 50045"). "col" and "wolf" are not: they are words.
+CATALOGUE_PREFIXES = frozenset({"lft", "hip", "lhs", "lp", "gj", "hd", "ltt", "nltt", "tyc", "hr", "bd", "cd", "cpd", "ngc", "ic", "tic"})
+
+
+def tidy_system_name(spoken):
+    """'lft 509' -> 'LFT 509', 'sector xy z' keeps its words. Only the leading catalogue letters are put in capitals."""
+    words = str(spoken or "").split()
+    out = []
+    for index, word in enumerate(words):
+        if index == 0 and word in CATALOGUE_PREFIXES:
+            out.append(word.upper())
+        elif word.isupper():
+            out.append(word)
+        else:
+            out.append(word.capitalize())
+    return " ".join(out)
+
+
+def is_bare_catalogue(spoken):
+    """True for 'lft' or 'hip' said with no number, which is not a system."""
+    words = str(spoken or "").split()
+    return len(words) == 1 and words[0] in CATALOGUE_PREFIXES
 
 
 def fix_neutron_mishearings(said):
@@ -145,6 +169,7 @@ class Narrator:
             text = text.format_map(_Quiet(fields or {}))
         except (ValueError, IndexError):
             pass
+        text = re.sub(r"\b1 (neutron stop|jump|waypoint|star|light year)s\b", r"1 \1", text)         # "1 neutron stops" -> "1 neutron stop"
         return bool(speech.say(text=personalise(text, self.settings), priority="normal", event_name="personality.route"))
 
 
@@ -360,6 +385,9 @@ class RouteVoice:
         if not name:
             self.narrator.say("RouteNoDestination")
             return "No destination."
+        if is_bare_catalogue(spoken):
+            self.narrator.say("RouteNeedNumber", {"destination": name})
+            return "Which %s? Say the whole name, with the number." % name
         if self._busy:
             return "Already plotting."
         self._busy = True
@@ -671,7 +699,7 @@ class RouteVoice:
             return self.carrier_system(key)
         if key is not None:
             return str(self.settings.get("bookmarks." + key, "") or "").strip()
-        return FAVOURITES.get(spoken) or " ".join(w.capitalize() if not w.isupper() else w for w in spoken.split())
+        return FAVOURITES.get(spoken) or tidy_system_name(spoken)
 
     def jump_range(self):
         try:

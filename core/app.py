@@ -510,7 +510,12 @@ class App:
     def install_ai_chat(self, progress=print):
         """Downloads the engine and the small model, then switches the AI chat on. Returns (ok, sentence for the screen)."""
         from personality import llm_server
-        ok, message = llm_server.install_all(progress=progress)
+
+        def note(text):
+            self.log.info("AI chat install: %s", str(text).strip())          # so the log shows how far it got
+            progress(text)
+        ok, message = llm_server.install_all(progress=note)
+        self.log.info("AI chat install %s: %s", "finished" if ok else "FAILED", message)
         if ok:
             self.settings.set("llm.enabled", True)
             self.settings.save()
@@ -522,7 +527,9 @@ class App:
         """Starts the AI chat and asks for one sentence. Returns (ok, sentence for the screen)."""
         from personality.llm import LocalLLM
         llm = getattr(self, "llm", None) or LocalLLM(self.settings)
-        return llm.test()
+        ok, message = llm.test()
+        self.log.info("AI chat test %s: %s", "worked" if ok else "FAILED", message)
+        return ok, message
 
     def ensure_updates(self):
         if getattr(self, "updates", None) is None:

@@ -35,7 +35,12 @@ class FSSSignalDiscovered(BaseEvent):
         note_signal(entry, state)
         if not str(entry.get("SignalName", "")).lower().startswith(("$uss", "$fixed_event")) and not entry.get("USSType"):
             return
-        log.info("FSS signal: %s / %s / %s", entry.get("SignalName"), entry.get("SignalName_Localised"), entry.get("USSType"))
+        seen = getattr(state, "_fss_logged", None)
+        if seen is None:
+            seen = state._fss_logged = set()
+        key = (state.system, entry.get("SignalName"), entry.get("USSType"))
+        (log.debug if key in seen else log.info)("FSS signal: %s / %s / %s", entry.get("SignalName"), entry.get("SignalName_Localised"), entry.get("USSType"))
+        seen.add(key)                                      # the same kind of signal in the same system is logged once, not thirty times at start-up
         if not is_high_grade(entry):
             return
         system = entry.get("SystemAddress") or state.system

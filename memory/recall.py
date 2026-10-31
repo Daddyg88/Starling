@@ -40,7 +40,8 @@ class MemoryRecall:
         line = self.dialogue.pick(key, mood, allow, False)
         if line is None:
             return None
-        return personalise(line.text.format_map(_Safe(values)), self.settings)
+        text = personalise(line.text.format_map(_Safe(values)), self.settings)
+        return text[:1].upper() + text[1:] if text[:1].islower() else text        # a line that starts with the memory ("the first time you...") still starts with a capital
 
     def _mood(self):
         if self.settings.get("personality.style", "personality") != "personality":

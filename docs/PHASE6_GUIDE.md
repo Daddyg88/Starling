@@ -1071,3 +1071,12 @@ Honest limits: typed tests only. The question appears only when the sentence is 
 - `core/app.py`: `install_ai_chat()` (engine, model, then switches `llm.enabled` on) and `test_ai_chat()`; `stop()` unloads. `ui/dashboard.py`: two buttons on the Personality page.
 - Untested live (the sandbox cannot reach GitHub downloads or Hugging Face, and there is no Windows here): the real download, the asset name in today's release, starting llama-server.exe on Windows, how long the first reply takes on a Ryzen 7 2700, and whether Windows Defender or a firewall asks about llama-server.exe. The release workflow in the llama.cpp repo names the asset `llama-<tag>-bin-win-cpu-x64.zip`, which is what the code looks for.
 
+## 0.77.6 - the 29 Oct log
+
+- `memory/recall.py` `_say`: a line that starts with `{memory}` is capitalised (chit-chat said "the first time you sampled..." and "your biggest biology sale...").
+- `navigation/voice.py`: `tidy_system_name()` keeps LFT/HIP/LHS/GJ... in capitals; `_PLOT` accepts "2" and "too" for "to"; `is_bare_catalogue()` + `RouteNeedNumber` lines (route.json) when only "LFT" was heard (the log shows "plot route to LFT" plotted to LFT 898); Narrator turns "1 neutron stops/jumps" into the singular.
+- `events/fss_signal_discovered.py`: the same signal in the same system is logged at INFO once, then DEBUG (30 identical lines at every start-up).
+- `core/app.py`: AI chat install and test log their progress.
+- Seen in the log and NOT changed: 1.3 to 5 s "Slow start" on lines with system names (they cannot be pre-recorded; the cache only helps fixed lines, and the new docking jokes need "Prepare her voice now" once), Void Compass offline messages (already throttled), repeated "Danger" + "Scanned" at the convoy/USS site (the game's danger flag was really on).
+- The log has no AI chat lines: the Install button had not been pressed, or the log was cut before it.
+

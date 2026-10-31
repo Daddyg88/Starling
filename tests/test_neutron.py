@@ -223,7 +223,7 @@ class VoiceTests(unittest.TestCase):
             ("work out a route to Sagittarius A star", "Sagittarius A*"),
             ("set a neutron course to the bubble", "Sol"),
             ("find a neutron route to colonia using neutron stars", "Colonia"),
-            ("plot neutron route to HIP 12345", "Hip 12345"),
+            ("plot neutron route to HIP 12345", "HIP 12345"),
         ]:
             self.build()
             self.assertIsNotNone(self.v.try_handle(text), text)

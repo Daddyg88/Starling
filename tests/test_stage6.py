@@ -219,3 +219,68 @@ class DockJokeTests(unittest.TestCase):
         from core import paths
         data = json.loads((paths.CONFIG_DIR / "speech.json").read_text(encoding="utf-8"))
         self.assertIn("DockSRV", data["cooldown_seconds"])
+
+
+class Log29OctTests(unittest.TestCase):
+    """0.77.6: fixes from the 29 Oct evening log (lower-case memory lines, 'Lft', 'route 2', FSS log spam, '1 neutron stops')."""
+
+    class Settings:
+        def __init__(self, **v): self.v = v
+        def get(self, k, d=None): return self.v.get(k, d)
+
+    class Narrator:
+        def __init__(self): self.said = []
+        def say(self, key, fields=None): self.said.append((key, fields))
+
+    class Follower:
+        active = False
+
+    def voice(self):
+        from navigation.voice import RouteVoice
+        narrator = self.Narrator()
+        v = RouteVoice(self.Follower(), None, narrator, self.Settings(), lambda: None, spawn=lambda f: None)
+        v.game_target = lambda: ""
+        return v, narrator
+
+    def test_catalogue_names_keep_their_capitals(self):
+        for said, expected in (("plot a neutron route to lft 509", "LFT 509"), ("plot neutron route to hip 50045", "HIP 50045"),
+                               ("plot neutron route to col 285 sector nx j c9 21", "Col 285 Sector Nx J C9 21")):
+            self.assertEqual(self.voice()[0].try_handle(said), "Plotting a neutron route to " + expected)
+
+    def test_microphone_two_means_to(self):
+        self.assertEqual(self.voice()[0].try_handle("plot route 2 LFT 509"), "Plotting a neutron route to LFT 509")
+        self.assertEqual(self.voice()[0].try_handle("plot neutron route too sol"), "Plotting a neutron route to Sol")
+
+    def test_a_bare_catalogue_name_asks_for_the_number(self):
+        v, narrator = self.voice()
+        answer = v.try_handle("plot route to LFT")
+        self.assertIn("Which LFT", answer)
+        self.assertEqual(narrator.said[-1][0], "RouteNeedNumber")
+
+    def test_singular_neutron_stop_and_jump(self):
+        from navigation.voice import Narrator
+        spoken = []
+        speech = SimpleNamespace(say=lambda text, **k: spoken.append(text) or True)
+
+        class Dialogue:
+            def pick(self, key, mood, allow, prefer):
+                return SimpleNamespace(text="Done. {stops} neutron stops, {left} jumps to {destination}.")
+        settings = self.Settings(**{"personality.style": "info"})
+        Narrator(lambda: speech, Dialogue(), settings).say("RouteReady", {"stops": 1, "left": 1, "destination": "LFT 898"})
+        self.assertEqual(spoken[-1], "Done. 1 neutron stop, 1 jump to LFT 898.")
+
+    def test_memory_lines_start_with_a_capital(self):
+        from memory.recall import MemoryRecall
+        import inspect
+        source = inspect.getsource(MemoryRecall._say)
+        self.assertIn(".upper()", source)
+
+    def test_same_fss_signal_is_logged_once_per_system(self):
+        from events.fss_signal_discovered import FSSSignalDiscovered
+        state = SimpleNamespace(system="Sol")
+        entry = {"event": "FSSSignalDiscovered", "SignalName": "$USS_DegradedEmissions;", "USSType": "$USS_Type_Salvage;", "SystemAddress": 1}
+        event = FSSSignalDiscovered()
+        with self.assertLogs("starling.fss_signal", level="INFO") as logs:
+            for _ in range(5):
+                event.update_state(entry, state)
+        self.assertEqual(len(logs.output), 1)
