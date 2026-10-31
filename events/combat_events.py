@@ -4,6 +4,7 @@ Their words live in voicepacks/default/combat.json. Several small events share t
 """
 
 import re
+import time
 
 from core.event_bus import NORMAL
 from core.ships import ship_name
@@ -46,28 +47,52 @@ def _is_thargoid(entry):
     return raw in THARGOID_NAMES or re.match(r"^scout(_|$)", raw) is not None or local in THARGOID_NAMES
 
 
+LOST_SECONDS = 30            # a target that flickers off and back on within this time is still the same target
+TOLD_AGAIN_SECONDS = 120     # the same pilot's bounty is not read out again within this time
+_now = time.monotonic
+
+
+def _same_target(seen, ship, pilot):
+    """The game gives no pilot name at scan stage 0 and adds it at stage 1, so an empty name matches any name."""
+    return seen is not None and seen[0] == ship and (not pilot or not seen[1] or pilot == seen[1])
+
+
 def _target_update(self, entry, state):
     """Decide what (if anything) is worth saying about the ship you just targeted or scanned."""
     ship = entry.get("Ship_Localised") or entry.get("Ship") or ""
     pilot = entry.get("PilotName_Localised") or entry.get("PilotName") or ""
+    now = _now()
     if not entry.get("TargetLocked", True) or not ship:
-        self._seen, self._bounty_told, self._pending = None, None, ""
+        self._lost_at = now                                             # keep what we know: it may flicker back on
+        self._pending = ""
         return
-    target = (ship, pilot)
+    lost_at = getattr(self, "_lost_at", None)
+    if self._seen is not None and lost_at is not None and now - lost_at > LOST_SECONDS:
+        self._seen, self._bounty_told = None, None
+    self._lost_at = None
     stage = entry.get("ScanStage") or 0
     pending = ""
     flags = getattr(state, "status_flags", None)
     fighting = bool(flags is not None and (flags >> 6) & 1)               # hardpoints out
-    if target != self._seen:
-        self._seen, self._bounty_told = target, None
+    if not _same_target(self._seen, ship, pilot):
+        self._seen, self._bounty_told = (ship, pilot), None
         if _is_thargoid(entry):
             pending = "thargoid"                                         # always worth a word, hardpoints or not
         elif fighting:
             pending = "ship"
+    elif pilot and not self._seen[1]:
+        self._seen = (ship, pilot)                                       # now we know who it is
     wanted = "wanted" in str(entry.get("LegalStatus", "")).lower()
-    if stage >= 3 and self._bounty_told != target and (wanted or entry.get("Bounty")) and pending != "thargoid":
-        self._bounty_told = target
-        pending = "bounty" if entry.get("Bounty") else "wanted"
+    if stage >= 3 and not self._bounty_told and (wanted or entry.get("Bounty")) and pending != "thargoid":
+        self._bounty_told = True
+        told = self.__dict__.setdefault("_told_at", {})
+        key = (ship, pilot)
+        if not pilot or now - told.get(key, -1e9) >= TOLD_AGAIN_SECONDS:
+            told[key] = now
+            if len(told) > 60:
+                for old in sorted(told, key=told.get)[:20]:
+                    del told[old]
+            pending = "bounty" if entry.get("Bounty") else "wanted"
     self._pending = pending
 
 

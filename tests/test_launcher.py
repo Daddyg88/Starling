@@ -266,3 +266,73 @@ class CertificateRetry(unittest.TestCase):
         with mock.patch.object(updater, "_certifi_context", return_value=None):
             with self.assertRaises(urllib_error.URLError):
                 updater._open("https://api.github.com/x", opener=opener)
+
+
+class DesktopShortcutTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.layout = L.Layout(Path(self.tmp.name) / "Starling")
+        self.layout.home.mkdir(parents=True)
+        self.layout.app.mkdir(parents=True)
+        self.ran = []
+        self.code = 0
+
+        def run(cmd, **kw):
+            self.ran.append((cmd, kw))
+            return SimpleNamespace(returncode=self.code, stdout="", stderr="boom")
+        self.launcher = L.Launcher(self.layout, lambda text: None, repo="x/y", run=run)
+
+    def test_makes_one_shortcut_with_the_exe_and_the_icon(self):
+        icon = self.layout.app / "ui" / "assets"
+        icon.mkdir(parents=True)
+        (icon / "starling.ico").write_bytes(b"ico")
+        self.assertTrue(self.launcher.make_desktop_shortcut(exe="C:/Games/Starling.exe", windows=True))
+        command, kwargs = self.ran[0]
+        self.assertEqual(command[0], "powershell")
+        self.assertEqual(kwargs["env"]["STARLING_LNK_TARGET"], "C:/Games/Starling.exe")
+        self.assertTrue(kwargs["env"]["STARLING_LNK_ICON"].endswith("starling.ico"))
+        self.assertIn("GetFolderPath('Desktop')", command[-1])
+        self.assertTrue((self.layout.home / "desktop_shortcut.done").exists())
+
+    def test_only_once_so_a_deleted_shortcut_stays_deleted(self):
+        self.assertTrue(self.launcher.make_desktop_shortcut(exe="C:/S.exe", windows=True))
+        self.assertFalse(self.launcher.make_desktop_shortcut(exe="C:/S.exe", windows=True))
+        self.assertEqual(len(self.ran), 1)
+
+    def test_falls_back_to_the_exes_own_icon(self):
+        self.launcher.make_desktop_shortcut(exe="C:/S.exe", windows=True)
+        self.assertEqual(self.ran[0][1]["env"]["STARLING_LNK_ICON"], "C:/S.exe,0")
+
+    def test_not_on_other_systems_or_when_not_the_exe(self):
+        self.assertFalse(self.launcher.make_desktop_shortcut(exe="/x/Starling", windows=False))
+        self.assertFalse(self.launcher.make_desktop_shortcut(exe="", windows=True))
+        self.assertEqual(self.ran, [])
+
+    def test_can_be_switched_off(self):
+        (self.layout.app / "config").mkdir()
+        (self.layout.app / "config" / "settings.json").write_text('{"app": {"desktop_shortcut": false}}', encoding="utf-8")
+        self.assertFalse(self.launcher.make_desktop_shortcut(exe="C:/S.exe", windows=True))
+        self.assertEqual(self.ran, [])
+
+    def test_a_failure_is_quiet_and_tried_again_next_time(self):
+        self.code = 1
+        self.assertFalse(self.launcher.make_desktop_shortcut(exe="C:/S.exe", windows=True))
+        self.assertFalse((self.layout.home / "desktop_shortcut.done").exists())
+
+    def test_an_exception_never_escapes(self):
+        def broken(cmd, **kw):
+            raise OSError("no powershell")
+        self.launcher.run = broken
+        self.assertFalse(self.launcher.make_desktop_shortcut(exe="C:/S.exe", windows=True))
+
+
+class IconFilesTests(unittest.TestCase):
+    def test_the_icon_files_exist_and_are_real_pictures(self):
+        from PIL import Image
+        assets = Path(__file__).resolve().parent.parent / "ui" / "assets"
+        ico = Image.open(assets / "starling.ico")
+        self.assertIn((256, 256), ico.info.get("sizes", {(256, 256)}))
+        for name in ("starling_logo.png", "starling_emblem.png", "starling_emblem_alpha.png"):
+            self.assertGreater(Image.open(assets / name).width, 200, name)
+

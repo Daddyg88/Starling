@@ -10,6 +10,7 @@ SAFETY RULE: if a critical event has no dialogue line at all, she speaks the
 event's own summary instead, so a warning is never silent.
 """
 
+import re
 import json
 import time
 
@@ -45,6 +46,15 @@ def load_rules(path=None):
     except (OSError, ValueError) as error:
         log.error("Could not read speech.json (%s); using defaults", error)
     return rules
+
+
+
+def fix_articles(text, data):
+    """'a Eagle' -> 'an Eagle' when the line was filled in with a name that starts with a vowel sound (ships, materials)."""
+    for value in set(v for v in data.values() if isinstance(v, str) and len(v) > 2):
+        if value[0] in "AEIOaeio" and not value.lower().startswith(("eu", "one")) and value in text:
+            text = re.sub(r"\b([Aa]) (?=%s)" % re.escape(value), lambda m: m.group(1) + "n ", text)
+    return text
 
 
 class EventSpeaker:
@@ -127,6 +137,6 @@ class EventSpeaker:
         if "{" not in text:
             return text
         try:
-            return text.format(**event.data)
+            return fix_articles(text.format(**event.data), event.data)
         except (KeyError, IndexError, ValueError):
             return (event.data.get("summary") or text) if use_summary else None

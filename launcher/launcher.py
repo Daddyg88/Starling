@@ -351,6 +351,41 @@ class Launcher:
             time.sleep(0.5)
         self.log("Dashboard is running.")
 
+    def shortcut_wanted(self):
+        """True unless you switched it off (app.desktop_shortcut = false in settings.json)."""
+        try:
+            data = json.loads(self.settings_path().read_text(encoding="utf-8"))
+            return bool((data.get("app") or {}).get("desktop_shortcut", True))
+        except (OSError, ValueError, AttributeError):
+            return True
+
+    def make_desktop_shortcut(self, exe=None, windows=None):
+        """Puts a Starling shortcut on the desktop ONCE, after Starling has started. If you delete it, it stays deleted.
+        Never lets a problem here stop Starling. Returns True when a shortcut was made."""
+        try:
+            windows = (os.name == "nt") if windows is None else windows
+            exe = exe or (sys.executable if getattr(sys, "frozen", False) else "")
+            marker = self.l.home / "desktop_shortcut.done"
+            if not windows or not exe or marker.exists() or not self.shortcut_wanted():
+                return False
+            icon = self.l.app / "ui" / "assets" / "starling.ico"
+            script = ("$d=[Environment]::GetFolderPath('Desktop');"
+                      "$s=(New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $d 'Starling.lnk'));"
+                      "$s.TargetPath=$env:STARLING_LNK_TARGET;$s.WorkingDirectory=(Split-Path $env:STARLING_LNK_TARGET);"
+                      "$s.IconLocation=$env:STARLING_LNK_ICON;$s.Description='Starling, your ship companion for Elite Dangerous';$s.Save()")
+            env = clean_env({"STARLING_LNK_TARGET": str(exe),
+                             "STARLING_LNK_ICON": (str(icon) if icon.exists() else str(exe) + ",0")})
+            done = self.run(["powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script],
+                            capture_output=True, text=True, creationflags=NO_WINDOW, env=env, timeout=30)
+            if getattr(done, "returncode", 1) == 0:
+                marker.write_text("done", encoding="utf-8")
+                self.log("Desktop shortcut created.")
+                return True
+            self.log("Desktop shortcut was not created: %s" % (getattr(done, "stderr", "") or "")[-300:])
+        except Exception as error:                      # a missing desktop must never stop Starling
+            self.log("Desktop shortcut was not created: %s" % error)
+        return False
+
     def run_all(self):
         self.l.home.mkdir(parents=True, exist_ok=True)
         first_run = not (self.l.app / "main.py").exists()
@@ -361,6 +396,7 @@ class Launcher:
             raise RuntimeError("Starling isn't installed and couldn't be downloaded.")
         self.ensure_environment()
         self.start_dashboard()
+        self.make_desktop_shortcut()                        # only once, and only after she has started
 
 
 def main():
@@ -370,6 +406,10 @@ def main():
         from tkinter import filedialog, ttk
         root = tk.Tk()
         root.title("Starling")
+        try:
+            root.iconbitmap(str(HERE / "ui" / "assets" / "starling.ico"))
+        except Exception:
+            pass
         root.geometry("460x120")
         root.resizable(False, False)
         label = tk.Label(root, text="Starting Starling...", wraplength=430, justify="left")

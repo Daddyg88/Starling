@@ -9,6 +9,7 @@ To change the look, edit theme.py. To add a setting, edit settings_model.py.
 import math
 import random
 import time
+from pathlib import Path
 
 from core.identity import assistant_name
 from core.logger import get_logger
@@ -25,6 +26,7 @@ TEST_LINES = [
 ]
 STATUS_COLOURS = {"good": T.GOOD, "warn": T.WARN, "bad": T.BAD, "muted": T.MUTED}
 REFRESH_MS = 1000
+ASSETS = Path(__file__).resolve().parent / "assets"
 
 
 def customtkinter_missing_message():
@@ -89,6 +91,7 @@ class Dashboard:
             log.exception("The biology overlay could not start")
             self.bio_overlay = None
         self.root.bind("<Configure>", self._window_moved, add="+")
+        self.root.after(300, self._set_window_icon)
         self.show("home" if app.settings.get("app.first_run_done", False) else "setup")      # first time: the checklist
         self.root.after(REFRESH_MS, self._tick)
 
@@ -115,9 +118,13 @@ class Dashboard:
         name = assistant_name(self.app.settings).upper()
         head = ctk.CTkFrame(side, fg_color="transparent")
         head.pack(fill="x", padx=16, pady=(20, 12))
-        logo = ctk.CTkCanvas(head, width=48, height=48, bg=T.SIDEBAR, highlightthickness=0)
-        logo.grid(row=0, column=0, rowspan=2, padx=(0, 10))
-        self._draw_logo(logo)
+        picture = self._logo_picture(48)
+        if picture is not None:
+            ctk.CTkLabel(head, image=picture, text="", width=48, height=48).grid(row=0, column=0, rowspan=2, padx=(0, 10))
+        else:                                                              # no picture file: the drawn ring
+            logo = ctk.CTkCanvas(head, width=48, height=48, bg=T.SIDEBAR, highlightthickness=0)
+            logo.grid(row=0, column=0, rowspan=2, padx=(0, 10))
+            self._draw_logo(logo)
         ctk.CTkLabel(head, text=" ".join(name), font=self._font(T.TITLE_SIZE - 2, True, head=True), text_color=T.TEXT).grid(
             row=0, column=1, sticky="w")
         ctk.CTkLabel(head, text="SHIP  COMPANION", font=self._font(T.SMALL_SIZE - 1, head=True), text_color=T.ACCENT).grid(
@@ -246,6 +253,25 @@ class Dashboard:
             colour = STATUS_COLOURS.get(tone, T.MUTED)
             self.banner.itemconfigure("hdr_mic", text=("\u25CF  " if tone == "good" else "\u25CB  ") + words, fill=colour)
             self.banner.itemconfigure("hdr_micbox", outline=colour)
+
+    def _logo_picture(self, size):
+        """Her emblem for the top of the menu (ui/assets/starling_emblem_alpha.png). None if it can't be loaded."""
+        try:
+            from PIL import Image
+            picture = Image.open(ASSETS / "starling_emblem_alpha.png")
+            picture.load()
+            self._logo_image = self.ctk.CTkImage(light_image=picture, dark_image=picture, size=(size, size))
+            return self._logo_image
+        except Exception:
+            log.warning("Could not load the Starling emblem", exc_info=True)
+            return None
+
+    def _set_window_icon(self):
+        """The window and taskbar icon (Windows). customtkinter sets its own icon a moment after start, so this runs later."""
+        try:
+            self.root.iconbitmap(str(ASSETS / "starling.ico"))
+        except Exception:
+            log.debug("Could not set the window icon", exc_info=True)
 
     @staticmethod
     def _draw_logo(canvas):

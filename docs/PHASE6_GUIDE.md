@@ -1125,3 +1125,13 @@ Testers who are not computer-literate got no hint of what to do after Starling.e
 - `docs/START_HERE.md`: plain install guide with the SmartScreen / antivirus steps.
 - Not tested in a real window (the sandbox has no customtkinter). If a row looks wrong, send a screenshot.
 
+## 0.77.12 - icon, desktop shortcut, targeting chatter
+
+- Assets in `ui/assets`: `starling_logo.png` (full logo), `starling_emblem.png` (square, no text), `starling_emblem_alpha.png` (sidebar, see-through), `starling.ico` (16 to 256 px).
+- Exe icon: `.github/workflows/release.yml` builds with `--icon ui/assets/starling.ico` and bundles it for the start-up window. Dashboard: window icon (`_set_window_icon`) and the menu logo (`_logo_picture`).
+- Desktop shortcut: `Launcher.make_desktop_shortcut` (launcher/launcher.py) runs after the dashboard has started, only from the real exe on Windows. It asks PowerShell to write `Starling.lnk` on the real Desktop (works with OneDrive desktops), icon from `app\ui\assets\starling.ico`. A marker `desktop_shortcut.done` in the install folder makes it once-only. `app.desktop_shortcut = false` turns it off. A failure only goes in launcher.log.
+- The exe's own icon only changes when the NEW Starling.exe is downloaded and run by hand; the automatic updates replace the app, not the exe. The window and menu icons change straight away.
+- Targeting (events/combat_events.py): same ship with an empty pilot name is the same target; a lock lost for under 30 s that comes back is the same target; the same pilot's bounty is not re-announced within 120 s. `personality/speaker.py fix_articles` turns "a Eagle" into "an Eagle".
+- brain_examples.json: "go go go" and friends are decoys.
+- Not tested in a real window or on Windows (no PowerShell here). If the shortcut does not appear, launcher.log says why.
+

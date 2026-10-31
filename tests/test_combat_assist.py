@@ -224,6 +224,76 @@ class TargetTests(unittest.TestCase):
         self.assertEqual(data["Announce"], "ship")
 
 
+class TargetChatterTests(unittest.TestCase):
+    """Live log 31 Oct: every new target was announced twice (the game adds the pilot's name at scan stage 1) and re-locks repeated the bounty."""
+
+    def setUp(self):
+        from events import combat_events
+        self.ce = combat_events
+        self.processor, self.bus, self.heard = make_processor()
+        self.processor.state.status_flags = 1 << 6
+        self.clock = [1000.0]
+        self._old_now = combat_events._now
+        combat_events._now = lambda: self.clock[0]
+        self.addCleanup(setattr, combat_events, "_now", self._old_now)
+
+    def target(self, stage, locked=True, pilot="", ship="Eagle", **extra):
+        entry = {"event": "ShipTargeted", "TargetLocked": locked, "ScanStage": stage}
+        if locked:
+            entry.update({"Ship": ship.lower(), "Ship_Localised": ship})
+            if pilot:
+                entry["PilotName_Localised"] = pilot
+        entry.update(extra)
+        self.processor.handle_line(json.dumps(entry))
+        return [e for e in self.heard if e.name == "ShipTargeted"][-1].data["Announce"]
+
+    def test_pilot_name_arriving_later_is_the_same_target(self):
+        self.assertEqual(self.target(0), "ship")
+        self.assertEqual(self.target(1, pilot="Dave"), "")
+        self.assertEqual(self.target(3, pilot="Dave", LegalStatus="Wanted", Bounty=500), "bounty")
+
+    def test_a_flicker_off_and_on_is_not_a_new_target(self):
+        self.assertEqual(self.target(0), "ship")
+        self.target(0, locked=False)
+        self.clock[0] += 5
+        self.assertEqual(self.target(0), "")
+
+    def test_a_long_gap_is_a_new_target(self):
+        self.target(0)
+        self.target(0, locked=False)
+        self.clock[0] += 60
+        self.assertEqual(self.target(0), "ship")
+
+    def test_a_different_ship_is_announced(self):
+        self.target(0)
+        self.assertEqual(self.target(0, ship="Anaconda"), "ship")
+
+    def test_same_pilots_bounty_is_not_read_out_again_soon(self):
+        self.target(0)
+        self.assertEqual(self.target(3, pilot="Dave", LegalStatus="Wanted", Bounty=500), "bounty")
+        self.target(0, locked=False)
+        self.clock[0] += 40                                  # lost it for a while, then locked it again
+        self.target(0, ship="Python")
+        self.assertEqual(self.target(1, pilot="Dave", ship="Eagle"), "ship")          # back on the Eagle: its name, but no bounty again
+        self.assertEqual(self.target(3, pilot="Dave", ship="Eagle", LegalStatus="Wanted", Bounty=500), "")
+        self.clock[0] += 200
+        self.target(0, ship="Python")
+        self.target(1, pilot="Dave", ship="Eagle")
+        self.assertEqual(self.target(3, pilot="Dave", ship="Eagle", LegalStatus="Wanted", Bounty=500), "bounty")
+
+
+class ArticleTests(unittest.TestCase):
+    def test_a_becomes_an_before_a_vowel_name(self):
+        from personality.speaker import fix_articles
+        data = {"Ship": "Eagle"}
+        self.assertEqual(fix_articles("It's a Eagle.", data), "It's an Eagle.")
+        self.assertEqual(fix_articles("A Eagle, Commander.", data), "An Eagle, Commander.")
+        self.assertEqual(fix_articles("Locked on. A Cobra Mk III.", {"Ship": "Cobra Mk III"}), "Locked on. A Cobra Mk III.")
+        self.assertEqual(fix_articles("A Anaconda.", {"Ship": "Anaconda"}), "An Anaconda.")
+        self.assertEqual(fix_articles("a Europium", {"M": "Europium"}), "a Europium")
+        self.assertEqual(fix_articles("What a day for an Eagle", data), "What a day for an Eagle")
+
+
 class LinesTests(unittest.TestCase):
     def test_keys_have_lines_and_fill_in(self):
         from core import paths

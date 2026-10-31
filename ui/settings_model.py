@@ -442,6 +442,8 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("game", "Game", "How she watches Elite Dangerous.", [
             Field("journal.folder", "Journal folder", "text", restart=True,
                   placeholder="Leave empty to find it automatically"),
+            Field("app.desktop_shortcut", "Put a Starling shortcut on the desktop (once, the first time Starling.exe starts her)", "toggle",
+                  help="She makes it once and never again, so deleting it is fine. This only decides whether she makes it"),
             Field("app.smooth_window", "Smooth dashboard (no lag when dragging between screens)", "toggle", restart=True,
                   help="On = the window ignores Windows display scaling, so dragging is smooth. Text can look slightly soft on a high-resolution screen. Turn it off if the dashboard looks blurry"),
             Field("app.log_level", "Log detail", "choice", LOG_DETAIL, restart=True,
