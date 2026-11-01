@@ -1140,3 +1140,8 @@ Testers who are not computer-literate got no hint of what to do after Starling.e
 ## 0.77.13 - Overlay on the right screen
 
 New ui/screens.py lists the Windows screens (EnumDisplayMonitors) and finds Elite's window; pure helpers pick_screen/overlay_rect are tested. ui/bio_overlay.py offsets its position by the chosen screen's corner. Setting overlay.screen: auto, primary, 1-4. The Windows calls are untested off Windows; test with the 10-second test list. Elite must be Borderless/Windowed for the overlay to show over it.
+
+
+## 0.77.14 - Nearest black market
+
+mining/services.py (ServiceFinder) posts a Spansh /stations/search with filters.services=[{name:'Black Market'}] sorted by distance from the current system; carriers skipped, 15 min cache, own thread. Brain intent Brain_BlackMarket (kind blackmarket) before Brain_Merit; lines in voicepacks/default/blackmarket.json. The services filter shape is from Spansh's public API and untested live. Also: removed 'ill' from the health chat topic (it matched I'll) and personality/meaning.py ignores sentences that are mostly one repeated word.

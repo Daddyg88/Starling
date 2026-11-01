@@ -70,6 +70,7 @@ class App:
         self.profile = None
         self.miner = None
         self.prices = None
+        self.services = None
         self.lore = None
         self.eoc = None
         self._record_events = True
@@ -261,6 +262,8 @@ class App:
         self.prices = PriceFinder(self.settings)
         from mining.merit import MeritFinder
         self.merit = MeritFinder(self.settings)
+        from mining.services import ServiceFinder
+        self.services = ServiceFinder(self.settings)
         from memory.profile import PlayerProfile
         self.profile = PlayerProfile(paths.DATA_DIR / "player_profile.json", enabled=lambda: bool(self.settings.get("brain.profile", True)))
         from personality.llm import LocalLLM
@@ -275,7 +278,7 @@ class App:
         self.people = People(paths.DATA_DIR / "people.json")
         self.llm = LocalLLM(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
-                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit,
+                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit, services=self.services,
                            profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered, people=self.people, ships=ShipInfo())
         return True
 

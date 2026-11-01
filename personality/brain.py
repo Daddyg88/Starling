@@ -72,7 +72,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None, people=None, ships=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, services=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None, people=None, ships=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -80,6 +80,7 @@ class Brain:
         self.chitchat = chitchat
         self.mining = mining         # mining/tracker.py: what you have refined this session
         self.prices = prices         # mining/prices.py: where to sell it
+        self.services = services     # mining/services.py: nearest black market
         self.merit = merit           # mining/merit.py: pristine metallic rings in your Power's systems
         self.ask = ask               # personality/ask.py: asks 'the first one or the second one?' and 'shall I plot a route?'
         self.facts = facts
@@ -795,6 +796,36 @@ class Brain:
         if not words:
             return None, ""
         return "".join(words), " ".join(w.capitalize() for w in words)
+
+    def _do_blackmarket(self, item, found, tidy):
+        """'Where is the nearest black market?' Looks it up on Spansh in the background and says the answer."""
+        if self.services is None or not self.services.enabled():
+            return self._say_pool("BlackMarket_Disabled", {}, remember=False)
+        system = getattr(self._state(), "system", None)
+        if not system:
+            return self._say_pool("BlackMarket_NoSystem", {}, remember=False)
+        first = self._say_pool("BlackMarket_Looking", {}, remember=False)
+        self.services.lookup_async(system, self._say_blackmarket)
+        return first
+
+    def _say_blackmarket(self, stations, ok):
+        if not ok:
+            return self._say_pool("BlackMarket_Offline", {})
+        if not stations:
+            return self._say_pool("BlackMarket_None", {})
+        best = stations[0]
+        values = {"Station": best["station"], "Where": self._where(best), "Arrival": ""}
+        if best.get("arrival"):
+            values["Arrival"] = "||It is %s light seconds from the star." % "{:,}".format(best["arrival"])
+        text = self._format("BlackMarket_Found", values)
+        if text is None:
+            return None
+        if len(stations) > 1:
+            second = stations[1]
+            more = self._format("BlackMarket_Second", {"Station2": second["station"], "Where2": self._where(second)})
+            if more:
+                text += "||" + more
+        return self._say(text)
 
     def _do_meritmining(self, item, found, tidy):
         """'I want to go merit mining': systems your Power controls with a pristine metallic ring and a station wanting 2000+ tonnes."""

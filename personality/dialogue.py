@@ -131,6 +131,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "guardian.json"))      # guardian blueprint sites and spoken guides
             self._merge(_read_json(self.pack_dir / "engineers.json"))     # "take me to Felicity Farseer"
             self._merge(_read_json(self.pack_dir / "merit.json"))         # "I want to go merit mining"
+            self._merge(_read_json(self.pack_dir / "blackmarket.json"))   # "where is the nearest black market"
             self._merge(_read_json(self.pack_dir / "biodistance.json"))   # beep + "far enough, take the next sample"
             self._merge(_read_json(self.pack_dir / "regions.json"))       # entering a galaxy region, first time in a region
             self._merge(_read_json(self.pack_dir / "messages.json"))      # incoming chat read aloud

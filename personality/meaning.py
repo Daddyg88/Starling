@@ -148,6 +148,8 @@ class Meaning:
         words = tokens(text)
         if len(words) < MIN_WORDS:
             return None
+        if len(words) >= 8 and len(set(words)) * 3 <= len(words):
+            return None                         # 'go go go go go...' (a stuck mic or a shout) is not a question
         known = [w for w in words if w in self.idf]
         if not known or len(known) / len(words) < MIN_KNOWN:
             return None
