@@ -336,3 +336,48 @@ class IconFilesTests(unittest.TestCase):
         for name in ("starling_logo.png", "starling_emblem.png", "starling_emblem_alpha.png"):
             self.assertGreater(Image.open(assets / name).width, 200, name)
 
+
+
+class InstalledUpdaterTests(unittest.TestCase):
+    """Starling.exe must use the update code of the installed app, so an old exe's bug can be cured by an update."""
+
+    def setUp(self):
+        import sys
+        self.sys = sys
+        self.saved = (L.updater, L.UpdateError, list(sys.modules["core"].__path__),
+                      sys.modules.get("core.updater"), sys.modules.get("core.secure_open"))
+
+    def tearDown(self):
+        L.updater, L.UpdateError = self.saved[0], self.saved[1]
+        self.sys.modules["core"].__path__ = self.saved[2]
+        for name, module in (("core.updater", self.saved[3]), ("core.secure_open", self.saved[4])):
+            if module is not None:
+                self.sys.modules[name] = module
+
+    def make_app(self, updater_text):
+        import tempfile
+        from pathlib import Path
+        folder = Path(tempfile.mkdtemp()) / "app"
+        (folder / "core").mkdir(parents=True)
+        (folder / "core" / "updater.py").write_text(updater_text, encoding="utf-8")
+        (folder / "core" / "secure_open.py").write_text("X = 1\n", encoding="utf-8")
+        return folder
+
+    def test_installed_copy_is_used(self):
+        good = ("class UpdateError(Exception):\n    pass\nMARK = 'installed'\n"
+                "def fetch_latest(*a, **k): pass\ndef stage_update(*a, **k): pass\n"
+                "def apply_pending(*a, **k): pass\ndef is_newer(*a, **k): return True\n")
+        self.assertTrue(L.use_installed_updater(self.make_app(good)))
+        self.assertEqual(L.updater.MARK, "installed")
+        self.assertIs(L.UpdateError, L.updater.UpdateError)
+
+    def test_broken_copy_falls_back(self):
+        before = L.updater
+        self.assertFalse(L.use_installed_updater(self.make_app("this is not python (\n")))
+        self.assertIs(L.updater, before)
+        self.assertFalse(L.use_installed_updater(self.make_app("MARK = 1\n")))
+        self.assertIs(L.updater, before)
+
+    def test_no_installed_copy(self):
+        import tempfile
+        self.assertFalse(L.use_installed_updater(tempfile.mkdtemp()))

@@ -59,7 +59,7 @@ jobs:
         shell: pwsh
         run: |
           "REPO = `"${{ github.repository }}`"" | Out-File -Encoding ascii launcher/launcher_config.py
-          pip install pyinstaller
+          pip install pyinstaller certifi
           pyinstaller --noconfirm --onefile --windowed --name Starling --icon ui/assets/starling.ico --add-data "ui/assets/starling.ico;ui/assets" --paths . --paths launcher launcher/launcher.py
 
       - name: Publish the release

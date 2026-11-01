@@ -32,6 +32,37 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from core import updater                      # noqa: E402  (pure standard library)
 from core.updater import UpdateError          # noqa: E402
 
+def use_installed_updater(app):
+    """Starling.exe carries its own copy of the update code, frozen on the day the exe was built. If that copy has a bug (an old
+    exe could not get past a Windows certificate problem) no update could ever fix it. So when the installed app has its own
+    core/updater.py, use that one instead; it updates with every release. Falls back to the built-in copy on any problem."""
+    global updater, UpdateError
+    core = sys.modules.get("core")
+    folder = Path(app) / "core"
+    if core is None or not (folder / "updater.py").exists() or not (folder / "secure_open.py").exists():
+        return False
+    saved_path = list(getattr(core, "__path__", []))
+    saved = {name: sys.modules.get(name) for name in ("core.updater", "core.secure_open")}
+    try:
+        core.__path__ = [str(folder)] + saved_path
+        for name in saved:
+            sys.modules.pop(name, None)
+        import importlib
+        fresh = importlib.import_module("core.updater")
+        if not all(hasattr(fresh, n) for n in ("fetch_latest", "stage_update", "apply_pending", "is_newer", "UpdateError")):
+            raise ImportError("the installed updater is incomplete")
+        updater, UpdateError = fresh, fresh.UpdateError
+        return True
+    except Exception:
+        core.__path__ = saved_path
+        for name, module in saved.items():
+            if module is not None:
+                sys.modules[name] = module
+            else:
+                sys.modules.pop(name, None)
+        return False
+
+
 try:
     from launcher_config import REPO          # noqa: E402
 except Exception:                             # pragma: no cover
@@ -251,6 +282,8 @@ class Launcher:
             if first_run:
                 raise
             self.log("Update check skipped: %s" % error)
+            self.say("Couldn't check for updates (%s). Starting the version you have." % str(error)[:140])
+            time.sleep(2.5)
             return
         if not first_run and not updater.is_newer(info["version"], self.current_version()):
             return
@@ -390,6 +423,8 @@ class Launcher:
         self.l.home.mkdir(parents=True, exist_ok=True)
         first_run = not (self.l.app / "main.py").exists()
         if not first_run:
+            if use_installed_updater(self.l.app):
+                self.log("Using the update code from the installed Starling")
             self.apply_waiting_update()
         self.get_newest(first_run)
         if not (self.l.app / "main.py").exists():
