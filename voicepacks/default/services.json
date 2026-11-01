@@ -1,0 +1,45 @@
+{
+ "_help": "'Where is the nearest material trader / tech broker / black market...' Fields: {Service} {Station} {Where} {Arrival}; the second one uses {Station2} {Where2}. || splits the line into sentences.",
+ "Brain_Service": [
+  "Let me look for that for you."
+ ],
+ "Service_Looking": [
+  "Looking for the nearest {Service}. One moment.",
+  "Let me find the closest {Service}. Checking now.",
+  "Searching for a {Service} near us, Commander."
+ ],
+ "Service_Looking_Sarcastic": [
+  "A {Service}. Of course. Searching."
+ ],
+ "Service_Looking_Close": [
+  "Anything for you, love. Looking for a {Service}."
+ ],
+ "Service_Looking_Frustrated": [
+  "Fine. Looking for a {Service}."
+ ],
+ "Service_NoSystem": [
+  "I don't know which system we're in yet. Make a jump and ask me again."
+ ],
+ "Service_Disabled": [
+  "Online searches are switched off. You can turn them on in the Mining page."
+ ],
+ "Service_Offline": [
+  "I couldn't reach Spansh just now. Check your internet and ask me again."
+ ],
+ "Service_None": [
+  "I couldn't find a {Service} anywhere near us. Try again from another system."
+ ],
+ "Service_Found": [
+  "The nearest {Service} is {Station} {Where}.{Arrival}",
+  "Closest {Service} I can find is {Station} {Where}.{Arrival}"
+ ],
+ "Service_Found_Sarcastic": [
+  "The nearest {Service} is {Station} {Where}. Try not to get lost.{Arrival}"
+ ],
+ "Service_Found_Close": [
+  "{Station} {Where} has a {Service}. Fly safe, love.{Arrival}"
+ ],
+ "Service_Second": [
+  "The next closest is {Station2} {Where2}."
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "_help": "Mission reminders (control/mission_reminder.py). Fields: {Name} {Minutes} {Count}.",
+ "Missions_Expiring": [
+  "Heads up, Commander. {Name} runs out in {Minutes} minutes.",
+  "{Name} has {Minutes} minutes left.",
+  "Careful, the clock is ticking on {Name}. {Minutes} minutes."
+ ],
+ "Missions_Expiring_Sarcastic": [
+  "Not to nag, but {Name} runs out in {Minutes} minutes."
+ ],
+ "Missions_Expiring_Close": [
+  "Darling, {Name} expires in {Minutes} minutes. I'd hate for you to miss it."
+ ],
+ "Missions_HandIn": [
+  "You have a mission with this station as its destination: {Name}.",
+  "{Name} is due here. You may be able to hand it in."
+ ],
+ "Missions_HandInMany": [
+  "You have {Count} missions with this station as their destination. Check the mission board.",
+  "{Count} of your missions are due here. Time to hand them in?"
+ ]
+}

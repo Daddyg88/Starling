@@ -7,5 +7,5 @@ from core.event_bus import NORMAL
 class MissionRedirected(BaseEvent):
     name = "MissionRedirected"
     priority = NORMAL
-    keep = ("LocalisedName", "NewDestinationSystem",)
+    keep = ("LocalisedName", "NewDestinationSystem", "NewDestinationStation", "MissionID",)
     summary = "Mission updated: {LocalisedName}"

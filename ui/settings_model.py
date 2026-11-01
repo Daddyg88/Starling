@@ -448,6 +448,12 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("game", "Game", "How she watches Elite Dangerous.", [
             Field("journal.folder", "Journal folder", "text", restart=True,
                   placeholder="Leave empty to find it automatically"),
+            Field("missions.reminders", "Mission reminders (running out of time, due at this station)", "toggle",
+                  help="She remembers the missions you accept while she is running. Missions taken before she started are not in her list"),
+            Field("binds.backup", "Back up my Elite key bindings (copies only, newest 20 kept)", "toggle",
+                  help="Safe copies go to the data/bind_backups folder whenever your bindings change. Starling never changes your bindings"),
+            Field("stats.enabled", "Keep count of my visits, kills, jumps and terraformable worlds", "toggle",
+                  help="Ask 'how many kills have I got?' or 'how many times have I been here?'. The counts live in data/stats.json on your PC; she counts from the day she learned this"),
             Field("app.desktop_shortcut", "Put a Starling shortcut on the desktop (once, the first time Starling.exe starts her)", "toggle",
                   help="She makes it once and never again, so deleting it is fine. This only decides whether she makes it"),
             Field("app.smooth_window", "Smooth dashboard (no lag when dragging between screens)", "toggle", restart=True,

@@ -7,5 +7,5 @@ from core.event_bus import CRITICAL
 class MissionFailed(BaseEvent):
     name = "MissionFailed"
     priority = CRITICAL
-    keep = ("LocalisedName", "Name", "Fine",)
+    keep = ("LocalisedName", "Name", "Fine", "MissionID",)
     summary = "Mission failed: {LocalisedName}"

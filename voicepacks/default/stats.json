@@ -1,0 +1,62 @@
+{
+ "_help": "Her answers about your numbers (memory/stats.py). Fields: {System} {Count} {Last} {Today} {Total} {Number}. || splits a line into sentences.",
+ "Brain_Stats": [
+  "Let me check my numbers."
+ ],
+ "Stats_VisitFirst": [
+  "This is the first time I've counted you in {System}.",
+  "First visit to {System}, as far as I've counted. Welcome!"
+ ],
+ "Stats_Visits": [
+  "That's visit number {Count} to {System}.{Last}",
+  "You've been to {System} {Count} times, counting this one.{Last}"
+ ],
+ "Stats_Visits_Sarcastic": [
+  "Visit number {Count} to {System}. Do you live here?{Last}"
+ ],
+ "Stats_Visits_Close": [
+  "You keep coming back to {System}, love. That's {Count} visits.{Last}"
+ ],
+ "Stats_Kills": [
+  "{Today} kills today, and {Total} in all that I've counted.",
+  "That's {Today} today and {Total} altogether since I started counting."
+ ],
+ "Stats_Kills_Sarcastic": [
+  "{Today} today, {Total} altogether. A real menace."
+ ],
+ "Stats_Kills_Close": [
+  "{Today} today and {Total} in total. My hero."
+ ],
+ "Stats_KillsNone": [
+  "I haven't counted a single kill yet. Go and change that, or don't. I'm easy.",
+  "No kills counted so far. I only started counting when I learned how."
+ ],
+ "Stats_Jumps": [
+  "{Today} jumps today, and {Total} in all that I've counted.",
+  "You've jumped {Today} times today and {Total} since I started counting."
+ ],
+ "Stats_JumpsNone": [
+  "I haven't counted any jumps yet. Make one and ask me again."
+ ],
+ "Stats_Terra": [
+  "I've counted {Count} terraformable worlds so far.",
+  "{Count} terraformable worlds found since I started counting."
+ ],
+ "Stats_TerraNone": [
+  "No terraformable worlds counted yet. Keep scanning!"
+ ],
+ "Stats_Off": [
+  "I'm not keeping count at the moment. You can turn it on in the settings."
+ ],
+ "Stats_KillMilestone": [
+  "That's kill number {Number}, Commander. Nicely done.",
+  "Kill number {Number}. You're on a roll.",
+  "{Number} kills counted. I'm impressed."
+ ],
+ "Stats_KillMilestone_Sarcastic": [
+  "Kill number {Number}. The galaxy is a little emptier."
+ ],
+ "Stats_KillMilestone_Close": [
+  "{Number} kills, love. I'm so proud of you."
+ ]
+}

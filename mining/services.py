@@ -21,6 +21,23 @@ CACHE_SECONDS = 15 * 60
 TIMEOUT_SECONDS = 15.0
 BLACK_MARKET = "Black Market"
 
+# What she can look for. (Spansh service name, how she says it, the words you might use). Add a line here and in
+# config/brain_intents.json to teach her another one.
+SERVICES = [
+    ("Black Market", "black market", ["black ?markets?"]),
+    ("Material Trader", "material trader", ["material (?:trader|traders|trading)", "materials? (?:trader|traders)"]),
+    ("Technology Broker", "technology broker", ["tech(?:nology)? brokers?"]),
+    ("Interstellar Factors Contact", "interstellar factors", ["interstellar factors?", "factors? contact", "bounty clearing"]),
+    ("Universal Cartographics", "Universal Cartographics", ["universal cartographics", "cartographics"]),
+    ("Vista Genomics", "Vista Genomics", ["vista genomics", "genomics"]),
+    ("Shipyard", "shipyard", ["ship ?yards?", "ship (?:seller|sellers|dealer|dealers)", "place to buy a ship"]),
+    ("Outfitting", "outfitting", ["outfitting", "module (?:seller|sellers|shop|shops|store)", "place to buy modules?"]),
+    ("Redemption Office", "redemption office", ["redemption offices?"]),
+    ("Pioneer Supplies", "Pioneer Supplies", ["pioneer supplies"]),
+    ("Frontline Solutions", "Frontline Solutions", ["frontline solutions"]),
+    ("Bartender", "bartender", ["bartenders?", "a bar"]),
+]
+
 
 def request_body(service, reference, size=25):
     return {"filters": {"services": [{"name": service}]}, "sort": [{"distance": {"direction": "asc"}}],

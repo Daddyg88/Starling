@@ -1155,3 +1155,12 @@ launcher.use_installed_updater(app) swaps core.updater/core.secure_open for the 
 ## 0.77.16 - Friends with the Watcher
 
 setting watcher.attitude: 'friends' (default) picks WatcherReply from the new pool WatcherFriend in voicepacks/default/watcher.json whatever her mood; 'mood' keeps the old WatcherReply_<mood> behaviour. personality/watcher.py reply().
+
+
+## 0.77.17 - Four EDCoPilot-inspired features
+
+* mining/services.py SERVICES table + Brain kind 'service' (config/brain_intents.json items carry 'service' and 'spoken'; lines in voicepacks/default/services.json). Replaces the single black market intent.
+* memory/stats.py StatsKeeper (data/stats.json): visits per system, kills (Bounty/FactionKillBond), jumps, terraformables (Scan). Brain kind 'stats'; lines in stats.json. Setting stats.enabled.
+* control/mission_reminder.py (data/missions.json): MissionAccepted/Completed/Failed/Abandoned/Redirected, expiry warnings at 60 and 15 minutes, hand-in when docking at the destination station. Setting missions.reminders. Mission events now keep MissionID and destinations.
+* control/bind_backup.py: copies *.binds from the Bindings folder into data/bind_backups when they change (timestamp check every 10 minutes, newest 20 kept). To restore, close Elite and copy the files back. Setting binds.backup.
+Untested live: the Spansh service names (Material Trader, Technology Broker, Interstellar Factors Contact...) and the real journal timings.

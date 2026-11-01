@@ -89,13 +89,25 @@ class BrainFlow(Base):
         self.assertIn("Alpha Centauri", self.said())
         self.assertEqual(self.calls[0]["reference_system"], "Sol")
 
+    def test_other_services_ask_for_the_right_thing(self):
+        for text, wanted in (("where is the nearest material trader", "Material Trader"), ("find me a tech broker", "Technology Broker"),
+                             ("nearest interstellar factors", "Interstellar Factors Contact"),
+                             ("where can i find vista genomics", "Vista Genomics"), ("closest shipyard", "Shipyard"),
+                             ("nearest outfitting", "Outfitting"), ("find the nearest universal cartographics", "Universal Cartographics")):
+            self.calls.clear()
+            self.brain.services = services.ServiceFinder(self.settings, post=lambda p, b: self.calls.append(b) or {"results": []},
+                                                         thread_factory=SyncThread)
+            self.ask(text)
+            self.assertTrue(self.calls, text)
+            self.assertEqual(self.calls[0]["filters"]["services"][0]["name"], wanted, text)
+
     def test_not_a_search(self):
         self.ask("what is a black market")
         self.assertEqual(self.calls, [])
 
     def test_lines_exist(self):
-        data = json.loads(Path("voicepacks/default/blackmarket.json").read_text(encoding="utf-8"))
-        for key in ("BlackMarket_Looking", "BlackMarket_Found", "BlackMarket_None", "BlackMarket_Offline", "BlackMarket_NoSystem"):
+        data = json.loads(Path("voicepacks/default/services.json").read_text(encoding="utf-8"))
+        for key in ("Service_Looking", "Service_Found", "Service_None", "Service_Offline", "Service_NoSystem"):
             self.assertIn(key, data)
 
 

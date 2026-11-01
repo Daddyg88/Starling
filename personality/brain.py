@@ -72,7 +72,7 @@ def strip_address(tidy):
 
 class Brain:
     def __init__(self, speech, dialogue, settings, state_provider=None, chitchat=None, facts=None, intents=None,
-                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, services=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None, people=None, ships=None):
+                 clock=time.monotonic, rng=None, now=datetime.now, mining=None, prices=None, ask=None, merit=None, services=None, stats=None, meaning=None, profile=None, llm=None, knowledge=None, lookup=None, unanswered=None, people=None, ships=None):
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
@@ -80,6 +80,7 @@ class Brain:
         self.chitchat = chitchat
         self.mining = mining         # mining/tracker.py: what you have refined this session
         self.prices = prices         # mining/prices.py: where to sell it
+        self.stats = stats           # memory/stats.py: visits, kills, jumps, terraformables
         self.services = services     # mining/services.py: nearest black market
         self.merit = merit           # mining/merit.py: pristine metallic rings in your Power's systems
         self.ask = ask               # personality/ask.py: asks 'the first one or the second one?' and 'shall I plot a route?'
@@ -797,32 +798,63 @@ class Brain:
             return None, ""
         return "".join(words), " ".join(w.capitalize() for w in words)
 
-    def _do_blackmarket(self, item, found, tidy):
-        """'Where is the nearest black market?' Looks it up on Spansh in the background and says the answer."""
+    def _do_stats(self, item, found, tidy):
+        """'How many kills have I got?', 'how many times have I been here?': answers from her own counts."""
+        keeper = self.stats
+        if keeper is None or not self.settings.get("stats.enabled", True):
+            return self._say_pool("Stats_Off", {}, remember=False)
+        topic = item.get("topic")
+        if topic == "visits":
+            system = getattr(self._state(), "system", None)
+            if not system:
+                return self._say_pool("Service_NoSystem", {}, remember=False)
+            count, last = keeper.visit_info(system)
+            if count <= 1:
+                return self._say_pool("Stats_VisitFirst", {"System": system}, remember=True)
+            return self._say_pool("Stats_Visits", {"System": system, "Count": count,
+                                                   "Last": (" The last time was on %s." % last) if last else ""}, remember=True)
+        if topic == "kills":
+            if keeper.kills_total == 0:
+                return self._say_pool("Stats_KillsNone", {}, remember=True)
+            return self._say_pool("Stats_Kills", {"Today": keeper.kills_today(), "Total": "{:,}".format(keeper.kills_total)}, remember=True)
+        if topic == "jumps":
+            if keeper.jumps_total == 0:
+                return self._say_pool("Stats_JumpsNone", {}, remember=True)
+            return self._say_pool("Stats_Jumps", {"Today": keeper.jumps_today(), "Total": "{:,}".format(keeper.jumps_total)}, remember=True)
+        if topic == "terra":
+            count = len(keeper.terraformable)
+            return self._say_pool("Stats_Terra" if count else "Stats_TerraNone", {"Count": count}, remember=True)
+        return None
+
+    def _do_service(self, item, found, tidy):
+        """'Where is the nearest material trader / black market / tech broker?' Looks it up on Spansh in the background."""
         if self.services is None or not self.services.enabled():
-            return self._say_pool("BlackMarket_Disabled", {}, remember=False)
+            return self._say_pool("Service_Disabled", {}, remember=False)
         system = getattr(self._state(), "system", None)
         if not system:
-            return self._say_pool("BlackMarket_NoSystem", {}, remember=False)
-        first = self._say_pool("BlackMarket_Looking", {}, remember=False)
-        self.services.lookup_async(system, self._say_blackmarket)
+            return self._say_pool("Service_NoSystem", {}, remember=False)
+        service, spoken = item.get("service"), item.get("spoken") or "place"
+        if not service:
+            return None
+        first = self._say_pool("Service_Looking", {"Service": spoken}, remember=False)
+        self.services.lookup_async(system, lambda stations, ok: self._say_service(spoken, stations, ok), service)
         return first
 
-    def _say_blackmarket(self, stations, ok):
+    def _say_service(self, spoken, stations, ok):
         if not ok:
-            return self._say_pool("BlackMarket_Offline", {})
+            return self._say_pool("Service_Offline", {})
         if not stations:
-            return self._say_pool("BlackMarket_None", {})
+            return self._say_pool("Service_None", {"Service": spoken})
         best = stations[0]
-        values = {"Station": best["station"], "Where": self._where(best), "Arrival": ""}
+        values = {"Service": spoken, "Station": best["station"], "Where": self._where(best), "Arrival": ""}
         if best.get("arrival"):
             values["Arrival"] = "||It is %s light seconds from the star." % "{:,}".format(best["arrival"])
-        text = self._format("BlackMarket_Found", values)
+        text = self._format("Service_Found", values)
         if text is None:
             return None
         if len(stations) > 1:
             second = stations[1]
-            more = self._format("BlackMarket_Second", {"Station2": second["station"], "Where2": self._where(second)})
+            more = self._format("Service_Second", {"Station2": second["station"], "Where2": self._where(second)})
             if more:
                 text += "||" + more
         return self._say(text)

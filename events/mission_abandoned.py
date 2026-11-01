@@ -7,5 +7,5 @@ from core.event_bus import NORMAL
 class MissionAbandoned(BaseEvent):
     name = "MissionAbandoned"
     priority = NORMAL
-    keep = ("LocalisedName",)
+    keep = ("LocalisedName", "MissionID",)
     summary = "Mission abandoned: {LocalisedName}"

@@ -71,6 +71,7 @@ class App:
         self.miner = None
         self.prices = None
         self.services = None
+        self.stats = None
         self.lore = None
         self.eoc = None
         self._record_events = True
@@ -262,6 +263,14 @@ class App:
         self.prices = PriceFinder(self.settings)
         from mining.merit import MeritFinder
         self.merit = MeritFinder(self.settings)
+        from memory.stats import StatsKeeper
+        from navigation.voice import Narrator as _StatsNarrator
+        _stats_narrator = _StatsNarrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+        self.stats = StatsKeeper(self.bus, paths.DATA_DIR / "stats.json",
+                                 announce=lambda key, values: _stats_narrator.say(key, values) if self.settings.get("stats.enabled", True) else None)
+        self.stats.attach()
+        import atexit
+        atexit.register(self.stats.flush)
         from mining.services import ServiceFinder
         self.services = ServiceFinder(self.settings)
         from memory.profile import PlayerProfile
@@ -278,7 +287,7 @@ class App:
         self.people = People(paths.DATA_DIR / "people.json")
         self.llm = LocalLLM(self.settings)
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
-                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit, services=self.services,
+                           facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit, services=self.services, stats=self.stats,
                            profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered, people=self.people, ships=ShipInfo())
         return True
 
@@ -665,6 +674,35 @@ class App:
             self.auto_shields = None
         self.onfoot_care = None
 
+    def ensure_mission_reminder(self):
+        """Warns when a mission is about to run out and when you dock where one is due. Safe to call twice."""
+        if getattr(self, "mission_reminder", None) is not None:
+            return self.mission_reminder
+        try:
+            from control.mission_reminder import MissionReminder
+            from navigation.voice import Narrator
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.mission_reminder = MissionReminder(self.bus, self.settings, narrator, lambda: self.state, paths.DATA_DIR / "missions.json")
+            self.mission_reminder.attach()
+        except Exception:
+            self.log.exception("The mission reminder could not start")
+            self.mission_reminder = None
+        return self.mission_reminder
+
+    def ensure_bind_backup(self):
+        """Keeps safe copies of your key bindings (copy only; never changes them). Safe to call twice."""
+        if getattr(self, "bind_backup", None) is not None:
+            return self.bind_backup
+        try:
+            from control.bind_backup import BindBackup
+            from control.binds import bindings_folder
+            self.bind_backup = BindBackup(self.bus, self.settings, bindings_folder, paths.DATA_DIR / "bind_backups")
+            self.bind_backup.attach()
+        except Exception:
+            self.log.exception("The keybind backup could not start")
+            self.bind_backup = None
+        return self.bind_backup
+
     def ensure_limpet_reminder(self):
         """Reminds you to buy limpets when you dock in a mining ship. Safe to call twice."""
         if getattr(self, "limpet_reminder", None) is not None:
@@ -810,6 +848,8 @@ class App:
         self.bus.subscribe("NomadDocked", self.on_nomad_docked)
         self.ensure_combat_assist()
         self.ensure_limpet_reminder()
+        self.ensure_mission_reminder()
+        self.ensure_bind_backup()
         self.ensure_material_fill()
         self.ensure_route()
         self.ensure_regions()
