@@ -1174,3 +1174,8 @@ Brain._say_service calls ask.offer_sale(spoken, stations[:2], 'best', 'service')
 ## 0.77.19 - Show off update
 
 control/catalog.py SHOWOFF_MACRO has three new talk steps (ShowOff_Find, ShowOff_Know, ShowOff_Friends) in groups of two between 'finish' steps (the speech queue holds at most 3 waiting normal lines). Lines in voicepacks/default/showoff.json. Keep ShowOff_New up to date with each release.
+
+
+## 0.77.20 - Overlay screen check cached
+
+ui/bio_overlay.py caches the screen rectangle for 5 seconds (RECT_EVERY_SECONDS); ui/screens.py sets ctypes argtypes and keeps callback objects in names.

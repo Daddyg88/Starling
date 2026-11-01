@@ -36,6 +36,7 @@ TONES = {"never": YELLOW, "elsewhere": BLUE, "here": ORANGE}      # text colour;
 MAX_ROWS = 8
 MAX_INLINE_FLAGS = 4         # up to this many flags the value sits on the same line
 CHECK_MS = 1000
+RECT_EVERY_SECONDS = 5.0           # how often the overlay re-checks which screen Elite is on
 TEST_SECONDS = 10
 
 SIZES = {"Small": 10, "Medium": 12, "Large": 15}
@@ -174,6 +175,7 @@ class BioOverlay:
         self.test_until = 0.0
         self._signature = None
         self._broken = False
+        self._rect_cache = None
         self._rect = None                 # (left, top, width, height) of the screen the box sits on
         self.root.after(CHECK_MS, self._tick)
 
@@ -196,8 +198,14 @@ class BioOverlay:
 
     def _screen_rect(self):
         """The screen to draw on: the one Elite is on (or the one chosen on the Overlay settings)."""
+        now = time.monotonic()
+        cached = self._rect_cache
+        if cached is not None and now - cached[0] < RECT_EVERY_SECONDS:
+            return cached[1]                      # asking Windows for every window is not needed once a second
         main = (self.root.winfo_screenwidth(), self.root.winfo_screenheight())
-        return screens.overlay_rect(self.settings.get("overlay.screen", "auto"), main)
+        rect = screens.overlay_rect(self.settings.get("overlay.screen", "auto"), main)
+        self._rect_cache = (now, rect)
+        return rect
 
     def _move_to_screen(self, width, height, left, up):
         """Puts the box on its screen (works for screens left of or above the main one, which have negative positions)."""

@@ -52,12 +52,14 @@ def list_screens():
     from ctypes import wintypes
     found = []
     proc = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(wintypes.RECT), ctypes.c_void_p)
+    ctypes.windll.user32.EnumDisplayMonitors.argtypes = [ctypes.c_void_p, ctypes.c_void_p, proc, ctypes.c_void_p]
 
     def callback(_monitor, _dc, rect, _data):
         r = rect.contents
         found.append(Screen(r.left, r.top, r.right, r.bottom))
         return 1
-    ctypes.windll.user32.EnumDisplayMonitors(None, None, proc(callback), 0)
+    keep = proc(callback)                                  # kept in a name so it cannot be freed during the call
+    ctypes.windll.user32.EnumDisplayMonitors(None, None, keep, None)
     return found
 
 
@@ -68,6 +70,10 @@ def elite_point():
     import ctypes
     from ctypes import wintypes
     user32 = ctypes.windll.user32
+    user32.IsWindowVisible.argtypes = [wintypes.HWND]
+    user32.GetWindowTextLengthW.argtypes = [wintypes.HWND]
+    user32.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
+    user32.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
     hits = []
     proc = ctypes.WINFUNCTYPE(ctypes.c_int, wintypes.HWND, wintypes.LPARAM)
 
@@ -80,7 +86,9 @@ def elite_point():
                 if buffer.value.startswith(ELITE_TITLE):
                     hits.append(hwnd)
         return 1
-    user32.EnumWindows(proc(callback), 0)
+    keep = proc(callback)
+    user32.EnumWindows.argtypes = [proc, wintypes.LPARAM]
+    user32.EnumWindows(keep, 0)
     if not hits:
         return None
     rect = wintypes.RECT()
