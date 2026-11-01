@@ -14,7 +14,11 @@ Nothing here runs while she is working; it only wakes up when something goes wro
 """
 
 import faulthandler
+import gc
+import json
 import os
+import re
+import subprocess
 import sys
 import threading
 import time
@@ -25,6 +29,8 @@ from core.logger import get_logger
 
 log = get_logger("crash")
 
+HEARTBEAT_FILE = "heartbeat.json"
+HEARTBEAT_SECONDS = 30.0
 CRASH_FILE = "crash.log"
 FLAG_FILE = "running.flag"
 LAST_CRASH_FILE = "crash_last.log"
@@ -46,6 +52,76 @@ def _read_tail(path, chars=SHOW_CHARS):
     return text[-chars:].strip()
 
 
+def write_heartbeat(folder, started, version=""):
+    """One small file, rewritten every 30 seconds: when she was last alive and how big she had grown. After a crash it shows what she
+    looked like just before (a thread count or memory that keeps climbing points at a leak)."""
+    data = {"saved": time.strftime("%Y-%m-%d %H:%M:%S"), "version": version, "uptime_minutes": round((time.time() - started) / 60.0, 1),
+            "threads": threading.active_count(), "python_memory_blocks": sys.getallocatedblocks(), "gc_counts": list(gc.get_count())}
+    tmp = folder / (HEARTBEAT_FILE + ".tmp")
+    tmp.write_text(json.dumps(data), encoding="utf-8")
+    os.replace(tmp, folder / HEARTBEAT_FILE)
+
+
+def start_heartbeat(folder, version=""):
+    started = time.time()
+
+    def work():
+        while True:
+            try:
+                write_heartbeat(folder, started, version)
+            except Exception:
+                pass
+            time.sleep(HEARTBEAT_SECONDS)
+    threading.Thread(target=work, name="heartbeat", daemon=True).start()
+
+
+def read_heartbeat(folder):
+    try:
+        data = json.loads((folder / HEARTBEAT_FILE).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ""
+    if not isinstance(data, dict):
+        return ""
+    return "Last seen alive at %s on version %s after %s minutes, %s threads, %s Python memory blocks, gc counts %s." % (
+        data.get("saved"), data.get("version"), data.get("uptime_minutes"), data.get("threads"),
+        data.get("python_memory_blocks"), data.get("gc_counts"))
+
+
+def parse_fault_events(text):
+    """Windows 'Application Error' events (from wevtutil) that mention Python or Starling -> short sentences. Never raises."""
+    found = []
+    for block in re.split(r"(?=^Event\[)", str(text or ""), flags=re.M):
+        low = block.lower()
+        if "python" not in low and "starling" not in low:
+            continue
+        def grab(label):
+            hit = re.search(label + r":\s*([^\r\n,]+)", block, re.I)
+            return hit.group(1).strip() if hit else ""
+        parts = [("when", grab("Date")), ("program", grab("Faulting application name")), ("faulting module", grab("Faulting module name")),
+                 ("exception code", grab("Exception code")), ("offset", grab("Fault offset"))]
+        line = ", ".join("%s %s" % (k, v) for k, v in parts if v)
+        found.append(line or block.strip()[:400])
+    return found[:3]
+
+
+def windows_fault_report(run=subprocess.run):
+    """Asks Windows' own event log which file was at fault for the last crash of Python (the DLL name is the real clue). Windows only."""
+    if sys.platform != "win32":
+        return []
+    try:
+        done = run(["wevtutil", "qe", "Application", "/q:*[System[Provider[@Name='Application Error'] and TimeCreated[timediff(@SystemTime) <= 86400000]]]",
+                    "/c:8", "/rd:true", "/f:text"], capture_output=True, text=True, timeout=15,
+                   creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        return parse_fault_events(done.stdout)
+    except Exception:
+        return []
+
+
+def _log_windows_fault():
+    for line in windows_fault_report():
+        log.warning("Windows event log says: %s", line)
+
+
 def report_previous(logs_dir=None):
     """Look at what the last run left behind. Returns a short sentence (or '') and writes the details into the log."""
     folder = _folder(logs_dir)
@@ -62,6 +138,10 @@ def report_previous(logs_dir=None):
     if unclean:
         said = "The last run did not stop cleanly%s." % (" (it started at %s)" % started if started else "")
         log.warning("%s It may have crashed, been closed from the Task Manager, or lost power.", said)
+        beat = read_heartbeat(folder)
+        if beat:
+            log.warning(beat)
+        threading.Thread(target=_log_windows_fault, name="fault-lookup", daemon=True).start()   # a few seconds; never holds up start-up
     if details:
         log.warning("The last crash report (logs\\%s):\n%s", CRASH_FILE, details)
         try:
@@ -95,6 +175,7 @@ def install(logs_dir=None, version=""):
         log.warning("Could not set up the crash report file", exc_info=True)
     sys.excepthook = _excepthook
     threading.excepthook = _thread_excepthook
+    start_heartbeat(folder, version)
     return True
 
 

@@ -69,3 +69,58 @@ class Hooks(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+SAMPLE_EVENTS = """Event[0]:
+  Log Name: Application
+  Date: 2026-11-01T22:05:12.123
+  Description:
+Faulting application name: pythonw.exe, version: 3.12.8150.1013, time stamp: 0x6740
+Faulting module name: _ctypes.pyd, version: 3.12.8150.1013, time stamp: 0x6740
+Exception code: 0xc0000005
+Fault offset: 0x0000000000012345
+Event[1]:
+  Log Name: Application
+  Date: 2026-11-01T21:00:00.000
+  Description:
+Faulting application name: notepad.exe, version: 1.0
+Faulting module name: user32.dll
+"""
+
+
+class MoreCrashInformation(unittest.TestCase):
+    def setUp(self):
+        self.folder = Path(tempfile.mkdtemp())
+
+    def test_the_heartbeat_is_written_and_read_back(self):
+        import time
+        crash.write_heartbeat(self.folder, time.time() - 120, "0.77.21")
+        text = crash.read_heartbeat(self.folder)
+        self.assertIn("0.77.21", text)
+        self.assertIn("threads", text)
+        self.assertEqual(crash.read_heartbeat(self.folder / "nowhere"), "")
+
+    def test_a_bad_heartbeat_file_is_ignored(self):
+        (self.folder / crash.HEARTBEAT_FILE).write_text("not json", encoding="utf-8")
+        self.assertEqual(crash.read_heartbeat(self.folder), "")
+
+    def test_an_unclean_start_prints_the_heartbeat(self):
+        import time
+        crash.write_heartbeat(self.folder, time.time(), "0.77.21")
+        (self.folder / crash.FLAG_FILE).write_text("2026-11-01 20:00:00\nversion 0.77.21\n", encoding="utf-8")
+        with self.assertLogs("starling.crash", level="WARNING") as seen:
+            crash.report_previous(self.folder)
+        self.assertIn("Last seen alive", "\n".join(seen.output))
+
+    def test_only_python_faults_are_picked_out_of_the_windows_log(self):
+        found = crash.parse_fault_events(SAMPLE_EVENTS)
+        self.assertEqual(len(found), 1)
+        self.assertIn("_ctypes.pyd", found[0])
+        self.assertIn("0xc0000005", found[0])
+        self.assertEqual(crash.parse_fault_events(None), [])
+        self.assertEqual(crash.parse_fault_events("nothing here"), [])
+
+    def test_the_lookup_never_raises(self):
+        def boom(*a, **k):
+            raise OSError("no wevtutil")
+        self.assertEqual(crash.windows_fault_report(boom), [])

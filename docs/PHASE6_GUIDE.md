@@ -1179,3 +1179,8 @@ control/catalog.py SHOWOFF_MACRO has three new talk steps (ShowOff_Find, ShowOff
 ## 0.77.20 - Overlay screen check cached
 
 ui/bio_overlay.py caches the screen rectangle for 5 seconds (RECT_EVERY_SECONDS); ui/screens.py sets ctypes argtypes and keeps callback objects in names.
+
+
+## 0.77.21 - More crash information
+
+core/crash.py: heartbeat thread (logs/heartbeat.json every 30 s: time, version, uptime, thread count, sys.getallocatedblocks, gc counts), read_heartbeat() logged after an unclean exit, and windows_fault_report() which runs 'wevtutil qe Application' (Windows only, 15 s timeout, in a background thread) and logs the 'Faulting module name' / exception code of recent Python crashes. Untested on a real Windows event log (the parsing is tested on an English sample; other languages fall back to the raw text).
