@@ -395,8 +395,10 @@ class AskManager:
         distance = option.get("distance")
         away = ("%d light years away" % int(round(distance))) if isinstance(distance, (int, float)) and distance >= 0.5 \
             else "right here in this system"
-        values = {"Price" + suffix: "{:,}".format(option["price"]), "Tons" + suffix: "{:,}".format(int(tons)),
+        values = {"Price" + suffix: "{:,}".format(option.get("price") or 0), "Tons" + suffix: "{:,}".format(int(tons or 0)),
                   "Station" + suffix: option["station"], "System" + suffix: option["system"], "Away" + suffix: away}
+        arrival = option.get("arrival")                  # a service search: how far the station is from its star
+        values["Arrival" + suffix] = (" It is %s light seconds from the star." % "{:,}".format(int(arrival))) if arrival else ""
         if option.get("body"):                       # merit mining: the planet with the pristine metallic ring, and the metal wanted
             values["Body" + suffix] = option["body"]
         if option.get("material"):
@@ -409,9 +411,9 @@ class AskManager:
         options = list(options or [])[:2]
         if not options:
             return None
-        values = {"Material": material}
+        values = {"Material": material, "Service": material}
         values.update(self._option_values(options[0]))
-        side = {"buy": "Buy", "merit": "Merit"}.get(mode, "Sell")
+        side = {"buy": "Buy", "merit": "Merit", "service": "Service"}.get(mode, "Sell")
         near = order == "nearest"
         if len(options) > 1:
             values.update(self._option_values(options[1], "2"))

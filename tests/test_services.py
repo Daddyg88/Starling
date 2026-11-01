@@ -111,5 +111,52 @@ class BrainFlow(Base):
             self.assertIn(key, data)
 
 
+class OfferRouteTests(unittest.TestCase):
+    """After a search she offers 'the first one or the second one', then 'shall I plot a route?'."""
+
+    STATIONS = [{"station": "Hutton Orbital", "system": "Alpha Centauri", "distance": 4.4, "arrival": 1500, "type": "Orbis"},
+                {"station": "Dock", "system": "Visto", "distance": 20.0, "arrival": None, "type": "Coriolis"}]
+
+    def make(self):
+        from tests.test_ask_and_paint import Rig
+        from tests.test_sell_route import FakeRoute
+        r = Rig()
+        r.route = FakeRoute()
+        r.ask.plot_provider = r.route
+        return r
+
+    def test_two_options_then_route(self):
+        r = self.make()
+        r.ask.offer_sale("black market", self.STATIONS, "best", "service")
+        said = r.speech.said[-1]["text"]
+        for part in ("The first one", "The second one", "Hutton Orbital", "Alpha Centauri", "1,500 light seconds", "Dock", "Visto"):
+            self.assertIn(part, said)
+        r.finish_question()
+        self.assertTrue(r.say("the second one"))
+        r.finish_question()
+        self.assertTrue(r.say("yes please"))
+        self.assertEqual(r.route.plotted, ["Visto"])
+
+    def test_one_option_goes_straight_to_the_route_question(self):
+        r = self.make()
+        r.ask.offer_sale("material trader", self.STATIONS[:1], "best", "service")
+        self.assertIn("material trader", r.speech.said[-1]["text"])
+        r.finish_question()
+        r.say("yes")
+        self.assertEqual(r.route.plotted, ["Alpha Centauri"])
+
+    def test_brain_uses_the_offer(self):
+        class Ask:
+            calls = []
+            def offer_sale(self, material, options, order, mode):
+                self.calls.append((material, len(options), mode))
+                return "said"
+        brain = BrainFlow("test_answer")
+        brain.setUp()
+        brain.brain.ask = Ask()
+        brain.ask("where is the nearest black market")
+        self.assertEqual(Ask.calls, [("black market", 1, "service")])
+
+
 if __name__ == "__main__":
     unittest.main()

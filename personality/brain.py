@@ -845,6 +845,10 @@ class Brain:
             return self._say_pool("Service_Offline", {})
         if not stations:
             return self._say_pool("Service_None", {"Service": spoken})
+        if self.ask is not None and hasattr(self.ask, "offer_sale"):
+            said = self.ask.offer_sale(spoken, stations[:2], "best", "service")      # "the first one or the second one?" then the route
+            if said:
+                return said
         best = stations[0]
         values = {"Service": spoken, "Station": best["station"], "Where": self._where(best), "Arrival": ""}
         if best.get("arrival"):

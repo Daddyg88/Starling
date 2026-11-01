@@ -1164,3 +1164,8 @@ setting watcher.attitude: 'friends' (default) picks WatcherReply from the new po
 * control/mission_reminder.py (data/missions.json): MissionAccepted/Completed/Failed/Abandoned/Redirected, expiry warnings at 60 and 15 minutes, hand-in when docking at the destination station. Setting missions.reminders. Mission events now keep MissionID and destinations.
 * control/bind_backup.py: copies *.binds from the Bindings folder into data/bind_backups when they change (timestamp check every 10 minutes, newest 20 kept). To restore, close Elite and copy the files back. Setting binds.backup.
 Untested live: the Spansh service names (Material Trader, Technology Broker, Interstellar Factors Contact...) and the real journal timings.
+
+
+## 0.77.18 - Route offer for service searches
+
+Brain._say_service calls ask.offer_sale(spoken, stations[:2], 'best', 'service'); lines Service_Options / Service_OneOption in voicepacks/default/services.json; AskManager._option_values now tolerates options without a price and adds {Arrival}.

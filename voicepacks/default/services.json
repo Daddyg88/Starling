@@ -41,5 +41,25 @@
  ],
  "Service_Second": [
   "The next closest is {Station2} {Where2}."
+ ],
+ "Service_Options": [
+  "I found two {Service} options near us.||The first one is {Station} in {System}, {Away}.{Arrival}||The second one is {Station2} in {System2}, {Away2}.{Arrival2}",
+  "Two places for you, Commander.||The first one: {Station} in {System}, {Away}.{Arrival}||The second one: {Station2} in {System2}, {Away2}.{Arrival2}"
+ ],
+ "Service_Options_Sarcastic": [
+  "Two {Service} options, since you asked.||The first one: {Station} in {System}, {Away}.{Arrival}||The second one: {Station2} in {System2}, {Away2}.{Arrival2}"
+ ],
+ "Service_Options_Close": [
+  "I found two for you, love.||The first one is {Station} in {System}, {Away}.{Arrival}||The second one is {Station2} in {System2}, {Away2}.{Arrival2}"
+ ],
+ "Service_OneOption": [
+  "The nearest {Service} is {Station} in {System}, {Away}.{Arrival}",
+  "Closest {Service} I can find is {Station} in {System}, {Away}.{Arrival}"
+ ],
+ "Service_OneOption_Sarcastic": [
+  "The nearest {Service} is {Station} in {System}, {Away}. Try not to get lost.{Arrival}"
+ ],
+ "Service_OneOption_Close": [
+  "{Station} in {System}, {Away}, has a {Service}. Fly safe, love.{Arrival}"
  ]
 }
