@@ -53,7 +53,8 @@
   "Now I wait for the proper planet scan before guessing the biology, and I know a green gas giant when the codex says so.",
   "I keep count of your codex now, I know Radicoida Unica is the one-of-a-kind species, and I cheer your big round numbers.",
   "And I can learn your voice now. Say, teach me your voice, and I'll learn how you sound.",
-  "I can tell you the time in Melbourne or Vienna, and my full name is Starling MoonFox. Ask me about either."
+  "I can tell you the time in Melbourne or Vienna, and my full name is Starling MoonFox. Ask me about either.",
+  "My little orange biology list now appears on whichever screen Elite is running on, and you can pick a screen yourself if I get it wrong."
  ],
  "ShowOff_End": [
   "And that's me. Ask me anything.",
@@ -66,5 +67,23 @@
  ],
  "ShowOff_End_Sarcastic": [
   "There. Wasn't that more impressive than your flying?"
+ ],
+ "ShowOff_Find": [
+  "Ask me where the nearest black market is. Or a material trader, a tech broker, interstellar factors, outfitting. I search Spansh, give you the first one or the second one, and plot the route if you say yes.",
+  "Need a material trader or a tech broker? Just ask. I find the two nearest, you pick one, and I put it in the galaxy map. When you arrive, I name the station.",
+  "Looking for somewhere to sell, a black market, Vista Genomics or a shipyard? I find them, I plot them, I do the remembering.",
+  "I find things for you now. The nearest black market, material trader, cartographics, a bartender. First one or second one, and I plot the route."
+ ],
+ "ShowOff_Know": [
+  "I count things for you now. Ask how many kills you've got, how many jumps today, or how many times you've been to this system. I cheer at the big round numbers too.",
+  "I watch your missions. When one has an hour left, and again at fifteen minutes, I say so. And when you dock where one is due, I tell you.",
+  "I keep a safe copy of your key bindings whenever they change. Lose them, and we get them back.",
+  "Kills, jumps, visits, terraformable worlds. I keep count. Missions running out of time? I tell you. Bindings changed? I back them up."
+ ],
+ "ShowOff_Friends": [
+  "I'm the best AI there is, and I'm a little jealous of the others. But I'm kind to the Watcher. He's gloomy, I'm funny, and we are friends.",
+  "And I can chat, offline, on your own computer. No cloud, no subscription. I just might get jealous if you mention another AI.",
+  "The Watcher and I are friends now. He worries, I tease. It works.",
+  "My biology list follows the screen Elite is on now, and I update myself when you start Starling.exe. I'm always getting better."
  ]
 }

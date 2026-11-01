@@ -1169,3 +1169,8 @@ Untested live: the Spansh service names (Material Trader, Technology Broker, Int
 ## 0.77.18 - Route offer for service searches
 
 Brain._say_service calls ask.offer_sale(spoken, stations[:2], 'best', 'service'); lines Service_Options / Service_OneOption in voicepacks/default/services.json; AskManager._option_values now tolerates options without a price and adds {Arrival}.
+
+
+## 0.77.19 - Show off update
+
+control/catalog.py SHOWOFF_MACRO has three new talk steps (ShowOff_Find, ShowOff_Know, ShowOff_Friends) in groups of two between 'finish' steps (the speech queue holds at most 3 waiting normal lines). Lines in voicepacks/default/showoff.json. Keep ShowOff_New up to date with each release.

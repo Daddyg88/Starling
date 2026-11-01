@@ -73,7 +73,10 @@ SHOWOFF_MACRO = ("talk ShowOff_Start", "finish",
                  "FocusRightPanel", "talk ShowOff_Right", "wait 1.6", "hold CycleNextPanel 0.15", "wait 1.2",
                  "hold CycleNextPanel 0.15", "finish", "hold CyclePreviousPanel 0.15", "wait 0.5",
                  "hold CyclePreviousPanel 0.15", "wait 0.5", "leave UI_Back 1", "wait 0.6",
-                 "talk ShowOff_Voice", "talk ShowOff_Care", "talk ShowOff_New", "talk ShowOff_End", "finish")
+                 "talk ShowOff_Voice", "talk ShowOff_Care", "finish",
+                 "talk ShowOff_New", "talk ShowOff_Find", "finish",
+                 "talk ShowOff_Know", "talk ShowOff_Friends", "finish",
+                 "talk ShowOff_End", "finish")
 # Nomad, as the commander described it: look down at the helm menu (the bottom / role panel), press down once, then right once.
 # Then Select to launch it. You can change these steps in config/settings.json (macros.deploy_nomad).
 # Auto launch from a station: Select on the Launch button of the station menu. Only works while docked (see core/app.py). If
