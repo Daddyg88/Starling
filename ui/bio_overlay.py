@@ -22,6 +22,7 @@ The game must be in Borderless or Windowed mode: a window can't be drawn over a 
 import time
 
 from core.logger import get_logger
+from ui import screens
 
 log = get_logger("bio_overlay")
 
@@ -173,6 +174,7 @@ class BioOverlay:
         self.test_until = 0.0
         self._signature = None
         self._broken = False
+        self._rect = None                 # (left, top, width, height) of the screen the box sits on
         self.root.after(CHECK_MS, self._tick)
 
     def show_test(self, seconds=TEST_SECONDS):
@@ -192,21 +194,33 @@ class BioOverlay:
         except Exception:
             pass
 
+    def _screen_rect(self):
+        """The screen to draw on: the one Elite is on (or the one chosen on the Overlay settings)."""
+        main = (self.root.winfo_screenwidth(), self.root.winfo_screenheight())
+        return screens.overlay_rect(self.settings.get("overlay.screen", "auto"), main)
+
+    def _move_to_screen(self, width, height, left, up):
+        """Puts the box on its screen (works for screens left of or above the main one, which have negative positions)."""
+        origin_x, origin_y, screen_w, screen_h = self._rect or self._screen_rect()
+        x, top = placement(screen_w, screen_h, width, height, left, up)
+        self.window.geometry("%dx%d+%d+%d" % (width, height, origin_x + x, origin_y + top))
+
     def _update(self):
         state = self.state_provider()
+        self._rect = self._screen_rect()
         settings = (self.settings.get("overlay.bio_x", 3), self.settings.get("overlay.bio_up", 25),
                     self.settings.get("overlay.bio_size", "Medium"), self.settings.get("overlay.bio_dark", False))
         view = wanted_focus(self.settings, state, test_until=self.test_until)
         if view is not None:
             focus = overlay_focus(view)
-            signature = ("focus", focus["body"], focus["kind"], tuple((l["name"], l["status"], l["tone"], l["done"], l["value"]) for l in focus["lives"]), settings)
+            signature = ("focus", focus["body"], focus["kind"], tuple((l["name"], l["status"], l["tone"], l["done"], l["value"]) for l in focus["lives"]), settings, self._rect)
             if signature != self._signature:
                 self._signature = signature
                 self._draw_focus(focus, settings)
             return
         rows, _ = wanted(self.settings, state, test_until=self.test_until)
         lines, more = overlay_rows(rows)
-        signature = (tuple((l["body"], l["count"], tuple(l["flag_colors"]), l["value"], l["kind"]) for l in lines), more, settings)
+        signature = (tuple((l["body"], l["count"], tuple(l["flag_colors"]), l["value"], l["kind"]) for l in lines), more, settings, self._rect)
         if not lines:
             if self._signature is not None:
                 self._signature = None
@@ -291,9 +305,7 @@ class BioOverlay:
             y += row_h + (extra_h if two else 0)
         if more:
             canvas.create_text(pad + 2, y + int(size * 0.8), text=more, anchor="w", fill=ORANGE, font=small)
-        screen_w, screen_h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-        x, top = placement(screen_w, screen_h, width, height, left, up)
-        self.window.geometry("%dx%d+%d+%d" % (width, height, x, top))
+        self._move_to_screen(width, height, left, up)
         self.window.deiconify()
         self.window.attributes("-topmost", True)
         self.window.lift()
@@ -331,9 +343,7 @@ class BioOverlay:
                 canvas.create_line(x - 2, mid, min(reach, width - pad - size * 3), mid, fill=tone, width=2)
                 canvas.create_line(width - pad - len(life["value"]) * size * 0.62, mid, width - pad, mid, fill=tone, width=2)
             y += row_h
-        screen_w, screen_h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-        px, top = placement(screen_w, screen_h, width, height, left, up)
-        self.window.geometry("%dx%d+%d+%d" % (width, height, px, top))
+        self._move_to_screen(width, height, left, up)
         self.window.deiconify()
         self.window.attributes("-topmost", True)
         self.window.lift()

@@ -1135,3 +1135,8 @@ Testers who are not computer-literate got no hint of what to do after Starling.e
 - brain_examples.json: "go go go" and friends are decoys.
 - Not tested in a real window or on Windows (no PowerShell here). If the shortcut does not appear, launcher.log says why.
 
+
+
+## 0.77.13 - Overlay on the right screen
+
+New ui/screens.py lists the Windows screens (EnumDisplayMonitors) and finds Elite's window; pure helpers pick_screen/overlay_rect are tested. ui/bio_overlay.py offsets its position by the chosen screen's corner. Setting overlay.screen: auto, primary, 1-4. The Windows calls are untested off Windows; test with the 10-second test list. Elite must be Borderless/Windowed for the overlay to show over it.

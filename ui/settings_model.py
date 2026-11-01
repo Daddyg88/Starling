@@ -68,6 +68,7 @@ CHITCHAT = [("Rarely", "rarely"), ("Normal", "normal"), ("Often", "often"), ("Ch
 REMARKS = [("Never", "off"), ("Rarely", "rare"), ("Sometimes", "sometimes"), ("Often", "often")]
 AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million", 500000000),
              ("After 1 billion", 1000000000)]
+from ui.screens import CHOICES as OVERLAY_SCREENS
 PERCENTS = [("%d%%" % v, v) for v in range(0, 96, 5)]
 OVERLAY_SIZES = [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]
 MINERAL_CHOICES = minerals.choices()      # every mineral, metal and ice you can mine (mining/minerals.py)
@@ -294,6 +295,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="After a species you had never logged is finished: how many species are in your codex and which kinds you have never sampled (named once only three or fewer are left)"),
             Field("overlay.bio_enabled", "Show the biology list on screen", "toggle",
                   help="A small see-through box with an orange border: every planet in the system with life, how many signals, the estimated value (~ is a guess) and a flag for each signal that could be new to your codex: yellow = never found anywhere, blue = found in another galaxy region but not this one. Text is yellow, blue or orange (already found in this region) to match. It goes away when you leave the system, or say 'hide the bio overlay'. Elite must be in Borderless or Windowed mode"),
+            Field("overlay.screen", "Biology list: which screen", "choice", OVERLAY_SCREENS,
+                  help="Automatic puts it on the screen Elite is running on. If it lands on the wrong one, pick a screen here (numbered left to right) and press the test button. Elite must be in Borderless or Windowed mode"),
             Field("overlay.bio_x", "Biology list: distance from the left of the screen", "choice", PERCENTS,
                   help="Percent of the screen width"),
             Field("overlay.bio_up", "Biology list: height above the bottom of the screen", "choice", PERCENTS,
