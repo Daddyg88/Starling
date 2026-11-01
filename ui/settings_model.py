@@ -90,6 +90,7 @@ SUPERCHARGE = [("Normal (x4)", 4), ("Special (x6)", 6)]
 MERIT_POWERS = [("From the game (what the journal says)", "")] + [(p, p) for p in (
     "Aisling Duval", "Archon Delaine", "Arissa Lavigny-Duval", "Denton Patreus", "Edmund Mahon", "Felicia Winters",
     "Jerome Archer", "Li Yong-Rui", "Nakato Kaine", "Pranav Antal", "Yuri Grom", "Zemina Torval")]
+WATCHER_ATTITUDE = [("Friends: always kind and funny", "friends"), ("Follow her own mood", "mood")]
 WATCHER_REPLY = [("Every time", "always"), ("Often", "often"), ("Sometimes", "sometimes"), ("Never", "never")]
 ANSWER_TIMES = [("5 seconds", 5), ("8 seconds", 8), ("10 seconds", 10), ("15 seconds", 15), ("20 seconds", 20)]
 MESSAGE_CHANNELS = [("Direct messages only", "direct"), ("Direct, friends, wing and squadron", "direct_plus"),
@@ -224,6 +225,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Only change this if you changed it in Void Compass (it is 7380 out of the box)"),
             Field("watcher.enabled", "Answer the Watcher from Void Compass", "toggle",
                   help="When his voice is on in Void Compass she answers him in her mood. Needs the Local API on, as above"),
+            Field("watcher.attitude", "Her attitude to the Watcher", "choice", WATCHER_ATTITUDE,
+                  help="Friends: she is always kind and funny to him, whatever mood she is in with you. Or let her answer in her current mood"),
             Field("watcher.reply", "How often she answers him", "choice", WATCHER_REPLY),
             Field("watcher.hush", "Ask Void Compass to keep the Watcher quiet while she talks", "toggle",
                   help="Needs a recent Void Compass (it has a 'hush' call). If your version has none she notices and stops asking"),

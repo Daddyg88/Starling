@@ -1150,3 +1150,8 @@ mining/services.py (ServiceFinder) posts a Spansh /stations/search with filters.
 ## 0.77.15 - Exe uses the installed updater
 
 launcher.use_installed_updater(app) swaps core.updater/core.secure_open for the copies in <home>/app/core (falls back to the built-in ones on any problem). A failed update check is now shown in the launcher window and in launcher.log. The release build installs certifi so the exe bundles it. Needs one new Starling.exe download; the launcher is not part of Starling-app.zip.
+
+
+## 0.77.16 - Friends with the Watcher
+
+setting watcher.attitude: 'friends' (default) picks WatcherReply from the new pool WatcherFriend in voicepacks/default/watcher.json whatever her mood; 'mood' keeps the old WatcherReply_<mood> behaviour. personality/watcher.py reply().

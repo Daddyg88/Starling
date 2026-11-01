@@ -103,7 +103,7 @@ class WatcherTests(unittest.TestCase):
         self.assertFalse(any("fuck" in t.lower() or "hell" in t.lower() for t in clean))
 
     def test_uses_current_mood(self):
-        self.build("Frustrated")
+        self.build("Frustrated", watcher__attitude="mood")
         self.hear()
         self.finish_and_reply()
         text = self.spoken()[0]

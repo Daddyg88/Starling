@@ -1060,3 +1060,44 @@ class DockingSelfCheck(unittest.TestCase):
         r = t.build(commands__key_hold=0.2)
         r.run_text("request docking")
         self.assertAlmostEqual(r.sender.hold_seconds, 0.2)
+
+
+class WatcherFriendTests(unittest.TestCase):
+    """She has her own kind, funny mood towards the Watcher, separate from her mood with the player."""
+
+    def bridge(self, **values):
+        import random
+        from personality.watcher import WatcherBridge
+        from tests.test_dialogue import real_dialogue
+
+        class Settings:
+            def __init__(self, v): self.v = v
+            def get(self, k, d=None): return self.v.get(k, d)
+
+        class Speech:
+            said = []
+            def say(self, text, **k):
+                self.said.append(text)
+                return True
+        base = {"watcher.reply": "always", "personality.mood_mode": "fixed", "personality.mood": "Frustrated"}
+        base.update(values)
+        speech = Speech()
+        speech.said = []
+        return WatcherBridge(None, speech, real_dialogue(), Settings(base), None, rng=random.Random(1)), speech
+
+    def test_friends_by_default_even_when_she_is_frustrated(self):
+        from tests.test_dialogue import said_by
+        b, speech = self.bridge()
+        for _ in range(20):
+            self.assertTrue(b.reply())
+        self.assertTrue(set(speech.said) <= said_by("WatcherFriend"))
+
+    def test_mood_setting_still_follows_her_mood(self):
+        from tests.test_dialogue import said_by
+        b, speech = self.bridge(**{"watcher.attitude": "mood"})
+        b.reply()
+        self.assertIn(speech.said[0], said_by("WatcherReply_Frustrated"))
+
+    def test_plenty_of_friend_lines(self):
+        from tests.test_dialogue import said_by
+        self.assertGreaterEqual(len(said_by("WatcherFriend")), 40)

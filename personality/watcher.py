@@ -3,8 +3,9 @@ THE WATCHER BRIDGE: Starling and the Watcher from Void Compass.
 
 The Watcher is the glowing orb in Void Compass. When its voice is on, it talks. This does two things:
 
-  1. REPLY.  After he speaks, Starling answers in her current mood: kind and supportive when she is happy,
-             "shut up, Watcher" when she is not. (voicepacks/default/watcher.json)
+  1. REPLY.  After he speaks, Starling answers. By default (watcher.attitude = "friends") she has her OWN mood towards him,
+             separate from yours: kind and funny, like old friends. Set it to "mood" and she answers in her current mood
+             instead: kind when she is happy, "shut up, Watcher" when she is not. (voicepacks/default/watcher.json)
   2. WAIT.   If he starts talking at a bad moment (she is speaking or asking you a question, a safety warning
              just happened, weapons are out, you are being interdicted, jumping, overheating, low on fuel...),
              she stops him at once and lets him say it again when it is calm. Lines that are still waiting
@@ -233,9 +234,13 @@ class WatcherBridge:
             return False
         if self.settings.get("personality.style", "personality") != "personality":
             return False
-        mood = self._mood() or "Neutral"
         allow = bool(self.settings.get("speech.allow_mature", False))
-        line = self.dialogue.pick("WatcherReply_" + mood, "", allow, False)
+        line = None
+        if self.settings.get("watcher.attitude", "friends") == "friends":
+            line = self.dialogue.pick("WatcherFriend", "", allow, False)       # her own warm, funny voice for him, whatever her mood
+        if line is None:
+            mood = self._mood() or "Neutral"
+            line = self.dialogue.pick("WatcherReply_" + mood, "", allow, False)
         if line is None:
             line = self.dialogue.pick("WatcherReply_Neutral", "", allow, False)
         if line is None:
