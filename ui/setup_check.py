@@ -84,6 +84,16 @@ def quality_item(app):
     return _item("quality", "How well she hears you", OK, "Listening quality is set to %s." % model)
 
 
+def training_item(app):
+    if not app.settings.get("stt.enabled", False):
+        return None
+    return _item("training", "Teach her your voice", OPTIONAL,
+                 "She asks you to say about two dozen short phrases, one at a time (no need to say her name), and learns how you "
+                 "sound. Very good if you have a strong accent or she mishears you. Takes about three minutes. You can also say "
+                 "\"%s, teach me your voice\" any time." % "Starling",
+                 ("Teach her my voice", "train_voice"))
+
+
 def keys_item(app, summary=None):
     """summary is None until the player has pressed the check: (commands with a key, keys still missing, key clashes)."""
     if summary is None:
@@ -113,7 +123,9 @@ def extras_item(app):
 
 
 def setup_items(app, key_summary=None, finder=None):
-    return [game_item(app, finder), voice_item(app), listening_item(app), quality_item(app), keys_item(app, key_summary), extras_item(app)]
+    items = [game_item(app, finder), voice_item(app), listening_item(app), quality_item(app), training_item(app),
+             keys_item(app, key_summary), extras_item(app)]
+    return [i for i in items if i is not None]
 
 
 def required_ready(items):

@@ -1184,3 +1184,8 @@ ui/bio_overlay.py caches the screen rectangle for 5 seconds (RECT_EVERY_SECONDS)
 ## 0.77.21 - More crash information
 
 core/crash.py: heartbeat thread (logs/heartbeat.json every 30 s: time, version, uptime, thread count, sys.getallocatedblocks, gc counts), read_heartbeat() logged after an unclean exit, and windows_fault_report() which runs 'wevtutil qe Application' (Windows only, 15 s timeout, in a background thread) and logs the 'Faulting module name' / exception code of recent Python crashes. Untested on a real Windows event log (the parsing is tested on an English sample; other languages fall back to the raw text).
+
+
+## 0.77.22 - Voice training button on Get started
+
+The checklist (ui/setup_check.py) has a new optional item `training_item`, shown only when listening is on. Its button runs `Dashboard._setup_train_voice`, which calls `VoiceTrainer.start_session()` (the spoken request uses the same method). The window code is not tested live.

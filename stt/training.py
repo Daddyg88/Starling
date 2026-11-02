@@ -73,14 +73,18 @@ class VoiceTrainer:
             self.say("Training_Report", {"where": where}, "Hearing report saved: %s" % where)
             return "report"
         if START.search(clean):
-            if not self.phrases:
-                return None
-            self.rows, self.index = [], 0
-            self.until = self.clock() + SESSION_SECONDS
-            self.say("Training_Start", {"total": len(self.phrases)}, "Okay, let's train your voice.")
-            self._prompt()
-            return "training"
+            return "training" if self.start_session() else None
         return None
+
+    def start_session(self):
+        """Begin a training session (spoken request or the Get started button). False if there are no phrases."""
+        if not self.phrases:
+            return False
+        self.rows, self.index = [], 0
+        self.until = self.clock() + SESSION_SECONDS
+        self.say("Training_Start", {"total": len(self.phrases)}, "Okay, let's train your voice.")
+        self._prompt()
+        return True
 
     def _prompt(self):
         self.say("Training_Prompt", {"n": self.index + 1, "total": len(self.phrases), "phrase": self.phrases[self.index]},

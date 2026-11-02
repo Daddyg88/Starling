@@ -24,7 +24,7 @@ class SetupCheckTests(unittest.TestCase):
         items = sc.setup_items(fake_app(), key_summary=(70, 0, 0))
         self.assertTrue(sc.required_ready(items))
         self.assertIn("ready", sc.headline(items).lower())
-        self.assertEqual([i["id"] for i in items], ["game", "voice", "listening", "quality", "keys", "extras"])
+        self.assertEqual([i["id"] for i in items], ["game", "voice", "listening", "quality", "training", "keys", "extras"])
 
     def test_missing_journal_folder_says_what_to_do(self):
         item = sc.game_item(fake_app(folder=None), finder=lambda _x: None)
@@ -62,6 +62,12 @@ class SetupCheckTests(unittest.TestCase):
         items = sc.setup_items(fake_app(stt_enabled=False), key_summary=None)
         self.assertFalse(sc.required_ready(items))
         self.assertIn("to do", sc.headline(items))
+
+    def test_training_button_only_when_listening_is_on(self):
+        on = [i for i in sc.setup_items(fake_app()) if i["id"] == "training"]
+        self.assertEqual(on[0]["action"][1], "train_voice")
+        off = sc.setup_items(fake_app(stt_enabled=False))
+        self.assertNotIn("training", [i["id"] for i in off])
 
     def test_a_broken_app_never_raises(self):
         broken = SimpleNamespace(settings=FakeSettings())

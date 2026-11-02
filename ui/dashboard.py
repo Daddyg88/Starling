@@ -897,6 +897,8 @@ class Dashboard:
                                 "Saved. Close Starling and open it again; she downloads the better listening model once.")
             elif action == "check_keys":
                 self._setup_check_keys()
+            elif action == "train_voice":
+                self._setup_train_voice()
         except Exception:
             log.exception("A Get started button failed: %s", action)
             self._controls_result("That didn't work. Open the Developer page and copy the log to send to Claude.", T.BAD, target="setup_result")
@@ -907,6 +909,17 @@ class Dashboard:
         ok, why = self.model.save()
         self._controls_result(message if ok else why, T.GOOD if ok else T.BAD, target="setup_result")
         self.root.after(120, lambda: self._refresh_setup(force=True))      # not inside the button's own click (it gets rebuilt)
+
+    def _setup_train_voice(self):
+        runner = self.app.ensure_commands()
+        trainer = getattr(self.app, "trainer", None)
+        if runner is None or trainer is None:
+            self._controls_result("Voice training could not start. Check the log.", T.BAD, target="setup_result")
+            return
+        if not trainer.start_session():
+            self._controls_result("I have no training phrases to use. Check the log.", T.BAD, target="setup_result")
+            return
+        self._controls_result("Training started. Say each phrase when she asks. Say 'stop' to end it.", T.GOOD, target="setup_result")
 
     def _setup_check_keys(self):
         runner = self.app.ensure_commands()
