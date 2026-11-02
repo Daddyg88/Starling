@@ -14,6 +14,7 @@ Elite does not let any program plot a route inside the game, so pasting into the
 import json
 import os
 import subprocess
+import time
 import threading
 
 from core import paths
@@ -29,15 +30,58 @@ UNSAFE_BITS = (19, 20, 22, 23, 30)
 SPEAK_DELAY_SECONDS = 6.0           # after an arrival, so she finishes her arrival line first
 
 
+def _copy_with_ctypes(text):
+    """Windows clipboard without starting another program (used when clip.exe cannot start). True if it worked."""
+    import ctypes
+    from ctypes import wintypes
+    user32, kernel32 = ctypes.windll.user32, ctypes.windll.kernel32
+    user32.OpenClipboard.argtypes = [wintypes.HWND]
+    user32.SetClipboardData.argtypes = [wintypes.UINT, wintypes.HANDLE]
+    user32.SetClipboardData.restype = wintypes.HANDLE
+    kernel32.GlobalAlloc.argtypes = [wintypes.UINT, ctypes.c_size_t]
+    kernel32.GlobalAlloc.restype = wintypes.HGLOBAL
+    kernel32.GlobalLock.argtypes = [wintypes.HGLOBAL]
+    kernel32.GlobalLock.restype = wintypes.LPVOID
+    kernel32.GlobalUnlock.argtypes = [wintypes.HGLOBAL]
+    data = (text + "\0").encode("utf-16-le")
+    handle = kernel32.GlobalAlloc(0x0002, len(data))        # GMEM_MOVEABLE
+    if not handle:
+        return False
+    pointer = kernel32.GlobalLock(handle)
+    if not pointer:
+        return False
+    ctypes.memmove(pointer, data, len(data))
+    kernel32.GlobalUnlock(handle)
+    for _ in range(10):                                      # another program may hold the clipboard for a moment
+        if user32.OpenClipboard(None):
+            break
+        time.sleep(0.05)
+    else:
+        return False
+    try:
+        user32.EmptyClipboard()
+        return bool(user32.SetClipboardData(13, handle))     # CF_UNICODETEXT
+    finally:
+        user32.CloseClipboard()
+
+
 def copy_to_clipboard(text):
-    """Put text on the Windows clipboard (uses Windows' own clip.exe). True if it worked."""
+    """Put text on the Windows clipboard. True if it worked.
+
+    First clip.exe, with every standard handle given explicitly: when Starling has no console window, Windows has no
+    stderr to hand on and Python fails with 'WinError 50'. If that still fails, Windows' clipboard is used directly."""
     if os.name != "nt" or not text:
         return False
     try:
         subprocess.run(["clip"], input=text.encode("cp1252", "replace"), check=True, timeout=5,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         return True
     except (OSError, subprocess.SubprocessError):
+        log.warning("clip.exe would not start; using the Windows clipboard directly", exc_info=True)
+    try:
+        return _copy_with_ctypes(text)
+    except Exception:
         log.exception("Could not copy to the clipboard")
         return False
 

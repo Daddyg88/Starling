@@ -1189,3 +1189,8 @@ core/crash.py: heartbeat thread (logs/heartbeat.json every 30 s: time, version, 
 ## 0.77.22 - Voice training button on Get started
 
 The checklist (ui/setup_check.py) has a new optional item `training_item`, shown only when listening is on. Its button runs `Dashboard._setup_train_voice`, which calls `VoiceTrainer.start_session()` (the spoken request uses the same method). The window code is not tested live.
+
+
+## 0.77.23 - Clipboard fix
+
+`navigation/route.py copy_to_clipboard`: clip.exe now gets stdout/stderr = DEVNULL (a process without a console has no stderr to inherit, which gave WinError 50); on failure `_copy_with_ctypes` sets the clipboard through user32/kernel32. The ctypes path is untested on real Windows.
