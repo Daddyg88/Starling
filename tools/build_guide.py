@@ -202,6 +202,7 @@ EXTRA = [
         ('During the training', ['Skip', 'Stop']),
         ('Save what she heard to a file', ['Hearing report']),
         ('Biology overlay', ['Hide the biology overlay', 'Show the biology overlay']),
+        ('Viewer chat (Twitch)', ['Pause the chat', 'Chat on']),
         ('Route map overlay', ['Hide the route map', 'Show the route map'])]),
 ]
 for gid, title, intro, rows in EXTRA:

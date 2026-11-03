@@ -89,7 +89,11 @@ class SetupPageAndUpdater(unittest.TestCase):
         import hashlib
         import io
         import zipfile
-        from core import updater
+        import importlib.util
+        # load the real file by path: another test (test_launcher) swaps a stub in for core.updater
+        spec = importlib.util.spec_from_file_location("real_updater_for_test", Path(__file__).resolve().parent.parent / "core" / "updater.py")
+        updater = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(updater)
         folder = Path(tempfile.mkdtemp())
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w") as z:

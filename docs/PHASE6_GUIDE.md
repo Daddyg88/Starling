@@ -1226,3 +1226,13 @@ window use the same code as the biology list.
 * personality/flavour.py: tone asides draw from the neighbouring levels too; dialogue.pick remembers all but one line of a pool of 12 or fewer.
 * core/updater.py: reuses a staged copy of the same version; mkdir(exist_ok) after a failed delete (WinError 183).
 * tts/kokoro_tts.py: British voices (bf_/bm_, their own lang_code "b" engine, made on first use) and am_santa added to the voice list.
+
+## 0.78.0 - Streaming, stage one (Twitch)
+
+* streaming/chat.py: the rules (parse, who may use it, blocked words, cooldowns, the fixed ACTIONS list, action_blocker safety checks). ChatDirector calls only three functions that touch the outside: do_action (runs the action's phrase through the normal voice-command runner, so only the player's own keys are pressed), do_ask, say.
+* streaming/twitch.py: read-only anonymous IRC (justinfan, no token), parse_line / message_from (moderator and subscriber badges), reconnect with back-off. Nothing is ever sent except JOIN, PONG and the log-in lines.
+* streaming/bridge.py: supervisor thread (follows the settings every 3 s) + worker thread with a small queue (floods are dropped) + pretend() for the dashboard test box.
+* streaming/wiring.py: builds the bridge from the app; make_chat_brain() is a second Brain with no profile, people, unanswered list or follow-up prompts.
+* streaming/voice.py: 'pause the chat' / 'chat on'.
+* Settings: the streaming.* section (core/settings.py), page in ui/settings_model.py, status + test box in ui/dashboard.py (_build_streaming).
+* Not tried against live Twitch: the first real connection will show any problems in the log.

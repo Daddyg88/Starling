@@ -71,6 +71,9 @@ AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million
 from ui.screens import CHOICES as OVERLAY_SCREENS
 PERCENTS = [("%d%%" % v, v) for v in range(0, 96, 5)]
 OVERLAY_SIZES = [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]
+CHAT_WHO = [("Everyone", "everyone"), ("Subscribers and moderators", "subscribers"), ("Moderators only", "mods")]
+CHAT_COOLDOWNS = [("15 seconds", 15), ("30 seconds", 30), ("45 seconds", 45), ("1 minute", 60), ("2 minutes", 120), ("5 minutes", 300)]
+CHAT_GAPS = [("5 seconds", 5), ("10 seconds", 10), ("20 seconds", 20), ("30 seconds", 30), ("1 minute", 60)]
 ROUTE_MAP_MODES = [("While I have a route (recommended)", "route"), ("Always", "always"), ("Never", "off")]
 EDGE_PERCENTS = [("%d%%" % v, v) for v in range(0, 41)]
 MINERAL_CHOICES = minerals.choices()      # every mineral, metal and ice you can mine (mining/minerals.py)
@@ -103,6 +106,11 @@ VOICES = ([("Her own cloned voice", "")]
           + [("%s - male" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("am_")]
           + [("%s - British female" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("bf_")]
           + [("%s - British male" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("bm_")])
+
+
+def _chat_actions():
+    from streaming.chat import ACTIONS
+    return ACTIONS
 
 
 def microphone_choices(lister=None):
@@ -389,6 +397,26 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("memory.enabled", "She remembers milestones", "toggle",
                   help="Longest jump, biggest sales, times destroyed, big missions, hours together. Off = nothing new is saved"),
             Field("memory.recall_at_login", "She mentions one memory when I log in", "toggle"),
+        ]),
+        Page("streaming", "Streaming", "Let your viewers talk to Starling. They ask questions in your Twitch chat and she answers out loud on stream, "
+             "and they can flip a few harmless things on your ship (lights, night vision...). It only READS chat: no password or Twitch login is needed, "
+             "and she only ever presses your own keys. Off until you switch it on. Say 'pause the chat' to stop it by voice.", [
+            Field("streaming.enabled", "Let chat talk to Starling", "toggle",
+                  help="Master switch. Off = she ignores chat completely"),
+            Field("streaming.twitch_channel", "Your Twitch channel", "text", placeholder="e.g. daddyg88",
+                  help="Just the name (or paste your twitch.tv link). Press Save settings, then watch the status below"),
+            Field("streaming.prefix", "Chat word that starts a question", "text", placeholder="!starling",
+                  help="A viewer types: !starling what is a neutron star?  (Actions also work as !lights, !nightvision...)"),
+            Field("streaming.who", "Who can use it", "choice", CHAT_WHO, help="You, the streamer, can always use it"),
+            Field("streaming.ask_enabled", "Viewers can ask her questions", "toggle"),
+            Field("streaming.announce", "She reads the question out first", "toggle",
+                  help="'Gav asks: what is a neutron star?' and then the answer, so viewers know whose question it was"),
+            Field("streaming.user_cooldown", "One thing per viewer every", "choice", CHAT_COOLDOWNS),
+            Field("streaming.action_cooldown", "Gap between ship actions (everyone)", "choice", CHAT_GAPS),
+            Field("streaming.ask_cooldown", "Gap between questions (everyone)", "choice", CHAT_GAPS),
+            Field("streaming.blocked_words", "Block messages with these words", "text", placeholder="word, another word",
+                  help="Separated by commas. Messages containing any of them are dropped. Links are always dropped"),
+            *[Field("streaming.act_" + a.key, "Viewers can use !%s (%s)" % (a.aliases[0], a.label), "toggle", help=a.help) for a in _chat_actions()],
         ]),
         Page("updates", "Updates", "Starling.exe installs new versions from your GitHub releases by itself. This page lets you check by hand.", [
             Field("updates.repo", "GitHub repository", "text", placeholder="owner/name",

@@ -142,7 +142,7 @@ footer .tagline { color: var(--accent-dim); }
 </style>
 
 <div class="topnav"><div class="wrap">
-  <a href="#setup">Setup</a><a href="#keys">Elite keys</a><a href="#talking">Talking to her</a><a href="#commands">Commands</a><a href="#help">Help</a><a href="https://github.com/Daddyg88/Starling/releases/latest" rel="noopener">Download</a><a href="https://buymeacoffee.com/bencanobi" rel="noopener">Buy me a coffee</a>
+  <a href="#setup">Setup</a><a href="#keys">Elite keys</a><a href="#talking">Talking to her</a><a href="#commands">Commands</a><a href="#streamers">For streamers</a><a href="#help">Help</a><a href="https://github.com/Daddyg88/Starling/releases/latest" rel="noopener">Download</a><a href="https://buymeacoffee.com/bencanobi" rel="noopener">Buy me a coffee</a>
 </div></div>
 
 <div class="wrap">
@@ -252,6 +252,18 @@ footer .tagline { color: var(--accent-dim); }
   <nav class="chips" aria-label="Command groups">{{NAV}}</nav>
   <div id="groups">{{COMMANDS}}</div>
   <p class="empty" id="empty">Nothing matches that. Try one word, like "map" or "target".</p>
+</section>
+
+<section class="block" id="streamers">
+  <div class="sechead"><span class="tag">Twitch chat</span><h2>For streamers</h2></div>
+  <p>Your viewers can talk to Starling from Twitch chat. She answers their questions out loud on your stream, and they can flip a few harmless things on your ship. It only <em>reads</em> chat: no password and no Twitch login are needed, and she only ever presses your own Elite keys. YouTube chat is planned next.</p>
+  <ul class="rules">
+    <li><strong>1. Switch it on</strong>Open the <span class="btn">Streaming</span> page, type your Twitch channel name, tick <span class="btn">Let chat talk to Starling</span> and press <span class="btn">Save settings</span>. The status line turns green when she is listening.</li>
+    <li><strong>2. Try it first</strong>Use the test box on that page. Type <code>!lights</code> or <code>!starling what is a neutron star?</code> and press <span class="btn">Send as a viewer</span>. It goes through the same rules as real chat.</li>
+    <li><strong>3. Viewers type</strong><code>!starling</code> and a question, or one of the ship words: <code>!lights</code>, <code>!nightvision</code>, and (if you allow them) <code>!headlook</code>, <code>!scoop</code>, <code>!gear</code>.</li>
+    <li><strong>You are in charge</strong>Choose who may use it (everyone, subscribers, moderators), switch each ship action on or off, set cooldowns, and block words. Say <em>"pause the chat"</em> any time to stop it, and <em>"chat on"</em> to bring it back.</li>
+    <li><strong>Kept safe</strong>Only the fixed list of words works. Landing gear is off by default, and even when it is on she refuses it while docked, landed, in supercruise or near anything big. Actions also wait while a menu is open or you are not in your ship. Viewers can never make her learn things about you: chat questions use a separate, read-only brain.</li>
+  </ul>
 </section>
 
 <section class="block" id="help">

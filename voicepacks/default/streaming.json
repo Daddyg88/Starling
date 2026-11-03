@@ -1,0 +1,33 @@
+{
+ "StreamChat_Asks": [
+  "{user} asks: {question}",
+  "A question from {user}: {question}",
+  "{user} wants to know: {question}"
+ ],
+ "StreamChat_NoAnswer": [
+  "Sorry {user}, I haven't got a good answer to that one.",
+  "That one has me stumped, {user}.",
+  "I'll have to think about that one, {user}."
+ ],
+ "StreamChat_Action": [
+  "{user} wants {action}. Fine.",
+  "Chat's in charge of {action} for a moment. Thanks, {user}.",
+  "{action}, courtesy of {user}.",
+  "Alright {user}, {action}."
+ ],
+ "StreamChat_Refused": [
+  "Not right now, {user}. Not safe: {reason}.",
+  "Sorry {user}, I can't touch {action} while {reason}.",
+  "Nice try, {user}. {reason}, so no."
+ ],
+ "StreamChat_Paused": [
+  "Chat is paused. I'll ignore them for now.",
+  "Chat muted. Back to just us.",
+  "Okay, chat can't reach me until you say so."
+ ],
+ "StreamChat_Resumed": [
+  "Chat is back on.",
+  "Chat can talk to me again.",
+  "Okay, I'm listening to chat."
+ ]
+}

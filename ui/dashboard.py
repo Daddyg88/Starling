@@ -822,7 +822,69 @@ class Dashboard:
                          font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left",
                          wraplength=720).grid(row=row + 1, column=0, sticky="w", pady=(8, 0))
             row += 2
+        if page.id == "streaming":
+            row = self._build_streaming(frame, row)
         return row
+
+    # ---- the Streaming page: status, what happened lately, and a test box ----
+    def _build_streaming(self, frame, row):
+        ctk = self.ctk
+        self.stream_status = ctk.CTkLabel(frame, text="", font=self._font(T.BODY_SIZE, True), text_color=T.MUTED, anchor="w", justify="left", wraplength=720)
+        self.stream_status.grid(row=row, column=0, sticky="w", pady=(16, 4))
+        self.stream_log = ctk.CTkLabel(frame, text="Nothing from chat yet.", font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w",
+                                       justify="left", wraplength=720)
+        self.stream_log.grid(row=row + 1, column=0, sticky="w")
+        line = ctk.CTkFrame(frame, fg_color=T.BG, corner_radius=0)
+        line.grid(row=row + 2, column=0, sticky="ew", pady=(14, 0))
+        line.grid_columnconfigure(0, weight=1)
+        self.stream_entry = ctk.CTkEntry(line, font=self._font(), fg_color=T.PANEL, border_color=T.BORDER, text_color=T.TEXT,
+                                         placeholder_text="Test: type what a viewer would, e.g. !lights or !starling what is a neutron star?", corner_radius=8)
+        self.stream_entry.grid(row=0, column=0, sticky="ew", padx=(0, 8))
+        ctk.CTkButton(line, text="Send as a viewer", width=150, font=self._font(), fg_color=T.PANEL, border_width=1, corner_radius=8,
+                      border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT,
+                      command=lambda: self.stream_test(False)).grid(row=0, column=1, padx=(0, 6))
+        ctk.CTkButton(line, text="Send as me", width=110, font=self._font(), fg_color=T.PANEL, border_width=1, corner_radius=8,
+                      border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER, text_color=T.TEXT,
+                      command=lambda: self.stream_test(True)).grid(row=0, column=2)
+        ctk.CTkLabel(frame, text="The test goes through the same rules as real chat (cooldowns, who may use it, what is switched on), even when chat is off. "
+                                 "Ship actions only work while you are in the game, in your ship.",
+                     font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left",
+                     wraplength=720).grid(row=row + 3, column=0, sticky="w", pady=(8, 0))
+        self._refresh_streaming()
+        return row + 4
+
+    def _refresh_streaming(self):
+        bridge = getattr(self.app, "stream_chat", None)
+        if getattr(self, "stream_status", None) is None:
+            return
+        if bridge is None:
+            self.stream_status.configure(text="Chat is not available (see the log).", text_color=T.BAD)
+            return
+        text = bridge.status()
+        colour = T.GOOD if text.startswith("Connected") else (T.MUTED if text.startswith(("Off", "Chat is on")) else T.WARN)
+        self.stream_status.configure(text="Status: " + text, text_color=colour)
+        lines = bridge.recent(8)
+        self.stream_log.configure(text="\n".join(lines) if lines else "Nothing from chat yet.")
+
+    def stream_test(self, as_streamer):
+        bridge = getattr(self.app, "stream_chat", None)
+        text = self.stream_entry.get().strip() if getattr(self, "stream_entry", None) is not None else ""
+        if bridge is None:
+            self._controls_result("Chat is not available (see the log).", T.BAD)
+            return
+        if not text:
+            self._controls_result("Type a pretend chat message in the box first.", T.WARN)
+            return
+        if self.model.dirty():
+            self.model.save()
+        words = {"done": "Done.", "answered": "She answered.", "ignored": "Ignored: it didn't start with the chat word or a ! command from the list.",
+                 "blocked": "Blocked", "cooldown": "Too soon (cooldown)", "refused": "Refused", "failed": "She couldn't do that"}
+
+        def finished(result):
+            note = ("%s (%s)." % (words.get(result.status, result.status), result.note)) if result.note and result.status in ("blocked", "cooldown", "refused", "failed") \
+                else words.get(result.status, result.status)
+            self.root.after(0, lambda: self._controls_result(note, T.GOOD if result.status in ("done", "answered") else T.WARN))
+        bridge.pretend("Streamer" if as_streamer else "TestViewer", text, owner=as_streamer, done=finished)
 
     # ---- the Get started checklist (what is on it lives in ui/setup_check.py) ----
     SETUP_COLOURS = {"ok": T.GOOD, "wait": T.WARN, "todo": T.WARN, "bad": T.BAD, "optional": T.MUTED}
@@ -1449,6 +1511,8 @@ class Dashboard:
                 self._refresh_home()
             elif self.current == "navigation":
                 self._sync_bookmarks()
+            elif self.current == "streaming":
+                self._refresh_streaming()
             elif self.current == "setup":
                 self._refresh_setup()
         except Exception:

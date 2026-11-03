@@ -137,6 +137,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "biodistance.json"))   # beep + "far enough, take the next sample"
             self._merge(_read_json(self.pack_dir / "regions.json"))       # entering a galaxy region, first time in a region
             self._merge(_read_json(self.pack_dir / "messages.json"))      # incoming chat read aloud
+            self._merge(_read_json(self.pack_dir / "streaming.json"))     # chat questions and chat actions (Twitch / YouTube)
             self._merge(_read_json(self.pack_dir / "routemap.json"))      # "hide the route map" / "show the route map"
             self._merge(_read_json(self.pack_dir / "carriers.json"))      # routes to the fleet carrier and the squad carrier
             self._merge(_read_json(self.pack_dir / "launch.json"))        # "I have control", "checking systems", launch speech

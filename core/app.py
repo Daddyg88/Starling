@@ -94,6 +94,7 @@ class App:
         self.onfoot_care = None
         self.route_voice = None
         self.route_follower = None
+        self.stream_chat = None
         self.ask = None
         self.ptt = None
         self.buttons = None
@@ -217,6 +218,7 @@ class App:
 
         # The Watcher (Void Compass's orb): she answers him, and makes him wait for a calm moment.
         self.start_watcher_bridge()
+        self.start_stream_chat()
 
         # Incoming chat messages, read out when nothing else is happening.
         from personality.messages import MessageReader
@@ -404,6 +406,13 @@ class App:
             except Exception:
                 self.log.exception("The biology overlay voice command could not start")
             try:
+                from streaming.voice import StreamChatVoice
+                from navigation.voice import Narrator
+                self.commands.extra_helpers.append(StreamChatVoice(
+                    self.settings, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
+            except Exception:
+                self.log.exception("The stream chat voice command could not start")
+            try:
                 from control.route_map_voice import RouteMapVoice
                 from navigation.voice import Narrator
                 self.commands.extra_helpers.append(RouteMapVoice(
@@ -425,6 +434,19 @@ class App:
             self.log.exception("Voice commands could not start")
             self.commands = None
         return self.commands
+
+    def start_stream_chat(self):
+        """Viewers' chat (Twitch now). Does nothing until it is switched on on the Streaming page."""
+        if getattr(self, "stream_chat", None) is not None:
+            return self.stream_chat
+        try:
+            from streaming.wiring import build
+            self.stream_chat = build(self)
+            self.stream_chat.start()
+        except Exception:
+            self.log.exception("Stream chat could not start")
+            self.stream_chat = None
+        return self.stream_chat
 
     def start_watcher_bridge(self):
         if getattr(self, "watcher", None) is not None:
@@ -870,6 +892,9 @@ class App:
 
     # ---- shutting down ----
     def stop(self):
+        if getattr(self, "stream_chat", None) is not None:
+            self.stream_chat.stop()
+            self.stream_chat = None
         if getattr(self, "llm", None) is not None:
             self.llm.unload()                              # stops the AI chat engine program too
         if self.chitchat is not None:
