@@ -398,13 +398,17 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Longest jump, biggest sales, times destroyed, big missions, hours together. Off = nothing new is saved"),
             Field("memory.recall_at_login", "She mentions one memory when I log in", "toggle"),
         ]),
-        Page("streaming", "Streaming", "Let your viewers talk to Starling. They ask questions in your Twitch chat and she answers out loud on stream, "
-             "and they can flip a few harmless things on your ship (lights, night vision...). It only READS chat: no password or Twitch login is needed, "
+        Page("streaming", "Streaming", "Let your viewers talk to Starling. They ask questions in your Twitch or YouTube chat and she answers out loud on stream, "
+             "and they can flip a few harmless things on your ship (lights, night vision...). It only READS chat: Twitch needs no password or login; YouTube needs a free API key. "
              "and she only ever presses your own keys. Off until you switch it on. Say 'pause the chat' to stop it by voice.", [
             Field("streaming.enabled", "Let chat talk to Starling", "toggle",
                   help="Master switch. Off = she ignores chat completely"),
             Field("streaming.twitch_channel", "Your Twitch channel", "text", placeholder="e.g. daddyg88",
                   help="Just the name (or paste your twitch.tv link). Press Save settings, then watch the status below"),
+            Field("streaming.youtube_video", "Your YouTube live stream link", "text", placeholder="https://www.youtube.com/watch?v=...",
+                  help="Paste the link of the live stream you are on now (or just the 11 letter video id). It changes every stream, so paste the new one each time"),
+            Field("streaming.youtube_key", "Your YouTube API key", "text", placeholder="AIza...",
+                  help="A free key from Google Cloud (YouTube Data API v3). The website guide shows how. Keep it private. Each key allows about 5 hours of chat a day"),
             Field("streaming.prefix", "Chat word that starts a question", "text", placeholder="!starling",
                   help="A viewer types: !starling what is a neutron star?  (Actions also work as !lights, !nightvision...)"),
             Field("streaming.who", "Who can use it", "choice", CHAT_WHO, help="You, the streamer, can always use it"),

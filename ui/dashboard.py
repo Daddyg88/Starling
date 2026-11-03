@@ -861,7 +861,7 @@ class Dashboard:
             self.stream_status.configure(text="Chat is not available (see the log).", text_color=T.BAD)
             return
         text = bridge.status()
-        colour = T.GOOD if text.startswith("Connected") else (T.MUTED if text.startswith(("Off", "Chat is on")) else T.WARN)
+        colour = T.GOOD if "Connected" in text and "Can't" not in text else (T.MUTED if text.startswith(("Off", "Chat is on")) else T.WARN)
         self.stream_status.configure(text="Status: " + text, text_color=colour)
         lines = bridge.recent(8)
         self.stream_log.configure(text="\n".join(lines) if lines else "Nothing from chat yet.")

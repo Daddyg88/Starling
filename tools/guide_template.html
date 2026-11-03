@@ -1,4 +1,5 @@
 <title>Starling Commander's Guide</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -51,6 +52,7 @@ a { color: var(--accent); }
 /* ---- hero ---- */
 .hero { padding-block: 56px 28px; }
 .eyebrow { font-family: var(--display); font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); }
+.hero .logo { display:block; width:min(320px,70vw); height:auto; margin:0 0 8px; mix-blend-mode:lighten; }
 .hero h1 { font-size: clamp(2.6rem, 9vw, 5rem); letter-spacing: 0.14em; font-weight: 700; margin-top: 10px; }
 .hero h1 span { color: var(--accent); }
 .tagline { font-family: var(--display); letter-spacing: 0.18em; font-size: 12px; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
@@ -147,6 +149,7 @@ footer .tagline { color: var(--accent-dim); }
 
 <div class="wrap">
 <header class="hero">
+  <img class="logo" src="starling-logo.png" width="320" height="320" alt="Starling logo: a glowing blue bird over a ringed star">
   <div class="eyebrow">Commander's guide</div>
   <h1>STAR<span>LING</span></h1>
   <div class="tagline">Fly further &nbsp;•&nbsp; Know more &nbsp;•&nbsp; Never alone</div>
@@ -255,12 +258,13 @@ footer .tagline { color: var(--accent-dim); }
 </section>
 
 <section class="block" id="streamers">
-  <div class="sechead"><span class="tag">Twitch chat</span><h2>For streamers</h2></div>
-  <p>Your viewers can talk to Starling from Twitch chat. She answers their questions out loud on your stream, and they can flip a few harmless things on your ship. It only <em>reads</em> chat: no password and no Twitch login are needed, and she only ever presses your own Elite keys. YouTube chat is planned next.</p>
+  <div class="sechead"><span class="tag">Twitch and YouTube chat</span><h2>For streamers</h2></div>
+  <p>Your viewers can talk to Starling from your Twitch chat, your YouTube live chat, or both at once. She answers their questions out loud on your stream, and they can flip a few harmless things on your ship. It only <em>reads</em> chat: Twitch needs no password or login, YouTube needs a free key (step 2), and she only ever presses your own Elite keys.</p>
   <ul class="rules">
     <li><strong>1. Switch it on</strong>Open the <span class="btn">Streaming</span> page, type your Twitch channel name, tick <span class="btn">Let chat talk to Starling</span> and press <span class="btn">Save settings</span>. The status line turns green when she is listening.</li>
-    <li><strong>2. Try it first</strong>Use the test box on that page. Type <code>!lights</code> or <code>!starling what is a neutron star?</code> and press <span class="btn">Send as a viewer</span>. It goes through the same rules as real chat.</li>
-    <li><strong>3. Viewers type</strong><code>!starling</code> and a question, or one of the ship words: <code>!lights</code>, <code>!nightvision</code>, and (if you allow them) <code>!headlook</code>, <code>!scoop</code>, <code>!gear</code>.</li>
+    <li><strong>2. YouTube (one-time key)</strong>Go to <code>console.cloud.google.com</code>, make a project, open <em>APIs &amp; Services</em>, enable <em>YouTube Data API v3</em>, then <em>Credentials &rarr; Create credentials &rarr; API key</em>. Paste the key into <span class="btn">Your YouTube API key</span>. Each time you go live, paste your stream link into <span class="btn">Your YouTube live stream link</span> and press <span class="btn">Save settings</span>. Keep the key private. YouTube gives each key a free daily allowance that lasts about 5 hours of chat; when it runs out she says so and tries again later. She ignores anything said before she connected.</li>
+    <li><strong>3. Try it first</strong>Use the test box on that page. Type <code>!lights</code> or <code>!starling what is a neutron star?</code> and press <span class="btn">Send as a viewer</span>. It goes through the same rules as real chat.</li>
+    <li><strong>4. Viewers type</strong><code>!starling</code> and a question, or one of the ship words: <code>!lights</code>, <code>!nightvision</code>, and (if you allow them) <code>!headlook</code>, <code>!scoop</code>, <code>!gear</code>.</li>
     <li><strong>You are in charge</strong>Choose who may use it (everyone, subscribers, moderators), switch each ship action on or off, set cooldowns, and block words. Say <em>"pause the chat"</em> any time to stop it, and <em>"chat on"</em> to bring it back.</li>
     <li><strong>Kept safe</strong>Only the fixed list of words works. Landing gear is off by default, and even when it is on she refuses it while docked, landed, in supercruise or near anything big. Actions also wait while a menu is open or you are not in your ship. Viewers can never make her learn things about you: chat questions use a separate, read-only brain.</li>
   </ul>

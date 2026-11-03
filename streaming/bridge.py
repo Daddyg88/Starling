@@ -1,5 +1,5 @@
 """
-Connects the chat sources (Twitch now, YouTube later) to the rules in streaming/chat.py.
+Connects the chat sources (Twitch and YouTube) to the rules in streaming/chat.py.
 
   * a supervisor thread looks at the settings every few seconds: chat on and a channel named -> connect; changed or off -> disconnect
   * a worker thread takes messages from a small queue one at a time (a question can take a few seconds to answer, and
@@ -11,7 +11,7 @@ import threading
 import time
 
 from core.logger import get_logger
-from streaming import chat, twitch
+from streaming import chat, twitch, youtube
 
 log = get_logger("chat_bridge")
 
@@ -20,10 +20,13 @@ QUEUE_SIZE = 12
 
 
 class ChatBridge:
-    def __init__(self, settings, director, source_factory=twitch.TwitchChat, clock=time.monotonic):
+    def __init__(self, settings, director, source_factory=twitch.TwitchChat, clock=time.monotonic,
+                 youtube_factory=youtube.YouTubeChat):
         self.settings = settings
         self.director = director
         self.source_factory = source_factory
+        self.youtube_factory = youtube_factory
+        self.slots = {}
         self.clock = clock
         self.queue = queue.Queue(maxsize=QUEUE_SIZE)
         self.source = None
@@ -66,32 +69,66 @@ class ChatBridge:
             self._stop.wait(CHECK_SECONDS)
 
     def check(self):
-        """Connects, reconnects or disconnects to match the settings. (Called every few seconds; tests call it directly.)"""
-        wanted = twitch.channel_name(self.settings.get("streaming.twitch_channel", "")) if self.settings.get("streaming.enabled", False) else ""
-        if wanted == self.channel and (self.source is not None or not wanted):
-            if not wanted:
-                self.state_text = "Off" if not self.settings.get("streaming.enabled", False) else "Chat is on: type your Twitch channel name"
-            return
-        self._disconnect()
-        self.channel = wanted
-        if not wanted:
-            self.state_text = "Off" if not self.settings.get("streaming.enabled", False) else "Chat is on: type your Twitch channel name"
-            return
-        self.state_text = "Connecting to #%s..." % wanted
-        self.source = self.source_factory(wanted, self.submit, self._set_status)
-        self.source.start()
+        """Connects, reconnects or disconnects each platform to match the settings. (Called every few seconds; tests call it directly.)"""
+        on = bool(self.settings.get("streaming.enabled", False))
+        wanted = {"twitch": twitch.channel_name(self.settings.get("streaming.twitch_channel", "")) if on else "",
+                  "youtube": ""}
+        key = str(self.settings.get("streaming.youtube_key", "") or "").strip()
+        video = youtube.video_id(self.settings.get("streaming.youtube_video", ""))
+        if on and key and video:
+            wanted["youtube"] = (key, video)
+        for platform, want in wanted.items():
+            slot = self.slots.get(platform)
+            if slot is not None and slot["want"] == want:
+                continue
+            if slot is not None:
+                self._stop_source(slot["source"])
+                del self.slots[platform]
+            if not want:
+                continue
+            slot = {"want": want, "status": "Connecting...", "source": None}
+            self.slots[platform] = slot
+            if platform == "twitch":
+                slot["status"] = "Connecting to #%s..." % want
+                slot["source"] = self.source_factory(want, self.submit, self._status_setter(platform))
+            else:
+                slot["status"] = "Connecting to YouTube..."
+                slot["source"] = self.youtube_factory(want[0], want[1], self.submit, self._status_setter(platform))
+            slot["source"].start()
+        self.source = (self.slots.get("twitch") or {}).get("source")
+        self.channel = wanted["twitch"]
+        self._write_status(on)
 
-    def _set_status(self, text):
-        self.state_text = text
+    def _status_setter(self, platform):
+        def set_status(text):
+            slot = self.slots.get(platform)
+            if slot is not None:
+                slot["status"] = text
+                self._write_status(True)
+        return set_status
 
-    def _disconnect(self):
-        source, self.source = self.source, None
-        self.channel = ""
+    def _write_status(self, on):
+        if not self.slots:
+            self.state_text = "Off" if not on else "Chat is on: type your Twitch channel name or add your YouTube key and link"
+        elif len(self.slots) == 1:
+            self.state_text = next(iter(self.slots.values()))["status"]
+        else:
+            self.state_text = " | ".join("%s: %s" % (name.capitalize() if name == "twitch" else "YouTube", slot["status"])
+                                         for name, slot in self.slots.items())
+
+    def _stop_source(self, source):
         if source is not None:
             try:
                 source.stop()
             except Exception:
                 log.exception("Could not stop the chat reader")
+
+    def _disconnect(self):
+        for slot in list(self.slots.values()):
+            self._stop_source(slot["source"])
+        self.slots = {}
+        self.source = None
+        self.channel = ""
 
     # ---- messages ----
     def submit(self, message):

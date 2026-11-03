@@ -1236,3 +1236,11 @@ window use the same code as the biology list.
 * streaming/voice.py: 'pause the chat' / 'chat on'.
 * Settings: the streaming.* section (core/settings.py), page in ui/settings_model.py, status + test box in ui/dashboard.py (_build_streaming).
 * Not tried against live Twitch: the first real connection will show any problems in the log.
+
+## 0.79.0 - YouTube chat, exobiology rule check, logo
+
+* streaming/youtube.py: read-only YouTube Data API v3 live chat. video_id() takes a link or id, parse_messages() keeps text messages only (owner/moderator/member flags from the API), YouTubeChat finds activeLiveChatId, skips the backlog on first fetch, polls at the speed Google asks but never faster than every 10 s (quota: 5 units a call, 10,000 a day), and handles quota/key/ended-chat problems with plain status text. The key is never put in a status or log line.
+* streaming/bridge.py: now keeps one slot per platform, so Twitch and YouTube can run together; status shows both when both are on. Settings: streaming.youtube_key, streaming.youtube_video (page fields in ui/settings_model.py).
+* config/bio_rules.json: High Metal Content added to Fungoida Stabitis/Gelata, Osseus Discus/Pellebantus, Tussock Ignis/Serrati/Pennatis; argonrich added to Osseus Pumice. Checked against ~1,000 real scanned life bodies from tester journals: species recall about 98.8% -> 99.8%, candidate genera per body about 4.6 -> 4.65. No personal data from those journals is stored in the repo.
+* Website: logo (tools/site_assets, copied to site/ by tools/build_guide.py), YouTube setup steps in the For streamers section.
+* Not tried against live YouTube: the first real connection will show any problems in the status line and the log.

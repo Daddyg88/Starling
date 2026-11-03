@@ -202,7 +202,7 @@ EXTRA = [
         ('During the training', ['Skip', 'Stop']),
         ('Save what she heard to a file', ['Hearing report']),
         ('Biology overlay', ['Hide the biology overlay', 'Show the biology overlay']),
-        ('Viewer chat (Twitch)', ['Pause the chat', 'Chat on']),
+        ('Viewer chat (Twitch and YouTube)', ['Pause the chat', 'Chat on']),
         ('Route map overlay', ['Hide the route map', 'Show the route map'])]),
 ]
 for gid, title, intro, rows in EXTRA:
@@ -230,4 +230,7 @@ if __name__ == '__main__':
     target.parent.mkdir(exist_ok=True)
     target.write_text(build(), encoding="utf-8")
     (REPO / "site" / ".nojekyll").write_text("", encoding="utf-8")
+    import shutil
+    for pic in (REPO / "tools" / "site_assets").glob("*"):
+        shutil.copy(pic, REPO / "site" / pic.name)
     print("Wrote %s (%d things to say)" % (target, count))

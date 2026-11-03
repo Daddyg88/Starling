@@ -3,7 +3,7 @@ import unittest
 
 from control.matcher import Matcher
 from journal.game_state import GameState
-from streaming import chat, twitch
+from streaming import chat, twitch, youtube
 from streaming.bridge import ChatBridge
 from streaming.voice import StreamChatVoice
 
@@ -264,7 +264,7 @@ class Bridge(unittest.TestCase):
         settings = director.settings
         bridge = ChatBridge(settings, director, source_factory=FakeSource)
         bridge.check()
-        self.assertEqual(bridge.status(), "Chat is on: type your Twitch channel name")
+        self.assertTrue(bridge.status().startswith("Chat is on"))
         settings.set("streaming.twitch_channel", "https://twitch.tv/Daddyg88")
         bridge.check()
         self.assertEqual(len(FakeSource.made), 1)
@@ -345,3 +345,147 @@ class Pieces(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def yt_page(items=(), token="t1", wait=5000):
+    return {"nextPageToken": token, "pollingIntervalMillis": wait, "items": list(items)}
+
+
+def yt_item(text, name="Gav", kind="textMessageEvent", **author):
+    return {"snippet": {"type": kind, "textMessageDetails": {"messageText": text}}, "authorDetails": dict({"displayName": name}, **author)}
+
+
+class YouTubeParsing(unittest.TestCase):
+    def test_video_id(self):
+        vid = "dQw4w9WgXcQ"
+        for text in (vid, "https://www.youtube.com/watch?v=" + vid, "https://youtu.be/" + vid + "?t=4",
+                     "https://www.youtube.com/live/" + vid + "?feature=share", "  " + vid + " "):
+            self.assertEqual(youtube.video_id(text), vid, text)
+        for text in ("", "hello", "https://example.com", None):
+            self.assertEqual(youtube.video_id(text), "")
+
+    def test_poll_seconds_never_burns_quota(self):
+        self.assertEqual(youtube.poll_seconds(1000), 10.0)
+        self.assertEqual(youtube.poll_seconds(25000), 25.0)
+        self.assertEqual(youtube.poll_seconds(900000), 60.0)
+        self.assertEqual(youtube.poll_seconds("x"), 10.0)
+
+    def test_messages_and_badges(self):
+        page = yt_page([yt_item("!lights"), yt_item("hi", "Mod", isChatModerator=True), yt_item("boss", "Me", isChatOwner=True),
+                        yt_item("member", "Sub", isChatSponsor=True), yt_item("5 dollars", "Rich", kind="superChatEvent")])
+        found = youtube.parse_messages(page)
+        self.assertEqual([m.user for m in found], ["Gav", "Mod", "Me", "Sub"])
+        self.assertTrue(found[1].mod and not found[1].owner)
+        self.assertTrue(found[2].owner and found[2].mod)
+        self.assertTrue(found[3].sub)
+        self.assertEqual(found[0].platform, "youtube")
+        self.assertEqual(youtube.parse_messages({}), [])
+
+    def test_error_reason_and_key_shape(self):
+        self.assertEqual(youtube.error_reason('{"error":{"errors":[{"reason":"quotaExceeded"}]}}'), "quotaExceeded")
+        self.assertEqual(youtube.error_reason("not json"), "")
+        self.assertTrue(youtube.looks_like_key("AIzaSyA" + "b" * 32))
+        self.assertFalse(youtube.looks_like_key("short"))
+
+
+class YouTubeLoop(unittest.TestCase):
+    def make(self, answers):
+        got, status, calls = [], [], []
+        queue_ = list(answers)
+
+        def fake_get(url):
+            calls.append(url)
+            answer = queue_.pop(0)
+            if isinstance(answer, Exception):
+                raise answer
+            return answer
+        chat_ = youtube.YouTubeChat("KEY123", "dQw4w9WgXcQ", got.append, status.append, get=fake_get, sleep=lambda s: None)
+        return chat_, got, status, calls
+
+    def test_finds_chat_skips_backlog_then_delivers_new_messages(self):
+        live = {"items": [{"liveStreamingDetails": {"activeLiveChatId": "CHAT1"}}]}
+        chat_, got, status, calls = self.make([live, yt_page([yt_item("old one")], "t1"), yt_page([yt_item("!lights")], "t2")])
+        self.assertEqual(chat_.step(), 0.0)
+        self.assertEqual(chat_.step(), 10.0)
+        self.assertEqual(got, [])                                  # the backlog is never acted on
+        chat_.step()
+        self.assertEqual([m.text for m in got], ["!lights"])
+        self.assertIn("pageToken=t1", calls[2])
+        self.assertIn("liveChatId=CHAT1", calls[1])
+        self.assertEqual(status[-1], "Connected to the YouTube live chat")
+
+    def test_waits_when_not_live(self):
+        chat_, got, status, _ = self.make([{"items": [{"liveStreamingDetails": {}}]}, {"items": []}])
+        self.assertEqual(chat_.step(), youtube.NO_CHAT_RETRY)
+        self.assertIn("no live chat", status[-1])
+        self.assertEqual(chat_.step(), youtube.NO_CHAT_RETRY)
+        self.assertIn("can't find that video", status[-1])
+
+    def test_problems_never_crash_and_never_show_the_key(self):
+        statuses = []
+        chat_, _g, status, _c = self.make([])
+        chat_.on_status = statuses.append
+        self.assertEqual(chat_._api_problem(youtube.ApiError(403, "quotaExceeded")), youtube.QUOTA_RETRY)
+        self.assertIn("daily limit", statuses[-1])
+        self.assertEqual(chat_._api_problem(youtube.ApiError(400, "keyInvalid")), youtube.KEY_RETRY)
+        self.assertIn("refused the key", statuses[-1])
+        chat_.chat_id = "X"
+        chat_._api_problem(youtube.ApiError(403, "liveChatEnded"))
+        self.assertEqual(chat_.chat_id, "")
+        chat_._api_problem(youtube.ApiError(500, ""))
+        self.assertTrue(all("KEY123" not in s for s in statuses))
+
+    def test_run_survives_network_errors(self):
+        chat_, _g, status, _c = self.make([OSError("down"), RuntimeError("boom")])
+        waits = []
+        def sleep(s):
+            waits.append(s)
+            if len(waits) >= 2:
+                chat_._stop.set()
+        chat_._sleep = sleep
+        chat_._run()
+        self.assertEqual(waits[:2], [15.0, 30.0])
+        self.assertTrue(any("Can't reach YouTube" in s for s in status))
+
+    def test_needs_key_and_video(self):
+        self.assertIsNone(youtube.YouTubeChat("", "dQw4w9WgXcQ", None, None).start())
+        a = youtube.YouTubeChat("k" * 30, "nonsense", None, None)
+        a.start()
+        self.assertIsNone(a._thread)
+
+
+class BridgeBothPlatforms(unittest.TestCase):
+    def test_youtube_needs_key_and_link_and_both_can_run(self):
+        FakeSource.made = []
+        yt = []
+
+        class FakeYT:
+            def __init__(self, key, video, on_message, on_status):
+                self.key, self.video, self.on_status, self.stopped = key, video, on_status, False
+                yt.append(self)
+            def start(self): pass
+            def stop(self): self.stopped = True
+
+        director, *_ = make()
+        s = director.settings
+        bridge = ChatBridge(s, director, source_factory=FakeSource, youtube_factory=FakeYT)
+        s.set("streaming.youtube_video", "https://youtu.be/dQw4w9WgXcQ")
+        bridge.check()
+        self.assertEqual(yt, [])                                    # a link alone is not enough
+        s.set("streaming.youtube_key", "K" * 35)
+        bridge.check()
+        self.assertEqual(len(yt), 1)
+        self.assertEqual(yt[0].video, "dQw4w9WgXcQ")
+        yt[0].on_status("Connected to the YouTube live chat")
+        self.assertEqual(bridge.status(), "Connected to the YouTube live chat")
+        s.set("streaming.twitch_channel", "daddyg88")
+        bridge.check()
+        self.assertEqual(len(yt), 1)                                # YouTube was not restarted
+        self.assertIn("YouTube: Connected", bridge.status())
+        self.assertIn("Twitch:", bridge.status())
+        s.set("streaming.youtube_video", "")
+        bridge.check()
+        self.assertTrue(yt[0].stopped)
+        s.set("streaming.enabled", False)
+        bridge.check()
+        self.assertEqual(bridge.status(), "Off")
