@@ -137,6 +137,8 @@ def stage_update(info, updates_dir, token="", opener=None, progress=None):
     """Download + verify + unpack into updates/pending. Nothing live changes. Returns the pending folder."""
     updates = Path(updates_dir)
     pending = updates / "pending"
+    if pending.is_dir() and pending_version(updates) == info.get("version") and (pending / "main.py").is_file():
+        return pending                       # this version is already unpacked (a second Starling may have done it a moment ago)
     shutil.rmtree(pending, ignore_errors=True)
     updates.mkdir(parents=True, exist_ok=True)
     archive = updates / ASSET_ZIP
@@ -148,7 +150,7 @@ def stage_update(info, updates_dir, token="", opener=None, progress=None):
         actual = _download(info["zip_url"], archive, token, opener, progress)
         if actual != expected:
             raise UpdateError("The download doesn't match its fingerprint, so I threw it away.")
-        pending.mkdir()
+        pending.mkdir(exist_ok=True)         # Windows may not have deleted an old folder (something had it open): extract over it
         _safe_extract(archive, pending)
         (updates / "READY.json").write_text(json.dumps({"version": info["version"]}), encoding="utf-8")
     except UpdateError:

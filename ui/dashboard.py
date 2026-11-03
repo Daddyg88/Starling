@@ -15,7 +15,7 @@ from core.identity import assistant_name
 from core.logger import get_logger
 from ui import portraits, setup_check, ship_pictures
 from ui import theme as T
-from ui.settings_model import SettingsModel
+from ui.settings_model import SECTION_OF, SettingsModel
 from ui.status import EventFeed, collect_status, header_data, home_data
 
 log = get_logger("dashboard")
@@ -892,7 +892,9 @@ class Dashboard:
         """One button on the checklist."""
         try:
             if action.startswith("page:"):
-                self.show(action[5:])
+                page_id = action[5:]
+                page_id = SECTION_OF.get(page_id, page_id)       # 'listening' is a section of the Voice page, not a page of its own
+                self.show(page_id if page_id in self.page_frames else "home")
             elif action == "test_voice":
                 self.test_voice()
             elif action == "prepare_voice":

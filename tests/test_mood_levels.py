@@ -126,7 +126,8 @@ class ToneLineTests(unittest.TestCase):
         for level in (1, 5):
             settings.set("personality.mood_level", level)
             heard = {f._tone("Friendly") for _ in range(40)}
-            wanted = {l.text for l in d.lines["Tone_Friendly_L%d" % level]}
+            # her own level and the one next to it (the lines are drawn from the neighbouring levels too, so they repeat less)
+            wanted = {l.text for n in (level - 1, level, level + 1) if 1 <= n <= 5 for l in d.lines["Tone_Friendly_L%d" % n]}
             self.assertTrue(heard <= wanted, level)
 
     def test_neutral_makes_more_remarks_and_warmer_levels_more_than_cold_ones(self):

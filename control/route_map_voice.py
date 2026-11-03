@@ -7,8 +7,8 @@ import re
 
 _TOPIC = r"(?:route|neutron|plotter|plotted|navigation|nav)"
 _THING = r"(?:map|maps|overlay|over lay|display|panel|window|picture)"
-_HIDE = re.compile(r"\b(?:hide|close|remove|dismiss|clear|get rid of|turn off|switch off|disable)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
-_SHOW = re.compile(r"\b(?:show|open|bring up|display|turn on|switch on|enable|put up)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
+_HIDE = re.compile(r"\b(?:hide|hidden|closed|close|closing|remove|dismiss|clear|get rid of|turn off|switch off|disable)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
+_SHOW = re.compile(r"\b(?:show|open|opened|bring up|display|turn on|switch on|enable|put up)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
 
 
 class RouteMapVoice:

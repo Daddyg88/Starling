@@ -74,13 +74,16 @@ def to_float32_array(piece):
     return np.asarray(audio, dtype=np.float32).reshape(-1)
 
 
-# Free built-in Kokoro voices (American English). "" means Starling's own cloned voice.
+# Free built-in Kokoro voices (American "a" and British "b" English). "" means Starling's own cloned voice.
+# Kokoro has no Australian voice; these are all it offers in English.
 BUILT_IN_VOICES = {
     "af_heart": "Heart", "af_bella": "Bella", "af_nicole": "Nicole", "af_sarah": "Sarah",
     "af_sky": "Sky", "af_nova": "Nova", "af_river": "River", "af_jessica": "Jessica",
     "af_kore": "Kore", "af_aoede": "Aoede", "af_alloy": "Alloy",
     "am_adam": "Adam", "am_michael": "Michael", "am_echo": "Echo", "am_eric": "Eric",
-    "am_liam": "Liam", "am_onyx": "Onyx", "am_puck": "Puck", "am_fenrir": "Fenrir",
+    "am_liam": "Liam", "am_onyx": "Onyx", "am_puck": "Puck", "am_fenrir": "Fenrir", "am_santa": "Santa",
+    "bf_alice": "Alice", "bf_emma": "Emma", "bf_isabella": "Isabella", "bf_lily": "Lily",
+    "bm_daniel": "Daniel", "bm_fable": "Fable", "bm_george": "George", "bm_lewis": "Lewis",
 }
 
 
@@ -103,6 +106,7 @@ class KokoroTTS(BaseTTS):
         self.cache_dir = Path(cache_dir) if cache_dir else None
 
         self.pipeline = None
+        self._british = None              # the engine for the British voices (made the first time one is used)
         self.voice_pack = None
         self.last_start_delay = 0.0
         self.ready = threading.Event()
@@ -115,6 +119,18 @@ class KokoroTTS(BaseTTS):
     def _voice_arg(self):
         """What to hand the engine as `voice=`: the cloned tensor or a built-in voice name."""
         return self.voice_pack if not self._voice_name else self._voice_name
+
+    def _engine(self):
+        """The American engine, or (for bf_/bm_ voices) the British one, so British words are pronounced the British way."""
+        if self._voice_name[:2] in ("bf", "bm") and self._pipeline_factory is None:
+            if self._british is None:
+                import warnings
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    from kokoro import KPipeline
+                    self._british = KPipeline(lang_code="b", repo_id="hexgrad/Kokoro-82M")
+            return self._british
+        return self.pipeline
 
     def _choose_voice(self, name):
         name = (name or "").strip()
@@ -301,7 +317,7 @@ class KokoroTTS(BaseTTS):
         if self._cache_load(text, speed) is not None:
             return True
         import numpy as np
-        pieces = [to_float32_array(p) for p in self.pipeline(text, voice=self._voice_arg(), speed=speed)]
+        pieces = [to_float32_array(p) for p in self._engine()(text, voice=self._voice_arg(), speed=speed)]
         pieces = [p for p in pieces if p.size]
         if not pieces:
             return False
@@ -361,7 +377,7 @@ class KokoroTTS(BaseTTS):
                 return cached.size
             made = []
             for sentence in split_sentences(part):                 # a long answer starts after its FIRST sentence is made, not after all of it
-                for piece in self.pipeline(sentence, voice=self._voice_arg(), speed=speed):
+                for piece in self._engine()(sentence, voice=self._voice_arg(), speed=speed):
                     if self._stop_flag.is_set():
                         return 0
                     audio = to_float32_array(piece)

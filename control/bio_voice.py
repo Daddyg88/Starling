@@ -4,8 +4,8 @@ import re
 
 _TOPIC = r"(?:bio|by o|biology|biological|exobiology|exo biology|exo|life)"
 _THING = r"(?:overlay|over lay|box|panel|list|display|window)"
-_HIDE = re.compile(r"\b(?:hide|close|remove|dismiss|clear|get rid of|turn off|switch off|disable)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
-_SHOW = re.compile(r"\b(?:show|open|bring up|display|turn on|switch on|enable|put up)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
+_HIDE = re.compile(r"\b(?:hide|hidden|closed|close|closing|remove|dismiss|clear|get rid of|turn off|switch off|disable)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
+_SHOW = re.compile(r"\b(?:show|open|opened|bring up|display|turn on|switch on|enable|put up)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
 
 
 class BioOverlayVoice:

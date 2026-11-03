@@ -210,6 +210,8 @@ class DialogueManager:
         if not found:
             return None
         size = max(3, min(60, int(len(found) * 0.75)))        # big pools remember more (three quarters of the pool), so a line is not heard again soon
+        if len(found) <= 12:
+            size = max(size, len(found) - 1)                  # a small pool uses every line before any is heard twice
         recent = self._recent.get(key)
         if recent is None or recent.maxlen != size:
             recent = self._recent[key] = deque(recent or (), maxlen=size)

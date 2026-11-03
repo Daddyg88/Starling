@@ -53,7 +53,10 @@ _PLOT_BARE = re.compile(r"^(?:\w+ ){0,3}?(plot|set|work out|find|calculate|creat
                         r".*\bneutron\b.*\b(route|course|highway|trail|plotter|plot)\b(?!.*\bto\b)|^neutron (route|course|plotter|plot|highway)$|^(plot|start) neutron$")
 # "emergency protocol": Spansh does not know where I am, find a known landmark nearby and get me there
 _EMERGENCY = re.compile(r"\b(emergency (protocol|route|plot|plotter)|(i m|i am|we re|we are) lost|spansh (can t|cannot|doesn t) find me|"
-                        r"find (me )?(a |the )?nearest (landmark|poi|point of interest|beacon|nav marker|carrier)|get me out of here)\b")
+                        r"get me out of here)\b")
+# "take me to the nearest point of interest": a normal galaxy map course, NO neutron route afterwards
+_NEAREST_POI = re.compile(r"\b(nearest|closest|near by|nearby)\b.*\b(poi|point of interest|points of interest|landmark|beacon|nav marker|navigation beacon)\b|"
+                          r"\b(poi|point of interest|landmark)\b.*\b(nearest|closest|near me|near by|nearby)\b")
 _NEXT = re.compile(r"\b(next (waypoint|stop|neutron|neutron star|star)|where (to )?next|where s the next|waypoint again|repeat the waypoint)\b")
 _STATUS = re.compile(r"\b(how far|how much (further|farther|left)|how many (jumps|stops|neutron).*left|route status|how s the route|jumps left|stops left)\b")
 _CANCEL = re.compile(r"\b(cancel|clear|stop|abandon|forget|scrap|delete|drop|reset|remove)\b.*\b(neutron route|the route|my route|route|root|course|plot|neutron plotter|emergency)\b")
@@ -290,6 +293,8 @@ class RouteVoice:
         asked = guardian.parse(said)
         if asked is not None:
             return self.guardian_asked(asked[0], asked[1], guardian.wants_alternative(said))
+        if _NEAREST_POI.search(said):
+            return self.nearest_poi()
         found = _CARRIER_GO.search(said)
         if found:
             return self.plot(found.group("dest"))
@@ -772,8 +777,7 @@ class RouteVoice:
         """'Emergency protocol': works out where you want to go (the target set in the game) and finds a way."""
         destination = self._target_in_game() or str(self.settings.get("neutron.destination", "") or "").strip()
         if not destination:
-            self.narrator.say("RouteNoDestination")
-            return "No destination."
+            return self.nearest_poi()          # nowhere to go yet: just get me to the nearest point of interest
         if self._busy:
             return "Already plotting."
         self._busy = True
@@ -790,6 +794,44 @@ class RouteVoice:
                 self._busy = False
         self.spawn(work)
         return "Emergency protocol: finding a known place near us."
+
+    def nearest_poi(self):
+        """'I'm lost' / 'take me to the nearest point of interest': a normal galaxy map course to the nearest known place
+        (EDAstro). No neutron route is plotted from there; it is a way out of nowhere, and it works with no destination."""
+        state = self.state_provider()
+        position = getattr(state, "star_pos", None)
+        if not position:
+            self.narrator.say("EmergencyNoPosition")
+            return "No position yet."
+        if self._busy:
+            return "Already plotting."
+        self._busy = True
+
+        def work():
+            try:
+                place = self.edastro.nearest(position)
+                if place is None:
+                    self.narrator.say("EmergencyNone")
+                    return
+                miles = round(distance(position, place["coords"])) if place.get("coords") else 0
+                fields = {"poi": place["system"], "place": place.get("poi") or place["system"], "distance": miles or "?"}
+                self.set_target(place["system"])
+                plot = getattr(self.follower, "auto_plot", None)
+                if plot is not None and self.settings.get("neutron.auto_plot", False):
+                    self.narrator.say("PoiPlotting", fields)
+                    self.schedule_plot(plot)
+                else:
+                    self.follower.copier(place["system"])
+                    self.narrator.say("PoiManual", fields)
+            except EdAstroError as error:
+                self.narrator.say("RouteFailed", {"reason": str(error)})
+            except Exception:
+                log.exception("Finding the nearest point of interest failed")
+                self.narrator.say("RouteFailed", {"reason": "Something went wrong. The log has the details."})
+            finally:
+                self._busy = False
+        self.spawn(work)
+        return "Finding the nearest point of interest."
 
     def emergency(self, destination):
         """Spansh can't start a route from here. Find the nearest landmark that Spansh DOES know, plot a course to it in

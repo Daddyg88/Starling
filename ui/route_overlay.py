@@ -51,8 +51,11 @@ def fit_text(text, limit):
     return text if len(text) <= limit else text[:max(1, limit - 1)].rstrip() + "…"
 
 
-def wanted_mode(settings, state, follower, test_until=0.0, now=None):
-    """'test', 'route', 'empty' (always-on with no route) or None (hide the map)."""
+FRESH_SECONDS = 25           # a new route is shown for this long even when a game screen (the galaxy map) is open
+
+
+def wanted_mode(settings, state, follower, test_until=0.0, now=None, fresh=False):
+    """'test', 'route', 'empty' (always-on with no route) or None (hide the map). fresh = the route was only just plotted."""
     now = time.monotonic() if now is None else now
     if test_until and now < test_until:
         return "test"
@@ -60,7 +63,7 @@ def wanted_mode(settings, state, follower, test_until=0.0, now=None):
         mode = str(settings.get("overlay.route_map", "route"))
         if mode == "off" or getattr(state, "game_quit", False) or getattr(state, "route_map_hidden", False):
             return None
-        if settings.get("overlay.route_cockpit_only", True) and getattr(state, "gui_focus", 0):
+        if settings.get("overlay.route_cockpit_only", True) and getattr(state, "gui_focus", 0) and not fresh:
             return None                      # a game screen is open (galaxy map, station menus...): keep out of the way
         active = bool(follower is not None and getattr(follower, "active", False))
         if active:
@@ -71,9 +74,9 @@ def wanted_mode(settings, state, follower, test_until=0.0, now=None):
         return None
 
 
-def route_scene(settings, state, follower, test_until=0.0, now=None):
+def route_scene(settings, state, follower, test_until=0.0, now=None, fresh=False):
     """The scene to draw (see galaxy_map.build_scene), or None to hide the map."""
-    mode = wanted_mode(settings, state, follower, test_until, now)
+    mode = wanted_mode(settings, state, follower, test_until, now, fresh)
     if mode is None:
         return None
     size = map_size(settings.get("overlay.route_size", "Medium"))
@@ -98,7 +101,8 @@ def backfill_positions(follower, coordinates, limit=BACKFILL_LIMIT, sleep=time.s
     """A route saved before 0.77.26 has no positions. Looks them up (a few, politely) and saves. Returns how many were found."""
     found = 0
     with follower._lock:
-        todo = [w for w in follower.waypoints[follower.index:] if not galaxy_map.has_position(w)][:limit]
+        ahead = [w for w in follower.waypoints[follower.index:] if not galaxy_map.has_position(w)]
+        todo = (ahead[-1:] + ahead[:-1])[:limit]          # the destination first: the map must at least show where you are going
     for waypoint in todo:
         position = coordinates(waypoint["system"])
         if position is not None:
@@ -125,6 +129,8 @@ class RouteOverlay:
         self._rect_cache = None
         self._rect = None
         self._backfilled_for = None
+        self._fresh_key = None
+        self._fresh_until = 0.0
         self.root.after(CHECK_MS, self._tick)
 
     def show_test(self, seconds=TEST_SECONDS):
@@ -161,7 +167,7 @@ class RouteOverlay:
         if key == self._backfilled_for:
             return
         self._backfilled_for = key
-        if any(galaxy_map.has_position(w) for w in follower.waypoints):
+        if all(galaxy_map.has_position(w) for w in follower.waypoints):
             return
         def work():
             try:
@@ -177,7 +183,12 @@ class RouteOverlay:
         self._rect = self._screen_rect()
         self._maybe_backfill(follower)
         s = self.settings
-        mode = wanted_mode(s, state, follower, self.test_until)
+        key = (getattr(follower, "destination", ""), len(getattr(follower, "waypoints", []))) if follower is not None and getattr(follower, "active", False) else None
+        if key is not None and key != self._fresh_key:
+            self._fresh_until = time.monotonic() + FRESH_SECONDS      # a brand new route: show it now, even over the galaxy map
+        self._fresh_key = key
+        fresh = time.monotonic() < self._fresh_until
+        mode = wanted_mode(s, state, follower, self.test_until, fresh=fresh)
         if mode is None:
             if self._signature is not None:
                 self._signature = None
@@ -188,11 +199,11 @@ class RouteOverlay:
         have = sum(1 for w in getattr(follower, "waypoints", []) if galaxy_map.has_position(w)) if follower is not None else 0
         signature = (mode, getattr(follower, "index", 0), getattr(follower, "destination", ""), len(getattr(follower, "waypoints", [])),
                      have, getattr(follower, "jumps_left", 0), here_key, s.get("overlay.route_size", "Medium"),
-                     s.get("overlay.route_right", 2), s.get("overlay.route_top", 10), self._rect)
+                     s.get("overlay.route_right", 2), s.get("overlay.route_top", 10), self._rect, fresh)
         if signature == self._signature:
             return
         self._signature = signature
-        scene = route_scene(s, state, follower, self.test_until)
+        scene = route_scene(s, state, follower, self.test_until, fresh=fresh)
         if scene is None:
             self._hide()
             return

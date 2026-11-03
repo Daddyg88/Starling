@@ -1216,3 +1216,13 @@ background thread (at most 40 stars). Settings: overlay.route_map (route/always/
 route_cockpit_only. Voice: control/route_map_voice.py ("hide/show the route map"; the game's own "galaxy map" is left alone) with lines
 in voicepacks/default/routemap.json. Test button on the Navigation page. Not tested on a real screen: placement and the click-through
 window use the same code as the biology list.
+
+## 0.77.27 - Tester fixes
+
+* Nomad: LaunchVessel always sets in_nomad, and journal/status_reader.py only clears it when you really come from the Nomad (Status.json lags the journal, which made the Nomad look like an SRV with hardpoints out: pips fired, and NomadDocked never came so hardpoints stayed out).
+* navigation/voice.py: nearest_poi() (EDAstro nearest, normal galaxy map course, no neutron). Used for "I'm lost" / "emergency protocol" with no destination and for "nearest point of interest". With a destination the emergency neutron route is unchanged. Lines: PoiPlotting, PoiManual in voicepacks/default/route.json.
+* ui/route_overlay.py: shows a new route for 25 s even over a game screen; destination is looked up first when positions are missing; galaxy_map.fit_view margin 0.4, whole galaxy from 40 % of its width.
+* ui/dashboard.py: setup buttons map section pages (listening) to their parent page (SECTION_OF).
+* personality/flavour.py: tone asides draw from the neighbouring levels too; dialogue.pick remembers all but one line of a pool of 12 or fewer.
+* core/updater.py: reuses a staged copy of the same version; mkdir(exist_ok) after a failed delete (WinError 183).
+* tts/kokoro_tts.py: British voices (bf_/bm_, their own lang_code "b" engine, made on first use) and am_santa added to the voice list.

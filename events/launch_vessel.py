@@ -12,5 +12,5 @@ class LaunchVessel(BaseEvent):
 
     def update_state(self, entry, state):
         # Status.json reports the Nomad as an SRV, so remember that this one is a Nomad.
-        vessel = str(entry.get("VesselType_Localised") or entry.get("VesselType") or "").lower()
-        state.in_nomad = vessel in ("nomad", "lander01")
+        # LaunchVessel is only written for ship-launched vessels (SRVs and fighters have their own events), so it is always the Nomad.
+        state.in_nomad = True

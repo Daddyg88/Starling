@@ -128,7 +128,11 @@ class Flavour:
 
     def _tone(self, mood):
         """A short aside written for her mood AND level, so each of the 5 steps in a mood sounds a little different."""
-        return self._pick("Tone_%s_L%d" % (mood, effective_level(self.settings)))
+        level = effective_level(self.settings)
+        # her own level most of the time, but also the levels either side (same mood, nearly the same feeling): three times the lines
+        levels = [level, level] + [n for n in (level - 1, level + 1) if 1 <= n <= 5]
+        key = "Tone_%s_L%d" % (mood, self.rng.choice(levels))
+        return self._pick(key) or self._pick("Tone_%s_L%d" % (mood, level))
 
     def _remark(self, mood):
         if self.rng.random() < TONE_CHANCE:

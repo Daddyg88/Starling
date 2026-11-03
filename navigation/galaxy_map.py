@@ -24,7 +24,7 @@ GRID = len(regionmap)                     # 2048
 X_MIN, Z_MIN = region_lookup.X0, region_lookup.Z0
 GALAXY_SPAN = GRID * CELL_LY              # about 101,000 ly
 MIN_SPAN_LY = 1500.0                      # never zoom in further than this
-WHOLE_BELOW = 0.55                        # a route spanning more than this share of the galaxy shows the whole galaxy
+WHOLE_BELOW = 0.40                        # a route spanning more than this share of the galaxy shows the whole galaxy
 
 OUTSIDE = "#050913"                       # space beyond the mapped regions
 EDGE = "#8fb4d8"                          # region borders
@@ -76,7 +76,7 @@ def has_position(point):
         return False
 
 
-def fit_view(points, margin=0.22):
+def fit_view(points, margin=0.4):
     """The view that shows all these (x, z) points with some room around them. Long routes get the whole galaxy."""
     points = [(float(x), float(z)) for x, z in points]
     if not points:

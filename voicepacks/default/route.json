@@ -161,5 +161,17 @@
  "RouteReadyDssa": [
   "Route ready to the DSSA carrier {carrier} in {system}. {left} jumps in total with {stops} neutron stops. First waypoint is {next}. {count}{clip}",
   "That's the way to {carrier} in {system}: {left} jumps, {stops} neutron stops. Head for {next} first. {count}{clip}"
+ ],
+ "PoiPlotting": [
+  "Nearest point of interest is {poi}, about {distance} light years away. Plotting a normal course there now.",
+  "Found {poi}, {distance} light years out. Setting the course in the galaxy map.",
+  "Got you a way out: {poi}, {distance} light years. Plotting it now."
+ ],
+ "PoiPlotting_Close": [
+  "Don't worry, love. {poi} is {distance} light years away. I'm plotting us there now."
+ ],
+ "PoiManual": [
+  "Nearest point of interest is {poi}, about {distance} light years away. It's on your clipboard. Paste it into the galaxy map and plot a course.",
+  "Found {poi}. It's on your clipboard for the galaxy map search."
  ]
 }

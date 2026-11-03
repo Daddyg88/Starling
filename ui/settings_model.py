@@ -100,7 +100,9 @@ MESSAGE_CHANNELS = [("Direct messages only", "direct"), ("Direct, friends, wing 
 SEXES = [("Not specified", "neutral"), ("Male", "male"), ("Female", "female")]
 VOICES = ([("Her own cloned voice", "")]
           + [("%s - female" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("af_")]
-          + [("%s - male" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("am_")])
+          + [("%s - male" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("am_")]
+          + [("%s - British female" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("bf_")]
+          + [("%s - British male" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("bm_")])
 
 
 def microphone_choices(lister=None):

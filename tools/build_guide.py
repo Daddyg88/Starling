@@ -127,7 +127,7 @@ EXTRA = [
          ('Type the next waypoint into the galaxy map for you', ['Plot the next waypoint']),
          ('Start the route again from here', ['Plot it again', 'Recalculate the route']),
          ('Cancel it', ['Cancel the route']),
-         ('Spansh does not know where you are', ['I am lost', 'Emergency protocol']),
+         ('Lost? A normal course to the nearest point of interest', ['I am lost', 'Emergency protocol', 'Take me to the nearest point of interest']),
          ('Save a place', ['Save this system as bookmark one', 'Set home to here', 'Save this system as my carrier']),
          ('Go to a saved place or your carrier', ['Plot a route to home', 'Take us to my carrier', 'Plot a route to bookmark three']),
          ('Nearest Deep Space Support carrier', ['Plot me a route to the nearest DSSA', 'Plot a route to the nearest DSSA in the Norma Expanse']),

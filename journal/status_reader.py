@@ -167,8 +167,10 @@ class StatusReader:
         came_from_nomad = self._vehicle == "Nomad" or (self._vehicle == "other vehicle" and self.processor.state.in_nomad)
         if vehicle == "main ship" and came_from_nomad and not baseline_only and not initial:
             self._announce("NomadDocked", status)             # the Nomad came home: the app puts the hardpoints away
-        if vehicle == "main ship":
-            self.processor.state.in_nomad = False   # back aboard: the Nomad is stowed
+        if vehicle == "main ship" and (came_from_nomad or not self.processor.state.in_nomad or baseline_only or initial):
+            # back aboard: the Nomad is stowed. (Not while Status.json still shows the OLD main-ship reading for a moment right
+            # after LaunchVessel: it lags the journal, and clearing it then made the Nomad look like an SRV with hardpoints out.)
+            self.processor.state.in_nomad = False
 
         # Flags are all zero in menus. Nothing to say, and the next real
         # reading must be treated as a fresh start.
