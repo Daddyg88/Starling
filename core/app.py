@@ -404,6 +404,13 @@ class App:
             except Exception:
                 self.log.exception("The biology overlay voice command could not start")
             try:
+                from control.route_map_voice import RouteMapVoice
+                from navigation.voice import Narrator
+                self.commands.extra_helpers.append(RouteMapVoice(
+                    lambda: self.state, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
+            except Exception:
+                self.log.exception("The route map voice command could not start")
+            try:
                 from stt.training import VoiceTrainer, load_phrases
                 self.trainer = VoiceTrainer(load_phrases(), self.learning, self.commands._speak, self.settings)
                 self.commands.trainer = self.trainer

@@ -129,8 +129,13 @@ class Spansh:
         for row in rows:
             if not isinstance(row, dict) or not row.get("system"):
                 continue
-            out.append({"system": str(row["system"]), "neutron": bool(row.get("neutron_star")),
-                        "jumps": int(row.get("jumps") or 0), "distance_left": float(row.get("distance_left") or 0)})
+            waypoint = {"system": str(row["system"]), "neutron": bool(row.get("neutron_star")),
+                        "jumps": int(row.get("jumps") or 0), "distance_left": float(row.get("distance_left") or 0)}
+            try:                                  # where the star is, for the route map (older answers may not have it)
+                waypoint["x"], waypoint["y"], waypoint["z"] = float(row["x"]), float(row["y"]), float(row["z"])
+            except (KeyError, TypeError, ValueError):
+                pass
+            out.append(waypoint)
         if not out:
             raise SpanshError("Spansh found no route.")
         return out

@@ -90,6 +90,12 @@ class Dashboard:
         except Exception:
             log.exception("The biology overlay could not start")
             self.bio_overlay = None
+        try:
+            from ui.route_overlay import RouteOverlay
+            self.route_overlay = RouteOverlay(self.root, app.settings, lambda: app.state, lambda: app.route_follower)
+        except Exception:
+            log.exception("The route map could not start")
+            self.route_overlay = None
         self.root.bind("<Configure>", self._window_moved, add="+")
         self.root.after(300, self._set_window_icon)
         self.show("home" if app.settings.get("app.first_run_done", False) else "setup")      # first time: the checklist
@@ -778,7 +784,8 @@ class Dashboard:
         if page.id == "navigation":
             extra += [("Plot neutron route to my destination", lambda: self.nav_plot(use_entry=False)),
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
-                      ("Clear the route", self.nav_clear)]
+                      ("Clear the route", self.nav_clear),
+                      ("Show a test route map for 10 seconds", self.test_route_overlay)]
         if page.id == "listening":
             extra += [("Learn push-to-talk button", self.learn_button)]
         if page.id == "developer":
@@ -1452,6 +1459,13 @@ class Dashboard:
             self.model.save()
         if getattr(self, "bio_overlay", None) is not None:
             self.bio_overlay.show_test(10)
+
+    def test_route_overlay(self):
+        """Shows a made-up Sol to Colonia route for 10 seconds, so you can check where the map sits (save settings first)."""
+        if self.model.dirty():
+            self.model.save()
+        if getattr(self, "route_overlay", None) is not None:
+            self.route_overlay.show_test(10)
 
     def close(self):
         if self.model.dirty():

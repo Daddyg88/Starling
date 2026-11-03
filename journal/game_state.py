@@ -65,5 +65,6 @@ class GameState:
     nsp_seen: set = field(default_factory=set)   # names of notable stellar phenomena she already told you about this session
     nsp_system: object = None        # the system she last said "there is an NSP here" in
     pending_events: list = field(default_factory=list)   # (name, data) she should announce after this journal line
+    route_map_hidden: bool = False          # "hide the route map" (the overlay on the right of the screen)
     gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     status_seen: bool = False               # True once Status.json has been read

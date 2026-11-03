@@ -1206,3 +1206,13 @@ The checklist (ui/setup_check.py) has a new optional item `training_item`, shown
 ## 0.77.25 - chat before guessed commands
 
 `Brain.recognises(text)` says whether a sentence is one of her chat intents. `CommandRunner._brain_owns` skips the matcher (and so its sound-alike guessing and learning) for such a sentence unless it is an exact or learned command. Test: tests/test_brain_owns.py.
+
+## 0.77.26 - Route map overlay
+
+A see-through window on the right of the screen (ui/route_overlay.py) draws the galaxy regions and the neutron route. All the drawing
+decisions are plain tested Python in navigation/galaxy_map.py (view fitting, region colours from navigation/region_data.py, route length vs
+straight line, regions crossed, a whole-galaxy inset). Spansh route rows now keep x, y, z; a route saved without them is looked up once in a
+background thread (at most 40 stars). Settings: overlay.route_map (route/always/off), route_size, route_right, route_top,
+route_cockpit_only. Voice: control/route_map_voice.py ("hide/show the route map"; the game's own "galaxy map" is left alone) with lines
+in voicepacks/default/routemap.json. Test button on the Navigation page. Not tested on a real screen: placement and the click-through
+window use the same code as the biology list.

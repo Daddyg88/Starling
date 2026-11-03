@@ -71,6 +71,8 @@ AFFECTION = [("Never", 0), ("After 100 million", 100000000), ("After 500 million
 from ui.screens import CHOICES as OVERLAY_SCREENS
 PERCENTS = [("%d%%" % v, v) for v in range(0, 96, 5)]
 OVERLAY_SIZES = [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]
+ROUTE_MAP_MODES = [("While I have a route (recommended)", "route"), ("Always", "always"), ("Never", "off")]
+EDGE_PERCENTS = [("%d%%" % v, v) for v in range(0, 41)]
 MINERAL_CHOICES = minerals.choices()      # every mineral, metal and ice you can mine (mining/minerals.py)
 MINING_CHATTER = [("Quiet (first of each, every 10 tonnes)", "quiet"), ("Normal (every 5 tonnes, a few cheers)", "normal"),
                   ("Chatty (every 3 tonnes, lots of cheers)", "chatty")]
@@ -370,6 +372,16 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="She runs the galaxy map macro by herself after a route is made and after each supercharge. "
                        "You can always say 'plot the next waypoint'. Needs the keys in Elite's controls (see the guide)"),
             Field("neutron.announce", "She tells me the next waypoint", "toggle"),
+            Field("overlay.route_map", "Route map on screen", "choice", ROUTE_MAP_MODES,
+                  help="A see-through map on the right of the screen: the galaxy regions, your neutron route (cyan = still to fly, yellow dots = neutron stars, red ring = the destination), "
+                       "where you are, and how straight the route is. Say 'hide the route map' or 'show the route map'. Elite must be in Borderless or Windowed mode"),
+            Field("overlay.route_size", "Route map: size", "choice", OVERLAY_SIZES),
+            Field("overlay.route_right", "Route map: distance from the right of the screen", "choice", EDGE_PERCENTS,
+                  help="Percent of the screen width"),
+            Field("overlay.route_top", "Route map: distance from the top of the screen", "choice", EDGE_PERCENTS,
+                  help="Percent of the screen height"),
+            Field("overlay.route_cockpit_only", "Route map: hide while a game screen is open", "toggle",
+                  help="On = it steps out of the way when the galaxy map, a station menu or any other screen is open"),
         ]),
         Page("memory", "Memory", "What she remembers about you and your trips. It is kept only on this computer, in data/tetko.db.", [
             Field("memory.enabled", "She remembers milestones", "toggle",

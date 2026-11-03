@@ -1,0 +1,12 @@
+{
+ "RouteMap_Hidden": [
+  "Route map hidden.",
+  "Done, the route map is gone.",
+  "Hidden. I'm still following the route."
+ ],
+ "RouteMap_Shown": [
+  "Route map is back.",
+  "There it is.",
+  "Showing the route map."
+ ]
+}

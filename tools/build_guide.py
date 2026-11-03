@@ -201,7 +201,8 @@ EXTRA = [
         ('Start the training', ['Teach me your voice']),
         ('During the training', ['Skip', 'Stop']),
         ('Save what she heard to a file', ['Hearing report']),
-        ('Biology overlay', ['Hide the biology overlay', 'Show the biology overlay'])]),
+        ('Biology overlay', ['Hide the biology overlay', 'Show the biology overlay']),
+        ('Route map overlay', ['Hide the route map', 'Show the route map'])]),
 ]
 for gid, title, intro, rows in EXTRA:
     sections.append((gid, title, intro, simple(rows)))
