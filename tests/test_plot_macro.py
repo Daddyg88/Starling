@@ -111,6 +111,32 @@ class RunMacro(unittest.TestCase):
         self.assertEqual([h for _, h in self.rec.events if h], [0.2, 1.2])  # zoom in briefly, then hold select
         self.assertEqual(self.parts["copied"][-1], "Neutron A")             # the clipboard was filled first
 
+    def test_you_asking_is_answered_but_her_own_auto_plot_is_silent(self):
+        r = self.runner()
+        r.run_text("plot the next waypoint")
+        self.assertTrue(r.speech.said)
+        r = self.runner()
+        outcome = r.run_text("plot the next waypoint", speak_unknown=False, auto=True)[0]
+        self.assertEqual(outcome.status, "done")
+        self.assertEqual(r.speech.said, [])
+
+    def test_auto_plot_still_speaks_when_it_fails(self):
+        r = self.runner()
+        self.parts["follower"].clear()
+        r.run_text("plot the next waypoint", speak_unknown=False, auto=True)
+        self.assertTrue(r.speech.said)
+
+    def test_auto_plot_mutes_the_nav_route_line(self):
+        from control.echo import Echo
+        r = self.runner()
+        r.echo = Echo()
+        r.run_text("plot the next waypoint", speak_unknown=False, auto=True)
+        self.assertIn("NavRoute", r.echo._muted)
+        r = self.runner()
+        r.echo = Echo()
+        r.run_text("plot the next waypoint")
+        self.assertNotIn("NavRoute", r.echo._muted)
+
     def test_open_galaxy_map_is_not_toggled_closed(self):
         r = self.runner()
         r.state_provider = lambda: type("S", (), {"status_seen": True, "gui_focus": 6, "status_flags": 0, "status_flags2": 0})()
@@ -357,3 +383,23 @@ class VoidCompassNoClashTests(unittest.TestCase):
             found = m.match(text)
             self.assertIsNotNone(found, text)
             self.assertNotIn(found.command.id, overlay_ids, text)
+
+
+class DssaRouteReady(unittest.TestCase):
+    def test_route_ready_names_the_carrier(self):
+        p = RouteFollowerHolder.build()
+        voice = p["voice"]
+        voice._route_note = {"carrier": "Lucky Star", "system": "Cloomeia FG-Y e95"}
+        voice._busy = True
+        voice._plot_now("Colonia")
+        keys = [k for k, _f in p["narr"].said]
+        self.assertIn("RouteReadyDssa", keys)
+        fields = [f for k, f in p["narr"].said if k == "RouteReadyDssa"][0]
+        self.assertEqual(fields["carrier"], "Lucky Star")
+        self.assertIsNone(voice._route_note)
+
+    def test_an_ordinary_route_is_unchanged(self):
+        p = RouteFollowerHolder.build()
+        p["voice"]._busy = True
+        p["voice"]._plot_now("Colonia")
+        self.assertIn("RouteReady", [k for k, _f in p["narr"].said])

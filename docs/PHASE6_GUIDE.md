@@ -1194,3 +1194,10 @@ The checklist (ui/setup_check.py) has a new optional item `training_item`, shown
 ## 0.77.23 - Clipboard fix
 
 `navigation/route.py copy_to_clipboard`: clip.exe now gets stdout/stderr = DEVNULL (a process without a console has no stderr to inherit, which gave WinError 50); on failure `_copy_with_ctypes` sets the clipboard through user32/kernel32. The ctypes path is untested on real Windows.
+
+
+## 0.77.24 - Quieter auto-plot, DSSA naming, tidier log
+
+- `CommandRunner.run_text(..., auto=True)` (used by core/app.py `_connect_auto_plot`): successes are not spoken and the `NavRoute` event is muted for 40 s; failures are still spoken.
+- `navigation/voice.py`: a DSSA request sets `_route_note`; `_plot_now` then says `RouteReadyDssa` (voicepacks/default/route.json) naming the carrier, because the earlier `DssaFar` line can be dropped by the speech queue (3 waiting at most).
+- `stt/listener.py`: `is_garbage` ignores one-sound repeats; sentences without the wake word are logged at DEBUG only unless `stt.log_everything` is true.

@@ -35,6 +35,15 @@ SELF_ECHO_SECONDS = 8.0 # a sentence that matches what she just said is her own 
 SELF_ECHO_RATIO = 0.85
 
 
+def is_garbage(text):
+    """Whisper sometimes 'hears' one sound over and over (P-P-P-P-P...). That is never a sentence."""
+    words = re.findall(r"[a-z0-9']+", str(text or "").lower())
+    if len(words) >= 8 and len(set(words)) <= 2:
+        return True
+    letters = re.sub(r"[^a-z]", "", str(text or "").lower())
+    return len(letters) >= 12 and len(set(letters)) <= 2
+
+
 class Listener:
     def __init__(self, bus, stt, settings, mic_factory, clock=time.monotonic, gate=None):
         self.bus = bus
@@ -184,9 +193,15 @@ class Listener:
         if self._is_her_own_voice(text):
             log.debug("Ignored her own voice: %r", text)
             return
+        if is_garbage(text):
+            log.debug("Ignored a garbled transcription: %.40r", text)
+            return
         wake, command = parse_wake(text, wake_phrase(self.settings))
         self.heard_count += 1
-        log.info("Heard: %r (wake=%s)", text, wake)
+        if wake or ptt or self.settings.get("stt.log_everything", False):
+            log.info("Heard: %r (wake=%s)", text, wake)
+        else:
+            log.debug("Heard (no wake word, %d words)", len(text.split()))
         if self.interceptor is not None:
             try:
                 if self.interceptor(text, wake, command, bool(ptt)):

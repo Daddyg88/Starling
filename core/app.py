@@ -477,7 +477,7 @@ class App:
         import threading
 
         def go():
-            threading.Thread(target=lambda: runner.run_text("plot the next waypoint", speak_unknown=False),
+            threading.Thread(target=lambda: runner.run_text("plot the next waypoint", speak_unknown=False, auto=True),
                              name="auto-plot", daemon=True).start()
         follower.auto_plot = go
 

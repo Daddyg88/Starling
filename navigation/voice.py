@@ -196,6 +196,7 @@ class RouteVoice:
         self.state_provider = state_provider
         self.spawn = spawn or self._thread
         self._busy = False
+        self._route_note = None            # set by a DSSA request: the carrier the route is for, so the 'route ready' line can name it
         self.target_override = None
         self.sleep = time.sleep
         self.clock = time.monotonic
@@ -499,6 +500,7 @@ class RouteVoice:
                 return
             self._busy = True
             self.narrator.say("DssaFar", fields)
+            self._route_note = fields
             self._plot_now(carrier["system"])         # clears the busy flag itself
         except Exception:
             self._busy = False
@@ -737,9 +739,14 @@ class RouteVoice:
                 self.narrator.say("RouteArrived", {"destination": target})
                 return
             self.follower.copy_next()
-            self.narrator.say("RouteReady", self.follower.fields())
+            note, self._route_note = self._route_note, None
+            if note:                            # she was asked for a DSSA carrier: say which one (the first line may have been dropped)
+                self.narrator.say("RouteReadyDssa", {**self.follower.fields(), "carrier": note["carrier"], "system": note["system"]})
+            else:
+                self.narrator.say("RouteReady", self.follower.fields())
             self.follower.maybe_auto_plot()
         except SpanshError as error:
+            self._route_note = None
             if self._spansh_does_not_know(here) and self.settings.get("neutron.emergency", True):
                 self.emergency(name)
             else:

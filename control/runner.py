@@ -208,10 +208,15 @@ class CommandRunner:
             log.exception("The chat window failed")
 
     # ---- doing ----
-    def run_text(self, text, speak_unknown=True, speak=True):
-        """Understand and carry out a sentence. Returns the list of Outcomes."""
+    def run_text(self, text, speak_unknown=True, speak=True, auto=False):
+        """Understand and carry out a sentence. Returns the list of Outcomes.
+        auto=True is for things she does by herself (the hands-free route plotting): she only speaks if it goes wrong."""
         started = self.clock()
-        outcomes = self._run_text(text, speak_unknown, speak)
+        self.auto_run = bool(auto)
+        try:
+            outcomes = self._run_text(text, speak_unknown, speak)
+        finally:
+            self.auto_run = False
         took = self.clock() - started
         (log.info if took > 1.0 else log.debug)("Command %r took %.2f s", text, took)
         return outcomes
@@ -434,6 +439,8 @@ class CommandRunner:
         if command.id == "show_off":                      # she opens and closes these herself: no "opening the galaxy map" chatter
             quiet = ("GalaxyMapOpened", "GalaxyMapClosed", "ScreenClosed", "InternalPanelOpened", "ExternalPanelOpened",
                      "CommsPanelOpened", "RolePanelOpened")
+        if getattr(self, "auto_run", False) and command.id == "plot_waypoint" and self.echo is not None:
+            self.echo.mute(("NavRoute",), 40)                # she set the course herself: no "Plotting a route" on top of the route lines
         if quiet and self.echo is not None:
             self.echo.mute(quiet, 300 if command.id == "show_off" else 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
         pressed = []
@@ -671,7 +678,7 @@ class CommandRunner:
         bad = [o for o in outcomes if o.status != "done"]
         if bad:
             outcome = bad[0]
-        elif not self.settings.get("commands.confirm", True):
+        elif not self.settings.get("commands.confirm", True) or getattr(self, "auto_run", False):
             return
         elif len(good) > 1:
             self._speak("CommandMulti", {"count": len(good)}, fallback="Done.")

@@ -26,7 +26,7 @@ DEFAULTS = {
             "clone_reference": "voicepacks/default/clone/Tetko_Issued_Notice.mp3",
             "clone_pack": "custom_covas.pt"},
     "stt": {"enabled": False, "provider": "faster_whisper", "model": "base.en", "microphone": "",
-            "wake_phrase": "", "require_wake": True, "reply": True, "energy_threshold": 0, "learning": True, "end_silence_ms": 550},
+            "wake_phrase": "", "require_wake": True, "reply": True, "energy_threshold": 0, "learning": True, "end_silence_ms": 550, "log_everything": False},
     "facts": {"frequency": "sometimes", "topics": "all"},
     "ask": {"scan_prompts": True, "bio_prompts": True, "answer_seconds": 10},
     "plans": {"ask": True},

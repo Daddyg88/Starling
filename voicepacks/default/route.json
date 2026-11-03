@@ -157,5 +157,9 @@
  ],
  "RouteNeedNumber_Close": [
   "Which {destination}, love? Give me the number and I'll plot it straight away."
+ ],
+ "RouteReadyDssa": [
+  "Route ready to the DSSA carrier {carrier} in {system}. {left} jumps in total with {stops} neutron stops. First waypoint is {next}. {count}{clip}",
+  "That's the way to {carrier} in {system}: {left} jumps, {stops} neutron stops. Head for {next} first. {count}{clip}"
  ]
 }
