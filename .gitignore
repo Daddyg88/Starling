@@ -9,3 +9,4 @@ dist/
 build/
 updates/
 *.previous
+site/
