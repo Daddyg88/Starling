@@ -114,6 +114,12 @@ class Brain:
         """True while she is waiting for a riddle answer (so a guess works without her name)."""
         return self.riddle is not None and self.clock() - self.riddle[2] < RIDDLE_SECONDS
 
+    def recognises(self, text):
+        """True if the sentence is one of her chat or question intents ("tell me more", "why", "where are we"). Used so a game
+        command guessed from a sound-alike ("tell me more" -> "tool mode") never wins over something she can simply answer."""
+        tidy = strip_address(clean(text))
+        return bool(tidy) and any(pattern.search(tidy) for _item, patterns in self.intents for pattern in patterns)
+
     def try_handle(self, text, deliberate=True):
         """Answer. Returns what she said, or None when this wasn't something she can answer."""
         if self.dialogue is None or not self.settings.get("brain.enabled", True):

@@ -235,7 +235,7 @@ class CommandRunner:
                 self._finish([outcome], False, text)
                 return [outcome]
         matches = []
-        single = self.matcher.match(text)
+        single = None if self._brain_owns(text) else self.matcher.match(text)
         if single is not None:
             matches = [single]
         else:
@@ -271,6 +271,24 @@ class CommandRunner:
             outcomes.append(self.execute(match, text))
         self._finish(outcomes, speak, text)
         return outcomes
+
+    def _brain_owns(self, text):
+        """A sentence that is NOT an exact command but IS one of her chat intents goes to her brain, not to a guessed command.
+        (Found in a log review: 'tell me more' was being matched, by sound, to the on-foot 'tool mode' key.)"""
+        brain = self.brain
+        if brain is None or not hasattr(brain, "recognises"):
+            return False
+        clean = normalise(text)
+        if not clean or clean in self.matcher.index:
+            return False
+        learning = getattr(self.matcher, "learning", None)
+        try:
+            if learning is not None and learning.learned(clean) in self.matcher.index:
+                return False
+            return bool(brain.recognises(text))
+        except Exception:
+            log.exception("The brain check failed")
+            return False
 
     def current_state(self, command):
         """True / False if Status.json says whether it is on right now, None if unknown."""
