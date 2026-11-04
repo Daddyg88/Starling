@@ -152,11 +152,17 @@ class ExoMoodTests(SwingTests):
         e = self.make(mood_start=5)
         score = e.score
         e.on_event(Ev("SellOrganicData", {"TotalValue": 500_000_000}))
-        self.assertAlmostEqual(e.score - score, 34 * e.scale, delta=1.0)    # the whole tier, not cut by the hourly cap
+        self.assertAlmostEqual(e.score - score, 40 * e.scale, delta=1.0)    # the whole tier, not cut by the hourly cap
         self.assertFalse(e.swing_active())                                   # no short-lived swing that fades away
         score = e.score
         e.on_event(Ev("SellOrganicData", {"TotalValue": 500_000_000}))       # and no soft cap on a second one
-        self.assertAlmostEqual(e.score - score, 34 * e.scale, delta=1.0)
+        self.assertAlmostEqual(e.score - score, 40 * e.scale, delta=1.0)
+
+    def test_a_two_billion_sale_is_huge(self):
+        e = self.make(mood_start=0)
+        e.on_event(Ev("SellOrganicData", {"TotalValue": 2_100_000_000}))
+        self.assertGreaterEqual(e.score, 75 * e.scale - 1)
+        self.assertEqual(e.band, "Infatuated")
 
     def test_every_exo_tier_is_higher_than_before(self):
         rule = next(r for r in mood_engine.load_rules()[1] if r["id"] == "sell_exo")
@@ -164,7 +170,7 @@ class ExoMoodTests(SwingTests):
         for minimum, points in old:
             mine = max(p for m, p in rule["tiers"] if m <= minimum)
             self.assertGreaterEqual(mine, points)
-        self.assertGreater(max(p for _m, p in rule["tiers"]), 30)
+        self.assertGreaterEqual(max(p for _m, p in rule["tiers"]), 100)
 
     def test_dying_with_lots_of_exo_is_very_upset_then_back_to_where_she_was(self):
         e = self.make(mood_start=20)
