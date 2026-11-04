@@ -145,3 +145,50 @@ class LoginTests(unittest.TestCase):
         known = set(DialogueManager(paths.VOICEPACKS_DIR / "default").load().lines)
         for s in mood_engine.load_swings():
             self.assertIn(s["still"], known)
+
+
+class ExoMoodTests(SwingTests):
+    def test_big_exo_sale_is_a_lasting_full_amount_gain(self):
+        e = self.make(mood_start=5)
+        score = e.score
+        e.on_event(Ev("SellOrganicData", {"TotalValue": 500_000_000}))
+        self.assertAlmostEqual(e.score - score, 34 * e.scale, delta=1.0)    # the whole tier, not cut by the hourly cap
+        self.assertFalse(e.swing_active())                                   # no short-lived swing that fades away
+        score = e.score
+        e.on_event(Ev("SellOrganicData", {"TotalValue": 500_000_000}))       # and no soft cap on a second one
+        self.assertAlmostEqual(e.score - score, 34 * e.scale, delta=1.0)
+
+    def test_every_exo_tier_is_higher_than_before(self):
+        rule = next(r for r in mood_engine.load_rules()[1] if r["id"] == "sell_exo")
+        old = [[100000, 1], [1000000, 2], [10000000, 3], [100000000, 4]]
+        for minimum, points in old:
+            mine = max(p for m, p in rule["tiers"] if m <= minimum)
+            self.assertGreaterEqual(mine, points)
+        self.assertGreater(max(p for _m, p in rule["tiers"]), 30)
+
+    def test_dying_with_lots_of_exo_is_very_upset_then_back_to_where_she_was(self):
+        e = self.make(mood_start=20)
+        carried = [30_000_000]
+        e.exo_provider = lambda: carried[0]
+        e.on_event(Ev("Scan", {"BodyName": "x"}))                  # she notices what you carry
+        score = e.score
+        carried[0] = 0                                             # the tracker empties on death
+        e.on_event(Ev("Died", {"KillerName": "x"}))
+        self.assertEqual(self.settings.get("personality.mood_live"), "Upset")
+        self.assertEqual(e._shown_level(), 1)                      # very upset
+        self.assertEqual(e.score, score)                           # nothing permanent lost
+        self.clock.t += 9 * 60
+        e.check_swing()
+        self.assertEqual(self.settings.get("personality.mood_live"), "Upset")   # longer than an ordinary death
+        self.clock.t += 61
+        self.assertTrue(e.check_swing())
+        self.assertEqual(self.settings.get("personality.mood_live"), "Friendly")
+        self.assertEqual(e.score, score)
+        self.assertTrue(any("exobiology" in t.lower() or "samples" in t.lower() or "data" in t.lower() for t in self.spoken), self.spoken)
+
+    def test_dying_with_little_exo_is_the_ordinary_death(self):
+        e = self.make(mood_start=20)
+        e.exo_provider = lambda: 1_000_000
+        e.on_event(Ev("Died", {"KillerName": "x"}))
+        self.clock.t += 5 * 60 + 1
+        self.assertTrue(e.check_swing())                           # the ordinary five minutes

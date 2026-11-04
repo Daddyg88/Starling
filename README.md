@@ -34,6 +34,8 @@ Just want to play? Read `docs/START_HERE.md` (plain words, no computer skills ne
 | `logs/` | STARLING's diary and error reports |
 | `tests/` | Automatic checks |
 See docs/UPDATING.md for how to update without losing settings.
+New in 0.79.2: BIG EXOBIOLOGY SALES LAST, AND DYING WITH A FORTUNE OF IT HURTS. Selling exobiology data now raises her mood by the whole amount, with no soft cap or hourly cap, and every tier is higher (a 500 million sale is worth a big jump; there is a new 1 billion tier). The short-lived 'Close' swing after a huge bio sale is gone, so it no longer feels like a cooldown that takes the level away again. If you die carrying 10 million or more of unsold exobiology she is very upset for 10 minutes and says so, then goes back to exactly the mood and level she had (no points lost, and the usual lost-data penalty is skipped). All of this is in config/mood_rules.json.
+
 New in 0.79.1: CHANGE LOG ON THE WEBSITE. The guide now ends with a change log built from these notes, newest first. Plus a small private surprise for the Commander.
 
 New in 0.79.0: YOUTUBE CHAT, BETTER EXOBIOLOGY GUESSES, LOGO. The Streaming page now also reads your YouTube live chat (you paste a free YouTube API key and the link of your live stream; it only reads, and ignores anything said before she connected). Twitch and YouTube can run together. The species rules were checked against a large set of real scans and a few High Metal Content and argon-rich fits were added, so fewer real species are missed. The Starling logo is on the website.

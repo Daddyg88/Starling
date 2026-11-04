@@ -1,5 +1,5 @@
 {
-  "_help": "Numbers in settings are base units; the real score is multiplied by scale (5), so each mood is split into 5 levels and she takes 5 times longer to max out. What makes Starling's mood go up or down. Edit freely. Each rule: event = the game event, delta = points (+ better mood, - worse), category = the group used for the soft cap (repeating the same category gives less and less), react = a line she says (key in personality.json), when = an optional condition. Only the FIRST matching rule for an event is used. Conditions: {field, equals|contains|is|gt|lt|in}, {any:[...]}, {all:[...]}, {ctx:'not_in_combat'}. Tiers: amount_field + tiers [[minimum, points], ...].",
+  "_help": "A rule with \"lasting\": true is applied in full, with no soft cap and no hourly cap. Numbers in settings are base units; the real score is multiplied by scale (5), so each mood is split into 5 levels and she takes 5 times longer to max out. What makes Starling's mood go up or down. Edit freely. Each rule: event = the game event, delta = points (+ better mood, - worse), category = the group used for the soft cap (repeating the same category gives less and less), react = a line she says (key in personality.json), when = an optional condition. Only the FIRST matching rule for an event is used. Conditions: {field, equals|contains|is|gt|lt|in}, {any:[...]}, {all:[...]}, {ctx:'not_in_combat'}. Tiers: amount_field + tiers [[minimum, points], ...].",
 
   "settings": {"start_score": 0, "close_at": 30, "friendly_at": 10, "sarcastic_at": -10, "frustrated_at": -35, "infatuated_at": 60, "upset_at": -60, "hysteresis": 4, "scale": 5, "hourly_cap": 15, "fatigue_factor": 0.6, "recovery_minutes": 10, "calm_minutes_per_point": 20, "offline_calm_hours": 0, "react_cooldown_seconds": 90, "react_min_effect": 0.9, "time_together_minutes": 25, "combat_grace_seconds": 45, "notoriety_points_per_hour": 6, "notoriety_floor": -25},
 
@@ -21,12 +21,13 @@
     {"id": "heat_damage", "label": "Cooking the ship", "event": "HeatDamage", "delta": -2, "category": "careless"},
     {"id": "jet_cone", "label": "Jet cone damage", "event": "JetConeDamage", "delta": -2, "category": "careless"},
     {"id": "low_fuel", "label": "Running low on fuel", "event": "LowFuel", "delta": -1, "category": "careless"},
+    {"id": "died_with_exo", "label": "Died carrying lots of unsold exobiology (very upset for a while, then back to how she was: no points lost)", "event": "Died", "delta": 0, "category": "death", "when": {"field": "ExoCarried", "gt": 10000000}},
     {"id": "died_combat", "label": "Destroyed in a fight (no penalty)", "event": "Died", "delta": 0, "category": "death", "when": {"any": [{"ctx": "in_combat"}, {"field": "KillerName", "exists": true}, {"field": "Killers", "exists": true}]}},
     {"id": "died", "label": "Getting the ship destroyed", "event": "Died", "delta": -1, "category": "death"},
     {"id": "self_destruct", "label": "Self-destruct", "event": "SelfDestruct", "delta": -3, "category": "death"},
     {"id": "mission_failed", "label": "Failing a mission", "event": "MissionFailed", "delta": -3, "category": "missions_bad"},
     {"id": "mission_abandoned", "label": "Abandoning a mission", "event": "MissionAbandoned", "delta": -2, "category": "missions_bad"},
-    {"id": "sell_exo", "label": "Selling exobiology data", "event": "SellOrganicData", "category": "sell_exo", "react": "React_GoodSale", "amount_field": "TotalValue", "tiers": [[100000, 1], [1000000, 2], [10000000, 3], [100000000, 4]]},
+    {"id": "sell_exo", "label": "Selling exobiology data (the whole amount stays)", "event": "SellOrganicData", "category": "sell_exo", "lasting": true, "react": "React_GoodSale", "amount_field": "TotalValue", "tiers": [[100000, 1], [1000000, 3], [10000000, 6], [50000000, 10], [100000000, 16], [250000000, 24], [500000000, 34], [1000000000, 45]]},
     {"id": "sell_data", "label": "Selling exploration data", "event": "SellExplorationData", "category": "sell_data", "react": "React_GoodSale", "amount_field": "TotalEarnings", "tiers": [[100000, 1], [1000000, 2], [10000000, 3], [50000000, 4]]},
     {"id": "sell_data_multi", "label": "Selling exploration data", "event": "MultiSellExplorationData", "category": "sell_data", "react": "React_GoodSale", "amount_field": "TotalEarnings", "tiers": [[100000, 1], [1000000, 2], [10000000, 3], [50000000, 4]]},
     {"id": "mission_done", "label": "Completing a mission", "event": "MissionCompleted", "delta": 2, "category": "missions_good", "react": "React_MissionDone"},
@@ -72,9 +73,10 @@
     {"id": "fuel_panic", "label": "Nearly out of fuel", "event": "FuelPanic", "delta": -2, "category": "careless"}
   ],
 
-  "_swings_help": "Mood swings: when the event (and the optional 'when') happens, she shows this mood for 'minutes' WITHOUT changing the score, then says the 'forgive' line and goes back to the mood she was really in.",
+  "_swings_help": "A swing can have \"level\" (1 = deepest) and \"announce\" (a line she says as it starts). Mood swings: when the event (and the optional 'when') happens, she shows this mood for 'minutes' WITHOUT changing the score, then says the 'forgive' line and goes back to the mood she was really in.",
 
   "swings": [
+    {"id": "died_exo", "label": "You died with a fortune of exobiology on board", "event": "Died", "when": {"field": "ExoCarried", "gt": 10000000}, "mood": "Upset", "level": 1, "minutes": 10, "announce": "Upset_DiedExo", "forgive": "Forgive_DiedExo", "still": "Still_DiedExo"},
     {"id": "died", "label": "You died", "event": "Died", "mood": "Upset", "minutes": 5, "forgive": "Forgive_Died", "still": "Still_Died"},
     {"id": "self_destruct", "label": "You blew yourself up", "event": "SelfDestruct", "mood": "Frustrated", "minutes": 3, "forgive": "Forgive_General", "still": "Still_General"},
     {"id": "murder", "label": "Killing civilians", "event": "CommitCrime", "when": {"field": "CrimeType", "equals": "murder"}, "mood": "Frustrated", "minutes": 5, "forgive": "Forgive_General", "still": "Still_General"},
@@ -82,7 +84,6 @@
     {"id": "big_trade_loss", "label": "A heavy loss on a sale", "event": "MarketSell", "when": {"field": "Loss", "gt": 199999}, "mood": "Sarcastic", "minutes": 3, "forgive": "Forgive_General", "still": "Still_General"},
     {"id": "canopy", "label": "Canopy broken", "event": "CockpitBreached", "mood": "Frustrated", "minutes": 2, "forgive": "Forgive_General", "still": "Still_General"},
     {"id": "big_bounty", "label": "A huge bounty", "event": "Bounty", "when": {"field": "TotalReward", "gt": 1999999}, "mood": "Infatuated", "minutes": 3, "forgive": "SwingEnd_Good", "still": "Still_Good"},
-    {"id": "big_data_sale", "label": "A very big data sale", "event": "SellExplorationData", "when": {"field": "TotalEarnings", "gt": 9999999}, "mood": "Close", "minutes": 5, "forgive": "SwingEnd_Good", "still": "Still_Good"},
-    {"id": "big_bio_sale", "label": "A very big biology sale", "event": "SellOrganicData", "when": {"field": "TotalEarnings", "gt": 9999999}, "mood": "Close", "minutes": 5, "forgive": "SwingEnd_Good", "still": "Still_Good"}
+    {"id": "big_data_sale", "label": "A very big data sale", "event": "SellExplorationData", "when": {"field": "TotalEarnings", "gt": 9999999}, "mood": "Close", "minutes": 5, "forgive": "SwingEnd_Good", "still": "Still_Good"}
   ]
 }

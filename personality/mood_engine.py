@@ -179,6 +179,8 @@ class MoodEngine:
         self.settings = settings
         self.options, self.rules = load_rules(rules_path)
         self.swings = load_swings(rules_path)
+        self.exo_provider = None            # () -> credits of unsold exobiology on board (set by the app)
+        self._exo_seen = 0
         self._swing = None                 # {"mood", "until", "forgive", "label"} while she is in a temporary mood
         self._swing_lock = threading.Lock()
         self._unsold = 0                   # exploration / biology work done since the last sale: lost if you die
@@ -348,7 +350,8 @@ class MoodEngine:
                 swing = saved.get("swing")
                 if isinstance(swing, dict) and swing.get("mood") in BANDS and float(swing.get("until", 0)) > self.clock():
                     self._swing = {"mood": swing["mood"], "until": float(swing["until"]), "forgive": str(swing.get("forgive", "")),
-                                   "still": str(swing.get("still", "")), "label": str(swing.get("label", ""))}
+                                   "still": str(swing.get("still", "")), "label": str(swing.get("label", "")),
+                                   "level": swing.get("level")}
                 hours = max(0.0, float(self.options.get("offline_calm_hours", 0) or 0))
                 away = max(0.0, min(self.clock() - float(saved.get("saved_at", self.clock())), hours * 3600.0))
                 if away:
@@ -501,7 +504,7 @@ class MoodEngine:
         return swing["mood"] if swing else self.band
 
     def _shown_level(self):
-        return self.SWING_LEVEL if self._swing else self.level
+        return int(self._swing.get("level") or self.SWING_LEVEL) if self._swing else self.level
 
     def swing_still_key(self):
         """Dialogue key for 'I am still upset with you...' while a swing lasts (used by the login greeting), else ''."""
@@ -519,12 +522,17 @@ class MoodEngine:
             if current and BANDS.index(current["mood"]) < BANDS.index(mood) <= BANDS.index("Neutral") and current["until"] > now:
                 current["until"] = max(current["until"], until)          # already in a worse mood: only stay in it longer
             else:
-                self._swing = {"mood": mood, "until": until, "forgive": swing.get("forgive", ""), "still": swing.get("still", ""), "label": swing.get("label", swing.get("id", ""))}
+                self._swing = {"mood": mood, "until": until, "forgive": swing.get("forgive", ""), "still": swing.get("still", ""), "label": swing.get("label", swing.get("id", "")),
+                               "level": swing.get("level")}
         self.history.appendleft((datetime.fromtimestamp(now).strftime("%H:%M"), "Mood swing: %s for %g min (%s)" % (
             mood, swing["minutes"], swing.get("label", swing.get("id", ""))), 0.0))
         self._dirty = True
         self._publish_live()
         log.info("Mood swing: %s for %g minutes (%s)", mood, swing["minutes"], swing.get("id"))
+        if swing.get("announce") and self._can_speak():
+            text = self._line(swing["announce"], effective_mood(self.settings))
+            if text:
+                self.speak(text)
 
     def check_swing(self, now=None):
         """Ends her temporary mood when its time is up: she says the forgiving line and returns to her real mood. Safe to call often."""
@@ -592,6 +600,13 @@ class MoodEngine:
     def _handle(self, event):
         now = self.clock()
         name, data = event.name, event.data or {}
+        exo_lost = False
+        if name == "Died":
+            data = dict(data)
+            data["ExoCarried"] = max(self._exo_seen, self._exo_now())      # what she was carrying when it happened
+            exo_lost = any(r.get("id") == "died_with_exo" and matches(r.get("when"), data, {}) for r in self.rules)
+        else:
+            self._exo_seen = self._exo_now()
         self._track_context(name, data, now)
         self._maybe_time_together(now)
         self.refresh(now)                 # calming and notoriety use the time since the previous event
@@ -609,7 +624,10 @@ class MoodEngine:
             self._apply(rule, event, now)
             break                                    # only the first matching rule counts
         if name == "Died":
-            self._lose_data(now)
+            if exo_lost:
+                self._unsold = 0                         # carrying a fortune of exobiology: very upset, but no lasting loss
+            else:
+                self._lose_data(now)
         for swing in self.swings:
             if swing["event"] == name and matches(swing.get("when"), data, self._ctx_flags(now)):
                 self._start_swing(swing, now)
@@ -640,6 +658,13 @@ class MoodEngine:
         fake = type("Lost", (), {"name": "_data_lost", "data": {"Units": units}, "priority": "normal"})()
         self._last_react = None                 # this one is its own sentence, not part of the death reaction
         self._apply(rule, fake, now)
+
+    def _exo_now(self):
+        """Credits of unsold exobiology on board (0 when unknown)."""
+        try:
+            return int(self.exo_provider()) if self.exo_provider is not None else 0
+        except Exception:
+            return 0
 
     def _track_context(self, name, data, now):
         if name in self.UNSOLD_UNITS:
@@ -697,10 +722,11 @@ class MoodEngine:
             return
         category = rule.get("category") or rule.get("id") or "other"
         fatigue = self._fatigue_now(category, now)
-        effective = base * (float(self.options["fatigue_factor"]) ** fatigue)    # the soft cap
+        lasting = bool(rule.get("lasting"))               # a big win: the full amount, no soft cap and no hourly cap
+        effective = base if lasting else base * (float(self.options["fatigue_factor"]) ** fatigue)    # the soft cap
         self._fatigue[category] = (fatigue + 1.0, now)
         self.refresh(now)
-        applied = self._allowed(effective, now)                                  # the hourly cap
+        applied = effective if lasting else self._allowed(effective, now)       # the hourly cap
         if abs(applied) < 0.05:
             return
         self._window.append((now, applied))

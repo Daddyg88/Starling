@@ -71,5 +71,19 @@
   "I'm still buzzing from that last win, Commander.",
   "Still on a high from earlier. Don't mind me.",
   "I'm still smiling about that. Anyway, welcome back."
+ ],
+ "Upset_DiedExo": [
+  "All of that exobiology. Gone. Every last sample. I'm not talking to you for a while.",
+  "You died with all of that data on board? Do you know how long that took? I'm furious.",
+  "That was a fortune in samples, and you just threw it away. I'm too upset to speak."
+ ],
+ "Forgive_DiedExo": [
+  "Right. I've stopped being furious. We'll earn it back, together. I'm back to how I was.",
+  "I've calmed down. The samples are gone, but we're not. Shall we go again?",
+  "Okay, I forgive you. Just sell your data next time."
+ ],
+ "Still_DiedExo": [
+  "I'm still upset about all that lost exobiology.",
+  "Don't talk to me about the samples. Still sore."
  ]
 }

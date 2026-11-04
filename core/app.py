@@ -197,6 +197,7 @@ class App:
                                wanted_provider=lambda: bool(self.state and self.state.wanted),
                                speak=lambda text: self.speech.say(text=text, priority="normal", event_name="mood.react")
                                if self.speech is not None else None)
+        self.mood.exo_provider = lambda: self.state.exobiology.carried_total() if self.state and self.state.exobiology else 0
         self.mood.attach()
         self.mood.start_timer()                 # ends her temporary moods on time
         from personality.favourite_ship import FavouriteShip
