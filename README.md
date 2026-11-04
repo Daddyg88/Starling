@@ -34,6 +34,8 @@ Just want to play? Read `docs/START_HERE.md` (plain words, no computer skills ne
 | `logs/` | STARLING's diary and error reports |
 | `tests/` | Automatic checks |
 See docs/UPDATING.md for how to update without losing settings.
+New in 0.79.3: GUIDE BUTTON. Every page of the dashboard now has a WEBSITE GUIDE box at the top, next to the microphone box. Click it to open the guide in your browser (it hides itself if the window is too narrow to fit it).
+
 New in 0.79.2: BIG EXOBIOLOGY SALES LAST, AND DYING WITH A FORTUNE OF IT HURTS. Selling exobiology data now raises her mood by the whole amount, with no soft cap or hourly cap, and every tier is higher (a 500 million sale is a big jump, 1 billion more, and 2 billion or more can take her from neutral all the way to infatuated; the top tier is 5 billion). The short-lived 'Close' swing after a huge bio sale is gone, so it no longer feels like a cooldown that takes the level away again. If you die carrying 10 million or more of unsold exobiology she is very upset for 10 minutes and says so, then goes back to exactly the mood and level she had (no points lost, and the usual lost-data penalty is skipped). All of this is in config/mood_rules.json.
 
 New in 0.79.1: CHANGE LOG ON THE WEBSITE. The guide now ends with a change log built from these notes, newest first. Plus a small private surprise for the Commander.

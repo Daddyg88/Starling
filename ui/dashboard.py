@@ -16,7 +16,7 @@ from core.logger import get_logger
 from ui import portraits, setup_check, ship_pictures
 from ui import theme as T
 from ui.settings_model import SECTION_OF, SettingsModel
-from ui.status import EventFeed, collect_status, header_data, home_data
+from ui.status import EventFeed, GUIDE_URL, collect_status, guide_box, header_data, home_data
 
 log = get_logger("dashboard")
 
@@ -238,10 +238,27 @@ class Dashboard:
         # the microphone box: lit green while she is listening to you
         canvas.create_rectangle(right - 470, 22, right - 330, 56, outline=T.BORDER, width=2, tags="hdr_micbox")
         canvas.create_text(right - 400, 39, text="", tags="hdr_mic", anchor="center", fill=T.MUTED, font=(T.HEAD_FONT, T.SMALL_SIZE, "bold"))
+        box = guide_box(right)
+        if box is not None:                                            # a link to the website guide, on every page
+            canvas.create_rectangle(box[0], 22, box[1], 56, outline=T.ACCENT, width=2, tags="hdr_guidebox")
+            canvas.create_text((box[0] + box[1]) / 2, 39, text="\u2197  WEBSITE GUIDE", tags="hdr_guide", anchor="center", fill=T.ACCENT,
+                               font=(T.HEAD_FONT, T.SMALL_SIZE, "bold"))
+            for tag in ("hdr_guidebox", "hdr_guide"):
+                canvas.tag_bind(tag, "<Button-1>", lambda _e: self.open_guide())
+                canvas.tag_bind(tag, "<Enter>", lambda _e: (canvas.configure(cursor="hand2"), canvas.itemconfigure("hdr_guidebox", outline=T.TEXT)))
+                canvas.tag_bind(tag, "<Leave>", lambda _e: (canvas.configure(cursor=""), canvas.itemconfigure("hdr_guidebox", outline=T.ACCENT)))
         canvas.create_text(right, 26, text="", tags="hdr_time", anchor="e", fill=T.TEXT, font=(T.HEAD_FONT, T.BODY_SIZE - 1))
         canvas.create_text(right, 50, text="", tags="hdr_date", anchor="e", fill=T.MUTED, font=(T.HEAD_FONT, T.SMALL_SIZE))
         self._header_shown = {}
         self._update_header()
+
+    def open_guide(self):
+        """Opens the website guide in the browser."""
+        import webbrowser
+        try:
+            webbrowser.open(GUIDE_URL)
+        except Exception:
+            log.info("Could not open the browser for the guide")
 
     def _update_header(self):
         """Commander, system, time and game date at the top right. Only changed words are sent to the window."""

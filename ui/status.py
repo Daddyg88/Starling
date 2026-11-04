@@ -254,6 +254,18 @@ def mic_state(app):
     return "LISTENING", "good"
 
 
+GUIDE_URL = "https://daddyg88.github.io/Starling/"
+GUIDE_WIDTH, GUIDE_GAP, MIC_LEFT = 150, 20, 470       # the guide box sits just left of the microphone box
+GUIDE_NEEDS = 380                                      # ...and is left out when the window is too narrow (it would cover the page title)
+
+
+def guide_box(right):
+    """Where the 'Guide' box goes in the dashboard's top bar: (left, right) edges, or None when there is no room."""
+    far = right - MIC_LEFT - GUIDE_GAP
+    left = far - GUIDE_WIDTH
+    return (left, far) if left >= GUIDE_NEEDS else None
+
+
 def header_data(app, now=None):
     """The small words at the top right of the window (cheap: it runs every second on every page)."""
     now = now or datetime.now()

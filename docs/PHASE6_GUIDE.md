@@ -1255,3 +1255,7 @@ window use the same code as the biology list.
 * config/mood_rules.json: sell_exo has "lasting": true (personality/mood_engine.py _apply skips the soft cap and the hourly cap for such rules) and new, higher tiers up to 5 billion (2 billion = 75 base points). The old big_bio_sale swing is removed (it also tested a field that biology sales do not have, so it never fired).
 * Dying with 10 million or more unsold exobiology: rule died_with_exo (0 points) and swing died_exo (Upset, level 1, 10 minutes, announces itself, forgives at the end). MoodEngine.exo_provider (set in core/app.py) gives the credits carried; the engine remembers the last value because the tracker empties itself on death. The lost-data penalty is skipped in that case so nothing is lost for good.
 * Swings can now have "level" and "announce"; lines in voicepacks/default/swings.json (Upset_DiedExo, Forgive_DiedExo, Still_DiedExo).
+
+## 0.79.3 - Website guide box
+
+* ui/dashboard.py _banner_title draws a clickable 'WEBSITE GUIDE' box left of the microphone box (the banner is shared by every page); open_guide() opens ui/status.GUIDE_URL. guide_box(right) in ui/status.py works out where it goes (None when the window is too narrow) and is tested in tests/test_guide_box.py. The drawing and the click are GUI code and were not run in the sandbox.
