@@ -72,6 +72,11 @@ section.block { padding-block: 44px 8px; }
 .sechead { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
 .sechead h2 { font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: 0.04em; }
 .sechead .tag { font-family: var(--display); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
+.changes { margin: 0 0 14px; padding: 0; list-style: none; display: grid; gap: 10px; }
+.changes li { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
+.changes li b { font-family: "IBM Plex Mono", monospace; color: var(--accent); }
+.changes li p { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+.older summary { cursor: pointer; color: var(--accent); margin: 8px 0 12px; }
 .sub { color: var(--muted); max-width: 64ch; margin: 0 0 24px; }
 
 /* ---- the plotted route: setup steps ---- */
@@ -144,7 +149,7 @@ footer .tagline { color: var(--accent-dim); }
 </style>
 
 <div class="topnav"><div class="wrap">
-  <a href="#setup">Setup</a><a href="#keys">Elite keys</a><a href="#talking">Talking to her</a><a href="#commands">Commands</a><a href="#streamers">For streamers</a><a href="#help">Help</a><a href="https://github.com/Daddyg88/Starling/releases/latest" rel="noopener">Download</a><a href="https://buymeacoffee.com/bencanobi" rel="noopener">Buy me a coffee</a>
+  <a href="#setup">Setup</a><a href="#keys">Elite keys</a><a href="#talking">Talking to her</a><a href="#commands">Commands</a><a href="#streamers">For streamers</a><a href="#help">Help</a><a href="#changelog">Change log</a><a href="https://github.com/Daddyg88/Starling/releases/latest" rel="noopener">Download</a><a href="https://buymeacoffee.com/bencanobi" rel="noopener">Buy me a coffee</a>
 </div></div>
 
 <div class="wrap">
@@ -277,6 +282,12 @@ footer .tagline { color: var(--accent-dim); }
     <li><strong>A voice command does nothing</strong>Press <span class="btn">Check my Elite keys</span>. Most of the time the action has no keyboard key or shares one.</li>
     <li><strong>Send a log</strong>Open the Developer page, press <span class="btn">Copy my log to the clipboard</span> and paste it into a message to whoever looks after Starling for you.</li>
   </ul>
+</section>
+
+<section class="block" id="changelog">
+  <div class="sechead"><span class="tag">Release notes</span><h2>Change log</h2></div>
+  <p class="sub">What changed in each version, newest first. Starling updates herself when you open Starling.exe.</p>
+  {{CHANGELOG}}
 </section>
 
 <footer>

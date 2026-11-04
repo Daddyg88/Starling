@@ -17,6 +17,7 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional
 
+from control import easter_eggs
 from control import binds, sender as sender_module
 from control.confirm import Confirmer
 from control.matcher import Matcher, normalise
@@ -222,6 +223,9 @@ class CommandRunner:
         return outcomes
 
     def _run_text(self, text, speak_unknown=True, speak=True):
+        secret = easter_eggs.rewrite(text)
+        if secret is not None:
+            text = secret                                  # a private phrase: carry out the ordinary command it stands for
         for helper in (*self.extra_helpers, self.smalltalk, self.memory, self.route):       # spoken questions and the route plotter answer for themselves
             if helper is None:
                 continue

@@ -216,13 +216,47 @@ body = ''.join('<section class="group" id="%s"><h3>%s</h3><p class="intro">%s</p
                % (g, html.escape(t), html.escape(i), tb) for g, t, i, tb in sections)
 
 
+def nice(shouting):
+    """'STREAMING, STAGE ONE (TWITCH)' -> 'Streaming, stage one (Twitch)'."""
+    text = shouting.capitalize()
+    for word in ("YouTube", "Twitch", "Starling", "Elite", "Nomad", "Spansh", "EDSM", "Kokoro", "Windows", "Whisper"):
+        text = re.sub(r"\b%s\b" % word, word, text, flags=re.I)
+    return text
+
+def changelog():
+    """The 'What's new' list at the bottom of the page, newest first, from the 'New in x.y.z:' notes in README.md."""
+    text = (REPO / "README.md").read_text(encoding="utf-8")
+    entries = []
+    for m in re.finditer(r"New in (\d+\.\d+\.\d+): (.*?)(?=\s*New in \d+\.\d+\.\d+: |\n\n|\Z)", text, re.S):
+        entries.append((m.group(1), " ".join(m.group(2).split())))
+    seen, unique = set(), []
+    for version, body in entries:
+        if version not in seen:
+            seen.add(version)
+            unique.append((version, body))
+    unique.sort(key=lambda e: tuple(int(x) for x in e[0].split(".")), reverse=True)
+
+    def item(version, body):
+        head, _, rest = body.partition(". ")
+        if head.isupper() or len(head) < 80:
+            title, detail = head.rstrip("."), rest
+        else:
+            title, detail = "", body
+        return ('<li><b>%s</b>%s<p>%s</p></li>' % (html.escape(version), (" &nbsp;" + html.escape(nice(title) if title.isupper() else title)) if title else "", html.escape(detail)))
+    shown, older = unique[:10], unique[10:]
+    out = '<ol class="changes">' + "".join(item(*e) for e in shown) + '</ol>'
+    if older:
+        out += '<details class="older"><summary>Older versions (%d)</summary><ol class="changes">%s</ol></details>' % (len(older), "".join(item(*e) for e in older))
+    return out
+
+
 def build():
     template = (REPO / "tools" / "guide_template.html").read_text(encoding="utf-8")
     head, _, rest = template.partition('<div class="topnav">')
     page = ('<!doctype html>\n<html lang="en"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n' + head + '</head><body>\n<div class="topnav">' + rest
             + '\n</body></html>\n')
-    return page.replace('{{NAV}}', nav).replace('{{COMMANDS}}', body).replace('{{COUNT}}', str(count))
+    return page.replace('{{NAV}}', nav).replace('{{COMMANDS}}', body).replace('{{COUNT}}', str(count)).replace('{{CHANGELOG}}', changelog())
 
 
 if __name__ == '__main__':

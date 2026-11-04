@@ -1244,3 +1244,8 @@ window use the same code as the biology list.
 * config/bio_rules.json: High Metal Content added to Fungoida Stabitis/Gelata, Osseus Discus/Pellebantus, Tussock Ignis/Serrati/Pennatis; argonrich added to Osseus Pumice. Checked against ~1,000 real scanned life bodies from tester journals: species recall about 98.8% -> 99.8%, candidate genera per body about 4.6 -> 4.65. No personal data from those journals is stored in the repo.
 * Website: logo (tools/site_assets, copied to site/ by tools/build_guide.py), YouTube setup steps in the For streamers section.
 * Not tried against live YouTube: the first real connection will show any problems in the status line and the log.
+
+## 0.79.1 - Change log on the website, private phrase
+
+* tools/build_guide.py: changelog() builds the "Change log" section from the "New in x.y.z:" notes in README.md (newest 10 open, older ones folded away). nice() tidies the shouted titles.
+* control/easter_eggs.py: private phrases that are rewritten into ordinary commands before matching. They are deliberately not in control/catalog.py, so they never show in help, dashboard lists or the website; tests/test_easter_eggs.py checks that. Do not document the phrases anywhere.
