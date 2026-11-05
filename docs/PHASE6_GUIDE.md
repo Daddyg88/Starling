@@ -1259,3 +1259,7 @@ window use the same code as the biology list.
 ## 0.79.3 - Website guide box
 
 * ui/dashboard.py _banner_title draws a clickable 'WEBSITE GUIDE' box left of the microphone box (the banner is shared by every page); open_guide() opens ui/status.GUIDE_URL. guide_box(right) in ui/status.py works out where it goes (None when the window is too narrow) and is tested in tests/test_guide_box.py. The drawing and the click are GUI code and were not run in the sandbox.
+
+## 0.79.4 - Route map look
+
+* navigation/galaxy_map.py: background() now returns see-through KEY pixels with orange (#ff8c1a) region borders only; AHEAD cyan, BEHIND dimmer cyan, WAYPOINT yellow, WAYPOINT_DONE dimmer yellow; every text colour is orange. ui/route_overlay.py: the frame is orange with no panel fill (the see-through colour is the canvas background). Colour test in tests/test_route_map.py. The look on screen is untested (GUI).

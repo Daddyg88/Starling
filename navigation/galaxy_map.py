@@ -26,20 +26,24 @@ GALAXY_SPAN = GRID * CELL_LY              # about 101,000 ly
 MIN_SPAN_LY = 1500.0                      # never zoom in further than this
 WHOLE_BELOW = 0.40                        # a route spanning more than this share of the galaxy shows the whole galaxy
 
-OUTSIDE = "#050913"                       # space beyond the mapped regions
-EDGE = "#8fb4d8"                          # region borders
-AHEAD = "#35e0ff"                         # the route still to fly
-BEHIND = "#4a6a86"                        # the part you have flown
-NEUTRON = "#ffd23d"
-FUEL = "#f4f7fb"
-HERE = "#ffffff"
-GOAL = "#ff4d6d"
-LANDMARK = "#9fd3ff"
-TEXT = "#e6f4ff"
-MUTED = "#8ea3c7"
-GOOD = "#3dffb0"
-WARN = "#ffb84d"
-BAD = "#ff6b6b"
+# The same look as the biology overlay: see-through, orange outlines, and just two other colours.
+KEY = "#010101"                           # this exact colour is see-through (Windows)
+ORANGE = "#ff8c1a"                        # region borders, the frame and the words
+EDGE = ORANGE
+AHEAD = "#35e0ff"                         # cyan: the route still to fly
+BEHIND = "#1f7f8f"                        # the same cyan, dimmer: the part you have flown
+WAYPOINT = "#ffd42a"                      # yellow: the waypoints
+WAYPOINT_DONE = "#8a7420"                 # yellow, dimmer: waypoints you have passed
+NEUTRON = WAYPOINT
+FUEL = WAYPOINT
+HERE = AHEAD
+GOAL = WAYPOINT
+LANDMARK = ORANGE
+TEXT = ORANGE
+MUTED = ORANGE
+GOOD = ORANGE
+WARN = ORANGE
+BAD = ORANGE
 
 LANDMARKS = (("Sol", 0.0, 0.0), ("Sgr A*", 25.2, 25899.0), ("Colonia", -9530.0, 19808.0))
 
@@ -109,24 +113,8 @@ def region_name(x, z):
     return regions[number] if number else None
 
 
-def region_colour(number):
-    """A dim, distinct colour for each region (so the borders and the route stand out on top)."""
-    if not number:
-        return OUTSIDE
-    hue = (number * 0.61803398875) % 1.0
-    return _hsv(hue, 0.42, 0.30 + 0.07 * (number % 3))
-
-
-def _hsv(h, s, v):
-    i = int(h * 6.0) % 6
-    f = h * 6.0 - int(h * 6.0)
-    p, q, t = v * (1 - s), v * (1 - f * s), v * (1 - (1 - f) * s)
-    r, g, b = ((v, t, p), (q, v, p), (p, v, t), (p, q, v), (t, p, v), (v, p, q))[i]
-    return "#%02x%02x%02x" % (int(r * 255), int(g * 255), int(b * 255))
-
-
 def background(view, size):
-    """size rows of size '#rrggbb' strings: each pixel is coloured by its region, with a light line along region borders."""
+    """size rows of size '#rrggbb' strings: see-through (KEY) everywhere except an orange line along the region borders."""
     rows = grid()
     ids = []
     for py in range(size):
@@ -147,7 +135,7 @@ def background(view, size):
             border = ((px + 1 < size and ids[py][px + 1] != number) or (py + 1 < size and ids[py + 1][px] != number))
             key = (number, border)
             if key not in colours:
-                colours[key] = EDGE if border and number else region_colour(number)
+                colours[key] = EDGE if border and number else KEY
             line.append(colours[key])
         out.append(line)
     return out
@@ -250,15 +238,15 @@ def build_scene(waypoints, index, here, destination="", jumps_left=0, stops_left
         for point in points:
             cx, cy = px(point)
             flown = point["index"] < index
-            colour = BEHIND if flown else (NEUTRON if point["neutron"] else FUEL)
+            colour = WAYPOINT_DONE if flown else WAYPOINT
             scene["dots"].append((cx, cy, 2.6 if flown else 3.4, colour, ""))
         goal = px(points[-1])
-        scene["dots"].append((goal[0], goal[1], 6.0, "", GOAL))
+        scene["dots"].append((goal[0], goal[1], 7.0, "", GOAL))
         scene["dots"].append((goal[0], goal[1], 2.5, GOAL, ""))
         nxt = next((p for p in points if p["index"] >= index), None)
         if nxt is not None:
             cx, cy = px(nxt)
-            scene["dots"].append((cx, cy, 6.5, "", NEUTRON if nxt["neutron"] else FUEL))
+            scene["dots"].append((cx, cy, 6.5, "", WAYPOINT))
             if here_point is not None:
                 hx, hy = px(here_point)
                 scene["lines"].append((hx, hy, cx, cy, AHEAD, 1, (3, 3)))

@@ -144,3 +144,20 @@ class Voice(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RouteMapLook(unittest.TestCase):
+    def test_see_through_with_orange_regions_yellow_waypoints_cyan_route(self):
+        steps = gm.test_route()
+        scene = gm.build_scene(steps, 1, (steps[0]["x"], steps[0]["y"], steps[0]["z"]), "Colonia", 3, 5, 300)
+        pixels = {c for row in scene["background"] for c in row}
+        self.assertEqual(pixels, {gm.KEY, gm.ORANGE})          # nothing coloured per region any more
+        small = {c for row in scene["inset"]["background"] for c in row}
+        self.assertTrue(small <= {gm.KEY, gm.ORANGE})
+        colours = {line[4] for line in scene["lines"]}
+        self.assertIn(gm.AHEAD, colours)
+        self.assertTrue(colours <= {gm.AHEAD, gm.BEHIND})
+        self.assertEqual(gm.AHEAD, "#35e0ff")
+        yellow = {dot[3] or dot[4] for dot in scene["dots"]}
+        self.assertIn(gm.WAYPOINT, yellow)
+        self.assertTrue(all(colour for colour in {t[1] for t in scene["text"]}) and {t[1] for t in scene["text"]} == {gm.ORANGE})

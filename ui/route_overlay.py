@@ -3,7 +3,7 @@ The route map overlay: a small see-through picture on the RIGHT of the screen sh
 neutron route, so you can SEE that the route is a good one instead of trusting it blindly.
 
 What it shows (all drawn by navigation/galaxy_map.py, which is plain tested Python):
-  * the galaxy regions as coloured patches with thin borders, and a tiny whole-galaxy picture in the corner
+  * the galaxy region borders as thin orange lines on a see-through background, and a tiny whole-galaxy picture in the corner
   * the route: cyan = still to fly, grey = already flown, yellow dots = neutron stars, red ring = the destination
   * a white dot for where you are, and words underneath: the stops left, the jumps left, how straight the route is, the regions crossed
 
@@ -22,9 +22,8 @@ from ui import screens
 
 log = get_logger("route_overlay")
 
-KEY = "#010101"             # this exact colour becomes see-through (Windows)
-PANEL = "#08111f"
-BORDER = "#35e0ff"
+KEY = galaxy_map.KEY        # this exact colour becomes see-through (Windows)
+BORDER = galaxy_map.ORANGE
 CHECK_MS = 1000
 RECT_EVERY_SECONDS = 5.0
 TEST_SECONDS = 10
@@ -249,7 +248,7 @@ class RouteOverlay:
         height = size + 8 + line_h * len(lines) + 6
         width = size
         canvas.configure(width=width, height=height)
-        canvas.create_rectangle(0, 0, width, height, fill=PANEL, outline=BORDER, width=2)
+        canvas.create_rectangle(1, 1, width - 2, height - 2, fill=KEY, outline=BORDER, width=2)       # see-through, orange frame
         self.photo = self._picture(tk, scene["background"])
         canvas.create_image(1, 1, image=self.photo, anchor="nw")
         for x1, y1, x2, y2, colour, w, dash in scene["lines"]:
