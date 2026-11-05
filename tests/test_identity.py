@@ -51,7 +51,7 @@ class GenderedSpeechTests(unittest.TestCase):
                      personality__remarks="often")
         d = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
         seen = set()
-        for seed in range(80):
+        for seed in range(300):
             f = Flavour(d, s, rng=Rng(0.0), clock=lambda: 0.0)
             f.rng = __import__("random").Random(seed)
             f._last_remark = None
