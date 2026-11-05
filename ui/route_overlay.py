@@ -3,9 +3,10 @@ The route map overlay: a small see-through picture on the RIGHT of the screen sh
 neutron route, so you can SEE that the route is a good one instead of trusting it blindly.
 
 What it shows (all drawn by navigation/galaxy_map.py, which is plain tested Python):
-  * the galaxy region borders as thin orange lines on a see-through background, and a tiny whole-galaxy picture in the corner
-  * the route: cyan = still to fly, grey = already flown, yellow dots = neutron stars, red ring = the destination
-  * a white dot for where you are, and words underneath: the stops left, the jumps left, how straight the route is, the regions crossed
+  * the galaxy region borders as thin orange lines on a see-through background
+  * the route: cyan = still to fly, dim cyan = already flown, yellow dots = waypoints, a yellow ring = the destination
+  * the start of the route sits near one edge and the destination near the other; every time you pass a waypoint the map zooms in
+  * a cyan ring for where you are, and words underneath: the stops left, the jumps left, how straight the route is, the regions crossed
 
 Two parts, like the biology list:
   * route_scene() decides WHAT to show (plain Python, tested)
@@ -257,9 +258,6 @@ class RouteOverlay:
             canvas.create_oval(x - r, y - r, x + r, y + r, fill=fill or "", outline=outline or fill, width=2 if outline else 1)
         for x, y, text, colour, anchor in scene["labels"]:
             canvas.create_text(x, y, text=text, fill=colour, anchor=anchor, font=("Segoe UI", 8, "bold"))
-        inset = scene.get("inset")
-        if inset:
-            self._draw_inset(tk, canvas, inset)
         limit = max(24, int(size / 6.3))
         y = size + 10
         for text, colour in lines:
@@ -272,18 +270,6 @@ class RouteOverlay:
         self.window.deiconify()
         self.window.attributes("-topmost", True)
         self.window.lift()
-
-    def _draw_inset(self, tk, canvas, inset):
-        self.inset_photo = self._picture(tk, inset["background"])
-        ox, oy = inset["x"], inset["y"]
-        canvas.create_image(ox, oy, image=self.inset_photo, anchor="nw")
-        canvas.create_rectangle(ox, oy, ox + inset["size"], oy + inset["size"], outline=BORDER)
-        for x1, y1, x2, y2, colour, w, dash in inset["lines"]:
-            canvas.create_line(ox + x1, oy + y1, ox + x2, oy + y2, fill=colour, width=w)
-        for x, y, r, fill, outline in inset["dots"]:
-            canvas.create_oval(ox + x - r, oy + y - r, ox + x + r, oy + y + r, fill=fill or "", outline=outline or fill)
-        for x1, y1, x2, y2, colour in inset["boxes"]:
-            canvas.create_rectangle(ox + x1, oy + y1, ox + x2, oy + y2, outline=colour, width=1)
 
     @staticmethod
     def _picture(tk, rows):

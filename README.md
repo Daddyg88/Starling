@@ -34,6 +34,8 @@ Just want to play? Read `docs/START_HERE.md` (plain words, no computer skills ne
 | `logs/` | STARLING's diary and error reports |
 | `tests/` | Automatic checks |
 See docs/UPDATING.md for how to update without losing settings.
+New in 0.79.5: ROUTE MAP ZOOMS IN AS YOU GO. The small whole-galaxy picture in the corner is gone. The map now shows where the route starts near one edge and the destination near the opposite edge, and every time you pass a waypoint it zooms in, starting again from that waypoint and ending at the destination.
+
 New in 0.79.4: ROUTE MAP MATCHES THE BIOLOGY OVERLAY. The route map is now see-through with orange region borders, a cyan route line and yellow waypoints, and orange words. The coloured patches for each region are gone.
 
 New in 0.79.3: GUIDE BUTTON. Every page of the dashboard now has a WEBSITE GUIDE box at the top, next to the microphone box. Click it to open the guide in your browser (it hides itself if the window is too narrow to fit it).

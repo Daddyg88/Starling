@@ -141,6 +141,35 @@ def background(view, size):
     return out
 
 
+EDGE_ROOM = 0.08                          # the start and the destination sit this share of the picture in from opposite edges
+
+
+def zoom_view(points, margin=EDGE_ROOM):
+    """The square view that holds all these (x, z) points with only a thin margin: the two ends of a route land near opposite edges."""
+    points = [(float(x), float(z)) for x, z in points]
+    if not points:
+        return WHOLE
+    xs, zs = [p[0] for p in points], [p[1] for p in points]
+    span = max(max(xs) - min(xs), max(zs) - min(zs), 1.0)
+    span = min(max(span * (1.0 + 2 * margin), MIN_SPAN_LY), GALAXY_SPAN)
+    centre_x, centre_z = (max(xs) + min(xs)) / 2.0, (max(zs) + min(zs)) / 2.0
+    return View(centre_x - span / 2.0, centre_z - span / 2.0, span)
+
+
+def route_view(points, index, here_point=None):
+    """Starts as the whole route (start near one edge, destination near the other). Each time you pass a waypoint the picture
+    zooms in: it begins again at the waypoint you just reached and ends at the destination."""
+    if len(points) < 2:
+        return fit_view([(p["x"], p["z"]) for p in points] + ([(here_point["x"], here_point["z"])] if here_point else []))
+    passed = [p for p in points if p["index"] < index]
+    origin = passed[-1] if passed else points[0]
+    ahead = [p for p in points if p["index"] > origin["index"]] or [points[-1]]
+    shown = [(origin["x"], origin["z"])] + [(p["x"], p["z"]) for p in ahead]
+    if here_point is not None:
+        shown.append((here_point["x"], here_point["z"]))
+    return zoom_view(shown)
+
+
 # ---- the route ----
 def route_points(waypoints):
     """Waypoints that have a position, in order: [{system, x, y, z, neutron, index}]. 'index' is its place in the full list."""
@@ -214,10 +243,7 @@ def build_scene(waypoints, index, here, destination="", jumps_left=0, stops_left
     here_point = None
     if here is not None and len(here) == 3:
         here_point = {"x": float(here[0]), "y": float(here[1]), "z": float(here[2]), "system": "", "neutron": False, "index": -1}
-    flat = [(p["x"], p["z"]) for p in points]
-    if here_point is not None:
-        flat.append((here_point["x"], here_point["z"]))
-    view = fit_view(flat) if flat else WHOLE
+    view = route_view(points, index, here_point) if points else WHOLE
     scene = {"view": view, "size": size, "background": background(view, size), "lines": [], "dots": [], "labels": [],
              "text": [], "has_route": len(points) >= 2}
 
@@ -255,8 +281,6 @@ def build_scene(waypoints, index, here, destination="", jumps_left=0, stops_left
         scene["dots"].append((hx, hy, 6.0, "", HERE))
         scene["dots"].append((hx, hy, 2.8, HERE, ""))
 
-    scene["inset"] = _inset(points, here_point, view, size)
-
     # words under the picture
     if scene["has_route"]:
         stats = route_stats(points)
@@ -274,28 +298,6 @@ def build_scene(waypoints, index, here, destination="", jumps_left=0, stops_left
         scene["text"].append(("No route plotted", TEXT))
         scene["text"].append(("You are in %s" % where if where else "Position not known yet", MUTED))
     return scene
-
-
-def _inset(points, here_point, view, size):
-    """A small picture of the WHOLE galaxy in the corner (so you always see where the route sits), with a box where the big picture is."""
-    small = max(60, int(size * 0.30))
-    inset = {"x": 6, "y": 6, "size": small, "background": background(WHOLE, small), "lines": [], "dots": [], "boxes": []}
-    if len(points) >= 2:
-        coords = [to_pixel(WHOLE, small, p["x"], p["z"]) for p in points]
-        for a, b in zip(coords, coords[1:]):
-            inset["lines"].append((a[0], a[1], b[0], b[1], AHEAD, 1, None))
-        inset["dots"].append((coords[-1][0], coords[-1][1], 2.0, GOAL, ""))
-    if here_point is not None:
-        hx, hy = to_pixel(WHOLE, small, here_point["x"], here_point["z"])
-        inset["dots"].append((hx, hy, 2.0, HERE, ""))
-    if view is not WHOLE and view.span < GALAXY_SPAN:
-        x1, y1 = to_pixel(WHOLE, small, view.x, view.z + view.span)
-        x2, y2 = to_pixel(WHOLE, small, view.x + view.span, view.z)
-        if x2 - x1 < 5:
-            cx, cy = (x1 + x2) / 2.0, (y1 + y2) / 2.0
-            x1, x2, y1, y2 = cx - 2.5, cx + 2.5, cy - 2.5, cy + 2.5
-        inset["boxes"].append((x1, y1, x2, y2, NEUTRON))
-    return inset
 
 
 def test_route():

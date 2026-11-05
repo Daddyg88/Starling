@@ -152,8 +152,7 @@ class RouteMapLook(unittest.TestCase):
         scene = gm.build_scene(steps, 1, (steps[0]["x"], steps[0]["y"], steps[0]["z"]), "Colonia", 3, 5, 300)
         pixels = {c for row in scene["background"] for c in row}
         self.assertEqual(pixels, {gm.KEY, gm.ORANGE})          # nothing coloured per region any more
-        small = {c for row in scene["inset"]["background"] for c in row}
-        self.assertTrue(small <= {gm.KEY, gm.ORANGE})
+        self.assertNotIn("inset", scene)                                       # no small whole-galaxy picture in the corner
         colours = {line[4] for line in scene["lines"]}
         self.assertIn(gm.AHEAD, colours)
         self.assertTrue(colours <= {gm.AHEAD, gm.BEHIND})
@@ -161,3 +160,37 @@ class RouteMapLook(unittest.TestCase):
         yellow = {dot[3] or dot[4] for dot in scene["dots"]}
         self.assertIn(gm.WAYPOINT, yellow)
         self.assertTrue(all(colour for colour in {t[1] for t in scene["text"]}) and {t[1] for t in scene["text"]} == {gm.ORANGE})
+
+
+class RouteZoom(unittest.TestCase):
+    def points(self):
+        return [{"system": "S%d" % i, "x": float(x), "y": 0.0, "z": float(z), "neutron": True, "index": i}
+                for i, (x, z) in enumerate([(0, 0), (2000, 500), (4000, 0), (6000, 800), (8000, 0)])]
+
+    def where(self, view, p):
+        px, py = gm.to_pixel(view, 100, p["x"], p["z"])
+        return px, py
+
+    def test_start_and_destination_sit_near_opposite_edges(self):
+        pts = self.points()
+        view = gm.route_view(pts, 0)
+        (x1, _), (x2, _) = self.where(view, pts[0]), self.where(view, pts[-1])
+        self.assertLess(x1, 12)
+        self.assertGreater(x2, 88)
+
+    def test_zooms_in_after_every_waypoint(self):
+        pts = self.points()
+        spans = [gm.route_view(pts, i).span for i in range(0, 5)]
+        self.assertEqual(spans, sorted(spans, reverse=True))
+        self.assertLess(spans[3], spans[0] * 0.6)
+        # after passing waypoint 2 the picture starts at waypoint 2 and ends at the destination
+        view = gm.route_view(pts, 3)
+        (x1, _), (x2, _) = self.where(view, pts[2]), self.where(view, pts[-1])
+        self.assertLess(x1, 15)
+        self.assertGreater(x2, 85)
+
+    def test_never_zooms_in_past_the_limit_and_never_past_the_galaxy(self):
+        pts = self.points()
+        self.assertGreaterEqual(gm.route_view(pts, 4).span, gm.MIN_SPAN_LY)
+        far = [dict(p, x=p["x"] * 20) for p in pts]
+        self.assertLessEqual(gm.route_view(far, 0).span, gm.GALAXY_SPAN)

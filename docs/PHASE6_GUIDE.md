@@ -1263,3 +1263,7 @@ window use the same code as the biology list.
 ## 0.79.4 - Route map look
 
 * navigation/galaxy_map.py: background() now returns see-through KEY pixels with orange (#ff8c1a) region borders only; AHEAD cyan, BEHIND dimmer cyan, WAYPOINT yellow, WAYPOINT_DONE dimmer yellow; every text colour is orange. ui/route_overlay.py: the frame is orange with no panel fill (the see-through colour is the canvas background). Colour test in tests/test_route_map.py. The look on screen is untested (GUI).
+
+## 0.79.5 - Route map zoom
+
+* navigation/galaxy_map.py: zoom_view() fits points with a thin margin (EDGE_ROOM 8%), route_view() starts with the whole route and after each passed waypoint begins at that waypoint (plus the remaining waypoints, the destination and your position). The inset (small whole-galaxy picture) and its drawing code were removed. Never zooms past MIN_SPAN_LY (1,500 ly) or beyond the galaxy. Tests in tests/test_route_map.py (RouteZoom). The on-screen result is untested (GUI).
