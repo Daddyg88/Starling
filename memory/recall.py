@@ -20,6 +20,17 @@ REST_HOURS = 6          # a memory she has just mentioned is left alone for this
 SAYINGS = {"record:": "Memory_Record", "death": "Memory_Death", "big_mission": "Memory_Mission", "first_species": "Memory_First"}
 
 
+def spoken_summary(memory):
+    """What she says out loud for a memory. A mission memory keeps only the payout ('a mission worth 5.1 million credits')
+    when the mission title after the colon is long; a short title is kept."""
+    text = str(memory.get("summary") or "")
+    if memory.get("memory_type") == "big_mission" and ":" in text:
+        head, title = text.split(":", 1)
+        if len(title.strip()) > 30:
+            text = head.strip()
+    return text
+
+
 class _Safe(dict):
     def __missing__(self, key):
         return "?"
@@ -63,7 +74,7 @@ class MemoryRecall:
         if not found:
             return None
         memory = found[0]
-        text = self._say(self._frame(memory) + "_Login", self._mood(), {"memory": memory["summary"], "system": memory["system_name"] or "there"})
+        text = self._say(self._frame(memory) + "_Login", self._mood(), {"memory": spoken_summary(memory), "system": memory["system_name"] or "there"})
         if text:
             self.store.mentioned(memory["id"])
         return text
@@ -79,7 +90,7 @@ class MemoryRecall:
             parts.append(self._say("Memory_Hours", mood, {"hours": ("%.1f" % hours).rstrip("0").rstrip(".")}))
         for memory in found:
             parts.append(self._say(self._frame(memory) + "_Ask", mood,
-                                   {"memory": memory["summary"], "system": memory["system_name"] or "there"}))
+                                   {"memory": spoken_summary(memory), "system": memory["system_name"] or "there"}))
             self.store.mentioned(memory["id"])
         if stats.get("times_destroyed"):
             parts.append(self._say("Memory_Destroyed", mood, {"count": stats["times_destroyed"]}))

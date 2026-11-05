@@ -339,12 +339,13 @@ class CacheTests(unittest.TestCase):
         sound.delay = 0.05
         sound_stream_delay = 0.05
         tts._sound_module = FakeSound(delay=sound_stream_delay)
-        t = threading.Thread(target=lambda: tts.speak(". ".join("s%d" % i for i in range(30)) + ".", VoiceSettings()))
+        whole = ". ".join("s%d" % i for i in range(30)) + "."
+        t = threading.Thread(target=lambda: tts.speak(whole, VoiceSettings()))
         t.start()
         time.sleep(0.2)
         tts.stop()
         t.join(5)
-        self.assertEqual(list((self.dir / "cache").glob("*.npy")), [])
+        self.assertFalse(tts.is_cached(whole))           # the unfinished line as a whole is never kept (finished sentences may be)
 
 
 class CacheBuilderTests(unittest.TestCase):

@@ -42,7 +42,51 @@ def priority_order(dialogue, allow_mature, settings):
             if key.startswith(wanted):
                 add(t for t in _texts(lines, allow_mature, settings, personalise))
     add(collect_texts(dialogue, allow_mature, settings))
+    if settings is None or settings.get("tts.warm_mining", True):
+        add(mining_texts(dialogue, allow_mature, settings))
     return ordered
+
+
+MINING_MATERIAL_KEYS = ("Refined_FirstTop", "Refined_FirstGood", "Refined_Cheer", "Prospected_Motherlode")
+MINING_COUNT_KEYS = ("Refined_Milestone", "Refined_MilestoneGood")
+MINING_MAX_COUNT = 40          # tonnes of one mineral she pre-makes the count lines for
+
+
+def mining_texts(dialogue, allow_mature, settings):
+    """The mining lines with a mineral name or a tonne count, made for your favourite minerals ahead of time.
+
+    They are the lines that used to start 2 or 3 seconds late (every one had to be made on the spot). Only the minerals she gets
+    excited about (your favourites and the solid-money ones) and the counts she actually calls out (every 3, 5 or 10 tonnes)."""
+    try:
+        from core.identity import personalise
+        from mining import minerals
+        step = {"quiet": 10, "chatty": 3}.get(str(minerals.option("chatter", "normal")), 5)
+        names = sorted({minerals.spoken(k) for k in (set(minerals.favourites()) | set(minerals.GOOD))})
+        counts = list(range(step, MINING_MAX_COUNT + 1, step))
+    except Exception:
+        return []
+
+    def fill(keys, fields_list):
+        for key in keys:
+            for line in dialogue.lines.get(key, []):
+                if line.mature and not allow_mature:
+                    continue
+                for fields in fields_list:
+                    try:
+                        text = personalise(line.text, settings).format_map(fields)
+                    except (KeyError, IndexError, ValueError):
+                        continue
+                    for part in (p.strip() for p in text.split("||")):
+                        if part and "{" not in part:
+                            yield part
+
+    class Fields(dict):
+        def __missing__(self, key):
+            raise KeyError(key)
+
+    out = list(fill(MINING_MATERIAL_KEYS, [Fields(Material=n) for n in names]))
+    out += list(fill(MINING_COUNT_KEYS, [Fields(Material=n, Count=c) for c in counts for n in names]))
+    return out
 
 
 def _texts(lines, allow_mature, settings, personalise):

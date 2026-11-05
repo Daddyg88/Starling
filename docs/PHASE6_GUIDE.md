@@ -1279,3 +1279,7 @@ window use the same code as the biology list.
 ## 0.80.1 - Route map fixed view
 
 * navigation/galaxy_map.py route_view() now always fits the whole route (zoom_view of all points); the per-waypoint zoom was removed at the user's request. tests/test_route_map.py updated. Looks on screen untested (GUI).
+
+## 0.80.2 - Snappier
+
+* tts/kokoro_tts.py: sentences_of() splits an uncached line into sentences; each is loaded from or saved to the cache on its own, then the whole line is cached as before. tts/voice_warmer.py: mining_texts() pre-makes Refined_First*/Refined_Cheer/Prospected_Motherlode for favourite and GOOD minerals and Refined_Milestone* for counts every 3/5/10 tonnes up to 40 (setting tts.warm_mining, default on); it runs after the fixed lines. personality/watcher.py: retry_delay() backs off 10 s up to 120 s while Void Compass is offline. memory/recall.py: spoken_summary() drops a long mission title. navigation/voice.py: a SpanshError mentioning the starting system also starts the emergency protocol. Tests in tests/test_session_fixes.py and tests/test_callouts.py. Real voice speed is untested in the sandbox (no Kokoro).

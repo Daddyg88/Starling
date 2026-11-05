@@ -691,6 +691,14 @@ class EmergencyTests(unittest.TestCase):
         v._plot_now("Colonia")
         self.assertEqual(v.narrator.said, ["RouteFailed"])
 
+    def test_spansh_knows_the_name_but_cannot_start_a_route_there(self):
+        v = self.make(known=("Colonia", "Landmark", "Lostville"), places=[self.place()])
+        from navigation.spansh import SpanshError
+        v.spansh.neutron_route = lambda *a, **k: (_ for _ in ()).throw(SpanshError("Could not find starting system"))
+        v._busy = True
+        v._plot_now("Colonia")
+        self.assertEqual(v.narrator.said[0], "EmergencyStart")
+
     def test_switched_off(self):
         v = self.make(places=[self.place()])
         v.settings.v["neutron.emergency"] = False

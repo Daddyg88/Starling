@@ -40,6 +40,7 @@ REPLY_START_DELAY_SECONDS = 1.5     # give his voice a moment to actually start 
 REPLY_WAIT_SECONDS = 25.0           # how long we wait for him to finish before giving up on the reply
 REPLY_CHANCE = {"always": 1.0, "often": 0.7, "sometimes": 0.4, "never": 0.0}
 OFFLINE_RETRY_SECONDS = 10.0
+OFFLINE_RETRY_MAX_SECONDS = 120.0     # while Void Compass stays away she asks less and less often (10 s, 20 s, 40 s ... 2 min)
 HUSH_SECONDS = 12                   # how long one hush lasts (it is renewed while she keeps talking)
 HUSH_GAP_SECONDS = 6.0              # do not ask more often than this
 HUSH_GIVE_UP_AFTER = 3              # this many errors in a row (an older Void Compass): stop trying
@@ -249,6 +250,12 @@ class WatcherBridge:
         return bool(self.speech.say(text=text, priority="normal", event_name="personality.watcher_reply"))
 
     # ---- the thread ----
+    def retry_delay(self):
+        """Seconds to wait before asking Void Compass again: doubles each time it is still away, up to two minutes."""
+        streak = getattr(self, "_offline_streak", 0)
+        self._offline_streak = streak + 1
+        return min(OFFLINE_RETRY_MAX_SECONDS, OFFLINE_RETRY_SECONDS * (2 ** min(streak, 6)))
+
     def _loop(self):
         while not self._stop.is_set():
             try:
@@ -260,6 +267,7 @@ class WatcherBridge:
                 wait = 2 if (self.held or self.reply_due) else 20
                 answer = self.client.events(self.seq, "voice", wait)
                 self.seq = int(answer.get("seq", self.seq))
+                self._offline_streak = 0
                 for item in answer.get("events", []):
                     self.handle(item)
                 self.tick()
@@ -267,7 +275,7 @@ class WatcherBridge:
                 self.seq = None
                 if error.kind != "offline":
                     log.info("Watcher bridge: %s", error.message or error.kind)
-                self._stop.wait(OFFLINE_RETRY_SECONDS)
+                self._stop.wait(self.retry_delay())
             except Exception:
                 log.exception("Watcher bridge problem")
                 self._stop.wait(OFFLINE_RETRY_SECONDS)

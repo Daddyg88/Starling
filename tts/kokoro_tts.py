@@ -52,6 +52,20 @@ def split_sentences(part):
     return merged or [part]
 
 
+def sentences_of(part, shortest=14):
+    """'Neutron star reached. Supercharge, then head for Foo, 4 jumps.' -> ['Neutron star reached.', 'Supercharge, then head for Foo, 4 jumps.']
+    Each sentence is cached on its own, so the fixed sentence of a line with a changing name or number plays at once.
+    A very short sentence is joined to the next one so the voice does not sound chopped up."""
+    pieces = [p.strip() for p in re.split(r"(?<=[.!?])\s+", part) if p.strip()]
+    merged = []
+    for piece in pieces:
+        if merged and len(merged[-1]) < shortest:
+            merged[-1] += " " + piece
+        else:
+            merged.append(piece)
+    return merged or [part]
+
+
 def speed_from_rate(rate):
     """settings 'tts.rate' runs -10..10; Kokoro speed is a multiplier (1.0 = normal)."""
     try:
@@ -376,14 +390,28 @@ class KokoroTTS(BaseTTS):
                 self._put(pieces, cached * gain)
                 return cached.size
             made = []
-            for sentence in split_sentences(part):                 # a long answer starts after its FIRST sentence is made, not after all of it
-                for piece in self._engine()(sentence, voice=self._voice_arg(), speed=speed):
-                    if self._stop_flag.is_set():
-                        return 0
-                    audio = to_float32_array(piece)
-                    if audio.size:
-                        made.append(audio)
-                        self._put(pieces, audio * gain)
+            for sentence in sentences_of(part):                    # one sentence at a time: fixed ones come from the cache, the rest start sooner
+                if len(sentence) > LONG_PART:
+                    chunks = split_sentences(sentence)
+                else:
+                    chunks = [sentence]
+                for chunk in chunks:
+                    saved = self._cache_load(chunk, speed) if chunk != part else None
+                    if saved is not None:
+                        made.append(saved)
+                        self._put(pieces, saved * gain)
+                        continue
+                    fresh = []
+                    for piece in self._engine()(chunk, voice=self._voice_arg(), speed=speed):
+                        if self._stop_flag.is_set():
+                            return 0
+                        audio = to_float32_array(piece)
+                        if audio.size:
+                            fresh.append(audio)
+                            self._put(pieces, audio * gain)
+                    if fresh and chunk != part and not self._stop_flag.is_set():
+                        self._cache_save(chunk, speed, np.concatenate(fresh))
+                    made.extend(fresh)
             if made and not self._stop_flag.is_set():
                 self._cache_save(part, speed, np.concatenate(made))
             return sum(a.size for a in made)

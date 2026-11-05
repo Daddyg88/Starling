@@ -106,5 +106,43 @@ class VisitedSystemTests(unittest.TestCase):
         self.assertIn("S11", self.keeper.visits)
 
 
+class SnappyVoiceTests(unittest.TestCase):
+    def test_lines_are_split_into_cacheable_sentences(self):
+        from tts.kokoro_tts import sentences_of
+        self.assertEqual(sentences_of("Neutron star reached. Supercharge, then head for Foo, 4 jumps."),
+                         ["Neutron star reached.", "Supercharge, then head for Foo, 4 jumps."])
+        self.assertEqual(sentences_of("Oh. That was close, Commander."), ["Oh. That was close, Commander."])   # too short to stand alone
+        self.assertEqual(sentences_of("One line only"), ["One line only"])
+
+    def test_mining_lines_are_prepared_for_favourites(self):
+        import random
+        from core import paths
+        from personality.dialogue import DialogueManager
+        from tts.voice_warmer import mining_texts
+        dialogue = DialogueManager(paths.VOICEPACKS_DIR / "default", [paths.DIALOGUE_DIR / "core_lines.json"], rng=random.Random(1)).load()
+        texts = mining_texts(dialogue, False, None)
+        self.assertGreater(len(texts), 100)
+        self.assertTrue(all("{" not in t for t in texts))
+        self.assertIn("Grandidierite", " ".join(texts))
+        self.assertTrue(any("tonnes" in t and "5" in t for t in texts))
+
+
+class WatcherBackoffTests(unittest.TestCase):
+    def test_retry_delay_grows_then_stops_at_two_minutes(self):
+        from personality.watcher import WatcherBridge
+        bridge = WatcherBridge.__new__(WatcherBridge)          # only the waiting rule is tested
+        delays = [bridge.retry_delay() for _ in range(8)]
+        self.assertEqual(delays[:4], [10.0, 20.0, 40.0, 80.0])
+        self.assertEqual(delays[-1], 120.0)
+
+
+class MissionMemoryTests(unittest.TestCase):
+    def test_only_the_payout_is_spoken(self):
+        from memory.recall import spoken_summary
+        memory = {"memory_type": "big_mission", "summary": "a mission worth 5.1 million credits: Expansion Support by Killing Known Terrorist: Oliver"}
+        self.assertEqual(spoken_summary(memory), "a mission worth 5.1 million credits")
+        self.assertEqual(spoken_summary({"memory_type": "death", "summary": "You were destroyed: oops"}), "You were destroyed: oops")
+
+
 if __name__ == "__main__":
     unittest.main()

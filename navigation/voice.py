@@ -752,7 +752,8 @@ class RouteVoice:
             self.follower.maybe_auto_plot()
         except SpanshError as error:
             self._route_note = None
-            if self._spansh_does_not_know(here) and self.settings.get("neutron.emergency", True):
+            lost = "starting system" in str(error).lower() or self._spansh_does_not_know(here)       # Spansh can't start a route from here
+            if lost and self.settings.get("neutron.emergency", True):
                 self.emergency(name)
             else:
                 self.narrator.say("RouteFailed", {"reason": str(error)})
