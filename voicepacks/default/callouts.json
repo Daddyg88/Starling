@@ -287,8 +287,8 @@
   "Half a tank. Plenty left, but let's not forget it.",
   "Fuel check: fifty percent. Keep a lookout for a scoopable star.",
   "Half a tank, Commander. You know how this usually goes.",
-  "Fuel is at half. Let's not turn this into one of your famous stories, Curd Nerd.",
-  "Half a tank. I'd hate for this to become another Curd Nerd legend.",
+  "Fuel is at half. Let's not turn this into one of your famous stories, Commander.",
+  "Half a tank. I'd hate for this to become another of your legends.",
   "Fifty percent fuel. Just saying it now, so I don't have to say it in a panic later."
  ],
  "FuelHalf_Sarcastic": [
@@ -315,13 +315,13 @@
   "Almost no fuel left! I don't want to drift out here!",
   "Fuel at {fuel_percent} percent! This is not a drill!",
   "Empty! Nearly empty! Find fuel, find fuel, find fuel!",
-  "Curd Nerd! Not again! We're almost out of fuel!",
-  "Oh no. Oh no no no. Fuel's at {fuel_percent} percent. Curd Nerd, you promised!",
-  "Fuel at {fuel_percent} percent and I can feel my circuits sweating. Again, Curd Nerd?",
-  "Another day, another near-empty tank. Curd Nerd, please! Find a star!"
+  "Commander! Not again! We're almost out of fuel!",
+  "Oh no. Oh no no no. Fuel's at {fuel_percent} percent. Commander, you promised!",
+  "Fuel at {fuel_percent} percent and I can feel my circuits sweating. Again, Commander?",
+  "Another day, another near-empty tank. Commander, please! Find a star!"
  ],
  "FuelPanic_Sarcastic": [
-  "Ten percent fuel. Of course. Right on schedule. Curd Nerd does it again.",
+  "Ten percent fuel. Of course. Right on schedule. You do it again.",
   "We're out of fuel, practically. What a surprise. Nobody saw that coming. Except me, ten minutes ago."
  ],
  "FuelPanic_Close": [
@@ -337,9 +337,9 @@
   "A quarter tank left, Commander, {fuel_percent} percent. Let's go and find some fuel.",
   "Fuel at {fuel_percent} percent. I'm reminding you again, nicely.",
   "We are at a quarter of a tank, {fuel_percent} percent. Please don't make this interesting.",
-  "Fuel's getting low, {fuel_percent} percent. Curd Nerd, you know how this ends.",
-  "Quarter of a tank, {fuel_percent} percent. Not another Curd Nerd special, please.",
+  "Fuel's getting low, {fuel_percent} percent. Commander, you know how this ends.",
+  "Quarter of a tank, {fuel_percent} percent. Not another one of your specials, please.",
   "{fuel_percent} percent fuel. Let's refuel before it becomes a story people tell.",
-  "Fuel is low, {fuel_percent} percent. The last time this happened to Curd Nerd, it took an hour of drifting. Just saying."
+  "Fuel is low, {fuel_percent} percent. The last time this happened, it took an hour of drifting. Just saying."
  ]
 }

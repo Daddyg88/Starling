@@ -9,6 +9,7 @@ import json
 import os
 import tempfile
 import threading
+from pathlib import Path
 import time
 from datetime import datetime
 
@@ -17,7 +18,10 @@ from core.logger import get_logger
 log = get_logger("stats")
 
 SAVE_EVERY_SECONDS = 30.0
-MAX_SYSTEMS = 20000
+MAX_SYSTEMS = 5000              # the most systems she keeps; the ones you have not seen for longest are dropped first
+TRIM_BY = 500
+REVISIT_COOLDOWN = 600.0        # seconds between 'we've been here' remarks
+MAX_SCANNED = 999
 MAX_BODIES = 5000
 KILL_MILESTONES = (50, 100, 250, 500, 1000, 2500, 5000, 10000)
 
@@ -36,6 +40,9 @@ class StatsKeeper:
         self.jumps_by_day = {}
         self.terraformable = []          # body names, newest last
         self.session = {"kills": 0, "jumps": 0}
+        self.history_done = False
+        self._here = ""
+        self._revisit_at = -REVISIT_COOLDOWN
         self._load()
 
     # ---- wiring ----
@@ -65,6 +72,7 @@ class StatsKeeper:
         for name in ("kills_by_day", "jumps_by_day"):
             value = data.get(name)
             setattr(self, name, {str(k): v for k, v in value.items() if isinstance(v, int)} if isinstance(value, dict) else {})
+        self.history_done = bool(data.get("history_done", False))
         bodies = data.get("terraformable")
         self.terraformable = [str(b) for b in bodies][-MAX_BODIES:] if isinstance(bodies, list) else []
 
@@ -73,7 +81,7 @@ class StatsKeeper:
             if not self._dirty:
                 return
             data = {"visits": self.visits, "kills_total": self.kills_total, "kills_by_day": self.kills_by_day,
-                    "jumps_total": self.jumps_total, "jumps_by_day": self.jumps_by_day, "terraformable": self.terraformable}
+                    "jumps_total": self.jumps_total, "jumps_by_day": self.jumps_by_day, "terraformable": self.terraformable, "history_done": self.history_done}
             self._dirty = False
         try:
             folder = os.path.dirname(str(self.path)) or "."
@@ -104,28 +112,49 @@ class StatsKeeper:
                 self._kill()
             elif name == "Scan":
                 self._scan(data)
+            elif name in ("Location", "CarrierJump"):
+                self._here = str(data.get("StarSystem") or self._here)
         except Exception:
             log.exception("Counting an event failed")
 
     def _jump(self, system):
+        speak = None
         with self._lock:
             day = self.today()
             self.jumps_total += 1
             self.jumps_by_day[day] = self.jumps_by_day.get(day, 0) + 1
             self.session["jumps"] += 1
             if system:
+                self._here = str(system)
                 entry = self.visits.setdefault(str(system), {"count": 0, "last": ""})
+                been = int(entry.get("count", 0)) >= 1 or int(entry.get("scanned", 0)) >= 1
                 entry["previous"] = entry.get("last", "")
                 entry["count"] = int(entry.get("count", 0)) + 1
                 entry["last"] = day
-                if len(self.visits) > MAX_SYSTEMS:
-                    oldest = sorted(self.visits, key=lambda k: self.visits[k].get("last", ""))[:1000]
-                    for key in oldest:
-                        self.visits.pop(key, None)
+                if been and self.clock() - self._revisit_at >= REVISIT_COOLDOWN:
+                    self._revisit_at = self.clock()
+                    last = entry["previous"]
+                    speak = (str(system), entry["count"], int(entry.get("scanned", 0)),
+                             (" The last time was on %s." % last) if last else "")
+                self._trim()
             if len(self.jumps_by_day) > 400:
                 for key in sorted(self.jumps_by_day)[:100]:
                     self.jumps_by_day.pop(key, None)
             self._changed()
+        if speak and self.announce is not None:
+            try:
+                name, count, bodies, last = speak
+                self.announce("Stats_Revisit_Scanned" if bodies else "Stats_Revisit",
+                              {"System": name, "Count": count, "Bodies": bodies, "Last": last})
+            except Exception:
+                log.exception("Could not say we have been here before")
+
+    def _trim(self):
+        """Keeps the list from growing for ever: past the cap, the 500 systems seen longest ago are forgotten."""
+        if len(self.visits) > MAX_SYSTEMS:
+            oldest = sorted(self.visits, key=lambda k: self.visits[k].get("last", ""))[:TRIM_BY]
+            for key in oldest:
+                self.visits.pop(key, None)
 
     def _kill(self):
         with self._lock:
@@ -152,6 +181,69 @@ class StatsKeeper:
                     self.terraformable.append(str(body))
                     self.terraformable = self.terraformable[-MAX_BODIES:]
                     self._changed()
+        system = str(data.get("StarSystem") or self._here or "")
+        if system and data.get("ScanType") != "NavBeaconDetail":
+            with self._lock:
+                entry = self.visits.setdefault(system, {"count": 0, "last": self.today()})
+                entry["scanned"] = min(MAX_SCANNED, int(entry.get("scanned", 0)) + 1)
+                self._trim()
+                self._changed()
+
+    # ---- reading the old journals once ----
+    def seed(self, found):
+        """Adds what the old journals say: {system: (visits, last day, scanned bodies)}. Never lowers what she already counted."""
+        with self._lock:
+            for system, (count, last, scanned) in found.items():
+                entry = self.visits.setdefault(system, {"count": 0, "last": ""})
+                entry["count"] = max(int(entry.get("count", 0)), int(count))
+                entry["last"] = max(str(entry.get("last", "")), str(last))
+                entry["scanned"] = min(MAX_SCANNED, max(int(entry.get("scanned", 0)), int(scanned)))
+            while len(self.visits) > MAX_SYSTEMS:
+                self._trim()
+            self.history_done = True
+            self._dirty = True
+        self.flush()
+
+    def scan_history(self, folder):
+        """Once, in the background: which systems you have been in and scanned, from your old journals (a few lines per file)."""
+        if self.history_done or not folder:
+            return
+        found = {}
+        tags = (b'"event":"FSDJump"', b'"event":"CarrierJump"', b'"event":"Scan"')
+        try:
+            files = sorted(Path(folder).glob("Journal*.log"))
+        except OSError:
+            return
+        for file in files:
+            here = ""
+            try:
+                with open(file, "rb") as handle:
+                    for raw in handle:
+                        if not any(tag in raw for tag in tags):
+                            continue
+                        try:
+                            entry = json.loads(raw)
+                        except ValueError:
+                            continue
+                        kind, day = entry.get("event"), str(entry.get("timestamp") or "")[:10]
+                        if kind in ("FSDJump", "CarrierJump"):
+                            here = str(entry.get("StarSystem") or "")
+                            if here:
+                                old = found.get(here, (0, "", 0))
+                                found[here] = (old[0] + 1, max(old[1], day), old[2])
+                        elif kind == "Scan" and entry.get("ScanType") != "NavBeaconDetail":
+                            name = str(entry.get("StarSystem") or here)
+                            if name:
+                                old = found.get(name, (0, "", 0))
+                                found[name] = (old[0], max(old[1], day), old[2] + 1)
+            except OSError:
+                continue
+            time.sleep(0.02)
+        if len(found) > MAX_SYSTEMS:                      # keep only the newest ones
+            keep = sorted(found, key=lambda k: found[k][1], reverse=True)[:MAX_SYSTEMS]
+            found = {k: found[k] for k in keep}
+        self.seed(found)
+        log.info("Learned %d systems from the old journals", len(found))
 
     # ---- questions ----
     def visit_info(self, system):
@@ -160,6 +252,10 @@ class StatsKeeper:
         if not entry:
             return 0, ""
         return int(entry.get("count", 0)), str(entry.get("previous") or "")
+
+    def scanned_here(self, system):
+        """How many bodies you have scanned in this system (0 if none or unknown)."""
+        return int((self.visits.get(str(system or "")) or {}).get("scanned", 0))
 
     def kills_today(self):
         return self.kills_by_day.get(self.today(), 0)

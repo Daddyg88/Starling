@@ -683,6 +683,16 @@ class App:
         except Exception:
             self.log.exception("The codex history scan could not start")
 
+    def start_stats_history(self):
+        """Once, in the background: reads the old journals so she knows which systems you have been in and scanned."""
+        try:
+            if self.stats is None or self.stats.history_done:
+                return
+            import threading
+            threading.Thread(target=self.stats.scan_history, args=(self.journal_folder,), name="stats-history", daemon=True).start()
+        except Exception:
+            self.log.exception("The visited-systems scan could not start")
+
     def ensure_auto_shields(self):
         """Raises the suit shields when you draw a weapon or take damage on foot (dashboard setting, off by default)."""
         try:
@@ -887,6 +897,7 @@ class App:
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
         self.ensure_bio_distance()
         self.start_bio_codex_scan()
+        self.start_stats_history()
         self.ensure_auto_shields()
         self.monitor.start()
         return self.journal_folder

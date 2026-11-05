@@ -1,3 +1,4 @@
+import tempfile
 import json
 import random
 import unittest
@@ -1101,3 +1102,67 @@ class WatcherFriendTests(unittest.TestCase):
     def test_plenty_of_friend_lines(self):
         from tests.test_dialogue import said_by
         self.assertGreaterEqual(len(said_by("WatcherFriend")), 40)
+
+
+class EdAstroLocalListTests(unittest.TestCase):
+    """The whole list is kept on disk, and the truly nearest place is worked out here (the web 'nearest' kept answering Sol)."""
+
+    def make(self, items, tmp):
+        from navigation.edastro import EdAstro
+        calls = []
+
+        class Reply:
+            def __init__(self, raw): self.raw = raw
+            def read(self, n=-1): return self.raw
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+
+        def opener(request, timeout=0):
+            calls.append(request.full_url)
+            return Reply(json.dumps(items).encode())
+        return EdAstro(opener, tmp / "poi.json", clock=lambda: 1000.0), calls
+
+    ITEMS = [
+        {"id": 1, "name": "The Solar System", "galMapSearch": "Sol", "coordinates": [0, 0, 0]},
+        {"id": 2, "name": "Guardian Ruins - Far Nebula", "galMapSearch": "Far Nebula AB-C d1", "coordinates": [-9000, -200, 19500]},
+        {"id": 3, "name": "Nav Beacon Eastwards", "galMapSearch": "Near Beacon XY-Z b2", "coordinates": [-9100, -150, 19400], "rating": 3},
+        {"id": 4, "name": "no position", "galMapSearch": "Nowhere"},
+    ]
+
+    def test_finds_the_nearest_not_sol(self):
+        with tempfile.TemporaryDirectory() as d:
+            e, calls = self.make(self.ITEMS, Path(d))
+            place = e.nearest((-9120, -140, 19390))
+            self.assertEqual(place["system"], "Near Beacon XY-Z b2")
+            self.assertEqual(len(calls), 1)
+            self.assertIn("/combined", calls[0])
+            self.assertEqual(e.nearest((-9000, -200, 19480))["system"], "Far Nebula AB-C d1")
+            self.assertEqual(len(calls), 1)                         # the list is reused, not downloaded again
+            self.assertEqual(e.nearest((-9000, -200, 19480), 3)["system"], "Near Beacon XY-Z b2")   # a minimum rating
+
+    def test_nearest_many_is_sorted_nearest_first(self):
+        with tempfile.TemporaryDirectory() as d:
+            e, _ = self.make(self.ITEMS, Path(d))
+            names = [p["system"] for p in e.nearest_many((-9000, -200, 19480), 3)]
+            self.assertEqual(names[:2], ["Far Nebula AB-C d1", "Near Beacon XY-Z b2"])
+            self.assertEqual(names[2], "Sol")
+
+    def test_kept_on_disk_for_next_time(self):
+        with tempfile.TemporaryDirectory() as d:
+            e, calls = self.make(self.ITEMS, Path(d))
+            e.nearest((0, 0, 0))
+            again, calls2 = self.make([], Path(d))
+            self.assertEqual(again.nearest((-9120, -140, 19390))["system"], "Near Beacon XY-Z b2")
+            self.assertEqual(calls2, [])
+
+    def test_without_a_cache_file_the_old_web_call_is_used(self):
+        from navigation.edastro import EdAstro
+        urls = []
+
+        class Reply:
+            def read(self): return json.dumps({"galMapSearch": "Sol", "coordinates": [0, 0, 0]}).encode()
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+        e = EdAstro(lambda request, timeout=0: (urls.append(request.full_url), Reply())[1])
+        self.assertEqual(e.nearest((1, 2, 3))["system"], "Sol")
+        self.assertEqual(len(urls), 1)

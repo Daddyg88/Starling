@@ -167,7 +167,11 @@
     "Course locked. Jumping to {StarSystem}.",
     "Drive charged. {StarSystem} ahead.",
     "Entering hyperspace for {StarSystem}.",
-    "Destination {StarSystem}. Hold on tight."
+    "Destination {StarSystem}. Hold on tight.",
+    "Off to {StarSystem}.",
+    "Dropping into the jump for {StarSystem}.",
+    "Hyperspace to {StarSystem}, here we go.",
+    "Jump to {StarSystem} under way."
   ],
   "StartJump_Close": [
     "Jumping to {StarSystem}. Stay close to me.",
@@ -185,7 +189,21 @@
     "Frameshift drive charging.",
     "Charging the frameshift drive.",
     "Frameshift drive spooling up.",
-    "Drive charging."
+    "Drive charging.",
+    "Drive is coming up to temperature.",
+    "Spinning up the drive.",
+    "Frame shift drive building charge.",
+    "The drive's winding up.",
+    "Charging the jump drive.",
+    "Drive charge started.",
+    "Drive's gathering itself.",
+    "Charging up. Nearly there.",
+    "Powering the frame shift drive.",
+    "Jump drive coming online.",
+    "Drive spooling. Stand by.",
+    "Frameshift charge under way.",
+    "Here comes the drive charge.",
+    "Drive power building."
   ],
   "FsdCharging_Close": [
     "Friendship drive charging.",
@@ -225,7 +243,13 @@
   "DockingRequested": [
     "Requesting landing pad.",
     "Asking the station for a pad.",
-    "Docking request sent."
+    "Docking request sent.",
+    "Asking for a pad.",
+    "Docking request is in.",
+    "Request sent. Waiting for a pad.",
+    "Pad request sent.",
+    "Asking permission to dock.",
+    "Hailing the station for a pad."
   ],
   "DockingDenied_TooLarge": [
     "That station has no pad big enough for us.",
@@ -250,13 +274,22 @@
     "Taking off.",
     "Lifting off.",
     "Liftoff.",
-    "Up we go."
+    "Up we go.",
+    "And we're off the ground.",
+    "Lifting clear.",
+    "Liftoff, easy does it.",
+    "We're airborne.",
+    "Off the surface we go."
   ],
   "Touchdown": [
     "Landing complete.",
     "Touchdown.",
     "We've landed.",
-    "Landing successful."
+    "Landing successful.",
+    "Wheels down.",
+    "Touchdown, nice and soft.",
+    "Landed. Engines settling.",
+    "Feet on the ground, well, landing gear."
   ],
   "LandingGearDown": [
     "Landing gear deployed.",
@@ -268,7 +301,11 @@
     "Landing gear retracted.",
     "Landing gear up.",
     "Gear up.",
-    "Wheels up."
+    "Wheels up.",
+    "Gear up and tucked away.",
+    "Wheels are up.",
+    "Gear retracted. Smooth.",
+    "Up it comes. Gear stowed."
   ],
   "HardpointsDeployed": [
     "Weapons hot! Oh, I've been waiting for this.",
@@ -306,7 +343,11 @@
   "SrvHandbrakeOn": [
     "Handbrake on.",
     "Handbrake engaged.",
-    "Brake's on."
+    "Brake's on.",
+    "Handbrake's on.",
+    "Brake set.",
+    "Holding still. Brake on.",
+    "Parked up."
   ],
   "GlideStarted": [
     "Glide engaged.",
@@ -364,7 +405,14 @@
     "All bodies in this system have been found.",
     "Every body in this system has been found.",
     "System fully scanned.",
-    "That's every body in the system."
+    "That's every body in the system.",
+    "That's every body in the system found.",
+    "Nothing left to find here. System complete.",
+    "All the bodies are accounted for.",
+    "Full system scan, nothing missing.",
+    "Every last body has been found.",
+    "System fully mapped out, Commander.",
+    "That's all of them. Nothing hiding."
   ],
   "SAAScanComplete": [
     "Surface scan complete.",
@@ -377,7 +425,12 @@
     "Something on the scanners.",
     "Signal detected.",
     "Something is transmitting.",
-    "New signal source."
+    "New signal source.",
+    "Something's out there.",
+    "That's a signal, Commander.",
+    "Ooh, a signal.",
+    "Picked up a signal.",
+    "Something just lit up on the scanner."
   ],
   "CodexEntry": [
     "Interesting.",
@@ -532,7 +585,12 @@
     "Route plotted.",
     "Course set.",
     "Plotting a route.",
-    "Route locked in."
+    "Route locked in.",
+    "Route set, Commander.",
+    "Your route is in, follow the line.",
+    "Got the route. Off we go.",
+    "Course plotted.",
+    "The route's laid in."
   ],
   "GalaxyMapOpened_Sarcastic": [
     "I think we're lost.",
@@ -547,12 +605,20 @@
   "MaterialCollected_Friendly": [
     "Can I keep one? I can keep one, right?",
     "Ooh, shiny.",
-    "Material collected."
+    "Material collected.",
+    "One more for the pile.",
+    "Collected, nice one.",
+    "That's another one.",
+    "Got it!"
   ],
   "MaterialCollected_Close": [
     "Mine, mine, mine!",
     "Mine now!",
-    "Ooh, I like that one."
+    "Ooh, I like that one.",
+    "Ooh, that's a good one.",
+    "Another for the collection.",
+    "Got it, and it's mine.",
+    "That one's staying with me."
   ],
   "CollectCargo_Friendly": [
     "Gimme, gimme.",
@@ -654,13 +720,31 @@
     "Fuel scooping complete.",
     "Tanks are full.",
     "Fuel tank full.",
-    "Scooping complete, tanks full."
+    "Scooping complete, tanks full.",
+    "Tanks are topped up.",
+    "Full tank, Commander.",
+    "Scooping done and the tank is full.",
+    "That's every drop we can carry.",
+    "Fuel is full. Lovely.",
+    "The tank is brimming.",
+    "Topped up from the star. Cheap fuel.",
+    "Fuel at maximum. Off we go."
   ],
   "FuelScoopDisengaged": [
     "Fuel scoop disengaged.",
     "Scoop disengaged.",
     "Fuel scoop off.",
-    "Leaving the scoop."
+    "Leaving the scoop.",
+    "Scoop retracted. Back to normal flight.",
+    "Scoop disengaged, we're clear of the star.",
+    "Done with the star. Scoop is stowed.",
+    "Scoop's in. Clear of the corona.",
+    "No longer scooping.",
+    "Scoop shut. Nice and tidy.",
+    "That's the scoop packed away.",
+    "Scoop disengaged. Heat should drop now.",
+    "Scoop off. Away from the fire.",
+    "Scooping stopped."
   ],
   "Passengers": [
     "One of our passengers has a request.",
@@ -990,13 +1074,24 @@
     "Don't wander too far from me.",
     "On foot.",
     "Out we go.",
-    "Boots on the ground."
+    "Boots on the ground.",
+    "On foot now. Mind your step.",
+    "Out we go, on foot.",
+    "Stretching the legs.",
+    "On foot. Watch out for the wildlife.",
+    "Leaving the vehicle behind."
   ],
   "RefuelAll": [
     "Refuelling complete.",
     "Refuelled.",
     "Tanks topped up.",
-    "Fuel tank full."
+    "Fuel tank full.",
+    "Fuel topped up.",
+    "Tanks are full again.",
+    "Refuelled and ready.",
+    "All fuelled up.",
+    "Fuel's done.",
+    "That's the tank filled."
   ],
   "ShieldsUp": [
     "Shields back online. Right, where were we?",
@@ -1014,7 +1109,12 @@
     "Mass lock detected.",
     "We're mass locked.",
     "Mass locked.",
-    "Mass lock engaged."
+    "Mass lock engaged.",
+    "Mass locked, can't jump from here.",
+    "Something big is holding us. Mass lock.",
+    "Mass lock on. Drive is unavailable.",
+    "Mass lock engaged, Commander.",
+    "Gravity's got us. Mass locked."
   ],
   "ColdWarning": [
     "It's getting cold out here.",
@@ -1099,22 +1199,40 @@
     "Galaxy map open.",
     "Opening the galaxy map.",
     "Galaxy map up.",
-    "Here's the galaxy map."
+    "Here's the galaxy map.",
+    "Galaxy map is up.",
+    "Here's the galaxy, Commander.",
+    "Galaxy map on screen.",
+    "Map's open. Where to?",
+    "Plenty of stars to pick from."
   ],
   "GalaxyMapClosed": [
     "Galaxy map closed.",
     "Closing the galaxy map.",
-    "Galaxy map off."
+    "Galaxy map off.",
+    "Map closed.",
+    "Galaxy map away.",
+    "Putting the galaxy away.",
+    "Back to the view.",
+    "Galaxy map shut."
   ],
   "SystemMapOpened": [
     "System map open.",
     "Opening the system map.",
-    "System map up."
+    "System map up.",
+    "System map is up.",
+    "Here's the system.",
+    "Pulling up the system map."
   ],
   "SystemMapClosed": [
     "System map closed.",
     "Closing the system map.",
-    "System map off."
+    "System map off.",
+    "Map closed.",
+    "System map away.",
+    "Back to flying.",
+    "System map shut.",
+    "Putting the system map away."
   ],
   "WakeHeard": [
     "Yes, Commander?",

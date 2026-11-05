@@ -17,6 +17,7 @@ Chat text is NEVER treated as a free-form command. An action only happens when i
 """
 
 import re
+import unicodedata
 from collections import deque
 from dataclasses import dataclass
 
@@ -71,8 +72,14 @@ def clean_name(name):
     return name[:MAX_NAME] or "someone"
 
 
+_EMOTICON = re.compile(r"(?:(?<=\s)|^)[:;=][-']?[)(DPpOo3/\\|]+(?=\s|$)")
+
+
 def tidy(text):
+    """One tidy line: no control characters, no emoji and no :D style faces (she would read them out loud)."""
     text = re.sub(r"[\x00-\x1f\x7f]", " ", str(text or ""))
+    text = "".join(ch for ch in text if unicodedata.category(ch) not in ("So", "Cs", "Co", "Cn"))
+    text = _EMOTICON.sub(" ", text)
     return re.sub(r"\s+", " ", text).strip()
 
 

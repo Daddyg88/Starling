@@ -1267,3 +1267,11 @@ window use the same code as the biology list.
 ## 0.79.5 - Route map zoom
 
 * navigation/galaxy_map.py: zoom_view() fits points with a thin margin (EDGE_ROOM 8%), route_view() starts with the whole route and after each passed waypoint begins at that waypoint (plus the remaining waypoints, the destination and your position). The inset (small whole-galaxy picture) and its drawing code were removed. Never zooms past MIN_SPAN_LY (1,500 ly) or beyond the galaxy. Tests in tests/test_route_map.py (RouteZoom). The on-screen result is untested (GUI).
+
+## 0.80.0 - Log fixes
+
+* navigation/edastro.py: the full landmark list (/gec/json/combined) is cached in data/poi_cache.json (refreshed weekly); nearest_local()/nearest_many() find the nearest by distance; navigation/voice.py _nearest_known_place walks that list nearest-first and checks each name on Spansh. EDAstro itself was not reachable from the sandbox, so the download is untested live.
+* memory/stats.py: visits now also hold a 'scanned' body count; scan_history(folder) reads old journals once (history_done flag in stats.json) and seed() merges the result; MAX_SYSTEMS 5000 (TRIM_BY 500 oldest dropped); FSDJump into a known system says Stats_Revisit or Stats_Revisit_Scanned (voicepacks/default/stats.json) with a 10 minute cooldown. core/app.py start_stats_history() starts the scan in the background.
+* personality/llm.py: looks_foreign() and extra refusal/leak phrases make clean_reply() reject odd replies. streaming/chat.py tidy() strips emoji and emoticons. streaming/bridge.py _youtube_notes() and INFO status logging.
+* Dialogue: Curd Nerd removed from callouts.json; about 130 variants added (dialogue.json, talk.json, biodistance.json, routemap.json). Tests: tests/test_session_fixes.py.
+

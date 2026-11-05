@@ -5,13 +5,23 @@
   "That's {distance} metres. Far enough. Next sample, Commander.",
   "Far enough from the last one. Go ahead and sample.",
   "Distance reached. You can take the next sample now.",
-  "This is far enough. Sample whenever you're ready."
+  "This is far enough. Sample whenever you're ready.",
+  "Far enough now. Go ahead.",
+  "That's the distance. Sample away.",
+  "You've walked far enough, Commander.",
+  "Clear of the last sample. Your turn.",
+  "Good distance. Take the next one.",
+  "Far enough from the last one. Off you go."
  ],
  "BioFarEnough_Friendly": [
-  "Nice walking. That's far enough, take the next sample."
+  "Nice walking. That's far enough, take the next sample.",
+  "Lovely, that's far enough. Sample away.",
+  "Good walk. Take the next sample."
  ],
  "BioFarEnough_Close": [
-  "That's far enough, love. Go on, take your sample."
+  "That's far enough, love. Go on, take your sample.",
+  "Far enough now, love. Go on.",
+  "That's the distance, darling. Take your sample."
  ],
  "BioFarEnough_Sarcastic": [
   "Congratulations, you've walked {distance} metres. Now sample something."

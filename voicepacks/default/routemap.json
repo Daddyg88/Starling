@@ -2,11 +2,19 @@
  "RouteMap_Hidden": [
   "Route map hidden.",
   "Done, the route map is gone.",
-  "Hidden. I'm still following the route."
+  "Hidden. I'm still following the route.",
+  "Route map off. I'm still tracking.",
+  "Tucked away.",
+  "Map hidden. Still on the route.",
+  "Gone from the screen, but I'm still counting waypoints."
  ],
  "RouteMap_Shown": [
   "Route map is back.",
   "There it is.",
-  "Showing the route map."
+  "Showing the route map.",
+  "Route map up.",
+  "Here's the route again.",
+  "Route map on screen.",
+  "Back on the screen."
  ]
 }

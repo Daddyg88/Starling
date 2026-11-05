@@ -37,7 +37,23 @@ LEAKS = ("as an ai", "language model", "openai", "alibaba", "qwen", "chatgpt", "
          "i don't have emotions", "i do not have emotions", "don't have feelings", "do not have feelings", "no emotions", "no feelings",
          "can't assist", "cannot assist", "can't help with that", "cannot help with that", "inappropriate", "unethical", "i'm just an",
          "i am just an", "here to assist", "here to provide", "information and assistance", "entertainment and information",
-         "how can i help", "how can i assist", "as starling, i", "i'm programmed", "i am programmed")
+         "how can i help", "how can i assist", "as starling, i", "i'm programmed", "i am programmed",
+         "need more context", "more context about", "i'm sorry, but", "i am sorry, but", "i'm sorry, i", "i apologize", "i'm just observing",
+         "providing answers", "continue our conversation elsewhere", "misunderstood", "peaceful haven")
+FOREIGN = frozenset("je tu il elle nous vous ils est sont pas ne je suis c'est comment pourquoi mais avec pour dans une des les mon ton "
+                    "ich du nicht und der die das ist wir sie ein eine wie warum aber mit für "
+                    "el los las una por para como pero esta está tengo "
+                    "não você uma com mais isso "
+                    "che non sono è della questo perché ciao".split())
+
+
+def looks_foreign(lowered):
+    """True when the model slipped into French, German, Spanish and so on (accented letters, or several foreign little words)."""
+    accents = sum(1 for ch in lowered if 0xC0 <= ord(ch) <= 0x24F)
+    if accents >= 2:
+        return True
+    words = re.findall(r"[a-zà-ÿ']+", lowered)
+    return sum(1 for w in words if w in FOREIGN) >= 2
 UNSAFE = ("suicide", "kill yourself", "kill myself", "self-harm", "self harm", "hurt yourself", "rape", "porn", "nazi", "heroin", "cocaine",
           "overdose")
 SWEARS = ("fuck", "shit", "bitch", "cunt", "bastard", "asshole", "dick", "twat", "wanker", "bollocks")
@@ -81,7 +97,7 @@ def clean_reply(text, allow_mature=False):
     if not letters or sum(1 for ch in letters if ord(ch) < 0x250) / len(letters) < 0.9:      # mostly Latin letters only
         return None
     lowered = text.lower()
-    if any(leak in lowered for leak in LEAKS) or any(bad in lowered for bad in UNSAFE):
+    if any(leak in lowered for leak in LEAKS) or any(bad in lowered for bad in UNSAFE) or looks_foreign(lowered):
         return None
     if "http" in lowered or "www." in lowered or ".com" in lowered or len(re.findall(r"\d", text)) >= 8:
         return None

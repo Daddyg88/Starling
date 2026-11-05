@@ -27,6 +27,7 @@ class ChatBridge:
         self.source_factory = source_factory
         self.youtube_factory = youtube_factory
         self.slots = {}
+        self.notes = []
         self.clock = clock
         self.queue = queue.Queue(maxsize=QUEUE_SIZE)
         self.source = None
@@ -97,7 +98,24 @@ class ChatBridge:
             slot["source"].start()
         self.source = (self.slots.get("twitch") or {}).get("source")
         self.channel = wanted["twitch"]
+        self.notes = self._youtube_notes(on, key, self.settings.get("streaming.youtube_video", ""), video)
         self._write_status(on)
+
+    @staticmethod
+    def _youtube_notes(on, key, video_text, video):
+        """Plain-words hints when YouTube is half set up, so the Streaming page says what is missing."""
+        video_text = str(video_text or "").strip()
+        if not on or not (key or video_text):
+            return []
+        if video_text and not video:
+            return ["YouTube: that doesn't look like a live stream link (it needs ...watch?v=... or youtu.be/...)"]
+        if video and not key:
+            return ["YouTube: add your YouTube API key"]
+        if key and not video_text:
+            return ["YouTube: paste the link of your live stream"]
+        if not youtube.looks_like_key(key):
+            return ["YouTube: that doesn't look like an API key (about 39 letters and numbers, starting AIza)"]
+        return []
 
     def _status_setter(self, platform):
         def set_status(text):
@@ -108,13 +126,19 @@ class ChatBridge:
         return set_status
 
     def _write_status(self, on):
-        if not self.slots:
-            self.state_text = "Off" if not on else "Chat is on: type your Twitch channel name or add your YouTube key and link"
-        elif len(self.slots) == 1:
-            self.state_text = next(iter(self.slots.values()))["status"]
+        parts = []
+        if len(self.slots) == 1 and not self.notes:
+            parts = [next(iter(self.slots.values()))["status"]]
         else:
-            self.state_text = " | ".join("%s: %s" % (name.capitalize() if name == "twitch" else "YouTube", slot["status"])
-                                         for name, slot in self.slots.items())
+            parts = ["%s: %s" % ("Twitch" if name == "twitch" else "YouTube", slot["status"]) for name, slot in self.slots.items()]
+            parts += [note for note in self.notes if not note.startswith("YouTube") or "youtube" not in self.slots]
+        if not parts:
+            text = "Off" if not on else "Chat is on: type your Twitch channel name or add your YouTube key and link"
+        else:
+            text = " | ".join(parts)
+        if text != self.state_text:
+            log.info("Streaming: %s", text)
+        self.state_text = text
 
     def _stop_source(self, source):
         if source is not None:

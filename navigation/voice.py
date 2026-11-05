@@ -206,7 +206,7 @@ class RouteVoice:
         self._ignore_until = 0.0         # her own galaxy map macro sets targets too: ignore those
         self._last_auto = ""
         self._home_said = None
-        self.edastro = EdAstro()
+        self.edastro = EdAstro(cache_file=paths.DATA_DIR / "poi_cache.json")
         self.emergency_file = paths.DATA_DIR / "emergency_route.json"
         self._emergency = self._load_emergency()
         self.engineers = EngineerBook()
@@ -866,6 +866,18 @@ class RouteVoice:
     def _nearest_known_place(self, position):
         """Ask EDAstro for the nearest landmark, then for better-rated ones, until Spansh knows the system by that exact name."""
         tried = set()
+        many = getattr(self.edastro, "nearest_many", None)
+        for place in (many(position) if many else []):          # the downloaded list: nearest first, so walk it in order
+            if place["system"].casefold() in tried:
+                continue
+            tried.add(place["system"].casefold())
+            try:
+                exact = self.spansh.find_system(place["system"])
+            except SpanshError:
+                continue
+            if exact.casefold() == place["system"].casefold():
+                place["system"] = exact
+                return place
         for rating in (None, 2, 3, 4, 5):
             try:
                 place = self.edastro.nearest(position, rating)

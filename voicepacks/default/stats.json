@@ -1,5 +1,5 @@
 {
- "_help": "Her answers about your numbers (memory/stats.py). Fields: {System} {Count} {Last} {Today} {Total} {Number}. || splits a line into sentences.",
+ "_help": "Her answers about your numbers (memory/stats.py). Fields: {System} {Count} {Bodies} {Last} {Today} {Total} {Number}. || splits a line into sentences.",
  "Brain_Stats": [
   "Let me check my numbers."
  ],
@@ -58,5 +58,23 @@
  ],
  "Stats_KillMilestone_Close": [
   "{Number} kills, love. I'm so proud of you."
+ ],
+ "Stats_Revisit": [
+  "{System} again. I remember this place.",
+  "Back in {System}. That's visit number {Count}.",
+  "We've been to {System} before, Commander.{Last}",
+  "{System}. Familiar. I've got this one in my notes."
+ ],
+ "Stats_Revisit_Scanned": [
+  "We've been here before. I've got {Bodies} scanned bodies in {System} on file.",
+  "{System} again. You've already scanned {Bodies} things in this system.",
+  "I remember {System}. {Bodies} bodies scanned last time, so keep an eye out for what's left.",
+  "Back in {System}, and you've already done a good chunk of the scanning here."
+ ],
+ "Stats_Revisit_Scanned_Sarcastic": [
+  "{System} again. You've already scanned {Bodies} bodies. Looking for something you missed?"
+ ],
+ "Stats_Revisit_Scanned_Close": [
+  "Back in {System}, love. You've already scanned {Bodies} bodies here."
  ]
 }

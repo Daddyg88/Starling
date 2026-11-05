@@ -7,7 +7,15 @@
   "Welcome to {StarSystem}. || I do like a fresh system. You never know what's waiting.",
   "We made it to {StarSystem} in one piece. || That is always my favourite kind of jump.",
   "All good on arrival. || Shall we see what this system has to offer?",
-  "Nicely done. {StarSystem} is on the board, and the drive is cooling down already."
+  "Nicely done. {StarSystem} is on the board, and the drive is cooling down already.",
+  "Arrived in {StarSystem}. || Scanners are on and the drive is cooling.",
+  "{StarSystem}, as promised. || Nothing has tried to eat us yet.",
+  "Out of the jump and into {StarSystem}. || Smooth enough for me.",
+  "We're through to {StarSystem}. || Let's see what's here.",
+  "Jump done. {StarSystem} is all yours, Commander.",
+  "That's {StarSystem}. || Everything is reporting normal.",
+  "In {StarSystem} and in one piece. || I'll take that every time.",
+  "{StarSystem} on the board. || The drive is quietly pleased with itself."
  ],
  "FSDJump_Friendly": [
   "We're in {StarSystem}, and I'm enjoying this trip more than I expected to. || You fly beautifully, you know.",
