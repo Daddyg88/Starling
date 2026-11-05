@@ -1275,3 +1275,7 @@ window use the same code as the biology list.
 * personality/llm.py: looks_foreign() and extra refusal/leak phrases make clean_reply() reject odd replies. streaming/chat.py tidy() strips emoji and emoticons. streaming/bridge.py _youtube_notes() and INFO status logging.
 * Dialogue: Curd Nerd removed from callouts.json; about 130 variants added (dialogue.json, talk.json, biodistance.json, routemap.json). Tests: tests/test_session_fixes.py.
 
+
+## 0.80.1 - Route map fixed view
+
+* navigation/galaxy_map.py route_view() now always fits the whole route (zoom_view of all points); the per-waypoint zoom was removed at the user's request. tests/test_route_map.py updated. Looks on screen untested (GUI).

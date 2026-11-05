@@ -156,18 +156,12 @@ def zoom_view(points, margin=EDGE_ROOM):
     return View(centre_x - span / 2.0, centre_z - span / 2.0, span)
 
 
-def route_view(points, index, here_point=None):
-    """Starts as the whole route (start near one edge, destination near the other). Each time you pass a waypoint the picture
-    zooms in: it begins again at the waypoint you just reached and ends at the destination."""
+def route_view(points, index=0, here_point=None):
+    """The picture stays fixed on the whole route (start near one edge, destination near the other) so it never zooms in as
+    you pass waypoints. 'index' and 'here_point' are kept so old callers still work."""
     if len(points) < 2:
         return fit_view([(p["x"], p["z"]) for p in points] + ([(here_point["x"], here_point["z"])] if here_point else []))
-    passed = [p for p in points if p["index"] < index]
-    origin = passed[-1] if passed else points[0]
-    ahead = [p for p in points if p["index"] > origin["index"]] or [points[-1]]
-    shown = [(origin["x"], origin["z"])] + [(p["x"], p["z"]) for p in ahead]
-    if here_point is not None:
-        shown.append((here_point["x"], here_point["z"]))
-    return zoom_view(shown)
+    return zoom_view([(p["x"], p["z"]) for p in points])
 
 
 # ---- the route ----

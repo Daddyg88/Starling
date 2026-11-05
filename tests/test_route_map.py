@@ -178,16 +178,14 @@ class RouteZoom(unittest.TestCase):
         self.assertLess(x1, 12)
         self.assertGreater(x2, 88)
 
-    def test_zooms_in_after_every_waypoint(self):
+    def test_the_view_stays_on_the_whole_route(self):
         pts = self.points()
         spans = [gm.route_view(pts, i).span for i in range(0, 5)]
-        self.assertEqual(spans, sorted(spans, reverse=True))
-        self.assertLess(spans[3], spans[0] * 0.6)
-        # after passing waypoint 2 the picture starts at waypoint 2 and ends at the destination
+        self.assertEqual(len(set(spans)), 1)                      # no zooming in as waypoints are passed
         view = gm.route_view(pts, 3)
-        (x1, _), (x2, _) = self.where(view, pts[2]), self.where(view, pts[-1])
-        self.assertLess(x1, 15)
-        self.assertGreater(x2, 85)
+        (x1, _), (x2, _) = self.where(view, pts[0]), self.where(view, pts[-1])
+        self.assertLess(x1, 12)
+        self.assertGreater(x2, 88)
 
     def test_never_zooms_in_past_the_limit_and_never_past_the_galaxy(self):
         pts = self.points()
