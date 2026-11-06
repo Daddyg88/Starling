@@ -74,6 +74,11 @@ def make_bundle(settings_path, logs_dir, data_dir, version, target_dir):
                 bundle.writestr("logs/" + log.name, _tail(log, MAX_LOG_BYTES))
             except OSError:
                 continue
+        try:                                                  # the little black-and-white maps of failed panel looks (no game pictures)
+            for png in sorted((Path(data_dir) / "panel_debug").glob("*.png"))[-24:]:
+                bundle.write(png, "panel_debug/" + png.name)
+        except OSError:
+            pass
     return out
 
 

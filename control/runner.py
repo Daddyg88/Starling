@@ -590,17 +590,24 @@ class CommandRunner:
         if self.settings.get("panel.read_screen", True):
             reader = self.panel_reader or panel_reader.capture_screen
             seen = {"ok": False}
+            notes, shots = [], []
 
             def read():
-                found = panel_reader.find_tab(reader())
+                picture = reader()
+                found = panel_reader.find_tab(picture)
                 seen["ok"] = seen["ok"] or found is not None
+                if picture is not None and len(shots) < 8:
+                    shots.append((len(notes), picture))
                 return found
             try:
                 done = panel_reader.goto_tab(read, lambda: press("CycleNextPanel"), lambda: press("CyclePreviousPanel"),
-                                             self.sleep, number)
+                                             self.sleep, number, note=notes.append)
             except Exception:
                 log.exception("Looking at the panel failed")
                 done = False
+            if not done:
+                log.info("Panel walk to tab %d: %s", number, "; ".join(notes) if notes else "no looks")
+                self._save_panel_masks(shots)
             if problems:
                 return problems[0]
             if done:
@@ -616,6 +623,23 @@ class CommandRunner:
                 return problems[0]
             self.sleep(0.5)
         return None
+
+    @staticmethod
+    def _save_panel_masks(shots):
+        """When a look fails, keeps a few small black-and-white 'what is bright' maps in data/panel_debug (never the game
+        picture) so the diagnostics zip can show what she saw."""
+        from control import panel_reader
+        from core import paths
+        try:
+            folder = paths.DATA_DIR / "panel_debug"
+            folder.mkdir(parents=True, exist_ok=True)
+            for old in sorted(folder.glob("*.png"))[:-24]:
+                old.unlink()
+            stamp = __import__("time").strftime("%H%M%S")
+            for index, (when, picture) in enumerate(shots):
+                panel_reader.mask_png(picture, folder / ("%s-%d.png" % (stamp, index)))
+        except Exception:
+            log.debug("Could not save the panel maps", exc_info=True)
 
     def _select_button(self, strokes, pressed, trace):
         """The 'select button' macro step. Returns None (pressed Select), "no_button" (she can see the screen but not the button,

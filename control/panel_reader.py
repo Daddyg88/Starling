@@ -127,22 +127,62 @@ def find_button(picture):
     return None
 
 
-def goto_tab(read, press_next, press_previous, wait, target):
+def describe(spot):
+    """A short text for the log: what she saw."""
+    if spot is None:
+        return "nothing"
+    return "%s(x=%.3f, w=%.3f, y=%.3f)" % ("icon" if spot.get("icon") else "tab", spot["cx"], spot["width"], spot["y"])
+
+
+def mask_png(picture, path):
+    """Saves ONLY the black-and-white 'what is bright' map (about 480 pixels wide, no game picture) so a failed look can be
+    studied afterwards without keeping a screenshot. Returns True if it was written."""
+    try:
+        import numpy as np
+        from PIL import Image
+        step = max(1, picture.shape[1] // SMALL_WIDTH)
+        small = picture[::step, ::step].astype(np.int16)
+        peak, low = small.max(axis=2), small.min(axis=2)
+        mask = (peak >= MIN_BRIGHT) & ((peak - low) >= MIN_SATURATION * np.maximum(peak, 1))
+        Image.fromarray((mask * 255).astype(np.uint8)).save(str(path))
+        return True
+    except Exception:
+        return False
+
+
+def goto_tab(read, press_next, press_previous, wait, target, note=None):
     """Walk to tab number `target` (0 = Navigation, 1 = Transactions, 2 = Contacts) by looking after every key.
 
     read()           -> what find_tab gives for the screen right now, or None
     press_next()     press the 'next panel tab' key;  press_previous() the 'previous' one
     wait(seconds)    pause
+    note(text)       (optional) is told what happens at every step, for the log
     Returns True when she got there and could see that she did, False when she could not tell (the caller then falls back to
     counting presses blind, the way the macro always did)."""
-    here = read()
+    say = note or (lambda text: None)
+
+    def look(after):
+        """Look once the panel has settled: two looks 0.3 s apart must agree (the tab highlight slides for a moment)."""
+        first = read()
+        for _ in range(3):
+            wait(0.3)
+            second = read()
+            if first is not None and second is not None and abs(first["cx"] - second["cx"]) < 0.01 \
+                    and bool(first.get("icon")) == bool(second.get("icon")):
+                say("%s -> %s" % (after, describe(second)))
+                return second
+            first = second
+        say("%s -> %s (never settled)" % (after, describe(first)))
+        return first
+
+    here = look("start")
     if here is None:
         return False
     if not here.get("icon"):
         for _ in range(6):                                     # step 1: left until she is on the little icon tab (the very first one)
             press_previous()
             wait(WAIT_AFTER_KEY)
-            now = read()
+            now = look("previous")
             if now is None:
                 return False
             if now.get("icon"):
@@ -155,7 +195,7 @@ def goto_tab(read, press_next, press_previous, wait, target):
             if moved > 1.2:                                    # jumped to the far right: it wrapped (no icon tab on this panel)
                 press_next()
                 wait(WAIT_AFTER_KEY)
-                back = read()
+                back = look("next (it had wrapped)")
                 if back is None:
                     return False
                 here = back
@@ -167,14 +207,14 @@ def goto_tab(read, press_next, press_previous, wait, target):
     if here.get("icon"):                                       # one step right of the icon is Navigation (tab 0)
         press_next()
         wait(WAIT_AFTER_KEY)
-        now = read()
+        now = look("next from the icon")
         if now is None or now.get("icon"):
             return False
         here = now
     for _ in range(target):                                    # step 2: forward to the one we want, checking each press worked
         press_next()
         wait(WAIT_AFTER_KEY)
-        now = read()
+        now = look("next")
         if now is None or (now["cx"] - here["cx"]) / max(here["width"], 0.01) < 0.5:
             return False
         here = now

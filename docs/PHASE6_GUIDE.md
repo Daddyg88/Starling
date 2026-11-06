@@ -702,6 +702,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.82.2 adds `select button` (presses Select only if the bright selected button is visible in the right-hand pane; no button = no key, and she says so) and teaches the tab reader about the small icon tab left of Navigation. The docking macro no longer uses UI_Up (it closed the panel). In the log trace look for `button>seen`, `button>not seen` or `button>unreadable`.
 
+0.82.3: every look waits for the tab highlight to settle (two looks 0.3 s apart must agree). When a tab walk fails the log has a `Panel walk to tab N: ...` line with what she saw after each key, and data/panel_debug holds small black-and-white maps (no game picture) that the diagnostics zip includes.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.
