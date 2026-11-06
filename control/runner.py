@@ -512,8 +512,14 @@ class CommandRunner:
                         return Outcome(status, text, command, intent, detail=self._explain(status, command))
                     self.sleep(GAP_SECONDS)
                 continue
+            if step[0] == "openleft":
+                problem = self._open_left_panel(strokes, pressed, trace)
+                if problem:
+                    status = SEND_FAILURE_STATUS.get(problem, "failed")
+                    return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                continue
             if step[0] == "tab":
-                problem = self._go_to_tab(step[1], strokes, pressed, trace)
+                problem = self._go_to_tab(step[1], strokes, pressed, trace, step[2] if len(step) > 2 else 0)
                 if problem:
                     status = SEND_FAILURE_STATUS.get(problem, "failed")
                     return Outcome(status, text, command, intent, detail=self._explain(status, command))
@@ -556,7 +562,7 @@ class CommandRunner:
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
                        detail=command.do_text(intent) + ".")
 
-    def _go_to_tab(self, number, strokes, pressed, trace):
+    def _go_to_tab(self, number, strokes, pressed, trace, start=0):
         """The 'tab N' macro step. Looks at the left panel to find the tab it opened on and walks to tab N; if she cannot see the
         screen it presses next tab N times (the old behaviour, which assumes the panel opened on Navigation).
         Returns None, or the sender's problem text if a key could not be pressed."""
@@ -591,11 +597,50 @@ class CommandRunner:
                 return None
             log.info("Panel: she could not read the screen (%s), so she counted the tab presses instead.",
                      "tab bar not found" if not seen["ok"] else "the tab did not move as expected")
-        for _ in range(number):
-            press("CycleNextPanel")
+        action = "CycleNextPanel" if number >= start else "CyclePreviousPanel"
+        for _ in range(abs(number - start)):             # blind: she assumes the panel is on tab `start` (Navigation unless told)
+            press(action)
             if problems:
                 return problems[0]
             self.sleep(0.5)
+        return None
+
+    def _open_left_panel(self, strokes, pressed, trace):
+        """The 'open left panel' macro step: gets the left panel open from whatever the game is showing.
+        GuiFocus: 0 cockpit, 1 right panel, 2 left panel, 3 comms, 4 role, 5 station services, 6 galaxy map, 7 system map,
+        8 orrery, 9 FSS, 10 SAA, 11 codex. Returns None, or the sender's problem text."""
+        def press(action):
+            problem = self.sender.send(strokes[action], hold=0.15)
+            pressed.append(action)
+            return problem
+
+        gui = self._gui_focus()
+        trace.append("open>gui%s" % gui)
+        if gui == 2:
+            return None                                  # already open: pressing the key again would CLOSE it
+        if gui in (5, 6, 7, 8, 9, 10, 11):               # a full screen is in the way: Back out of it first
+            problem = press("UI_Back")
+            if problem:
+                return problem
+            self.sleep(1.2)
+            gui = self._gui_focus()
+            trace.append("back>gui%s" % gui)
+            if gui in (5, 6, 7, 8, 9, 10, 11):
+                log.warning("Panel: the screen (gui %s) would not close, so she did not press more keys.", gui)
+                return "failed"
+        if gui == 2:
+            return None
+        for attempt in range(2):
+            problem = press("FocusLeftPanel")
+            if problem:
+                return problem
+            self.sleep(1.6)
+            gui = self._gui_focus()
+            trace.append("focus>gui%s" % gui)
+            if gui in (2, "?"):                          # open, or Status.json cannot tell: carry on as the macro always did
+                return None
+            if gui != 0:                                 # something else opened: one more press would only close it
+                break
         return None
 
     def _key_clashes(self, strokes):

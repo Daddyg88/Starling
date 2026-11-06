@@ -16,6 +16,10 @@ A step is one of:
                            and wait for the screen to open. Used when a key press closes the panel by accident.
     "tab 2"                look at the left panel and go to that tab (0 = Navigation, 1 = Transactions, 2 = Contacts), whichever tab it
                            opened on. If she cannot see the screen she presses next tab that many times, as before.
+    "tab 0 from 2"         the same, but if she cannot see the screen she assumes the panel is on tab 2 and presses previous tab twice
+    "open left panel"      get the left panel open from WHATEVER is on screen (Status.json GuiFocus): nothing if it is already open,
+                           Back first if the galaxy map / system map / station services / FSS is open, then Focus Left Panel.
+                           (A plain "FocusLeftPanel" would CLOSE the panel if it was already open.)
     "paste"                press Ctrl+V (pastes what is on the clipboard, e.g. the next neutron waypoint)
     "enter"                press the Enter key
     "say Launch_Start"     she says a line from that dialogue key (used by auto launch: "I have control")
@@ -80,14 +84,21 @@ def parse_macro(steps):
             except ValueError:
                 raise ValueError("I don't understand this ensure (write it like: ensure FocusLeftPanel 2): %r" % text)
             continue
+        if lowered == "open left panel":
+            parsed.append(("openleft",))
+            continue
         if lowered.startswith("tab "):
             try:
-                number = int(text[4:].strip())
-                if not 0 <= number <= 3:
+                bits = lowered.split()
+                if len(bits) not in (2, 4) or (len(bits) == 4 and bits[2] != "from"):
+                    raise ValueError
+                number = int(bits[1])
+                start = int(bits[3]) if len(bits) == 4 else 0
+                if not (0 <= number <= 3 and 0 <= start <= 3):
                     raise ValueError
             except ValueError:
-                raise ValueError("I don't understand this tab step (write it like: tab 2): %r" % text)
-            parsed.append(("tab", number))
+                raise ValueError("I don't understand this tab step (write it like: tab 2  or  tab 0 from 2): %r" % text)
+            parsed.append(("tab", number, start))
             continue
         if lowered in LITERALS:
             parsed.append(("literal", lowered))
@@ -116,6 +127,10 @@ def actions_in(parsed):
     for step in parsed:
         if step[0] in ("press", "hold", "ensure", "leave") and step[1] not in seen:
             seen.append(step[1])
+        if step[0] == "openleft":
+            for needed in ("FocusLeftPanel", "UI_Back"):
+                if needed not in seen:
+                    seen.append(needed)
         if step[0] == "tab":
             for needed in ("CycleNextPanel", "CyclePreviousPanel"):
                 if needed not in seen:

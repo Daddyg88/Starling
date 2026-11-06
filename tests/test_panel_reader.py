@@ -6,6 +6,7 @@ import numpy as np
 
 from control import panel_reader as pr
 from control.macros import actions_in, parse_macro
+from tests.test_macros import ALL as ALL_KEYS
 
 TABS = 4
 SHOTS = Path("/mnt/user-data/attachments/056a8d7e-59f4-5178-84a2-456c45d6729a")
@@ -84,9 +85,12 @@ class WalkTests(unittest.TestCase):
 
 class MacroStepTests(unittest.TestCase):
     def test_parse_and_actions(self):
-        self.assertEqual(parse_macro(["tab 2"]), [("tab", 2)])
+        self.assertEqual(parse_macro(["tab 2"]), [("tab", 2, 0)])
+        self.assertEqual(parse_macro(["tab 0 from 2"]), [("tab", 0, 2)])
+        self.assertEqual(parse_macro(["open left panel"]), [("openleft",)])
+        self.assertEqual(actions_in(parse_macro(["open left panel"])), ["FocusLeftPanel", "UI_Back"])
         self.assertEqual(actions_in(parse_macro(["tab 2"])), ["CycleNextPanel", "CyclePreviousPanel"])
-        for bad in ("tab x", "tab 9"):
+        for bad in ("tab x", "tab 9", "tab 0 from"):
             with self.assertRaises(ValueError):
                 parse_macro([bad])
 
@@ -110,6 +114,47 @@ class RunnerTests(unittest.TestCase):
             with self.assertLogs("starling", level="INFO") as logs:
                 r.run_text("request docking")
             self.assertTrue(any("went to tab 2" in line for line in logs.output), start)
+
+
+class OpenLeftPanelTests(unittest.TestCase):
+    """'open left panel' from every screen the game can be showing (GuiFocus from Status.json)."""
+
+    def run_from(self, gui, closes_on_back=True):
+        from tests.test_macros import MacroTests
+        from journal.game_state import GameState
+        t = MacroTests()
+        r = t.build()
+        state = GameState()
+        state.status_seen = True
+        state.gui_focus = gui
+        r.state_provider = lambda: state
+
+        def send(stroke, hold=0.0):
+            t.sender.pressed.append(stroke)
+            if stroke.key == "Key_6":                               # UI_Back
+                if closes_on_back and state.gui_focus in (5, 6, 7, 8, 9, 10, 11):
+                    state.gui_focus = 0
+            elif stroke.key == "Key_0":                             # FocusLeftPanel: opens, or CLOSES if already open
+                state.gui_focus = 0 if state.gui_focus == 2 else 2
+            return None
+        t.sender.pressed = []
+        t.sender.send = send
+        strokes = {"FocusLeftPanel": ALL_KEYS["FocusLeftPanel"][0], "UI_Back": ALL_KEYS["UI_Back"][0]}
+        problem = r._open_left_panel(strokes, [], [])
+        return problem, [s.key for s in t.sender.pressed], state.gui_focus
+
+    def test_every_starting_screen(self):
+        for gui, keys in ((0, ["Key_0"]), (1, ["Key_0"]), (2, []), (3, ["Key_0"]), (4, ["Key_0"]),
+                          (5, ["Key_6", "Key_0"]), (6, ["Key_6", "Key_0"]), (7, ["Key_6", "Key_0"]), (9, ["Key_6", "Key_0"])):
+            problem, pressed, end = self.run_from(gui)
+            self.assertIsNone(problem, gui)
+            self.assertEqual(pressed, keys, gui)
+            self.assertEqual(end, 2, gui)                           # the panel is open at the end, never closed by accident
+
+    def test_a_screen_that_will_not_close_stops_the_macro(self):
+        problem, pressed, _ = self.run_from(6, closes_on_back=False)
+        self.assertEqual(problem, "failed")
+        self.assertEqual(pressed, ["Key_6"])                       # one Back, then she stops pressing keys
 
 
 if __name__ == "__main__":

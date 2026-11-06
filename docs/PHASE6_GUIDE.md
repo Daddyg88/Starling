@@ -698,6 +698,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.82.0 adds the macro step `tab N` (0 = Navigation, 1 = Transactions, 2 = Contacts). She screenshots the screen in memory (never saved), finds the bright selected tab bar, presses Previous Tab until she is on the first tab, then presses Next Tab N times checking each one moved. If she cannot see the screen she presses Next Tab N times blind. Docking now uses `tab 2`. Look for "she looked at the screen and went to tab 2" in the log. Setting: panel.read_screen (default true).
 
+0.82.1 adds `open left panel` (gets the left panel open from whatever is on screen using GuiFocus: 2 already open = nothing; 5-11 full screens = Back first; 0, 1, 3, 4 = Focus Left Panel; if a full screen will not close she stops) and `tab 0 from 2` (like `tab`, but if she cannot see the screen she assumes the panel is on tab 2). The docking macro now starts with `open left panel` and returns with `tab 0 from 2`. Look for "open>gui" in the macro trace log line.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.

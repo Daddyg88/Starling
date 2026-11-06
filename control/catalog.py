@@ -54,15 +54,15 @@ MACROS = {
 # a key that is also a flight control seems to drop the panel focus. So after each UI key she looks at the screen
 # (Status.json, which updates about once a second, hence the 1.2 s waits) and presses Focus Left Panel again if it closed.
 # Steps: your recording (Next Tab x2, Up, Right, Select, Left, Previous Tab x2, Back).
-# 0.82.0: the two Next Tab presses are now "tab 2": she LOOKS at the panel first (control/panel_reader.py) so it works whichever tab
-# the game opened on; if she cannot see the screen she presses Next Tab twice exactly as before.
-DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "tab 2", "wait 1.15",
+# 0.82.0: she gets the left panel open from WHATEVER is on screen ("open left panel": nothing if it is already open, Back out of a map
+# first) and LOOKS at the tab bar ("tab 2") so it works whichever tab the game opened on. If she cannot see the screen she counts the
+# Next Tab / Previous Tab presses exactly as before.
+DOCKING_MACRO = ("open left panel", "wait 0.4", "tab 2", "wait 1.15",
                  "hold UI_Up 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
                  "hold UI_Right 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
                  "hold UI_Select 0.15", "wait 1.2",
                  "hold UI_Left 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
-                 "hold CyclePreviousPanel 0.15", "wait 0.7", "hold CyclePreviousPanel 0.15",
-                 "wait 0.85", "hold UI_Back 0.15")
+                 "tab 0 from 2", "wait 0.85", "hold UI_Back 0.15")
 # 0.48.0: SHOW OFF. She talks through what she can do while she opens and closes the screens herself: galaxy map, left panel
 # (a couple of tabs), right panel. Only screens: nothing that moves the ship. "talk" queues a plain line (no extra remarks, so it
 # starts at once) and the steps go on while she speaks; "finish" waits for her;

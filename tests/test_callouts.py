@@ -890,11 +890,12 @@ class NewMacros(unittest.TestCase):
         self.assertEqual(LAUNCH_MACRO[-3:], ("UI_Down", "wait 0.6", "UI_Select"))
         self.assertEqual([s for s in LAUNCH_MACRO if s.startswith("say ")], ["say Launch_Start", "say Launch_Systems", "say Launch_Go"])
         self.assertEqual(LAUNCH_MACRO.count("UI_Back"), 2)
-        self.assertEqual(DOCKING_MACRO[0], "FocusLeftPanel")
+        self.assertEqual(DOCKING_MACRO[0], "open left panel")
         self.assertEqual(DOCKING_MACRO[-1], "hold UI_Back 0.15")
         order = [s.split()[1] for s in DOCKING_MACRO if s.startswith("hold ")]
         self.assertIn("tab 2", DOCKING_MACRO)                     # 0.82.0: she looks at the panel instead of two blind Next Tab presses
-        self.assertEqual(order, ["UI_Up", "UI_Right", "UI_Select", "UI_Left"] + ["CyclePreviousPanel"] * 2 + ["UI_Back"])
+        self.assertIn("tab 0 from 2", DOCKING_MACRO)
+        self.assertEqual(order, ["UI_Up", "UI_Right", "UI_Select", "UI_Left", "UI_Back"])
 
 
 class PreferUnsharedKey(unittest.TestCase):
