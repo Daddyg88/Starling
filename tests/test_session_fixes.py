@@ -144,5 +144,18 @@ class MissionMemoryTests(unittest.TestCase):
         self.assertEqual(spoken_summary({"memory_type": "death", "summary": "You were destroyed: oops"}), "You were destroyed: oops")
 
 
+class VoidRunningTests(unittest.TestCase):
+    def test_running_means_answered_recently(self):
+        import time
+        from personality.watcher import WatcherBridge
+        bridge = WatcherBridge.__new__(WatcherBridge)
+        bridge.last_ok = None
+        self.assertFalse(bridge.void_compass_running())
+        bridge.last_ok = time.monotonic()
+        self.assertTrue(bridge.void_compass_running())
+        bridge.last_ok = time.monotonic() - 100
+        self.assertFalse(bridge.void_compass_running())
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1295,3 +1295,7 @@ window use the same code as the biology list.
 ## 0.80.5 - Prepared once
 
 * tts/voice_warmer.py: _fingerprint() (speed, voice signature, every line) is saved to data/voice_prepared.json when a run ends with no failures; _already_prepared() skips the whole warm-up when it matches and about 40 spread-out lines are really in the cache. kokoro.cache_signature() added. The dashboard button (force) always checks. Test: tests/test_speed.py test_no_second_check_once_fully_prepared.
+
+## 0.80.6 - Route map hides with Void Compass
+
+* personality/watcher.py: last_ok and void_compass_running() (Void Compass answered in the last 45 s). ui/route_overlay.py: wanted_mode(..., void_compass) returns None when running and the setting overlay.route_hide_with_voidcompass (default on) is set; test mode still shows. ui/dashboard.py passes the provider. Tests in tests/test_route_map.py and tests/test_session_fixes.py. Overlay behaviour on screen untested.

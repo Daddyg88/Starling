@@ -59,6 +59,15 @@ class Gating(unittest.TestCase):
         self.state = GameState()
         self.active = follower_with(gm.test_route())
 
+    def test_hidden_while_void_compass_runs(self):
+        s = Settings(**{"overlay.route_map": "route"})
+        self.assertIsNone(ro.wanted_mode(s, self.state, self.active, void_compass=True))
+        self.assertEqual(ro.wanted_mode(s, self.state, self.active, void_compass=False), "route")
+        self.assertEqual(ro.wanted_mode(s, self.state, self.active, test_until=1e12, void_compass=True), "test")   # the test button still works
+        s = Settings(**{"overlay.route_map": "route", "overlay.route_hide_with_voidcompass": False})
+        self.assertEqual(ro.wanted_mode(s, self.state, self.active, void_compass=True), "route")
+        self.assertIsNone(ro.route_scene(Settings(**{"overlay.route_map": "route"}), self.state, self.active, void_compass=True))
+
     def test_modes(self):
         s = Settings(**{"overlay.route_map": "route"})
         self.assertEqual(ro.wanted_mode(s, self.state, self.active), "route")

@@ -92,7 +92,8 @@ class Dashboard:
             self.bio_overlay = None
         try:
             from ui.route_overlay import RouteOverlay
-            self.route_overlay = RouteOverlay(self.root, app.settings, lambda: app.state, lambda: app.route_follower)
+            self.route_overlay = RouteOverlay(self.root, app.settings, lambda: app.state, lambda: app.route_follower,
+                                              lambda: bool(getattr(app, "watcher", None) and app.watcher.void_compass_running()))
         except Exception:
             log.exception("The route map could not start")
             self.route_overlay = None

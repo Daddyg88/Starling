@@ -386,6 +386,7 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="A see-through map on the right of the screen: the galaxy regions, your neutron route (cyan = still to fly, yellow dots = neutron stars, red ring = the destination), "
                        "where you are, and how straight the route is. Say 'hide the route map' or 'show the route map'. Elite must be in Borderless or Windowed mode"),
             Field("overlay.route_size", "Route map: size", "choice", OVERLAY_SIZES),
+            Field("overlay.route_hide_with_voidcompass", "Route map: hide while Void Compass is running", "toggle"),
             Field("overlay.route_right", "Route map: distance from the right of the screen", "choice", EDGE_PERCENTS,
                   help="Percent of the screen width"),
             Field("overlay.route_top", "Route map: distance from the top of the screen", "choice", EDGE_PERCENTS,

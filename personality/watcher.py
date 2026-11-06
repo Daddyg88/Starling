@@ -64,6 +64,7 @@ class WatcherBridge:
         self.held = None                  # (text, since) he wanted to say at a bad time
         self.reply_due = None             # (deadline, was_waiting_for_voice_to_end)
         self.seq = None
+        self.last_ok = None               # when Void Compass last answered (monotonic clock), None = never / went away
         self._hush_at = None
         self._logged_other_voice_event = False
         self._hush_failures = 0
@@ -250,6 +251,11 @@ class WatcherBridge:
         return bool(self.speech.say(text=text, priority="normal", event_name="personality.watcher_reply"))
 
     # ---- the thread ----
+    def void_compass_running(self):
+        """True while Void Compass is answering (it answers at least every 20 seconds)."""
+        last = self.last_ok
+        return last is not None and time.monotonic() - last < 45.0
+
     def retry_delay(self):
         """Seconds to wait before asking Void Compass again: doubles each time it is still away, up to two minutes."""
         streak = getattr(self, "_offline_streak", 0)
@@ -268,11 +274,13 @@ class WatcherBridge:
                 answer = self.client.events(self.seq, "voice", wait)
                 self.seq = int(answer.get("seq", self.seq))
                 self._offline_streak = 0
+                self.last_ok = time.monotonic()
                 for item in answer.get("events", []):
                     self.handle(item)
                 self.tick()
             except VoidError as error:
                 self.seq = None
+                self.last_ok = None
                 if error.kind != "offline":
                     log.info("Watcher bridge: %s", error.message or error.kind)
                 self._stop.wait(self.retry_delay())

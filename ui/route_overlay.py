@@ -54,13 +54,15 @@ def fit_text(text, limit):
 FRESH_SECONDS = 25           # a new route is shown for this long even when a game screen (the galaxy map) is open
 
 
-def wanted_mode(settings, state, follower, test_until=0.0, now=None, fresh=False):
+def wanted_mode(settings, state, follower, test_until=0.0, now=None, fresh=False, void_compass=False):
     """'test', 'route', 'empty' (always-on with no route) or None (hide the map). fresh = the route was only just plotted."""
     now = time.monotonic() if now is None else now
     if test_until and now < test_until:
         return "test"
     try:
         mode = str(settings.get("overlay.route_map", "route"))
+        if void_compass and settings.get("overlay.route_hide_with_voidcompass", True):
+            return None                      # Void Compass draws its own route: no second map on top of it
         if mode == "off" or getattr(state, "game_quit", False) or getattr(state, "route_map_hidden", False):
             return None
         if settings.get("overlay.route_cockpit_only", True) and getattr(state, "gui_focus", 0) and not fresh:
@@ -74,9 +76,9 @@ def wanted_mode(settings, state, follower, test_until=0.0, now=None, fresh=False
         return None
 
 
-def route_scene(settings, state, follower, test_until=0.0, now=None, fresh=False):
+def route_scene(settings, state, follower, test_until=0.0, now=None, fresh=False, void_compass=False):
     """The scene to draw (see galaxy_map.build_scene), or None to hide the map."""
-    mode = wanted_mode(settings, state, follower, test_until, now, fresh)
+    mode = wanted_mode(settings, state, follower, test_until, now, fresh, void_compass)
     if mode is None:
         return None
     size = map_size(settings.get("overlay.route_size", "Medium"))
@@ -115,11 +117,12 @@ def backfill_positions(follower, coordinates, limit=BACKFILL_LIMIT, sleep=time.s
 
 
 class RouteOverlay:
-    def __init__(self, root, settings, state_provider, follower_provider):
+    def __init__(self, root, settings, state_provider, follower_provider, void_provider=None):
         self.root = root
         self.settings = settings
         self.state_provider = state_provider
         self.follower_provider = follower_provider
+        self.void_provider = void_provider or (lambda: False)     # True while Void Compass is running
         self.window = None
         self.canvas = None
         self.photo = None
@@ -136,6 +139,12 @@ class RouteOverlay:
     def show_test(self, seconds=TEST_SECONDS):
         self.test_until = time.monotonic() + seconds
         self._signature = None
+
+    def _void_running(self):
+        try:
+            return bool(self.void_provider())
+        except Exception:
+            return False
 
     def _tick(self):
         try:
@@ -188,7 +197,8 @@ class RouteOverlay:
             self._fresh_until = time.monotonic() + FRESH_SECONDS      # a brand new route: show it now, even over the galaxy map
         self._fresh_key = key
         fresh = time.monotonic() < self._fresh_until
-        mode = wanted_mode(s, state, follower, self.test_until, fresh=fresh)
+        void = self._void_running()
+        mode = wanted_mode(s, state, follower, self.test_until, fresh=fresh, void_compass=void)
         if mode is None:
             if self._signature is not None:
                 self._signature = None
@@ -203,7 +213,7 @@ class RouteOverlay:
         if signature == self._signature:
             return
         self._signature = signature
-        scene = route_scene(s, state, follower, self.test_until, fresh=fresh)
+        scene = route_scene(s, state, follower, self.test_until, fresh=fresh, void_compass=void)
         if scene is None:
             self._hide()
             return
