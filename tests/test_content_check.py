@@ -117,5 +117,48 @@ class DiagnosticsTests(unittest.TestCase):
                 self.assertIn("mood.json", bundle.read("about.json").decode())
 
 
+class SettingsCheckTests(unittest.TestCase):
+    def test_the_defaults_are_clean(self):
+        from core.settings import DEFAULTS, check_settings
+        checked, problems = check_settings(DEFAULTS, DEFAULTS)
+        self.assertEqual(problems, [])
+        self.assertEqual(checked, DEFAULTS)
+
+    def test_wrong_kinds_are_fixed_or_reset(self):
+        from core.settings import check_settings
+        defaults = {"a": {"on": True, "count": 5, "ratio": 0.5, "name": "", "items": [1], "sub": {"x": 1}}}
+        saved = {"a": {"on": "yes", "count": "40", "ratio": "high", "name": 7, "items": "nope", "sub": 3}}
+        checked, problems = check_settings(saved, defaults)
+        self.assertIs(checked["a"]["on"], True)                 # 'yes' read as a switch
+        self.assertEqual(checked["a"]["count"], 40)             # '40' read as a number
+        self.assertEqual(checked["a"]["ratio"], 0.5)            # 'high' is not a number: default
+        self.assertEqual(checked["a"]["name"], 7)               # text settings are left alone
+        self.assertEqual(checked["a"]["items"], [1])
+        self.assertEqual(checked["a"]["sub"], {"x": 1})
+        self.assertEqual(len(problems), 5)
+
+    def test_a_bool_is_not_a_number(self):
+        from core.settings import check_settings
+        checked, problems = check_settings({"n": True}, {"n": 3})
+        self.assertEqual(checked["n"], 3)
+        self.assertEqual(len(problems), 1)
+
+    def test_typos_in_known_groups_are_reported(self):
+        from core.settings import check_settings
+        _, problems = check_settings({"g": {"enabld": True}}, {"g": {"enabled": True}})
+        self.assertEqual(len(problems), 1)
+        self.assertIn("did you mean g.enabled", problems[0])
+
+    def test_loading_a_damaged_value_keeps_her_running(self):
+        from core.settings import Settings
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "settings.json"
+            path.write_text(json.dumps({"tts": {"volume": "loud"}, "speech": {"enabled": "off"}}))
+            loaded = Settings(path).load()
+            self.assertIs(loaded.get("speech.enabled"), False)
+            self.assertIsInstance(loaded.get("tts.volume"), (int, float))
+            self.assertTrue(loaded.problems)
+
+
 if __name__ == "__main__":
     unittest.main()

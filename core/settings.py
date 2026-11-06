@@ -9,6 +9,7 @@ Rules that keep things safe:
 """
 
 import copy
+import difflib
 import shutil
 import json
 import os
@@ -97,6 +98,61 @@ def _merge(defaults, saved):
     return result
 
 
+_TRUE = {"true", "yes", "on", "1"}
+_FALSE = {"false", "no", "off", "0"}
+
+
+def _fit(value, default):
+    """(value to use, problem text or ''). A value of the wrong kind is converted when that is obvious ('40' for a number,
+    'yes' for a switch) and otherwise replaced by the default, so one typo in settings.json cannot stop her working."""
+    if isinstance(default, bool):
+        if isinstance(value, bool):
+            return value, ""
+        if isinstance(value, str) and value.strip().lower() in _TRUE | _FALSE:
+            return value.strip().lower() in _TRUE, "was text, read as a switch"
+        return default, "should be true or false"
+    if isinstance(default, (int, float)):
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return value, ""
+        if isinstance(value, str):
+            try:
+                number = float(value.strip())
+                return (int(number) if isinstance(default, int) and number == int(number) else number), "was text, read as a number"
+            except ValueError:
+                pass
+        return default, "should be a number"
+    if isinstance(default, list) and not isinstance(value, list):
+        return default, "should be a list"
+    if isinstance(default, dict) and not isinstance(value, dict):
+        return default, "should be a group of settings"
+    return value, ""
+
+
+def check_settings(values, defaults, where=""):
+    """Walks the loaded settings against the defaults. Returns (checked copy, [plain-words problems]).
+    Wrong kinds are fixed as above; keys that are not known (a typo) are kept but reported, with a guess at what was meant."""
+    problems, result = [], copy.deepcopy(values)
+    for key, default in defaults.items():
+        if key not in result:
+            continue
+        name = where + key
+        if isinstance(default, dict) and isinstance(result[key], dict):
+            result[key], inner = check_settings(result[key], default, name + ".")
+            problems += inner
+            continue
+        fixed, problem = _fit(result[key], default)
+        if problem:
+            problems.append("%s %s (it was %r)" % (name, problem, result[key]) if fixed == default else "%s %s" % (name, problem))
+        result[key] = fixed
+    if where:                                          # inside a known group: spot unknown names
+        for key in result:
+            if key not in defaults and defaults:
+                guess = difflib.get_close_matches(key, list(defaults), n=1, cutoff=0.75)
+                if guess:
+                    problems.append("%s%s is not a known setting; did you mean %s%s?" % (where, key, where, guess[0]))
+    return result, problems
+
+
 def _read_json(path):
     """Read a JSON file. Returns None if it is missing or damaged."""
     if not path.exists():
@@ -121,10 +177,15 @@ class Settings:
     def __init__(self, path=None):
         self.path = path or paths.SETTINGS_FILE
         self.values = copy.deepcopy(DEFAULTS)
+        self.problems = []
 
     def load(self):
         saved = _read_json(self.path)
         self.values = _merge(DEFAULTS, saved) if saved else copy.deepcopy(DEFAULTS)
+        if saved:
+            self.values, self.problems = check_settings(self.values, DEFAULTS)
+            for problem in self.problems:
+                log.warning("settings.json: %s", problem)
         return self
 
     def get(self, dotted_key, default=None):

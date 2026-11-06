@@ -1315,3 +1315,7 @@ window use the same code as the biology list.
 ## 0.81.0 - Safety nets
 
 * core/diagnostics.py (make_bundle, redact; button on Updates and Developer pages). core/backup.py: backup_if_new_version() runs first in app.start (data/ to data_backups/<old version>-<date>, newest 3 kept, SKIP caches) and run_migrations() with the MIGRATIONS list and data/data_format.json (format number; none yet). data_backups added to the updater KEEP list. tools/check_dialogue.py + tests/test_content_check.py. The update rollback that already existed (core/updater.py, .previous folder and start-up test) is unchanged. Buttons and desktop zip untested live (GUI).
+
+## 0.81.1 - Settings check
+
+* core/settings.py: check_settings(values, defaults) (_fit converts or resets by the default's kind; difflib typo hints inside known groups), run by Settings.load(); problems kept in Settings.problems and logged as warnings. Text settings are left alone on purpose. Tests in tests/test_content_check.py.
