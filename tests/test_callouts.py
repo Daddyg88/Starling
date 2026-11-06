@@ -893,7 +893,8 @@ class NewMacros(unittest.TestCase):
         self.assertEqual(DOCKING_MACRO[0], "FocusLeftPanel")
         self.assertEqual(DOCKING_MACRO[-1], "hold UI_Back 0.15")
         order = [s.split()[1] for s in DOCKING_MACRO if s.startswith("hold ")]
-        self.assertEqual(order, ["CycleNextPanel"] * 2 + ["UI_Up", "UI_Right", "UI_Select", "UI_Left"] + ["CyclePreviousPanel"] * 2 + ["UI_Back"])
+        self.assertIn("tab 2", DOCKING_MACRO)                     # 0.82.0: she looks at the panel instead of two blind Next Tab presses
+        self.assertEqual(order, ["UI_Up", "UI_Right", "UI_Select", "UI_Left"] + ["CyclePreviousPanel"] * 2 + ["UI_Back"])
 
 
 class PreferUnsharedKey(unittest.TestCase):

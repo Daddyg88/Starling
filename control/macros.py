@@ -14,6 +14,8 @@ A step is one of:
                            Status.json cannot be read. Closes what she opened without ever pressing Back into an empty cockpit
     "ensure FocusLeftPanel 2"  if Status.json says NO screen is open (the panel closed by accident), press that key (0.15 s)
                            and wait for the screen to open. Used when a key press closes the panel by accident.
+    "tab 2"                look at the left panel and go to that tab (0 = Navigation, 1 = Transactions, 2 = Contacts), whichever tab it
+                           opened on. If she cannot see the screen she presses next tab that many times, as before.
     "paste"                press Ctrl+V (pastes what is on the clipboard, e.g. the next neutron waypoint)
     "enter"                press the Enter key
     "say Launch_Start"     she says a line from that dialogue key (used by auto launch: "I have control")
@@ -78,6 +80,15 @@ def parse_macro(steps):
             except ValueError:
                 raise ValueError("I don't understand this ensure (write it like: ensure FocusLeftPanel 2): %r" % text)
             continue
+        if lowered.startswith("tab "):
+            try:
+                number = int(text[4:].strip())
+                if not 0 <= number <= 3:
+                    raise ValueError
+            except ValueError:
+                raise ValueError("I don't understand this tab step (write it like: tab 2): %r" % text)
+            parsed.append(("tab", number))
+            continue
         if lowered in LITERALS:
             parsed.append(("literal", lowered))
             continue
@@ -105,4 +116,8 @@ def actions_in(parsed):
     for step in parsed:
         if step[0] in ("press", "hold", "ensure", "leave") and step[1] not in seen:
             seen.append(step[1])
+        if step[0] == "tab":
+            for needed in ("CycleNextPanel", "CyclePreviousPanel"):
+                if needed not in seen:
+                    seen.append(needed)
     return seen

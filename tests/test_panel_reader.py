@@ -1,0 +1,116 @@
+"""She looks at the left panel to find which tab is open, then walks to the tab she wants."""
+import unittest
+from pathlib import Path
+
+import numpy as np
+
+from control import panel_reader as pr
+from control.macros import actions_in, parse_macro
+
+TABS = 4
+SHOTS = Path("/mnt/user-data/attachments/056a8d7e-59f4-5178-84a2-456c45d6729a")
+
+
+def picture(tab, tabs=TABS, noise=True):
+    """A made-up 1920x1080 screen: dark, a few small bright bits, a bright wide bar for the selected tab, list rows lower down."""
+    pic = np.full((1080, 1920, 3), 12, dtype=np.uint8)
+    if noise:
+        pic[100:120, 1500:1510] = (255, 140, 0)                  # a small bright thing (not wide)
+        pic[600:640, 300:900] = (255, 120, 0)                    # a big list row, LOWER down than the tab bar
+    left = 300 + tab * 250
+    pic[255:290, left:left + 240] = (255, 128, 0)
+    return pic
+
+
+class FindTabTests(unittest.TestCase):
+    def test_finds_the_bar_and_moves_right_with_the_tab(self):
+        spots = [pr.find_tab(picture(i)) for i in range(TABS)]
+        self.assertTrue(all(spots))
+        for a, b in zip(spots, spots[1:]):
+            self.assertGreater(b["cx"], a["cx"])
+
+    def test_nothing_to_find(self):
+        self.assertIsNone(pr.find_tab(np.full((1080, 1920, 3), 10, dtype=np.uint8)))
+        self.assertIsNone(pr.find_tab(None))
+
+    @unittest.skipUnless(SHOTS.exists(), "the commander's screenshots are only here")
+    def test_real_screenshots(self):
+        from PIL import Image
+        xs = [pr.find_tab(np.asarray(Image.open(SHOTS / ("%s-image.png" % n)).convert("RGB")))["cx"]
+              for n in ("d60ffe87", "a929ae94", "72528b22")]
+        self.assertEqual(xs, sorted(xs))
+
+
+class FakeGame:
+    def __init__(self, tab, wrap=True, blind=False):
+        self.tab, self.wrap, self.blind, self.presses = tab, wrap, blind, []
+
+    def read(self):
+        return None if self.blind else pr.find_tab(picture(self.tab))
+
+    def nxt(self):
+        self.presses.append("n")
+        self.tab = (self.tab + 1) % TABS
+
+    def prev(self):
+        self.presses.append("p")
+        self.tab = (self.tab - 1) % TABS if self.wrap else max(0, self.tab - 1)
+
+
+class WalkTests(unittest.TestCase):
+    def go(self, start, target, **kw):
+        g = FakeGame(start, **kw)
+        ok = pr.goto_tab(g.read, g.nxt, g.prev, lambda s: None, target)
+        return ok, g
+
+    def test_gets_to_contacts_from_every_starting_tab(self):
+        for wrap in (True, False):
+            for start in range(TABS):
+                ok, g = self.go(start, 2, wrap=wrap)
+                self.assertTrue(ok, (start, wrap))
+                self.assertEqual(g.tab, 2, (start, wrap))
+
+    def test_gets_to_each_target(self):
+        for target in range(3):
+            ok, g = self.go(3, target)
+            self.assertTrue(ok)
+            self.assertEqual(g.tab, target)
+
+    def test_blind_means_false_and_no_keys(self):
+        ok, g = self.go(1, 2, blind=True)
+        self.assertFalse(ok)
+        self.assertEqual(g.presses, [])
+
+
+class MacroStepTests(unittest.TestCase):
+    def test_parse_and_actions(self):
+        self.assertEqual(parse_macro(["tab 2"]), [("tab", 2)])
+        self.assertEqual(actions_in(parse_macro(["tab 2"])), ["CycleNextPanel", "CyclePreviousPanel"])
+        for bad in ("tab x", "tab 9"):
+            with self.assertRaises(ValueError):
+                parse_macro([bad])
+
+
+class RunnerTests(unittest.TestCase):
+    def test_docking_starts_from_any_tab_when_she_can_see(self):
+        from tests.test_macros import MacroTests
+        for start in (0, 1, 3):
+            t = MacroTests()
+            r = t.build()
+            game = {"tab": start}
+            keys = {"Key_3": 1, "Key_8": -1}                     # CycleNextPanel / CyclePreviousPanel in the test table
+            real_send = t.sender.send
+
+            def send(stroke, hold=0.0, _real=real_send, _game=game, _keys=keys):
+                _game["tab"] = (_game["tab"] + _keys.get(stroke.key, 0)) % TABS
+                return _real(stroke, hold=hold)
+            t.sender.send = send
+            r.panel_reader = lambda _g=game: picture(_g["tab"])
+            r.sleep = lambda s: None
+            with self.assertLogs("starling", level="INFO") as logs:
+                r.run_text("request docking")
+            self.assertTrue(any("went to tab 2" in line for line in logs.output), start)
+
+
+if __name__ == "__main__":
+    unittest.main()

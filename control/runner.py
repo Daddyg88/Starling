@@ -88,6 +88,7 @@ class CommandRunner:
         self.brain = brain               # personality/brain.py: answers anything that is not a command
         self.smalltalk = smalltalk       # personality/smalltalk.py: "how are you?", "tell me a joke"
         self.memory = memory             # memory/recall.py: "what do you remember"
+        self.panel_reader = None         # a function that returns a screenshot (tests give a pretend one); None = the real screen
         self.extra_helpers = []          # more voice helpers (the biology overlay) that answer before anything else
         self.route = route               # navigation/voice.py: 'plot a neutron route to Colonia'
         self.voidcompass = voidcompass   # control/voidcompass.py (made on first use if not given)
@@ -511,6 +512,12 @@ class CommandRunner:
                         return Outcome(status, text, command, intent, detail=self._explain(status, command))
                     self.sleep(GAP_SECONDS)
                 continue
+            if step[0] == "tab":
+                problem = self._go_to_tab(step[1], strokes, pressed, trace)
+                if problem:
+                    status = SEND_FAILURE_STATUS.get(problem, "failed")
+                    return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                continue
             if step[0] == "ensure":
                 if self._gui_focus() == 0:                       # only when Status.json clearly says NO screen is open
                     problem = self.sender.send(strokes[step[1]], hold=0.15)
@@ -548,6 +555,48 @@ class CommandRunner:
             self.echo.mute(quiet, 6)            # the game's "map closed" can arrive a moment after the last key
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
                        detail=command.do_text(intent) + ".")
+
+    def _go_to_tab(self, number, strokes, pressed, trace):
+        """The 'tab N' macro step. Looks at the left panel to find the tab it opened on and walks to tab N; if she cannot see the
+        screen it presses next tab N times (the old behaviour, which assumes the panel opened on Navigation).
+        Returns None, or the sender's problem text if a key could not be pressed."""
+        from control import panel_reader
+        problems = []
+
+        def press(action):
+            problem = self.sender.send(strokes[action], hold=0.15)
+            pressed.append(action)
+            if problem:
+                problems.append(problem)
+
+        if self.settings.get("panel.read_screen", True):
+            reader = self.panel_reader or panel_reader.capture_screen
+            seen = {"ok": False}
+
+            def read():
+                found = panel_reader.find_tab(reader())
+                seen["ok"] = seen["ok"] or found is not None
+                return found
+            try:
+                done = panel_reader.goto_tab(read, lambda: press("CycleNextPanel"), lambda: press("CyclePreviousPanel"),
+                                             self.sleep, number)
+            except Exception:
+                log.exception("Looking at the panel failed")
+                done = False
+            if problems:
+                return problems[0]
+            if done:
+                trace.append("tab%d>seen" % number)
+                log.info("Panel: she looked at the screen and went to tab %d.", number)
+                return None
+            log.info("Panel: she could not read the screen (%s), so she counted the tab presses instead.",
+                     "tab bar not found" if not seen["ok"] else "the tab did not move as expected")
+        for _ in range(number):
+            press("CycleNextPanel")
+            if problems:
+                return problems[0]
+            self.sleep(0.5)
+        return None
 
     def _key_clashes(self, strokes):
         """Writes a log line (once per action) when a key a macro presses is also bound to another ship action. Never spoken."""

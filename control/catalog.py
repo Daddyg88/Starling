@@ -54,7 +54,9 @@ MACROS = {
 # a key that is also a flight control seems to drop the panel focus. So after each UI key she looks at the screen
 # (Status.json, which updates about once a second, hence the 1.2 s waits) and presses Focus Left Panel again if it closed.
 # Steps: your recording (Next Tab x2, Up, Right, Select, Left, Previous Tab x2, Back).
-DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "hold CycleNextPanel 0.15", "wait 0.5", "hold CycleNextPanel 0.15", "wait 1.15",
+# 0.82.0: the two Next Tab presses are now "tab 2": she LOOKS at the panel first (control/panel_reader.py) so it works whichever tab
+# the game opened on; if she cannot see the screen she presses Next Tab twice exactly as before.
+DOCKING_MACRO = ("FocusLeftPanel", "wait 1.6", "tab 2", "wait 1.15",
                  "hold UI_Up 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
                  "hold UI_Right 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
                  "hold UI_Select 0.15", "wait 1.2",
