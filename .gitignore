@@ -10,3 +10,4 @@ build/
 updates/
 *.previous
 site/
+data_backups/

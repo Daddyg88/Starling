@@ -27,7 +27,7 @@ from pathlib import Path
 ASSET_ZIP = "Starling-app.zip"
 ASSET_SHA = "Starling-app.zip.sha256"
 # Things that belong to YOU, not to the program. They are carried over into every new version.
-KEEP = ["data", "recordings", "logs", "config/settings.json", "plugins", "custom_covas.pt"]
+KEEP = ["data", "data_backups", "recordings", "logs", "config/settings.json", "plugins", "custom_covas.pt"]
 USER_AGENT = "Starling-updater"
 MAX_ZIP_BYTES = 400 * 1024 * 1024
 

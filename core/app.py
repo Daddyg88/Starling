@@ -104,6 +104,12 @@ class App:
     def start(self, record_events=True, show_events=False):
         self._record_events = record_events
         paths.ensure_folders()
+        try:
+            from core import backup
+            backup.backup_if_new_version(paths.DATA_DIR, paths.ROOT / "data_backups", APP_VERSION)    # a copy of her data when a new version first starts
+            backup.run_migrations(paths.DATA_DIR)
+        except Exception:
+            pass                                                 # never stop her starting because of a backup problem
 
         # Load settings first, because they say how chatty the log should be.
         self.settings = Settings(self._settings_path).load()

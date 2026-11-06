@@ -1311,3 +1311,7 @@ window use the same code as the biology list.
 ## 0.80.9 - Window position
 
 * ui/window_memory.py: parse_geometry/usable_geometry (pure, tested) and WindowMemory (tkinter): restore() before showing, save() on close; settings window.geometry and window.maximised. The desktop area comes from Windows GetSystemMetrics (virtual screen, can start negative with a left-hand monitor). Real multi-monitor behaviour untested (no screen in the sandbox).
+
+## 0.81.0 - Safety nets
+
+* core/diagnostics.py (make_bundle, redact; button on Updates and Developer pages). core/backup.py: backup_if_new_version() runs first in app.start (data/ to data_backups/<old version>-<date>, newest 3 kept, SKIP caches) and run_migrations() with the MIGRATIONS list and data/data_format.json (format number; none yet). data_backups added to the updater KEEP list. tools/check_dialogue.py + tests/test_content_check.py. The update rollback that already existed (core/updater.py, .previous folder and start-up test) is unchanged. Buttons and desktop zip untested live (GUI).

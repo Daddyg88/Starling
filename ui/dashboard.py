@@ -804,7 +804,8 @@ class Dashboard:
             extra += [("Show what she remembers", self.show_memories),
                       ("Forget everything", self.forget_memories)]
         if page.id == "updates":
-            extra += [("Check for updates now", self.check_updates)]
+            extra += [("Check for updates now", self.check_updates),
+                      ("Make a file to send when something is wrong", self.make_diagnostics)]
         if page.id == "navigation":
             extra += [("Plot neutron route to my destination", lambda: self.nav_plot(use_entry=False)),
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
@@ -817,7 +818,8 @@ class Dashboard:
                       ("Test the honk now", self.test_honk),
                       ("Look for my joystick / HOTAS", self.scan_joysticks),
                       ("Record my buttons", self.record_buttons),
-                      ("Copy my log to the clipboard (to send to Claude)", self.copy_log)]
+                      ("Copy my log to the clipboard (to send to Claude)", self.copy_log),
+                      ("Make a file to send when something is wrong", self.make_diagnostics)]
         if page.id == "voice":
             self._build_voice_progress(frame, row)
             row += 1
@@ -1279,6 +1281,24 @@ class Dashboard:
             self.save_note.configure(text="Copied the last %d log lines. Paste them into the chat." % len(lines), text_color=T.GOOD)
         except OSError:
             self.save_note.configure(text="I could not find the log file yet.", text_color=T.WARN)
+
+    def make_diagnostics(self):
+        """Makes a zip of the logs and settings (secrets removed) on the desktop and opens the folder, to send to whoever is helping."""
+        import os
+        from pathlib import Path
+        from core import diagnostics, paths
+        from core.app import APP_VERSION
+        try:
+            desktop = Path.home() / "Desktop"
+            target = desktop if desktop.is_dir() else paths.DATA_DIR
+            out = diagnostics.make_bundle(paths.SETTINGS_FILE, paths.LOGS_DIR, paths.DATA_DIR, APP_VERSION, target)
+            self._controls_result("Made %s (keys and tokens are removed). Send that file." % out.name, T.GOOD)
+            try:
+                os.startfile(str(out.parent))                    # Windows: opens the folder
+            except (AttributeError, OSError):
+                pass
+        except Exception as error:
+            self._controls_result("I couldn't make the file: %s" % error, T.WARN)
 
     def install_ai_chat(self):
         """Personality page: download the AI chat engine and model in the background and show the progress."""
