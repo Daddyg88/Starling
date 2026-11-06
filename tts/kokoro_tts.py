@@ -13,6 +13,7 @@ How it works, in plain words:
 """
 
 import hashlib
+import os
 import re
 import queue
 import threading
@@ -127,6 +128,7 @@ class KokoroTTS(BaseTTS):
         self.failed_reason = ""
         self.status_message = "not started"
         self._loader = None
+        self._load_started = None
         self._stop_flag = threading.Event()
         self._voice_name = ""     # "" = cloned voice; otherwise a built-in voice such as "af_heart"
 
@@ -168,7 +170,25 @@ class KokoroTTS(BaseTTS):
         self._loader.join(timeout)
         return self.ready.is_set()
 
+    def loading_seconds(self):
+        """How long the voice has been loading (0 once it is ready or if it never started)."""
+        if self._load_started is None or self.ready.is_set() or self.failed_reason:
+            return 0.0
+        return max(0.0, time.monotonic() - self._load_started)
+
+    @staticmethod
+    def model_is_downloaded():
+        """True when the voice model files are already on this computer (Hugging Face cache)."""
+        try:
+            home = os.environ.get("HF_HOME") or str(Path.home() / ".cache" / "huggingface")
+            hub = os.environ.get("HF_HUB_CACHE") or str(Path(home) / "hub")
+            snapshots = Path(hub) / "models--hexgrad--Kokoro-82M" / "snapshots"
+            return any((folder / "config.json").is_file() for folder in snapshots.iterdir())
+        except (OSError, ValueError):
+            return False
+
     def _load(self):
+        self._load_started = time.monotonic()
         try:
             # 1. One-time voice tuning. Skipped instantly if custom_covas.pt exists.
             ok, message = self._setup_function(self.pack_path, self.reference_mp3)
@@ -177,15 +197,25 @@ class KokoroTTS(BaseTTS):
                 self._fail(message)
                 return
 
-            # 2. Load the voice engine.
+            # 2. Load the voice engine. With the cloned voice and the model already downloaded, do not ask the internet
+            # whether it has changed (that check is slow on a bad connection and is pointless once everything is here).
+            if (self._pipeline_factory is None and not self._voice_name and self.model_is_downloaded()
+                    and not os.environ.get("HF_HUB_OFFLINE")):
+                os.environ["HF_HUB_OFFLINE"] = "1"
+                log.info("Voice model is already on this computer: not checking the internet for it.")
             factory = self._pipeline_factory or self._default_pipeline_factory
+            step = time.monotonic()
             self.pipeline = factory()
+            engine_seconds = time.monotonic() - step
 
             # 3. Load the cloned voice tensor.
             loader = self._torch_load or self._default_torch_load
+            step = time.monotonic()
             self.voice_pack = loader(str(self.pack_path))
+            tensor_seconds = time.monotonic() - step
 
             # 4. Warm up: the very first sentence is slow, so do a silent one now.
+            step_warm = time.monotonic()
             try:
                 for _ in self.pipeline("Ready.", voice=self.voice_pack, speed=1.0):
                     pass
@@ -194,7 +224,8 @@ class KokoroTTS(BaseTTS):
 
             self.status_message = "ready"
             self.ready.set()
-            log.info("Kokoro voice ready.")
+            log.info("Kokoro voice ready (%.0f s: engine %.0f s, voice file %.1f s, first sentence %.0f s).",
+                     time.monotonic() - self._load_started, engine_seconds, tensor_seconds, time.monotonic() - step_warm)
         except Exception as error:
             log.exception("Kokoro failed to load")
             self._fail("Kokoro failed to load: %s" % error)

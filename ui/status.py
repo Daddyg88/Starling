@@ -75,7 +75,8 @@ def collect_status(app):
     elif kokoro.failed_reason:
         rows.append(("Voice", "Problem: " + kokoro.failed_reason, "bad"))
     else:
-        rows.append(("Voice", "Loading...", "warn"))
+        seconds = int(kokoro.loading_seconds()) if hasattr(kokoro, "loading_seconds") else 0
+        rows.append(("Voice", "Loading... %d s (she speaks when this says Ready; it can take a minute or two)" % seconds if seconds else "Loading...", "warn"))
 
     # listening
     listener = app.listener

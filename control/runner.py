@@ -226,15 +226,14 @@ class CommandRunner:
         secret = easter_eggs.rewrite(text)
         if secret is not None:
             text = secret                                  # a private phrase: carry out the ordinary command it stands for
-        for helper in (*self.extra_helpers, self.smalltalk, self.memory, self.route):       # spoken questions and the route plotter answer for themselves
-            if helper is None:
-                continue
+        for name, helper in self.voice_helpers():       # spoken questions and the route plotter answer for themselves
             try:
                 handled = helper.try_handle(text)
             except Exception:
-                log.exception("A voice helper failed")
+                log.exception("The voice helper %s failed", name)
                 handled = None
             if handled is not None:
+                log.debug("%r was answered by the %s helper", text, name)
                 outcome = Outcome("route", text, None, "press", detail=handled)
                 self._finish([outcome], False, text)
                 return [outcome]
@@ -275,6 +274,23 @@ class CommandRunner:
             outcomes.append(self.execute(match, text))
         self._finish(outcomes, speak, text)
         return outcomes
+
+    def voice_helpers(self):
+        """[(name, helper)] in the order they get to answer a spoken sentence, before the command list and her brain.
+        Order: the extra helpers (added with add_helper), small talk, memory questions, the route plotter."""
+        found = [(type(h).__name__, h) for h in self.extra_helpers if h is not None]
+        for name, helper in (("SmallTalk", self.smalltalk), ("Memory", self.memory), ("Route", self.route)):
+            if helper is not None:
+                found.append((type(helper).__name__ or name, helper))
+        return found
+
+    def add_helper(self, helper, first=False):
+        """Plug in a new voice helper (an object with try_handle(text) that returns None when it is not for it).
+        first=True lets it answer before the others."""
+        if first:
+            self.extra_helpers.insert(0, helper)
+        else:
+            self.extra_helpers.append(helper)
 
     def _brain_owns(self, text):
         """A sentence that is NOT an exact command but IS one of her chat intents goes to her brain, not to a guessed command.

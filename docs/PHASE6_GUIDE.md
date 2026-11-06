@@ -1303,3 +1303,7 @@ window use the same code as the biology list.
 ## 0.80.7 - Line picker memory and mood log
 
 * personality/dialogue.py: pick() keeps per-key recent TEXTS, a global deque of the last 40 spoken texts (GLOBAL_MEMORY) and avoids repeating a global recent text or an opener (first two words) from the last 5 (OPENER_MEMORY), always falling back when it would leave nothing. attach_memory()/save_memory() keep it in data/recent_lines.json (saved every 25 picks and on stop). personality/mood_engine.py: _apply() logs changes of 1 point or more at INFO. Tests in tests/test_session_fixes.py.
+
+## 0.80.8 - Voice start and helper registry
+
+* tts/kokoro_tts.py: model_is_downloaded() and HF_HUB_OFFLINE=1 (cloned voice only, model already in the Hugging Face cache); loading_seconds(); 'Kokoro voice ready' now logs the time split (engine / voice file / first sentence). ui/status.py shows the seconds. control/runner.py: voice_helpers() (named, ordered: extra helpers, small talk, memory, route) and add_helper(helper, first=False); a debug line names the helper that answered. Tests in tests/test_session_fixes.py. The real load time effect is untested (no Kokoro in the sandbox); the new log line will show it.

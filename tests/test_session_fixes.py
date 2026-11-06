@@ -3,6 +3,7 @@ import json
 import tempfile
 import unittest
 from datetime import datetime
+from types import SimpleNamespace
 from pathlib import Path
 
 from core.event_bus import Event
@@ -190,6 +191,58 @@ class LinePickerTests(unittest.TestCase):
             first.save_memory()
             second = self.make(lines).attach_memory(file)
             self.assertEqual(second.pick("A").text, ({"One.", "Two.", "Three.", "Four."} - set(said)).pop())
+
+
+class VoiceLoadingTests(unittest.TestCase):
+    def test_model_check_looks_for_downloaded_files(self):
+        import os
+        from tts.kokoro_tts import KokoroTTS
+        with tempfile.TemporaryDirectory() as folder:
+            old = os.environ.get("HF_HUB_CACHE")
+            os.environ["HF_HUB_CACHE"] = folder
+            try:
+                self.assertFalse(KokoroTTS.model_is_downloaded())
+                snap = Path(folder) / "models--hexgrad--Kokoro-82M" / "snapshots" / "abc"
+                snap.mkdir(parents=True)
+                (snap / "config.json").write_text("{}")
+                self.assertTrue(KokoroTTS.model_is_downloaded())
+            finally:
+                if old is None:
+                    os.environ.pop("HF_HUB_CACHE", None)
+                else:
+                    os.environ["HF_HUB_CACHE"] = old
+
+    def test_loading_time_is_reported_while_loading(self):
+        import time
+        from tts.kokoro_tts import KokoroTTS
+        tts = KokoroTTS.__new__(KokoroTTS)
+        import threading
+        tts.ready, tts.failed_reason, tts._load_started = threading.Event(), "", None
+        self.assertEqual(tts.loading_seconds(), 0.0)
+        tts._load_started = time.monotonic() - 30
+        self.assertGreaterEqual(tts.loading_seconds(), 29)
+        tts.ready.set()
+        self.assertEqual(tts.loading_seconds(), 0.0)
+
+
+class HelperOrderTests(unittest.TestCase):
+    def runner(self):
+        from types import SimpleNamespace
+        from control.runner import CommandRunner
+        r = CommandRunner.__new__(CommandRunner)
+        r.extra_helpers = []
+        r.smalltalk = SimpleNamespace(try_handle=lambda t: None)
+        r.memory = None
+        r.route = SimpleNamespace(try_handle=lambda t: None)
+        return r
+
+    def test_order_is_extras_then_small_talk_memory_route(self):
+        r = self.runner()
+        a, b = SimpleNamespace(try_handle=lambda t: None), SimpleNamespace(try_handle=lambda t: None)
+        r.add_helper(a)
+        r.add_helper(b, first=True)
+        helpers = [h for _, h in r.voice_helpers()]
+        self.assertEqual(helpers, [b, a, r.smalltalk, r.route])          # a missing helper (memory) is simply left out
 
 
 if __name__ == "__main__":
