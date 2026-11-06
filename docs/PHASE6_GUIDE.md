@@ -1307,3 +1307,7 @@ window use the same code as the biology list.
 ## 0.80.8 - Voice start and helper registry
 
 * tts/kokoro_tts.py: model_is_downloaded() and HF_HUB_OFFLINE=1 (cloned voice only, model already in the Hugging Face cache); loading_seconds(); 'Kokoro voice ready' now logs the time split (engine / voice file / first sentence). ui/status.py shows the seconds. control/runner.py: voice_helpers() (named, ordered: extra helpers, small talk, memory, route) and add_helper(helper, first=False); a debug line names the helper that answered. Tests in tests/test_session_fixes.py. The real load time effect is untested (no Kokoro in the sandbox); the new log line will show it.
+
+## 0.80.9 - Window position
+
+* ui/window_memory.py: parse_geometry/usable_geometry (pure, tested) and WindowMemory (tkinter): restore() before showing, save() on close; settings window.geometry and window.maximised. The desktop area comes from Windows GetSystemMetrics (virtual screen, can start negative with a left-hand monitor). Real multi-monitor behaviour untested (no screen in the sandbox).

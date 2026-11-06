@@ -19,6 +19,7 @@ from core.logger import get_logger
 log = get_logger("settings")
 
 DEFAULTS = {
+    "window": {"geometry": "", "maximised": False},
     "app": {"log_level": "INFO", "first_run_done": False, "desktop_shortcut": True, "name": "Starling", "smooth_window": True},
     "player": {"sex": "neutral"},
     "journal": {"folder": "", "poll_seconds": 1.0},

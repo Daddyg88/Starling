@@ -81,6 +81,12 @@ class Dashboard:
         self.root.title(assistant_name(app.settings).upper())
         self.root.geometry(T.WINDOW_SIZE)
         self.root.minsize(*T.MIN_SIZE)
+        try:
+            from ui.window_memory import WindowMemory
+            self.window_memory = WindowMemory(self.root, app.settings)
+            self.window_memory.restore()              # back on the screen she was last on
+        except Exception:
+            self.window_memory = None
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         self._build_layout()
@@ -1554,6 +1560,8 @@ class Dashboard:
     def close(self):
         if self.model.dirty():
             self.model.save()
+        if getattr(self, "window_memory", None) is not None:
+            self.window_memory.save()
         self.root.destroy()
 
     def run(self):
