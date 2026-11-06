@@ -157,5 +157,40 @@ class VoidRunningTests(unittest.TestCase):
         self.assertFalse(bridge.void_compass_running())
 
 
+class LinePickerTests(unittest.TestCase):
+    def make(self, lines):
+        import random
+        from personality.dialogue import DialogueManager
+        manager = DialogueManager(rng=random.Random(3))
+        manager._merge(lines)
+        return manager
+
+    def test_same_words_under_another_key_are_avoided(self):
+        manager = self.make({"B": ["Shared line one", "B two", "B three", "B four", "B five"]})
+        manager._spoken.append("Shared line one")
+        for _ in range(3):                                       # while there are other lines to use, the shared one waits
+            self.assertNotEqual(manager.pick("B").text, "Shared line one")
+
+    def test_the_same_opening_is_avoided_when_there_is_a_choice(self):
+        manager = self.make({"A": ["Nice work on that one.", "Nice work again.", "Brilliant, Commander."]})
+        manager._spoken.append("Nice work, Commander.")
+        self.assertEqual(manager.pick("A").text, "Brilliant, Commander.")
+
+    def test_never_stuck_with_one_line(self):
+        manager = self.make({"A": ["Only one."]})
+        manager._spoken.append("Only one.")
+        self.assertEqual(manager.pick("A").text, "Only one.")
+
+    def test_memory_survives_a_restart(self):
+        with tempfile.TemporaryDirectory() as folder:
+            file = Path(folder) / "recent.json"
+            lines = {"A": ["One.", "Two.", "Three.", "Four."]}
+            first = self.make(lines).attach_memory(file)
+            said = [first.pick("A").text for _ in range(3)]
+            first.save_memory()
+            second = self.make(lines).attach_memory(file)
+            self.assertEqual(second.pick("A").text, ({"One.", "Two.", "Three.", "Four."} - set(said)).pop())
+
+
 if __name__ == "__main__":
     unittest.main()

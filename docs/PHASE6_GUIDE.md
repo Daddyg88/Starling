@@ -1299,3 +1299,7 @@ window use the same code as the biology list.
 ## 0.80.6 - Route map hides with Void Compass
 
 * personality/watcher.py: last_ok and void_compass_running() (Void Compass answered in the last 45 s). ui/route_overlay.py: wanted_mode(..., void_compass) returns None when running and the setting overlay.route_hide_with_voidcompass (default on) is set; test mode still shows. ui/dashboard.py passes the provider. Tests in tests/test_route_map.py and tests/test_session_fixes.py. Overlay behaviour on screen untested.
+
+## 0.80.7 - Line picker memory and mood log
+
+* personality/dialogue.py: pick() keeps per-key recent TEXTS, a global deque of the last 40 spoken texts (GLOBAL_MEMORY) and avoids repeating a global recent text or an opener (first two words) from the last 5 (OPENER_MEMORY), always falling back when it would leave nothing. attach_memory()/save_memory() keep it in data/recent_lines.json (saved every 25 picks and on stop). personality/mood_engine.py: _apply() logs changes of 1 point or more at INFO. Tests in tests/test_session_fixes.py.

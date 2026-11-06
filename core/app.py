@@ -180,6 +180,7 @@ class App:
             paths.VOICEPACKS_DIR / pack_name,
             [paths.DIALOGUE_DIR / "core_lines.json"],
         ).load()
+        self.dialogue.attach_memory(paths.DATA_DIR / "recent_lines.json")
         missing = self.dialogue.missing_audio()
         if missing:
             self.log.warning("%d dialogue lines name an mp3 that is missing", len(missing))
@@ -905,6 +906,10 @@ class App:
 
     # ---- shutting down ----
     def stop(self):
+        try:
+            self.dialogue.save_memory()
+        except Exception:
+            pass
         if getattr(self, "stream_chat", None) is not None:
             self.stream_chat.stop()
             self.stream_chat = None

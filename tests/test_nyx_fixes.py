@@ -152,6 +152,8 @@ class Repeats(unittest.TestCase):
         import random
         d = Dialogue.__new__(Dialogue)
         d._recent = {}
+        from collections import deque
+        d._spoken, d._memory_file, d._since_save = deque(maxlen=40), None, 0
         d.rng = random.Random(3)
         from collections import namedtuple
         L = namedtuple("L", "text")

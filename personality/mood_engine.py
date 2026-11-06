@@ -741,7 +741,10 @@ class MoodEngine:
         self._dirty = True
         self._save_soon(now)
         self.history.appendleft((datetime.fromtimestamp(now).strftime("%H:%M"), rule.get("label", rule.get("id", "")), applied))
-        log.debug("Mood %+.2f (%s) -> %.1f %s", applied, rule.get("id"), self.score, self.band)
+        if abs(applied) >= 1.0 or self.band != before:        # in the log so a real session can show what moves her mood and by how much
+            log.info("Mood %+.1f (%s, base %+.1f, tiredness %.1f) -> %.0f %s", applied, rule.get("id"), base, fatigue, self.score, self.band)
+        else:
+            log.debug("Mood %+.2f (%s) -> %.1f %s", applied, rule.get("id"), self.score, self.band)
         if self.band != before:
             self._publish_live()
             self._announce_shift()

@@ -16,7 +16,10 @@ or  {"text": "...", "audio": "file.mp3", "mature": false, "then_speak": false,
 """
 
 import json
+import os
 import random
+import re
+import tempfile
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
@@ -67,6 +70,17 @@ def _make_line(key, raw):
     return None
 
 
+GLOBAL_MEMORY = 40          # how many recent lines (of any kind) she avoids repeating
+OPENER_MEMORY = 5           # ...and how many recent openings ('Right now we're', 'Nice work') she tries not to start with again
+SAVE_EVERY = 25             # picks between saves of her 'what I said lately' memory
+
+
+def opener_of(text):
+    """The first two words, lower case: 'Nice work on that one.' -> 'nice work'."""
+    words = re.findall(r"[a-z']+", str(text).lower())
+    return " ".join(words[:2])
+
+
 class DialogueManager:
     def __init__(self, pack_dir=None, extra_files=(), rng=None):
         self.pack_dir = Path(pack_dir) if pack_dir else None
@@ -74,8 +88,37 @@ class DialogueManager:
         self.rng = rng or random.Random()
         self.lines = {}
         self.pack_info = {}
-        self._recent = {}
+        self._recent = {}                                # key -> the last few line texts used for it
+        self._spoken = deque(maxlen=GLOBAL_MEMORY)       # the last lines picked for ANY key, so similar lines do not follow each other
+        self._memory_file = None
+        self._since_save = 0
         self._audio_exists = {}
+
+    # ---- remembering what she said lately (kept between starts, so a new session does not open with the same lines) ----
+    def attach_memory(self, path):
+        self._memory_file = Path(path)
+        try:
+            data = json.loads(self._memory_file.read_text(encoding="utf-8"))
+            for key, texts in (data.get("recent") or {}).items():
+                self._recent[str(key)] = deque((str(t) for t in texts), maxlen=max(3, len(texts)))
+            self._spoken.extend(str(t) for t in (data.get("spoken") or [])[-GLOBAL_MEMORY:])
+        except (OSError, ValueError, AttributeError):
+            pass
+        return self
+
+    def save_memory(self):
+        if self._memory_file is None:
+            return
+        self._since_save = 0
+        data = {"recent": {key: list(texts)[-40:] for key, texts in self._recent.items() if texts}, "spoken": list(self._spoken)}
+        try:
+            self._memory_file.parent.mkdir(parents=True, exist_ok=True)
+            handle, temp = tempfile.mkstemp(dir=str(self._memory_file.parent), suffix=".tmp")
+            with os.fdopen(handle, "w", encoding="utf-8") as out:
+                json.dump(data, out)
+            os.replace(temp, self._memory_file)
+        except OSError:
+            log.warning("Could not save what she said lately", exc_info=True)
 
     # ---- loading ----
     def load(self):
@@ -216,7 +259,15 @@ class DialogueManager:
         recent = self._recent.get(key)
         if recent is None or recent.maxlen != size:
             recent = self._recent[key] = deque(recent or (), maxlen=size)
-        fresh = [line for line in found if line not in recent] or found
-        choice = self.rng.choice(fresh)
-        recent.append(choice)
+        fresh = [line for line in found if line.text not in recent] or found
+        lately = set(self._spoken)                                   # not a line she said a moment ago under another key either
+        fresher = [line for line in fresh if line.text not in lately] or fresh
+        openers = {opener_of(text) for text in list(self._spoken)[-OPENER_MEMORY:]}
+        varied = [line for line in fresher if opener_of(line.text) not in openers] or fresher
+        choice = self.rng.choice(varied)
+        recent.append(choice.text)
+        self._spoken.append(choice.text)
+        self._since_save += 1
+        if self._memory_file is not None and self._since_save >= SAVE_EVERY:
+            self.save_memory()
         return choice
