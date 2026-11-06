@@ -17,6 +17,7 @@ import time
 from dataclasses import dataclass, field
 
 from core.logger import get_logger
+from core.timing import JobTimer
 
 log = get_logger("event_bus")
 
@@ -43,6 +44,7 @@ class EventBus:
         self._subscribers = {}
         self._lock = threading.RLock()
         self.handler_errors = 0  # how many listeners have crashed so far
+        self.timer = JobTimer()  # where the time goes (see core/timing.py)
 
     def subscribe(self, event_name, callback):
         """Ask to be told when event_name happens. callback(event) is called."""
@@ -71,6 +73,7 @@ class EventBus:
             listeners += list(self._subscribers.get(ALL_EVENTS, []))
 
         for callback in listeners:
+            started = time.perf_counter()
             try:
                 callback(event)
             except Exception:
@@ -78,4 +81,6 @@ class EventBus:
                 # and must never crash the program.
                 self.handler_errors += 1
                 log.exception("A listener crashed while handling %s", event_name)
+            finally:
+                self.timer.record(getattr(callback, "__qualname__", None) or type(callback).__name__, time.perf_counter() - started, event_name)
         return event

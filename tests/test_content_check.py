@@ -160,5 +160,46 @@ class SettingsCheckTests(unittest.TestCase):
             self.assertTrue(loaded.problems)
 
 
+class TimingTests(unittest.TestCase):
+    def make(self):
+        self.now = [0.0]
+        self.cpu = [0.0]
+        return __import__("core.timing", fromlist=["JobTimer"]).JobTimer(clock=lambda: self.now[0], cpu=lambda: self.cpu[0])
+
+    def test_totals_and_summary(self):
+        timer = self.make()
+        for seconds in (0.1, 0.2, 0.05):
+            timer.record("Mood.update", seconds)
+        timer.record("Brain.reply", 0.3)
+        self.assertEqual(timer.jobs["Mood.update"][0], 3)
+        self.assertTrue(timer.summary().startswith("Mood.update 3 x"))          # biggest total first
+
+    def test_slow_jobs_are_reported_but_not_every_time(self):
+        timer = self.make()
+        with self.assertLogs("starling.timing", "INFO") as seen:
+            timer.record("Slow.thing", 1.2, "FSDJump")
+            timer.record("Slow.thing", 1.3, "FSDJump")
+            self.now[0] = 100.0
+            timer.record("Slow.thing", 0.9)
+        self.assertEqual(len([m for m in seen.output if "Slow job" in m]), 2)
+
+    def test_summary_line_every_ten_minutes_resets(self):
+        timer = self.make()
+        timer.record("A", 0.1)
+        self.now[0], self.cpu[0] = 700.0, 7.0
+        with self.assertLogs("starling.timing", "INFO") as seen:
+            timer.record("B", 0.1)
+        self.assertIn("7.0 s of processor time", seen.output[0])
+        self.assertIn("1.0%", seen.output[0])
+        self.assertEqual(timer.jobs, {})
+
+    def test_the_bus_times_its_listeners(self):
+        from core.event_bus import EventBus
+        bus = EventBus()
+        bus.subscribe("X", lambda e: None)
+        bus.publish("X")
+        self.assertEqual(sum(v[0] for v in bus.timer.jobs.values()), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -913,6 +913,10 @@ class App:
     # ---- shutting down ----
     def stop(self):
         try:
+            self.bus.timer.report()                      # one last line: where her time went since the last report
+        except Exception:
+            pass
+        try:
             self.dialogue.save_memory()
         except Exception:
             pass

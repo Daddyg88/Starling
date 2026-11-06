@@ -1319,3 +1319,7 @@ window use the same code as the biology list.
 ## 0.81.1 - Settings check
 
 * core/settings.py: check_settings(values, defaults) (_fit converts or resets by the default's kind; difflib typo hints inside known groups), run by Settings.load(); problems kept in Settings.problems and logged as warnings. Text settings are left alone on purpose. Tests in tests/test_content_check.py.
+
+## 0.81.2 - Timing
+
+* core/timing.py JobTimer: per-job counts/totals/longest, 10-minute summary with process CPU time, 'Slow job' lines over 0.5 s (once a minute per job). core/event_bus.py times every listener (EventBus.timer); core/app.py stop() writes a final report. Tests in tests/test_content_check.py.
