@@ -118,6 +118,16 @@ class KokoroSpeedTests(Cache):
         self.tts.render("Hello there.")
         self.assertTrue(self.tts.is_cached("Hello there."))
 
+    def test_a_very_long_line_is_kept_sentence_by_sentence(self):
+        long_line = " ".join("This is sentence number %d of a very long answer that goes on." % i for i in range(6))
+        self.assertGreater(len(long_line), 200)
+        self.assertFalse(self.tts.is_cached(long_line))
+        self.assertTrue(self.tts.render(long_line))
+        self.assertTrue(self.tts.is_cached(long_line))                 # so the warm-up does not make it again at every start
+        calls = len(self.pipe.calls)
+        self.assertTrue(self.tts.render(long_line))
+        self.assertEqual(len(self.pipe.calls), calls)
+
     def test_start_delay_is_measured(self):
         self.tts.speak("Hello there.", VoiceSettings())
         self.assertGreaterEqual(self.tts.last_start_delay, 0.0)

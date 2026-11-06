@@ -315,10 +315,25 @@ class KokoroTTS(BaseTTS):
         except OSError:
             log.warning("Could not save to the voice cache", exc_info=True)
 
+    def _units(self, text):
+        """What is kept in the cache for this text: the text itself, or (when it is too long to keep whole) its sentences."""
+        if len(text) <= MAX_CACHED_CHARS:
+            return [text]
+        units = []
+        for sentence in sentences_of(text):
+            units.extend(split_sentences(sentence) if len(sentence) > LONG_PART else [sentence])
+        return units
+
     def is_cached(self, text, speed=1.0):
-        """True if this exact sentence is already made (so it will play instantly)."""
-        path = self._cache_file(text, speed)
-        return path is not None and path.is_file()
+        """True if this exact sentence is already made (so it will play instantly). A very long text counts as made when
+        every one of its sentences is."""
+        if self.cache_dir is None:
+            return False
+        for unit in self._units(text):
+            path = self._cache_file(unit, speed)
+            if path is not None and not path.is_file():              # (a piece that can never be kept is not worth making again and again)
+                return False
+        return True
 
     def render(self, text, speed=1.0):
         """Make the sound for `text` WITHOUT playing it (and cache it). Returns True on success."""
@@ -326,6 +341,9 @@ class KokoroTTS(BaseTTS):
         if len(parts) != 1:
             return bool(parts) and all([self.render(part, speed) for part in parts])
         text = parts[0]
+        units = self._units(text)
+        if len(units) != 1 or units[0] != text:
+            return all([self.render(unit, speed) for unit in units])          # too long to keep whole: keep it sentence by sentence
         if not self._wait_until_ready():
             return False
         if self._cache_load(text, speed) is not None:
