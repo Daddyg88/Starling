@@ -176,6 +176,37 @@ class WarmerTests(Cache):
         self.assertNotIn(texts[0], calls)
         self.assertEqual(calls[0], texts[1])
 
+    def test_no_second_check_once_fully_prepared(self):
+        state = self.dir / "prepared.json"
+        small = ["One line.", "Two lines.", "Three lines."]
+        import tts.voice_warmer as vw
+        original = vw.priority_order
+        vw.priority_order = lambda *a, **k: list(small)
+        self.addCleanup(lambda: setattr(vw, "priority_order", original))
+        warmer = VoiceWarmer(self.tts, self.dialogue, self.settings, sleep=lambda s: None, state_file=state)
+        warmer.force = True
+        warmer._run()
+        self.assertEqual(warmer.made, 3)
+        self.assertTrue(state.is_file())
+        again = VoiceWarmer(self.tts, self.dialogue, self.settings, sleep=lambda s: None, state_file=state)
+        again.render_calls = 0
+        real = self.tts.render
+        self.tts.render = lambda *a, **k: (_ for _ in ()).throw(AssertionError("should not render"))
+        again._run()
+        self.tts.render = real
+        self.assertEqual(again.skipped, 3)
+        self.assertTrue(again.finished)
+        small.append("A brand new line.")                                  # new lines: it works again
+        third = VoiceWarmer(self.tts, self.dialogue, self.settings, sleep=lambda s: None, state_file=state)
+        third.force = True
+        third._run()
+        self.assertEqual(third.made, 1)
+        for f in (self.dir / "cache").glob("*.npy"):                       # cache folder emptied: it notices and re-makes
+            f.unlink()
+        fourth = VoiceWarmer(self.tts, self.dialogue, self.settings, sleep=lambda s: None, state_file=state)
+        fourth.force = False
+        self.assertFalse(fourth._already_prepared(fourth._fingerprint(small, 1.0), small, 1.0))
+
     def test_waits_while_the_cpu_is_busy(self):
         self.free[0] = False
         self.assertFalse(self.warmer.may_work())

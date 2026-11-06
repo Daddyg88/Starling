@@ -239,7 +239,8 @@ class App:
         if kokoro is not None:
             from tts.voice_warmer import VoiceWarmer
             self.warmer = VoiceWarmer(kokoro, self.dialogue, self.settings, speech=self.speech,
-                                      free_provider=self.cpu_is_free)
+                                      free_provider=self.cpu_is_free,
+                                      state_file=paths.DATA_DIR / "voice_prepared.json")
             if str(self.settings.get("tts.warm_cache", "idle")).lower() != "off":
                 self.warmer.start()
 

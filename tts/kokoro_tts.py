@@ -284,6 +284,10 @@ class KokoroTTS(BaseTTS):
         self._stamp = (seen, digest.hexdigest()[:16])
         return self._stamp[1]
 
+    def cache_signature(self):
+        """Changes whenever a saved line would no longer fit this voice (re-tuned voice file or a different built-in voice)."""
+        return "%s|%s" % (self._pack_stamp(), self._voice_name)
+
     def _cache_file(self, text, speed):
         if self.cache_dir is None or len(text) > MAX_CACHED_CHARS:
             return None

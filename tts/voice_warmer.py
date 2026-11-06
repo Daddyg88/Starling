@@ -9,6 +9,8 @@ in the background, one at a time, and only when it will not get in the way:
 Most-used lines are made first (jumps, docking, combat), the rest after. It is safe to stop at any moment, and lines that
 are already made are skipped instantly. Switch it off with  tts.warm_cache = "off"  (dashboard: Voice page).
 """
+import hashlib
+import json
 import threading
 import time
 
@@ -101,7 +103,8 @@ def _texts(lines, allow_mature, settings, personalise):
 
 class VoiceWarmer:
     def __init__(self, kokoro, dialogue, settings, speech=None, clock=time.monotonic, sleep=time.sleep,
-                 free_provider=None):
+                 free_provider=None, state_file=None):
+        self.state_file = state_file       # remembers 'all prepared' so the next start does not check every line again
         self.kokoro = kokoro
         self.dialogue = dialogue
         self.settings = settings
@@ -118,6 +121,37 @@ class VoiceWarmer:
         self.force = False                 # "prepare her voice now": ignore the free-CPU rule
         self._stop = threading.Event()
         self._thread = None
+
+    def _fingerprint(self, texts, speed):
+        """Identifies exactly what 'fully prepared' means: every line, the speed and the voice. Any change makes a new one."""
+        digest = hashlib.sha1()
+        digest.update(("%.2f|%s|" % (speed, self.kokoro.cache_signature())).encode("utf-8"))
+        for text in texts:
+            digest.update(text.encode("utf-8"))
+            digest.update(b"\n")
+        return digest.hexdigest()
+
+    def _already_prepared(self, fingerprint, texts, speed):
+        """True when the last run finished for exactly these lines AND a handful of them are really still in the cache."""
+        if self.state_file is None or self.force:
+            return False
+        try:
+            saved = json.loads(self.state_file.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return False
+        if saved.get("fingerprint") != fingerprint or not texts:
+            return False
+        step = max(1, len(texts) // 40)
+        return all(self.kokoro.is_cached(text, speed) for text in texts[::step])      # the cache folder may have been cleared
+
+    def _remember_prepared(self, fingerprint):
+        if self.state_file is None:
+            return
+        try:
+            self.state_file.parent.mkdir(parents=True, exist_ok=True)
+            self.state_file.write_text(json.dumps({"fingerprint": fingerprint}), encoding="utf-8")
+        except OSError:
+            log.warning("Could not save the voice preparation note", exc_info=True)
 
     def mode(self):
         return str(self.settings.get("tts.warm_cache", "idle")).lower()
@@ -150,6 +184,11 @@ class VoiceWarmer:
             speed = speed_from_rate(self.settings.get("tts.rate", 0))
             texts = priority_order(self.dialogue, bool(self.settings.get("speech.allow_mature", False)), self.settings)
             self.total = len(texts)
+            fingerprint = self._fingerprint(texts, speed)
+            if self._already_prepared(fingerprint, texts, speed):
+                self.skipped = self.total
+                log.info("Her voice was already fully prepared for these lines: nothing to check.")
+                return
             self.started_at = self.clock()
             quiet_since = self.clock()
             for text in texts:
@@ -172,6 +211,8 @@ class VoiceWarmer:
                 if not self.force:
                     self.sleep(PAUSE_BETWEEN_SECONDS)
             log.info("Voice warm-up finished: %d made, %d already there, %d failed", self.made, self.skipped, self.failed)
+            if not self.failed:
+                self._remember_prepared(fingerprint)
         except Exception:
             log.exception("The voice warm-up stopped")
         finally:

@@ -1291,3 +1291,7 @@ window use the same code as the biology list.
 ## 0.80.4
 
 * tts/voice_warmer.py mining_texts() trimmed to favourites, Refined_Milestone only, counts up to 20 (about 1,700 lines instead of 4,800).
+
+## 0.80.5 - Prepared once
+
+* tts/voice_warmer.py: _fingerprint() (speed, voice signature, every line) is saved to data/voice_prepared.json when a run ends with no failures; _already_prepared() skips the whole warm-up when it matches and about 40 spread-out lines are really in the cache. kokoro.cache_signature() added. The dashboard button (force) always checks. Test: tests/test_speed.py test_no_second_check_once_fully_prepared.
