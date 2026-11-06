@@ -48,20 +48,21 @@ def priority_order(dialogue, allow_mature, settings):
 
 
 MINING_MATERIAL_KEYS = ("Refined_FirstTop", "Refined_FirstGood", "Refined_Cheer", "Prospected_Motherlode")
-MINING_COUNT_KEYS = ("Refined_Milestone", "Refined_MilestoneGood")
-MINING_MAX_COUNT = 40          # tonnes of one mineral she pre-makes the count lines for
+MINING_COUNT_KEYS = ("Refined_Milestone",)
+MINING_MAX_COUNT = 20          # tonnes of one mineral she pre-makes the count lines for
 
 
 def mining_texts(dialogue, allow_mature, settings):
     """The mining lines with a mineral name or a tonne count, made for your favourite minerals ahead of time.
 
     They are the lines that used to start 2 or 3 seconds late (every one had to be made on the spot). Only the minerals she gets
-    excited about (your favourites and the solid-money ones) and the counts she actually calls out (every 3, 5 or 10 tonnes)."""
+    excited about (your favourites) and the first few counts she calls out (every 3, 5 or 10 tonnes, up to 20). Kept small on purpose:
+    every extra line is more waiting the first time."""
     try:
         from core.identity import personalise
         from mining import minerals
         step = {"quiet": 10, "chatty": 3}.get(str(minerals.option("chatter", "normal")), 5)
-        names = sorted({minerals.spoken(k) for k in (set(minerals.favourites()) | set(minerals.GOOD))})
+        names = sorted({minerals.spoken(k) for k in minerals.favourites()})
         counts = list(range(step, MINING_MAX_COUNT + 1, step))
     except Exception:
         return []
