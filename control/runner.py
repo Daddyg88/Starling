@@ -41,6 +41,7 @@ LINE_FOR_STATUS = {
     "game_not_active": "CommandNotInGame",
     "not_windows": "CommandFailed",
     "failed": "CommandFailed",
+    "no_button": "CommandNoButton",
     "unknown": "CommandUnknown",
     "vc_offline": "CommandVoidOffline",
     "vc_forbidden": "CommandVoidForbidden",
@@ -483,6 +484,7 @@ class CommandRunner:
         if quiet and self.echo is not None:
             self.echo.mute(quiet, 300 if command.id == "show_off" else 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
         pressed = []
+        self._no_button = False
         self.macro_spoke = False
         for step in steps:
             if step[0] == "wait":
@@ -511,6 +513,14 @@ class CommandRunner:
                         status = SEND_FAILURE_STATUS.get(problem, "failed")
                         return Outcome(status, text, command, intent, detail=self._explain(status, command))
                     self.sleep(GAP_SECONDS)
+                continue
+            if step[0] == "selectbutton":
+                problem = self._select_button(strokes, pressed, trace)
+                if problem == "no_button":
+                    self._no_button = True               # carry on tidying up (back to Navigation, close the panel), then report
+                elif problem:
+                    status = SEND_FAILURE_STATUS.get(problem, "failed")
+                    return Outcome(status, text, command, intent, detail=self._explain(status, command))
                 continue
             if step[0] == "openleft":
                 problem = self._open_left_panel(strokes, pressed, trace)
@@ -555,6 +565,8 @@ class CommandRunner:
         self._last[key] = now
         log.info("Macro %s trace (key>screen after each wait; gui 0=cockpit 1=right panel 2=left panel 6=galaxy map): %s",
                  command.id, ", ".join(trace) if trace else "none")
+        if self._no_button:
+            return Outcome("no_button", text, command, intent, detail=self._explain("no_button", command))
         if command.id == "request_docking":
             self._check_docking_later()
         if quiet and self.echo is not None:
@@ -604,6 +616,33 @@ class CommandRunner:
                 return problems[0]
             self.sleep(0.5)
         return None
+
+    def _select_button(self, strokes, pressed, trace):
+        """The 'select button' macro step. Returns None (pressed Select), "no_button" (she can see the screen but not the button,
+        so she pressed nothing), or the sender's problem text."""
+        from control import panel_reader
+        look = None
+        if self.settings.get("panel.read_screen", True):
+            reader = self.panel_reader or panel_reader.capture_screen
+            try:
+                picture = reader()
+                look = None if picture is None else (panel_reader.find_button(picture) is not None)
+            except Exception:
+                log.exception("Looking for the button failed")
+        if look is False:
+            self.sleep(0.8)                                  # the button can take a moment to light up: one more look
+            try:
+                look = panel_reader.find_button(reader()) is not None
+            except Exception:
+                look = None
+        if look is False:
+            trace.append("button>not seen")
+            log.warning("Panel: she could not see the selected button in the right-hand pane, so she did not press Select.")
+            return "no_button"
+        trace.append("button>seen" if look else "button>unreadable")
+        problem = self.sender.send(strokes["UI_Select"], hold=0.15)
+        pressed.append("UI_Select")
+        return problem
 
     def _open_left_panel(self, strokes, pressed, trace):
         """The 'open left panel' macro step: gets the left panel open from whatever the game is showing.
@@ -672,6 +711,7 @@ class CommandRunner:
             "game_not_active": "Elite Dangerous isn't the active window, so I haven't pressed anything.",
             "not_windows": "I can only press keys on Windows.",
             "failed": "I couldn't press the key.",
+            "no_button": "I couldn't see the button on the panel, so I didn't press anything.",
         }.get(status, "That didn't work.")
 
     # ---- checking without pressing anything (used by the dashboard) ----

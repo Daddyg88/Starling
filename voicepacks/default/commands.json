@@ -117,6 +117,11 @@
     "I couldn't press the key, Commander. Windows didn't let me.",
     "That didn't work. Check the log if it keeps happening."
   ],
+  "CommandNoButton": [
+    "I can't see the docking button on the panel, Commander, so I didn't press anything. Select the station and I'll try again.",
+    "The panel isn't showing me the button I need. I've closed it again, Commander.",
+    "I couldn't find the button on the panel, so I held off. Try again with the station selected."
+  ],
   "CommandUnknown": [
     "I didn't catch a command I know in that, Commander.",
     "Sorry, I don't know how to do that one.",

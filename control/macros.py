@@ -17,6 +17,9 @@ A step is one of:
     "tab 2"                look at the left panel and go to that tab (0 = Navigation, 1 = Transactions, 2 = Contacts), whichever tab it
                            opened on. If she cannot see the screen she presses next tab that many times, as before.
     "tab 0 from 2"         the same, but if she cannot see the screen she assumes the panel is on tab 2 and presses previous tab twice
+    "select button"        look at the right-hand pane and press Select ONLY if she can see the bright selected button (e.g. Request
+                           Docking). If she can see the screen but not the button she presses nothing and the command reports it.
+                           If she cannot see the screen she presses Select anyway, as a plain "UI_Select" would.
     "open left panel"      get the left panel open from WHATEVER is on screen (Status.json GuiFocus): nothing if it is already open,
                            Back first if the galaxy map / system map / station services / FSS is open, then Focus Left Panel.
                            (A plain "FocusLeftPanel" would CLOSE the panel if it was already open.)
@@ -84,6 +87,9 @@ def parse_macro(steps):
             except ValueError:
                 raise ValueError("I don't understand this ensure (write it like: ensure FocusLeftPanel 2): %r" % text)
             continue
+        if lowered == "select button":
+            parsed.append(("selectbutton",))
+            continue
         if lowered == "open left panel":
             parsed.append(("openleft",))
             continue
@@ -127,6 +133,8 @@ def actions_in(parsed):
     for step in parsed:
         if step[0] in ("press", "hold", "ensure", "leave") and step[1] not in seen:
             seen.append(step[1])
+        if step[0] == "selectbutton" and "UI_Select" not in seen:
+            seen.append("UI_Select")
         if step[0] == "openleft":
             for needed in ("FocusLeftPanel", "UI_Back"):
                 if needed not in seen:

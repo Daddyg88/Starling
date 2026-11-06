@@ -8,18 +8,25 @@ from control import panel_reader as pr
 from control.macros import actions_in, parse_macro
 from tests.test_macros import ALL as ALL_KEYS
 
-TABS = 4
+TABS = 5                     # 0 = the small icon tab on the far left, 1 = Navigation, 2 = Transactions, 3 = Contacts, 4 = Target
+NAV = 1                      # the macro's "tab 0" is Navigation = index 1 here
 SHOTS = Path("/mnt/user-data/attachments/056a8d7e-59f4-5178-84a2-456c45d6729a")
 
 
 def picture(tab, tabs=TABS, noise=True):
-    """A made-up 1920x1080 screen: dark, a few small bright bits, a bright wide bar for the selected tab, list rows lower down."""
+    """A made-up 1920x1080 screen: dark, a few small bright bits, the selected tab filled bright (the icon tab is a small square),
+    list rows lower down, and the Request Docking bar in the right-hand pane when the Contacts tab is open."""
     pic = np.full((1080, 1920, 3), 12, dtype=np.uint8)
     if noise:
         pic[100:120, 1500:1510] = (255, 140, 0)                  # a small bright thing (not wide)
         pic[600:640, 300:900] = (255, 120, 0)                    # a big list row, LOWER down than the tab bar
-    left = 300 + tab * 250
-    pic[255:290, left:left + 240] = (255, 128, 0)
+    if tab == 0:
+        pic[256:296, 256:296] = (255, 128, 0)                    # the icon tab, selected
+    else:
+        left = 300 + (tab - 1) * 250
+        pic[255:290, left:left + 240] = (255, 128, 0)
+    if tab == 3:
+        pic[525:600, 898:1303] = (255, 170, 0)                   # REQUEST DOCKING
     return pic
 
 
@@ -27,8 +34,15 @@ class FindTabTests(unittest.TestCase):
     def test_finds_the_bar_and_moves_right_with_the_tab(self):
         spots = [pr.find_tab(picture(i)) for i in range(TABS)]
         self.assertTrue(all(spots))
+        self.assertTrue(spots[0].get("icon"))
         for a, b in zip(spots, spots[1:]):
             self.assertGreater(b["cx"], a["cx"])
+            self.assertFalse(b.get("icon"))
+
+    def test_the_button_is_only_seen_when_it_is_there(self):
+        self.assertIsNotNone(pr.find_button(picture(3)))
+        for tab in (0, 1, 2, 4):
+            self.assertIsNone(pr.find_button(picture(tab)), tab)
 
     def test_nothing_to_find(self):
         self.assertIsNone(pr.find_tab(np.full((1080, 1920, 3), 10, dtype=np.uint8)))
@@ -37,9 +51,15 @@ class FindTabTests(unittest.TestCase):
     @unittest.skipUnless(SHOTS.exists(), "the commander's screenshots are only here")
     def test_real_screenshots(self):
         from PIL import Image
-        xs = [pr.find_tab(np.asarray(Image.open(SHOTS / ("%s-image.png" % n)).convert("RGB")))["cx"]
-              for n in ("d60ffe87", "a929ae94", "72528b22")]
+        def look(name):
+            return np.asarray(Image.open(SHOTS / ("%s-image.png" % name)).convert("RGB"))
+        spots = [pr.find_tab(look(n)) for n in ("e80dadc1", "d60ffe87", "a929ae94", "72528b22")]   # icon, Nav, Transactions, Contacts
+        self.assertTrue(spots[0].get("icon"))
+        xs = [spot["cx"] for spot in spots]
         self.assertEqual(xs, sorted(xs))
+        self.assertIsNotNone(pr.find_button(look("86867523")))                  # the Request Docking screen
+        for name in ("e80dadc1", "d60ffe87", "a929ae94", "72528b22"):
+            self.assertIsNone(pr.find_button(look(name)), name)
 
 
 class FakeGame:
@@ -69,16 +89,16 @@ class WalkTests(unittest.TestCase):
             for start in range(TABS):
                 ok, g = self.go(start, 2, wrap=wrap)
                 self.assertTrue(ok, (start, wrap))
-                self.assertEqual(g.tab, 2, (start, wrap))
+                self.assertEqual(g.tab, NAV + 2, (start, wrap))
 
     def test_gets_to_each_target(self):
         for target in range(3):
             ok, g = self.go(3, target)
             self.assertTrue(ok)
-            self.assertEqual(g.tab, target)
+            self.assertEqual(g.tab, NAV + target)
 
     def test_blind_means_false_and_no_keys(self):
-        ok, g = self.go(1, 2, blind=True)
+        ok, g = self.go(2, 2, blind=True)
         self.assertFalse(ok)
         self.assertEqual(g.presses, [])
 
@@ -98,7 +118,7 @@ class MacroStepTests(unittest.TestCase):
 class RunnerTests(unittest.TestCase):
     def test_docking_starts_from_any_tab_when_she_can_see(self):
         from tests.test_macros import MacroTests
-        for start in (0, 1, 3):
+        for start in (0, 1, 3, 4):
             t = MacroTests()
             r = t.build()
             game = {"tab": start}
@@ -110,10 +130,13 @@ class RunnerTests(unittest.TestCase):
                 return _real(stroke, hold=hold)
             t.sender.send = send
             r.panel_reader = lambda _g=game: picture(_g["tab"])
+            r.state_provider = lambda: __import__("journal.game_state", fromlist=["GameState"]).GameState()
             r.sleep = lambda s: None
             with self.assertLogs("starling", level="INFO") as logs:
                 r.run_text("request docking")
             self.assertTrue(any("went to tab 2" in line for line in logs.output), start)
+            self.assertTrue(any(k.key == "Key_4" for k in t.sender.pressed), start)               # UI_Select (Key_4) was pressed: she saw the button
+            self.assertFalse(any(k.key == "Key_9" for k in t.sender.pressed), start)             # and there is no UI_Up any more
 
 
 class OpenLeftPanelTests(unittest.TestCase):
@@ -155,6 +178,19 @@ class OpenLeftPanelTests(unittest.TestCase):
         problem, pressed, _ = self.run_from(6, closes_on_back=False)
         self.assertEqual(problem, "failed")
         self.assertEqual(pressed, ["Key_6"])                       # one Back, then she stops pressing keys
+
+
+    def test_no_button_means_no_select_and_a_clear_report(self):
+        from tests.test_macros import MacroTests
+        t = MacroTests()
+        r = t.build()
+        no_button = picture(3)
+        no_button[500:620, 880:1320] = 12                                                       # Contacts, but the button is not lit
+        r.panel_reader = lambda: no_button
+        r.sleep = lambda s: None
+        outcome = r.run_text("request docking")[0]
+        self.assertEqual(outcome.status, "no_button")
+        self.assertFalse(any(k.key == "Key_4" for k in t.sender.pressed))                       # UI_Select was never pressed
 
 
 if __name__ == "__main__":

@@ -57,10 +57,11 @@ MACROS = {
 # 0.82.0: she gets the left panel open from WHATEVER is on screen ("open left panel": nothing if it is already open, Back out of a map
 # first) and LOOKS at the tab bar ("tab 2") so it works whichever tab the game opened on. If she cannot see the screen she counts the
 # Next Tab / Previous Tab presses exactly as before.
-DOCKING_MACRO = ("open left panel", "wait 0.4", "tab 2", "wait 1.15",
-                 "hold UI_Up 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
-                 "hold UI_Right 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
-                 "hold UI_Select 0.15", "wait 1.2",
+# 0.82.2: NO MORE UI_Up. In the logs UI_Up closed the panel every time (gui 0) and the panel then reopened with the cursor somewhere else.
+# The station is the first contact, so Right goes straight to its Request Docking button; 'select button' presses Select only if she
+# can SEE that bright button.
+DOCKING_MACRO = ("open left panel", "wait 0.4", "tab 2", "wait 1.0",
+                 "hold UI_Right 0.15", "wait 1.0", "select button", "wait 1.2",
                  "hold UI_Left 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
                  "tab 0 from 2", "wait 0.85", "hold UI_Back 0.15")
 # 0.48.0: SHOW OFF. She talks through what she can do while she opens and closes the screens herself: galaxy map, left panel

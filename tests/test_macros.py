@@ -50,8 +50,8 @@ class MacroTests(unittest.TestCase):
         r = self.build()
         r.run_text("request docking")
         names = [s.key for s in self.sender.pressed]
-        # 0.45.3: Focus, Next Tab x2, Up (held), Right, Select, Left, Previous Tab x2, Back
-        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_9", "Key_5", "Key_4", "Key_10", "Key_8", "Key_8", "Key_6"])
+        # 0.82.2 (she cannot see a screen in the tests): Focus, Next Tab x2, Right, Select, Left, Previous Tab x2, Back. No Up any more.
+        self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_5", "Key_4", "Key_10", "Key_8", "Key_8", "Key_6"])
         self.assertIn(1.6, self.sleeps)
 
     def test_ensure_reopens_the_panel_only_when_the_game_shows_no_screen(self):

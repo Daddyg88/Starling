@@ -18,6 +18,10 @@ MIN_BRIGHT = 190             # a selected-tab pixel is bright...
 MIN_SATURATION = 0.75        # ...and strongly coloured (any HUD colour: orange, blue, green...)
 MIN_AREA = 40                # in shrunk pixels
 MIN_ASPECT = 3.0             # the tab bar is much wider than it is tall
+TAB_MIN_WIDTH = 0.08         # a selected tab is this wide, as a fraction of the screen width (about 0.12 to 0.14 in practice)
+TAB_MAX_WIDTH = 0.19
+ICON_MIN = 0.012            # the small square icon tab is this wide, as a fraction of the screen width
+ICON_MAX = 0.04
 WAIT_AFTER_KEY = 0.7         # seconds the panel takes to change tab before she looks again
 
 
@@ -35,11 +39,10 @@ def capture_screen():
     return picture
 
 
-def find_tab(picture):
-    """The selected tab bar in a picture: {"cx", "width", "y"} as fractions of the picture, or None."""
+def _blobs(picture):
+    """Every bright, strongly coloured, solid blob in the picture as (x0, x1, y0, y1, area) in shrunk-picture pixels, plus the
+    shrunk size (columns, rows). Only numpy: a flood fill on a picture about 480 pixels wide."""
     import numpy as np
-    if picture is None or picture.ndim != 3:
-        return None
     height, width = picture.shape[:2]
     step = max(1, width // SMALL_WIDTH)
     small = picture[::step, ::step].astype(np.int16)
@@ -47,7 +50,7 @@ def find_tab(picture):
     mask = (peak >= MIN_BRIGHT) & ((peak - low) >= MIN_SATURATION * np.maximum(peak, 1))
     rows, cols = mask.shape
     seen = np.zeros_like(mask)
-    best = None
+    blobs = []
     for y in range(rows):
         for x in range(cols):
             if not mask[y, x] or seen[y, x]:
@@ -64,15 +67,64 @@ def find_tab(picture):
                     if 0 <= ny < rows and 0 <= nx < cols and mask[ny, nx] and not seen[ny, nx]:
                         seen[ny, nx] = True
                         stack.append((ny, nx))
-            box_w, box_h = x1 - x0 + 1, y1 - y0 + 1
-            if count < MIN_AREA or box_w < MIN_ASPECT * box_h or count < 0.5 * box_w * box_h:
-                continue                                       # too small, not a wide bar, or not a solid fill
-            if best is None or y0 < best[0]:                   # the top-most one is the tab bar (the rows of a list are lower down)
-                best = (y0, x0, x1)
-    if best is None:
+            if count >= MIN_AREA:
+                blobs.append((x0, x1, y0, y1, count))
+    return blobs, cols, rows
+
+
+def _wide_bars(picture):
+    """The solid wide, short blobs (tab bars, buttons) as dicts of fractions of the picture, top to bottom."""
+    if picture is None or picture.ndim != 3:
+        return [], []
+    blobs, cols, rows = _blobs(picture)
+    bars = []
+    for x0, x1, y0, y1, count in blobs:
+        box_w, box_h = x1 - x0 + 1, y1 - y0 + 1
+        if box_w >= MIN_ASPECT * box_h and count >= 0.5 * box_w * box_h:
+            bars.append({"cx": (x0 + x1 + 1) / 2.0 / cols, "width": box_w / float(cols), "y": y0 / float(rows),
+                         "height": box_h / float(rows), "x0": x0 / float(cols)})
+    bars.sort(key=lambda bar: bar["y"])
+    return bars, blobs
+
+
+def find_tab(picture):
+    """The selected tab in a picture: {"cx", "width", "y"} (fractions of the picture), or None.
+    Normally that is the top-most wide bright bar. The panel also has a small square icon tab on the far LEFT (one step left of
+    Navigation, the Previous Tab key lands on it): when that is the selected one there is no wide bar, so she reports
+    {"icon": True, ...} instead."""
+    bars, blobs = _wide_bars(picture)
+    bars = [bar for bar in bars if TAB_MIN_WIDTH <= bar["width"] <= TAB_MAX_WIDTH]   # a tab is about 0.12-0.14 of the screen wide: not a row or a long bar
+    if bars:
+        top = bars[0]
+        return {"cx": top["cx"], "width": top["width"], "y": top["y"]}
+    if picture is None or picture.ndim != 3 or not blobs:
         return None
-    y0, x0, x1 = best
-    return {"cx": (x0 + x1 + 1) / 2.0 / cols, "width": (x1 - x0 + 1) / float(cols), "y": y0 / float(rows)}
+    _, cols, rows = _blobs_shape(picture)
+    for x0, x1, y0, y1, count in sorted(blobs, key=lambda blob: blob[2]):
+        box_w, box_h = x1 - x0 + 1, y1 - y0 + 1
+        if (0.6 <= box_w / float(box_h) <= 1.8 and ICON_MIN <= box_w / float(cols) <= ICON_MAX
+                and x0 / float(cols) < 0.4 and count >= 0.5 * box_w * box_h):
+            return {"icon": True, "cx": (x0 + x1 + 1) / 2.0 / cols, "width": box_w / float(cols), "y": y0 / float(rows)}
+    return None
+
+
+def _blobs_shape(picture):
+    height, width = picture.shape[:2]
+    step = max(1, width // SMALL_WIDTH)
+    return None, len(range(0, width, step)), len(range(0, height, step))
+
+
+def find_button(picture):
+    """The big bright bar of the selected button in the right-hand pane (the 'Request Docking' button) when the cursor is on
+    it, or None. It must be well below the tab bar and in the right part of the panel."""
+    bars, _ = _wide_bars(picture)
+    tab = find_tab(picture)
+    if not bars or tab is None:
+        return None
+    for bar in bars:
+        if bar["y"] > tab["y"] + 0.12 and bar["cx"] > tab["cx"] - 0.1 and 0.05 <= bar["width"] <= 0.35 and bar["x0"] > 0.3:
+            return bar
+    return None
 
 
 def goto_tab(read, press_next, press_previous, wait, target):
@@ -86,28 +138,39 @@ def goto_tab(read, press_next, press_previous, wait, target):
     here = read()
     if here is None:
         return False
-    for _ in range(5):                                         # step 1: to the first tab (previous either stays put or wraps round)
-        press_previous()
+    if not here.get("icon"):
+        for _ in range(6):                                     # step 1: left until she is on the little icon tab (the very first one)
+            press_previous()
+            wait(WAIT_AFTER_KEY)
+            now = read()
+            if now is None:
+                return False
+            if now.get("icon"):
+                here = now
+                break
+            moved = (now["cx"] - here["cx"]) / max(here["width"], 0.01)
+            if moved < -0.5:                                   # went one tab to the left: keep going
+                here = now
+                continue
+            if moved > 1.2:                                    # jumped to the far right: it wrapped (no icon tab on this panel)
+                press_next()
+                wait(WAIT_AFTER_KEY)
+                back = read()
+                if back is None:
+                    return False
+                here = back
+                break
+            here = now                                         # did not move: this is the first tab
+            break
+        else:
+            return False                                       # still moving after six presses: something is odd
+    if here.get("icon"):                                       # one step right of the icon is Navigation (tab 0)
+        press_next()
         wait(WAIT_AFTER_KEY)
         now = read()
-        if now is None:
+        if now is None or now.get("icon"):
             return False
-        moved = (now["cx"] - here["cx"]) / max(here["width"], 0.01)
-        if moved < -0.5:                                       # went one tab to the left: keep going
-            here = now
-            continue
-        if moved > 1.2:                                        # jumped to the far right: it wrapped, so it WAS on the first tab
-            press_next()
-            wait(WAIT_AFTER_KEY)
-            back = read()
-            if back is None:
-                return False
-            here = back
-            break
-        here = now                                             # did not move: this is the first tab
-        break
-    else:
-        return False                                           # still moving after five presses: something is odd
+        here = now
     for _ in range(target):                                    # step 2: forward to the one we want, checking each press worked
         press_next()
         wait(WAIT_AFTER_KEY)
