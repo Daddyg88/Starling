@@ -309,5 +309,10 @@
     "The game says that can't be deployed right now, Commander.",
     "That button is greyed out, Commander, so I've left it alone.",
     "Not available at the moment, Commander. The panel won't let me."
+  ],
+  "CommandCannotTooClose": [
+    "We're too close to the planet for that, Commander. The panel says it can't be deployed here.",
+    "The game won't let me deploy from this close to the planet, Commander.",
+    "Too close to the planet, Commander. I've left it alone."
   ]
 }

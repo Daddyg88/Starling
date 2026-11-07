@@ -7,7 +7,8 @@ import numpy as np
 from control import role_reader, role_walk
 
 FOLDER = Path("/mnt/user-data/attachments/056a8d7e-59f4-5178-84a2-456c45d6729a")
-FILES = {"launch0": "ed056453", "launch1": "f9cfbf77", "srv0": "3abd3f09", "srv1": "51e512c3", "suit": "3c27df87"}
+FILES = {"launch0": "ed056453", "launch1": "f9cfbf77", "srv0": "3abd3f09", "srv1": "51e512c3", "suit": "3c27df87",
+         "list_suit": "f48970d6", "list_launch": "137b6f48", "list_srv": "0cb58856"}      # the last three: the cursor is in the TAB LIST
 HAVE = all((FOLDER / ("%s-image.png" % name)).exists() for name in FILES.values())
 _cache = {}
 
@@ -34,6 +35,13 @@ class RealPictureTests(unittest.TestCase):
         self.assertEqual([b["row"] for b in role_reader.grey_buttons(shot("srv1"))], [0])     # the Rhino: too close to the planet
         self.assertEqual(role_reader.grey_buttons(shot("launch0")), [])
 
+    def test_tab_list_state_the_selected_tab_is_bright_amber_and_no_button_is_lit(self):
+        for name, tab in (("list_suit", 0), ("list_launch", 1), ("list_srv", 2)):
+            self.assertEqual(role_reader.selected_tab(shot(name)), tab, name)
+            self.assertIsNone(role_reader.lit_button(shot(name)), name)
+        self.assertEqual([b["row"] for b in role_reader.grey_buttons(shot("list_launch"))], [0, 1])   # both: too close to the planet
+        self.assertEqual([b["row"] for b in role_reader.grey_buttons(shot("list_srv"))], [0])          # the Rhino only
+
     def test_both_rows_have_a_vessel(self):
         for name in ("launch0", "launch1", "srv0", "srv1"):
             self.assertEqual((role_reader.row_occupied(shot(name), 0), role_reader.row_occupied(shot(name), 1)), (True, True), name)
@@ -54,6 +62,50 @@ class RealPictureTests(unittest.TestCase):
             self.assertEqual(len(role_reader.grey_buttons(picture)), 1, size)
 
 
+@unittest.skipUnless(HAVE, "the commander's role-panel screenshots are only here")
+class SettleTests(unittest.TestCase):
+    """The log showed one quick Down press racing on to the last tab, and a blurred look in between: she steps ONE key at a time and
+    only trusts a look that two reads agree on."""
+
+    def test_a_tab_list_that_runs_past_is_walked_back_one_step_at_a_time(self):
+        game = FakeGame(tab=0)
+        original = game.press
+        presses = []
+
+        def racing(name):                                # the first Down runs on past the tab she wanted (as in the log)
+            presses.append(name)
+            if name == "UI_Down" and len(presses) == 1:
+                game.tab = 2
+            else:
+                original(name)
+        read = lambda: role_walk.read_all(game.picture())
+        self.assertEqual(role_walk.go_to_tab(read, racing, lambda s: None, 1), "ok")
+        self.assertEqual(game.tab, 1)
+        self.assertEqual(presses, ["UI_Down", "UI_Up"])
+
+    def test_a_blurred_look_is_not_an_answer(self):
+        game = FakeGame(tab=1)
+        blurry = [None, None]                            # two reads where nothing is clear, then the real picture
+        real = lambda: role_walk.read_all(game.picture())
+
+        def read():
+            if blurry:
+                blurry.pop()
+                seen = real()
+                seen["tab"] = None
+                return seen
+            return real()
+        self.assertEqual(role_walk.go_to_tab(read, game.press, lambda s: None, 1), "ok")
+        self.assertEqual(game.keys, [])
+
+    def test_all_grey_page_is_blocked_after_stepping_in(self):
+        picture = shot("list_launch")
+        keys = []
+        result = role_walk.pick(lambda: role_walk.read_all(picture), keys.append, lambda s: None, 1, 0)
+        self.assertEqual(result[0], "blocked")
+        self.assertEqual(keys, ["UI_Right"])             # she stepped in to look, and never pressed Select
+
+
 class ReasonTests(unittest.TestCase):
     def test_reasons(self):
         self.assertEqual(role_walk.blocked_reason("scarab", 0, None), "landed")
@@ -63,6 +115,8 @@ class ReasonTests(unittest.TestCase):
         self.assertEqual(role_walk.blocked_reason("slf", 0, 120), "slf_low")
         self.assertEqual(role_walk.blocked_reason("slf", 0, None), "other")
         self.assertEqual(role_walk.blocked_reason("nomad", 0, None), "other")
+        self.assertEqual(role_walk.blocked_reason("nomad", 2, None), "close")         # landed: "too close to planet"
+        self.assertEqual(role_walk.blocked_reason("slf", 2, None), "close")
 
 
 class FakeGame:

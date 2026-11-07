@@ -23,44 +23,54 @@ def read_all(picture):
             "text": role_reader.describe(picture)}
 
 
-def _look(read, wait, need):
-    """Looks until `need(seen)` is true, at most LOOKS times (the highlight takes a moment to move). Returns the last look."""
+def _look(read, wait, need, tries=6):
+    """Looks until `need(seen)` is true and two looks in a row agree (the highlight takes a moment to move and the panel fades while
+    it does), at most `tries` times. Returns the last look: None if there is no picture at all, else the last thing she saw even if
+    it never settled (the caller checks the fields it needs)."""
     seen = read()
-    for _ in range(LOOKS - 1):
-        if seen is None or need(seen):
-            break
-        wait(0.3)
+    previous = None
+    for _ in range(tries - 1):
+        if seen is None:
+            return None
+        if need(seen) and previous is not None and _same(previous, seen):
+            return seen
+        previous = seen if need(seen) else None
+        wait(0.25)
         seen = read()
     return seen
 
 
+def _same(one, two):
+    lit_one, lit_two = one["lit"], two["lit"]
+    return (one["tab"] == two["tab"] and (lit_one is None) == (lit_two is None)
+            and (lit_one is None or lit_one["row"] == lit_two["row"]))
+
+
 def go_to_tab(read, press, wait, target, note=None):
-    """Gets the role panel onto tab `target` (0 suit, 1 launch bay, 2 SRV, 3 crew). Returns "ok", "unreadable" (no picture / she
+    """Gets the role panel onto tab `target` (0 suit, 1 launch bay, 2 SRV, 3 crew), ONE key press at a time, looking after each: in
+    the commander's log a single quick Down press raced past the tab she wanted. Returns "ok", "unreadable" (no picture / she
     cannot tell which tab is selected) or "failed" (it did not get there)."""
     note = note or (lambda text: None)
-    seen = _look(read, wait, lambda s: s["tab"] is not None)
-    if seen is None:
+    have_tab = lambda s: s["tab"] is not None
+    seen = _look(read, wait, have_tab)
+    if seen is None or seen["tab"] is None:
         return "unreadable"
     note("first look: %s" % seen["text"])
-    if seen["lit"] is not None and seen["tab"] != target:           # a lit button = the cursor may be inside a page: one Left goes back
+    if seen["lit"] is not None and seen["tab"] != target:           # a lit button = the cursor is inside a page: one Left goes back
         press("UI_Left")                                              # to the tab list (if it was already there, Left does nothing)
-        wait(0.45)
-        seen = _look(read, wait, lambda s: s["tab"] is not None)
-        if seen is None:
+        wait(0.5)
+        seen = _look(read, wait, have_tab)
+        if seen is None or seen["tab"] is None:
             return "unreadable"
         note("after Left: %s" % seen["text"])
-    for _ in range(5):
+    for _ in range(8):
         tab = seen["tab"]
-        if tab is None:
-            return "unreadable"
         if tab == target:
             return "ok"
-        for _ in range(abs(target - tab)):
-            press("UI_Down" if target > tab else "UI_Up")
-            wait(0.3)
-        wait(0.2)
-        seen = _look(read, wait, lambda s: s["tab"] is not None)
-        if seen is None:
+        press("UI_Down" if target > tab else "UI_Up")
+        wait(0.5)
+        seen = _look(read, wait, have_tab)
+        if seen is None or seen["tab"] is None:
             return "unreadable"
         note("after pressing: %s" % seen["text"])
     return "failed"
@@ -70,34 +80,32 @@ def pick(read, press, wait, tab, row):
     """On tab `tab`: puts the cursor on `row` (0 top, 1 second, None = wherever the game puts it) and presses Select on the lit button.
     Returns ("ok", None) after Select, ("missing", None) if that row has no vessel, ("blocked", None) if the button is not available
     (grey, or the cursor would not go there), ("unreadable", None) if she cannot see enough to act."""
-    seen = _look(read, wait, lambda s: s["tab"] is not None or s["lit"] is not None)
-    if seen is None:
-        return "unreadable", None
+    seen = _look(read, wait, lambda s: s["tab"] == tab)
+    if seen is None or seen["tab"] != tab:
+        return "unreadable", None                                     # not on the tab she thought: never press blind
     if tab in (1, 2) and row is not None and seen["rows"][row] is False:
         return "missing", None                                        # nothing in that slot
     if seen["lit"] is None:
         press("UI_Right")                                             # into the page
-        wait(0.55)
-        seen = _look(read, wait, lambda s: s["lit"] is not None)
-        if seen is None:
+        wait(0.6)
+        seen = _look(read, wait, lambda s: s["tab"] == tab)
+        if seen is None or seen["tab"] != tab:
             return "unreadable", None
-    if seen["lit"] is None:
-        return ("blocked", None) if seen["grey"] else ("unreadable", None)
+        if seen["lit"] is None:
+            return ("blocked", None) if seen["grey"] else ("unreadable", None)
     if tab in (1, 2) and row is not None:
-        if seen["rows"][row] is False:
-            return "missing", None
         for _ in range(2):
             lit_row = seen["lit"]["row"]
             if lit_row == row:
                 break
             press("UI_Down" if row > lit_row else "UI_Up")
-            wait(0.45)
-            seen = _look(read, wait, lambda s: s["lit"] is not None and s["lit"]["row"] == row)
-            if seen is None:
+            wait(0.5)
+            seen = _look(read, wait, lambda s: s["tab"] == tab)
+            if seen is None or seen["tab"] != tab:
                 return "unreadable", None
             if seen["lit"] is None:
-                return "blocked", None                                # the wanted button went grey / the cursor left
-        if seen["lit"] is None or seen["lit"]["row"] != row:
+                return "blocked", None                                # the wanted button is grey: the cursor cannot go there
+        if seen["lit"]["row"] != row:
             return "blocked", None                                    # the cursor would not go to that row: it is not available
     press("UI_Select")
     return "ok", None
@@ -106,10 +114,12 @@ def pick(read, press, wait, tab, row):
 def blocked_reason(kind, flags, altitude):
     """Why she thinks the button is greyed out, from Status.json (flags: the Flags number, altitude in metres or None).
     'landed' = needs landing, 'high30' = the Rhino needs 30 m or lower, 'slf_low' = the fighter needs 500 m or higher,
-    'other' = she cannot tell."""
+    'close' = too close to the planet (the Nomad / fighter greyed out while landed), 'other' = she cannot tell."""
     landed = bool(flags & 2)
     if kind == "slf":
-        return "slf_low" if altitude is not None and altitude < 500 else "other"
+        return "slf_low" if altitude is not None and altitude < 500 else ("close" if landed else "other")
+    if kind == "nomad":
+        return "close" if landed or (altitude is not None and altitude < 500) else "other"
     if kind == "rhino":
         if landed:
             return "other"

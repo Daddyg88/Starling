@@ -48,6 +48,7 @@ LINE_FOR_STATUS = {
     "cannot_landed": "CommandCannotLanded",
     "cannot_high30": "CommandCannotHigh30",
     "cannot_slf_low": "CommandCannotFighterLow",
+    "cannot_close": "CommandCannotTooClose",
     "cannot_other": "CommandCannotDeploy",
     "unknown": "CommandUnknown",
     "vc_offline": "CommandVoidOffline",
@@ -568,7 +569,7 @@ class CommandRunner:
                     return Outcome(status, text, command, intent, detail=self._explain(status, command))
                 continue
             if step[0] in ("roletab", "rolepick"):
-                if self._role_status:
+                if self._role_status or self._no_button:
                     continue                                   # an earlier step already said no: just tidy up
                 problem = self._role_step(step, strokes, pressed, trace)
                 if problem:
@@ -700,7 +701,7 @@ class CommandRunner:
         problems, shots = [], []
 
         def press(action):
-            problem = self.sender.send(strokes[action], hold=0.15)
+            problem = self.sender.send(strokes[action], hold=0.05)           # a SHORT press: held longer the tab list runs on past the tab
             pressed.append(action)
             if problem:
                 problems.append(problem)
@@ -950,6 +951,7 @@ class CommandRunner:
             "cannot_landed": "You have to be landed for that.",
             "cannot_high30": "The Rhino needs you at 30 metres or lower.",
             "cannot_slf_low": "The fighter needs you at 500 metres or higher.",
+            "cannot_close": "You're too close to the planet for that.",
             "cannot_other": "The game says that can't be deployed right now.",
         }.get(status, "That didn't work.")
 
