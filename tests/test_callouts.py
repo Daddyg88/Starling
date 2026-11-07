@@ -916,6 +916,28 @@ class PreferUnsharedKey(unittest.TestCase):
         self.assertEqual(book.lookup("QuickCommsPanel")[0].key, "Key_Enter")
 
 
+class AvoidBareModifierKeys(unittest.TestCase):
+    """From the commander's log: UI Down on Right Shift moved the role panel tab; his other slot (S) is a normal key."""
+
+    def book(self, xml):
+        from control.binds import BindingBook, parse_binds
+        book = BindingBook.__new__(BindingBook)
+        book._actions = parse_binds(xml)
+        book.refresh = lambda: True
+        return book
+
+    def test_a_bare_shift_key_loses_to_a_normal_key_even_if_that_one_is_shared(self):
+        book = self.book("""<Root>
+  <UI_Down><Primary Device="Keyboard" Key="Key_RightShift" /><Secondary Device="Keyboard" Key="Key_S" /></UI_Down>
+  <BackwardKey><Primary Device="Keyboard" Key="Key_S" /><Secondary Device="{NoDevice}" Key="" /></BackwardKey>
+</Root>""")
+        self.assertEqual(book.lookup("UI_Down")[0].key, "Key_S")
+
+    def test_a_modifier_only_binding_is_still_used_when_it_is_all_there_is(self):
+        book = self.book("""<Root><UI_Down><Primary Device="Keyboard" Key="Key_RightShift" /><Secondary Device="{NoDevice}" Key="" /></UI_Down></Root>""")
+        self.assertEqual(book.lookup("UI_Down")[0].key, "Key_RightShift")
+
+
 class LaunchTalk(unittest.TestCase):
     PHRASES = ("take us out", "number one take us out", "Number 1, take us out.", "you have control", "you have the helm",
                "take her out please", "get us out of here", "starling take us out", "take control", "the ship is yours")

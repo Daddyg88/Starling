@@ -65,6 +65,9 @@ class Match:
     sure: bool = True                            # False = same button number but the device NAME differs from what we read
 
 
+MODIFIER_KEYS = ("leftshift", "rightshift", "leftcontrol", "rightcontrol", "leftalt", "rightalt")
+
+
 def _norm_key(name):
     name = (name or "").strip().lower()
     if name.startswith("key_"):
@@ -377,7 +380,10 @@ class BindingBook:
         if usable:
             # 0.34.3: when both slots are keyboard keys, prefer the one no other action shares (Enter for UI Select and
             # for the quick comms panel made the launch macro open chat). Otherwise primary first, as before.
-            best = next((sl for sl in usable if not self._others_on(action, sl)), usable[0])
+            # 0.85.6: a bare Shift / Control / Alt key is the LAST choice. In the commander's log UI Down was on Right Shift (primary) and S
+            # (secondary, shared with Backward thrust): pressing Right Shift on its own moved the role panel TAB instead of the cursor.
+            pool = [sl for sl in usable if _norm_key(sl.key) not in MODIFIER_KEYS] or usable
+            best = next((sl for sl in pool if not self._others_on(action, sl)), pool[0])
             return Keystroke(best.key, tuple(k for _d, k in best.modifiers)), ""
         return None, problem
 
