@@ -143,6 +143,22 @@ class WindowsWindows:
         self.ctypes = ctypes
         self.user32 = ctypes.windll.user32
         self.kernel32 = ctypes.windll.kernel32
+        # Window handles are 64-bit on modern Windows; without these, ctypes squeezes them into 32 bits and
+        # raises ArgumentError ("int too long to convert") for some handles.
+        wintypes = ctypes.c_void_p
+        for name, args in (("IsWindowVisible", [wintypes]), ("GetWindowTextLengthW", [wintypes]),
+                           ("GetWindowTextW", [wintypes, ctypes.c_wchar_p, ctypes.c_int]),
+                           ("GetWindowThreadProcessId", [wintypes, ctypes.c_void_p]),
+                           ("IsIconic", [wintypes]), ("ShowWindow", [wintypes, ctypes.c_int]),
+                           ("SetForegroundWindow", [wintypes])):
+            try:
+                getattr(self.user32, name).argtypes = args
+            except Exception:
+                pass
+        try:
+            self.user32.GetForegroundWindow.restype = wintypes
+        except Exception:
+            pass
 
     def _title(self, handle):
         length = self.user32.GetWindowTextLengthW(handle)
@@ -178,11 +194,17 @@ class WindowsWindows:
 
         @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
         def visit(handle, _param):
-            if self.user32.IsWindowVisible(handle) and _is_game(self._title(handle)):
-                found.append(handle)
-                return False
+            try:
+                if handle and self.user32.IsWindowVisible(handle) and _is_game(self._title(handle)):
+                    found.append(handle)
+                    return False
+            except Exception:
+                pass                                   # one odd window must not stop the search
             return True
-        self.user32.EnumWindows(visit, 0)
+        try:
+            self.user32.EnumWindows(visit, 0)
+        except Exception:
+            log.exception("Could not list windows to find Elite Dangerous")
         return found[0] if found else 0
 
     def bring_forward(self, handle):

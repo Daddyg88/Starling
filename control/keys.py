@@ -43,7 +43,7 @@ _add("SemiColon Semicolon", 0x27)
 _add("Apostrophe Quote", 0x28)
 _add("Grave Tilde BackQuote", 0x29)
 _add("LeftShift", 0x2A)
-_add("BackSlash Backslash", 0x2B)
+_add("BackSlash Backslash Hash", 0x2B)     # Hash is the UK keyboard "#" key, same place as the US backslash
 _add("Comma", 0x33)
 _add("Period FullStop", 0x34)
 _add("Slash ForwardSlash", 0x35)

@@ -1367,3 +1367,7 @@ window use the same code as the biology list.
 ## 0.81.2 - Timing
 
 * core/timing.py JobTimer: per-job counts/totals/longest, 10-minute summary with process CPU time, 'Slow job' lines over 0.5 s (once a minute per job). core/event_bus.py times every listener (EventBus.timer); core/app.py stop() writes a final report. Tests in tests/test_content_check.py.
+
+## 0.85.9 - Woz log fixes
+
+* sender.WindowsWindows: argtypes for 64-bit handles, find_game tolerant; keys.py Hash; binds/combat_assist warn once; timing.thread_cpu_times + busiest_threads in the 10-minute line.

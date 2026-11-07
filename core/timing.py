@@ -5,6 +5,8 @@ INFO line with the busiest few and how much processor time she used, and it logs
 second (at most once a minute per job) because those hold up everything behind them."""
 import time
 
+import sys
+
 from core.logger import get_logger
 
 log = get_logger("timing")
@@ -15,6 +17,55 @@ SLOW_REPEAT = 60.0            # ...but not more than once a minute for the same 
 TOP = 5
 
 
+def thread_cpu_times():
+    """CPU seconds used so far by EVERY thread of this program, including ones started by libraries (Windows only).
+    Returns {thread id: seconds}; empty anywhere else or if Windows will not say."""
+    if sys.platform != "win32":
+        return {}
+    try:
+        import ctypes
+        from ctypes import wintypes
+        k32 = ctypes.windll.kernel32
+        k32.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+        k32.OpenThread.restype = wintypes.HANDLE
+
+        class Entry(ctypes.Structure):
+            _fields_ = [("size", wintypes.DWORD), ("usage", wintypes.DWORD), ("tid", wintypes.DWORD),
+                        ("owner", wintypes.DWORD), ("base", wintypes.LONG), ("delta", wintypes.LONG), ("flags", wintypes.DWORD)]
+        snap = k32.CreateToolhelp32Snapshot(0x4, 0)                     # TH32CS_SNAPTHREAD
+        if not snap or snap == wintypes.HANDLE(-1).value:
+            return {}
+        out = {}
+        try:
+            entry = Entry()
+            entry.size = ctypes.sizeof(Entry)
+            pid = k32.GetCurrentProcessId()
+            ok = k32.Thread32First(snap, ctypes.byref(entry))
+            while ok:
+                if entry.owner == pid:
+                    handle = k32.OpenThread(0x0800, False, entry.tid)   # THREAD_QUERY_LIMITED_INFORMATION
+                    if handle:
+                        c, e, kern, user = (wintypes.FILETIME() for _ in range(4))
+                        if k32.GetThreadTimes(handle, ctypes.byref(c), ctypes.byref(e), ctypes.byref(kern), ctypes.byref(user)):
+                            def ticks(t):
+                                return (t.dwHighDateTime << 32 | t.dwLowDateTime) / 1e7
+                            out[entry.tid] = ticks(kern) + ticks(user)
+                        k32.CloseHandle(handle)
+                ok = k32.Thread32Next(snap, ctypes.byref(entry))
+        finally:
+            k32.CloseHandle(snap)
+        return out
+    except Exception:
+        return {}
+
+
+def busiest_threads(before, after, names=None, top=3):
+    """Plain text: the threads that used the most CPU between two thread_cpu_times() readings."""
+    names = names or {}
+    used = sorted(((after[t] - before.get(t, 0.0), t) for t in after), reverse=True)[:top]
+    return ", ".join("%s %.1f s" % (names.get(t, "native thread %d" % t), secs) for secs, t in used if secs >= 0.5)
+
+
 class JobTimer:
     def __init__(self, clock=time.monotonic, cpu=time.process_time):
         self.clock = clock
@@ -23,6 +74,7 @@ class JobTimer:
         self._slow_said = {}
         self._period_start = clock()
         self._cpu_start = cpu()
+        self._threads_start = thread_cpu_times()
 
     def record(self, name, seconds, detail=""):
         entry = self.jobs.setdefault(name, [0, 0.0, 0.0])
@@ -50,5 +102,15 @@ class JobTimer:
                      elapsed / 60.0, used, 100.0 * used / elapsed, self.summary())
         else:
             log.info("Last %.0f min: she used %.1f s of processor time (%.1f%% of one core).", elapsed / 60.0, used, 100.0 * used / elapsed)
+        try:                                    # which thread burned the time (0.85.9: Woz's log showed 230% with no job to blame)
+            after = thread_cpu_times()
+            import threading
+            names = {t.native_id: t.name for t in threading.enumerate() if t.native_id}
+            busy = busiest_threads(self._threads_start, after, names)
+            if busy and used / elapsed > 0.5:
+                log.info("Busiest threads in that time: %s", busy)
+            self._threads_start = after
+        except Exception:
+            pass
         self.jobs = {}
         self._period_start, self._cpu_start = now, self.cpu()

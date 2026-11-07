@@ -26,6 +26,7 @@ from control import keys
 from core.logger import get_logger
 
 log = get_logger("binds")
+_WARNED_UNKNOWN = set()          # (action, key names) already complained about, so the log says it once
 
 NO_DEVICE = "{nodevice}"
 
@@ -374,7 +375,9 @@ class BindingBook:
             names = [slot.key] + [k for _d, k in slot.modifiers]
             if not all(keys.is_known(n) for n in names):
                 problem = UNKNOWN_KEY
-                log.warning("Unknown key name in the binds file for %s: %s", action, names)
+                if (action, tuple(names)) not in _WARNED_UNKNOWN:           # once per action, not on every lookup
+                    _WARNED_UNKNOWN.add((action, tuple(names)))
+                    log.warning("Unknown key name in the binds file for %s: %s", action, names)
                 continue
             usable.append(slot)
         if usable:

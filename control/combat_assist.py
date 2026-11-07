@@ -120,11 +120,15 @@ class CombatAssist:
             self._thread = None
 
     # ---- pressing keys ----
+    _warned = set()
+
     def press(self, action, hold=None):
         stroke, why = self.book.lookup(action)
         if stroke is None:
             self.last_result = "unbound"
-            log.warning("Combat assist: no keyboard key for %s (%s)", action, why)
+            if (action, why) not in self._warned:                      # once per action, not every shot
+                self._warned.add((action, why))
+                log.warning("Combat assist: no keyboard key for %s (%s)", action, why)
             self._tell_once(action)
             return False
         problem = self.sender.send(stroke) if hold is None else self.sender.send(stroke, hold=hold)
