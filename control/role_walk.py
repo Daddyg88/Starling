@@ -44,7 +44,7 @@ def _look(read, wait, need, tries=6):
         if need(seen) and previous is not None and _same(previous, seen):
             return seen
         previous = seen if need(seen) else None
-        wait(0.25)
+        wait(0.15)
         seen = read()
     return seen
 
@@ -75,12 +75,23 @@ def go_to_tab(read, press, wait, target, note=None):
             return "unreadable"
         note("after Left: %s" % seen["text"])
     forward, backward = "CycleNextPanel", "CyclePreviousPanel"
+    if seen["tab"] != target and abs(target - seen["tab"]) >= 2:
+        # QUICK: the four tabs never move, so press every key she needs in one go and look once (the tab keys moved exactly one
+        # tab per press in the commander's logs). If she did not land on the right one, the careful one-at-a-time walk below fixes it.
+        tab = seen["tab"]
+        for _ in range(abs(target - tab)):
+            press(forward if target > tab else backward)
+            wait(0.3)
+        seen = _look(read, wait, have_tab)
+        if seen is None or seen["tab"] is None:
+            return "unreadable"
+        note("quick walk landed: %s" % seen["text"])
     for _ in range(8):
         tab = seen["tab"]
         if tab == target:
             return "ok"
         press(forward if target > tab else backward)
-        wait(0.5)
+        wait(0.35)
         seen = _look(read, wait, have_tab)
         if seen is None or seen["tab"] is None:
             return "unreadable"
@@ -104,7 +115,11 @@ def pick(read, press, wait, tab, row, note=None):
         return "missing", None                                        # nothing in that slot
     if seen["lit"] is None and seen["focus"] is None:
         press("UI_Right")                                             # into the page
-        wait(0.6)
+        if tab in (1, 2) and row == 1:
+            wait(0.35)                                                # QUICK: Right always lands on the top row, so Down at once
+            press("UI_Down")
+            note("pressed Right and Down together")
+        wait(0.45)
         seen = _look(read, wait, lambda s: s["tab"] == tab)
         if seen is None:
             return "unreadable", None
@@ -128,7 +143,7 @@ def pick(read, press, wait, tab, row, note=None):
                 if here["row"] == goal:
                     break
                 press("UI_Down" if goal > here["row"] else "UI_Up")
-                wait(0.5)
+                wait(0.35)
                 seen = _look(read, wait, lambda s: s["tab"] == tab)
                 if seen is not None:
                     note("after moving: %s" % seen["text"])

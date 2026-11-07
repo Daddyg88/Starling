@@ -116,6 +116,37 @@ class SettleTests(unittest.TestCase):
         self.assertEqual(role_walk.go_to_tab(read, game.press, lambda s: None, 2), "ok")
         self.assertEqual(game.tab, 2)
 
+    def test_a_two_tab_jump_presses_both_keys_then_looks_once(self):
+        game = FakeGame(tab=0)
+        looks = []
+
+        def read():
+            looks.append(1)
+            return role_walk.read_all(game.picture())
+        self.assertEqual(role_walk.go_to_tab(read, game.press, lambda s: None, 2), "ok")
+        self.assertEqual(game.keys, ["CycleNextPanel", "CycleNextPanel"])
+        self.assertLessEqual(len(looks), 4)                  # the first settled look and one more: the careful walk needs 6 or more
+
+    def test_a_quick_jump_that_overshoots_is_walked_back_carefully(self):
+        game = FakeGame(tab=0)
+        original = game.press
+        count = []
+
+        def racing(name):                                    # the second key runs on one more tab (to the crew tab, drawn as the suit here)
+            count.append(name)
+            original(name)
+            if len(count) == 2:
+                game.tab = 1
+        read = lambda: role_walk.read_all(game.picture())
+        self.assertEqual(role_walk.go_to_tab(read, racing, lambda s: None, 2), "ok")
+        self.assertEqual(game.tab, 2)
+
+    def test_row_two_steps_in_and_goes_down_at_once(self):
+        game = FakeGame(tab=1)
+        read = lambda: role_walk.read_all(game.picture())
+        self.assertEqual(role_walk.pick(read, game.press, lambda s: None, 1, 1)[0], "ok")
+        self.assertEqual(game.keys, ["UI_Right", "UI_Down", "UI_Select"])
+
     def test_up_and_down_are_never_used_for_tabs(self):
         game = FakeGame(tab=0)
         read = lambda: role_walk.read_all(game.picture())

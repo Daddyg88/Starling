@@ -97,7 +97,7 @@ LAUNCH_MACRO = ("say Launch_Start", "FocusLeftPanel", "wait 1.35", "CycleNextPan
                 "UI_Select")
 # 0.85.0: the role panel is READ now (control/role_walk.py): open it, go to the right tab, put the cursor on the right row, press
 # Deploy only when the button is lit. A missing vessel or a greyed-out button makes her say so instead.
-ROLE_PICK = lambda tab, row, kind: ("open role panel", "role tab " + tab, "role pick %s %s" % (row, kind), "wait 0.8", "close panels")
+ROLE_PICK = lambda tab, row, kind: ("open role panel", "role tab " + tab, "role pick %s %s" % (row, kind), "wait 0.6", "close panels")
 NOMAD_MACRO = ROLE_PICK("launch", "1", "nomad")
 
 # Plot the next neutron waypoint, hands free (the clipboard already holds its name, see navigation/route.py).
