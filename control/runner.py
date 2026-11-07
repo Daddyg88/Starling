@@ -514,6 +514,11 @@ class CommandRunner:
                         return Outcome(status, text, command, intent, detail=self._explain(status, command))
                     self.sleep(GAP_SECONDS)
                 continue
+            if step[0] == "stopclosed":
+                if self._gui_focus() == 0:
+                    trace.append("closed>stop")
+                    break
+                continue
             if step[0] == "selectbutton":
                 problem = self._select_button(strokes, pressed, trace)
                 if problem == "no_button":
@@ -642,31 +647,54 @@ class CommandRunner:
             log.debug("Could not save the panel maps", exc_info=True)
 
     def _select_button(self, strokes, pressed, trace):
-        """The 'select button' macro step. Returns None (pressed Select), "no_button" (she can see the screen but not the button,
-        so she pressed nothing), or the sender's problem text."""
+        """The 'select button' macro step. Looks for the bright selected button in the right-hand pane and presses Select.
+        When she can read the screen and Status.json, she checks that it WORKED (the game closes the panel itself after Request
+        Docking, and sends DockingRequested) and presses Select again if the panel is still open: in your log one press was
+        simply ignored. At most 3 presses.
+        Returns None (done), "no_button" (she can see the screen but not the button, so she pressed nothing), or the sender's
+        problem text."""
         from control import panel_reader
-        look = None
-        if self.settings.get("panel.read_screen", True):
-            reader = self.panel_reader or panel_reader.capture_screen
+        reader = self.panel_reader or panel_reader.capture_screen
+        use_screen = self.settings.get("panel.read_screen", True)
+
+        def look():
+            """True = button seen, False = screen readable but no button, None = cannot read the screen."""
+            if not use_screen:
+                return None
             try:
                 picture = reader()
-                look = None if picture is None else (panel_reader.find_button(picture) is not None)
+                return None if picture is None else (panel_reader.find_button(picture) is not None)
             except Exception:
                 log.exception("Looking for the button failed")
-        if look is False:
-            self.sleep(0.8)                                  # the button can take a moment to light up: one more look
-            try:
-                look = panel_reader.find_button(reader()) is not None
-            except Exception:
-                look = None
-        if look is False:
-            trace.append("button>not seen")
-            log.warning("Panel: she could not see the selected button in the right-hand pane, so she did not press Select.")
-            return "no_button"
-        trace.append("button>seen" if look else "button>unreadable")
-        problem = self.sender.send(strokes["UI_Select"], hold=0.15)
-        pressed.append("UI_Select")
-        return problem
+                return None
+
+        for attempt in range(3):
+            seen = look()
+            if seen is False:
+                self.sleep(0.8)                              # the button can take a moment to light up: one more look
+                seen = look()
+            if seen is False:
+                if attempt == 0:
+                    trace.append("button>not seen")
+                    log.warning("Panel: she could not see the selected button in the right-hand pane, so she did not press Select.")
+                    return "no_button"
+                return None                                  # a later look found nothing: the panel probably closed after our press
+            if attempt == 0:
+                trace.append("button>seen" if seen else "button>unreadable")
+                self.sleep(0.4)                              # let the pane finish sliding in: an early press can be ignored
+            problem = self.sender.send(strokes["UI_Select"], hold=0.15 if attempt == 0 else 0.3)
+            pressed.append("UI_Select")
+            if problem:
+                return problem
+            self.sleep(1.4)
+            gui = self._gui_focus()
+            if "DockingRequested" in getattr(self, "_docking_seen", []) or gui != 2:
+                return None                                  # worked (or she cannot tell: Status.json unreadable)
+            if seen is None:
+                return None                                  # blind: never press a second time without seeing the button
+            trace.append("select>ignored")
+            log.info("Panel: Select did not do anything (the panel is still open), so she pressed it again.")
+        return None
 
     def _open_left_panel(self, strokes, pressed, trace):
         """The 'open left panel' macro step: gets the left panel open from whatever the game is showing.

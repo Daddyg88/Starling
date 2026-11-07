@@ -61,7 +61,7 @@ MACROS = {
 # The station is the first contact, so Right goes straight to its Request Docking button; 'select button' presses Select only if she
 # can SEE that bright button.
 DOCKING_MACRO = ("open left panel", "wait 0.4", "tab 2", "wait 1.0",
-                 "hold UI_Right 0.15", "wait 1.0", "select button", "wait 1.2",
+                 "hold UI_Right 0.15", "wait 1.0", "select button", "wait 0.8", "stop if closed",
                  "hold UI_Left 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
                  "tab 0 from 2", "wait 0.85", "hold UI_Back 0.15")
 # 0.48.0: SHOW OFF. She talks through what she can do while she opens and closes the screens herself: galaxy map, left panel

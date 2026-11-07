@@ -193,5 +193,51 @@ class OpenLeftPanelTests(unittest.TestCase):
         self.assertFalse(any(k.key == "Key_4" for k in t.sender.pressed))                       # UI_Select was never pressed
 
 
+class SelectRetryTests(unittest.TestCase):
+    """Select is pressed again only when the panel is still open (it was ignored); the macro stops when the game closed the panel."""
+
+    def run_docking(self, ignored_presses):
+        from tests.test_macros import MacroTests
+        from journal.game_state import GameState
+        t = MacroTests()
+        r = t.build()
+        state = GameState()
+        state.status_seen = True
+        state.gui_focus = 2
+        r.state_provider = lambda: state
+        r.sleep = lambda s: None
+        game = {"tab": 1, "selects": 0}
+        keys = {"Key_3": 1, "Key_8": -1}                          # next / previous tab
+
+        def send(stroke, hold=0.0):
+            t.sender.pressed.append(stroke)
+            if stroke.key in keys:
+                game["tab"] = max(0, min(TABS - 1, game["tab"] + keys[stroke.key]))
+            if stroke.key == "Key_4":                              # UI_Select
+                game["selects"] += 1
+                if game["selects"] > ignored_presses:
+                    state.gui_focus = 0                            # the game closed the panel: the request went through
+            return None
+        t.sender.send = send
+        r.panel_reader = lambda: picture(game["tab"])
+        with self.assertLogs("starling", level="INFO"):
+            r.run_text("request docking")
+        return [k.key for k in t.sender.pressed]
+
+    def test_a_press_that_works_stops_the_macro_there(self):
+        keys = self.run_docking(0)
+        self.assertEqual(keys.count("Key_4"), 1)
+        self.assertNotIn("Key_10", keys)                           # no UI_Left, no Back pressed into the cockpit
+        self.assertNotIn("Key_6", keys)
+
+    def test_an_ignored_press_is_repeated(self):
+        keys = self.run_docking(1)
+        self.assertEqual(keys.count("Key_4"), 2)
+
+    def test_it_gives_up_after_three_presses(self):
+        keys = self.run_docking(99)
+        self.assertEqual(keys.count("Key_4"), 3)
+
+
 if __name__ == "__main__":
     unittest.main()

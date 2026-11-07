@@ -20,6 +20,8 @@ A step is one of:
     "select button"        look at the right-hand pane and press Select ONLY if she can see the bright selected button (e.g. Request
                            Docking). If she can see the screen but not the button she presses nothing and the command reports it.
                            If she cannot see the screen she presses Select anyway, as a plain "UI_Select" would.
+    "stop if closed"       end the macro here (successfully) when Status.json says NO screen is open. Used after a button that makes the
+                           game close the panel itself (Request Docking does), so the tidy-up keys are never pressed into the cockpit.
     "open left panel"      get the left panel open from WHATEVER is on screen (Status.json GuiFocus): nothing if it is already open,
                            Back first if the galaxy map / system map / station services / FSS is open, then Focus Left Panel.
                            (A plain "FocusLeftPanel" would CLOSE the panel if it was already open.)
@@ -86,6 +88,9 @@ def parse_macro(steps):
                 parsed.append(("ensure", bits[1], int(bits[2])))
             except ValueError:
                 raise ValueError("I don't understand this ensure (write it like: ensure FocusLeftPanel 2): %r" % text)
+            continue
+        if lowered == "stop if closed":
+            parsed.append(("stopclosed",))
             continue
         if lowered == "select button":
             parsed.append(("selectbutton",))
