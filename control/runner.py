@@ -49,6 +49,7 @@ LINE_FOR_STATUS = {
     "cannot_high30": "CommandCannotHigh30",
     "cannot_slf_low": "CommandCannotFighterLow",
     "cannot_close": "CommandCannotTooClose",
+    "cannot_key": "CommandCannotKey",
     "cannot_other": "CommandCannotDeploy",
     "unknown": "CommandUnknown",
     "vc_offline": "CommandVoidOffline",
@@ -709,6 +710,10 @@ class CommandRunner:
 
         def press(action):
             panel_open()
+            if action in ("UI_Up", "UI_Down"):
+                from control.binds import MODIFIER_KEYS, _norm_key
+                if _norm_key(strokes[action].key) in MODIFIER_KEYS and not strokes[action].modifiers:
+                    raise role_walk.UnsafeKey(action)
             problem = self.sender.send(strokes[action], hold=0.15)
             pressed.append(action)
             if problem:
@@ -730,9 +735,15 @@ class CommandRunner:
                     others = ", ".join(self.book.conflicts(action)) or "nothing else"
                 except Exception:
                     others = "?"
-                log.info("Role panel key: %s = %s (also on: %s)", action, strokes[action].key, others)
+                log.info("Role panel key: %s = %s%s (also on: %s)", action, "+".join(list(strokes[action].modifiers) + [""]) if strokes[action].modifiers else "",
+                         strokes[action].key, others)
         try:
             return self._role_step_inner(step, press, read, notes, problems, shots, trace)
+        except role_walk.UnsafeKey as error:
+            log.warning("Role panel: %s is only bound to a bare Shift/Control/Alt key on the keyboard, so she did not press it. %s", error, "; ".join(notes))
+            trace.append("unsafe_key")
+            self._role_status = "cannot_key"
+            return None
         except role_walk.PanelClosed:
             log.warning("Role panel: the panel closed by itself, so she pressed nothing more. %s", "; ".join(notes))
             trace.append("panel_closed")
@@ -984,6 +995,7 @@ class CommandRunner:
             "cannot_high30": "The Rhino needs you at 30 metres or lower.",
             "cannot_slf_low": "The fighter needs you at 500 metres or higher.",
             "cannot_close": "You're too close to the planet for that.",
+            "cannot_key": "UI Down is only on a bare Shift key on the keyboard. Give it another keyboard key in Elite's controls.",
             "cannot_other": "The game says that can't be deployed right now.",
         }.get(status, "That didn't work.")
 

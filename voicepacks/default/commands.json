@@ -314,5 +314,10 @@
     "We're too close to the planet for that, Commander. The panel says it can't be deployed here.",
     "The game won't let me deploy from this close to the planet, Commander.",
     "Too close to the planet, Commander. I've left it alone."
+  ],
+  "CommandCannotKey": [
+    "I can't reach that one, Commander. Your Down key on the keyboard is just a Shift key, and pressed on its own it does the wrong thing. Give UI Down a normal keyboard key in Elite's controls and I'll do it.",
+    "To go down a row I need a normal keyboard key for UI Down, Commander. Yours is only a Shift key, so I've left it alone.",
+    "I'm stuck at the Down key, Commander. It's only a Shift key on the keyboard. Bind UI Down to an ordinary key and I can finish that."
   ]
 }

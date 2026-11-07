@@ -736,6 +736,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.85.6: binds.lookup prefers a normal key over a bare modifier key (Shift/Control/Alt), then an unshared one (MODIFIER_KEYS).
 
+0.85.7: role_walk.UnsafeKey: a bare modifier key as UI_Up / UI_Down is never pressed in the role panel; status cannot_key + CommandCannotKey voice lines; role key log lines show modifiers.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.

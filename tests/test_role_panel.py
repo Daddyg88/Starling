@@ -248,11 +248,15 @@ class WalkTests(unittest.TestCase):
 class CommandTests(unittest.TestCase):
     """Whole commands through the runner: 'deploy the nomad', 'launch the fighter', 'deploy the scarab', 'disembark'."""
 
-    def run_command(self, phrase, game, readable=True, flags=0, altitude=None):
+    def run_command(self, phrase, game, readable=True, flags=0, altitude=None, shift_down=False):
         from journal.game_state import GameState
         from tests.test_macros import MacroTests
         t = MacroTests()
         r = t.build()
+        if shift_down:
+            from control.binds import Keystroke
+            r.book.table = dict(r.book.table)                       # a copy: the table is shared by other tests
+            r.book.table["UI_Down"] = (Keystroke("Key_RightShift"), "")
         state = GameState()
         state.status_seen = True
         state.gui_focus = 0
@@ -344,6 +348,14 @@ class CommandTests(unittest.TestCase):
         for phrase in ("deployed rhino", "deployed there rhino", "deployed the srv"):
             outcome, game = self.run_command(phrase, FakeGame(tab=0))
             self.assertNotEqual(outcome.status, "unknown", phrase)
+
+    def test_a_bare_shift_key_for_ui_down_is_never_pressed(self):
+        """The commander's UI Down keyboard key is Right Shift: pressed alone it moved the tab. She tells him instead of pressing it."""
+        game = FakeGame(tab=0, grey_top=True)
+        outcome, game = self.run_command("deploy the srv", game, shift_down=True)
+        self.assertEqual(outcome.status, "cannot_key")
+        self.assertNotIn("UI_Down", game.keys)
+        self.assertIsNone(game.selected)
 
     def test_the_panel_closing_stops_every_key(self):
         """The log: a key shut the panel and the keys after it went into the cockpit. Now nothing more is pressed once it is closed."""

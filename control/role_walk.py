@@ -13,6 +13,11 @@ TAB_NUMBER = {"suit": 0, "launch": 1, "srv": 2, "crew": 3}
 LOOKS = 3                                  # how many times she looks again when she cannot tell yet
 
 
+class UnsafeKey(Exception):
+    """The only keyboard key for UI Up / UI Down is a bare Shift / Control / Alt key. Pressed alone it acts as a modifier for the rest of
+    Elite's keys (in the commander's log it moved the TAB, not the cursor), so she will not press it in the role panel."""
+
+
 class PanelClosed(Exception):
     """The role panel is not open any more (Status.json says so): nothing more may be pressed, or the keys land in the cockpit."""
 
