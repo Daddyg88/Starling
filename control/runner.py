@@ -649,19 +649,23 @@ class CommandRunner:
             log.debug("Could not save the panel maps", exc_info=True)
 
     def _select_button(self, strokes, pressed, trace):
-        """The 'select button' macro step. Looks for the bright selected button in the right-hand pane and presses Select.
-        When she can read the screen she then checks that it WORKED (DockingRequested arrives in the journal) and presses
-        Select again if the button is still lit and nothing happened. At most 3 presses, and never blind.
-        If it does not work she keeps small black-and-white maps of what she saw (before and after) for the diagnostics zip.
-        Returns None (done), "no_button" (she can see the screen but not the button, so she pressed nothing), or the sender's
-        problem text."""
+        """The 'select button' macro step: presses Select on the lit button in the right-hand pane (Request Docking), steering by
+        what she SEES, because in the commander's logs the first Select sometimes sends the cursor back to the station row in the
+        list (the button goes dark): then she presses Right to get back to the button and Select again.
+            button lit        -> press Select, then wait up to 3 s for the game's answer (DockingRequested / panel closing)
+            station row lit   -> press Right (at most 2 times)
+            nothing           -> look once more; if still nothing she stops
+        At most 3 Select presses. She never presses blind when she can read the screen. If she cannot read the screen at all she
+        presses Select once, as a plain "UI_Select" step would. When it fails she keeps small black-and-white maps (never the
+        picture) for the diagnostics zip.
+        Returns None (done), "no_button" (she never found anything to press), or the sender's problem text."""
         from control import panel_reader
         reader = self.panel_reader or panel_reader.capture_screen
         use_screen = self.settings.get("panel.read_screen", True)
         shots = []
 
         def look(label):
-            """True = button seen, False = screen readable but no button, None = cannot read the screen."""
+            """'button', 'row', 'none', or None when the screen cannot be read."""
             if not use_screen:
                 return None
             try:
@@ -669,10 +673,12 @@ class CommandRunner:
                 if picture is None:
                     return None
                 button = panel_reader.find_button(picture)
+                row = None if button is not None else panel_reader.find_list_row(picture)
                 if len(shots) < 8:
                     shots.append((label, picture))
-                log.info("Panel: %s: %s", label, panel_reader.describe_button(button))
-                return button is not None
+                log.info("Panel: %s: %s%s", label, panel_reader.describe_button(button),
+                         ", cursor on the list row" if row is not None else "")
+                return "button" if button is not None else ("row" if row is not None else "none")
             except Exception:
                 log.exception("Looking for the button failed")
                 return None
@@ -680,47 +686,60 @@ class CommandRunner:
         def answered():
             return "DockingRequested" in getattr(self, "_docking_seen", [])
 
-        for attempt in range(3):
-            seen = look("before Select #%d" % (attempt + 1))
-            if seen is False:
-                self.sleep(0.8)                              # the button can take a moment to light up: one more look
-                seen = look("before Select #%d (second look)" % (attempt + 1))
-            if seen is False:
-                if attempt == 0:
-                    trace.append("button>not seen")
-                    log.warning("Panel: she could not see the selected button in the right-hand pane, so she did not press Select.")
-                    self._save_panel_masks(shots, "nobutton")
-                    return "no_button"
-                # The button is no longer lit although the game never answered. In the commander's logs a second Select pressed
-                # by hand then worked, so press once more, blind, and give the game another 3 s. Only ONE such press.
-                if attempt != 1:
+        def send(action, hold):
+            problem = self.sender.send(strokes[action], hold=hold)
+            pressed.append(action)
+            return problem
+
+        selects = rights = 0
+        for step in range(7):
+            state = look("look %d" % (step + 1))
+            if state == "none":
+                self.sleep(0.8)                              # the highlight can take a moment: one more look
+                state = look("look %d (second)" % (step + 1))
+            if state is None:                                # cannot read the screen: one plain Select, as before
+                if selects == 0:
+                    trace.append("button>unreadable")
+                    problem = send("UI_Select", 0.15)
+                    return problem
+                break
+            if state == "none":
+                break
+            if state == "button":
+                if selects >= 3:
                     break
-                trace.append("select>again(blind)")
-                log.info("Panel: the button went dark but the game did not answer, so she presses Select once more.")
-                seen = None
-            if attempt == 0:
-                trace.append("button>seen" if seen else "button>unreadable")
-                self.sleep(0.4)                              # let the pane finish sliding in: an early press can be ignored
-            problem = self.sender.send(strokes["UI_Select"], hold=0.15 if attempt == 0 else 0.3)
-            pressed.append("UI_Select")
-            if problem:
-                return problem
-            for _ in range(6):                               # up to 3 s for the game to answer (the journal is read once a second)
-                self.sleep(0.5)
-                if answered() or self._gui_focus() == 0:
-                    for _ in range(12):                      # the game closes the panel a few seconds after the request: wait for it
-                        if self._gui_focus() in (0, "?"):
-                            break
-                        self.sleep(0.5)
-                    return None
-            if seen is None and attempt != 1:
-                return None                                  # blind: never press a second time without seeing the button
-            if seen is None:
-                break                                        # that WAS the one blind press
-            trace.append("select#%d>no answer" % (attempt + 1))
-            log.info("Panel: Select #%d got no answer from the game (no DockingRequested).", attempt + 1)
-        look("after the last Select")
-        self._save_panel_masks(shots, "select")
+                if selects == 0:
+                    trace.append("button>seen")
+                    self.sleep(0.4)                          # let the pane finish sliding in: an early press can be ignored
+                problem = send("UI_Select", 0.15 if selects == 0 else 0.3)
+                if problem:
+                    return problem
+                selects += 1
+                for _ in range(6):                           # up to 3 s for the game to answer (the journal is read once a second)
+                    self.sleep(0.5)
+                    if answered() or self._gui_focus() == 0:
+                        for _ in range(12):                  # the game closes the panel a few seconds after the request
+                            if self._gui_focus() in (0, "?"):
+                                break
+                            self.sleep(0.5)
+                        return None
+                trace.append("select#%d>no answer" % selects)
+                log.info("Panel: Select #%d got no answer from the game (no DockingRequested).", selects)
+            else:                                            # "row": the cursor is on the station in the list
+                if rights >= 2:
+                    break
+                trace.append("row>right")
+                log.info("Panel: the cursor is on the list row, so she presses Right to get back to the button.")
+                problem = send("UI_Right", 0.15)
+                if problem:
+                    return problem
+                rights += 1
+                self.sleep(1.0)
+        self._save_panel_masks(shots, "select" if selects else "nobutton")
+        if selects == 0:
+            trace.append("button>not seen")
+            log.warning("Panel: she could not find the Request Docking button, so she did not press Select.")
+            return "no_button"
         return None
 
     def _open_left_panel(self, strokes, pressed, trace):

@@ -170,6 +170,18 @@ def describe(spot):
     return "%s(x=%.3f, w=%.3f, y=%.3f)" % ("icon" if spot.get("icon") else "tab", spot["cx"], spot["width"], spot["y"])
 
 
+def find_list_row(picture):
+    """The lit row in the contact LIST on the left (the cursor is in the list, not on a button), or None."""
+    bars, _ = _wide_bars(picture)
+    tab = find_tab(picture)
+    if not bars or tab is None:
+        return None
+    for bar in bars:
+        if bar["y"] > tab["y"] + 0.05 and bar["cx"] < tab["cx"] - 0.1 and 0.15 <= bar["width"] <= 0.5:
+            return bar
+    return None
+
+
 def describe_button(bar):
     """A short text for the log: where the selected button was (fractions of the window)."""
     if bar is None:

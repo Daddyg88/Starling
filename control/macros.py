@@ -138,8 +138,10 @@ def actions_in(parsed):
     for step in parsed:
         if step[0] in ("press", "hold", "ensure", "leave") and step[1] not in seen:
             seen.append(step[1])
-        if step[0] == "selectbutton" and "UI_Select" not in seen:
-            seen.append("UI_Select")
+        if step[0] == "selectbutton":
+            for needed in ("UI_Select", "UI_Right"):
+                if needed not in seen:
+                    seen.append(needed)
         if step[0] == "openleft":
             for needed in ("FocusLeftPanel", "UI_Back"):
                 if needed not in seen:

@@ -240,10 +240,11 @@ class SelectRetryTests(unittest.TestCase):
         keys = self.run_docking(1)
         self.assertEqual(keys.count("Key_4"), 2)
 
-    def test_button_goes_dark_without_an_answer_means_one_more_blind_press(self):
+    def test_cursor_jumps_to_the_list_row_so_she_goes_right_and_selects_again(self):
+        """What the commander's maps showed: an ignored Select sends the cursor to the station row in the list (button dark)."""
         from tests.test_macros import MacroTests
         from journal.game_state import GameState
-        for needed in (1, 2, 99):                                  # the game answers on the 1st, 2nd press, or never
+        for needed in (1, 2, 3, 99):                                # the game answers on this press of Select (99 = never)
             t = MacroTests()
             r = t.build()
             state = GameState()
@@ -251,25 +252,29 @@ class SelectRetryTests(unittest.TestCase):
             state.gui_focus = 2
             r.state_provider = lambda: state
             r.sleep = lambda s: None
-            game = {"tab": 1, "selects": 0}
+            game = {"tab": 1, "selects": 0, "cursor": "button"}
             keys = {"Key_3": 1, "Key_8": -1}
 
             def send(stroke, hold=0.0, _g=game, _s=state, _n=needed, _k=keys):
                 t.sender.pressed.append(stroke)
                 if stroke.key in _k:
                     _g["tab"] = max(0, min(TABS - 1, _g["tab"] + _k[stroke.key]))
-                if stroke.key == "Key_4":
+                if stroke.key == "Key_5" and _g["cursor"] == "row":            # UI_Right: back to the button
+                    _g["cursor"] = "button"
+                if stroke.key == "Key_4" and _g["tab"] == 3 and _g["cursor"] == "button":   # UI_Select on the button
                     _g["selects"] += 1
                     if _g["selects"] >= _n:
-                        _s.gui_focus = 0
+                        _s.gui_focus = 0                                # the request went through; the game closes the panel
+                    else:
+                        _g["cursor"] = "row"                            # ignored: the cursor jumps to the list row
                 return None
             t.sender.send = send
-            # the button is lit before the first Select and dark afterwards, whatever the game does
-            r.panel_reader = lambda _g=game: picture(_g["tab"]) if (_g["tab"] != 3 or _g["selects"] == 0) else _no_button()
+            r.panel_reader = lambda _g=game: _no_button() if (_g["tab"] == 3 and _g["cursor"] == "row") else picture(_g["tab"])
             with self.assertLogs("starling", level="INFO"):
                 r.run_text("request docking")
-            presses = [k.key for k in t.sender.pressed].count("Key_4")
-            self.assertEqual(presses, min(needed, 2), needed)      # never more than ONE extra, blind press
+            keys_pressed = [k.key for k in t.sender.pressed]
+            self.assertEqual(keys_pressed.count("Key_4"), min(needed, 3), needed)
+            self.assertEqual(keys_pressed.count("Key_5"), 1 + min(needed, 3) - 1, needed)   # the macro's own Right + one per ignored Select
 
     def test_it_gives_up_after_three_presses(self):
         keys = self.run_docking(99)
