@@ -18,7 +18,7 @@ MIN_BRIGHT = 190             # a selected-tab pixel is bright...
 MIN_SATURATION = 0.75        # ...and strongly coloured (any HUD colour: orange, blue, green...)
 MIN_AREA = 40                # in shrunk pixels
 MIN_ASPECT = 3.0             # the tab bar is much wider than it is tall
-TAB_MIN_WIDTH = 0.08         # a selected tab is this wide, as a fraction of the screen width (about 0.12 to 0.14 in practice)
+TAB_MIN_WIDTH = 0.05         # a selected tab is this wide, as a fraction of the screen width (0.07 to 0.14 in practice: the right panel's Modules tab is narrow)
 TAB_MAX_WIDTH = 0.19
 ICON_MIN = 0.012            # the small square icon tab is this wide, as a fraction of the screen width
 ICON_MAX = 0.04
@@ -123,13 +123,14 @@ def _wide_bars(picture):
     return bars, blobs
 
 
-def find_tab(picture):
+def find_tab(picture, near_y=None):
     """The selected tab in a picture: {"cx", "width", "y"} (fractions of the picture), or None.
     Normally that is the top-most wide bright bar. The panel also has a small square icon tab on the far LEFT (one step left of
     Navigation, the Previous Tab key lands on it): when that is the selected one there is no wide bar, so she reports
     {"icon": True, ...} instead."""
     bars, blobs = _wide_bars(picture)
-    bars = [bar for bar in bars if TAB_MIN_WIDTH <= bar["width"] <= TAB_MAX_WIDTH]   # a tab is about 0.12-0.14 of the screen wide: not a row or a long bar
+    bars = [bar for bar in bars if TAB_MIN_WIDTH <= bar["width"] <= TAB_MAX_WIDTH
+            and (near_y is None or abs(bar["y"] - near_y) < 0.03)]       # near_y: she already knows the height of this tab bar   # a tab is about 0.12-0.14 of the screen wide: not a row or a long bar
     if bars:
         top = bars[0]
         return {"cx": top["cx"], "width": top["width"], "y": top["y"]}
@@ -139,7 +140,8 @@ def find_tab(picture):
     for x0, x1, y0, y1, count in sorted(blobs, key=lambda blob: blob[2]):
         box_w, box_h = x1 - x0 + 1, y1 - y0 + 1
         if (0.6 <= box_w / float(box_h) <= 1.8 and ICON_MIN <= box_w / float(cols) <= ICON_MAX
-                and x0 / float(cols) < 0.4 and count >= 0.5 * box_w * box_h):
+                and (near_y is None or abs(y0 / float(rows) - near_y) < 0.03)
+                and (near_y is not None or x0 / float(cols) < 0.9) and count >= 0.5 * box_w * box_h):
             return {"icon": True, "cx": (x0 + x1 + 1) / 2.0 / cols, "width": box_w / float(cols), "y": y0 / float(rows)}
     return None
 
@@ -205,25 +207,34 @@ def mask_png(picture, path):
         return False
 
 
-def goto_tab(read, press_next, press_previous, wait, target, note=None, memory=None):
-    """Walk to tab number `target` (0 = Navigation, 1 = Transactions, 2 = Contacts) by looking after every key.
+def goto_tab(read, press_next, press_previous, wait, target, note=None, memory=None, last_index=None):
+    """Walk to tab number `target` (0 = the first real tab) by looking after every key.
+    Left panel: 0 = Navigation, 1 = Transactions, 2 = Contacts. Right panel: 0 = Modules, 1 = Fire Groups, 2 = Ship, 3 = Inventory,
+    4 = Storage, 5 = Status.  Both panels have a small ICON tab on the far left (index 0 here, so Navigation / Modules is index 1);
+    the right panel also has a small icon at the far RIGHT (pass last_index=7 for it).
 
     read()           -> what find_tab gives for the screen right now, or None
     press_next()     press the 'next panel tab' key;  press_previous() the 'previous' one
     wait(seconds)    pause
     note(text)       (optional) is told what happens at every step, for the log
-    memory           (optional) a dict she keeps between walks: where each tab was last seen (index 0 = the icon tab, 1 = Navigation,
-                     2 = Transactions, 3 = Contacts, as a fraction of the window width). With it, a later walk recognises which
-                     tab it starts on by position and presses the exact number of keys, instead of walking to the first tab
-                     and counting from there (about 4 seconds faster). If anything looks different she walks the long way.
-    Returns True when she got there and could see that she did, False when she could not tell (the caller then falls back to
-    counting presses blind, the way the macro always did)."""
+    memory           (optional) a dict she keeps between walks: where each tab was last seen (a fraction of the window width, by
+                     index). With it, a later walk recognises which tab it starts on by position and presses the exact number of
+                     keys instead of walking to the first tab and counting from there. If anything looks different she walks
+                     the long way.
+    last_index       (optional) the index of the small icon on the far right, when the panel has one
+    Returns True when she got there and could see that she did, False when she could not tell."""
     say = note or (lambda text: None)
-    goal = target + 1                                          # index: 0 = icon tab, 1 = Navigation, 2 = Transactions, 3 = Contacts
+    goal = target + 1                                          # index: 0 = icon tab, 1 = first real tab, ...
 
     def remember(index, spot):
         if memory is not None and spot is not None:
             memory[index] = spot["cx"]
+
+    def icon_index(spot):
+        """Which small icon is this: the one on the far left (0) or, on the right panel, the one on the far right."""
+        if last_index is not None and spot["cx"] > 0.62 and not (memory and 0 in memory and abs(spot["cx"] - memory[0]) < 0.05):
+            return last_index
+        return 0
 
     def look(after):
         """Look once the panel has settled: two looks 0.2 s apart must agree (the tab highlight slides for a moment)."""
@@ -239,47 +250,29 @@ def goto_tab(read, press_next, press_previous, wait, target, note=None, memory=N
         say("%s -> %s (never settled)" % (after, describe(first)))
         return first
 
+    def classify(spot):
+        if spot.get("icon"):
+            return icon_index(spot)
+        if memory:
+            near = [(abs(spot["cx"] - cx), k) for k, cx in memory.items() if k > 0]
+            if near and min(near)[0] < 0.4 * max(spot["width"], 0.05):
+                return min(near)[1]
+        return None
+
     here = look("start")
     if here is None:
         return False
+    index = classify(here)
 
-    # Shortcut: she knows which tab this is (the icon, or a position she has seen before): press exactly the keys needed.
-    index = None
-    if here.get("icon"):
-        index = 0
-    elif memory:
-        near = [(abs(here["cx"] - cx), k) for k, cx in memory.items() if k > 0]
-        if near and min(near)[0] < 0.4 * max(here["width"], 0.05):
-            index = min(near)[1]
-    if index is not None:
-        remember(index, here)
-        while index != goal:
-            step = 1 if goal > index else -1
-            (press_next if step > 0 else press_previous)()
-            wait(WAIT_AFTER_KEY)
-            now = look("next" if step > 0 else "previous")
-            if now is None:
-                return False
-            moved = (now["cx"] - here["cx"]) / max(here["width"], 0.01)
-            if (step > 0 and moved < 0.5) or (step < 0 and moved > -0.5):
-                say("it did not move the way she expected: walking the long way")
-                here, index = now, None
-                break
-            index += step
-            here = now
-            remember(index, here)
-        if index == goal:
-            return True
-
-    if not here.get("icon"):
-        for _ in range(6):                                     # step 1: left until she is on the little icon tab (the very first one)
+    if index is None:                                          # long way: left until she is on an icon tab (or cannot go further)
+        for _ in range(8):
             press_previous()
             wait(WAIT_AFTER_KEY)
             now = look("previous")
             if now is None:
                 return False
             if now.get("icon"):
-                here = now
+                here, index = now, icon_index(now)
                 break
             moved = (now["cx"] - here["cx"]) / max(here["width"], 0.01)
             if moved < -0.5:                                   # went one tab to the left: keep going
@@ -291,29 +284,26 @@ def goto_tab(read, press_next, press_previous, wait, target, note=None, memory=N
                 back = look("next (it had wrapped)")
                 if back is None:
                     return False
-                here = back
+                here, index = back, 1
                 break
-            here = now                                         # did not move: this is the first tab
+            here, index = now, 1                               # did not move: this is the first tab
             break
         else:
-            return False                                       # still moving after six presses: something is odd
-    position = 1
-    if here.get("icon"):                                       # one step right of the icon is Navigation (tab 0)
-        remember(0, here)
-        press_next()
+            return False                                       # still moving after eight presses: something is odd
+
+    remember(index, here)
+    while index != goal:                                       # walk to the goal, checking after every key that it really moved
+        step = 1 if goal > index else -1
+        (press_next if step > 0 else press_previous)()
         wait(WAIT_AFTER_KEY)
-        now = look("next from the icon")
-        if now is None or now.get("icon"):
+        now = look("next" if step > 0 else "previous")
+        if now is None:
             return False
-        here = now
-    remember(position, here)
-    for _ in range(target):                                    # step 2: forward to the one we want, checking each press worked
-        press_next()
-        wait(WAIT_AFTER_KEY)
-        now = look("next")
-        if now is None or (now["cx"] - here["cx"]) / max(here["width"], 0.01) < 0.5:
+        moved = (now["cx"] - here["cx"]) / max(here["width"], 0.01)
+        if (step > 0 and moved < 0.5) or (step < 0 and moved > -0.5):
+            say("it did not move the way she expected")
             return False
+        index += step
         here = now
-        position += 1
-        remember(position, here)
+        remember(index, here)
     return True

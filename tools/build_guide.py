@@ -32,6 +32,9 @@ OVER = {
     'supercruise': ['Engage supercruise'], 'hyperspace': ['Engage hyperspace'],
     'request_docking': ['Request docking'], 'auto_launch': ['Launch'], 'deploy_nomad': ['Deploy the Nomad'],
     'plot_waypoint': ['Plot the next waypoint'], 'show_off': ['Show off'],
+    'panel_home': ['Go home on the panel'], 'panel_modules': ['Open the modules'], 'panel_fire_groups': ['Open fire groups'],
+    'panel_ship': ['Open ship functions'], 'panel_inventory': ['Open the inventory'], 'panel_storage': ['Open storage'],
+    'panel_status': ['Open the status tab'],
     'left_panel': ['Open the left panel'], 'right_panel': ['Open the right panel'],
     'comms_panel': ['Open the comms panel'], 'radar_panel': ['Open the role panel'],
     'radar_range_up': ['Increase the radar range'], 'radar_range_down': ['Decrease the radar range'],
@@ -72,6 +75,8 @@ GROUPS = [
       'boost', 'speed_0', 'speed_50', 'speed_75', 'speed_100', 'supercruise', 'hyperspace']),
     ('big', 'Big actions', 'She presses a whole run of keys for these. She only acts when she is sure she heard you right, so say them clearly.',
      ['request_docking', 'auto_launch', 'deploy_nomad', 'plot_waypoint', 'show_off']),
+    ('panels', 'Right-hand panel tabs', 'She opens the right panel and looks at it to find the tab, so it works whichever tab was open last. If she cannot see the panel she says so and presses nothing more.',
+     [i for i in C if i.startswith('panel_')]),
     ('combat', 'Combat', 'Targets, power, countermeasures and wingmen.',
      ['next_target', 'prev_target', 'next_hostile', 'prev_hostile', 'highest_threat', 'next_route_system',
       'targets_target', 'next_subsystem', 'prev_subsystem', 'wingman_1', 'wingman_2', 'wingman_3', 'assist_1',
@@ -207,7 +212,7 @@ EXTRA = [
 ]
 for gid, title, intro, rows in EXTRA:
     sections.append((gid, title, intro, simple(rows)))
-order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'ship', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
+order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'panels', 'ship', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
 secmap = {s[0]: s for s in sections}
 sections = [secmap[k] for k in order]
 count = sum(t.count('<tr><td') for _, _, _, t in sections)

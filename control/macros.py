@@ -22,6 +22,10 @@ A step is one of:
                            If she cannot see the screen she presses Select anyway, as a plain "UI_Select" would.
     "stop if closed"       end the macro here (successfully) when Status.json says NO screen is open. Used after a button that makes the
                            game close the panel itself (Request Docking does), so the tidy-up keys are never pressed into the cockpit.
+    "open right panel"     the same for the RIGHT panel (Focus Right Panel; Status.json GuiFocus 1)
+    "right tab 3"          look at the right panel and go to that tab ("right tab home" = the home icon, 0 = Modules, 1 = Fire Groups, 2 = Ship, 3 = Inventory,
+                           4 = Storage, 5 = Status). The panel has no "blind" fallback: if she cannot see the screen she presses
+                           nothing and says so.
     "open left panel"      get the left panel open from WHATEVER is on screen (Status.json GuiFocus): nothing if it is already open,
                            Back first if the galaxy map / system map / station services / FSS is open, then Focus Left Panel.
                            (A plain "FocusLeftPanel" would CLOSE the panel if it was already open.)
@@ -89,6 +93,19 @@ def parse_macro(steps):
             except ValueError:
                 raise ValueError("I don't understand this ensure (write it like: ensure FocusLeftPanel 2): %r" % text)
             continue
+        if lowered == "open right panel":
+            parsed.append(("openright",))
+            continue
+        if lowered.startswith("right tab "):
+            try:
+                word = lowered.split()[2]
+                number = -1 if word == "home" else int(word)           # "home" = the small home icon at the far left
+                if len(lowered.split()) != 3 or not -1 <= number <= 5:
+                    raise ValueError
+            except (ValueError, IndexError):
+                raise ValueError("I don't understand this tab step (write it like: right tab 3): %r" % text)
+            parsed.append(("tab", number, 0, "right"))
+            continue
         if lowered == "stop if closed":
             parsed.append(("stopclosed",))
             continue
@@ -109,7 +126,7 @@ def parse_macro(steps):
                     raise ValueError
             except ValueError:
                 raise ValueError("I don't understand this tab step (write it like: tab 2  or  tab 0 from 2): %r" % text)
-            parsed.append(("tab", number, start))
+            parsed.append(("tab", number, start, "left"))
             continue
         if lowered in LITERALS:
             parsed.append(("literal", lowered))
@@ -140,6 +157,10 @@ def actions_in(parsed):
             seen.append(step[1])
         if step[0] == "selectbutton":
             for needed in ("UI_Select", "UI_Right"):
+                if needed not in seen:
+                    seen.append(needed)
+        if step[0] == "openright":
+            for needed in ("FocusRightPanel", "UI_Back"):
                 if needed not in seen:
                     seen.append(needed)
         if step[0] == "openleft":

@@ -105,8 +105,8 @@ class WalkTests(unittest.TestCase):
 
 class MacroStepTests(unittest.TestCase):
     def test_parse_and_actions(self):
-        self.assertEqual(parse_macro(["tab 2"]), [("tab", 2, 0)])
-        self.assertEqual(parse_macro(["tab 0 from 2"]), [("tab", 0, 2)])
+        self.assertEqual(parse_macro(["tab 2"]), [("tab", 2, 0, "left")])
+        self.assertEqual(parse_macro(["tab 0 from 2"]), [("tab", 0, 2, "left")])
         self.assertEqual(parse_macro(["open left panel"]), [("openleft",)])
         self.assertEqual(actions_in(parse_macro(["open left panel"])), ["FocusLeftPanel", "UI_Back"])
         self.assertEqual(actions_in(parse_macro(["tab 2"])), ["CycleNextPanel", "CyclePreviousPanel"])
@@ -134,7 +134,7 @@ class RunnerTests(unittest.TestCase):
             r.sleep = lambda s: None
             with self.assertLogs("starling", level="INFO") as logs:
                 r.run_text("request docking")
-            self.assertTrue(any("went to tab 2" in line for line in logs.output), start)
+            self.assertTrue(any("went to left tab 2" in line for line in logs.output), start)
             self.assertTrue(any(k.key == "Key_4" for k in t.sender.pressed), start)               # UI_Select (Key_4) was pressed: she saw the button
             self.assertFalse(any(k.key == "Key_9" for k in t.sender.pressed), start)             # and there is no UI_Up any more
 

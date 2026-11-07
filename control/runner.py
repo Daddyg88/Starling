@@ -89,7 +89,8 @@ class CommandRunner:
         self.brain = brain               # personality/brain.py: answers anything that is not a command
         self.smalltalk = smalltalk       # personality/smalltalk.py: "how are you?", "tell me a joke"
         self.memory = memory             # memory/recall.py: "what do you remember"
-        self._tab_memory = {}            # where she last saw each tab of the left panel (a faster tab walk next time)
+        self._tab_memory = {"left": {}, "right": {}}   # where she last saw each tab of each panel (a faster tab walk next time)
+        self._tab_height = {}                          # the height of each panel's tab bar on screen, once she has seen it
         self.panel_reader = None         # a function that returns a screenshot (tests give a pretend one); None = the real screen
         self.extra_helpers = []          # more voice helpers (the biology overlay) that answer before anything else
         self.route = route               # navigation/voice.py: 'plot a neutron route to Colonia'
@@ -536,8 +537,17 @@ class CommandRunner:
                     status = SEND_FAILURE_STATUS.get(problem, "failed")
                     return Outcome(status, text, command, intent, detail=self._explain(status, command))
                 continue
+            if step[0] == "openright":
+                problem = self._open_left_panel(strokes, pressed, trace, "FocusRightPanel", 1)
+                if problem:
+                    status = SEND_FAILURE_STATUS.get(problem, "failed")
+                    return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                continue
             if step[0] == "tab":
-                problem = self._go_to_tab(step[1], strokes, pressed, trace, step[2] if len(step) > 2 else 0)
+                panel = step[3] if len(step) > 3 else "left"
+                problem = self._go_to_tab(step[1], strokes, pressed, trace, step[2] if len(step) > 2 else 0, panel)
+                if problem == "no_screen":                     # the right panel cannot be counted blind: stop and say so
+                    return Outcome("no_button", text, command, intent, detail=self._explain("no_button", command))
                 if problem:
                     status = SEND_FAILURE_STATUS.get(problem, "failed")
                     return Outcome(status, text, command, intent, detail=self._explain(status, command))
@@ -582,7 +592,7 @@ class CommandRunner:
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
                        detail=command.do_text(intent) + ".")
 
-    def _go_to_tab(self, number, strokes, pressed, trace, start=0):
+    def _go_to_tab(self, number, strokes, pressed, trace, start=0, panel="left"):
         """The 'tab N' macro step. Looks at the left panel to find the tab it opened on and walks to tab N; if she cannot see the
         screen it presses next tab N times (the old behaviour, which assumes the panel opened on Navigation).
         Returns None, or the sender's problem text if a key could not be pressed."""
@@ -602,14 +612,17 @@ class CommandRunner:
 
             def read():
                 picture = reader()
-                found = panel_reader.find_tab(picture)
+                found = panel_reader.find_tab(picture, near_y=self._tab_height.get(panel))
                 seen["ok"] = seen["ok"] or found is not None
+                if found is not None:
+                    self._tab_height[panel] = found["y"]
                 if picture is not None and len(shots) < 8:
                     shots.append((len(notes), picture))
                 return found
             try:
                 done = panel_reader.goto_tab(read, lambda: press("CycleNextPanel"), lambda: press("CyclePreviousPanel"),
-                                             self.sleep, number, note=notes.append, memory=self._tab_memory)
+                                             self.sleep, number, note=notes.append, memory=self._tab_memory[panel],
+                                             last_index=7 if panel == "right" else None)
             except Exception:
                 log.exception("Looking at the panel failed")
                 done = False
@@ -619,11 +632,18 @@ class CommandRunner:
             if problems:
                 return problems[0]
             if done:
-                trace.append("tab%d>seen" % number)
-                log.info("Panel: she looked at the screen and went to tab %d.", number)
+                trace.append("%stab%d>seen" % ("r" if panel == "right" else "", number))
+                log.info("Panel: she looked at the screen and went to %s tab %d.", panel, number)
                 return None
+            self._tab_height.pop(panel, None)                 # forget what she thought she knew: next time look afresh
+            self._tab_memory[panel].clear()
+            if panel == "right":
+                log.info("Panel: she could not read the right panel, so she pressed nothing more.")
+                return "no_screen"
             log.info("Panel: she could not read the screen (%s), so she counted the tab presses instead.",
                      "tab bar not found" if not seen["ok"] else "the tab did not move as expected")
+        if panel == "right":
+            return "no_screen"                                  # the right panel cannot be counted blind (it opens on its last tab)
         action = "CycleNextPanel" if number >= start else "CyclePreviousPanel"
         for _ in range(abs(number - start)):             # blind: she assumes the panel is on tab `start` (Navigation unless told)
             press(action)
@@ -757,7 +777,7 @@ class CommandRunner:
                 return True
         return False
 
-    def _open_left_panel(self, strokes, pressed, trace):
+    def _open_left_panel(self, strokes, pressed, trace, focus_action="FocusLeftPanel", panel_gui=2):
         """The 'open left panel' macro step: gets the left panel open from whatever the game is showing.
         GuiFocus: 0 cockpit, 1 right panel, 2 left panel, 3 comms, 4 role, 5 station services, 6 galaxy map, 7 system map,
         8 orrery, 9 FSS, 10 SAA, 11 codex. Returns None, or the sender's problem text."""
@@ -768,7 +788,7 @@ class CommandRunner:
 
         gui = self._gui_focus()
         trace.append("open>gui%s" % gui)
-        if gui == 2:
+        if gui == panel_gui:
             return None                                  # already open: pressing the key again would CLOSE it
         if gui in (5, 6, 7, 8, 9, 10, 11):               # a full screen is in the way: Back out of it first
             problem = press("UI_Back")
@@ -780,22 +800,22 @@ class CommandRunner:
             if gui in (5, 6, 7, 8, 9, 10, 11):
                 log.warning("Panel: the screen (gui %s) would not close, so she did not press more keys.", gui)
                 return "failed"
-        if gui == 2:
+        if gui == panel_gui:
             return None
         for attempt in range(2):
-            problem = press("FocusLeftPanel")
+            problem = press(focus_action)
             if problem:
                 return problem
             gui = self._gui_focus()
             for _ in range(8):                           # poll instead of a fixed wait: usually open within half a second
-                if gui != 0:
+                if gui == panel_gui or gui == "?":
                     break
                 self.sleep(0.25)
                 gui = self._gui_focus()
-            if gui == 2 or gui == "?":
-                self.sleep(0.5 if gui == 2 else 1.4)     # let the panel finish sliding in (Status.json unreadable: wait the old time)
+            if gui == panel_gui or gui == "?":
+                self.sleep(0.5 if gui == panel_gui else 1.4)     # let the panel finish sliding in (Status.json unreadable: wait the old time)
             trace.append("focus>gui%s" % gui)
-            if gui in (2, "?"):                          # open, or Status.json cannot tell: carry on as the macro always did
+            if gui in (panel_gui, "?"):                   # open, or Status.json cannot tell: carry on as the macro always did
                 return None
             if gui != 0:                                 # something else opened: one more press would only close it
                 break

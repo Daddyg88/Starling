@@ -718,6 +718,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.83.0: the docking macro starts with `talk Docking_Start` and says `Docking_Contacts` after finding the tab; `select button` says `Docking_Retry` when the cursor bounced. Lines live in voicepacks/default/docking.json. A macro that speaks replaces the final confirmation line when it succeeds.
 
+0.84.0: new macro steps `open right panel` and `right tab N` (N = 0 Modules, 1 Fire Groups, 2 Ship, 3 Inventory, 4 Storage, 5 Status, or `right tab home`). Commands panel_home / panel_modules / panel_fire_groups / panel_ship / panel_inventory / panel_storage / panel_status use them. The tab finder now accepts tabs 0.05 to 0.19 of the screen wide and, once it has seen a tab bar, ignores anything not at the same height. `open left panel` is now one of two uses of a shared panel-opening routine (focus key + GuiFocus number).
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.

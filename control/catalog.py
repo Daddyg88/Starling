@@ -128,6 +128,12 @@ class Command:
                 "press": "Using %s"}[intent] % self.label
 
 
+# 0.84.0: the right-hand panel tabs, in order: home icon, Modules, Fire Groups, Ship, Inventory, Storage, Status. She opens the panel from
+# whatever is on screen and LOOKS at the tab bar to walk to the tab (like docking, no blind fallback: if she cannot see, she says so).
+def RIGHT_TAB(name):
+    return ("open right panel", "right tab " + name)
+
+
 def C(id, action, label, on=None, off=None, toggle=None, press=None, doing=None, flag=None, words=("on", "off"),
       strict=False, macro=(), service=()):
     phrases = {k: v for k, v in (("on", on), ("off", off), ("toggle", toggle), ("press", press)) if v}
@@ -437,9 +443,31 @@ CATALOG = [
       press=["{OPEN_V} [the] (radar|role|scanner) panel", "(radar|role) panel", "{OPEN_V} [the] radar", "{OPEN_V} (role|ship role) panel"],
       doing={"press": "Opening the role panel"}),
     C("right_panel", "FocusRightPanel", "the right panel",
-      press=["{OPEN_V} [the] (right|systems|internal|functions|status) panel", "(right|systems|internal|status) panel", "{OPEN_V} (ship )?status",
-             "{OPEN_V} [the] modules"],
+      press=["{OPEN_V} [the] (right|systems|internal|functions|status) panel", "(right|systems|internal|status) panel",
+             ],
       doing={"press": "Opening the right panel"}),
+    # ------------------------------------------------------------------ right panel tabs (she looks at the panel to find them)
+    C("panel_home", "FocusRightPanel", "the home tab",
+      press=["{OPEN_V} [the] (right panel )?home [tab|page|screen]", "(right panel|panel) home", "go home on the panel"],
+      doing={"press": "Opening the home tab"}, strict=True, macro=RIGHT_TAB("home")),
+    C("panel_modules", "FocusRightPanel", "the modules tab",
+      press=["{OPEN_V} [the] modules [tab|page|screen|list]", "modules (tab|page|screen)", "(go|switch) to [the] modules"],
+      doing={"press": "Opening the modules tab"}, strict=True, macro=RIGHT_TAB("0")),
+    C("panel_fire_groups", "FocusRightPanel", "the fire groups tab",
+      press=["{OPEN_V} [the] (fire groups|firegroups|fire group) [tab|page|screen]", "(fire groups|firegroups|fire group) (tab|page|screen)", "(go|switch) to [the] (fire groups|firegroups|fire group)"],
+      doing={"press": "Opening the fire groups tab"}, strict=True, macro=RIGHT_TAB("1")),
+    C("panel_ship", "FocusRightPanel", "the ship functions tab",
+      press=["{OPEN_V} [the] ship (functions|tab|page|screen)", "ship functions", "(go|switch) to [the] ship (functions|tab)"],
+      doing={"press": "Opening the ship functions tab"}, strict=True, macro=RIGHT_TAB("2")),
+    C("panel_inventory", "FocusRightPanel", "the inventory tab",
+      press=["{OPEN_V} [the] (inventory|cargo hold|cargo tab) [tab|page|screen]", "inventory (tab|page|screen)", "(go|switch) to [the] inventory"],
+      doing={"press": "Opening the inventory tab"}, strict=True, macro=RIGHT_TAB("3")),
+    C("panel_storage", "FocusRightPanel", "the storage tab",
+      press=["{OPEN_V} [the] storage [tab|page|screen]", "storage (tab|page|screen)", "(go|switch) to [the] storage"],
+      doing={"press": "Opening the storage tab"}, strict=True, macro=RIGHT_TAB("4")),
+    C("panel_status", "FocusRightPanel", "the status tab",
+      press=["{OPEN_V} [the] [ship|system] status [tab|page|screen]", "[ship|system] status (tab|page|screen)", "(go|switch) to [the] status"],
+      doing={"press": "Opening the status tab"}, strict=True, macro=RIGHT_TAB("5")),
     C("radar_range_up", "RadarIncreaseRange", "radar range",
       press=["(increase|extend|raise|expand|widen|zoom out) [the] radar [range]", "radar (range )?(up|out|bigger|longer)", "zoom radar out"],
       doing={"press": "Increasing radar range"}),
