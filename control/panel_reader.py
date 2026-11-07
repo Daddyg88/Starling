@@ -25,15 +25,51 @@ ICON_MAX = 0.04
 WAIT_AFTER_KEY = 0.7         # seconds the panel takes to change tab before she looks again
 
 
+_announced = []
+
+
+def game_box():
+    """(left, top, right, bottom) of the window in front (Elite, when she presses keys), or None. Windows only.
+    Needed because on a multi-monitor desktop the whole desktop can be 5760 pixels wide: shrunk to look at, the tab bar
+    became a 3-pixel smudge and she could not see it."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+        user32 = ctypes.windll.user32
+        try:
+            user32.SetProcessDPIAware()                          # real pixels, not scaled ones
+        except Exception:
+            pass
+        window = user32.GetForegroundWindow()
+        rect = wintypes.RECT()
+        if not window or not user32.GetWindowRect(window, ctypes.byref(rect)):
+            return None
+        box = (rect.left, rect.top, rect.right, rect.bottom)
+        if box[2] - box[0] < 800 or box[3] - box[1] < 450:       # not a game-sized window
+            return None
+        return box
+    except Exception:
+        return None
+
+
 def capture_screen():
-    """The whole desktop as a numpy RGB picture (Windows). None if it cannot be taken (not Windows, or a black frame)."""
+    """The game window (or, if that cannot be found, the main screen) as a numpy RGB picture (Windows). None if it cannot be
+    taken (not Windows, or a black frame)."""
     try:
         import numpy as np
         from PIL import ImageGrab
-        picture = np.asarray(ImageGrab.grab(all_screens=True).convert("RGB"))
+        box = game_box()
+        if box is not None:
+            picture = np.asarray(ImageGrab.grab(bbox=box, all_screens=True).convert("RGB"))
+        else:
+            picture = np.asarray(ImageGrab.grab().convert("RGB"))
     except Exception:
         log.debug("Screen capture is not available", exc_info=True)
         return None
+    if not _announced:
+        _announced.append(True)
+        log.info("Panel: looking at %dx%d pixels (%s).", picture.shape[1], picture.shape[0],
+                 "the game window at %s" % (box,) if box else "the main screen: the game window was not found")
     if picture.size == 0 or picture.max() < 30:               # a fully black frame: the game is not capturable (exclusive fullscreen)
         return None
     return picture
