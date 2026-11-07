@@ -537,6 +537,22 @@ class CommandRunner:
                     status = SEND_FAILURE_STATUS.get(problem, "failed")
                     return Outcome(status, text, command, intent, detail=self._explain(status, command))
                 continue
+            if step[0] == "closepanels":
+                gui = self._gui_focus()
+                trace.append("close>gui%s" % gui)
+                for _ in range(4):
+                    if gui not in (1, 2, 3, 4, "?"):
+                        break                                  # closed (0), or a map / services screen that is none of her business
+                    problem = self.sender.send(strokes["UI_Back"], hold=0.15)
+                    pressed.append("UI_Back")
+                    if problem:
+                        status = SEND_FAILURE_STATUS.get(problem, "failed")
+                        return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                    self.sleep(0.45)
+                    gui = self._gui_focus()
+                    if gui == "?":
+                        break                                  # Status.json unreadable: one press, as a plain Back would
+                continue
             if step[0] == "openright":
                 problem = self._open_left_panel(strokes, pressed, trace, "FocusRightPanel", 1)
                 if problem:

@@ -22,7 +22,7 @@ TAB_MIN_WIDTH = 0.05         # a selected tab is this wide, as a fraction of the
 TAB_MAX_WIDTH = 0.19
 ICON_MIN = 0.012            # the small square icon tab is this wide, as a fraction of the screen width
 ICON_MAX = 0.04
-WAIT_AFTER_KEY = 0.5         # seconds the panel takes to change tab before she looks again
+WAIT_AFTER_KEY = 0.4         # seconds the panel takes to change tab before she looks again
 
 
 _announced = []
@@ -240,7 +240,7 @@ def goto_tab(read, press_next, press_previous, wait, target, note=None, memory=N
         """Look once the panel has settled: two looks 0.2 s apart must agree (the tab highlight slides for a moment)."""
         first = read()
         for _ in range(3):
-            wait(0.2)
+            wait(0.15)
             second = read()
             if first is not None and second is not None and abs(first["cx"] - second["cx"]) < 0.01 \
                     and bool(first.get("icon")) == bool(second.get("icon")):
@@ -292,6 +292,25 @@ def goto_tab(read, press_next, press_previous, wait, target, note=None, memory=N
             return False                                       # still moving after eight presses: something is odd
 
     remember(index, here)
+    if memory and goal in memory and abs(goal - index) >= 2:   # she knows where the goal is: press all the keys quickly, look once
+        step = 1 if goal > index else -1
+        for count in range(abs(goal - index)):
+            (press_next if step > 0 else press_previous)()
+            wait(0.3 if count < abs(goal - index) - 1 else WAIT_AFTER_KEY)
+        now = look("after %d quick presses" % abs(goal - index))
+        if now is None:
+            return False
+        found = classify(now)
+        if found == goal:
+            remember(goal, now)
+            return True
+        say("the quick presses did not land on the goal: checking one step at a time")
+        if found is None:                                      # she does not know this place: forget what she thought she knew
+            memory.clear()
+            say("what she remembered is wrong: starting again from scratch")
+            return goto_tab(read, press_next, press_previous, wait, target, note, memory, last_index)
+        here, index = now, found
+        remember(index, here)
     while index != goal:                                       # walk to the goal, checking after every key that it really moved
         step = 1 if goal > index else -1
         (press_next if step > 0 else press_previous)()

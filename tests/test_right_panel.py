@@ -132,5 +132,50 @@ class RightPanelCommandTests(unittest.TestCase):
         self.assertNotIn("Key_8", keys)
 
 
+class ClosePanelsTests(unittest.TestCase):
+    def close(self, gui, depth):
+        """depth = how many Back presses the game needs before the panel is gone (the cursor can be deep inside it)."""
+        from journal.game_state import GameState
+        from tests.test_macros import MacroTests
+        t = MacroTests()
+        r = t.build()
+        state = GameState()
+        state.status_seen = True
+        state.gui_focus = gui
+        r.state_provider = lambda: state
+        r.sleep = lambda s: None
+        left = {"n": depth}
+
+        def send(stroke, hold=0.0):
+            t.sender.pressed.append(stroke)
+            if stroke.key == "Key_6" and state.gui_focus in (1, 2, 3, 4):      # UI_Back
+                left["n"] -= 1
+                if left["n"] <= 0:
+                    state.gui_focus = 0
+            return None
+        t.sender.send = send
+        outcome = r.run_text("close the panel")[0]
+        return outcome, [k.key for k in t.sender.pressed]
+
+    def test_presses_back_until_the_panel_is_gone(self):
+        for depth in (1, 2, 3):
+            for gui in (1, 2):
+                outcome, keys = self.close(gui, depth)
+                self.assertEqual(outcome.status, "done")
+                self.assertEqual(keys.count("Key_6"), depth, (gui, depth))
+
+    def test_nothing_to_close_means_no_keys(self):
+        outcome, keys = self.close(0, 1)
+        self.assertEqual(keys, [])
+
+    def test_a_map_is_left_alone(self):
+        outcome, keys = self.close(6, 1)                                         # galaxy map: not a panel
+        self.assertEqual(keys, [])
+
+    def test_stops_after_four_presses(self):
+        outcome, keys = self.close(2, 99)
+        self.assertEqual(keys.count("Key_6"), 4)
+
+
 if __name__ == "__main__":
     unittest.main()

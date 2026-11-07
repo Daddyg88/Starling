@@ -22,6 +22,8 @@ A step is one of:
                            If she cannot see the screen she presses Select anyway, as a plain "UI_Select" would.
     "stop if closed"       end the macro here (successfully) when Status.json says NO screen is open. Used after a button that makes the
                            game close the panel itself (Request Docking does), so the tidy-up keys are never pressed into the cockpit.
+    "close panels"         close whatever panel is open: presses Back until Status.json says no panel is open (at most 4 presses),
+                           and nothing at all if none is open. Maps and station services are left alone.
     "open right panel"     the same for the RIGHT panel (Focus Right Panel; Status.json GuiFocus 1)
     "right tab 3"          look at the right panel and go to that tab ("right tab home" = the home icon, 0 = Modules, 1 = Fire Groups, 2 = Ship, 3 = Inventory,
                            4 = Storage, 5 = Status). The panel has no "blind" fallback: if she cannot see the screen she presses
@@ -93,6 +95,9 @@ def parse_macro(steps):
             except ValueError:
                 raise ValueError("I don't understand this ensure (write it like: ensure FocusLeftPanel 2): %r" % text)
             continue
+        if lowered == "close panels":
+            parsed.append(("closepanels",))
+            continue
         if lowered == "open right panel":
             parsed.append(("openright",))
             continue
@@ -159,6 +164,8 @@ def actions_in(parsed):
             for needed in ("UI_Select", "UI_Right"):
                 if needed not in seen:
                     seen.append(needed)
+        if step[0] == "closepanels" and "UI_Back" not in seen:
+            seen.append("UI_Back")
         if step[0] == "openright":
             for needed in ("FocusRightPanel", "UI_Back"):
                 if needed not in seen:
