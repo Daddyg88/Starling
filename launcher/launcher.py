@@ -361,6 +361,8 @@ class Launcher:
         self.say("Starting Starling...")
         exe = self.l.pythonw if self.l.pythonw.exists() else self.l.python
         extra = {"STARLING_LAUNCHER": "1", "PYTHONUTF8": "1"}
+        if getattr(sys, "frozen", False):
+            extra["STARLING_LAUNCHER_EXE"] = sys.executable      # so the dashboard can offer "Restart now to install"
         if self.repo:
             extra["STARLING_REPO"] = self.repo               # so the dashboard's update page knows where to look
         env = clean_env(extra)

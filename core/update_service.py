@@ -4,6 +4,8 @@ It never swaps files itself (they are in use). It downloads and verifies, then t
 next time Starling starts.
 """
 import os
+import subprocess
+import sys
 import threading
 from pathlib import Path
 
@@ -13,6 +15,8 @@ from core.version import __version__
 
 
 class UpdateService:
+    RECHECK_FLOOR = 5.0 / 60.0          # never re-check more often than every 5 seconds
+
     def __init__(self, settings, home=None, fetch=updater.fetch_latest, stage=updater.stage_update):
         self.settings = settings
         self.fetch, self.stage = fetch, stage
@@ -59,17 +63,49 @@ class UpdateService:
             self._busy = False
 
     def check_in_background(self, log=None):
+        """Checks now, then again every updates.recheck_minutes (default 30) while she keeps running.
+        0.85.9: it used to check ONCE at start, so someone who leaves her running all day never saw a new version."""
         if not self.settings.get("updates.auto_check", True) or not self.repo():
             return None
+        self._stop = threading.Event()
 
         def work():
-            try:
-                text = self.check()
-                if log:
-                    log.info("Update check: %s", text)
-            except Exception:
-                if log:
-                    log.exception("Update check failed")
+            last = None
+            while not self._stop.is_set():
+                try:
+                    text = self.check()
+                    if log and text != last:                     # say it when it changes, not every half hour
+                        log.info("Update check: %s", text)
+                    last = text
+                except Exception:
+                    if log:
+                        log.exception("Update check failed")
+                try:
+                    minutes = float(self.settings.get("updates.recheck_minutes", 30) or 30)
+                except (TypeError, ValueError):
+                    minutes = 30.0
+                if self._stop.wait(max(self.RECHECK_FLOOR, minutes) * 60.0):
+                    break
         thread = threading.Thread(target=work, name="update-check", daemon=True)
         thread.start()
         return thread
+
+    def stop(self):
+        event = getattr(self, "_stop", None)
+        if event is not None:
+            event.set()
+
+    def restart_now(self, launcher=None, spawn=subprocess.Popen):
+        """Opens Starling.exe a few seconds from now (it installs the waiting update). Returns (ok, sentence).
+        The caller then closes the dashboard. Needs the launcher's path, which newer Starling.exe files pass along."""
+        launcher = launcher or os.environ.get("STARLING_LAUNCHER_EXE", "")
+        if not self.waiting():
+            return False, "There is no downloaded update waiting."
+        if not launcher or not os.path.isfile(launcher):
+            return False, "Update %s is ready. Close Starling and open Starling.exe again to install it." % self.waiting()
+        try:
+            flags = 0x08000000 | 0x00000008 if sys.platform == "win32" else 0        # no window, detached
+            spawn('cmd /c "ping -n 4 127.0.0.1 >nul & start "" "%s""' % launcher, shell=True, creationflags=flags)
+        except Exception as error:
+            return False, "I could not restart by myself (%s). Close Starling and open Starling.exe again." % error
+        return True, "Restarting to install %s..." % self.waiting()

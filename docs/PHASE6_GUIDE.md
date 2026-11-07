@@ -1371,3 +1371,7 @@ window use the same code as the biology list.
 ## 0.85.9 - Woz log fixes
 
 * sender.WindowsWindows: argtypes for 64-bit handles, find_game tolerant; keys.py Hash; binds/combat_assist warn once; timing.thread_cpu_times + busiest_threads in the 10-minute line.
+
+## 0.85.10 - Updates while running
+
+* update_service: repeating background check (30 min), stop(), restart_now(); launcher passes STARLING_LAUNCHER_EXE; dashboard title note + Restart button.

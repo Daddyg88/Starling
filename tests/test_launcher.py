@@ -151,6 +151,38 @@ class UpdateServiceTests(unittest.TestCase):
             os.environ.pop("STARLING_REPO", None)
             self.assertIsNone(UpdateService(self.settings, home=self.tmp.name).check_in_background())
 
+    def test_background_check_repeats_while_running(self):
+        import threading
+        calls = []
+        done = threading.Event()
+
+        def fetch(repo, token=""):
+            calls.append(1)
+            if len(calls) >= 3:
+                done.set()
+            return {"version": "0.0.1", "zip_url": "", "sha_url": ""}
+        self.settings.set("updates.recheck_minutes", 0.001)
+        service = UpdateService(self.settings, home=self.tmp.name, fetch=fetch)
+        service.RECHECK_FLOOR = 0.0
+        service.check_in_background()
+        self.assertTrue(done.wait(10))
+        service.stop()
+        self.assertGreaterEqual(len(calls), 3)
+
+    def test_restart_needs_a_waiting_update_and_a_launcher(self):
+        service = self.service("99.0.0")
+        self.assertFalse(service.restart_now(launcher="x")[0])             # nothing downloaded yet
+        service.waiting = lambda: "99.0.0"
+        ok, text = service.restart_now(launcher=str(Path(self.tmp.name) / "missing.exe"))
+        self.assertFalse(ok)
+        self.assertIn("open Starling.exe again", text)
+        exe = Path(self.tmp.name) / "Starling.exe"
+        exe.write_text("x")
+        sent = []
+        ok, text = service.restart_now(launcher=str(exe), spawn=lambda *a, **k: sent.append(a))
+        self.assertTrue(ok)
+        self.assertIn("Starling.exe", sent[0][0])
+
 
 class CleanEnvTests(unittest.TestCase):
     def test_pyinstaller_tcl_paths_are_not_passed_on(self):

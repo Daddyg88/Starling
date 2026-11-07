@@ -426,8 +426,8 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("updates", "Updates", "Starling.exe installs new versions from your GitHub releases by itself. This page lets you check by hand.", [
             Field("updates.repo", "GitHub repository", "text", placeholder="owner/name",
                   help="Filled in automatically when you start from Starling.exe"),
-            Field("updates.auto_check", "Look for updates when Starling starts", "toggle",
-                  help="A new version is downloaded in the background and installed the next time you open Starling.exe"),
+            Field("updates.auto_check", "Look for updates when Starling starts and every 30 minutes", "toggle",
+                  help="A new version is downloaded in the background and installed the next time you open Starling.exe (or press Restart now on this page)"),
             Field("updates.ask", "Ask me before updating when I open Starling.exe", "toggle",
                   help="On: a separate 'Update available' screen appears before she loads (Update now / Not now). Off (the default): updates install by themselves when you open Starling.exe"),
             Field("updates.token", "GitHub token (only for a private repository)", "text",

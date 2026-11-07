@@ -805,6 +805,7 @@ class Dashboard:
                       ("Forget everything", self.forget_memories)]
         if page.id == "updates":
             extra += [("Check for updates now", self.check_updates),
+                      ("Restart now to install the update", self.restart_to_update),
                       ("Make a file to send when something is wrong", self.make_diagnostics)]
         if page.id == "navigation":
             extra += [("Plot neutron route to my destination", lambda: self.nav_plot(use_entry=False)),
@@ -1345,6 +1346,20 @@ class Dashboard:
             self.root.after(0, lambda: self._controls_result(text, T.GOOD))
         threading.Thread(target=work, name="update-now", daemon=True).start()
 
+    def restart_to_update(self):
+        """Updates page: close and reopen through Starling.exe, which installs the downloaded version."""
+        ok, text = self.app.ensure_updates().restart_now()
+        self._controls_result(text, T.GOOD if ok else T.WARN)
+        if ok:
+            self.root.after(800, self.close)
+
+    def _announce_update(self):
+        """Puts 'update ready' in the window title once a new version has been downloaded, so it is not missed."""
+        waiting = self.app.ensure_updates().waiting()
+        if waiting and waiting != getattr(self, "_update_announced", None):
+            self._update_announced = waiting
+            self.root.title("%s  -  update %s ready: Updates page, Restart now" % (assistant_name(self.app.settings).upper(), waiting))
+
     def nav_plot(self, use_entry=True):
         """Navigation page: plot a neutron route without speaking."""
         typed = ""
@@ -1551,6 +1566,7 @@ class Dashboard:
             return
         try:
             self._update_header()
+            self._announce_update()
             if self.current == "home":
                 self._refresh_home()
             elif self.current == "navigation":
@@ -1582,6 +1598,10 @@ class Dashboard:
             self.model.save()
         if getattr(self, "window_memory", None) is not None:
             self.window_memory.save()
+        try:
+            self.app.ensure_updates().stop()
+        except Exception:
+            pass
         self.root.destroy()
 
     def run(self):
