@@ -133,9 +133,10 @@ class ReasonTests(unittest.TestCase):
 
 class FakeGame:
     """The role panel as a little game: tabs (Up/Down in the tab list), rows (Up/Down in a page), Right / Left, Select."""
-    def __init__(self, tab=0, in_page=False, lit_in_list=False, stuck_rows=(), empty=(), closes_on=None, reversed_keys=False):
+    def __init__(self, tab=0, in_page=False, lit_in_list=False, stuck_rows=(), empty=(), closes_on=None, reversed_keys=False, grey_top=False):
         self.tab, self.in_page, self.row = tab, in_page, 0
         self.closes_on, self.closed, self.reversed_keys = closes_on, False, reversed_keys
+        self.grey_top = grey_top
         self.lit_in_list, self.stuck_rows, self.empty = lit_in_list, stuck_rows, empty
         self.keys, self.selected = [], None
 
@@ -171,6 +172,8 @@ class FakeGame:
         else:
             base = "suit"
         picture = shot(base).copy()
+        if self.grey_top and self.tab in (1, 2) and self.row == 0 and self.in_page:
+            picture = shot("list_srv").copy()            # the top button is greyed out and the cursor sits on it: nothing is lit
         if not self.in_page and not self.lit_in_list:
             red, green = picture[..., 0].astype(int), picture[..., 1].astype(int)
             lit = (red >= 185) & (green >= 105) & (green <= 170) & (picture[..., 2] <= 45)
@@ -310,6 +313,25 @@ class CommandTests(unittest.TestCase):
         game = FakeGame(tab=1, stuck_rows=(1,))
         outcome, game = self.run_command("launch the fighter", game, altitude=120.0)
         self.assertEqual(outcome.status, "cannot_slf_low")
+
+    def test_the_top_button_greyed_out_so_down_reaches_the_second(self):
+        """The log: Rhino greyed (too close to planet), Scarab deployable below it: 'deploy SRV' must press Down and then Select."""
+        game = FakeGame(tab=0, grey_top=True)
+        outcome, game = self.run_command("deploy the srv", game)
+        self.assertEqual((outcome.status, game.selected), ("done", (2, 1)))
+        self.assertIn("UI_Down", game.keys)
+
+    def test_the_rhino_greyed_out_is_blocked_without_pressing_down(self):
+        game = FakeGame(tab=0, grey_top=True)
+        outcome, game = self.run_command("deploy the rhino", game)
+        self.assertEqual(outcome.status, "cannot_landed")
+        self.assertNotIn("UI_Down", game.keys)
+        self.assertIsNone(game.selected)
+
+    def test_heard_wrong_words_still_match(self):
+        for phrase in ("deployed rhino", "deployed there rhino", "deployed the srv"):
+            outcome, game = self.run_command(phrase, FakeGame(tab=0))
+            self.assertNotEqual(outcome.status, "unknown", phrase)
 
     def test_the_panel_closing_stops_every_key(self):
         """The log: a key shut the panel and the keys after it went into the cockpit. Now nothing more is pressed once it is closed."""

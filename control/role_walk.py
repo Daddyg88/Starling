@@ -102,7 +102,17 @@ def pick(read, press, wait, tab, row):
         if seen is None or seen["tab"] != tab:
             return "unreadable", None
         if seen["lit"] is None:
-            return ("blocked", None) if seen["grey"] else ("unreadable", None)
+            # Nothing is lit: the cursor went in onto the TOP row, and that button is greyed out (the commander's log: the Rhino
+            # was "too close to planet" but the Scarab below it could be deployed, and she had to press Down to reach it).
+            if tab not in (1, 2) or row == 0:
+                return "blocked", None
+            press("UI_Down")
+            wait(0.5)
+            seen = _look(read, wait, lambda s: s["tab"] == tab)
+            if seen is None or seen["tab"] != tab:
+                return "unreadable", None
+            if seen["lit"] is None:
+                return "blocked", None                                # the second one is greyed out too
     if tab in (1, 2) and row is not None:
         for _ in range(2):
             lit_row = seen["lit"]["row"]
