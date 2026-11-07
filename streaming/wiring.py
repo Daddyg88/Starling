@@ -4,9 +4,10 @@ import time
 
 from core.logger import get_logger
 from streaming.bridge import ChatBridge
-from streaming.chat import ChatDirector
+from streaming.chat import FSD_CHARGING, FSD_JUMP, IN_DANGER, ChatDirector, flag
 
 log = get_logger("streaming")
+QUIET_SECONDS = 4.0          # she must have been silent this long before a held chat question is answered
 
 
 def make_chat_brain(app):
@@ -52,5 +53,22 @@ def build(app):
             return False
         return True
 
-    director = ChatDirector(app.settings, lambda: app.state, do_action, do_ask, say, time.monotonic)
+    def quiet():
+        """True when a chat question can be answered without talking over anything: she is not speaking, has been silent a few
+        seconds, and the game is calm (no fight, no danger, no jump or charging)."""
+        speech = app.speech
+        if speech is not None and speech.is_busy():
+            return False
+        chit = getattr(app, "chitchat", None)
+        if chit is not None:
+            if getattr(chit, "mode", "") == "combat":
+                return False
+            if time.monotonic() - getattr(chit, "last_spoke", -1e9) < QUIET_SECONDS:
+                return False
+        state = app.state
+        if state is not None and any(flag(state, bit) for bit in (IN_DANGER, FSD_JUMP, FSD_CHARGING)):
+            return False
+        return True
+
+    director = ChatDirector(app.settings, lambda: app.state, do_action, do_ask, say, time.monotonic, quiet_provider=quiet)
     return ChatBridge(app.settings, director)

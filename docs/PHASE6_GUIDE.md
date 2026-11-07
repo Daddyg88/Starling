@@ -1375,3 +1375,7 @@ window use the same code as the biology list.
 ## 0.85.10 - Updates while running
 
 * update_service: repeating background check (30 min), stop(), restart_now(); launcher passes STARLING_LAUNCHER_EXE; dashboard title note + Restart button.
+
+## 0.85.11 - Held chat questions
+
+* streaming/chat.py ChatDirector: quiet_provider, held deque (cap streaming.hold_max 4, hold_max_age 300 s), pump(); bridge worker pumps each second; wiring.quiet() = speech idle + 4 s silence + no combat/danger/jump/charging.

@@ -178,8 +178,11 @@ class Result:
 class ChatDirector:
     """Decides what happens to each chat message. The three `do_*` functions are the only things that touch the game or her voice."""
 
-    def __init__(self, settings, state_provider, do_action, do_ask, say, clock):
+    def __init__(self, settings, state_provider, do_action, do_ask, say, clock, quiet_provider=None):
         self.settings = settings
+        self.clock = clock
+        self.quiet_provider = quiet_provider    # () -> True when she is not busy (None = never hold anything back)
+        self.held = deque()                     # (time, user, question) waiting for a quiet moment
         self.state_provider = state_provider
         self.do_action = do_action      # (action) -> True when it was done
         self.do_ask = do_ask            # (user, question) -> True when she answered
@@ -237,6 +240,13 @@ class ChatDirector:
         if self.cool.wait_kind(kind, self._number(gap, 20 if kind == "action" else 10)) > 0:
             return Result("cooldown", kind, user, text, "busy")
         if kind == "ask":
+            if self._should_hold():
+                limit = int(self._number("hold_max", 4))
+                if len(self.held) >= limit:
+                    return Result("blocked", kind, user, what, "too many waiting (%d)" % limit)
+                self.cool.user[user] = self.cool.clock()           # the viewer's own cooldown starts now
+                self.held.append((self.clock(), user, what))
+                return Result("held", "ask", user, what, "waiting for a quiet moment (%d waiting)" % len(self.held))
             self.cool.mark(user, "ask")
             ok = self.do_ask(user, what)
             return Result("answered" if ok else "failed", "ask", user, what)
@@ -248,3 +258,44 @@ class ChatDirector:
         self.say("StreamChat_Action", {"user": user, "action": action.label})
         ok = self.do_action(action)
         return Result("done" if ok else "failed", "action", user, action.label)
+
+    # ---- held questions ----
+    def _should_hold(self):
+        """True when a question should wait: holding is on, she is busy, or others are already waiting (first come, first served)."""
+        if self.quiet_provider is None or not self.option("hold", True):
+            return False
+        if self.held:
+            return True
+        try:
+            return not self.quiet_provider()
+        except Exception:
+            return False
+
+    def pump(self):
+        """Called about once a second. When it is quiet, answers the OLDEST held question (one at a time).
+        Questions that waited too long (hold_max_age seconds, default 5 minutes) are dropped: the moment has passed."""
+        if not self.held:
+            return None
+        now = self.clock()
+        max_age = self._number("hold_max_age", 300)
+        while self.held and max_age and now - self.held[0][0] > max_age:
+            _t, user, question = self.held.popleft()
+            self.log.append(Result("blocked", "ask", user, question, "waited too long"))
+        if not self.held:
+            return None
+        if not self.option("enabled", False):
+            self.held.clear()                                    # chat was switched off: forget them
+            return None
+        if self.cool.wait_kind("ask", self._number("ask_cooldown", 10)) > 0:
+            return None
+        try:
+            if self.quiet_provider is not None and not self.quiet_provider():
+                return None
+        except Exception:
+            return None
+        _t, user, question = self.held.popleft()
+        self.cool.last["ask"] = self.clock()
+        ok = self.do_ask(user, question)
+        result = Result("answered" if ok else "failed", "ask", user, question, "was held")
+        self.log.append(result)
+        return result

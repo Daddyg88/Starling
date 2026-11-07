@@ -489,3 +489,67 @@ class BridgeBothPlatforms(unittest.TestCase):
         s.set("streaming.enabled", False)
         bridge.check()
         self.assertEqual(bridge.status(), "Off")
+
+
+class HeldQuestions(unittest.TestCase):
+    def build(self, **settings):
+        director, clock, done, asked, _said = make(**settings)
+        self.quiet = [False]
+        director.quiet_provider = lambda: self.quiet[0]
+        return director, clock, asked
+
+    def test_question_waits_while_busy_then_is_answered(self):
+        director, clock, asked = self.build()
+        result = director.handle(msg("!starling what is a neutron star?"))
+        self.assertEqual(result.status, "held")
+        self.assertEqual(asked, [])
+        self.assertIsNone(director.pump())                    # still busy
+        self.quiet[0] = True
+        answered = director.pump()
+        self.assertEqual(answered.status, "answered")
+        self.assertEqual(asked, [("Gav", "what is a neutron star?")])
+
+    def test_quiet_means_answered_at_once(self):
+        director, clock, asked = self.build()
+        self.quiet[0] = True
+        self.assertEqual(director.handle(msg("!starling hello there")).status, "answered")
+
+    def test_cap_of_four_and_oldest_first(self):
+        director, clock, asked = self.build()
+        for i in range(4):
+            self.assertEqual(director.handle(msg("!starling question %d" % i, user="User%d" % i)).status, "held")
+        over = director.handle(msg("!starling one too many", user="Late"))
+        self.assertEqual(over.status, "blocked")
+        self.assertIn("too many", over.note)
+        self.quiet[0] = True
+        director.pump()
+        clock.now += 11
+        director.pump()
+        self.assertEqual([q for _u, q in asked], ["question 0", "question 1"])
+
+    def test_cap_is_a_setting(self):
+        director, clock, asked = self.build(hold_max=2)
+        director.handle(msg("!starling one", user="A"))
+        director.handle(msg("!starling two", user="B"))
+        self.assertEqual(director.handle(msg("!starling three", user="C")).status, "blocked")
+
+    def test_old_questions_are_dropped(self):
+        director, clock, asked = self.build()
+        director.handle(msg("!starling old one"))
+        clock.now += 400
+        self.quiet[0] = True
+        self.assertIsNone(director.pump())
+        self.assertEqual(asked, [])
+
+    def test_actions_are_never_held(self):
+        director, clock, asked = self.build()
+        self.assertEqual(director.handle(msg("!lights")).status, "done")
+
+    def test_same_viewer_cannot_queue_twice(self):
+        director, clock, asked = self.build()
+        director.handle(msg("!starling one"))
+        self.assertEqual(director.handle(msg("!starling two")).status, "cooldown")
+
+    def test_switching_hold_off_answers_at_once(self):
+        director, clock, asked = self.build(hold=False)
+        self.assertEqual(director.handle(msg("!starling hi")).status, "answered")

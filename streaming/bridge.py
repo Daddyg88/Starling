@@ -166,11 +166,19 @@ class ChatBridge:
             try:
                 message = self.queue.get(timeout=1.0)
             except queue.Empty:
+                self._pump()
                 continue
             try:
                 self.director.handle(message)
+                self._pump()
             except Exception:
                 log.exception("Chat message failed")
+
+    def _pump(self):
+        try:
+            self.director.pump()
+        except Exception:
+            log.exception("Answering a held chat question failed")
 
     def pretend(self, user, text, mod=False, sub=False, owner=False, done=None):
         """The dashboard's test box: runs a made-up message through the same rules, even when chat is switched off."""
