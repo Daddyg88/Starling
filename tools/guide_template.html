@@ -219,6 +219,8 @@ footer .tagline { color: var(--accent-dim); }
   <ul class="rules">
     <li class="big"><strong>UI Panel Select must be a key you cannot type with. Use Enter.</strong>
       Select confirms nearly everything: docking, launching, the Nomad and plotting routes. When she plots a route she pastes the system name into the galaxy map search bar and presses Select while that bar is open. If Select is a typing key (a letter, a number or the space bar), she types that character into the search bar and the system name is ruined. Put Select on <kbd>Enter</kbd>, or another key that does not type, such as a numpad key, and make sure nothing else uses it. It needs to be on the keyboard, because she cannot press joystick buttons.</li>
+    <li class="big"><strong>UI Panel Down must be a normal key, not Shift, Control or Alt on their own. Use the Down arrow.</strong>
+      Down moves the cursor between the rows on the Role panel (the Nomad is the top row of Vessels, the fighter the second; the Rhino is the top row of the SRV tab, the Scarab the second) and on the left and right panels. If Down is only on a Shift, Control or Alt key, Elite treats a bare press of it as something else: in a tester's log it moved the Role panel to a different TAB instead of down a row, so she was looking at the wrong list. She now picks your other key for Down when it has one, and refuses to press a bare Shift, Control or Alt for Up or Down (she tells you instead). Put UI Panel Down on the <kbd>Down</kbd> arrow, or another key that does not type or fly, make sure nothing else uses it, and keep it on the keyboard because she cannot press joystick buttons. The same goes for UI Panel Up, Left and Right.</li>
     <li><strong>Keyboard keys only</strong>She can only press keys. A joystick-only button cannot be pressed by voice, so give the action a keyboard key as well. Your joystick keeps working.</li>
     <li><strong>No shared keys</strong>If two actions share a key, Elite may do the wrong thing. Testers found a shared panel key dropping out of the menu halfway through a command. Her key check lists any clashes.</li>
     <li><strong>Keep the menu keys off typing and flying keys</strong>UI Panel Up, Down, Left, Right and Back should be keys that neither type nor fly. The arrow keys are a good start, and a numpad key suits Back. Avoid letters, numbers, the space bar and Backspace (they edit the search bar), and avoid W, A, S and D (they fly the ship).</li>
@@ -230,7 +232,7 @@ footer .tagline { color: var(--accent-dim); }
       <tr><td class="cmd">Plot the next waypoint</td><td>Galaxy Map Open, UI Panel Up, UI Panel Select, Camera Zoom In, UI Panel Back</td></tr>
       <tr><td class="cmd">Request docking</td><td>Focus Left Panel, Cycle Next Panel, Cycle Previous Panel, UI Panel Up, Left, Right, Select, Back</td></tr>
       <tr><td class="cmd">Launch</td><td>Focus Left Panel, Focus Right Panel, Cycle Next Panel, Cycle Previous Panel, UI Panel Down, Select, Back</td></tr>
-      <tr><td class="cmd">Deploy the Nomad</td><td>Focus Role Panel, UI Panel Down, Right, Select</td></tr>
+      <tr><td class="cmd">Deploy the Nomad, the fighter, the SRV or the Rhino, or disembark</td><td>Focus Role Panel, Cycle Next Panel, Cycle Previous Panel, UI Panel Down, Right, Left, Select, Back</td></tr>
       <tr><td class="cmd">Landing gear, lights, scoop and the rest</td><td>The action's own key (Landing Gear, Ship Lights, Cargo Scoop and so on). The Keybinds page lists every one she uses.</td></tr>
     </tbody>
   </table></div>

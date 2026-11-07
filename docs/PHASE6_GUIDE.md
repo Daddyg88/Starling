@@ -1379,3 +1379,7 @@ window use the same code as the biology list.
 ## 0.85.11 - Held chat questions
 
 * streaming/chat.py ChatDirector: quiet_provider, held deque (cap streaming.hold_max 4, hold_max_age 300 s), pump(); bridge worker pumps each second; wiring.quiet() = speech idle + 4 s silence + no combat/danger/jump/charging.
+
+## 0.85.12 - Website: UI Down rule
+
+* guide_template.html: UI Panel Down rule, role panel key row.
