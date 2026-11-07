@@ -13,6 +13,10 @@ TAB_NUMBER = {"suit": 0, "launch": 1, "srv": 2, "crew": 3}
 LOOKS = 3                                  # how many times she looks again when she cannot tell yet
 
 
+class PanelClosed(Exception):
+    """The role panel is not open any more (Status.json says so): nothing more may be pressed, or the keys land in the cockpit."""
+
+
 def read_all(picture):
     """What she sees in one picture, as a dict (or None if there is no picture)."""
     if picture is None:
@@ -47,9 +51,11 @@ def _same(one, two):
 
 
 def go_to_tab(read, press, wait, target, note=None):
-    """Gets the role panel onto tab `target` (0 suit, 1 launch bay, 2 SRV, 3 crew), ONE key press at a time, looking after each: in
-    the commander's log a single quick Down press raced past the tab she wanted. Returns "ok", "unreadable" (no picture / she
-    cannot tell which tab is selected) or "failed" (it did not get there)."""
+    """Gets the role panel onto tab `target` (0 suit, 1 launch bay, 2 SRV, 3 crew), ONE key press at a time, looking after each.
+    The tabs are changed with the TAB keys (Next / Previous panel tab, the same ones that work on the side panels): the commander's
+    log showed UI_Up / UI_Down are NOT tab keys here (Down ran on two tabs, Up closed the panel, and the keys after that landed in the
+    cockpit). If a press moves the wrong way she swaps the two keys. Returns "ok", "unreadable" (no picture / she cannot tell which tab
+    is selected) or "failed" (it did not get there). `read` / `press` may raise PanelClosed, which the caller handles."""
     note = note or (lambda text: None)
     have_tab = lambda s: s["tab"] is not None
     seen = _look(read, wait, have_tab)
@@ -63,16 +69,20 @@ def go_to_tab(read, press, wait, target, note=None):
         if seen is None or seen["tab"] is None:
             return "unreadable"
         note("after Left: %s" % seen["text"])
+    forward, backward = "CycleNextPanel", "CyclePreviousPanel"
     for _ in range(8):
         tab = seen["tab"]
         if tab == target:
             return "ok"
-        press("UI_Down" if target > tab else "UI_Up")
+        press(forward if target > tab else backward)
         wait(0.5)
         seen = _look(read, wait, have_tab)
         if seen is None or seen["tab"] is None:
             return "unreadable"
         note("after pressing: %s" % seen["text"])
+        if (seen["tab"] - tab) * (1 if target > tab else -1) < 0 and abs(seen["tab"] - tab) == 1:
+            forward, backward = backward, forward                     # it went the other way: the keys are the other way round
+            note("the tab keys go the other way round")
     return "failed"
 
 

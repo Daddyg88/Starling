@@ -74,14 +74,14 @@ class SettleTests(unittest.TestCase):
 
         def racing(name):                                # the first Down runs on past the tab she wanted (as in the log)
             presses.append(name)
-            if name == "UI_Down" and len(presses) == 1:
+            if name == "CycleNextPanel" and len(presses) == 1:
                 game.tab = 2
             else:
                 original(name)
         read = lambda: role_walk.read_all(game.picture())
         self.assertEqual(role_walk.go_to_tab(read, racing, lambda s: None, 1), "ok")
         self.assertEqual(game.tab, 1)
-        self.assertEqual(presses, ["UI_Down", "UI_Up"])
+        self.assertEqual(presses, ["CycleNextPanel", "CyclePreviousPanel"])
 
     def test_a_blurred_look_is_not_an_answer(self):
         game = FakeGame(tab=1)
@@ -97,6 +97,18 @@ class SettleTests(unittest.TestCase):
             return real()
         self.assertEqual(role_walk.go_to_tab(read, game.press, lambda s: None, 1), "ok")
         self.assertEqual(game.keys, [])
+
+    def test_tab_keys_that_go_the_other_way_are_swapped(self):
+        game = FakeGame(tab=1, reversed_keys=True)
+        read = lambda: role_walk.read_all(game.picture())
+        self.assertEqual(role_walk.go_to_tab(read, game.press, lambda s: None, 2), "ok")
+        self.assertEqual(game.tab, 2)
+
+    def test_up_and_down_are_never_used_for_tabs(self):
+        game = FakeGame(tab=0)
+        read = lambda: role_walk.read_all(game.picture())
+        role_walk.go_to_tab(read, game.press, lambda s: None, 2)
+        self.assertEqual(set(game.keys), {"CycleNextPanel"})
 
     def test_all_grey_page_is_blocked_after_stepping_in(self):
         picture = shot("list_launch")
@@ -121,14 +133,23 @@ class ReasonTests(unittest.TestCase):
 
 class FakeGame:
     """The role panel as a little game: tabs (Up/Down in the tab list), rows (Up/Down in a page), Right / Left, Select."""
-    def __init__(self, tab=0, in_page=False, lit_in_list=False, stuck_rows=(), empty=()):
+    def __init__(self, tab=0, in_page=False, lit_in_list=False, stuck_rows=(), empty=(), closes_on=None, reversed_keys=False):
         self.tab, self.in_page, self.row = tab, in_page, 0
+        self.closes_on, self.closed, self.reversed_keys = closes_on, False, reversed_keys
         self.lit_in_list, self.stuck_rows, self.empty = lit_in_list, stuck_rows, empty
         self.keys, self.selected = [], None
 
     def press(self, name):
         self.keys.append(name)
-        if name == "UI_Right":
+        if name == self.closes_on:
+            self.closed = True                       # a key that shuts the panel (as UI_Up did in the log)
+            return
+        if name in ("CycleNextPanel", "CyclePreviousPanel"):
+            step = 1 if name == "CycleNextPanel" else -1
+            if self.reversed_keys:
+                step = -step
+            self.tab = max(0, min(3, self.tab + step))
+        elif name == "UI_Right":
             self.in_page = True
         elif name == "UI_Left":
             self.in_page = False
@@ -138,8 +159,7 @@ class FakeGame:
                 new = max(0, min(1, self.row + step))
                 if new not in self.stuck_rows:
                     self.row = new
-            elif not self.in_page:
-                self.tab = max(0, min(3, self.tab + step))
+            # in the tab list Up / Down do NOT change tab (the log: they ran on, or closed the panel)
         elif name == "UI_Select":
             self.selected = (self.tab, self.row)
 
@@ -225,7 +245,7 @@ class CommandTests(unittest.TestCase):
         state.altitude = altitude
         r.state_provider = lambda: state
         r.sleep = lambda s: None
-        names = {"Key_2": None, "Key_4": "UI_Select", "Key_5": "UI_Right", "Key_6": "UI_Back", "Key_7": "UI_Down",
+        names = {"Key_2": None, "Key_3": "CycleNextPanel", "Key_8": "CyclePreviousPanel", "Key_4": "UI_Select", "Key_5": "UI_Right", "Key_6": "UI_Back", "Key_7": "UI_Down",
                  "Key_9": "UI_Up", "Key_10": "UI_Left"}
 
         def send(stroke, hold=0.0):
@@ -236,7 +256,7 @@ class CommandTests(unittest.TestCase):
                 game.press(names[stroke.key])
                 if names[stroke.key] == "UI_Select":
                     state.gui_focus = 0                            # the panel goes away after a deploy
-                if names[stroke.key] == "UI_Back":
+                if names[stroke.key] == "UI_Back" or game.closed:
                     state.gui_focus = 0
             return None
         t.sender.send = send
@@ -290,6 +310,14 @@ class CommandTests(unittest.TestCase):
         game = FakeGame(tab=1, stuck_rows=(1,))
         outcome, game = self.run_command("launch the fighter", game, altitude=120.0)
         self.assertEqual(outcome.status, "cannot_slf_low")
+
+    def test_the_panel_closing_stops_every_key(self):
+        """The log: a key shut the panel and the keys after it went into the cockpit. Now nothing more is pressed once it is closed."""
+        game = FakeGame(tab=0, closes_on="CycleNextPanel")
+        outcome, game = self.run_command("deploy the nomad", game)
+        self.assertEqual(outcome.status, "no_button")
+        self.assertEqual(game.keys, ["CycleNextPanel"])
+        self.assertIsNone(game.selected)
 
     def test_unreadable_screen_presses_no_menu_keys(self):
         outcome, game = self.run_command("deploy the nomad", FakeGame(tab=0), readable=False)

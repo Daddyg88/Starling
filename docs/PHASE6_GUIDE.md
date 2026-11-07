@@ -726,6 +726,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.85.1: role panel keys are pressed for 0.05 s (0.15 s let the tab list run on), one tab per press, looks must be stable (two agreeing reads), role pick is skipped when the tab walk failed, new status cannot_close (CommandCannotTooClose).
 
+0.85.2: role panel tabs use CycleNextPanel / CyclePreviousPanel (UI_Up/UI_Down are not tab keys there; keys swap if a press goes the wrong way); every key and look first checks Status.json GuiFocus == 4 (role_walk.PanelClosed otherwise); macros.actions_in lists the two tab keys for role steps.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.

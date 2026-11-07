@@ -700,13 +700,21 @@ class CommandRunner:
         reader = self.panel_reader or panel_reader.capture_screen
         problems, shots = [], []
 
+        def panel_open():
+            """Status.json says the role panel (GuiFocus 4) is still the open panel. Before EVERY key and every look: the log showed a
+            key that closed the panel, and the keys after it went into the cockpit."""
+            if self._gui_focus() not in (4, "?"):
+                raise role_walk.PanelClosed()
+
         def press(action):
-            problem = self.sender.send(strokes[action], hold=0.05)           # a SHORT press: held longer the tab list runs on past the tab
+            panel_open()
+            problem = self.sender.send(strokes[action], hold=0.15 if action.startswith("Cycle") else 0.05)
             pressed.append(action)
             if problem:
                 problems.append(problem)
 
         def read():
+            panel_open()
             picture = reader() if self.settings.get("panel.read_screen", True) else None
             seen = role_walk.read_all(picture)
             if picture is not None and len(shots) < 8:
@@ -714,6 +722,17 @@ class CommandRunner:
             return seen
 
         notes = []
+        try:
+            return self._role_step_inner(step, press, read, notes, problems, shots, trace)
+        except role_walk.PanelClosed:
+            log.warning("Role panel: the panel closed by itself, so she pressed nothing more. %s", "; ".join(notes))
+            trace.append("panel_closed")
+            self._save_panel_masks(shots, "role")
+            self._no_button = True
+            return None
+
+    def _role_step_inner(self, step, press, read, notes, problems, shots, trace):
+        from control import role_walk
         if step[0] == "roletab":
             result = role_walk.go_to_tab(read, press, self.sleep, step[1], note=notes.append)
             log.info("Role panel: walk to tab %d: %s (%s)", step[1], result, "; ".join(notes) or "no notes")

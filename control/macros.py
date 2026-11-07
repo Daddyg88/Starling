@@ -186,7 +186,7 @@ def actions_in(parsed):
         if step[0] == "closepanels" and "UI_Back" not in seen:
             seen.append("UI_Back")
         if step[0] in ("openrole", "roletab", "rolepick"):
-            for needed in ("FocusRadarPanel", "UI_Back", "UI_Up", "UI_Down", "UI_Left", "UI_Right", "UI_Select"):
+            for needed in ("FocusRadarPanel", "UI_Back", "UI_Up", "UI_Down", "UI_Left", "UI_Right", "UI_Select", "CycleNextPanel", "CyclePreviousPanel"):
                 if needed not in seen:
                     seen.append(needed)
         if step[0] == "openright":
