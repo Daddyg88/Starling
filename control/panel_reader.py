@@ -170,6 +170,13 @@ def describe(spot):
     return "%s(x=%.3f, w=%.3f, y=%.3f)" % ("icon" if spot.get("icon") else "tab", spot["cx"], spot["width"], spot["y"])
 
 
+def describe_button(bar):
+    """A short text for the log: where the selected button was (fractions of the window)."""
+    if bar is None:
+        return "no selected button seen"
+    return "button seen (x=%.3f..%.3f, y=%.3f, w=%.3f, h=%.3f)" % (bar["x0"], bar["x0"] + bar["width"], bar["y"], bar["width"], bar["height"])
+
+
 def mask_png(picture, path):
     """Saves ONLY the black-and-white 'what is bright' map (about 480 pixels wide, no game picture) so a failed look can be
     studied afterwards without keeping a screenshot. Returns True if it was written."""

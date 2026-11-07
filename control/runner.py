@@ -630,7 +630,7 @@ class CommandRunner:
         return None
 
     @staticmethod
-    def _save_panel_masks(shots):
+    def _save_panel_masks(shots, name=""):
         """When a look fails, keeps a few small black-and-white 'what is bright' maps in data/panel_debug (never the game
         picture) so the diagnostics zip can show what she saw."""
         from control import panel_reader
@@ -642,43 +642,56 @@ class CommandRunner:
                 old.unlink()
             stamp = __import__("time").strftime("%H%M%S")
             for index, (when, picture) in enumerate(shots):
-                panel_reader.mask_png(picture, folder / ("%s-%d.png" % (stamp, index)))
+                label = when if isinstance(when, str) else str(index)
+                label = "".join(c if c.isalnum() else "_" for c in label)[:30]
+                panel_reader.mask_png(picture, folder / ("%s-%s-%d-%s.png" % (stamp, name or "walk", index, label)))
         except Exception:
             log.debug("Could not save the panel maps", exc_info=True)
 
     def _select_button(self, strokes, pressed, trace):
         """The 'select button' macro step. Looks for the bright selected button in the right-hand pane and presses Select.
-        When she can read the screen and Status.json, she checks that it WORKED (the game closes the panel itself after Request
-        Docking, and sends DockingRequested) and presses Select again if the panel is still open: in your log one press was
-        simply ignored. At most 3 presses.
+        When she can read the screen she then checks that it WORKED (DockingRequested arrives in the journal) and presses
+        Select again if the button is still lit and nothing happened. At most 3 presses, and never blind.
+        If it does not work she keeps small black-and-white maps of what she saw (before and after) for the diagnostics zip.
         Returns None (done), "no_button" (she can see the screen but not the button, so she pressed nothing), or the sender's
         problem text."""
         from control import panel_reader
         reader = self.panel_reader or panel_reader.capture_screen
         use_screen = self.settings.get("panel.read_screen", True)
+        shots = []
 
-        def look():
+        def look(label):
             """True = button seen, False = screen readable but no button, None = cannot read the screen."""
             if not use_screen:
                 return None
             try:
                 picture = reader()
-                return None if picture is None else (panel_reader.find_button(picture) is not None)
+                if picture is None:
+                    return None
+                button = panel_reader.find_button(picture)
+                if len(shots) < 8:
+                    shots.append((label, picture))
+                log.info("Panel: %s: %s", label, panel_reader.describe_button(button))
+                return button is not None
             except Exception:
                 log.exception("Looking for the button failed")
                 return None
 
+        def answered():
+            return "DockingRequested" in getattr(self, "_docking_seen", [])
+
         for attempt in range(3):
-            seen = look()
+            seen = look("before Select #%d" % (attempt + 1))
             if seen is False:
                 self.sleep(0.8)                              # the button can take a moment to light up: one more look
-                seen = look()
+                seen = look("before Select #%d (second look)" % (attempt + 1))
             if seen is False:
                 if attempt == 0:
                     trace.append("button>not seen")
                     log.warning("Panel: she could not see the selected button in the right-hand pane, so she did not press Select.")
+                    self._save_panel_masks(shots, "nobutton")
                     return "no_button"
-                return None                                  # a later look found nothing: the panel probably closed after our press
+                break                                        # it is gone now: judged below
             if attempt == 0:
                 trace.append("button>seen" if seen else "button>unreadable")
                 self.sleep(0.4)                              # let the pane finish sliding in: an early press can be ignored
@@ -686,14 +699,20 @@ class CommandRunner:
             pressed.append("UI_Select")
             if problem:
                 return problem
-            self.sleep(1.4)
-            gui = self._gui_focus()
-            if "DockingRequested" in getattr(self, "_docking_seen", []) or gui != 2:
-                return None                                  # worked (or she cannot tell: Status.json unreadable)
+            for _ in range(6):                               # up to 3 s for the game to answer (the journal is read once a second)
+                self.sleep(0.5)
+                if answered() or self._gui_focus() == 0:
+                    for _ in range(12):                      # the game closes the panel a few seconds after the request: wait for it
+                        if self._gui_focus() in (0, "?"):
+                            break
+                        self.sleep(0.5)
+                    return None
             if seen is None:
                 return None                                  # blind: never press a second time without seeing the button
-            trace.append("select>ignored")
-            log.info("Panel: Select did not do anything (the panel is still open), so she pressed it again.")
+            trace.append("select#%d>no answer" % (attempt + 1))
+            log.info("Panel: Select #%d got no answer from the game (no DockingRequested).", attempt + 1)
+        look("after the last Select")
+        self._save_panel_masks(shots, "select")
         return None
 
     def _open_left_panel(self, strokes, pressed, trace):

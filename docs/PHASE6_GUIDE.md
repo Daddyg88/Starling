@@ -708,6 +708,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.82.5: `select button` checks that Select worked (panel closed or DockingRequested seen) and presses it again if the panel is still open (max 3, only when she can see the button). New step `stop if closed` ends a macro early when Status.json says no screen is open. In the trace look for `select>ignored` and `closed>stop`.
 
+0.82.6: `select button` logs the button's position before each Select (`Panel: before Select #1: button seen (x=..)`), waits up to 3 s for DockingRequested, and keeps black-and-white maps in data/panel_debug (select-*, nobutton-*) when the game does not answer. After a successful request it waits for the game to close the panel before the macro tidies up.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.
