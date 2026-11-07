@@ -730,6 +730,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.85.3: role_walk.pick: stepping into a page with nothing lit presses UI_Down once for row None / row 2 (top button greyed out), 'blocked' for row 1; deploy phrases accept deployed / launched / there.
 
+0.85.4: role_reader.map_png (three-level debug map for role looks), role_walk.pick(note=) logs what she saw after Right / Down.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.

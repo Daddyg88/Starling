@@ -744,8 +744,8 @@ class CommandRunner:
                 self._no_button = True
             return None
         tab = {"nomad": 1, "slf": 1, "rhino": 2, "scarab": 2, "srv": 2, "disembark": 0}[step[2]]
-        result, _ = role_walk.pick(read, press, self.sleep, tab, step[1])
-        log.info("Role panel: pick %s (row %s): %s", step[2], step[1], result)
+        result, _ = role_walk.pick(read, press, self.sleep, tab, step[1], note=notes.append)
+        log.info("Role panel: pick %s (row %s): %s (%s)", step[2], step[1], result, "; ".join(notes) or "no notes")
         if problems:
             return problems[0]
         trace.append("rolepick>%s" % result)
@@ -769,7 +769,7 @@ class CommandRunner:
     def _save_panel_masks(shots, name=""):
         """When a look fails, keeps a few small black-and-white 'what is bright' maps in data/panel_debug (never the game
         picture) so the diagnostics zip can show what she saw."""
-        from control import panel_reader
+        from control import panel_reader, role_reader
         from core import paths
         try:
             folder = paths.DATA_DIR / "panel_debug"
@@ -780,7 +780,11 @@ class CommandRunner:
             for index, (when, picture) in enumerate(shots):
                 label = when if isinstance(when, str) else str(index)
                 label = "".join(c if c.isalnum() else "_" for c in label)[:30]
-                panel_reader.mask_png(picture, folder / ("%s-%s-%d-%s.png" % (stamp, name or "walk", index, label)))
+                target = folder / ("%s-%s-%d-%s.png" % (stamp, name or "walk", index, label))
+                if name == "role":
+                    role_reader.map_png(picture, target)              # the role panel: bright / grey-button / orange levels
+                else:
+                    panel_reader.mask_png(picture, target)
         except Exception:
             log.debug("Could not save the panel maps", exc_info=True)
 

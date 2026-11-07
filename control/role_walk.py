@@ -86,20 +86,25 @@ def go_to_tab(read, press, wait, target, note=None):
     return "failed"
 
 
-def pick(read, press, wait, tab, row):
+def pick(read, press, wait, tab, row, note=None):
     """On tab `tab`: puts the cursor on `row` (0 top, 1 second, None = wherever the game puts it) and presses Select on the lit button.
     Returns ("ok", None) after Select, ("missing", None) if that row has no vessel, ("blocked", None) if the button is not available
     (grey, or the cursor would not go there), ("unreadable", None) if she cannot see enough to act."""
+    note = note or (lambda text: None)
     seen = _look(read, wait, lambda s: s["tab"] == tab)
     if seen is None or seen["tab"] != tab:
         return "unreadable", None                                     # not on the tab she thought: never press blind
+    note("on the page: %s" % seen["text"])
     if tab in (1, 2) and row is not None and seen["rows"][row] is False:
         return "missing", None                                        # nothing in that slot
     if seen["lit"] is None:
         press("UI_Right")                                             # into the page
         wait(0.6)
         seen = _look(read, wait, lambda s: s["tab"] == tab)
-        if seen is None or seen["tab"] != tab:
+        if seen is None:
+            return "unreadable", None
+        note("after Right: %s" % seen["text"])
+        if seen["tab"] != tab:
             return "unreadable", None
         if seen["lit"] is None:
             # Nothing is lit: the cursor went in onto the TOP row, and that button is greyed out (the commander's log: the Rhino
@@ -109,8 +114,10 @@ def pick(read, press, wait, tab, row):
             press("UI_Down")
             wait(0.5)
             seen = _look(read, wait, lambda s: s["tab"] == tab)
+            if seen is not None:
+                note("after Down: %s" % seen["text"])
             if seen is None or seen["tab"] != tab:
-                return "unreadable", None
+                return "unreadable", None                             # Down moved the TAB (the cursor was not in the page)
             if seen["lit"] is None:
                 return "blocked", None                                # the second one is greyed out too
     if tab in (1, 2) and row is not None:

@@ -139,3 +139,22 @@ def describe(picture):
         TABS[tab] if tab is not None else "?",
         "row%d(y=%.2f)" % (bar["row"] + 1, bar["y"]) if bar else "none", len(grey_buttons(picture)),
         row_occupied(picture, 0), row_occupied(picture, 1))
+
+
+def map_png(picture, path):
+    """Saves a small 'what is where' map of the role panel (about 480 pixels wide, NO game picture): white = lit amber button or the
+    selected tab fill, light grey = greyed-out button, dark grey = ordinary orange panel drawing. Shows which row the cursor is on
+    when a look fails. Returns True if it was written."""
+    try:
+        import numpy as np
+        from PIL import Image
+        small, _ = _small(picture)
+        out = np.zeros(small.shape[:2], dtype=np.uint8)
+        red, green, blue = small[..., 0], small[..., 1], small[..., 2]
+        out[(red >= 70) & (green >= 25) & (blue <= 70) & (red > green + 20)] = 70
+        out[_grey(small)] = 150
+        out[_amber(small)] = 255
+        Image.fromarray(out).save(str(path))
+        return True
+    except Exception:
+        return False
