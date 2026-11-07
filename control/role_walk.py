@@ -21,7 +21,7 @@ def read_all(picture):
     """What she sees in one picture, as a dict (or None if there is no picture)."""
     if picture is None:
         return None
-    return {"tab": role_reader.selected_tab(picture), "lit": role_reader.lit_button(picture),
+    return {"tab": role_reader.selected_tab(picture), "lit": role_reader.lit_button(picture), "focus": role_reader.focus_button(picture),
             "grey": role_reader.grey_buttons(picture),
             "rows": (role_reader.row_occupied(picture, 0), role_reader.row_occupied(picture, 1)),
             "text": role_reader.describe(picture)}
@@ -97,7 +97,7 @@ def pick(read, press, wait, tab, row, note=None):
     note("on the page: %s" % seen["text"])
     if tab in (1, 2) and row is not None and seen["rows"][row] is False:
         return "missing", None                                        # nothing in that slot
-    if seen["lit"] is None:
+    if seen["lit"] is None and seen["focus"] is None:
         press("UI_Right")                                             # into the page
         wait(0.6)
         seen = _look(read, wait, lambda s: s["tab"] == tab)
@@ -106,34 +106,35 @@ def pick(read, press, wait, tab, row, note=None):
         note("after Right: %s" % seen["text"])
         if seen["tab"] != tab:
             return "unreadable", None
-        if seen["lit"] is None:
-            # Nothing is lit: the cursor went in onto the TOP row, and that button is greyed out (the commander's log: the Rhino
-            # was "too close to planet" but the Scarab below it could be deployed, and she had to press Down to reach it).
-            if tab not in (1, 2) or row == 0:
-                return "blocked", None
-            press("UI_Down")
-            wait(0.5)
-            seen = _look(read, wait, lambda s: s["tab"] == tab)
-            if seen is not None:
-                note("after Down: %s" % seen["text"])
-            if seen is None or seen["tab"] != tab:
-                return "unreadable", None                             # Down moved the TAB (the cursor was not in the page)
-            if seen["lit"] is None:
-                return "blocked", None                                # the second one is greyed out too
-    if tab in (1, 2) and row is not None:
-        for _ in range(2):
-            lit_row = seen["lit"]["row"]
-            if lit_row == row:
-                break
-            press("UI_Down" if row > lit_row else "UI_Up")
-            wait(0.5)
-            seen = _look(read, wait, lambda s: s["tab"] == tab)
-            if seen is None or seen["tab"] != tab:
-                return "unreadable", None
-            if seen["lit"] is None:
-                return "blocked", None                                # the wanted button is grey: the cursor cannot go there
-        if seen["lit"]["row"] != row:
-            return "blocked", None                                    # the cursor would not go to that row: it is not available
+        if seen["lit"] is None and seen["focus"] is None:
+            return ("blocked", None) if seen["grey"] else ("unreadable", None)
+    # The cursor is on a lit (deployable) button, or on a GREYED-OUT one that is drawn light grey (the commander's pictures: the Rhino
+    # "too close to planet" turns white when the cursor is on it, and Down then goes to the Scarab).
+    cursor = lambda s: s["lit"] or s["focus"]
+    if tab in (1, 2):
+        goal = row
+        if goal is None and seen["lit"] is None:
+            goal = 1 - cursor(seen)["row"]                            # "any": the cursor is on a dead one, try the other row
+        if goal is not None:
+            if seen["rows"][goal] is False:
+                return "missing", None
+            for _ in range(2):
+                here = cursor(seen)
+                if here["row"] == goal:
+                    break
+                press("UI_Down" if goal > here["row"] else "UI_Up")
+                wait(0.5)
+                seen = _look(read, wait, lambda s: s["tab"] == tab)
+                if seen is not None:
+                    note("after moving: %s" % seen["text"])
+                if seen is None or seen["tab"] != tab:
+                    return "unreadable", None                         # the key moved the TAB, not the cursor: never press on
+                if cursor(seen) is None:
+                    return "blocked", None
+            if cursor(seen)["row"] != goal:
+                return "blocked", None                                # the cursor would not go to that row
+    if seen["lit"] is None:
+        return "blocked", None                                        # the button under the cursor is greyed out
     press("UI_Select")
     return "ok", None
 

@@ -8,7 +8,8 @@ from control import role_reader, role_walk
 
 FOLDER = Path("/mnt/user-data/attachments/056a8d7e-59f4-5178-84a2-456c45d6729a")
 FILES = {"launch0": "ed056453", "launch1": "f9cfbf77", "srv0": "3abd3f09", "srv1": "51e512c3", "suit": "3c27df87",
-         "list_suit": "f48970d6", "list_launch": "137b6f48", "list_srv": "0cb58856"}      # the last three: the cursor is in the TAB LIST
+         "list_suit": "f48970d6", "list_launch": "137b6f48", "list_srv": "0cb58856",
+         "srv_list2": "4d789816", "srv_right": "52ca5d9a", "srv_down": "ae51e407"}      # the last three: the cursor is in the TAB LIST
 HAVE = all((FOLDER / ("%s-image.png" % name)).exists() for name in FILES.values())
 _cache = {}
 
@@ -41,6 +42,17 @@ class RealPictureTests(unittest.TestCase):
             self.assertIsNone(role_reader.lit_button(shot(name)), name)
         self.assertEqual([b["row"] for b in role_reader.grey_buttons(shot("list_launch"))], [0, 1])   # both: too close to the planet
         self.assertEqual([b["row"] for b in role_reader.grey_buttons(shot("list_srv"))], [0])          # the Rhino only
+
+    def test_the_cursor_on_a_greyed_out_button_is_light_grey_and_down_lights_the_next(self):
+        right, down, before = shot("srv_right"), shot("srv_down"), shot("srv_list2")
+        self.assertIsNone(role_reader.lit_button(right))
+        self.assertEqual(role_reader.focus_button(right)["row"], 0)
+        self.assertEqual(role_reader.lit_button(down)["row"], 1)
+        self.assertIsNone(role_reader.focus_button(down))
+        self.assertIsNone(role_reader.focus_button(before))             # tab list: nothing has the cursor
+        self.assertIsNone(role_reader.lit_button(before))
+        for name in ("launch0", "srv0", "list_launch", "list_srv"):
+            self.assertIsNone(role_reader.focus_button(shot(name)), name)
 
     def test_both_rows_have_a_vessel(self):
         for name in ("launch0", "launch1", "srv0", "srv1"):
@@ -173,7 +185,7 @@ class FakeGame:
             base = "suit"
         picture = shot(base).copy()
         if self.grey_top and self.tab in (1, 2) and self.row == 0 and self.in_page:
-            picture = shot("list_srv").copy()            # the top button is greyed out and the cursor sits on it: nothing is lit
+            picture = shot("srv_right").copy()           # the Rhino is greyed out and the cursor sits on it (drawn light grey)
         if not self.in_page and not self.lit_in_list:
             red, green = picture[..., 0].astype(int), picture[..., 1].astype(int)
             lit = (red >= 185) & (green >= 105) & (green <= 170) & (picture[..., 2] <= 45)

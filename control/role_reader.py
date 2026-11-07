@@ -84,6 +84,20 @@ def _grey(small):
     return (abs(red - green) <= 6) & (abs(green - blue) <= 6) & (red >= 20) & (red <= 80)
 
 
+def _focus_grey(small):
+    """A greyed-out button with the cursor on it is drawn light grey / white (about 204, 204, 204)."""
+    red, green, blue = small[..., 0], small[..., 1], small[..., 2]
+    return (abs(red - green) <= 6) & (abs(green - blue) <= 6) & (red >= 185) & (red <= 235)
+
+
+def focus_button(picture):
+    """The greyed-out button the cursor is sitting on (light grey), as {"cx","y","width","height","row"}, or None."""
+    for bar in _bars(picture, _focus_grey, 0.08):
+        if 0.42 <= bar["y"] <= 0.78 and abs(bar["cx"] - 0.5) < 0.2:
+            return bar
+    return None
+
+
 def lit_button(picture):
     """The lit (cursor-on) amber button of the role panel: {"cx","y","width","height","row"} or None. Only buttons below the title."""
     for bar in _bars(picture, _amber, 0.08):
@@ -134,10 +148,11 @@ def row_occupied(picture, row):
 
 def describe(picture):
     """One line for the log."""
-    bar, tab = lit_button(picture), selected_tab(picture)
-    return "role tab=%s lit=%s grey=%d rows=%s/%s" % (
+    bar, tab, focus = lit_button(picture), selected_tab(picture), focus_button(picture)
+    return "role tab=%s lit=%s focus_grey=%s grey=%d rows=%s/%s" % (
         TABS[tab] if tab is not None else "?",
-        "row%d(y=%.2f)" % (bar["row"] + 1, bar["y"]) if bar else "none", len(grey_buttons(picture)),
+        "row%d(y=%.2f)" % (bar["row"] + 1, bar["y"]) if bar else "none",
+        "row%d" % (focus["row"] + 1) if focus else "none", len(grey_buttons(picture)),
         row_occupied(picture, 0), row_occupied(picture, 1))
 
 
@@ -153,6 +168,7 @@ def map_png(picture, path):
         red, green, blue = small[..., 0], small[..., 1], small[..., 2]
         out[(red >= 70) & (green >= 25) & (blue <= 70) & (red > green + 20)] = 70
         out[_grey(small)] = 150
+        out[_focus_grey(small)] = 200
         out[_amber(small)] = 255
         Image.fromarray(out).save(str(path))
         return True

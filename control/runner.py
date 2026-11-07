@@ -495,6 +495,7 @@ class CommandRunner:
             self.echo.mute(quiet, 300 if command.id == "show_off" else 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
         pressed = []
         self._no_button = False
+        self._role_keys_logged = set()
         self._role_status = None                     # "no_nomad", "cannot_landed"... when a role-panel pick could not be done
         self.macro_spoke = False
         for step in steps:
@@ -708,7 +709,7 @@ class CommandRunner:
 
         def press(action):
             panel_open()
-            problem = self.sender.send(strokes[action], hold=0.15 if action.startswith("Cycle") else 0.05)
+            problem = self.sender.send(strokes[action], hold=0.15)
             pressed.append(action)
             if problem:
                 problems.append(problem)
@@ -722,6 +723,14 @@ class CommandRunner:
             return seen
 
         notes = []
+        for action in ("UI_Down", "UI_Up", "UI_Right", "UI_Left", "UI_Select", "CycleNextPanel", "CyclePreviousPanel"):
+            if action in strokes and action not in self._role_keys_logged:
+                self._role_keys_logged.add(action)
+                try:
+                    others = ", ".join(self.book.conflicts(action)) or "nothing else"
+                except Exception:
+                    others = "?"
+                log.info("Role panel key: %s = %s (also on: %s)", action, strokes[action].key, others)
         try:
             return self._role_step_inner(step, press, read, notes, problems, shots, trace)
         except role_walk.PanelClosed:
