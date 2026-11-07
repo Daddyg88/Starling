@@ -193,6 +193,12 @@ class OpenLeftPanelTests(unittest.TestCase):
         self.assertFalse(any(k.key == "Key_4" for k in t.sender.pressed))                       # UI_Select was never pressed
 
 
+def _no_button():
+    pic = picture(3)
+    pic[500:620, 880:1320] = 12
+    return pic
+
+
 class SelectRetryTests(unittest.TestCase):
     """Select is pressed again only when the panel is still open (it was ignored); the macro stops when the game closed the panel."""
 
@@ -233,6 +239,37 @@ class SelectRetryTests(unittest.TestCase):
     def test_an_ignored_press_is_repeated(self):
         keys = self.run_docking(1)
         self.assertEqual(keys.count("Key_4"), 2)
+
+    def test_button_goes_dark_without_an_answer_means_one_more_blind_press(self):
+        from tests.test_macros import MacroTests
+        from journal.game_state import GameState
+        for needed in (1, 2, 99):                                  # the game answers on the 1st, 2nd press, or never
+            t = MacroTests()
+            r = t.build()
+            state = GameState()
+            state.status_seen = True
+            state.gui_focus = 2
+            r.state_provider = lambda: state
+            r.sleep = lambda s: None
+            game = {"tab": 1, "selects": 0}
+            keys = {"Key_3": 1, "Key_8": -1}
+
+            def send(stroke, hold=0.0, _g=game, _s=state, _n=needed, _k=keys):
+                t.sender.pressed.append(stroke)
+                if stroke.key in _k:
+                    _g["tab"] = max(0, min(TABS - 1, _g["tab"] + _k[stroke.key]))
+                if stroke.key == "Key_4":
+                    _g["selects"] += 1
+                    if _g["selects"] >= _n:
+                        _s.gui_focus = 0
+                return None
+            t.sender.send = send
+            # the button is lit before the first Select and dark afterwards, whatever the game does
+            r.panel_reader = lambda _g=game: picture(_g["tab"]) if (_g["tab"] != 3 or _g["selects"] == 0) else _no_button()
+            with self.assertLogs("starling", level="INFO"):
+                r.run_text("request docking")
+            presses = [k.key for k in t.sender.pressed].count("Key_4")
+            self.assertEqual(presses, min(needed, 2), needed)      # never more than ONE extra, blind press
 
     def test_it_gives_up_after_three_presses(self):
         keys = self.run_docking(99)

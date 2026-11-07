@@ -638,7 +638,7 @@ class CommandRunner:
         try:
             folder = paths.DATA_DIR / "panel_debug"
             folder.mkdir(parents=True, exist_ok=True)
-            for old in sorted(folder.glob("*.png"))[:-24]:
+            for old in sorted(folder.glob("*.png"), key=lambda f: f.stat().st_mtime)[:-24]:
                 old.unlink()
             stamp = __import__("time").strftime("%H%M%S")
             for index, (when, picture) in enumerate(shots):
@@ -691,7 +691,13 @@ class CommandRunner:
                     log.warning("Panel: she could not see the selected button in the right-hand pane, so she did not press Select.")
                     self._save_panel_masks(shots, "nobutton")
                     return "no_button"
-                break                                        # it is gone now: judged below
+                # The button is no longer lit although the game never answered. In the commander's logs a second Select pressed
+                # by hand then worked, so press once more, blind, and give the game another 3 s. Only ONE such press.
+                if attempt != 1:
+                    break
+                trace.append("select>again(blind)")
+                log.info("Panel: the button went dark but the game did not answer, so she presses Select once more.")
+                seen = None
             if attempt == 0:
                 trace.append("button>seen" if seen else "button>unreadable")
                 self.sleep(0.4)                              # let the pane finish sliding in: an early press can be ignored
@@ -707,8 +713,10 @@ class CommandRunner:
                             break
                         self.sleep(0.5)
                     return None
-            if seen is None:
+            if seen is None and attempt != 1:
                 return None                                  # blind: never press a second time without seeing the button
+            if seen is None:
+                break                                        # that WAS the one blind press
             trace.append("select#%d>no answer" % (attempt + 1))
             log.info("Panel: Select #%d got no answer from the game (no DockingRequested).", attempt + 1)
         look("after the last Select")
