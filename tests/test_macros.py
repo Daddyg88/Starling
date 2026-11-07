@@ -69,10 +69,12 @@ class MacroTests(unittest.TestCase):
         r.run_text("deploy the nomad")
         self.assertEqual([s.key for s in self.sender.pressed], ["Key_1", "Key_7", "Key_7", "Key_4"])
 
-    def test_the_nomad_looks_down_then_presses_down_right_then_select(self):
+    def test_the_nomad_reads_the_role_panel_and_presses_nothing_blind(self):
         r = self.build()
         r.run_text("deploy the nomad")
-        self.assertEqual([s.key for s in self.sender.pressed], ["Key_2", "Key_7", "Key_5", "Key_4"])
+        keys = [s.key for s in self.sender.pressed]
+        self.assertEqual(keys[0], "Key_2")                           # the role panel key, then she looks (see tests/test_role_panel.py)
+        self.assertNotIn("Key_4", keys)                              # no Select when she cannot see the Deploy button
 
     def test_a_missing_key_stops_before_pressing_anything(self):
         table = {k: v for k, v in ALL.items() if k != "CycleNextPanel"}

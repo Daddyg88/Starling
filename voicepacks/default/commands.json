@@ -276,5 +276,38 @@
     "{doing}, Commander.",
     "{doing}.",
     "Sorry, Commander. {doing}"
+  ],
+  "CommandNoNomad": [
+    "There's no Nomad on board, Commander, so there's nothing to deploy.",
+    "I can't find a Nomad on the launch bay, Commander. Is it still on this ship?",
+    "The bay is empty, Commander. No Nomad to send out."
+  ],
+  "CommandNoFighter": [
+    "There's no fighter in the hangar, Commander.",
+    "The hangar shows no fighter, so I haven't launched anything.",
+    "No fighter on board to launch, Commander."
+  ],
+  "CommandNoSrv": [
+    "There's no SRV in the bay, Commander, so I can't deploy one.",
+    "I can't see an SRV on the panel, Commander. Check the bay.",
+    "No SRV on board, Commander."
+  ],
+  "CommandCannotLanded": [
+    "You have to be landed for that, Commander.",
+    "I can't do that in flight, Commander. Put us on the ground first.",
+    "The game won't allow it until we're landed, Commander."
+  ],
+  "CommandCannotHigh30": [
+    "The Rhino can only drop from 30 metres or lower, Commander. Get closer to the surface.",
+    "We're too high for the Rhino, Commander. It needs 30 metres or lower."
+  ],
+  "CommandCannotFighterLow": [
+    "The fighter needs us at 500 metres or higher, Commander. We're too close to the planet.",
+    "Too close to the surface to launch the fighter, Commander. 500 metres or higher."
+  ],
+  "CommandCannotDeploy": [
+    "The game says that can't be deployed right now, Commander.",
+    "That button is greyed out, Commander, so I've left it alone.",
+    "Not available at the moment, Commander. The panel won't let me."
   ]
 }

@@ -42,6 +42,13 @@ LINE_FOR_STATUS = {
     "not_windows": "CommandFailed",
     "failed": "CommandFailed",
     "no_button": "CommandNoButton",
+    "no_nomad": "CommandNoNomad",
+    "no_slf": "CommandNoFighter",
+    "no_srv": "CommandNoSrv",
+    "cannot_landed": "CommandCannotLanded",
+    "cannot_high30": "CommandCannotHigh30",
+    "cannot_slf_low": "CommandCannotFighterLow",
+    "cannot_other": "CommandCannotDeploy",
     "unknown": "CommandUnknown",
     "vc_offline": "CommandVoidOffline",
     "vc_forbidden": "CommandVoidForbidden",
@@ -487,13 +494,14 @@ class CommandRunner:
             self.echo.mute(quiet, 300 if command.id == "show_off" else 60)           # she opens and closes the map herself: no "opening / closing the galaxy map"
         pressed = []
         self._no_button = False
+        self._role_status = None                     # "no_nomad", "cannot_landed"... when a role-panel pick could not be done
         self.macro_spoke = False
         for step in steps:
             if step[0] == "wait":
                 self.sleep(step[1])
                 trace.append("%s>gui%s" % (pressed[-1] if pressed else "-", self._gui_focus()))
                 continue
-            if step[0] in ("say", "talk") and self._no_button:
+            if step[0] in ("say", "talk") and (self._no_button or self._role_status):
                 continue                                       # she could not find the button: do not talk as if all is well
             if step[0] == "say":
                 self.macro_spoke = True
@@ -553,6 +561,20 @@ class CommandRunner:
                     if gui == "?":
                         break                                  # Status.json unreadable: one press, as a plain Back would
                 continue
+            if step[0] == "openrole":
+                problem = self._open_left_panel(strokes, pressed, trace, "FocusRadarPanel", 4)
+                if problem:
+                    status = SEND_FAILURE_STATUS.get(problem, "failed")
+                    return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                continue
+            if step[0] in ("roletab", "rolepick"):
+                if self._role_status:
+                    continue                                   # an earlier step already said no: just tidy up
+                problem = self._role_step(step, strokes, pressed, trace)
+                if problem:
+                    status = SEND_FAILURE_STATUS.get(problem, "failed")
+                    return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                continue
             if step[0] == "openright":
                 problem = self._open_left_panel(strokes, pressed, trace, "FocusRightPanel", 1)
                 if problem:
@@ -601,6 +623,8 @@ class CommandRunner:
                  command.id, ", ".join(trace) if trace else "none")
         if self._no_button:
             return Outcome("no_button", text, command, intent, detail=self._explain("no_button", command))
+        if self._role_status:
+            return Outcome(self._role_status, text, command, intent, detail=self._explain(self._role_status, command))
         if command.id == "request_docking":
             self._check_docking_later()
         if quiet and self.echo is not None:
@@ -668,6 +692,59 @@ class CommandRunner:
             self.sleep(0.5)
         return None
 
+    def _role_step(self, step, strokes, pressed, trace):
+        """The 'role tab X' and 'role pick N kind' macro steps (the bottom panel). She looks at the panel, see control/role_walk.py.
+        Sets self._role_status when the vessel is missing or its button is greyed out. Returns None or the sender's problem text."""
+        from control import panel_reader, role_walk
+        reader = self.panel_reader or panel_reader.capture_screen
+        problems, shots = [], []
+
+        def press(action):
+            problem = self.sender.send(strokes[action], hold=0.15)
+            pressed.append(action)
+            if problem:
+                problems.append(problem)
+
+        def read():
+            picture = reader() if self.settings.get("panel.read_screen", True) else None
+            seen = role_walk.read_all(picture)
+            if picture is not None and len(shots) < 8:
+                shots.append(("role%d" % len(shots), picture))
+            return seen
+
+        notes = []
+        if step[0] == "roletab":
+            result = role_walk.go_to_tab(read, press, self.sleep, step[1], note=notes.append)
+            log.info("Role panel: walk to tab %d: %s (%s)", step[1], result, "; ".join(notes) or "no notes")
+            if problems:
+                return problems[0]
+            trace.append("roletab%d>%s" % (step[1], result))
+            if result != "ok":                       # unreadable or failed: she does not press blind in the cockpit
+                self._save_panel_masks(shots, "role")
+                self._no_button = True
+            return None
+        tab = {"nomad": 1, "slf": 1, "rhino": 2, "scarab": 2, "srv": 2, "disembark": 0}[step[2]]
+        result, _ = role_walk.pick(read, press, self.sleep, tab, step[1])
+        log.info("Role panel: pick %s (row %s): %s", step[2], step[1], result)
+        if problems:
+            return problems[0]
+        trace.append("rolepick>%s" % result)
+        if result == "ok":
+            self.sleep(0.8)
+            return None
+        self._save_panel_masks(shots, "role")
+        if result == "missing":
+            self._role_status = {"nomad": "no_nomad", "slf": "no_slf"}.get(step[2], "no_srv")
+        elif result == "blocked":
+            state = self.state_provider()
+            altitude = getattr(state, "altitude", None) if state is not None else None
+            flags = getattr(state, "status_flags", 0) or 0
+            self._role_status = "cannot_" + role_walk.blocked_reason(step[2], flags, altitude)
+        else:
+            self._no_button = True
+        return None
+
+    @staticmethod
     @staticmethod
     def _save_panel_masks(shots, name=""):
         """When a look fails, keeps a few small black-and-white 'what is bright' maps in data/panel_debug (never the game
@@ -867,6 +944,13 @@ class CommandRunner:
             "not_windows": "I can only press keys on Windows.",
             "failed": "I couldn't press the key.",
             "no_button": "I couldn't see the button on the panel, so I didn't press anything.",
+            "no_nomad": "There is no Nomad on board.",
+            "no_slf": "There is no fighter in the hangar.",
+            "no_srv": "There is no SRV in the bay.",
+            "cannot_landed": "You have to be landed for that.",
+            "cannot_high30": "The Rhino needs you at 30 metres or lower.",
+            "cannot_slf_low": "The fighter needs you at 500 metres or higher.",
+            "cannot_other": "The game says that can't be deployed right now.",
         }.get(status, "That didn't work.")
 
     # ---- checking without pressing anything (used by the dashboard) ----

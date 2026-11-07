@@ -136,6 +136,7 @@ class StatusReader:
         if state is not None:
             state.status_flags, state.status_flags2, state.status_seen = flags, flags2, flags != 0
             state.gui_focus = int(status.get("GuiFocus") or 0)
+            state.altitude = float(status["Altitude"]) if isinstance(status.get("Altitude"), (int, float)) else None
             state.selected_weapon = str(status.get("SelectedWeapon") or "")
             state.health = float(status["Health"]) if isinstance(status.get("Health"), (int, float)) else None
             state.suit_energy = suit_energy(status)

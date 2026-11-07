@@ -95,7 +95,10 @@ LAUNCH_MACRO = ("say Launch_Start", "FocusLeftPanel", "wait 1.35", "CycleNextPan
                 "wait 1.1", "UI_Back", "wait 0.9", "FocusRightPanel", "say Launch_Systems", "wait 1.25", "CycleNextPanel x5",
                 "wait 0.25", "CyclePreviousPanel x5", "wait 0.9", "UI_Back", "say Launch_Go", "wait 2", "UI_Down", "wait 0.6",
                 "UI_Select")
-NOMAD_MACRO = ("FocusRadarPanel", "wait 0.8", "UI_Down", "wait 0.2", "UI_Right", "wait 0.2", "UI_Select")
+# 0.85.0: the role panel is READ now (control/role_walk.py): open it, go to the right tab, put the cursor on the right row, press
+# Deploy only when the button is lit. A missing vessel or a greyed-out button makes her say so instead.
+ROLE_PICK = lambda tab, row, kind: ("open role panel", "role tab " + tab, "role pick %s %s" % (row, kind), "wait 0.8", "close panels")
+NOMAD_MACRO = ROLE_PICK("launch", "1", "nomad")
 
 # Plot the next neutron waypoint, hands free (the clipboard already holds its name, see navigation/route.py).
 # Taken from a real recording of the commander on the X52 (0.10.5): open the galaxy map, Up to the search box, Select to
@@ -412,6 +415,23 @@ CATALOG = [
       press=["(deploy|launch|send out|release|drop|put out) [the|my] nomad", "nomad (deploy|launch)", "(deploy|launch) [the|my] (nomad shuttle|exploration shuttle)",
              "get the nomad out", "(deploy|launch) nomad"],
       doing={"press": "Deploying the Nomad"}, strict=True, macro=NOMAD_MACRO),
+
+    C("deploy_slf", "FocusRadarPanel", "the fighter",
+      press=["(deploy|launch|send out|release|drop|put out) [the|my] (slf|fighter|ship launched fighter|ship-launched fighter)",
+             "(slf|fighter) (deploy|launch)", "(launch|deploy) [the|my] (taipan|trident|javelin|gu-97|gu97)"],
+      doing={"press": "Launching the fighter"}, strict=True, macro=ROLE_PICK("launch", "2", "slf")),
+    C("deploy_srv", "FocusRadarPanel", "the SRV",
+      press=["(deploy|launch|send out|release|drop|put out) [the|my] (srv|buggy|rover)", "(srv|buggy|rover) (deploy|launch)"],
+      doing={"press": "Deploying the SRV"}, strict=True, macro=ROLE_PICK("srv", "any", "srv")),
+    C("deploy_rhino", "FocusRadarPanel", "the Rhino",
+      press=["(deploy|launch|send out|release|drop|put out) [the|my] [srv] rhino", "rhino (deploy|launch)"],
+      doing={"press": "Deploying the Rhino"}, strict=True, macro=ROLE_PICK("srv", "1", "rhino")),
+    C("deploy_scarab", "FocusRadarPanel", "the Scarab",
+      press=["(deploy|launch|send out|release|drop|put out) [the|my] [srv] (scarab|scorpion)", "(scarab|scorpion) (deploy|launch)"],
+      doing={"press": "Deploying the Scarab"}, strict=True, macro=ROLE_PICK("srv", "2", "scarab")),
+    C("disembark", "FocusRadarPanel", "disembarking",
+      press=["disembark", "(disembark|get out) (of|from) [the] ship", "exit the ship", "step out [of the ship]", "go on foot"],
+      doing={"press": "Disembarking"}, strict=True, macro=ROLE_PICK("suit", "any", "disembark")),
 
     C("auto_launch", "UI_Select", "the launch",
       press=["launch", "auto launch", "[(please|ok)] launch (the ship|us|now)", "(launch|take off|lift off|depart) (from|out of|off) [the] (station|port|pad|dock|starport|outpost)",

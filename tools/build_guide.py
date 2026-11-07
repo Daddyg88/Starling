@@ -30,7 +30,8 @@ OVER = {
     'power_engines': ['Pips to engines'], 'power_weapons': ['Pips to weapons'], 'power_systems': ['Pips to systems'],
     'power_reset': ['Balance the power'], 'heatsink': ['Fire heatsink'], 'boost': ['Boost'],
     'supercruise': ['Engage supercruise'], 'hyperspace': ['Engage hyperspace'],
-    'request_docking': ['Request docking'], 'auto_launch': ['Launch'], 'deploy_nomad': ['Deploy the Nomad'],
+    'request_docking': ['Request docking'], 'auto_launch': ['Launch'], 'deploy_nomad': ['Deploy the Nomad'], 'deploy_slf': ['Launch the fighter'], 'deploy_srv': ['Deploy the SRV'],
+    'deploy_rhino': ['Deploy the Rhino'], 'deploy_scarab': ['Deploy the Scarab'], 'disembark': ['Disembark'],
     'plot_waypoint': ['Plot the next waypoint'], 'show_off': ['Show off'],
     'panel_home': ['Go home on the panel'], 'panel_modules': ['Open the modules'], 'panel_fire_groups': ['Open fire groups'],
     'panel_ship': ['Open ship functions'], 'panel_inventory': ['Open the inventory'], 'panel_storage': ['Open storage'],
@@ -44,7 +45,7 @@ OVER = {
     'gear': ['Deploy the landing gear', 'Retract the landing gear'], 'weapons': ['Deploy weapons', 'Retract weapons'],
     'scoop': ['Deploy the cargo scoop', 'Retract the cargo scoop'], 'lights': ['Turn on the lights', 'Turn off the lights'],
 }
-CAREFUL = {'supercruise', 'hyperspace', 'request_docking', 'auto_launch', 'deploy_nomad', 'plot_waypoint', 'show_off',
+CAREFUL = {'supercruise', 'hyperspace', 'request_docking', 'auto_launch', 'deploy_nomad', 'deploy_slf', 'deploy_srv', 'deploy_rhino', 'deploy_scarab', 'disembark', 'plot_waypoint', 'show_off',
            'foot_grenade_throw'}
 
 
@@ -74,7 +75,9 @@ GROUPS = [
      ['gear', 'weapons', 'scoop', 'lights', 'night_vision', 'silent_running', 'flight_assist', 'hud_mode', 'head_look',
       'boost', 'speed_0', 'speed_50', 'speed_75', 'speed_100', 'supercruise', 'hyperspace']),
     ('big', 'Big actions', 'She presses a whole run of keys for these. She only acts when she is sure she heard you right, so say them clearly.',
-     ['request_docking', 'auto_launch', 'deploy_nomad', 'plot_waypoint', 'show_off']),
+     ['request_docking', 'auto_launch', 'plot_waypoint', 'show_off']),
+    ('role', 'Role panel: Nomad, fighter, SRV, disembark', 'She opens the role (bottom) panel and looks at it: she goes to the right tab, checks the vessel is on board, and only presses Deploy when the button is lit. If it is not there or greyed out she tells you why (for example: you have to be landed for the SRV and to disembark, the fighter needs 500 metres or higher, the Rhino 30 metres or lower).',
+     ['deploy_nomad', 'deploy_slf', 'deploy_srv', 'deploy_rhino', 'deploy_scarab', 'disembark']),
     ('panels', 'Right-hand panel tabs', 'She opens the right panel and looks at it to find the tab, so it works whichever tab was open last. If she cannot see the panel she says so and presses nothing more.',
      [i for i in C if i.startswith('panel_')] + ['close_panels']),
     ('combat', 'Combat', 'Targets, power, countermeasures and wingmen.',
@@ -212,7 +215,7 @@ EXTRA = [
 ]
 for gid, title, intro, rows in EXTRA:
     sections.append((gid, title, intro, simple(rows)))
-order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'panels', 'ship', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
+order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'panels', 'role', 'ship', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
 secmap = {s[0]: s for s in sections}
 sections = [secmap[k] for k in order]
 count = sum(t.count('<tr><td') for _, _, _, t in sections)

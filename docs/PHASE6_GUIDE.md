@@ -722,6 +722,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.84.1: new macro step `close panels` (Back until Status.json GuiFocus is 0, max 4 presses; only panels 1-4) and command close_panels. `tab`/`right tab` walks use quick mode when the goal tab's position is remembered (all keys, one look; trace shows fewer looks).
 
+0.85.0: role panel. New macro steps `open role panel`, `role tab suit|launch|srv|crew`, `role pick 1|2|any nomad|slf|rhino|scarab|srv|disembark`; reader in control/role_reader.py, walking logic in control/role_walk.py. New commands deploy_slf, deploy_srv, deploy_rhino, deploy_scarab, disembark; deploy_nomad now reads the panel. New statuses no_nomad/no_slf/no_srv/cannot_landed/cannot_high30/cannot_slf_low/cannot_other with voice lines. Status.json Altitude is stored as state.altitude.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.

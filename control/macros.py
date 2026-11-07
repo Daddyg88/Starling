@@ -28,6 +28,10 @@ A step is one of:
     "right tab 3"          look at the right panel and go to that tab ("right tab home" = the home icon, 0 = Modules, 1 = Fire Groups, 2 = Ship, 3 = Inventory,
                            4 = Storage, 5 = Status). The panel has no "blind" fallback: if she cannot see the screen she presses
                            nothing and says so.
+    "open role panel"      get the role (bottom) panel open (the same way)
+    "role tab launch"      look at the role panel and go to that tab: suit, launch (Nomad / fighter), srv or crew
+    "role pick 1 nomad"    press the lit Deploy / Disembark button in row 1 or 2 (or "any"); the word after the number names what it
+                           is (nomad, slf, rhino, scarab, srv, disembark) so she can say why when it cannot be done
     "open left panel"      get the left panel open from WHATEVER is on screen (Status.json GuiFocus): nothing if it is already open,
                            Back first if the galaxy map / system map / station services / FSS is open, then Focus Left Panel.
                            (A plain "FocusLeftPanel" would CLOSE the panel if it was already open.)
@@ -101,6 +105,21 @@ def parse_macro(steps):
         if lowered == "open right panel":
             parsed.append(("openright",))
             continue
+        if lowered == "open role panel":
+            parsed.append(("openrole",))
+            continue
+        if lowered.startswith("role tab "):
+            word = lowered.split()[2] if len(lowered.split()) == 3 else ""
+            if word not in ("suit", "launch", "srv", "crew"):
+                raise ValueError("I don't understand this step (write it like: role tab launch  or  role tab srv): %r" % text)
+            parsed.append(("roletab", {"suit": 0, "launch": 1, "srv": 2, "crew": 3}[word]))
+            continue
+        if lowered.startswith("role pick "):
+            bits = lowered.split()
+            if len(bits) != 4 or bits[2] not in ("1", "2", "any") or bits[3] not in ("nomad", "slf", "rhino", "scarab", "srv", "disembark"):
+                raise ValueError("I don't understand this step (write it like: role pick 1 nomad): %r" % text)
+            parsed.append(("rolepick", None if bits[2] == "any" else int(bits[2]) - 1, bits[3]))
+            continue
         if lowered.startswith("right tab "):
             try:
                 word = lowered.split()[2]
@@ -166,6 +185,10 @@ def actions_in(parsed):
                     seen.append(needed)
         if step[0] == "closepanels" and "UI_Back" not in seen:
             seen.append("UI_Back")
+        if step[0] in ("openrole", "roletab", "rolepick"):
+            for needed in ("FocusRadarPanel", "UI_Back", "UI_Up", "UI_Down", "UI_Left", "UI_Right", "UI_Select"):
+                if needed not in seen:
+                    seen.append(needed)
         if step[0] == "openright":
             for needed in ("FocusRightPanel", "UI_Back"):
                 if needed not in seen:
