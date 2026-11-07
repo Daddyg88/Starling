@@ -52,7 +52,7 @@ class MacroTests(unittest.TestCase):
         names = [s.key for s in self.sender.pressed]
         # 0.82.2 (she cannot see a screen in the tests): Focus, Next Tab x2, Right, Select, Left, Previous Tab x2, Back. No Up any more.
         self.assertEqual(names, ["Key_0", "Key_3", "Key_3", "Key_5", "Key_4", "Key_10", "Key_8", "Key_8", "Key_6"])
-        self.assertIn(1.6, self.sleeps)
+        self.assertLess(sum(self.sleeps), 20)                      # 0.82.9: much quicker than the 35 s she took in 0.82.8
 
     def test_ensure_reopens_the_panel_only_when_the_game_shows_no_screen(self):
         from types import SimpleNamespace

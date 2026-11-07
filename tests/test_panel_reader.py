@@ -139,6 +139,38 @@ class RunnerTests(unittest.TestCase):
             self.assertFalse(any(k.key == "Key_9" for k in t.sender.pressed), start)             # and there is no UI_Up any more
 
 
+class FasterWalkTests(unittest.TestCase):
+    """With a memory of where each tab was seen, a later walk presses exactly the keys it needs."""
+
+    def walk(self, start, target, memory):
+        g = FakeGame(start)
+        ok = pr.goto_tab(g.read, g.nxt, g.prev, lambda s: None, target, memory=memory)
+        return ok, g
+
+    def test_second_walk_is_shorter(self):
+        memory = {}
+        ok, first = self.walk(NAV, 2, memory)                      # starts on Navigation: the long way (icon first)
+        self.assertTrue(ok)
+        self.assertEqual(sorted(memory), [0, 1, 2, 3])
+        long_presses = len(first.presses)
+        for start in (NAV, 2, 3, 0):                               # Navigation, Transactions, Contacts, the icon tab
+            ok, g = self.walk(start, 2, memory)
+            self.assertTrue(ok, start)
+            self.assertEqual(g.tab, NAV + 2, start)
+            self.assertEqual(len(g.presses), abs(NAV + 2 - start), start)            # exactly the keys needed, no more
+        ok, g = self.walk(4, 2, memory)                            # Target was never seen: the long way, but it still gets there
+        self.assertTrue(ok)
+        self.assertEqual(g.tab, NAV + 2)
+        ok, g = self.walk(NAV, 2, memory)
+        self.assertLess(len(g.presses), long_presses)
+
+    def test_a_wrong_memory_falls_back_to_the_long_walk(self):
+        memory = {1: 0.9, 2: 0.95, 3: 0.99}                         # nonsense positions
+        ok, g = self.walk(2, 2, memory)
+        self.assertTrue(ok)
+        self.assertEqual(g.tab, NAV + 2)
+
+
 class OpenLeftPanelTests(unittest.TestCase):
     """'open left panel' from every screen the game can be showing (GuiFocus from Status.json)."""
 

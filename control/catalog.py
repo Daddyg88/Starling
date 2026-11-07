@@ -60,10 +60,12 @@ MACROS = {
 # 0.82.2: NO MORE UI_Up. In the logs UI_Up closed the panel every time (gui 0) and the panel then reopened with the cursor somewhere else.
 # The station is the first contact, so Right goes straight to its Request Docking button; 'select button' presses Select only if she
 # can SEE that bright button.
-DOCKING_MACRO = ("open left panel", "wait 0.4", "tab 2", "wait 1.0",
-                 "hold UI_Right 0.15", "wait 1.0", "select button", "wait 0.8", "stop if closed",
-                 "hold UI_Left 0.15", "wait 1.2", "ensure FocusLeftPanel 2",
-                 "tab 0 from 2", "wait 0.85", "hold UI_Back 0.15")
+# 0.82.9 (speed): the way back is two plain Previous Tab presses again (no looking, about 9 s saved), the waits are shorter because she
+# looks before she acts anyway, and she does not wait for the game to close the panel before tidying up.
+DOCKING_MACRO = ("open left panel", "tab 2", "wait 0.3",
+                 "hold UI_Right 0.15", "wait 0.6", "select button", "stop if closed",
+                 "hold UI_Left 0.15", "wait 0.4", "ensure FocusLeftPanel 2",
+                 "hold CyclePreviousPanel 0.15", "wait 0.35", "hold CyclePreviousPanel 0.15", "wait 0.45", "hold UI_Back 0.15")
 # 0.48.0: SHOW OFF. She talks through what she can do while she opens and closes the screens herself: galaxy map, left panel
 # (a couple of tabs), right panel. Only screens: nothing that moves the ship. "talk" queues a plain line (no extra remarks, so it
 # starts at once) and the steps go on while she speaks; "finish" waits for her;

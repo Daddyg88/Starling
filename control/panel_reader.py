@@ -22,7 +22,7 @@ TAB_MIN_WIDTH = 0.08         # a selected tab is this wide, as a fraction of the
 TAB_MAX_WIDTH = 0.19
 ICON_MIN = 0.012            # the small square icon tab is this wide, as a fraction of the screen width
 ICON_MAX = 0.04
-WAIT_AFTER_KEY = 0.7         # seconds the panel takes to change tab before she looks again
+WAIT_AFTER_KEY = 0.5         # seconds the panel takes to change tab before she looks again
 
 
 _announced = []
@@ -205,22 +205,31 @@ def mask_png(picture, path):
         return False
 
 
-def goto_tab(read, press_next, press_previous, wait, target, note=None):
+def goto_tab(read, press_next, press_previous, wait, target, note=None, memory=None):
     """Walk to tab number `target` (0 = Navigation, 1 = Transactions, 2 = Contacts) by looking after every key.
 
     read()           -> what find_tab gives for the screen right now, or None
     press_next()     press the 'next panel tab' key;  press_previous() the 'previous' one
     wait(seconds)    pause
     note(text)       (optional) is told what happens at every step, for the log
+    memory           (optional) a dict she keeps between walks: where each tab was last seen (index 0 = the icon tab, 1 = Navigation,
+                     2 = Transactions, 3 = Contacts, as a fraction of the window width). With it, a later walk recognises which
+                     tab it starts on by position and presses the exact number of keys, instead of walking to the first tab
+                     and counting from there (about 4 seconds faster). If anything looks different she walks the long way.
     Returns True when she got there and could see that she did, False when she could not tell (the caller then falls back to
     counting presses blind, the way the macro always did)."""
     say = note or (lambda text: None)
+    goal = target + 1                                          # index: 0 = icon tab, 1 = Navigation, 2 = Transactions, 3 = Contacts
+
+    def remember(index, spot):
+        if memory is not None and spot is not None:
+            memory[index] = spot["cx"]
 
     def look(after):
-        """Look once the panel has settled: two looks 0.3 s apart must agree (the tab highlight slides for a moment)."""
+        """Look once the panel has settled: two looks 0.2 s apart must agree (the tab highlight slides for a moment)."""
         first = read()
         for _ in range(3):
-            wait(0.3)
+            wait(0.2)
             second = read()
             if first is not None and second is not None and abs(first["cx"] - second["cx"]) < 0.01 \
                     and bool(first.get("icon")) == bool(second.get("icon")):
@@ -233,6 +242,35 @@ def goto_tab(read, press_next, press_previous, wait, target, note=None):
     here = look("start")
     if here is None:
         return False
+
+    # Shortcut: she knows which tab this is (the icon, or a position she has seen before): press exactly the keys needed.
+    index = None
+    if here.get("icon"):
+        index = 0
+    elif memory:
+        near = [(abs(here["cx"] - cx), k) for k, cx in memory.items() if k > 0]
+        if near and min(near)[0] < 0.4 * max(here["width"], 0.05):
+            index = min(near)[1]
+    if index is not None:
+        remember(index, here)
+        while index != goal:
+            step = 1 if goal > index else -1
+            (press_next if step > 0 else press_previous)()
+            wait(WAIT_AFTER_KEY)
+            now = look("next" if step > 0 else "previous")
+            if now is None:
+                return False
+            moved = (now["cx"] - here["cx"]) / max(here["width"], 0.01)
+            if (step > 0 and moved < 0.5) or (step < 0 and moved > -0.5):
+                say("it did not move the way she expected: walking the long way")
+                here, index = now, None
+                break
+            index += step
+            here = now
+            remember(index, here)
+        if index == goal:
+            return True
+
     if not here.get("icon"):
         for _ in range(6):                                     # step 1: left until she is on the little icon tab (the very first one)
             press_previous()
@@ -259,13 +297,16 @@ def goto_tab(read, press_next, press_previous, wait, target, note=None):
             break
         else:
             return False                                       # still moving after six presses: something is odd
+    position = 1
     if here.get("icon"):                                       # one step right of the icon is Navigation (tab 0)
+        remember(0, here)
         press_next()
         wait(WAIT_AFTER_KEY)
         now = look("next from the icon")
         if now is None or now.get("icon"):
             return False
         here = now
+    remember(position, here)
     for _ in range(target):                                    # step 2: forward to the one we want, checking each press worked
         press_next()
         wait(WAIT_AFTER_KEY)
@@ -273,4 +314,6 @@ def goto_tab(read, press_next, press_previous, wait, target, note=None):
         if now is None or (now["cx"] - here["cx"]) / max(here["width"], 0.01) < 0.5:
             return False
         here = now
+        position += 1
+        remember(position, here)
     return True

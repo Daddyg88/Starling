@@ -89,6 +89,7 @@ class CommandRunner:
         self.brain = brain               # personality/brain.py: answers anything that is not a command
         self.smalltalk = smalltalk       # personality/smalltalk.py: "how are you?", "tell me a joke"
         self.memory = memory             # memory/recall.py: "what do you remember"
+        self._tab_memory = {}            # where she last saw each tab of the left panel (a faster tab walk next time)
         self.panel_reader = None         # a function that returns a screenshot (tests give a pretend one); None = the real screen
         self.extra_helpers = []          # more voice helpers (the biology overlay) that answer before anything else
         self.route = route               # navigation/voice.py: 'plot a neutron route to Colonia'
@@ -606,7 +607,7 @@ class CommandRunner:
                 return found
             try:
                 done = panel_reader.goto_tab(read, lambda: press("CycleNextPanel"), lambda: press("CyclePreviousPanel"),
-                                             self.sleep, number, note=notes.append)
+                                             self.sleep, number, note=notes.append, memory=self._tab_memory)
             except Exception:
                 log.exception("Looking at the panel failed")
                 done = False
@@ -715,14 +716,8 @@ class CommandRunner:
                 if problem:
                     return problem
                 selects += 1
-                for _ in range(6):                           # up to 3 s for the game to answer (the journal is read once a second)
-                    self.sleep(0.5)
-                    if answered() or self._gui_focus() == 0:
-                        for _ in range(12):                  # the game closes the panel a few seconds after the request
-                            if self._gui_focus() in (0, "?"):
-                                break
-                            self.sleep(0.5)
-                        return None
+                if self._after_select(look, answered):
+                    return None
                 trace.append("select#%d>no answer" % selects)
                 log.info("Panel: Select #%d got no answer from the game (no DockingRequested).", selects)
             else:                                            # "row": the cursor is on the station in the list
@@ -741,6 +736,22 @@ class CommandRunner:
             log.warning("Panel: she could not find the Request Docking button, so she did not press Select.")
             return "no_button"
         return None
+
+    def _after_select(self, look, answered):
+        """After a Select press: True if the game answered (DockingRequested / the panel closed). She does NOT sit and wait for an
+        answer that is not coming: half a second after the press she looks, and if the screen has changed to the list row (the
+        press bounced) she returns False at once so the caller presses Right. Only when the button is still lit or the screen
+        shows nothing she knows does she give the game up to 3 s to answer (the journal is read once a second)."""
+        self.sleep(0.5)
+        if answered() or self._gui_focus() == 0:
+            return True
+        if look("after Select") == "row":
+            return False
+        for _ in range(5):
+            self.sleep(0.5)
+            if answered() or self._gui_focus() == 0:
+                return True
+        return False
 
     def _open_left_panel(self, strokes, pressed, trace):
         """The 'open left panel' macro step: gets the left panel open from whatever the game is showing.
@@ -771,8 +782,14 @@ class CommandRunner:
             problem = press("FocusLeftPanel")
             if problem:
                 return problem
-            self.sleep(1.6)
             gui = self._gui_focus()
+            for _ in range(8):                           # poll instead of a fixed wait: usually open within half a second
+                if gui != 0:
+                    break
+                self.sleep(0.25)
+                gui = self._gui_focus()
+            if gui == 2 or gui == "?":
+                self.sleep(0.5 if gui == 2 else 1.4)     # let the panel finish sliding in (Status.json unreadable: wait the old time)
             trace.append("focus>gui%s" % gui)
             if gui in (2, "?"):                          # open, or Status.json cannot tell: carry on as the macro always did
                 return None
