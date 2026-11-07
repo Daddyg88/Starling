@@ -62,7 +62,7 @@ MACROS = {
 # can SEE that bright button.
 # 0.82.9 (speed): the way back is two plain Previous Tab presses again (no looking, about 9 s saved), the waits are shorter because she
 # looks before she acts anyway, and she does not wait for the game to close the panel before tidying up.
-DOCKING_MACRO = ("open left panel", "tab 2", "wait 0.3",
+DOCKING_MACRO = ("talk Docking_Start", "open left panel", "tab 2", "talk Docking_Contacts", "wait 0.3",
                  "hold UI_Right 0.15", "wait 0.6", "select button", "stop if closed",
                  "hold UI_Left 0.15", "wait 0.4", "ensure FocusLeftPanel 2",
                  "hold CyclePreviousPanel 0.15", "wait 0.35", "hold CyclePreviousPanel 0.15", "wait 0.45", "hold UI_Back 0.15")

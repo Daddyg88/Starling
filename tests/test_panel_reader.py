@@ -139,6 +139,19 @@ class RunnerTests(unittest.TestCase):
             self.assertFalse(any(k.key == "Key_9" for k in t.sender.pressed), start)             # and there is no UI_Up any more
 
 
+class DockingSpeechTests(unittest.TestCase):
+    def test_every_line_she_can_say_while_docking_exists(self):
+        import json
+        pack = json.load(open(Path(__file__).resolve().parent.parent / "voicepacks" / "default" / "docking.json"))
+        for key in ("Docking_Start", "Docking_Contacts", "Docking_Retry"):
+            self.assertGreaterEqual(len(pack[key]), 6, key)
+            self.assertEqual(len(set(pack[key])), len(pack[key]), key)
+        from control.catalog import DOCKING_MACRO
+        said = [step.split()[1] for step in DOCKING_MACRO if step.startswith(("say ", "talk "))]
+        for key in said:
+            self.assertIn(key, pack)
+
+
 class FasterWalkTests(unittest.TestCase):
     """With a memory of where each tab was seen, a later walk presses exactly the keys it needs."""
 

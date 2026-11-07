@@ -492,6 +492,8 @@ class CommandRunner:
                 self.sleep(step[1])
                 trace.append("%s>gui%s" % (pressed[-1] if pressed else "-", self._gui_focus()))
                 continue
+            if step[0] in ("say", "talk") and self._no_button:
+                continue                                       # she could not find the button: do not talk as if all is well
             if step[0] == "say":
                 self.macro_spoke = True
                 self._speak(step[1], {}, fallback="")
@@ -724,6 +726,8 @@ class CommandRunner:
                 if rights >= 2:
                     break
                 trace.append("row>right")
+                if rights == 0:
+                    self._speak("Docking_Retry", {}, fallback="", plain=True)
                 log.info("Panel: the cursor is on the list row, so she presses Right to get back to the button.")
                 problem = send("UI_Right", 0.15)
                 if problem:
@@ -972,8 +976,9 @@ class CommandRunner:
             return
         else:
             outcome = good[0]
-            if outcome.command is not None and outcome.command.id == "auto_launch" and getattr(self, "macro_spoke", False):
-                return                          # the launch macro already talked her way through it
+            if (outcome.command is not None and outcome.command.id in ("auto_launch", "request_docking")
+                    and outcome.status == "done" and getattr(self, "macro_spoke", False)):
+                return                          # the macro already talked her way through it
         label = outcome.command.label if outcome.command else ""
         fields = {
             "doing": outcome.detail.rstrip("."),

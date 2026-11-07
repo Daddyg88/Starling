@@ -716,6 +716,8 @@ What 0.45.4 does: after Up, Right and Left she waits 1.2 s, looks at Status.json
 
 0.82.9 (speed): docking macro is now `open left panel`, `tab 2`, Right, `select button`, `stop if closed`, Left, two Previous Tab presses, Back. `tab N` keeps a per-session memory of where each tab was seen and uses it to press exactly the keys needed (trace: no extra `previous` looks). `open left panel` polls Status.json instead of waiting 1.6 s. `select button` looks 0.5 s after Select instead of waiting 3 s.
 
+0.83.0: the docking macro starts with `talk Docking_Start` and says `Docking_Contacts` after finding the tab; `select button` says `Docking_Retry` when the cursor bounced. Lines live in voicepacks/default/docking.json. A macro that speaks replaces the final confirmation line when it succeeds.
+
 If it still fails, the clean fix is in Elite: give UI Up, UI Right and UI Left a keyboard key that is not also a flight key (for example the arrow keys on the first slot), then Check my Elite keys should list no clash for them. I have not changed any of your keys.
 
 A quick test that tells us if I am right: with Elite open, press your Focus Left Panel key, Next Tab twice, then W once by hand. If the panel closes, it is the shared key.

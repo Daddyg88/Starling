@@ -1,0 +1,32 @@
+{
+ "_help": "What she says while she works the left panel to request docking. Docking_Start is the first thing (as she opens the panel), Docking_Contacts when she has found the Contacts tab, Docking_Retry when the cursor slipped and she has to go again. After the request goes through the game's own DockingRequested / DockingGranted lines take over, so none of these say 'granted'.",
+ "Docking_Start": [
+  "Right, let's get you a pad.",
+  "Opening the panel. One moment.",
+  "Docking request coming up.",
+  "On it. Finding the station.",
+  "Panel's coming up. Hands off the keys, please.",
+  "Let me get the contacts open.",
+  "Pad request. Give me a few seconds.",
+  "Bringing up the left panel."
+ ],
+ "Docking_Contacts": [
+  "Contacts tab, there it is.",
+  "Found the contacts. Looking for the station.",
+  "Contacts open. Nearly there.",
+  "There's the station. Going in.",
+  "Contacts. Good. Now the button.",
+  "Station's on the list. One more step.",
+  "Got the contacts up. Don't touch anything.",
+  "Right tab. Now the request."
+ ],
+ "Docking_Retry": [
+  "The cursor slipped. Going again.",
+  "That bounced. Trying once more.",
+  "Missed the button. Again.",
+  "Cursor wandered off. Back to the button.",
+  "Not that one. Hold on.",
+  "The panel jumped. Fixing it.",
+  "Slipped. One more go."
+ ]
+}
