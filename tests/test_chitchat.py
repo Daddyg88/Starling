@@ -146,3 +146,121 @@ class ModeTests(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Noticing(Base):
+    """0.89.0: she counts kills, interdictions, scans, systems and jumps since a scoop, and remarks when a count passes a step."""
+
+    def test_nothing_to_remark_on_at_first(self):
+        self.assertEqual(self.chat.milestone_keys(), [])
+
+    def test_five_kills_makes_a_remark_once(self):
+        for _ in range(4):
+            self.fire("Bounty", Reward=1000)
+        self.assertNotIn("ChitChat_Kills", self.chat.milestone_keys())
+        self.fire("FactionKillBond", Reward=1000)
+        self.assertIn("ChitChat_Kills", self.chat.milestone_keys())
+        self.later(FREQUENCY["normal"][1] + 10)
+        text = self.chat.tick()
+        self.assertTrue(text)
+        self.assertEqual(self.chat.milestone_keys(), [])                   # said: not again until the next five
+        for _ in range(5):
+            self.fire("Bounty", Reward=1000)
+        self.assertIn("ChitChat_Kills", self.chat.milestone_keys())
+
+    def test_kill_remarks_use_the_number(self):
+        for _ in range(5):
+            self.fire("Bounty", Reward=1)
+        self.assertEqual(self.chat.context()["kills"], 5)
+        self.later(FREQUENCY["normal"][1] + 10)
+        spoken = set()
+        for seed in range(30):
+            self.chat.rng = random.Random(seed)
+            self.chat.remarked.clear()
+            self.chat.last_chat = self.chat.last_spoke = self.t[0] - 5000
+            self.chat.mode = "general"
+            text = self.chat.tick()
+            if text:
+                spoken.add(text)
+            self.chat.reached["ChitChat_Kills"] = (1, self.t[0])
+        self.assertTrue(any("5" in t for t in spoken))
+        self.assertFalse(any("{" in t for t in spoken))
+
+    def test_an_old_milestone_is_not_worth_saying(self):
+        for _ in range(5):
+            self.fire("Bounty", Reward=1)
+        self.later(700)
+        self.assertEqual(self.chat.milestone_keys(), [])
+
+    def test_in_combat_only_kills_may_be_remarked_on(self):
+        self.fire("CombatModeOn")
+        for _ in range(2):
+            self.fire("Interdicted", Submitted=False)
+        self.assertEqual(self.chat.candidate_keys(), ["ChitChat_Combat"])
+        for _ in range(5):
+            self.fire("Bounty", Reward=1)
+        self.assertEqual(self.chat.candidate_keys(), ["ChitChat_Kills", "ChitChat_Combat"])
+
+    def test_systems_scans_and_scoop(self):
+        for i in range(10):
+            self.fire("FSDJump", StarSystem="Sys%d" % i, JumpDist=10)
+        self.fire("FSDJump", StarSystem="Sys0", JumpDist=10)                # an old system does not count again
+        self.assertEqual(self.chat.counts["systems"], 10)
+        self.assertEqual(self.chat.counts["since_scoop"], 11)
+        self.assertIn("ChitChat_Systems", self.chat.milestone_keys())
+        self.assertIn("ChitChat_NoScoop", self.chat.milestone_keys())
+        self.fire("FuelScoop", Scooped=1)
+        self.assertEqual(self.chat.counts["since_scoop"], 0)
+        for _ in range(25):
+            self.fire("Scan", BodyName="x")
+        self.assertIn("ChitChat_Scans", self.chat.milestone_keys())
+
+    def test_can_be_switched_off(self):
+        self.settings.set("chitchat.notice", False)
+        for _ in range(5):
+            self.fire("Bounty", Reward=1)
+        self.assertEqual(self.chat.milestone_keys(), [])
+
+    def test_every_new_pool_has_lines_and_only_known_values(self):
+        import re
+        known = {"kills", "interdictions", "scans", "systems", "since_scoop", "ship", "jumps", "system", "station", "minutes", "hours", "distance", "hull"}
+        for key in ("ChitChat_Kills", "ChitChat_Interdicted", "ChitChat_Scans", "ChitChat_Systems", "ChitChat_NoScoop"):
+            lines = [l.text for l in self.dialogue.lines.get(key, [])]
+            self.assertGreaterEqual(len(lines), 4, key)
+            for text in lines:
+                self.assertTrue(set(re.findall(r"{(\w+)}", text)) <= known, text)
+        for mood in ("Friendly", "Close", "Frustrated"):
+            self.assertGreaterEqual(len(self.dialogue.lines.get("ChitChat_Combat_" + mood, [])), 4, mood)
+
+    def test_calm_combat_lines_have_no_pet_names(self):
+        for mood in ("Friendly", "Close", "Frustrated"):
+            for line in self.dialogue.lines["ChitChat_Combat_" + mood]:
+                for word in ("darling", "sweetheart", "love", "handsome", "babe"):
+                    self.assertNotIn(word, line.text.lower())
+
+
+class LookingBack(Base):
+    def test_she_looks_back_on_a_moment_after_moving_on(self):
+        self.state.system = "Sol"
+        self.fire("Interdicted", Submitted=False)
+        self.state.system = "Alpha Centauri"
+        self.assertNotIn("ChitChat_Callback_Interdicted", self.chat.state_keys(self.state))      # too soon
+        self.later(700)
+        self.assertIn("ChitChat_Callback_Interdicted", self.chat.state_keys(self.state))
+        self.assertEqual(self.chat.context()["interdict_system"], "Sol")
+        self.later(6000)
+        self.assertNotIn("ChitChat_Callback_Interdicted", self.chat.state_keys(self.state))      # too long ago
+
+    def test_not_while_still_in_that_system(self):
+        self.state.system = "Sol"
+        self.fire("Bounty", Reward=1)
+        self.later(700)
+        self.assertNotIn("ChitChat_Callback_Kill", self.chat.state_keys(self.state))
+
+    def test_switched_off(self):
+        self.state.system = "Sol"
+        self.fire("Bounty", Reward=1)
+        self.state.system = "Wolf 359"
+        self.later(700)
+        self.settings.set("chitchat.notice", False)
+        self.assertNotIn("ChitChat_Callback_Kill", self.chat.state_keys(self.state))

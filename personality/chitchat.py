@@ -30,10 +30,22 @@ MINING_SECONDS = 600.0           # she talks about mining for 10 minutes after t
 ALARMS = ("UnderAttack", "Interdicted", "InterdictionInProgress", "LowFuel", "Overheating", "HeatWarning", "HeatDamage",
           "HullDamage", "InDanger", "LowHealth", "LowOxygen", "Died", "CockpitBreached", "ShieldState")
 ALARM_QUIET_SECONDS = 75.0
-STATE_KEYS = ("ChitChat_Hull", "ChitChat_Wanted", "ChitChat_Long")
+STATE_KEYS = ("ChitChat_Hull", "ChitChat_Wanted", "ChitChat_Long", "ChitChat_Callback_Interdicted", "ChitChat_Callback_Kill")
+CALLBACK_AFTER_SECONDS = 600.0      # she looks back on a moment from 10 minutes to 90 minutes ago
+CALLBACK_UNTIL_SECONDS = 5400.0
 STATE_REST = 1200.0              # and says the same kind of remark at most once in 20 minutes
 HULL_REMARK = 0.8                # below this much hull she mentions it (when it is quiet)
 CHECK_EVERY_SECONDS = 15.0
+
+# NOTICING (0.89.0): she counts things during the session and, at a quiet moment, remarks when a count passes a step.
+# (pool, counter name, step, only worth saying for this long after it happened). Kills may also be remarked on in combat mode.
+MILESTONES = (
+    ("ChitChat_Kills", "kills", 5, 600.0),
+    ("ChitChat_Interdicted", "interdictions", 2, 900.0),
+    ("ChitChat_Scans", "scans", 25, 900.0),
+    ("ChitChat_Systems", "systems", 10, 900.0),
+    ("ChitChat_NoScoop", "since_scoop", 8, 600.0),
+)
 
 
 class ChitChat:
@@ -61,6 +73,11 @@ class ChitChat:
         self._thread = None
         self.last_mining = None
         self.state_said = {}             # when she last made each state remark (hull, bounty, long session)
+        self.counts = {"kills": 0, "interdictions": 0, "scans": 0, "systems": 0, "since_scoop": 0}
+        self.systems_seen = set()
+        self.last_moment = {}            # "interdicted" / "kill" -> (when, system it happened in): for looking back on it later
+        self.reached = {}                # pool -> (level reached, when): a milestone waiting to be remarked on
+        self.remarked = {}               # pool -> the level she last remarked on
 
     # ---- listening ----
     def attach(self):
@@ -73,17 +90,58 @@ class ChitChat:
             self.last_spoke = now
         elif name == "FSDJump":
             self.jumps += 1
+            self._count("since_scoop", self.counts["since_scoop"] + 1, now)
+            system = (event.data or {}).get("StarSystem")
+            if system and system not in self.systems_seen:
+                self.systems_seen.add(system)
+                self._count("systems", len(self.systems_seen), now)
             dist = (event.data or {}).get("JumpDist")
             if isinstance(dist, (int, float)) and dist > 0:
                 self.distance += float(dist)
         elif name in MINING_EVENTS:
             self.last_mining = now
+        elif name in ("Bounty", "FactionKillBond"):
+            self._count("kills", self.counts["kills"] + 1, now)
+            self._remember_moment("kill", now)
+        elif name == "Interdicted":
+            self._count("interdictions", self.counts["interdictions"] + 1, now)
+            self._remember_moment("interdicted", now)
+        elif name == "Scan":
+            self._count("scans", self.counts["scans"] + 1, now)
+        elif name == "FuelScoop":
+            self.counts["since_scoop"] = 0
         elif name == "CombatModeOn":
             self.mode = "combat"
         elif name == "AnalysisModeOn":
             self.mode = "analysis"
         elif name in ALARMS:
             self.last_alarm = now
+
+    def _count(self, name, value, now):
+        """Sets a counter and notes when it passes a step, so she can remark on it at the next quiet moment."""
+        self.counts[name] = value
+        if not self.settings.get("chitchat.notice", True):
+            return
+        for pool, counter, step, _fresh in MILESTONES:
+            if counter == name and step > 0 and value // step > 0:
+                self.reached[pool] = (value // step, now)
+
+    def _remember_moment(self, what, now):
+        system = getattr(self.state_provider(), "system", None)
+        if system:
+            self.last_moment[what] = (now, str(system))
+
+    def milestone_keys(self, now=None):
+        """Pools for counts that passed a step recently and have not been remarked on yet."""
+        now = self.clock() if now is None else now
+        if not self.settings.get("chitchat.notice", True):
+            return []
+        found = []
+        for pool, _counter, _step, fresh in MILESTONES:
+            level, when = self.reached.get(pool, (0, 0.0))
+            if level > self.remarked.get(pool, 0) and now - when <= fresh:
+                found.append(pool)
+        return found
 
     # ---- deciding ----
     def _timing(self):
@@ -118,9 +176,10 @@ class ChitChat:
         """Which pools she may use right now, most fitting first. She picks one at random."""
         state = self.state_provider()
         docked = bool(getattr(state, "docked", False))
+        notice = self.milestone_keys()
         if self.mode == "combat":
-            return ["ChitChat_Combat"]
-        extra = self.state_keys(state)
+            return (["ChitChat_Kills"] if "ChitChat_Kills" in notice else []) + ["ChitChat_Combat"]
+        extra = notice + self.state_keys(state)
         if extra:
             return extra + self._normal_keys(state, docked)
         return self._normal_keys(state, docked)
@@ -136,6 +195,11 @@ class ChitChat:
         if int((self.clock() - self.started) / 3600) >= 2:
             keys.append("ChitChat_Long")
         now = self.clock()
+        if self.settings.get("chitchat.notice", True):
+            for what, key in (("interdicted", "ChitChat_Callback_Interdicted"), ("kill", "ChitChat_Callback_Kill")):
+                moment = self.last_moment.get(what)
+                if moment and CALLBACK_AFTER_SECONDS <= now - moment[0] <= CALLBACK_UNTIL_SECONDS and moment[1] != getattr(state, "system", None):
+                    keys.append(key)                         # (only when you have moved on: "back in X", not "right here")
         return [k for k in keys if now - self.state_said.get(k, -STATE_REST) >= STATE_REST]
 
     def _normal_keys(self, state, docked):
@@ -177,12 +241,22 @@ class ChitChat:
         minutes = int((now - self.started) / 60)
         if minutes >= 20:
             values["minutes"] = minutes
+        if "interdicted" in self.last_moment:
+            values["interdict_system"] = self.last_moment["interdicted"][1]
+        if "kill" in self.last_moment:
+            values["kill_system"] = self.last_moment["kill"][1]
+        for name in ("kills", "interdictions", "scans", "systems", "since_scoop"):
+            if self.counts.get(name, 0) > 0:
+                values[name] = self.counts[name]
         return values
 
     def _pick_text(self, now, mood, allow):
         values = self.context(now)
         keys = list(self.candidate_keys())
-        self.rng.shuffle(keys)
+        first = [k for k in keys if k in self.reached and k in self.milestone_keys(now)]       # something she noticed comes first
+        rest = [k for k in keys if k not in first]
+        self.rng.shuffle(rest)
+        keys = first + rest
         keys.append("ChitChat_General")
         for key in keys:
             for _ in range(6):
@@ -193,6 +267,8 @@ class ChitChat:
                     text = line.text.format(**values)       # needs every value it mentions
                     if key in STATE_KEYS:
                         self.state_said[key] = now
+                    if key in self.reached:
+                        self.remarked[key] = self.reached[key][0]       # said: the next remark waits for the next step
                     return text
                 except (KeyError, IndexError, ValueError):
                     continue

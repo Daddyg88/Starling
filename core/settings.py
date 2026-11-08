@@ -69,7 +69,7 @@ DEFAULTS = {
     "mining": {"prices": True, "merit": True, "limpet_reminder": True, "destination_reminder": True, "chatter": "normal",
                "fav1": "platinum", "fav2": "painite", "fav3": "opal", "fav4": "lowtemperaturediamond", "fav5": "monazite",
                "fav6": "musgravite", "fav7": "serendibite", "fav8": "grandidierite", "fav9": "alexandrite", "fav10": "rhodplumsite"},
-    "chitchat": {"enabled": True, "frequency": "normal"},
+    "chitchat": {"enabled": True, "frequency": "normal", "notice": True},
     "subtarget": {"press_ahead": True},
     "red_alert": {"minutes": 30, "banner": True, "size": "Medium", "combat_mode": True},
     "memory": {"enabled": True, "recall_at_login": True},

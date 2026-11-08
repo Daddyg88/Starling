@@ -157,5 +157,69 @@
     "You've been flying for {minutes} minutes. || Have you had a drink? Go on, I won't tell the {ship}.",
     "This {ship} has been good to us, hasn't she? || I'd say we make a good crew.",
     "Right now we're in {system}, and honestly, I'm happy. || That's not something I say lightly."
+  ],
+  "ChitChat_Kills": [
+    "That's {kills} kills tonight. || Keep your shields up, Commander.",
+    "{kills} down so far. I'm keeping count, even if you aren't.",
+    "Kill count's at {kills}. Not bad for one session.",
+    "{kills} confirmed kills now. The bounty vouchers are adding up.",
+    "That makes {kills}. Stay sharp, there may be more.",
+    "{kills} ships down tonight. Your {ship} is earning its keep."
+  ],
+  "ChitChat_Kills_Sarcastic": [
+    "{kills} kills. Try to look surprised when the bounty hunters start sending Christmas cards.",
+    "{kills} down. Do try to leave a few for the rest of the galaxy."
+  ],
+  "ChitChat_Interdicted": [
+    "That's {interdictions} interdictions tonight. || Someone clearly likes our company.",
+    "We've been pulled out of supercruise {interdictions} times now. Worth watching your back out here.",
+    "{interdictions} interdictions so far. Maybe a quieter route next time?",
+    "Interdicted {interdictions} times tonight. I'm starting to take it personally."
+  ],
+  "ChitChat_Scans": [
+    "{scans} bodies scanned tonight. || That's a lot of rocks, Commander.",
+    "That's {scans} scans in the log now. The cartographers will be pleased.",
+    "{scans} scans and counting. You're mapping this corner of the galaxy properly.",
+    "We've scanned {scans} bodies this session. Quite the survey."
+  ],
+  "ChitChat_Systems": [
+    "That's {systems} different systems tonight. || A proper tour.",
+    "{systems} systems visited this session. The stars are getting familiar.",
+    "We've seen {systems} different systems tonight. Not a bad evening's flying.",
+    "{systems} systems so far. I'd say we're well travelled by now."
+  ],
+  "ChitChat_NoScoop": [
+    "That's {since_scoop} jumps since we last scooped fuel. || Worth keeping an eye on the tank.",
+    "{since_scoop} jumps without a scoop. A convenient star would be nice.",
+    "Fuel check, Commander. We're {since_scoop} jumps past our last scoop.",
+    "It's been {since_scoop} jumps since we topped up. Just so you know."
+  ],
+  "ChitChat_Combat_Friendly": [
+    "I've got the scanners. You fly, I'll watch.",
+    "Steady, Commander. You're doing well.",
+    "Shields look good. Keep it tight.",
+    "Eyes on the target. I'm with you."
+  ],
+  "ChitChat_Combat_Close": [
+    "I'm right here. Eyes on the fight.",
+    "Stay focused. I'll watch the rest.",
+    "You've got this. I'm with you.",
+    "Steady hands. I'm watching your back."
+  ],
+  "ChitChat_Combat_Frustrated": [
+    "Focus. Shoot. Repeat.",
+    "Keep your head in this. Talk later.",
+    "Eyes up. Stay on target.",
+    "Less drifting, more shooting."
+  ],
+  "ChitChat_Callback_Interdicted": [
+    "I'm still thinking about that interdiction back in {interdict_system}. || Whoever it was, they were persistent.",
+    "Remember {interdict_system}, when we got pulled out of supercruise? I'd rather not do that again.",
+    "That interdiction in {interdict_system} wasn't so long ago. Keep an eye on the scanner out here."
+  ],
+  "ChitChat_Callback_Kill": [
+    "Our last kill was back in {kill_system}. It's been quiet since.",
+    "Since {kill_system} we've had it easy. Not that I'm complaining.",
+    "That fight in {kill_system} feels like a while ago now. Good flying, Commander."
   ]
 }

@@ -492,6 +492,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Optional. Runs a small model on this PC (no internet, nothing sent) for open conversation. Press 'Install AI chat' (below) first. Uses about 1 GB RAM while chatting and gives it back after 10 quiet minutes. She falls back to her normal lines if it is slow"),
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
+            Field("chitchat.notice", "She notices how the night is going", "toggle",
+                  help="At a quiet moment she remarks on counts such as kills, interdictions, scans, systems visited or jumps since a fuel scoop. Only when the count passes a step, and never in red alert"),
             Field("chitchat.frequency", "How often she chats", "choice", CHITCHAT,
                   help="Normal is about every 5 to 8 quiet minutes, Chatty about every 2 to 3"),
             Field("personality.pet_names", "Pet names", "toggle", help="Sweetheart, darling... or worse"),

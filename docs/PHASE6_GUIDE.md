@@ -1435,3 +1435,7 @@ window use the same code as the biology list.
 ## 0.88.4 - Chord letters clash
 
 * BindingBook.conflicts also reports a chord's non-Shift/Ctrl/Alt modifier keys that are bound on their own to another action in the same view (night vision S+V+R+RShift vs DeployHeatSink on V).
+
+## 0.89.0 - Noticing, looking back, calm combat lines
+
+* personality/chitchat.py: counters (kills, interdictions, scans, systems, since_scoop), MILESTONES + milestone_keys() (first in the pick order), last_moment callbacks (ChitChat_Callback_*), setting chitchat.notice. voicepacks/default/chitchat.json: new pools. Tests: tests/test_chitchat.Noticing, LookingBack.
