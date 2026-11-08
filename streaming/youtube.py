@@ -179,6 +179,7 @@ class YouTubeChat:
         else:
             for message in messages:
                 self.on_message(message)
+        self._refused = 0
         self.on_status("Connected to the YouTube live chat")
         return poll_seconds(page.get("pollingIntervalMillis"))
 
@@ -194,6 +195,14 @@ class YouTubeChat:
             self.chat_id = ""
             self.on_status("That live chat has ended or is not available. Waiting...")
             return NO_CHAT_RETRY
-        log.info("YouTube chat answered %s %s", error.status, reason)
-        self.on_status("YouTube said no (%s %s). Retrying..." % (error.status, reason))
-        return 30.0
+        # Anything else (a plain 403 'forbidden' for example): wait longer each time (30 s, 1, 2, then 5 minutes) so a key that is simply
+        # not allowed does not hammer YouTube all stream (the 0.88.0 log had 405 tries in 3.5 hours). Only the first few are logged.
+        self._refused = getattr(self, "_refused", 0) + 1
+        wait = min(300.0, 30.0 * (2 ** (self._refused - 1)))
+        if self._refused <= 3:
+            log.info("YouTube chat answered %s %s", error.status, reason)
+        if error.status == 403:
+            self.on_status("YouTube said no (403 %s). The key may be restricted (Google Cloud > Credentials > API restrictions), or this chat is not open to it. Trying again in %d s." % (reason or "forbidden", wait))
+        else:
+            self.on_status("YouTube said no (%s %s). Retrying..." % (error.status, reason))
+        return wait

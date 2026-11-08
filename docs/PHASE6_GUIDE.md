@@ -1423,3 +1423,7 @@ window use the same code as the biology list.
 ## 0.88.1 - Red alert: no speed-up, banner like the bio box, quiet in combat
 
 * red_alert.speed removed (uncached fast speech cost up to 120% of a core). ui/red_alert_overlay.py now a canvas window like bio_overlay. Flavour(combat_provider) -> app._in_combat (target_locked or attacked_at < 120 s) drops pet names and remarks.
+
+## 0.88.2 - YouTube chat: growing back-off on 403
+
+* streaming/youtube.py _api_problem: unknown errors (403 forbidden) wait 30/60/120/240/300 s, reset by a good fetch; clearer status text.

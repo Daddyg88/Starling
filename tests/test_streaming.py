@@ -435,6 +435,16 @@ class YouTubeLoop(unittest.TestCase):
         chat_._api_problem(youtube.ApiError(500, ""))
         self.assertTrue(all("KEY123" not in s for s in statuses))
 
+    def test_a_refused_key_is_retried_more_and_more_slowly(self):
+        statuses = []
+        chat_, _g, status, _c = self.make([])
+        chat_.on_status = statuses.append
+        waits = [chat_._api_problem(youtube.ApiError(403, "forbidden")) for _ in range(7)]
+        self.assertEqual(waits, [30.0, 60.0, 120.0, 240.0, 300.0, 300.0, 300.0])
+        self.assertIn("restricted", statuses[-1])
+        chat_._refused = 0                                           # a good answer resets it (see _fetch)
+        self.assertEqual(chat_._api_problem(youtube.ApiError(500, "")), 30.0)
+
     def test_run_survives_network_errors(self):
         chat_, _g, status, _c = self.make([OSError("down"), RuntimeError("boom")])
         waits = []
