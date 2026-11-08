@@ -107,16 +107,46 @@ class RedAlertOverlay:
     def _make(self, colour):
         import tkinter as tk
         window = tk.Toplevel(self.root)
+        window.withdraw()                    # never let it appear (and take the game's focus) before it is set up
         window.overrideredirect(True)
-        window.attributes("-topmost", True)
         window.configure(bg=colour)
         window.update_idletasks()
+        self._harden(window)
+        return window
+
+    @staticmethod
+    def _hwnd(window):
+        import ctypes
+        return ctypes.windll.user32.GetParent(window.winfo_id()) or window.winfo_id()
+
+    def _harden(self, window):
+        """Windows: makes sure the window can never take a click or the keyboard focus from the game. Called every time it is shown,
+        because changing see-through settings in tkinter can quietly reset these (0.87.2: the first version lost them and the player
+        got a mouse cursor and could not click). WS_EX_LAYERED | TRANSPARENT (clicks go through) | TOOLWINDOW | NOACTIVATE (never active)."""
         try:
-            from ui.bio_overlay import BioOverlay
-            BioOverlay._click_through(window)
+            import ctypes
+            user32 = ctypes.windll.user32
+            hwnd = self._hwnd(window)
+            style = user32.GetWindowLongW(hwnd, -20)
+            wanted = style | 0x80000 | 0x20 | 0x80 | 0x08000000
+            if wanted != style:
+                user32.SetWindowLongW(hwnd, -20, wanted)
         except Exception:
             pass
-        return window
+
+    def _put_on_top_without_focus(self, window):
+        """Shows the window and keeps it on top WITHOUT activating it (tkinter's deiconify and -topmost can activate it)."""
+        try:
+            import ctypes
+            user32 = ctypes.windll.user32
+            hwnd = self._hwnd(window)
+            user32.ShowWindow(hwnd, 4)                                           # SW_SHOWNOACTIVATE
+            user32.SetWindowPos(hwnd, -1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010)  # TOPMOST, no move, no size, no activate
+        except Exception:
+            try:
+                window.deiconify()
+            except Exception:
+                pass
 
     def _show(self):
         import tkinter as tk
@@ -144,17 +174,15 @@ class RedAlertOverlay:
                 rings, each = bands(w, h)
                 for left, top, right, bottom, colour in rings:
                     self.canvas.create_rectangle(left, top, right, bottom, outline=colour, width=each + 1)
-        if not self._shown:
-            self.tint.deiconify()
-            self.frame.deiconify()
-            self._shown = True
         try:
             self.tint.attributes("-alpha", tint_alpha(strength) if want_tint else 0.0)
             self.frame.attributes("-alpha", edge_alpha(strength) if want_glow else 0.0)
-            self.tint.attributes("-topmost", True)
-            self.frame.attributes("-topmost", True)
         except Exception:
             pass
+        for window in (self.tint, self.frame):
+            self._harden(window)                                 # again, after the see-through settings above (they can reset it)
+            self._put_on_top_without_focus(window)
+        self._shown = True
 
     def _hide(self):
         for window in (self.tint, self.frame):

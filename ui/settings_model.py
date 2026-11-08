@@ -268,7 +268,7 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
         ]),
         Page("redalert", "Red alert", "Say 'red alert' (or press the button below) and she speaks faster, stops chatting (no idle talk, pet names or remarks; warnings and answers stay) the cockpit goes to combat mode and the screen gets a steady red filter with a thin red edge. Say 'stand down' or 'all clear' to end it. It is never saved: restarting her ends it. The glow needs Elite in Borderless or Windowed mode.", [
-            Field("red_alert.speed", "How much faster she speaks", "choice", [("25% faster", 1.25), ("50% faster", 1.5), ("75% faster", 1.75), ("Twice as fast", 2.0)],
+            Field("red_alert.speed", "How much faster she speaks", "choice", [("10% faster", 1.1), ("20% faster", 1.2), ("30% faster", 1.3), ("50% faster", 1.5), ("75% faster", 1.75), ("Twice as fast", 2.0)],
                   help="Her words are made on the spot at this speed (lines she has not said fast before take a moment to start); the more she says them, the quicker they come"),
             Field("red_alert.minutes", "Stand down by itself after", "choice", [("Never", 0), ("10 minutes", 10), ("20 minutes", 20), ("30 minutes", 30), ("60 minutes", 60)],
                   help="So red alert cannot be left on by mistake"),

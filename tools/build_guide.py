@@ -200,7 +200,7 @@ EXTRA = [
         ('The company', ['Tell me about the East Orion Company', 'Tell me more']),
         ('Who runs it', ['Who is the CEO?']),
         ('About her', ['Who are you?', 'Tell me about yourself'])]),
-    ('redalert', 'Red alert', 'A mood switch for tense moments. She speaks faster (50% by default), stops chatting (no idle talk, pet names or remarks; safety warnings and answers to your commands stay) and the cockpit switches to combat mode and the screen gets a steady (not pulsing) red filter with a thin soft red edge. It ends when you say so, after 30 minutes by default, or when she restarts. The glow needs Elite in Borderless or Windowed mode and does not change the cockpit lights.', [
+    ('redalert', 'Red alert', 'A mood switch for tense moments. She speaks faster (20% by default), stops chatting (no idle talk, pet names or remarks; safety warnings and answers to your commands stay) and the cockpit switches to combat mode and the screen gets a steady (not pulsing) red filter with a thin soft red edge. It ends when you say so, after 30 minutes by default, or when she restarts. The glow needs Elite in Borderless or Windowed mode and does not change the cockpit lights.', [
         ('Start red alert', ['Red alert', 'Battle stations', 'Go to red alert']),
         ('End it', ['Stand down', 'All clear', 'Cancel red alert'])]),
     ('stream', 'For streamers', 'Say these and she talks to your viewers.', [

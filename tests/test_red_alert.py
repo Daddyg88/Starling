@@ -29,7 +29,7 @@ class Switch(unittest.TestCase):
         a = self.build()
         self.assertTrue(a.turn_on())
         self.assertTrue(self.speech.alert and self.flavour.red_alert)
-        self.assertEqual(self.kokoro.speed_boost, 1.5)
+        self.assertEqual(self.kokoro.speed_boost, 1.2)
         self.assertEqual(self.narrator.said, ["RedAlert_On"])
         self.assertTrue(a.turn_off())
         self.assertFalse(self.speech.alert or self.flavour.red_alert)
@@ -49,7 +49,7 @@ class Switch(unittest.TestCase):
         self.assertEqual(self.kokoro.speed_boost, 1.75)
         self.assertEqual(red_alert.speed_setting(make_settings(red_alert={"speed": 9})), 2.0)
         self.assertEqual(red_alert.speed_setting(make_settings(red_alert={"speed": 0.2})), 1.0)
-        self.assertEqual(red_alert.speed_setting(make_settings(red_alert={"speed": "x"})), 1.5)
+        self.assertEqual(red_alert.speed_setting(make_settings(red_alert={"speed": "x"})), 1.2)
 
     def test_it_stands_down_by_itself(self):
         a = self.build(red_alert={"minutes": 10})
@@ -177,3 +177,54 @@ class CombatMode(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NeverTakesTheMouse(unittest.TestCase):
+    def test_the_overlay_hardens_and_shows_without_activating(self):
+        """0.87.2: the first version took the game's focus (mouse cursor appeared, clicks blocked). Check the safe Windows calls are
+        the ones used, with a fake user32, since the real one only exists on Windows."""
+        import sys
+        import types
+        calls = []
+
+        class User32:
+            def GetParent(self, h):
+                return 0
+
+            def GetWindowLongW(self, h, i):
+                calls.append(("get", i))
+                return 0
+
+            def SetWindowLongW(self, h, i, v):
+                calls.append(("set", i, v))
+
+            def ShowWindow(self, h, c):
+                calls.append(("show", c))
+
+            def SetWindowPos(self, h, after, x, y, w, hh, flags):
+                calls.append(("pos", after, flags))
+
+        class Window:
+            def winfo_id(self):
+                return 7
+
+        fake = types.SimpleNamespace(windll=types.SimpleNamespace(user32=User32()))
+        real = sys.modules.get("ctypes")
+        overlay = glow.RedAlertOverlay.__new__(glow.RedAlertOverlay)
+        import ctypes
+        old = getattr(ctypes, "windll", None)
+        ctypes.windll = fake.windll
+        try:
+            overlay._harden(Window())
+            overlay._put_on_top_without_focus(Window())
+        finally:
+            if old is None:
+                del ctypes.windll
+            else:
+                ctypes.windll = old
+        setcall = [c for c in calls if c[0] == "set"][0]
+        self.assertTrue(setcall[2] & 0x20)               # clicks go through
+        self.assertTrue(setcall[2] & 0x08000000)         # never the active window
+        self.assertIn(("show", 4), calls)                # SW_SHOWNOACTIVATE, not a normal show
+        pos = [c for c in calls if c[0] == "pos"][0]
+        self.assertTrue(pos[2] & 0x10)                   # SWP_NOACTIVATE

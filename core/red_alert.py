@@ -1,7 +1,7 @@
 """RED ALERT: one switch that changes how she behaves and how the screen looks.
 
 While it is on:
-  * she speaks faster (settings red_alert.speed, default 1.5 = 50% quicker)
+  * she speaks faster (settings red_alert.speed, default 1.2 = 20% quicker)
   * she stops chatting: no idle chit-chat, no pet names or remarks added to her lines. Safety warnings and the answers to your commands
     are never touched
   * a pulsing red glow around the edge of the screen and a very light red tint (ui/red_alert_overlay.py)
@@ -24,9 +24,9 @@ def clean(text):
 
 def speed_setting(settings):
     try:
-        return max(1.0, min(MAX_SPEED, float(settings.get("red_alert.speed", 1.5))))
+        return max(1.0, min(MAX_SPEED, float(settings.get("red_alert.speed", 1.2))))
     except (TypeError, ValueError):
-        return 1.5
+        return 1.2
 
 
 class RedAlert:

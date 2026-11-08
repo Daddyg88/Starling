@@ -1411,3 +1411,7 @@ window use the same code as the biology list.
 ## 0.87.1 - Red alert calmer + combat mode
 
 * red_alert_overlay: steady (no pulse), thinner edge, stronger tint; RedAlert(combat_mode=app._red_alert_combat_mode) runs 'switch to combat mode' in a thread; setting red_alert.combat_mode.
+
+## 0.87.2 - Red alert focus + speed
+
+* red_alert_overlay: windows created withdrawn, _harden (layered/transparent/toolwindow/noactivate) re-applied on every show, ShowWindow SW_SHOWNOACTIVATE + SetWindowPos NOACTIVATE; default speed 1.2.
