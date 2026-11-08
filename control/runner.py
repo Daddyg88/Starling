@@ -679,10 +679,23 @@ class CommandRunner:
             trace.append("sub>already")
             return None
         seen = [state.target_subsystem] if state.target_subsystem else []
+        action = "CycleNextSubsystem"
+        way = subsystems.shorter_way(subsystems.which(state.target_subsystem, state.target_subsystem_readable), key)
+        if way == "previous":                                       # fewer presses the other way round (Previous Subsystem is optional)
+            try:
+                back, _why = self.book.lookup("CyclePreviousSubsystem")
+            except Exception:
+                back = None
+            if back is not None:
+                strokes = dict(strokes)
+                strokes["CyclePreviousSubsystem"] = back
+                action = "CyclePreviousSubsystem"
+        log.info("Sub target: going %s from %r to %s", "backwards" if action == "CyclePreviousSubsystem" else "forwards",
+                 state.target_subsystem_readable or state.target_subsystem or "nothing", key)
         for number in range(self.SUBSYSTEM_PRESSES):
             before = state.target_seq
-            problem = self.sender.send(strokes["CycleNextSubsystem"], hold=0.1)
-            pressed.append("CycleNextSubsystem")
+            problem = self.sender.send(strokes[action], hold=0.1)
+            pressed.append(action)
             if problem:
                 return problem
             started = time.monotonic()

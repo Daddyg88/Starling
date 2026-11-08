@@ -48,6 +48,7 @@ class Commands(unittest.TestCase):
         state = GameState()
         state.target_locked, state.target_scan = locked, scan
         position = [start if start is not None else -1]
+        r.book.table["CyclePreviousSubsystem"] = (Keystroke("Key_P"), "")
         presses = []
         if start is not None:
             state.target_subsystem, state.target_subsystem_readable = order[start]
@@ -59,7 +60,8 @@ class Commands(unittest.TestCase):
             presses.append(stroke.key)
             if silent:
                 return None
-            position[0] = (position[0] + 1) % (len(order) + 1)             # after the last part it wraps to "no subsystem"
+            step = -1 if stroke.key == "Key_P" else 1
+            position[0] = (position[0] + step) % (len(order) + 1)          # after the last part it wraps to "no subsystem"
             if drop_lock_at and len(presses) >= drop_lock_at:
                 state.target_locked = False
             if position[0] < len(order):
@@ -85,6 +87,20 @@ class Commands(unittest.TestCase):
         outcome, presses = self.run_command("sub target the power plant", order=order)
         self.assertEqual(outcome.status, "done")
         self.assertEqual(len(presses), 4)
+
+    def test_goes_backwards_when_that_is_shorter(self):
+        order = [("$ext_drive_class1_c_name;", "Drive"), ("$int_powerplant_size2_class3_name;", "Power Plant"), ("$int_hyperdrive_size3_class3_name;", "FSD"),
+                 ("$int_lifesupport_size1_class3_name;", "Life Support"), ("$int_powerdistributor_size2_class3_name;", "Power Distributor"),
+                 ("$int_shieldgenerator_size3_class5_name;", "Shield Generator"), ("$modularcargobaydoor_name;", "Cargo Hatch")]
+        outcome, presses = self.run_command("sub target the power plant", order=order, start=4)      # from the distributor: 3 back, 6 forward
+        self.assertEqual(outcome.status, "done")
+        self.assertEqual(presses, ["Key_P"] * 3)
+
+    def test_ring_choice(self):
+        self.assertEqual(subsystems.shorter_way("distributor", "powerplant"), "previous")
+        self.assertEqual(subsystems.shorter_way("powerplant", "distributor"), "next")
+        self.assertEqual(subsystems.shorter_way(None, "powerplant"), "next")
+        self.assertEqual(subsystems.shorter_way("weapons", "sensors"), "next")
 
     def test_already_selected_presses_nothing(self):
         outcome, presses = self.run_command("sub target the power plant", start=2)
@@ -169,6 +185,7 @@ class FastLooking(unittest.TestCase):
         class Counter:
             count = 0
             path = None
+            processor = None
 
             def poll_once(self):
                 self.count += 1
@@ -201,3 +218,18 @@ class FastLooking(unittest.TestCase):
         with self.assertLogs("starling", level="INFO"):
             r.run_text("sub target the power plant")
         self.assertEqual(asked, [40, 0])
+
+
+class YesAndTheCommand(unittest.TestCase):
+    def test_yes_followed_by_the_command_counts(self):
+        from control.confirm import Confirmer
+
+        class Match:
+            phrase = "sub target shield generator"
+        c = Confirmer(lambda: 0.0)
+        c.ask(Match(), "target shield cell bank")
+        self.assertEqual(c.answer("Yes, target the shield generator."), "yes")
+        c.ask(Match(), "x")
+        self.assertIsNone(c.answer("Yes, open the galaxy map"))          # a yes followed by something else is a new sentence
+        c.ask(Match(), "x")
+        self.assertEqual(c.answer("yes"), "yes")

@@ -31,3 +31,27 @@ def matches(key, raw, readable=""):
         return False
     text = squash(raw, readable)
     return any(piece in text for piece in SUBSYSTEMS[key][1])
+
+
+# The order the game cycles in (from Benny's 8 Nov 2026 log): the engines ("Drive", twice), power plant, FSD, life support,
+# power distributor, shield generator, [FSD interdictor], cargo hatch, then every weapon and the manifest scanner, then round again.
+# Used only to choose between Next and Previous Subsystem; she still checks the journal after every press.
+RING = ("engines", "powerplant", "fsd", "lifesupport", "distributor", "shields", "cargo", "weapons")
+
+
+def which(raw, readable=""):
+    """The key (see SUBSYSTEMS) of the part the game names, or None when it is not one of the ring parts."""
+    for key in RING:
+        if matches(key, raw, readable):
+            return key
+    return None
+
+
+def shorter_way(current, wanted):
+    """'next' or 'previous': whichever is fewer presses round the ring. Unknown current part: 'next'."""
+    if current not in RING or wanted not in RING:
+        return "next"
+    size = len(RING)
+    forward = (RING.index(wanted) - RING.index(current)) % size
+    backward = (RING.index(current) - RING.index(wanted)) % size
+    return "previous" if backward < forward else "next"

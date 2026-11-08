@@ -8,7 +8,7 @@ sentence. Big actions (jumping, supercruise) are only ever done after a clear ye
 """
 import re
 
-WINDOW_SECONDS = 10.0
+WINDOW_SECONDS = 15.0              # her question can take 3 or 4 seconds to say, so the answer window starts to feel short at 10
 YES = {"yes", "yeah", "yep", "yup", "aye", "correct", "right", "thats right", "thats it", "thats the one", "that one", "exactly", "do it",
        "go ahead", "please", "yes please", "sure", "affirmative", "yes thats right", "yes do it", "yeah thats right", "yeah do it",
        "yes it is", "yes i did", "that is right", "ok", "okay"}
@@ -46,8 +46,22 @@ class Confirmer:
             return "yes"
         if said in NO:
             return "no"
+        if self._yes_and_the_command(said):
+            return "yes"
         self.pending = None
         return None
+
+    def _yes_and_the_command(self, said):
+        """'yes, target the shield generator' while she is asking 'say yes if you meant sub target shield generator': a yes word followed by
+        (nearly) the words she asked about counts as a yes. 'yes' followed by something else does not."""
+        words = said.split()
+        if len(words) < 2 or words[0] not in ("yes", "yeah", "yep", "yup", "correct", "sure", "right"):
+            return False
+        rest = [w for w in words[1:] if w not in ("the", "a", "my", "please")]
+        asked = [w for w in tidy(getattr(self.pending[0], "phrase", "") or "").split() if w not in ("the", "a", "my")]
+        if not rest or not asked:
+            return False
+        return sum(1 for w in rest if w in asked) / len(rest) >= 0.75
 
     def take(self):
         pending, self.pending = self.pending, None

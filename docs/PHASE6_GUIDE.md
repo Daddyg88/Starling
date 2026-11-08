@@ -1399,3 +1399,7 @@ window use the same code as the biology list.
 ## 0.86.3 - Faster sub targeting
 
 * journal/monitor.py look_fast(seconds); runner.journal_boost (set in core/app.py) wraps _subsystem_step: boost(40) ... boost(0) in finally; 0.05 s waits.
+
+## 0.86.4 - Shorter way round, yes + command
+
+* subsystems.RING / which / shorter_way; runner._subsystem_walk picks Next or Previous; confirm.py accepts 'yes, <the command>' and a 15 s window.
