@@ -124,3 +124,19 @@ class JournalToState(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LeftPanelTabs(unittest.TestCase):
+    def test_phrases_and_macros(self):
+        from control.macros import actions_in, parse_macro
+        r = test_macros.MacroTests().build()
+        wanted = {"open contacts": ("panel_contacts", 2), "open the navigation tab": ("panel_navigation", 0),
+                  "show transactions": ("panel_transactions", 1), "open the target tab": ("panel_target", 3), "contacts panel": ("panel_contacts", 2)}
+        for text, (command_id, tab) in wanted.items():
+            m = r.matcher.match(text)
+            self.assertEqual(m.command.id, command_id, text)
+            steps = parse_macro(m.command.macro)
+            self.assertEqual(steps[0], ("openleft",))
+            self.assertEqual(steps[1][:2], ("tab", tab))
+            self.assertIn("FocusLeftPanel", actions_in(steps))
+        self.assertEqual(r.matcher.match("open the left panel").command.id, "left_panel")

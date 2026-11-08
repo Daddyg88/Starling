@@ -1387,3 +1387,7 @@ window use the same code as the biology list.
 ## 0.86.0 - Sub targeting
 
 * control/subsystems.py (names), game_state target_* fields filled by combat_events._target_update, macro step `subsystem <key>`, runner._subsystem_step (press CycleNextSubsystem, wait for ShipTargeted, up to 14), commands sub_powerplant/engines/fsd/shields/lifesupport/distributor/sensors/cargo, statuses no_target/no_scan/no_subsystem/sub_unread with voice pools.
+
+## 0.86.1 - Left panel tabs
+
+* catalog: panel_navigation / panel_transactions / panel_contacts / panel_target = LEFT_TAB (open left panel + tab N); left_panel phrases narrowed to 'left panel'.

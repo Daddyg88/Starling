@@ -13,7 +13,7 @@
   "retract cargo scoop",
   "boost",
   "open the comms panel",
-  "open the navigation panel",
+  "open the left panel",
   "set speed to zero",
   "turn on night vision",
   "turn on silent running",
@@ -23,6 +23,6 @@
   "turn on the flight assist",
   "switch to analysis mode",
   "switch to combat mode",
-  "open the contacts panel"
+  "open the role panel"
  ]
 }

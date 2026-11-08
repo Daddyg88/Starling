@@ -80,7 +80,7 @@ GROUPS = [
      ['deploy_nomad', 'deploy_slf', 'deploy_srv', 'deploy_rhino', 'deploy_scarab', 'disembark']),
     ('subtarget', 'Sub targeting (combat)', 'After a ship is locked and fully scanned you can pick a part to shoot. Say "sub target the power plant" and she presses Next Subsystem, checking the game journal after each press, until that part is selected. If nothing is locked, the ship is not fully scanned yet, or that ship does not show that part, she tells you instead of pressing on. Needs a keyboard key on Cycle Next Subsystem.',
      [i for i in C if i.startswith('sub_')]),
-    ('panels', 'Right-hand panel tabs', 'She opens the right panel and looks at it to find the tab, so it works whichever tab was open last. If she cannot see the panel she says so and presses nothing more.',
+    ('panels', 'Panel tabs (left and right)', 'She opens the panel and looks at it to find the tab, so it works whichever tab was open last. Left panel: Navigation, Transactions, Contacts, Target. Right panel: Home, Modules, Fire Groups, Ship, Inventory, Storage, Status. If she cannot see the panel she says so and presses nothing more.',
      [i for i in C if i.startswith('panel_')] + ['close_panels']),
     ('combat', 'Combat', 'Targets, power, countermeasures and wingmen.',
      ['next_target', 'prev_target', 'next_hostile', 'prev_hostile', 'highest_threat', 'next_route_system',

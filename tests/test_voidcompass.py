@@ -71,7 +71,7 @@ class MatchingTests(unittest.TestCase):
 
     def test_ship_commands_still_win_when_no_overlay_word(self):
         self.assertEqual(self.matcher.match("open the left panel").command.id, "left_panel")
-        self.assertEqual(self.matcher.match("show navigation").command.id, "left_panel")
+        self.assertEqual(self.matcher.match("show navigation").command.id, "panel_navigation")
         self.assertEqual(self.matcher.match("deploy the cargo scoop").command.id, "scoop")
 
     def test_hide_and_show_everything(self):

@@ -134,6 +134,10 @@ class Command:
 
 # 0.84.0: the right-hand panel tabs, in order: home icon, Modules, Fire Groups, Ship, Inventory, Storage, Status. She opens the panel from
 # whatever is on screen and LOOKS at the tab bar to walk to the tab (like docking, no blind fallback: if she cannot see, she says so).
+def LEFT_TAB(number):
+    return ("open left panel", "tab " + number)
+
+
 def RIGHT_TAB(name):
     return ("open right panel", "right tab " + name)
 
@@ -479,9 +483,22 @@ CATALOG = [
 
     # ------------------------------------------------------------------ cockpit panels and radar
     C("left_panel", "FocusLeftPanel", "the left panel",
-      press=["{OPEN_V} [the] (left|target|navigation|nav|contacts) panel", "(left|target|navigation|nav|contacts) panel",
-             "(show|open) contacts", "(show|open) navigation", "navigation panel"],
+      press=["{OPEN_V} [the] left panel", "left panel"],
       doing={"press": "Opening the left panel"}),
+    # 0.86.1: the left-hand panel tabs, like the right-hand ones: she opens the panel from whatever is on screen and LOOKS at the tab
+    # bar to walk to the tab. Tabs: 0 Navigation, 1 Transactions, 2 Contacts, 3 Target.
+    C("panel_navigation", "FocusLeftPanel", "the navigation tab",
+      press=["{OPEN_V} [the] (navigation|nav) [tab|panel|page|screen]", "(navigation|nav) (tab|panel|page|screen)", "(go|switch) to [the] (navigation|nav)"],
+      doing={"press": "Opening the navigation tab"}, strict=True, macro=LEFT_TAB("0")),
+    C("panel_transactions", "FocusLeftPanel", "the transactions tab",
+      press=["{OPEN_V} [the] transactions [tab|panel|page|screen]", "transactions (tab|panel|page|screen)", "(go|switch) to [the] transactions"],
+      doing={"press": "Opening the transactions tab"}, strict=True, macro=LEFT_TAB("1")),
+    C("panel_contacts", "FocusLeftPanel", "the contacts tab",
+      press=["{OPEN_V} [the] contacts [tab|panel|page|screen|list]", "contacts (tab|panel|page|screen|list)", "(go|switch) to [the] contacts"],
+      doing={"press": "Opening the contacts tab"}, strict=True, macro=LEFT_TAB("2")),
+    C("panel_target", "FocusLeftPanel", "the target tab",
+      press=["{OPEN_V} [the] target (tab|panel|page|screen)", "target (tab|panel|page|screen)", "(go|switch) to [the] target (tab|panel)"],
+      doing={"press": "Opening the target tab"}, strict=True, macro=LEFT_TAB("3")),
     C("comms_panel", "FocusCommsPanel", "the comms panel",
       press=["{OPEN_V} [the] (comms|chat|messages|communications) panel", "(comms|chat|communications) panel", "{OPEN_V} comms",
              "check (messages|comms)", "(any|new) messages"],
