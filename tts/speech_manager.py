@@ -59,6 +59,7 @@ class SpeechManager:
         self._counter = itertools.count()
         self._warned_no_voice = False
         self.dropped = 0
+        self.alert = False               # RED ALERT (core/red_alert.py): background chatter is dropped
 
     # ---- lifecycle ----
     def start(self):
@@ -90,7 +91,7 @@ class SpeechManager:
         with self._cond:
             if not self._running:
                 return False
-            if priority == "low" and (self._current is not None or self._queue):
+            if priority == "low" and (self.alert or self._current is not None or self._queue):
                 self.dropped += 1
                 return False
             if priority == "critical":

@@ -64,6 +64,7 @@ class App:
         self.memory_keeper = None
         self.memory_recall = None
         self.chitchat = None
+        self.red_alert = None            # core/red_alert.py: 'red alert' / 'stand down' (never saved)
         self.warmer = None
         self.smalltalk = None
         self.brain = None
@@ -415,6 +416,14 @@ class App:
                     lambda: self.state, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
             except Exception:
                 self.log.exception("The biology overlay voice command could not start")
+            try:
+                from core.red_alert import RedAlert
+                from navigation.voice import Narrator
+                self.red_alert = RedAlert(self.settings, lambda: self.speech, lambda: self.providers.get("kokoro"), lambda: self.flavour,
+                                          Narrator(lambda: self.speech, lambda: self.dialogue, self.settings))
+                self.commands.extra_helpers.insert(0, self.red_alert)
+            except Exception:
+                self.log.exception("Red alert could not start")
             try:
                 from streaming.voice import StreamChatVoice
                 from navigation.voice import Narrator

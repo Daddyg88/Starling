@@ -1403,3 +1403,7 @@ window use the same code as the biology list.
 ## 0.86.4 - Shorter way round, yes + command
 
 * subsystems.RING / which / shorter_way; runner._subsystem_walk picks Next or Previous; confirm.py accepts 'yes, <the command>' and a 15 s window.
+
+## 0.87.0 - Red alert
+
+* core/red_alert.py (switch + voice helper), SpeechManager.alert drops low-priority chatter, Flavour.red_alert skips remarks/pet names, KokoroTTS.speed_boost, ui/red_alert_overlay.py (two click-through windows: pulsing frame + tint), settings red_alert.*, Red alert page, voicepack RedAlert_On / RedAlert_Off.

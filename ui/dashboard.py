@@ -97,6 +97,13 @@ class Dashboard:
             log.exception("The biology overlay could not start")
             self.bio_overlay = None
         try:
+            from ui.red_alert_overlay import RedAlertOverlay
+            self.red_alert_overlay = RedAlertOverlay(self.root, app.settings, lambda: bool(getattr(getattr(app, "red_alert", None), "active", False)),
+                                                    tick=lambda: getattr(app, "red_alert", None) and app.red_alert.tick())
+        except Exception:
+            log.exception("The red alert glow could not start")
+            self.red_alert_overlay = None
+        try:
             from ui.route_overlay import RouteOverlay
             self.route_overlay = RouteOverlay(self.root, app.settings, lambda: app.state, lambda: app.route_follower,
                                               lambda: bool(getattr(app, "watcher", None) and app.watcher.void_compass_running()))
@@ -812,6 +819,9 @@ class Dashboard:
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
                       ("Clear the route", self.nav_clear),
                       ("Show a test route map for 10 seconds", self.test_route_overlay)]
+        if page.id == "redalert":
+            extra += [("Red alert: switch on / off", self.toggle_red_alert),
+                      ("Show the red glow for 8 seconds (test)", self.test_red_alert)]
         if page.id == "listening":
             extra += [("Learn push-to-talk button", self.learn_button)]
         if page.id == "developer":
@@ -1585,6 +1595,20 @@ class Dashboard:
             self.model.save()
         if getattr(self, "bio_overlay", None) is not None:
             self.bio_overlay.show_test(10)
+
+    def toggle_red_alert(self):
+        alert = getattr(self.app, "red_alert", None)
+        if alert is None:
+            self.save_note.configure(text="Red alert is not ready yet (her voice has to be switched on).", text_color=T.WARN)
+            return
+        on = alert.toggle()
+        self.save_note.configure(text="RED ALERT is ON" if alert.active else "Red alert is off", text_color=T.WARN if alert.active else T.MUTED)
+
+    def test_red_alert(self):
+        if self.model.dirty():
+            self.model.save()
+        if getattr(self, "red_alert_overlay", None) is not None:
+            self.red_alert_overlay.show_test(8)
 
     def test_route_overlay(self):
         """Shows a made-up Sol to Colonia route for 10 seconds, so you can check where the map sits (save settings first)."""

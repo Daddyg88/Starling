@@ -180,8 +180,8 @@ class Flavour:
     # ---- the one call the speaker makes ----
     def apply(self, text, priority="normal"):
         """Return `text`, possibly with a pet name and/or a remark added."""
-        if priority == "critical" or not self.active() or not text:
-            return text
+        if priority == "critical" or not self.active() or not text or getattr(self, "red_alert", False):
+            return text                                   # red alert: no pet names, no remarks
         mood = effective_mood(self.settings)
         text = self.rename(text)
 

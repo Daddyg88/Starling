@@ -428,7 +428,7 @@ class KokoroTTS(BaseTTS):
     def _synthesise_and_play(self, text, voice, sound):
         import numpy as np
         gain = max(0.0, min(1.0, voice.volume / 100.0))
-        speed = speed_from_rate(voice.rate)
+        speed = min(2.0, speed_from_rate(voice.rate) * float(getattr(self, "speed_boost", 1.0) or 1.0))      # red alert makes this 1.5
         pieces = queue.Queue(maxsize=QUEUE_PIECES)
         end = object()
         problem = []

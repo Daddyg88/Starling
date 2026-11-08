@@ -200,6 +200,9 @@ EXTRA = [
         ('The company', ['Tell me about the East Orion Company', 'Tell me more']),
         ('Who runs it', ['Who is the CEO?']),
         ('About her', ['Who are you?', 'Tell me about yourself'])]),
+    ('redalert', 'Red alert', 'A mood switch for tense moments. She speaks faster (50% by default), stops chatting (no idle talk, pet names or remarks; safety warnings and answers to your commands stay) and the screen gets a pulsing red edge glow with a faint red tint. It ends when you say so, after 30 minutes by default, or when she restarts. The glow needs Elite in Borderless or Windowed mode and does not change the cockpit lights.', [
+        ('Start red alert', ['Red alert', 'Battle stations', 'Go to red alert']),
+        ('End it', ['Stand down', 'All clear', 'Cancel red alert'])]),
     ('stream', 'For streamers', 'Say these and she talks to your viewers.', [
         ('Greet chat', ['Say hello to chat']),
         ('Thank chat', ['Thank chat for watching']),
@@ -217,7 +220,7 @@ EXTRA = [
 ]
 for gid, title, intro, rows in EXTRA:
     sections.append((gid, title, intro, simple(rows)))
-order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'panels', 'role', 'subtarget', 'ship', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
+order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'panels', 'role', 'subtarget', 'ship', 'redalert', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
 secmap = {s[0]: s for s in sections}
 sections = [secmap[k] for k in order]
 count = sum(t.count('<tr><td') for _, _, _, t in sections)

@@ -339,5 +339,15 @@
     "I pressed the key but the game didn't tell me what's selected, Commander, so I stopped.",
     "I can't tell which part is selected, Commander. Is the key bound?",
     "Nothing came back from the game, Commander, so I stopped cycling."
+  ],
+  "RedAlert_On": [
+    "Red alert, Commander. I'll keep it short.",
+    "Red alert. Eyes open, Commander.",
+    "Going to red alert. Only what matters from here."
+  ],
+  "RedAlert_Off": [
+    "Standing down, Commander. Back to normal.",
+    "Red alert cleared. You can breathe now, Commander.",
+    "All clear. Standing down."
   ]
 }
