@@ -1395,3 +1395,7 @@ window use the same code as the biology list.
 ## 0.86.2 - Sub target fixes
 
 * subsystems.py: engines = ext_drive, cargo = modularcargobaydoor, weapons = hpt; runner._subsystem_step ignores an adjacent repeat, 24 presses; sub_weapons command.
+
+## 0.86.3 - Faster sub targeting
+
+* journal/monitor.py look_fast(seconds); runner.journal_boost (set in core/app.py) wraps _subsystem_step: boost(40) ... boost(0) in finally; 0.05 s waits.

@@ -157,3 +157,47 @@ class LeftPanelTabs(unittest.TestCase):
             self.assertEqual(steps[1][:2], ("tab", tab))
             self.assertIn("FocusLeftPanel", actions_in(steps))
         self.assertEqual(r.matcher.match("open the left panel").command.id, "left_panel")
+
+
+class FastLooking(unittest.TestCase):
+    def test_monitor_looks_often_only_while_asked(self):
+        import tempfile
+        import time
+        from pathlib import Path
+        from journal.monitor import JournalMonitor
+
+        class Counter:
+            count = 0
+            path = None
+
+            def poll_once(self):
+                self.count += 1
+        with tempfile.TemporaryDirectory() as folder:
+            monitor = JournalMonitor(Path(folder), None, None, poll_seconds=1.0)
+            monitor.journal, monitor.status = Counter(), Counter()
+            monitor.start()
+            time.sleep(0.4)
+            slow = monitor.journal.count
+            monitor.look_fast(1.0)
+            time.sleep(0.9)
+            fast = monitor.journal.count - slow
+            monitor.look_fast(0)
+            time.sleep(0.3)
+            monitor.stop()
+        self.assertLessEqual(slow, 2)
+        self.assertGreaterEqual(fast, 6)                      # about ten a second while fast
+
+    def test_the_command_asks_for_fast_looking_and_always_hands_it_back(self):
+        t = test_macros.MacroTests()
+        r = t.build()
+        asked = []
+        r.journal_boost = asked.append
+        from control.binds import Keystroke
+        r.book.table = dict(r.book.table)
+        r.book.table["CycleNextSubsystem"] = (Keystroke("Key_N"), "")
+        state = GameState()                                    # nothing locked: she stops at once, but must still hand the boost back
+        r.state_provider = lambda: state
+        r.sleep = lambda s: None
+        with self.assertLogs("starling", level="INFO"):
+            r.run_text("sub target the power plant")
+        self.assertEqual(asked, [40, 0])

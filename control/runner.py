@@ -110,6 +110,7 @@ class CommandRunner:
         self.voidcompass = voidcompass   # control/voidcompass.py (made on first use if not given)
         self.clock = clock
         self.sleep = sleep
+        self.journal_boost = None               # (seconds) -> reads the journal ten times a second for a while (set by the app)
         self.confirmer = Confirmer(clock)       # "did you mean...?"
         self.trainer = None                     # stt/training.py: 'teach me your voice' (set by the app)
         self._last = {}
@@ -650,6 +651,16 @@ class CommandRunner:
     SUBSYSTEM_PRESSES = 24            # more than any ship has (weapons first, then the parts): after this many "next subsystem" she gives up
 
     def _subsystem_step(self, key, strokes, pressed, trace):
+        boost = self.journal_boost
+        if boost is not None:
+            boost(40)                                               # look at the journal ten times a second while this runs
+        try:
+            return self._subsystem_walk(key, strokes, pressed, trace)
+        finally:
+            if boost is not None:
+                boost(0)
+
+    def _subsystem_walk(self, key, strokes, pressed, trace):
         """Presses Next Subsystem until the game's journal says the wanted part is selected. The journal writes a ShipTargeted
         line for every change, so she checks after each press instead of counting blind. Sets self._role_status when it cannot
         be done. Returns None, or the sender's problem text."""
@@ -674,10 +685,12 @@ class CommandRunner:
             pressed.append("CycleNextSubsystem")
             if problem:
                 return problem
-            for _ in range(20):                                     # up to 2 seconds for the journal to catch up
-                self.sleep(0.1)
+            started = time.monotonic()
+            for _ in range(40):                                     # up to 2 seconds for the journal to catch up (checks every 0.05 s)
+                self.sleep(0.05)
                 if state.target_seq != before or not state.target_locked:
                     break
+            log.info("Sub target: the journal answered %.2f s after the key", time.monotonic() - started)
             if not state.target_locked:
                 self._role_status = "no_target"
                 return None

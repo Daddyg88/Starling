@@ -39,7 +39,17 @@ class JournalMonitor:
         self.journal = JournalWatcher(folder, processor, bus)
         self.status = StatusReader(folder, processor)
         self._stop = threading.Event()
+        self._wake = threading.Event()
+        self._fast_until = 0.0
         self._thread = None
+
+    FAST_SECONDS = 0.1
+
+    def look_fast(self, seconds):
+        """Looks at the journal ten times a second for the next `seconds` (0 = back to normal at once). For short jobs that wait on
+        the game's answer, like sub targeting; the rest of the time the slow, cheap one-second rate is used."""
+        self._fast_until = time.monotonic() + seconds if seconds > 0 else 0.0
+        self._wake.set()                      # do not sleep out the rest of the current second
 
     def start(self):
         self._thread = threading.Thread(target=self._run, name="journal-monitor", daemon=True)
@@ -64,5 +74,21 @@ class JournalMonitor:
             except Exception:
                 # Never let one bad moment kill the monitor.
                 log.exception("Problem while checking the journal")
-            self._stop.wait(self.poll_seconds)
+            self._wait()
         log.info("Journal monitor stopped")
+
+    def _wait(self):
+        """Sleeps until the next look: 0.1 s while look_fast is on, else poll_seconds. Status.json is only read at the normal rate."""
+        if time.monotonic() < self._fast_until:
+            end = time.monotonic() + self.poll_seconds
+            while not self._stop.is_set() and time.monotonic() < min(end, self._fast_until):
+                self._wake.clear()
+                self._stop.wait(self.FAST_SECONDS)
+                try:
+                    self.journal.poll_once()
+                except Exception:
+                    log.exception("Problem while checking the journal")
+            return
+        self._wake.clear()
+        if not self._stop.is_set():
+            self._wake.wait(self.poll_seconds)

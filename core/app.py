@@ -406,6 +406,7 @@ class App:
                 state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route(),
                 macro_hooks=self._macro_hooks(),
                 memory=self.memory_recall, smalltalk=self.smalltalk, brain=self.brain)
+            self.commands.journal_boost = lambda seconds: self.monitor.look_fast(seconds) if self.monitor is not None else None
             # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
             try:
                 from control.bio_voice import BioOverlayVoice
