@@ -51,6 +51,10 @@ LINE_FOR_STATUS = {
     "cannot_close": "CommandCannotTooClose",
     "cannot_key": "CommandCannotKey",
     "cannot_other": "CommandCannotDeploy",
+    "no_target": "CommandNoTarget",
+    "no_scan": "CommandNotScanned",
+    "no_subsystem": "CommandNoSubsystem",
+    "sub_unread": "CommandSubUnread",
     "unknown": "CommandUnknown",
     "vc_offline": "CommandVoidOffline",
     "vc_forbidden": "CommandVoidForbidden",
@@ -564,6 +568,14 @@ class CommandRunner:
                     if gui == "?":
                         break                                  # Status.json unreadable: one press, as a plain Back would
                 continue
+            if step[0] == "subsystem":
+                if self._role_status or self._no_button:
+                    continue
+                problem = self._subsystem_step(step[1], strokes, pressed, trace)
+                if problem:
+                    status = SEND_FAILURE_STATUS.get(problem, "failed")
+                    return Outcome(status, text, command, intent, detail=self._explain(status, command))
+                continue
             if step[0] == "openrole":
                 problem = self._open_left_panel(strokes, pressed, trace, "FocusRadarPanel", 4)
                 if problem:
@@ -634,6 +646,60 @@ class CommandRunner:
             self.echo.mute(quiet, 6)            # the game's "map closed" can arrive a moment after the last key
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
                        detail=command.do_text(intent) + ".")
+
+    SUBSYSTEM_PRESSES = 14            # more than any ship has: after this many "next subsystem" she gives up
+
+    def _subsystem_step(self, key, strokes, pressed, trace):
+        """Presses Next Subsystem until the game's journal says the wanted part is selected. The journal writes a ShipTargeted
+        line for every change, so she checks after each press instead of counting blind. Sets self._role_status when it cannot
+        be done. Returns None, or the sender's problem text."""
+        from control import subsystems
+        state = self.state_provider()
+        if state is None or not getattr(state, "target_locked", False):
+            self._role_status = "no_target"
+            return None
+        if int(getattr(state, "target_scan", 0) or 0) < 3:
+            self._role_status = "no_scan"
+            return None
+
+        def right_one():
+            return subsystems.matches(key, state.target_subsystem, state.target_subsystem_readable)
+        if right_one():
+            trace.append("sub>already")
+            return None
+        seen = [state.target_subsystem] if state.target_subsystem else []
+        for number in range(self.SUBSYSTEM_PRESSES):
+            before = state.target_seq
+            problem = self.sender.send(strokes["CycleNextSubsystem"], hold=0.1)
+            pressed.append("CycleNextSubsystem")
+            if problem:
+                return problem
+            for _ in range(20):                                     # up to 2 seconds for the journal to catch up
+                self.sleep(0.1)
+                if state.target_seq != before or not state.target_locked:
+                    break
+            if not state.target_locked:
+                self._role_status = "no_target"
+                return None
+            if state.target_seq == before:
+                log.warning("Sub target: pressed Next Subsystem but the journal said nothing (seen so far: %s)", seen)
+                trace.append("sub>unread")
+                self._role_status = "sub_unread"
+                return None
+            name = state.target_subsystem_readable or state.target_subsystem
+            log.info("Sub target: selected %r (%r)", name, state.target_subsystem)
+            if right_one():
+                trace.append("sub>%d" % (number + 1))
+                return None
+            if not state.target_subsystem:                          # it wrapped round to "no subsystem": keep going
+                continue
+            if state.target_subsystem in seen:
+                break                                               # back where it started: this ship does not have it
+            seen.append(state.target_subsystem)
+        log.info("Sub target: %s not found; this ship showed %s", key, seen)
+        trace.append("sub>none")
+        self._role_status = "no_subsystem"
+        return None
 
     def _go_to_tab(self, number, strokes, pressed, trace, start=0, panel="left"):
         """The 'tab N' macro step. Looks at the left panel to find the tab it opened on and walks to tab N; if she cannot see the
@@ -997,6 +1063,10 @@ class CommandRunner:
             "cannot_close": "You're too close to the planet for that.",
             "cannot_key": "UI Down is only on a bare Shift key on the keyboard. Give it another keyboard key in Elite's controls.",
             "cannot_other": "The game says that can't be deployed right now.",
+            "no_target": "You have no ship locked.",
+            "no_scan": "That ship has not been fully scanned yet, so it has no subsystems to pick.",
+            "no_subsystem": "That ship does not show that subsystem.",
+            "sub_unread": "I could not tell which subsystem is selected, so I stopped.",
         }.get(status, "That didn't work.")
 
     # ---- checking without pressing anything (used by the dashboard) ----

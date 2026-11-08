@@ -319,5 +319,25 @@
     "I can't reach that one, Commander. Your Down key on the keyboard is just a Shift key, and pressed on its own it does the wrong thing. Give UI Down a normal keyboard key in Elite's controls and I'll do it.",
     "To go down a row I need a normal keyboard key for UI Down, Commander. Yours is only a Shift key, so I've left it alone.",
     "I'm stuck at the Down key, Commander. It's only a Shift key on the keyboard. Bind UI Down to an ordinary key and I can finish that."
+  ],
+  "CommandNoTarget": [
+    "You haven't got a ship locked, Commander. Lock one first and I'll pick its parts.",
+    "Nothing's targeted, Commander. Which ship do you want me to look at?",
+    "I've got no target to aim at, Commander."
+  ],
+  "CommandNotScanned": [
+    "That ship hasn't been scanned yet, Commander. Give it a scan and I'll pick the part.",
+    "Not fully scanned, Commander. I can't pick its subsystems until it is.",
+    "I can't see inside it yet, Commander. Finish the scan first."
+  ],
+  "CommandNoSubsystem": [
+    "That ship doesn't show one, Commander. I went all the way round.",
+    "I cycled through every part and couldn't find it, Commander.",
+    "It's not on this ship's list, Commander."
+  ],
+  "CommandSubUnread": [
+    "I pressed the key but the game didn't tell me what's selected, Commander, so I stopped.",
+    "I can't tell which part is selected, Commander. Is the key bound?",
+    "Nothing came back from the game, Commander, so I stopped cycling."
   ]
 }

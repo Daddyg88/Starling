@@ -66,6 +66,11 @@ class GameState:
     nsp_system: object = None        # the system she last said "there is an NSP here" in
     pending_events: list = field(default_factory=list)   # (name, data) she should announce after this journal line
     route_map_hidden: bool = False          # "hide the route map" (the overlay on the right of the screen)
+    target_locked: bool = False             # a ship is locked (ShipTargeted)
+    target_scan: int = 0                    # its ScanStage: 3 = fully scanned, which is what sub targeting needs
+    target_subsystem: str = ""              # the game's name for the selected subsystem ("" = none); see control/subsystems.py
+    target_subsystem_readable: str = ""
+    target_seq: int = 0                     # counts ShipTargeted lines, so a command can tell a new one arrived
     altitude: Optional[float] = None        # Status.json Altitude in metres (only near a planet)
     gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     status_seen: bool = False               # True once Status.json has been read

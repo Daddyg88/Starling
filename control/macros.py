@@ -108,6 +108,13 @@ def parse_macro(steps):
         if lowered == "open role panel":
             parsed.append(("openrole",))
             continue
+        if lowered.startswith("subsystem "):
+            from control.subsystems import SUBSYSTEMS
+            word = lowered.split()[1] if len(lowered.split()) == 2 else ""
+            if word not in SUBSYSTEMS:
+                raise ValueError("I don't understand this step (write it like: subsystem powerplant; one of %s): %r" % (", ".join(SUBSYSTEMS), text))
+            parsed.append(("subsystem", word))
+            continue
         if lowered.startswith("role tab "):
             word = lowered.split()[2] if len(lowered.split()) == 3 else ""
             if word not in ("suit", "launch", "srv", "crew"):
@@ -189,6 +196,8 @@ def actions_in(parsed):
             for needed in ("FocusRadarPanel", "UI_Back", "UI_Up", "UI_Down", "UI_Left", "UI_Right", "UI_Select", "CycleNextPanel", "CyclePreviousPanel"):
                 if needed not in seen:
                     seen.append(needed)
+        if step[0] == "subsystem" and "CycleNextSubsystem" not in seen:
+            seen.append("CycleNextSubsystem")
         if step[0] == "openright":
             for needed in ("FocusRightPanel", "UI_Back"):
                 if needed not in seen:

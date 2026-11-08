@@ -59,6 +59,15 @@ def _same_target(seen, ship, pilot):
 
 def _target_update(self, entry, state):
     """Decide what (if anything) is worth saying about the ship you just targeted or scanned."""
+    try:                                                    # what sub targeting needs to know (control/subsystems.py)
+        lowered = {str(k).lower(): v for k, v in entry.items()}
+        state.target_locked = bool(entry.get("TargetLocked", True))
+        state.target_scan = int(entry.get("ScanStage") or 0)
+        state.target_subsystem = str(lowered.get("subsystem") or "") if state.target_locked else ""
+        state.target_subsystem_readable = str(lowered.get("subsystem_localised") or "") if state.target_locked else ""
+        state.target_seq = getattr(state, "target_seq", 0) + 1
+    except Exception:
+        pass
     ship = entry.get("Ship_Localised") or entry.get("Ship") or ""
     pilot = entry.get("PilotName_Localised") or entry.get("PilotName") or ""
     now = _now()

@@ -78,6 +78,8 @@ GROUPS = [
      ['request_docking', 'auto_launch', 'plot_waypoint', 'show_off']),
     ('role', 'Role panel: Nomad, fighter, SRV, disembark', 'She opens the role (bottom) panel and looks at it: she goes to the right tab, checks the vessel is on board, and only presses Deploy when the button is lit. If it is not there or greyed out she tells you why (for example: you have to be landed for the SRV and to disembark, the fighter needs 500 metres or higher, the Rhino 30 metres or lower).',
      ['deploy_nomad', 'deploy_slf', 'deploy_srv', 'deploy_rhino', 'deploy_scarab', 'disembark']),
+    ('subtarget', 'Sub targeting (combat)', 'After a ship is locked and fully scanned you can pick a part to shoot. Say "sub target the power plant" and she presses Next Subsystem, checking the game journal after each press, until that part is selected. If nothing is locked, the ship is not fully scanned yet, or that ship does not show that part, she tells you instead of pressing on. Needs a keyboard key on Cycle Next Subsystem.',
+     [i for i in C if i.startswith('sub_')]),
     ('panels', 'Right-hand panel tabs', 'She opens the right panel and looks at it to find the tab, so it works whichever tab was open last. If she cannot see the panel she says so and presses nothing more.',
      [i for i in C if i.startswith('panel_')] + ['close_panels']),
     ('combat', 'Combat', 'Targets, power, countermeasures and wingmen.',
@@ -215,7 +217,7 @@ EXTRA = [
 ]
 for gid, title, intro, rows in EXTRA:
     sections.append((gid, title, intro, simple(rows)))
-order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'panels', 'role', 'ship', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
+order = ['route', 'finder', 'mining', 'info', 'facts', 'chat', 'you', 'company', 'stream', 'screens', 'panels', 'role', 'subtarget', 'ship', 'big', 'combat', 'fighter', 'foot', 'overlays', 'learn']
 secmap = {s[0]: s for s in sections}
 sections = [secmap[k] for k in order]
 count = sum(t.count('<tr><td') for _, _, _, t in sections)
