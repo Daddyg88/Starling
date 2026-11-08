@@ -1,10 +1,9 @@
 """RED ALERT: one switch that changes how she behaves and how the screen looks.
 
 While it is on:
-  * she speaks faster (settings red_alert.speed, default 1.2 = 20% quicker)
   * she stops chatting: no idle chit-chat, no pet names or remarks added to her lines. Safety warnings and the answers to your commands
     are never touched
-  * a pulsing red glow around the edge of the screen and a very light red tint (ui/red_alert_overlay.py)
+  * a small RED ALERT at the bottom of the screen (ui/red_alert_overlay.py)
 It is NEVER saved: closing her or restarting ends it. It also ends by itself after red_alert.minutes (default 30, 0 = never).
 Say "red alert" to start it and "stand down" (or "all clear") to end it.
 """
@@ -14,19 +13,11 @@ import time
 
 ON = re.compile(r"\b(?:red alert|battle stations|action stations)\b")
 OFF = re.compile(r"\b(?:stand down|all clear|stand easy|cancel red alert|end red alert|red alert (?:off|over|cancelled|canceled|ended|finished|clear))\b")
-MAX_SPEED = 2.0
 
 
 def clean(text):
     text = re.sub(r"[^a-z ]", " ", str(text or "").lower())
     return re.sub(r"\s+", " ", text).strip()
-
-
-def speed_setting(settings):
-    try:
-        return max(1.0, min(MAX_SPEED, float(settings.get("red_alert.speed", 1.2))))
-    except (TypeError, ValueError):
-        return 1.2
 
 
 class RedAlert:
@@ -69,7 +60,7 @@ class RedAlert:
         return self.turn_off() if self.active else self.turn_on()
 
     def _apply(self, on):
-        """Hands the three changes to the parts that own them. Each part is optional (a part that is not running is skipped)."""
+        """Hands the changes to the parts that own them. Each part is optional (a part that is not running is skipped)."""
         for provider, name, value in ((self.speech_provider, "alert", on), (self.flavour_provider, "red_alert", on)):
             try:
                 target = provider()
@@ -77,12 +68,6 @@ class RedAlert:
                     setattr(target, name, value)
             except Exception:
                 pass
-        try:
-            kokoro = self.kokoro_provider()
-            if kokoro is not None:
-                kokoro.speed_boost = speed_setting(self.settings) if on else 1.0
-        except Exception:
-            pass
 
     # ---- housekeeping, called about once a second ----
     def tick(self):
@@ -95,7 +80,7 @@ class RedAlert:
         if minutes > 0 and self.clock() - self.since >= minutes * 60.0:
             self.turn_off()
         else:
-            self._apply(True)                                  # the settings may have changed (the speed box): follow them
+            self._apply(True)
 
     # ---- her voice ----
     def try_handle(self, text):

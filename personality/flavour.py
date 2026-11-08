@@ -40,13 +40,20 @@ DARK_HUMOUR_CHANCE = 0.2          # of the remarks she makes, about one in five 
 
 
 class Flavour:
-    def __init__(self, dialogue, settings, carried_provider=None, rng=None, clock=time.monotonic):
+    def __init__(self, dialogue, settings, carried_provider=None, rng=None, clock=time.monotonic, combat_provider=None):
         self.dialogue = dialogue
         self.settings = settings
         self.carried_provider = carried_provider or (lambda: 0)
         self.rng = rng or random.Random()
         self.clock = clock
         self._last_remark = None
+        self.combat_provider = combat_provider      # () -> True while you are in a fight: no pet names or remarks then
+
+    def in_combat(self):
+        try:
+            return bool(self.combat_provider()) if self.combat_provider is not None else False
+        except Exception:
+            return False
 
     # ---- what is she like right now? ----
     def active(self):
@@ -166,7 +173,7 @@ class Flavour:
 
     def rename(self, text, always=False):
         """Maybe swap "Commander" for a pet name (no remarks). always=True skips the dice roll."""
-        if not self.active() or not text or not self.settings.get("personality.pet_names", True):
+        if not self.active() or not text or not self.settings.get("personality.pet_names", True) or self.in_combat():
             return text
         if not _COMMANDER.search(text):
             return text
@@ -180,8 +187,8 @@ class Flavour:
     # ---- the one call the speaker makes ----
     def apply(self, text, priority="normal"):
         """Return `text`, possibly with a pet name and/or a remark added."""
-        if priority == "critical" or not self.active() or not text or getattr(self, "red_alert", False):
-            return text                                   # red alert: no pet names, no remarks
+        if priority == "critical" or not self.active() or not text or getattr(self, "red_alert", False) or self.in_combat():
+            return text                                   # red alert or a fight: no pet names, no remarks
         mood = effective_mood(self.settings)
         text = self.rename(text)
 

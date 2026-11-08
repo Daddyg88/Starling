@@ -1,4 +1,4 @@
-"""Red alert (0.87.0): the switch, her voice, the speed, the chatter, the glow numbers."""
+"""Red alert (0.87.0): the switch, her voice, the chatter, the glow numbers."""
 import unittest
 
 from core import red_alert
@@ -29,11 +29,10 @@ class Switch(unittest.TestCase):
         a = self.build()
         self.assertTrue(a.turn_on())
         self.assertTrue(self.speech.alert and self.flavour.red_alert)
-        self.assertEqual(self.kokoro.speed_boost, 1.2)
+        self.assertFalse(hasattr(self.kokoro, 'speed_boost'))      # 0.88.1: red alert no longer changes her speed
         self.assertEqual(self.narrator.said, ["RedAlert_On"])
         self.assertTrue(a.turn_off())
         self.assertFalse(self.speech.alert or self.flavour.red_alert)
-        self.assertEqual(self.kokoro.speed_boost, 1.0)
         self.assertEqual(self.narrator.said, ["RedAlert_On", "RedAlert_Off"])
 
     def test_twice_does_nothing_twice(self):
@@ -42,14 +41,6 @@ class Switch(unittest.TestCase):
         self.assertFalse(a.turn_on())
         self.assertEqual(self.narrator.said, ["RedAlert_On"])
         self.assertFalse(self.build().turn_off())
-
-    def test_speed_setting_is_followed_and_limited(self):
-        a = self.build(red_alert={"speed": 1.75})
-        a.turn_on()
-        self.assertEqual(self.kokoro.speed_boost, 1.75)
-        self.assertEqual(red_alert.speed_setting(make_settings(red_alert={"speed": 9})), 2.0)
-        self.assertEqual(red_alert.speed_setting(make_settings(red_alert={"speed": 0.2})), 1.0)
-        self.assertEqual(red_alert.speed_setting(make_settings(red_alert={"speed": "x"})), 1.2)
 
     def test_it_stands_down_by_itself(self):
         a = self.build(red_alert={"minutes": 10})
@@ -224,3 +215,45 @@ class NeverTakesTheMouse(unittest.TestCase):
         self.assertIn(("show", 4), calls)                # SW_SHOWNOACTIVATE, not a normal show
         pos = [c for c in calls if c[0] == "pos"][0]
         self.assertTrue(pos[2] & 0x10)                   # SWP_NOACTIVATE
+
+
+class QuietInAFight(unittest.TestCase):
+    """0.88.1: no pet names or remarks while you are in combat (target locked / shot at recently)."""
+
+    def build(self, fighting):
+        from tests import test_flavour
+        f, _ = test_flavour.make(mood="Friendly", remarks="often")
+        f.combat_provider = lambda: fighting
+        return f
+
+    def test_no_pet_names_or_remarks_in_a_fight(self):
+        f = self.build(True)
+        for _ in range(20):
+            self.assertEqual(f.apply("Targeting the power plant, Commander."), "Targeting the power plant, Commander.")
+        self.assertEqual(f.rename("Of course, Commander.", always=True), "Of course, Commander.")
+
+    def test_flavour_returns_when_the_fight_is_over(self):
+        f = self.build(False)
+        self.assertNotEqual(f.rename("Of course, Commander.", always=True), "Of course, Commander.")
+
+    def test_a_broken_provider_is_ignored(self):
+        f = self.build(False)
+        f.combat_provider = lambda: 1 / 0
+        self.assertFalse(f.in_combat())
+
+    def test_app_in_combat_rules(self):
+        import time
+        from types import SimpleNamespace
+        from core.app import App
+        app = App.__new__(App)
+        app.state = None
+        self.assertFalse(app._in_combat())
+        app.state = SimpleNamespace(target_locked=False, attacked_at=-999.0)
+        self.assertFalse(app._in_combat())
+        app.state.target_locked = True
+        self.assertTrue(app._in_combat())
+        app.state.target_locked = False
+        app.state.attacked_at = time.monotonic() - 30
+        self.assertTrue(app._in_combat())
+        app.state.attacked_at = time.monotonic() - 300
+        self.assertFalse(app._in_combat())

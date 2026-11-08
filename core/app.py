@@ -194,7 +194,8 @@ class App:
 
         from personality.flavour import Flavour
         flavour = Flavour(self.dialogue, self.settings,
-                          lambda: self.state.exobiology.carried_total() if self.state and self.state.exobiology else 0)
+                          lambda: self.state.exobiology.carried_total() if self.state and self.state.exobiology else 0,
+                          combat_provider=self._in_combat)
         self.flavour = flavour
         self.speaker = EventSpeaker(self.bus, self.speech, self.dialogue, self.settings, rules, flavour=flavour, echo=self.echo)
         self.speaker.attach()
@@ -896,6 +897,16 @@ class App:
             self.log.exception("Combat assist could not start")
             self.combat_assist = None
         return self.combat_assist
+
+    def _in_combat(self):
+        """True while you are in a fight (shot at in the last two minutes, or a ship is locked): she drops pet names and remarks."""
+        import time
+        state = self.state
+        if state is None:
+            return False
+        if getattr(state, "target_locked", False):
+            return True
+        return time.monotonic() - getattr(state, "attacked_at", -999.0) < 120.0
 
     def _red_alert_combat_mode(self):
         """Red alert: switch the cockpit to combat mode in the background (it says nothing and does nothing if it already is)."""

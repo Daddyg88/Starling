@@ -1,8 +1,7 @@
 """The red alert banner: a small, see-through "RED ALERT" in red text at the bottom centre of the screen, just under the
 Disembark / launch buttons. No filter, no glow, no pulse (0.88.0): the player is in a fight and the screen is left alone.
 
-One see-through, click-through window on the screen Elite is on (Borderless or Windowed mode). The window is created hidden and shown
-WITHOUT taking the game's focus, and the 'clicks go through / never active' settings are re-applied each time it is shown (see _harden).
+One see-through, click-through window on the screen Elite is on (Borderless or Windowed mode). It is built like the biology box (a canvas on a see-through colour), and the 'clicks go through / never active' settings are re-applied each time it is shown (see _harden).
 While red alert is off nothing is drawn and she only checks once a second whether it has started.
 """
 
@@ -39,7 +38,8 @@ class RedAlertOverlay:
         self.active_provider = active_provider
         self.tick_hook = tick
         self.window = None
-        self.label = None
+        self.canvas = None
+        self._font = None
         self.test_until = 0.0
         self._rect = None
         self._rect_at = 0.0
@@ -88,18 +88,20 @@ class RedAlertOverlay:
         return self._rect
 
     def _make(self):
+        """Built the same way as the biology box (ui/bio_overlay.py), which is known to show over Elite: a normal borderless window with
+        a see-through colour and a canvas. Then the click-through / never-active settings are added in _harden."""
         import tkinter as tk
         window = tk.Toplevel(self.root)
-        window.withdraw()                    # never let it appear (and take the game's focus) before it is set up
         window.overrideredirect(True)
+        window.attributes("-topmost", True)
         window.configure(bg=KEY)
-        self.label = tk.Label(window, text=TEXT, fg=RED, bg=KEY, bd=0, padx=0, pady=0)
-        self.label.pack()
-        window.update_idletasks()
         try:
-            window.attributes("-transparentcolor", KEY)
+            window.attributes("-transparentcolor", KEY)          # Windows only
         except Exception:
             pass
+        self.canvas = tk.Canvas(window, bg=KEY, highlightthickness=0, bd=0)
+        self.canvas.pack(fill="both", expand=True)
+        window.update_idletasks()
         self._harden(window)
         return window
 
@@ -138,21 +140,31 @@ class RedAlertOverlay:
                 pass
 
     def _show(self):
+        import tkinter.font as tkfont
         x, y, w, h = self._screen_rect()
         size = self.settings.get("red_alert.size", "Medium")
-        if self.window is None:
+        first = self.window is None
+        if first:
             self.window = self._make()
         key = (x, y, w, h, size)
-        if key != self._last:
+        if key != self._last or first:
             self._last = key
-            pixels = font_pixels(size, h)
-            self.label.configure(font=("Segoe UI", -pixels, "bold"))
-            self.window.update_idletasks()
-            tw, th = self.label.winfo_reqwidth(), self.label.winfo_reqheight()
+            font = tkfont.Font(family="Segoe UI", size=-font_pixels(size, h), weight="bold")
+            tw, th = font.measure(TEXT) + 8, font.metrics("linespace") + 4
             left, top = place(w, h, tw, th)
+            self.canvas.delete("all")
+            self.canvas.configure(width=tw, height=th)
+            self.canvas.create_text(tw // 2, th // 2, text=TEXT, fill=RED, font=font)
             self.window.geometry("%dx%d+%d+%d" % (tw, th, x + left, y + top))
+            self._font = font                                     # keep a reference so tkinter does not drop it
+        if not self._shown:
+            self.window.deiconify()
+        self.window.attributes("-topmost", True)
+        self.window.lift()
         self._harden(self.window)
         self._put_on_top_without_focus(self.window)
+        if not self._shown:
+            log.info("RED ALERT banner shown on the screen at %d,%d (%dx%d)", x, y, w, h)
         self._shown = True
 
     def _hide(self):

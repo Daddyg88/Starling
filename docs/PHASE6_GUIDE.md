@@ -1419,3 +1419,7 @@ window use the same code as the biology list.
 ## 0.88.0 - Red alert banner
 
 * red_alert_overlay.py rewritten: one transparent click-through window with RED ALERT text at the bottom centre; filter/glow/tint settings removed; settings red_alert.banner / red_alert.size.
+
+## 0.88.1 - Red alert: no speed-up, banner like the bio box, quiet in combat
+
+* red_alert.speed removed (uncached fast speech cost up to 120% of a core). ui/red_alert_overlay.py now a canvas window like bio_overlay. Flavour(combat_provider) -> app._in_combat (target_locked or attacked_at < 120 s) drops pet names and remarks.
