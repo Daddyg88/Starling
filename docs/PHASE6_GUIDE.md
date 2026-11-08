@@ -1391,3 +1391,7 @@ window use the same code as the biology list.
 ## 0.86.1 - Left panel tabs
 
 * catalog: panel_navigation / panel_transactions / panel_contacts / panel_target = LEFT_TAB (open left panel + tab N); left_panel phrases narrowed to 'left panel'.
+
+## 0.86.2 - Sub target fixes
+
+* subsystems.py: engines = ext_drive, cargo = modularcargobaydoor, weapons = hpt; runner._subsystem_step ignores an adjacent repeat, 24 presses; sub_weapons command.

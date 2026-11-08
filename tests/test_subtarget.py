@@ -18,11 +18,20 @@ class Matching(unittest.TestCase):
         self.assertFalse(subsystems.matches("engines", "$int_hyperdrive_size5;", "Frame Shift Drive"))     # "drive" must not mean the FSD
         self.assertFalse(subsystems.matches("powerplant", "", ""))
 
+    def test_names_from_the_real_game(self):
+        # taken from Benny's log, 8 Nov 2026
+        self.assertTrue(subsystems.matches("engines", "$ext_drive_class2_a_name;", "Drive"))
+        self.assertFalse(subsystems.matches("fsd", "$ext_drive_class2_a_name;", "Drive"))
+        self.assertTrue(subsystems.matches("cargo", "$modularcargobaydoor_name;", "Cargo Hatch"))
+        self.assertFalse(subsystems.matches("cargo", "$hpt_cargoscanner_size0_class5_name;", "Manifest Scanner"))
+        self.assertTrue(subsystems.matches("weapons", "$hpt_beamlaser_gimbal_medium_name;", "Beam Laser"))
+        self.assertTrue(subsystems.matches("powerplant", "$int_powerplant_size3_class3_name;", "Power Plant"))
+
     def test_phrases(self):
         r = test_macros.MacroTests().build()
         wanted = {"sub target the power plant": "sub_powerplant", "subtarget power plant": "sub_powerplant", "sub-target the engines": "sub_engines",
                   "target the shield generator": "sub_shields", "sub target the frame shift drive": "sub_fsd", "go for the life support": "sub_lifesupport",
-                  "sub target the cargo hatch": "sub_cargo", "sub target the sensors": "sub_sensors", "lock the power distributor": "sub_distributor"}
+                  "sub target the cargo hatch": "sub_cargo", "sub target the weapons": "sub_weapons", "sub target the drive": "sub_engines", "sub target the sensors": "sub_sensors", "lock the power distributor": "sub_distributor"}
         for text, command_id in wanted.items():
             m = r.matcher.match(text)
             self.assertIsNotNone(m, text)
@@ -68,6 +77,14 @@ class Commands(unittest.TestCase):
         outcome, presses = self.run_command("sub target the power plant")
         self.assertEqual(outcome.status, "done")
         self.assertEqual(len(presses), 3)
+
+    def test_a_part_written_twice_does_not_stop_the_search(self):
+        # her 11:17 log: the game showed 'Drive' twice in a row, she took that for "all the way round" and gave up one press short
+        order = [("$hpt_beamlaser_fixed_small_name;", "Beam Laser"), ("$ext_drive_class2_a_name;", "Drive"), ("$ext_drive_class2_a_name;", "Drive"),
+                 ("$int_powerplant_size3_class3_name;", "Power Plant")]
+        outcome, presses = self.run_command("sub target the power plant", order=order)
+        self.assertEqual(outcome.status, "done")
+        self.assertEqual(len(presses), 4)
 
     def test_already_selected_presses_nothing(self):
         outcome, presses = self.run_command("sub target the power plant", start=2)

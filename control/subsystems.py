@@ -9,13 +9,14 @@ import re
 # key -> (what she calls it, pieces of the game's name that mean it)
 SUBSYSTEMS = {
     "powerplant": ("the power plant", ("powerplant",)),
-    "engines": ("the engines", ("engine", "thruster")),
+    "engines": ("the engines", ("engine", "thruster", "extdrive")),     # the real log calls them "Drive" ($ext_drive_class2_a_name;)
     "fsd": ("the frame shift drive", ("hyperdrive", "frameshift")),
     "shields": ("the shield generator", ("shieldgenerator",)),
     "lifesupport": ("life support", ("lifesupport",)),
     "distributor": ("the power distributor", ("powerdistributor",)),
     "sensors": ("the sensors", ("sensor",)),
-    "cargo": ("the cargo hatch", ("cargo",)),
+    "cargo": ("the cargo hatch", ("modularcargobaydoor", "cargohatch")),   # NOT "cargo": the Manifest Scanner is $hpt_cargoscanner
+    "weapons": ("the weapons", ("hpt",)),                            # every weapon is $hpt_... (Beam Laser, Cannon, Pulse Laser ...)
 }
 
 

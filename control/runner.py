@@ -647,7 +647,7 @@ class CommandRunner:
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
                        detail=command.do_text(intent) + ".")
 
-    SUBSYSTEM_PRESSES = 14            # more than any ship has: after this many "next subsystem" she gives up
+    SUBSYSTEM_PRESSES = 24            # more than any ship has (weapons first, then the parts): after this many "next subsystem" she gives up
 
     def _subsystem_step(self, key, strokes, pressed, trace):
         """Presses Next Subsystem until the game's journal says the wanted part is selected. The journal writes a ShipTargeted
@@ -693,6 +693,8 @@ class CommandRunner:
                 return None
             if not state.target_subsystem:                          # it wrapped round to "no subsystem": keep going
                 continue
+            if seen and state.target_subsystem == seen[-1]:
+                continue                                            # the game wrote the same part twice (Benny's 11:17 log): press again
             if state.target_subsystem in seen:
                 break                                               # back where it started: this ship does not have it
             seen.append(state.target_subsystem)
