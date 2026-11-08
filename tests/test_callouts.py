@@ -1200,3 +1200,25 @@ class EdAstroLocalListTests(unittest.TestCase):
         e = EdAstro(lambda request, timeout=0: (urls.append(request.full_url), Reply())[1])
         self.assertEqual(e.nearest((1, 2, 3))["system"], "Sol")
         self.assertEqual(len(urls), 1)
+
+
+class ChordLettersClash(unittest.TestCase):
+    def test_a_letter_held_as_part_of_a_shortcut_also_fires_its_own_action(self):
+        """Benny's 22:49 report: night vision (S + V + R + Right Shift) also deployed a heat sink, because V is Deploy Heat Sink."""
+        xml = """<Root>
+  <NightVisionToggle><Primary Device="Keyboard" Key="Key_RightShift"><Modifier Device="Keyboard" Key="Key_S" /><Modifier Device="Keyboard" Key="Key_V" /></Primary><Secondary Device="{NoDevice}" Key="" /></NightVisionToggle>
+  <DeployHeatSink><Primary Device="Keyboard" Key="Key_V" /><Secondary Device="{NoDevice}" Key="" /></DeployHeatSink>
+  <ShipSpotLightToggle><Primary Device="Keyboard" Key="Key_L" /><Secondary Device="{NoDevice}" Key="" /></ShipSpotLightToggle>
+</Root>"""
+        r = KeyClashReport().runner(xml)
+        found = r.book.conflicts("NightVisionToggle")
+        self.assertEqual(len(found), 1)
+        self.assertIn("DeployHeatSink", found[0])
+        self.assertEqual(r.book.conflicts("ShipSpotLightToggle"), [])
+
+    def test_ordinary_shift_keys_are_not_a_clash(self):
+        xml = """<Root>
+  <A><Primary Device="Keyboard" Key="Key_G"><Modifier Device="Keyboard" Key="Key_LeftShift" /></Primary><Secondary Device="{NoDevice}" Key="" /></A>
+  <B><Primary Device="Keyboard" Key="Key_LeftShift" /><Secondary Device="{NoDevice}" Key="" /></B>
+</Root>"""
+        self.assertEqual(KeyClashReport().runner(xml).book.conflicts("A"), [])

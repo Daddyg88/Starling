@@ -1431,3 +1431,7 @@ window use the same code as the biology list.
 ## 0.88.3 - Sub targeting presses ahead
 
 * GameState.target_history (last 80 ShipTargeted lines). runner._subsystem_press_ahead: after SLOW_PRESSES=3 careful presses, taps every ~0.18 s, reads answers from the history, stops at the first match, steps back over the extra presses with the opposite key, falls back to careful steps; setting subtarget.press_ahead. Tests: tests/test_subtarget.PressAhead (fake game with 0.55 s lag).
+
+## 0.88.4 - Chord letters clash
+
+* BindingBook.conflicts also reports a chord's non-Shift/Ctrl/Alt modifier keys that are bound on their own to another action in the same view (night vision S+V+R+RShift vs DeployHeatSink on V).

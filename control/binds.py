@@ -428,6 +428,19 @@ class BindingBook:
                 if (_norm_key(slot.key), frozenset(_norm_key(d_k[1]) for d_k in slot.modifiers)) == mine:
                     found.append(other)
                     break
+        # A "shift" key that is an ordinary letter or number (a chord like S + V + R + Right Shift): while it is held down, the game also sees
+        # that key on its own, so whatever it is bound to fires too (Benny's night vision chord held V, which is Deploy Heat Sink).
+        for modifier in stroke.modifiers:
+            plain = _norm_key(modifier)
+            if plain in MODIFIER_KEYS:
+                continue
+            for other, slots in self._actions.items():
+                if other == action or other in found or view_of(other) != view_of(action):
+                    continue
+                for slot in slots:
+                    if (not slot.is_empty() and slot.device.lower() == "keyboard" and _norm_key(slot.key) == plain and not slot.modifiers):
+                        found.append("%s (the %s key is held down as part of the shortcut)" % (other, keys.nice_name(modifier)))
+                        break
         return sorted(found)
 
     def has_action(self, action):
