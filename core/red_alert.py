@@ -30,13 +30,14 @@ def speed_setting(settings):
 
 
 class RedAlert:
-    def __init__(self, settings, speech_provider, kokoro_provider, flavour_provider, narrator=None, clock=time.monotonic):
+    def __init__(self, settings, speech_provider, kokoro_provider, flavour_provider, narrator=None, clock=time.monotonic, combat_mode=None):
         self.settings = settings
         self.speech_provider = speech_provider
         self.kokoro_provider = kokoro_provider
         self.flavour_provider = flavour_provider
         self.narrator = narrator                  # navigation.voice.Narrator: says a line from the voicepack
         self.clock = clock
+        self.combat_mode = combat_mode            # () -> switches the HUD to combat mode (a no-op when it already is)
         self.active = False
         self.since = 0.0
 
@@ -48,6 +49,11 @@ class RedAlert:
         self._apply(True)
         if announce and self.narrator is not None:
             self.narrator.say("RedAlert_On")
+        if self.combat_mode is not None and self.settings.get("red_alert.combat_mode", True):
+            try:
+                self.combat_mode()
+            except Exception:
+                pass
         return True
 
     def turn_off(self, announce=True):

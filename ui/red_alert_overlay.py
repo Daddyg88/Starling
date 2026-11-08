@@ -1,14 +1,12 @@
-"""The red alert glow: a pulsing red frame around the edge of the screen and a very faint red tint over the view.
+"""The red alert filter: a steady red wash over the whole screen with a soft, thin red edge. It does NOT pulse (0.87.1): the player is in a fight.
 
 Two see-through, click-through windows on the screen Elite is on (the game must be in Borderless or Windowed mode):
-  * the FRAME window: the middle is a see-through colour, the edge is bands of red from bright (outside) to dark (inside); the whole
-    window's see-through level swings up and down about once a second, which is the pulse
-  * the TINT window: all red, but so see-through (about 6%) that it only warms the view
+  * the TINT window: all red, but see-through (7 to 16%, by strength) so it works as a red filter over the view
+  * the EDGE window: the middle is a see-through colour and the edge is a thin soft band of red that fades inward
 While red alert is off nothing is drawn and she only checks once a second whether it has started.
-The drawing numbers come from plain tested functions (bands, pulse_alpha); the tkinter part is the thin outside.
+The numbers come from plain tested functions (bands, edge_alpha, tint_alpha); the tkinter part is the thin outside.
 """
 
-import math
 import time
 
 from core.logger import get_logger
@@ -18,26 +16,24 @@ log = get_logger("red_alert_overlay")
 
 KEY = "#010101"                  # this exact colour becomes see-through (Windows)
 IDLE_MS = 1000
-PULSE_MS = 70                    # about 14 frames a second while it is on
-PULSE_SECONDS = 1.2
-STRENGTH = {"Soft": (0.10, 0.30, 0.04), "Medium": (0.16, 0.45, 0.06), "Strong": (0.24, 0.62, 0.09)}     # frame low, frame high, tint
-BANDS = 16
+ACTIVE_MS = 500                  # while it is on she only has to look for a change (screen moved, settings changed)
+STRENGTH = {"Soft": (0.12, 0.07), "Medium": (0.20, 0.11), "Strong": (0.30, 0.16)}     # edge see-through level, tint see-through level
+BANDS = 12
 
 
-def pulse_alpha(strength, seconds):
-    """The frame's see-through level (0 = invisible, 1 = solid) at a moment: a smooth swing between the low and high value."""
-    low, high, _tint = STRENGTH.get(str(strength), STRENGTH["Medium"])
-    swing = (math.sin(seconds * 2 * math.pi / PULSE_SECONDS) + 1.0) / 2.0
-    return round(low + (high - low) * swing, 3)
+def edge_alpha(strength):
+    """The edge's see-through level (0 = invisible, 1 = solid). Steady: it never pulses."""
+    return STRENGTH.get(str(strength), STRENGTH["Medium"])[0]
 
 
 def tint_alpha(strength):
-    return STRENGTH.get(str(strength), STRENGTH["Medium"])[2]
+    """The whole-screen red wash's see-through level."""
+    return STRENGTH.get(str(strength), STRENGTH["Medium"])[1]
 
 
 def band_width(width, height):
-    """How thick the glowing edge is: about 5% of the shorter side, never thinner than 40 pixels."""
-    return max(40, int(min(width, height) * 0.05))
+    """How thick the edge is: about 2.5% of the shorter side, never thinner than 20 pixels (it was 5% and 40 in 0.87.0)."""
+    return max(20, int(min(width, height) * 0.025))
 
 
 def bands(width, height):
@@ -89,7 +85,7 @@ class RedAlertOverlay:
             if not self._broken:
                 if self._wanted() and (self.settings.get("red_alert.glow", True) or self.settings.get("red_alert.tint", True)):
                     self._show()
-                    delay = PULSE_MS
+                    delay = ACTIVE_MS
                 elif self._shown:
                     self._hide()
         except Exception:
@@ -154,7 +150,7 @@ class RedAlertOverlay:
             self._shown = True
         try:
             self.tint.attributes("-alpha", tint_alpha(strength) if want_tint else 0.0)
-            self.frame.attributes("-alpha", pulse_alpha(strength, time.monotonic()) if want_glow else 0.0)
+            self.frame.attributes("-alpha", edge_alpha(strength) if want_glow else 0.0)
             self.tint.attributes("-topmost", True)
             self.frame.attributes("-topmost", True)
         except Exception:

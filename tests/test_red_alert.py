@@ -126,28 +126,53 @@ class Effects(unittest.TestCase):
 
 
 class GlowNumbers(unittest.TestCase):
-    def test_pulse_swings_between_low_and_high(self):
-        values = [glow.pulse_alpha("Medium", t / 100.0) for t in range(0, 240)]
-        self.assertAlmostEqual(min(values), 0.16, places=2)
-        self.assertAlmostEqual(max(values), 0.45, places=2)
-        self.assertGreater(glow.pulse_alpha("Strong", 0.3), glow.pulse_alpha("Soft", 0.3))
-        self.assertEqual(glow.pulse_alpha("nonsense", 0.0), glow.pulse_alpha("Medium", 0.0))
+    def test_it_is_steady_and_gets_stronger_by_choice(self):
+        self.assertFalse(hasattr(glow, "pulse_alpha"))
+        self.assertLess(glow.edge_alpha("Soft"), glow.edge_alpha("Medium"))
+        self.assertLess(glow.edge_alpha("Medium"), glow.edge_alpha("Strong"))
+        self.assertEqual(glow.edge_alpha("nonsense"), glow.edge_alpha("Medium"))
 
-    def test_tint_is_faint(self):
+    def test_it_is_a_filter_not_a_wall(self):
         for name in glow.STRENGTH:
-            self.assertLess(glow.tint_alpha(name), 0.12)
+            self.assertLessEqual(glow.tint_alpha(name), 0.16)
+            self.assertLessEqual(glow.edge_alpha(name), 0.30)
+            self.assertGreater(glow.tint_alpha(name), 0.05)            # strong enough to read as a red filter
 
-    def test_bands_go_from_bright_edge_to_dark_inside(self):
+    def test_bands_go_from_bright_edge_to_dark_inside_and_stay_thin(self):
         rings, each = glow.bands(1920, 1080)
         self.assertEqual(len(rings), glow.BANDS)
         self.assertEqual(rings[0][:2], (0, 0))
         self.assertEqual(rings[0][2:4], (1920, 1080))
         self.assertGreater(int(rings[0][4][1:3], 16), int(rings[-1][4][1:3], 16))
-        self.assertLess(rings[-1][0] + each, 1080 // 2)                 # the frame never reaches the middle
-        self.assertGreaterEqual(glow.band_width(800, 600), 40)
+        self.assertLessEqual(glow.band_width(1920, 1080), 30)         # thin: about 2.5% of the height
+        self.assertGreaterEqual(glow.band_width(800, 600), 20)
 
     def test_four_k_scales(self):
         self.assertGreater(glow.band_width(3840, 2160), glow.band_width(1920, 1080))
+
+
+class CombatMode(unittest.TestCase):
+    def test_red_alert_asks_for_combat_mode_once_and_it_can_be_switched_off(self):
+        calls = []
+        a = RedAlert(make_settings(), lambda: None, lambda: None, lambda: None, None, combat_mode=lambda: calls.append(1))
+        a.turn_on()
+        a.turn_on()                                                    # already on: not asked again
+        self.assertEqual(calls, [1])
+        b = RedAlert(make_settings(red_alert={"combat_mode": False}), lambda: None, lambda: None, lambda: None, None, combat_mode=lambda: calls.append(2))
+        b.turn_on()
+        self.assertEqual(calls, [1])
+
+    def test_a_failing_combat_mode_does_not_stop_red_alert(self):
+        def boom():
+            raise RuntimeError("no key")
+        a = RedAlert(make_settings(), lambda: None, lambda: None, lambda: None, None, combat_mode=boom)
+        self.assertTrue(a.turn_on())
+        self.assertTrue(a.active)
+
+    def test_the_hud_command_it_uses_exists(self):
+        from tests import test_macros
+        r = test_macros.MacroTests().build()
+        self.assertEqual(r.matcher.match("switch to combat mode").command.id, "hud_mode")
 
 
 if __name__ == "__main__":

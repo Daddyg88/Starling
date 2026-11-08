@@ -420,7 +420,7 @@ class App:
                 from core.red_alert import RedAlert
                 from navigation.voice import Narrator
                 self.red_alert = RedAlert(self.settings, lambda: self.speech, lambda: self.providers.get("kokoro"), lambda: self.flavour,
-                                          Narrator(lambda: self.speech, lambda: self.dialogue, self.settings))
+                                          Narrator(lambda: self.speech, lambda: self.dialogue, self.settings), combat_mode=self._red_alert_combat_mode)
                 self.commands.extra_helpers.insert(0, self.red_alert)
             except Exception:
                 self.log.exception("Red alert could not start")
@@ -896,6 +896,17 @@ class App:
             self.log.exception("Combat assist could not start")
             self.combat_assist = None
         return self.combat_assist
+
+    def _red_alert_combat_mode(self):
+        """Red alert: switch the cockpit to combat mode in the background (it says nothing and does nothing if it already is)."""
+        import threading
+
+        def work():
+            try:
+                self.commands.run_text("switch to combat mode", speak=False, auto=True)
+            except Exception:
+                self.log.exception("Red alert could not switch to combat mode")
+        threading.Thread(target=work, name="red-alert-combat", daemon=True).start()
 
     def start_monitor(self):
         """Start watching the real game. Returns the journal folder, or None."""

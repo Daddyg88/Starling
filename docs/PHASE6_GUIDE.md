@@ -1407,3 +1407,7 @@ window use the same code as the biology list.
 ## 0.87.0 - Red alert
 
 * core/red_alert.py (switch + voice helper), SpeechManager.alert drops low-priority chatter, Flavour.red_alert skips remarks/pet names, KokoroTTS.speed_boost, ui/red_alert_overlay.py (two click-through windows: pulsing frame + tint), settings red_alert.*, Red alert page, voicepack RedAlert_On / RedAlert_Off.
+
+## 0.87.1 - Red alert calmer + combat mode
+
+* red_alert_overlay: steady (no pulse), thinner edge, stronger tint; RedAlert(combat_mode=app._red_alert_combat_mode) runs 'switch to combat mode' in a thread; setting red_alert.combat_mode.

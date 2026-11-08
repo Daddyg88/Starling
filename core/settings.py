@@ -70,7 +70,7 @@ DEFAULTS = {
                "fav1": "platinum", "fav2": "painite", "fav3": "opal", "fav4": "lowtemperaturediamond", "fav5": "monazite",
                "fav6": "musgravite", "fav7": "serendibite", "fav8": "grandidierite", "fav9": "alexandrite", "fav10": "rhodplumsite"},
     "chitchat": {"enabled": True, "frequency": "normal"},
-    "red_alert": {"speed": 1.5, "minutes": 30, "glow": True, "tint": True, "strength": "Medium"},
+    "red_alert": {"speed": 1.5, "minutes": 30, "glow": True, "tint": True, "strength": "Medium", "combat_mode": True},
     "memory": {"enabled": True, "recall_at_login": True},
     "updates": {"repo": "", "auto_check": True, "ask": False, "ask_reset": False, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},

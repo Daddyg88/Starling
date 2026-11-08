@@ -267,14 +267,15 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("combat_assist.heat_sink", "Combat: deploy a heat sink when overheating", "toggle",
                   help="Elite does not share the heat percentage, so she uses the game's own overheat warning (about 100%). Never while docked, landed or scooping"),
         ]),
-        Page("redalert", "Red alert", "Say 'red alert' (or press the button below) and she speaks faster, stops chatting (no idle talk, pet names or remarks; warnings and answers stay) and the screen gets a pulsing red edge glow. Say 'stand down' or 'all clear' to end it. It is never saved: restarting her ends it. The glow needs Elite in Borderless or Windowed mode.", [
+        Page("redalert", "Red alert", "Say 'red alert' (or press the button below) and she speaks faster, stops chatting (no idle talk, pet names or remarks; warnings and answers stay) the cockpit goes to combat mode and the screen gets a steady red filter with a thin red edge. Say 'stand down' or 'all clear' to end it. It is never saved: restarting her ends it. The glow needs Elite in Borderless or Windowed mode.", [
             Field("red_alert.speed", "How much faster she speaks", "choice", [("25% faster", 1.25), ("50% faster", 1.5), ("75% faster", 1.75), ("Twice as fast", 2.0)],
                   help="Her words are made on the spot at this speed (lines she has not said fast before take a moment to start); the more she says them, the quicker they come"),
             Field("red_alert.minutes", "Stand down by itself after", "choice", [("Never", 0), ("10 minutes", 10), ("20 minutes", 20), ("30 minutes", 30), ("60 minutes", 60)],
                   help="So red alert cannot be left on by mistake"),
-            Field("red_alert.glow", "Red glow around the screen edge", "toggle", help="A see-through, click-through frame that pulses. Elite must be in Borderless or Windowed mode"),
-            Field("red_alert.tint", "Light red tint over the whole screen", "toggle", help="A very faint red wash over the view"),
-            Field("red_alert.strength", "How strong the glow is", "choice", [("Soft", "Soft"), ("Medium", "Medium"), ("Strong", "Strong")]),
+            Field("red_alert.combat_mode", "Switch the cockpit to combat mode", "toggle", help="Presses your HUD mode key, only if the cockpit is in analysis mode. Needs a keyboard key on Cockpit Mode / HUD mode"),
+            Field("red_alert.glow", "Thin red edge around the screen", "toggle", help="A see-through, click-through frame. It does not pulse. Elite must be in Borderless or Windowed mode"),
+            Field("red_alert.tint", "Red filter over the whole screen", "toggle", help="A see-through red wash over the view"),
+            Field("red_alert.strength", "How strong the red is", "choice", [("Soft", "Soft"), ("Medium", "Medium"), ("Strong", "Strong")]),
         ]),
         Page("onfoot", "On foot", "Voice control for everything on foot. Say 'suit shields', 'torch', 'next grenade type', 'select EMP grenades', 'use a health pack', 'use a battery', 'helmet night vision', 'energy link', 'crouch', 'wave'... Each needs a keyboard key in Elite's on-foot controls. Emote words are in config/emotes.json (docs/PHASE6_GUIDE.md).", [
             Field("onfoot.auto_shields", "On foot: raise my suit shields when I draw a weapon or take damage", "toggle",
