@@ -1439,3 +1439,7 @@ window use the same code as the biology list.
 ## 0.89.0 - Noticing, looking back, calm combat lines
 
 * personality/chitchat.py: counters (kills, interdictions, scans, systems, since_scoop), MILESTONES + milestone_keys() (first in the pick order), last_moment callbacks (ChitChat_Callback_*), setting chitchat.notice. voicepacks/default/chitchat.json: new pools. Tests: tests/test_chitchat.Noticing, LookingBack.
+
+## 0.89.1 - docs/TODO.md
+
+* The running done / to-do list lives in docs/TODO.md. Update it with every version.
