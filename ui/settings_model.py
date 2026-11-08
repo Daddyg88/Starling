@@ -258,6 +258,8 @@ def build_pages(mic_lister=None, pack_folder=None):
         Page("combat", "Combat", "Fighting: what she says, and the helpers that press keys for you.", [
             Field("talk.combat", "She comments on combat", "toggle",
                   help="Ship names, bounties, wanted targets, interdictions, wings and kills. Off = quiet, but safety warnings (under attack, shields, heat, hull) are never silenced"),
+            Field("subtarget.press_ahead", "Sub targeting: press ahead on big ships", "toggle",
+                  help="On a ship with many weapons she presses Next Subsystem quickly without waiting for each answer, then steps back over the extra presses (about 40% quicker). Off = one careful press at a time. Press-ahead also uses your Previous Subsystem key if you have one set"),
             Field("combat_assist.pips", "Combat: pips to weapons while I fire", "toggle",
                   help="While your hardpoints are out she puts the pips in weapons when you hold a fire button, and back to systems and engines when you let go. Uses your Primary/Secondary fire buttons from Elite"),
             Field("combat_assist.pips_analysis", "Combat: also in analysis mode (mining lasers)", "toggle",

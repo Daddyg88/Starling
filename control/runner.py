@@ -648,6 +648,7 @@ class CommandRunner:
         return Outcome("done", text, command, intent, keys=" > ".join(dict.fromkeys(pressed)),
                        detail=command.do_text(intent) + ".")
 
+    SLOW_PRESSES = 3                  # the first presses are checked one by one (a part near the start is found at once); after that she presses ahead
     SUBSYSTEM_PRESSES = 24            # more than any ship has (weapons first, then the parts): after this many "next subsystem" she gives up
 
     def _subsystem_step(self, key, strokes, pressed, trace):
@@ -692,7 +693,19 @@ class CommandRunner:
                 action = "CyclePreviousSubsystem"
         log.info("Sub target: going %s from %r to %s", "backwards" if action == "CyclePreviousSubsystem" else "forwards",
                  state.target_subsystem_readable or state.target_subsystem or "nothing", key)
+        opposite = "CycleNextSubsystem" if action == "CyclePreviousSubsystem" else "CyclePreviousSubsystem"
+        if opposite not in strokes:
+            try:
+                back, _why = self.book.lookup(opposite)
+            except Exception:
+                back = None
+            if back is not None:
+                strokes = dict(strokes)
+                strokes[opposite] = back
+        can_press_ahead = opposite in strokes and self.settings.get("subtarget.press_ahead", True)
         for number in range(self.SUBSYSTEM_PRESSES):
+            if number == self.SLOW_PRESSES and can_press_ahead:
+                return self._subsystem_press_ahead(key, state, strokes, action, opposite, seen, number, pressed, trace)
             before = state.target_seq
             problem = self.sender.send(strokes[action], hold=0.1)
             pressed.append(action)
@@ -725,6 +738,128 @@ class CommandRunner:
                 break                                               # back where it started: this ship does not have it
             seen.append(state.target_subsystem)
         log.info("Sub target: %s not found; this ship showed %s", key, seen)
+        trace.append("sub>none")
+        self._role_status = "no_subsystem"
+        return None
+
+    FAST_HOLD = 0.06                  # press ahead: how long each key is held, then a short pause (about 0.18 s per press instead of 0.6)
+    FAST_STEPS = 3
+    FAST_STEP_SECONDS = 0.04
+    FAST_MAX = 30
+
+    @staticmethod
+    def _ring_complete(names):
+        """True when a part shows up again after a different one (the list has gone all the way round). The same part twice in a row
+        is NOT that: the game writes e.g. 'Drive' twice."""
+        seen = set()
+        previous = None
+        for name in names:
+            if name and name != previous and name in seen:
+                return True
+            if name:
+                seen.add(name)
+            previous = name
+        return False
+
+    def _entries_since(self, state, seq):
+        """The ShipTargeted lines since `seq` as (subsystem, readable), oldest first."""
+        history = getattr(state, "target_history", None) or []
+        found = [(sub, readable) for number, sub, readable in history if number > seq]
+        if not found and state.target_seq > seq:                    # no history kept: only the newest line is known
+            found = [(state.target_subsystem, state.target_subsystem_readable)]
+        return found
+
+    def _wait_for_entries(self, state, seq, count, seconds=1.5):
+        """Waits until `count` new lines have arrived since `seq`, or the time is up. Returns how many arrived."""
+        for _ in range(int(seconds / 0.05)):
+            if len(self._entries_since(state, seq)) >= count or not state.target_locked:
+                break
+            self.sleep(0.05)
+        return len(self._entries_since(state, seq))
+
+    def _subsystem_press_ahead(self, key, state, strokes, action, opposite, seen, used, pressed, trace):
+        """The long way round (heavily armed ships have twenty-odd parts, and the game's journal answers about half a second after each
+        key): press the key every ~0.18 s WITHOUT waiting for each answer, read the answers as they come, stop at the first one that is
+        the wanted part, then step back over the few extra presses. If anything is unclear she carefully steps one at a time instead.
+        Returns None (the answer is in self._role_status / trace) or the sender's problem text."""
+        from control import subsystems
+
+        def right_one():
+            return subsystems.matches(key, state.target_subsystem, state.target_subsystem_readable)
+
+        def tap(name):
+            problem = self.sender.send(strokes[name], hold=self.FAST_HOLD)
+            pressed.append(name)
+            for _ in range(self.FAST_STEPS):
+                self.sleep(self.FAST_STEP_SECONDS)
+            return problem
+
+        start = state.target_seq
+        sent, found_at, names, wrapped = 0, 0, [], False
+        while sent < self.FAST_MAX and used + sent < self.SUBSYSTEM_PRESSES + 6:
+            problem = tap(action)
+            if problem:
+                return problem
+            sent += 1
+            entries = self._entries_since(state, start)
+            for index, (sub, readable) in enumerate(entries, 1):
+                if subsystems.matches(key, sub, readable):
+                    found_at = found_at or index
+            if not state.target_locked:
+                self._role_status = "no_target"
+                return None
+            names = [sub for sub, _ in entries]
+            if found_at:
+                break
+            if self._ring_complete(names) or any(not n for n in names[1:]):      # came round again / wrapped to "no subsystem"
+                wrapped = True
+                break
+        arrived = self._wait_for_entries(state, start, sent)
+        entries = self._entries_since(state, start)
+        log.info("Sub target: pressed ahead %d times, %d answers read, wanted part was answer number %s", sent, arrived, found_at or "none")
+        if not state.target_locked:
+            self._role_status = "no_target"
+            return None
+        if right_one():
+            trace.append("sub>fast%d" % sent)
+            return None
+        if found_at:
+            over = len(entries) - found_at
+            if over > 0:                                           # back over the presses that went past it, also without waiting for each
+                mark = state.target_seq
+                for _ in range(over):
+                    problem = tap(opposite)
+                    if problem:
+                        return problem
+                self._wait_for_entries(state, mark, over)
+                log.info("Sub target: stepped back %d over-presses", over)
+                if right_one():
+                    trace.append("sub>fast%d-%d" % (sent, over))
+                    return None
+        if wrapped and not found_at:
+            log.info("Sub target: %s not found; this ship showed %s", key, sorted(set(n for n in names if n)))
+            trace.append("sub>none")
+            self._role_status = "no_subsystem"
+            return None
+        # Unclear (a press was lost, or it was passed): careful single steps. A little back first when it was passed, then forwards.
+        order = ([opposite] * 6 + [action] * 6) if found_at else [action] * 8
+        for name in order:
+            before = state.target_seq
+            problem = self.sender.send(strokes[name], hold=0.1)
+            pressed.append(name)
+            if problem:
+                return problem
+            for _ in range(40):
+                self.sleep(0.05)
+                if state.target_seq != before or not state.target_locked:
+                    break
+            if not state.target_locked:
+                self._role_status = "no_target"
+                return None
+            if right_one():
+                trace.append("sub>fast-fixed")
+                return None
+        log.info("Sub target: %s not found after pressing ahead; this ship showed %s", key, sorted(set(n for n in names if n)))
         trace.append("sub>none")
         self._role_status = "no_subsystem"
         return None

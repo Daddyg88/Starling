@@ -71,6 +71,7 @@ class GameState:
     target_subsystem: str = ""              # the game's name for the selected subsystem ("" = none); see control/subsystems.py
     target_subsystem_readable: str = ""
     target_seq: int = 0                     # counts ShipTargeted lines, so a command can tell a new one arrived
+    target_history: list = field(default_factory=list)   # the last ShipTargeted lines: (seq, subsystem, readable). Press-ahead sub targeting reads several at once
     altitude: Optional[float] = None        # Status.json Altitude in metres (only near a planet)
     gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     status_seen: bool = False               # True once Status.json has been read

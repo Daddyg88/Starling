@@ -66,6 +66,10 @@ def _target_update(self, entry, state):
         state.target_subsystem = str(lowered.get("subsystem") or "") if state.target_locked else ""
         state.target_subsystem_readable = str(lowered.get("subsystem_localised") or "") if state.target_locked else ""
         state.target_seq = getattr(state, "target_seq", 0) + 1
+        history = getattr(state, "target_history", None)
+        if history is not None:
+            history.append((state.target_seq, state.target_subsystem, state.target_subsystem_readable))
+            del history[:-80]
     except Exception:
         pass
     ship = entry.get("Ship_Localised") or entry.get("Ship") or ""

@@ -69,6 +69,7 @@ class Commands(unittest.TestCase):
             else:
                 state.target_subsystem, state.target_subsystem_readable = "", ""
             state.target_seq += 1
+            state.target_history.append((state.target_seq, state.target_subsystem, state.target_subsystem_readable))
             return None
         t.sender.send = send
         with self.assertLogs("starling", level="INFO"):
@@ -233,3 +234,98 @@ class YesAndTheCommand(unittest.TestCase):
         self.assertIsNone(c.answer("Yes, open the galaxy map"))          # a yes followed by something else is a new sentence
         c.ask(Match(), "x")
         self.assertEqual(c.answer("yes"), "yes")
+
+
+class PressAhead(unittest.TestCase):
+    """0.88.3: on a ship with many parts she presses ahead without waiting for each answer, then steps back over the extra presses.
+    The fake game answers each key only after 0.55 s of fake time, like the real journal."""
+
+    def run_lagged(self, phrase, order, lag=0.55, start=None, drop_every=0):
+        t = test_macros.MacroTests()
+        r = t.build()
+        from control.binds import Keystroke
+        r.book.table = dict(r.book.table)
+        r.book.table["CycleNextSubsystem"] = (Keystroke("Key_N"), "")
+        r.book.table["CyclePreviousSubsystem"] = (Keystroke("Key_P"), "")
+        state = GameState()
+        state.target_locked, state.target_scan = True, 3
+        clock = [0.0]
+        queue = []                                   # (arrives_at, step)
+        position = [start if start is not None else -1]
+        presses, seqs = [], [0]
+        if start is not None:
+            state.target_subsystem, state.target_subsystem_readable = order[start]
+
+        def deliver():
+            while queue and queue[0][0] <= clock[0]:
+                _when, step = queue.pop(0)
+                position[0] = (position[0] + step) % (len(order) + 1)
+                if position[0] < len(order):
+                    state.target_subsystem, state.target_subsystem_readable = order[position[0]]
+                else:
+                    state.target_subsystem, state.target_subsystem_readable = "", ""
+                state.target_seq += 1
+                state.target_history.append((state.target_seq, state.target_subsystem, state.target_subsystem_readable))
+
+        def send(stroke, hold=0.0):
+            presses.append(stroke.key)
+            clock[0] += hold
+            deliver()
+            if drop_every and len(presses) % drop_every == 0:
+                return None                           # the game lost this key press
+            queue.append((clock[0] + lag, -1 if stroke.key == "Key_P" else 1))
+            return None
+
+        def sleep(seconds):
+            clock[0] += seconds
+            deliver()
+        r.state_provider = lambda: state
+        r.sleep = sleep
+        t.sender.send = send
+        with self.assertLogs("starling", level="INFO"):
+            outcome = r.run_text(phrase)[0]
+        deliver()
+        return outcome, presses, clock[0], state
+
+    def big_ship(self):
+        weapons = [("$hpt_cannon_fixed_large_name;", "Cannon %d" % i) for i in range(1)]
+        order = [("$modularcargobaydoor_name;", "Cargo Hatch")]
+        for i in range(16):
+            order.append(("$hpt_weapon%d_name;" % i, "Weapon %d" % i))
+        order += [("$ext_drive_class7_a_name;", "Drive"), ("$int_powerplant_size6_class5_name;", "Power Plant"),
+                  ("$int_hyperdrive_size5_class5_name;", "Frame Shift Drive"), ("$int_shieldgenerator_size6_class5_name;", "Shield Generator")]
+        return order
+
+    def test_finds_a_deep_part_faster_than_one_by_one(self):
+        order = self.big_ship()
+        outcome, presses, seconds, state = self.run_lagged("sub target the power plant", order)
+        self.assertEqual(outcome.status, "done")
+        self.assertIn("powerplant", [k for k in ("powerplant",) if subsystems.matches(k, state.target_subsystem, state.target_subsystem_readable)])
+        one_by_one = 18 * 0.65                     # 18 presses at about 0.65 s each in the old way
+        self.assertLess(seconds, one_by_one * 0.75)
+        self.assertIn("Key_P", presses)            # it stepped back over the extra presses
+
+    def test_ends_on_the_right_part_whatever_the_lag(self):
+        order = self.big_ship()
+        for lag in (0.2, 0.4, 0.55, 0.8, 1.1):
+            outcome, _presses, _s, state = self.run_lagged("sub target the shield generator", order, lag=lag)
+            self.assertEqual(outcome.status, "done", lag)
+            self.assertTrue(subsystems.matches("shields", state.target_subsystem, state.target_subsystem_readable), lag)
+
+    def test_a_lost_key_press_is_fixed_with_careful_steps(self):
+        order = self.big_ship()
+        outcome, _presses, _s, state = self.run_lagged("sub target the frame shift drive", order, drop_every=7)
+        self.assertEqual(outcome.status, "done")
+        self.assertTrue(subsystems.matches("fsd", state.target_subsystem, state.target_subsystem_readable))
+
+    def test_a_missing_part_is_reported_not_endless(self):
+        order = self.big_ship()
+        outcome, presses, _s, _state = self.run_lagged("sub target the sensors", order)
+        self.assertEqual(outcome.status, "no_subsystem")
+        self.assertLess(len(presses), 45)
+
+    def test_can_be_switched_off(self):
+        t = test_macros.MacroTests()
+        r = t.build()
+        r.settings.set("subtarget.press_ahead", False)
+        self.assertFalse(r.settings.get("subtarget.press_ahead", True))
