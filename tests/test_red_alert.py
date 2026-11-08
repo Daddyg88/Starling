@@ -125,30 +125,26 @@ class Effects(unittest.TestCase):
         self.assertTrue(pools["RedAlert_On"] and pools["RedAlert_Off"])
 
 
-class GlowNumbers(unittest.TestCase):
-    def test_it_is_steady_and_gets_stronger_by_choice(self):
-        self.assertFalse(hasattr(glow, "pulse_alpha"))
-        self.assertLess(glow.edge_alpha("Soft"), glow.edge_alpha("Medium"))
-        self.assertLess(glow.edge_alpha("Medium"), glow.edge_alpha("Strong"))
-        self.assertEqual(glow.edge_alpha("nonsense"), glow.edge_alpha("Medium"))
+class BannerNumbers(unittest.TestCase):
+    def test_no_filter_no_glow_no_pulse(self):
+        for name in ("pulse_alpha", "edge_alpha", "tint_alpha", "bands", "band_width", "STRENGTH"):
+            self.assertFalse(hasattr(glow, name), name)
+        from core.settings import DEFAULTS
+        for old in ("glow", "tint", "strength"):
+            self.assertNotIn(old, DEFAULTS["red_alert"])
 
-    def test_it_is_a_filter_not_a_wall(self):
-        for name in glow.STRENGTH:
-            self.assertLessEqual(glow.tint_alpha(name), 0.16)
-            self.assertLessEqual(glow.edge_alpha(name), 0.30)
-            self.assertGreater(glow.tint_alpha(name), 0.05)            # strong enough to read as a red filter
+    def test_text_scales_with_the_screen(self):
+        self.assertGreater(glow.font_pixels("Medium", 2160), glow.font_pixels("Medium", 1080))
+        self.assertLess(glow.font_pixels("Small", 1080), glow.font_pixels("Large", 1080))
+        self.assertGreaterEqual(glow.font_pixels("Small", 300), 14)
+        self.assertEqual(glow.font_pixels("nonsense", 1080), glow.font_pixels("Medium", 1080))
 
-    def test_bands_go_from_bright_edge_to_dark_inside_and_stay_thin(self):
-        rings, each = glow.bands(1920, 1080)
-        self.assertEqual(len(rings), glow.BANDS)
-        self.assertEqual(rings[0][:2], (0, 0))
-        self.assertEqual(rings[0][2:4], (1920, 1080))
-        self.assertGreater(int(rings[0][4][1:3], 16), int(rings[-1][4][1:3], 16))
-        self.assertLessEqual(glow.band_width(1920, 1080), 30)         # thin: about 2.5% of the height
-        self.assertGreaterEqual(glow.band_width(800, 600), 20)
-
-    def test_four_k_scales(self):
-        self.assertGreater(glow.band_width(3840, 2160), glow.band_width(1920, 1080))
+    def test_it_sits_bottom_centre_under_the_disembark_button(self):
+        left, top = glow.place(1920, 1080, 200, 32)
+        self.assertEqual(left, 860)                                  # centred across
+        centre = top + 16
+        self.assertTrue(0.90 <= centre / 1080.0 <= 0.97)             # below the Disembark button (about 0.87), above the screen edge
+        self.assertEqual(glow.place(3840, 2160, 400, 64)[0], 1720)
 
 
 class CombatMode(unittest.TestCase):

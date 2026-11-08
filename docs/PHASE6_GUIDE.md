@@ -1415,3 +1415,7 @@ window use the same code as the biology list.
 ## 0.87.2 - Red alert focus + speed
 
 * red_alert_overlay: windows created withdrawn, _harden (layered/transparent/toolwindow/noactivate) re-applied on every show, ShowWindow SW_SHOWNOACTIVATE + SetWindowPos NOACTIVATE; default speed 1.2.
+
+## 0.88.0 - Red alert banner
+
+* red_alert_overlay.py rewritten: one transparent click-through window with RED ALERT text at the bottom centre; filter/glow/tint settings removed; settings red_alert.banner / red_alert.size.

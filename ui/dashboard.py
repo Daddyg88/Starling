@@ -821,7 +821,7 @@ class Dashboard:
                       ("Show a test route map for 10 seconds", self.test_route_overlay)]
         if page.id == "redalert":
             extra += [("Red alert: switch on / off", self.toggle_red_alert),
-                      ("Show the red filter for 8 seconds (test)", self.test_red_alert)]
+                      ("Show the RED ALERT banner for 8 seconds (test)", self.test_red_alert)]
         if page.id == "listening":
             extra += [("Learn push-to-talk button", self.learn_button)]
         if page.id == "developer":
