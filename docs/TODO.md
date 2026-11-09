@@ -20,7 +20,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Australian voice one-click install (0.89.7) is built but UNTESTED on a real PC: a tester presses 'Install Australian voice' on the Voice page and reports (install log is data/melo_env/install_log.txt). Check idle shutdown and that lines are not choppy. Older notes (0.89.3 to 0.89.5): first try (0.89.4) failed on fugashi and tokenizers (they must be compiled); 0.89.5 installed fine on Windows. First sentence took 16 s (slower than real time) and load took 50 s, so it needs saved lines. Waiting for: the listening verdict (female? good?) and the 0.89.6 speed and memory numbers. Then decide how to install it for everyone (own private environment). a tester runs run_try_australian_voice.bat and sends australian_test\log.txt plus a note on the sample (female? good?). Then build a safe one-click install (separate private environment, so it cannot break her normal voice). Older note: a tester installs MeloTTS and listens (is it female and good enough?); then decide on bundling it into the exe, a download button, and running 'prepare her voice' for it.
 - [ ] Australian wording pack (mate, no worries) as a personality option (offered, not built).
 - [ ] Dashboard list of missed sentences with a tap to teach (the voice version, 'I meant ...', is done).
-- [ ] "Next weapon" sub-target command.
+- [ ] "Next weapon" (0.89.9) built; needs a real-game try on a ship with several guns.
 - [ ] Read the next Woz zip: the 10-minute CPU line should now say which program file the busy threads started in.
 - [ ] Viewer awareness beyond the welcome-back lines (reacting to a run of messages), and remembering viewers between sessions.
 - [ ] Follow-up commands after sub targeting ("next one", "the drive").
@@ -33,7 +33,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Gentle voice mode.
 - [ ] Optional: room-light red alert (Hue, Govee and similar) and an EDHM theme.
 - [ ] Post-deploy checks: SRV, Nomad, fighter out.
-- [ ] A "what changed since last session" line at startup.
+- [ ] "Last time out" recap line at login (0.89.9) built; listen for how it sounds in the game.
 - [ ] Guardian ruins, settlement and Canonn data (only if wanted; SRVSurvey is far ahead here).
 
 ### Things on the player's side (not code)
@@ -42,6 +42,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] UI_Down shares a key with ResetPowerDistribution (Benny), and UI_Select with PlaceSettlement (Woz).
 
 ## DONE (newest first)
+- [x] 0.89.8 Updater moves her files instead of copying (confirmed: no longer sticks). Red alert banner confirmed in place.
 - [x] 0.89.7 Australian voice one-click install in a private environment + worker (untested on real Windows).
 - [x] 0.89.3 Optional Australian voice via MeloTTS (built against a pretend model; real MeloTTS untried).
 - [x] 0.89.2 Teach-by-voice and miss list, small reactions, welcome-back for viewers, six more sub-target parts, thread owner names. (She already asked 'Did you mean...?' before this.)

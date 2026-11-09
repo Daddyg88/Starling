@@ -164,5 +164,26 @@ class ThroughTheRealProcessor(unittest.TestCase):
         self.assertTrue(heard[-1].data["Landed"])
 
 
+class RecapTests(unittest.TestCase):
+    def greet(self, provider):
+        g, bus, speech, *_ = build()
+        g.recap_provider = provider
+        bus.publish("LoadGame", LOAD, "low")
+        bus.publish("Location", {"StarSystem": "Sol", "Docked": False, "Landed": False}, "low")
+        return speech.said[0][0]
+
+    def test_the_greeting_tells_what_the_last_session_was(self):
+        text = self.greet(lambda: {"when": "yesterday", "summary": "18 jumps and 3 kills"})
+        self.assertIn("18 jumps and 3 kills", text)
+        self.assertIn("yesterday", text)
+
+    def test_no_recap_when_there_is_none_or_it_breaks(self):
+        self.assertNotIn("jumps", self.greet(lambda: None))
+
+        def broken():
+            raise RuntimeError("x")
+        self.assertIn("Sol", self.greet(broken))                  # the greeting still happens
+
+
 if __name__ == "__main__":
     unittest.main()

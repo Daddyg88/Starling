@@ -116,3 +116,40 @@ class VoiceTests(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RecapTests(unittest.TestCase):
+    """0.89.9: the start-up line about the last play session."""
+
+    def make(self, folder, day):
+        return StatsKeeper(None, Path(folder) / "stats.json", announce=lambda k, v: None, now=lambda: day)
+
+    def test_last_session_is_remembered_and_told_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            first = self.make(tmp, datetime(2026, 11, 8, 20, 0))
+            for _ in range(18):
+                first.on_event(ev("FSDJump", StarSystem="Sol"))
+            first.on_event(ev("Bounty"))
+            first.flush()
+            second = self.make(tmp, datetime(2026, 11, 9, 19, 0))
+            self.assertEqual(second.recap(), {"when": "yesterday", "summary": "18 jumps and 1 kill"})
+            self.assertIsNone(second.recap())                      # only once per start
+
+    def test_an_empty_session_does_not_wipe_the_record(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            first = self.make(tmp, datetime(2026, 11, 8, 20, 0))
+            first.on_event(ev("FSDJump", StarSystem="Sol"))
+            first.flush()
+            quiet = self.make(tmp, datetime(2026, 11, 9, 19, 0))
+            quiet._dirty = True
+            quiet.flush()                                          # a start with nothing done in it
+            third = self.make(tmp, datetime(2026, 11, 10, 19, 0))
+            self.assertEqual(third.recap(), {"when": "2 days ago", "summary": "1 jump"})
+
+    def test_nothing_to_say_for_no_record_or_a_very_old_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertIsNone(self.make(tmp, datetime(2026, 11, 9)).recap())
+            old = self.make(tmp, datetime(2026, 1, 1))
+            old.on_event(ev("FSDJump", StarSystem="Sol"))
+            old.flush()
+            self.assertIsNone(self.make(tmp, datetime(2026, 11, 9)).recap())

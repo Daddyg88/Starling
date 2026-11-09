@@ -34,7 +34,7 @@ class _Safe(dict):
 
 class LoginGreeter:
     def __init__(self, bus, speech, dialogue, settings, state_provider=None, flavour=None,
-                 clock=time.monotonic, timer_factory=None, memory=None, mood=None):
+                 clock=time.monotonic, timer_factory=None, memory=None, mood=None, recap_provider=None):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
@@ -42,6 +42,7 @@ class LoginGreeter:
         self.state_provider = state_provider or (lambda: None)
         self.flavour = flavour
         self.memory = memory            # memory/recall.py (optional)
+        self.recap_provider = recap_provider        # () -> {"when", "summary"} or None: what the last session was (memory/stats.py)
         self.mood = mood                # the MoodEngine (optional): knows if she is in a temporary mood
         self.clock = clock
         self.timer_factory = timer_factory or (lambda seconds, function: threading.Timer(seconds, function))
@@ -135,6 +136,7 @@ class LoginGreeter:
         if location and location.get("Wanted"):
             parts.append(self._say("Login_Wanted", mood, values))
 
+        parts.append(self._recap(mood, values))
         sentence = " ".join(p for p in parts if p)
         if self.memory is not None and personality:
             try:
@@ -154,6 +156,20 @@ class LoginGreeter:
             if feeling:
                 sentence = "%s || %s" % (sentence, feeling)
         return sentence.strip()
+
+    def _recap(self, mood, values):
+        """'Last time out, yesterday, we made 18 jumps and 3 kills.' Once per start, and only when there is something to say."""
+        if self.recap_provider is None:
+            return None
+        try:
+            found = self.recap_provider()
+        except Exception:
+            log.exception("Could not work out what happened last session")
+            return None
+        if not found:
+            return None
+        values.update(found)
+        return self._say("Login_Recap", mood, values)
 
     def _swing_line(self, values):
         """While she is still in a temporary mood (she was upset with you for dying), she says so instead of the usual feeling."""

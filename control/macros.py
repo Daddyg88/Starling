@@ -111,8 +111,8 @@ def parse_macro(steps):
         if lowered.startswith("subsystem "):
             from control.subsystems import SUBSYSTEMS
             word = lowered.split()[1] if len(lowered.split()) == 2 else ""
-            if word not in SUBSYSTEMS:
-                raise ValueError("I don't understand this step (write it like: subsystem powerplant; one of %s): %r" % (", ".join(SUBSYSTEMS), text))
+            if word not in SUBSYSTEMS and word != "nextweapon":
+                raise ValueError("I don't understand this step (write it like: subsystem powerplant; one of %s, nextweapon): %r" % (", ".join(SUBSYSTEMS), text))
             parsed.append(("subsystem", word))
             continue
         if lowered.startswith("role tab "):

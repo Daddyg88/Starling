@@ -130,6 +130,29 @@ class Commands(unittest.TestCase):
         self.assertEqual(outcome.status, "no_target")
         self.assertEqual(len(presses), 2)
 
+    GUNS = [("$int_powerplant_size3_class3_name;", "Power Plant"), ("$hpt_beamlaser_gimbal_medium_name;", "Beam Laser"),
+            ("$hpt_cannon_gimbal_small_name;", "Cannon"), ("$hpt_cargoscanner_size0_class5_name;", "Manifest Scanner"),
+            ("$hpt_chafflauncher_tiny_name;", "Chaff Launcher"), ("$int_shieldgenerator_size3_class5_name;", "Shield Generator")]
+
+    def test_next_weapon_goes_to_the_following_gun(self):
+        outcome, presses = self.run_command("next weapon subsystem", order=self.GUNS, start=1)
+        self.assertEqual(outcome.status, "done")
+        self.assertEqual(presses, ["Key_N"])                       # Beam Laser -> Cannon
+
+    def test_next_weapon_steps_over_the_scanner_and_utility_parts(self):
+        outcome, presses = self.run_command("next weapon subsystem", order=self.GUNS, start=2)
+        self.assertEqual(outcome.status, "done")                   # Cannon -> scanner, chaff, shields, (none), power plant, Beam Laser
+        self.assertEqual(len(presses), 6)
+
+    def test_next_weapon_with_no_weapon_selected_finds_the_first_one(self):
+        outcome, presses = self.run_command("another weapon subsystem", order=self.GUNS, start=0)
+        self.assertEqual(outcome.status, "done")                   # same walk as "sub target the weapons" (it may go the short way round)
+        self.assertGreaterEqual(len(presses), 1)
+
+    def test_next_weapon_needs_a_scanned_target(self):
+        outcome, presses = self.run_command("next weapon subsystem", order=self.GUNS, start=1, scan=1)
+        self.assertEqual((outcome.status, presses), ("no_scan", []))
+
     def test_every_status_has_a_voice_pool(self):
         import json
         from pathlib import Path

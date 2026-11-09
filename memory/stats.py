@@ -41,6 +41,8 @@ class StatsKeeper:
         self.terraformable = []          # body names, newest last
         self.session = {"kills": 0, "jumps": 0}
         self.history_done = False
+        self.previous = {}               # how the last play session ended: {"ended": "2026-11-08", "jumps": n, "kills": n}
+        self._recap_given = False
         self._here = ""
         self._revisit_at = -REVISIT_COOLDOWN
         self._load()
@@ -73,6 +75,9 @@ class StatsKeeper:
             value = data.get(name)
             setattr(self, name, {str(k): v for k, v in value.items() if isinstance(v, int)} if isinstance(value, dict) else {})
         self.history_done = bool(data.get("history_done", False))
+        last = data.get("last_session")
+        if isinstance(last, dict):
+            self.previous = {"ended": str(last.get("ended", "")), "jumps": int(last.get("jumps", 0) or 0), "kills": int(last.get("kills", 0) or 0)}
         bodies = data.get("terraformable")
         self.terraformable = [str(b) for b in bodies][-MAX_BODIES:] if isinstance(bodies, list) else []
 
@@ -82,6 +87,10 @@ class StatsKeeper:
                 return
             data = {"visits": self.visits, "kills_total": self.kills_total, "kills_by_day": self.kills_by_day,
                     "jumps_total": self.jumps_total, "jumps_by_day": self.jumps_by_day, "terraformable": self.terraformable, "history_done": self.history_done}
+            if self.session["jumps"] or self.session["kills"]:          # this session becomes "last time" for the next start
+                data["last_session"] = {"ended": self.today(), "jumps": self.session["jumps"], "kills": self.session["kills"]}
+            elif self.previous:
+                data["last_session"] = self.previous
             self._dirty = False
         try:
             folder = os.path.dirname(str(self.path)) or "."
@@ -101,6 +110,28 @@ class StatsKeeper:
 
     def today(self):
         return self.now().strftime("%Y-%m-%d")
+
+    def recap(self):
+        """What the last play session was, ONCE per start: {"when": "yesterday", "summary": "18 jumps and 3 kills"} or None.
+        Nothing when there is no record, it was empty, or it is more than 60 days old."""
+        with self._lock:
+            if self._recap_given or not self.previous:
+                return None
+            self._recap_given = True
+            jumps, kills = self.previous.get("jumps", 0), self.previous.get("kills", 0)
+            try:
+                days = (self.now().date() - datetime.strptime(self.previous.get("ended", ""), "%Y-%m-%d").date()).days
+            except ValueError:
+                return None
+        if days < 0 or days > 60 or not (jumps or kills):
+            return None
+        parts = []
+        if jumps:
+            parts.append("%d jump%s" % (jumps, "" if jumps == 1 else "s"))
+        if kills:
+            parts.append("%d kill%s" % (kills, "" if kills == 1 else "s"))
+        when = "earlier today" if days == 0 else "yesterday" if days == 1 else "%d days ago" % days
+        return {"when": when, "summary": " and ".join(parts)}
 
     # ---- counting ----
     def on_event(self, event):

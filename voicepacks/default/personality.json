@@ -454,6 +454,12 @@
   "Login_Ship_Frustrated": [
     "We're in the {ship}. Try not to break it this time."
   ],
+  "Login_Recap": [
+    "Last time out, {when}, we made {summary}.",
+    "Since {when}: {summary} on our last trip.",
+    "Our last trip, {when}, was {summary}.",
+    "Last session, {when}, that was {summary}. Let's see if we can beat it."
+  ],
   "Login_Docked": [
     "We're docked at {station} in the {system} system.",
     "Docked at {station}, in the {system} system.",

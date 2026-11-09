@@ -798,6 +798,7 @@ class Dashboard:
             extra.append(("Test her voice", self.test_voice))
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
             extra.append(("Install Australian voice (downloads several GB)", self.install_australian_voice))
+            extra.append(("Clear saved voice lines (frees disk space)", self.clear_voice_lines))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
             extra.append(("Install AI chat (downloads about 450 MB)", self.install_ai_chat))
@@ -1331,6 +1332,16 @@ class Dashboard:
                 self._ai_busy = False
             say(message + ("" if ok else " Nothing else is affected."), T.GOOD if ok else T.BAD)
         threading.Thread(target=work, name="install-ai-chat", daemon=True).start()
+
+    def clear_voice_lines(self):
+        """Voice page: delete the saved voice lines to free disk space (safe: they are made again when needed)."""
+        from tkinter import messagebox
+        from tts import voice_space
+        size = voice_space.gb(voice_space.cache_bytes())
+        if not messagebox.askyesno("Clear saved voice lines", "Delete her saved voice lines (%s)? Her memory and settings are not touched. "
+                                   "Lines are made again when she needs them, a little slower at first." % size):
+            return
+        self._controls_result(self.app.clear_voice_lines(), T.GOOD)
 
     def install_australian_voice(self):
         """Voice page: install the optional Australian voice (MeloTTS) in the background, in its own private folder."""

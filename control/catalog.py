@@ -323,6 +323,9 @@ CATALOG = [
     C("sub_weapons", "CycleNextSubsystem", "the weapons",
       press=["{SUB_V} [the] (weapons|weapon|guns|gun)"],
       doing={"press": "Targeting the weapons"}, strict=True, macro=("subsystem weapons",)),
+    C("sub_next_weapon", "CycleNextSubsystem", "the next weapon",
+      press=["(next|another|different|other) (weapon|gun|hardpoint) (subsystem|sub system|part)", "(next|another|different|other) (subsystem|sub system) (weapon|gun|hardpoint)"],        # plain "next weapon" is the on-foot command
+      doing={"press": "Targeting the next weapon"}, strict=True, macro=("subsystem nextweapon",)),
     C("sub_cargo", "CycleNextSubsystem", "the cargo hatch",
       press=["{SUB_V} [the] (cargo hatch|cargo bay|cargo bay door|cargo hold|hatch)"],
       doing={"press": "Targeting the cargo hatch"}, strict=True, macro=("subsystem cargo",)),

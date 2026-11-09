@@ -214,3 +214,26 @@ class PrivateInstallTests(unittest.TestCase):
     def test_the_warm_up_only_prepares_a_few_hundred_lines_with_the_australian_voice(self):
         from tts import voice_warmer
         self.assertLessEqual(voice_warmer.MELO_WARM_LINES, 1000)
+
+
+class DiskSpaceTests(unittest.TestCase):
+    def test_the_install_refuses_when_the_disk_is_nearly_full(self):
+        from tts import melo_install
+        ran = []
+        ok, message = melo_install.install(progress=lambda t: None, run=lambda c, f: ran.append(c) or 0, free_bytes=lambda: 2 * 1073741824)
+        self.assertFalse(ok)
+        self.assertIn("not enough free disk space", message)
+        self.assertEqual(ran, [])                               # nothing was started
+
+    def test_clearing_voice_lines_only_deletes_saved_sound(self):
+        from tts import voice_space
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            (folder / "a.npy").write_bytes(b"x" * 1000)
+            (folder / "b.npy").write_bytes(b"x" * 500)
+            (folder / "keep.json").write_text("{}")
+            self.assertEqual(voice_space.cache_bytes(folder), 1500)
+            self.assertEqual(voice_space.clear_cache(folder), (2, 1500))
+            self.assertTrue((folder / "keep.json").exists())
+            self.assertEqual(voice_space.cache_bytes(folder), 0)
+            self.assertEqual(voice_space.clear_cache(folder / "missing"), (0, 0))

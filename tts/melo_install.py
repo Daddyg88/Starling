@@ -59,8 +59,17 @@ def steps(python):
     ]
 
 
-def install(progress=print, run=None, python_for_venv=None):
-    """Returns (ok, message). 'run' is replaceable for tests: run(command, log_file) -> exit code."""
+MIN_FREE_GB = 10                 # torch plus the voice models: about 5-6 GB, and pip needs room to unpack
+
+
+def install(progress=print, run=None, python_for_venv=None, free_bytes=None, min_free_gb=MIN_FREE_GB):
+    """Returns (ok, message). 'run' and 'free_bytes' are replaceable for tests: run(command, log_file) -> exit code."""
+    from tts import voice_space
+    free = (free_bytes or voice_space.free_bytes)()
+    if free is not None and free < min_free_gb * 1073741824 and env_python() is None:
+        return False, ("There is not enough free disk space for the Australian voice: it needs about %d GB and this drive has %s. "
+                       "Free some space first (Settings > Voice > 'Clear saved voice lines' frees some) and try again. Nothing was changed."
+                       % (min_free_gb, voice_space.gb(free)))
     folder = env_dir()
     log_file = folder / "install_log.txt"
     run = run or _run

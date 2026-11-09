@@ -1471,3 +1471,7 @@ window use the same code as the biology list.
 ## 0.89.8 - updater moves her files instead of copying
 
 * core/updater.py: _copy_keep moves (instant) with restore on failure/rollback.
+
+## 0.89.9 - next weapon, disk-space safeguards, last-session recap
+
+* control/runner.py _next_weapon; tts/voice_space.py + Voice page clear button; melo_install free-space check; memory/stats.py recap + greeter Login_Recap.

@@ -242,7 +242,8 @@ class App:
         from memory.recall import MemoryRecall
         self.memory_recall = MemoryRecall(self.memory_store, self.dialogue, self.settings, speech=self.speech)
         self.greeter = LoginGreeter(self.bus, self.speech, self.dialogue, self.settings,
-                                    state_provider=lambda: self.state, flavour=flavour, memory=self.memory_recall, mood=self.mood)
+                                    state_provider=lambda: self.state, flavour=flavour, memory=self.memory_recall, mood=self.mood,
+                                    recap_provider=lambda: self.stats.recap() if getattr(self, "stats", None) is not None else None)
         self.greeter.attach()
 
         # Gets new lines ready in the background when the CPU is free (see tts/voice_warmer.py).
@@ -600,6 +601,16 @@ class App:
             self.settings.set("tts.voice", "melo_en_au")
             self.settings.save()
         return ok, message
+
+    def clear_voice_lines(self):
+        """Deletes the saved voice lines (a speed-up only: they are made again when needed). Returns a sentence for the screen."""
+        from tts import voice_space
+        files, freed = voice_space.clear_cache()
+        self.log.info("Cleared %d saved voice lines (%s)", files, voice_space.gb(freed))
+        again = str(self.settings.get("tts.warm_cache", "idle")).lower() != "off"
+        return ("Cleared %d saved voice lines and freed %s. " % (files, voice_space.gb(freed)) +
+                ("She will slowly make them again when the PC is quiet; set 'Get new lines ready in the background' to off to keep the space." if again else
+                 "Lines are made again as she needs them."))
 
     def test_ai_chat(self):
         """Starts the AI chat and asks for one sentence. Returns (ok, sentence for the screen)."""

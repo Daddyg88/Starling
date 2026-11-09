@@ -670,10 +670,52 @@ class CommandRunner:
         if boost is not None:
             boost(40)                                               # look at the journal ten times a second while this runs
         try:
+            if key == "nextweapon":
+                return self._next_weapon(strokes, pressed, trace)
             return self._subsystem_walk(key, strokes, pressed, trace)
         finally:
             if boost is not None:
                 boost(0)
+
+    def _next_weapon(self, strokes, pressed, trace):
+        """"Next weapon": from the weapon that is selected, presses Next Subsystem (one at a time, checking the journal) until the
+        game selects a weapon again. Parts that are not guns (the manifest scanner, utility mounts, the "no subsystem" gap) are stepped over.
+        When no weapon is selected yet this is just "sub target the weapons"."""
+        from control import subsystems
+        state = self.state_provider()
+        if state is None or not getattr(state, "target_locked", False):
+            self._role_status = "no_target"
+            return None
+        if int(getattr(state, "target_scan", 0) or 0) < 3:
+            self._role_status = "no_scan"
+            return None
+        if not subsystems.matches("weapons", state.target_subsystem, state.target_subsystem_readable):
+            return self._subsystem_walk("weapons", strokes, pressed, trace)
+        for number in range(self.SUBSYSTEM_PRESSES):
+            before = state.target_seq
+            problem = self.sender.send(strokes["CycleNextSubsystem"], hold=0.1)
+            pressed.append("CycleNextSubsystem")
+            if problem:
+                return problem
+            for _ in range(40):
+                self.sleep(0.05)
+                if state.target_seq != before or not state.target_locked:
+                    break
+            if not state.target_locked:
+                self._role_status = "no_target"
+                return None
+            if state.target_seq == before:
+                log.warning("Sub target: pressed Next Subsystem for the next weapon but the journal said nothing")
+                trace.append("sub>unread")
+                self._role_status = "sub_unread"
+                return None
+            log.info("Sub target: selected %r (%r)", state.target_subsystem_readable or state.target_subsystem, state.target_subsystem)
+            if subsystems.matches("weapons", state.target_subsystem, state.target_subsystem_readable):
+                trace.append("sub>nextweapon%d" % (number + 1))
+                return None
+        trace.append("sub>none")
+        self._role_status = "no_subsystem"
+        return None
 
     def _subsystem_walk(self, key, strokes, pressed, trace):
         """Presses Next Subsystem until the game's journal says the wanted part is selected. The journal writes a ShipTargeted

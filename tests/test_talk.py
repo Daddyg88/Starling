@@ -155,7 +155,7 @@ class ChatterTests(Base):
 
 
 class LongLineTests(unittest.TestCase):
-    ALLOWED = {"StarSystem", "JumpDist", "StationName", "LandingPad", "ship", "system", "station", "jumps", "distance", "minutes", "name", "hull", "hours", 'kills', 'interdictions', 'scans', 'systems', 'since_scoop', 'interdict_system', 'kill_system'}
+    ALLOWED = {"StarSystem", "JumpDist", "StationName", "LandingPad", "ship", "system", "station", "jumps", "distance", "minutes", "name", "hull", "hours", 'kills', 'interdictions', 'scans', 'systems', 'since_scoop', 'interdict_system', 'kill_system', 'when', 'summary'}
 
     def test_placeholders_are_all_known(self):
         d = real_dialogue()
