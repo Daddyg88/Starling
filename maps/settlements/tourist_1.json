@@ -1,0 +1,339 @@
+{
+ "id": "tourist_1",
+ "name": "Tourist 1",
+ "group": "Tourist",
+ "size": [
+  1634,
+  830
+ ],
+ "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
+ "note": "PROTOTYPE traced by eye from one screenshot: positions are approximate and the up-arrow doors are not marked yet.",
+ "buildings": [
+  {
+   "rect": [
+    310,
+    135,
+    500,
+    285
+   ]
+  },
+  {
+   "rect": [
+    335,
+    345,
+    490,
+    450
+   ]
+  },
+  {
+   "rect": [
+    310,
+    550,
+    500,
+    670
+   ]
+  },
+  {
+   "rect": [
+    395,
+    285,
+    430,
+    345
+   ]
+  },
+  {
+   "rect": [
+    395,
+    450,
+    430,
+    550
+   ]
+  },
+  {
+   "rect": [
+    490,
+    380,
+    1345,
+    440
+   ]
+  },
+  {
+   "rect": [
+    1425,
+    280,
+    1610,
+    460
+   ]
+  }
+ ],
+ "circles": [
+  {
+   "x": 690,
+   "y": 285,
+   "r": 78
+  },
+  {
+   "x": 690,
+   "y": 535,
+   "r": 78
+  },
+  {
+   "x": 1110,
+   "y": 225,
+   "r": 150
+  },
+  {
+   "x": 1110,
+   "y": 595,
+   "r": 150
+  }
+ ],
+ "labels": [
+  {
+   "text": "HAB",
+   "x": 285,
+   "y": 177
+  },
+  {
+   "text": "HAB",
+   "x": 341,
+   "y": 360
+  },
+  {
+   "text": "HAB",
+   "x": 336,
+   "y": 533
+  },
+  {
+   "text": "PWR",
+   "x": 1569,
+   "y": 333
+  }
+ ],
+ "markers": [
+  {
+   "type": "terminal_l0",
+   "x": 406,
+   "y": 160
+  },
+  {
+   "type": "terminal_l0",
+   "x": 441,
+   "y": 376
+  },
+  {
+   "type": "terminal_l0",
+   "x": 441,
+   "y": 405
+  },
+  {
+   "type": "terminal_l0",
+   "x": 709,
+   "y": 414
+  },
+  {
+   "type": "terminal_l0",
+   "x": 1156,
+   "y": 420
+  },
+  {
+   "type": "terminal_l0",
+   "x": 400,
+   "y": 642
+  },
+  {
+   "type": "terminal_above",
+   "x": 1471,
+   "y": 404
+  },
+  {
+   "type": "airlock",
+   "x": 410,
+   "y": 126,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 483,
+   "y": 367,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 483,
+   "y": 415,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 404,
+   "y": 687,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 1501,
+   "y": 325,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 1439,
+   "y": 419,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 323,
+   "y": 148,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 351,
+   "y": 148,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 452,
+   "y": 148,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 480,
+   "y": 146,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 323,
+   "y": 186,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 351,
+   "y": 186,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 452,
+   "y": 186,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 480,
+   "y": 186,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 351,
+   "y": 229,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 453,
+   "y": 229,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 351,
+   "y": 571,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 452,
+   "y": 571,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 323,
+   "y": 604,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 351,
+   "y": 604,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 452,
+   "y": 604,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 480,
+   "y": 604,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 323,
+   "y": 642,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 351,
+   "y": 642,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 452,
+   "y": 642,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 480,
+   "y": 642,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 1576,
+   "y": 368,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 1576,
+   "y": 426,
+   "level": 3
+  },
+  {
+   "type": "power",
+   "x": 1559,
+   "y": 391
+  },
+  {
+   "type": "alarm",
+   "x": 1590,
+   "y": 400
+  },
+  {
+   "type": "tip",
+   "x": 343,
+   "y": 393
+  },
+  {
+   "type": "tip",
+   "x": 1590,
+   "y": 468
+  }
+ ],
+ "tips": []
+}

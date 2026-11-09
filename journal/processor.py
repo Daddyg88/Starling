@@ -30,6 +30,7 @@ class EventProcessor:
         self.ignored = Counter()    # which event names we ignored, and how often
         self.damaged_lines = 0
         self.skipped_by_settings = 0
+        self.raw_listeners = []     # functions called as listener(entry, silent) for every journal line that has an event file (the settlement recorder)
 
     # ---- journal lines ----
     def handle_line(self, line, silent=False):
@@ -53,6 +54,11 @@ class EventProcessor:
         if handler is None or handler.source != "journal":
             return
         handler.update_state(entry, self.state)
+        for listener in self.raw_listeners:
+            try:
+                listener(entry, silent)
+            except Exception:
+                log.exception("A journal listener failed")
         pending, self.state.pending_events = list(getattr(self.state, "pending_events", None) or []), []
         if handler.name == "FSDJump" and not silent:
             self.bus.publish("journal.arrived", {"StarSystem": entry.get("StarSystem", "")}, "low")    # auto honk listens for this

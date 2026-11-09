@@ -104,6 +104,13 @@ class Dashboard:
             log.exception("The red alert glow could not start")
             self.red_alert_overlay = None
         try:
+            from ui.settlement_overlay import SettlementOverlay
+            maps, view = getattr(app, "settlement_maps", None), getattr(app, "settlement_view", None)
+            self.settlement_overlay = SettlementOverlay(self.root, app.settings, maps, view) if maps is not None and view is not None else None
+        except Exception:
+            log.exception("The settlement map could not start")
+            self.settlement_overlay = None
+        try:
             from ui.route_overlay import RouteOverlay
             self.route_overlay = RouteOverlay(self.root, app.settings, lambda: app.state, lambda: app.route_follower,
                                               lambda: bool(getattr(app, "watcher", None) and app.watcher.void_compass_running()))

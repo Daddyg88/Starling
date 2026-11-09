@@ -217,7 +217,10 @@ EXTRA = [
         ('Save what she heard to a file', ['Hearing report']),
         ('Biology overlay', ['Hide the biology overlay', 'Show the biology overlay']),
         ('Viewer chat (Twitch and YouTube)', ['Pause the chat', 'Chat on']),
-        ('Route map overlay', ['Hide the route map', 'Show the route map'])]),
+        ('Route map overlay', ['Hide the route map', 'Show the route map']),
+        ('Settlement map (Tourist 1 so far, more to come)', ['Show settlement map tourist one', 'Hide the settlement map']),
+        ('Recording a settlement visit (helps us build more maps)', ['Mark spot power regulator (stand at it first; any name works)']),
+        ('Credits', ['Settlement maps are based on the Odyssey Map Guide by CMDR Quizengine (elitedangereuse.fr). Thank you, Commander.'])]),
 ]
 for gid, title, intro, rows in EXTRA:
     sections.append((gid, title, intro, simple(rows)))

@@ -63,3 +63,8 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - Run the full tests (`python3 -m unittest discover -s tests -t .`) before pushing. Say what is untested.
 - The secret hardpoints phrase never appears in any list, doc, README or site.
 - Do not give any information about Payden.
+
+## Settlement maps (work in progress, NOT pushed)
+- [ ] Prototype wireframe map Tourist 1 (maps/settlements/tourist_1.json), overlay (ui/settlement_overlay.py), voice "show settlement map tourist one" / "hide settlement map". Credit: CMDR Quizengine's Odyssey Map Guide (maps/settlements/CREDITS.md). Still to add: credit in README + website when shipped.
+- [ ] Settlement recorder (navigation/settlement_recorder.py) writes data/settlement_samples.json (journal details, on-foot trail, voice marks "mark spot <name>"); goes into the diagnostics zip. Needs real visits to learn: what the approach coordinates mean, how pad counts (LandingPads) match layouts, whether Status Heading works on foot.
+- [ ] Then: group (StationEconomy) + pad counts -> suggest layout; two-point calibration; position/heading arrow on the map.

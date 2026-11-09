@@ -1475,3 +1475,7 @@ window use the same code as the biology list.
 ## 0.89.9 - next weapon, disk-space safeguards, last-session recap
 
 * control/runner.py _next_weapon; tts/voice_space.py + Voice page clear button; melo_install free-space check; memory/stats.py recap + greeter Login_Recap.
+
+## 0.90.0 - settlement maps (first step) and recorder
+
+* navigation/settlement_maps.py, ui/settlement_overlay.py, control/settlement_voice.py, maps/settlements/; navigation/settlement_recorder.py; heading/altitude kept from Status.json; journal processor raw_listeners.

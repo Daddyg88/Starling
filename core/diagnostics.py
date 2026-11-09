@@ -74,6 +74,12 @@ def make_bundle(settings_path, logs_dir, data_dir, version, target_dir):
                 bundle.writestr("logs/" + log.name, _tail(log, MAX_LOG_BYTES))
             except OSError:
                 continue
+        try:                                                  # settlement visits (positions and journal lines only), for working out the maps
+            sample = Path(data_dir) / "settlement_samples.json"
+            if sample.exists() and sample.stat().st_size < 2_000_000:
+                bundle.write(sample, "settlement_samples.json")
+        except OSError:
+            pass
         try:                                                  # the little black-and-white maps of failed panel looks (no game pictures)
             for png in sorted((Path(data_dir) / "panel_debug").glob("*.png"), key=lambda f: f.stat().st_mtime)[-24:]:
                 bundle.write(png, "panel_debug/" + png.name)

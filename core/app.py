@@ -87,6 +87,11 @@ class App:
         from control.echo import Echo
         self.echo = Echo()
         self.commands = None
+        try:
+            from navigation.settlement_maps import MapView, SettlementMaps
+            self.settlement_maps, self.settlement_view = SettlementMaps(), MapView()       # shown by ui/settlement_overlay.py, set by voice
+        except Exception:
+            self.settlement_maps = self.settlement_view = None
         self.autohonk = None
         self.combat_assist = None
         self.watcher = None
@@ -150,6 +155,13 @@ class App:
                                      learned=BioLearned(paths.DATA_DIR / "bio_learned.json"))
         self.registry = load_registry()
         self.processor = EventProcessor(self.bus, self.event_config, self.state, self.registry)
+        try:
+            from navigation.settlement_recorder import SettlementRecorder
+            self.settlement_recorder = SettlementRecorder(lambda: self.state)
+            self.processor.raw_listeners.append(self.settlement_recorder.on_entry)
+        except Exception:
+            self.log.exception("The settlement recorder could not start")
+            self.settlement_recorder = None
         if record_events:
             saver = EventLogger(self.database, self.session_id)
             saver.trim_old()
@@ -421,6 +433,14 @@ class App:
                     lambda: self.state, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
             except Exception:
                 self.log.exception("The biology overlay voice command could not start")
+            try:
+                from control.settlement_voice import SettlementMapVoice
+                if self.settlement_maps is not None:
+                    self.commands.extra_helpers.append(SettlementMapVoice(self.settlement_maps, self.settlement_view))
+                if getattr(self, "settlement_recorder", None) is not None:
+                    self.commands.extra_helpers.append(self.settlement_recorder)
+            except Exception:
+                self.log.exception("The settlement map voice command could not start")
             try:
                 from core.red_alert import RedAlert
                 from navigation.voice import Narrator
@@ -963,6 +983,8 @@ class App:
         self.ensure_regions()
         poll = self.settings.get("journal.poll_seconds", 1.0)
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
+        if getattr(self, "settlement_recorder", None) is not None:
+            self.monitor.status.listeners.append(self.settlement_recorder.on_status)
         self.ensure_bio_distance()
         self.start_bio_codex_scan()
         self.start_stats_history()

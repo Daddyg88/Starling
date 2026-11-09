@@ -157,6 +157,8 @@ class StatusReader:
             state.latitude = float(status["Latitude"]) if near else None
             state.longitude = float(status["Longitude"]) if near else None
             state.planet_radius = float(status["PlanetRadius"]) if near else None
+            state.heading = float(status["Heading"]) if near and isinstance(status.get("Heading"), (int, float)) else None
+            state.altitude = float(status["Altitude"]) if near and isinstance(status.get("Altitude"), (int, float)) else None
             for listener in self.listeners:
                 try:
                     listener(state)

@@ -26,6 +26,8 @@ class GameState:
     latitude: Optional[float] = None        # Status.json, while you are close to a planet (otherwise None)
     longitude: Optional[float] = None
     planet_radius: Optional[float] = None   # metres
+    heading: Optional[float] = None         # Status.json, degrees (0 = north), while close to a planet
+    altitude: Optional[float] = None        # Status.json, metres
     fuel_main: Optional[float] = None       # tonnes in the main tank now (Status.json), for the Home page
     cargo_tons: Optional[float] = None      # tonnes of cargo carried now (Status.json)
     cargo_capacity: Optional[float] = None  # from the Loadout event
