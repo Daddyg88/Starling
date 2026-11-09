@@ -19,6 +19,7 @@ from tts.kokoro_tts import speed_from_rate
 from tts.voice_cache_builder import collect_texts
 
 log = get_logger("voice_warmer")
+MELO_WARM_LINES = 400            # with the Australian (MeloTTS) voice only this many lines are prepared in advance (the rest are saved as she says them)
 
 FIRST = ("FSDJump", "Docked", "Undocked", "SupercruiseEntry", "SupercruiseExit", "StartJump", "DockingGranted", "Touchdown",
          "Liftoff", "FuelScoopComplete", "UnderAttack", "ShieldsDown", "ShieldsUp", "Bounty", "Died", "HardpointsDeployed",
@@ -183,6 +184,8 @@ class VoiceWarmer:
                 return
             speed = speed_from_rate(self.settings.get("tts.rate", 0))
             texts = priority_order(self.dialogue, bool(self.settings.get("speech.allow_mature", False)), self.settings)
+            if str(self.settings.get("tts.voice", "")) == "melo_en_au":
+                texts = texts[:MELO_WARM_LINES]            # the Australian voice makes about one line every 3 s: only the most important ones
             self.total = len(texts)
             fingerprint = self._fingerprint(texts, speed)
             if self._already_prepared(fingerprint, texts, speed):

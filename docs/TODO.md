@@ -17,7 +17,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Crash 0xc0000409: cause unknown.
 
 ### To build
-- [ ] Australian voice (MeloTTS, 0.89.3 to 0.89.5): first try (0.89.4) failed on fugashi and tokenizers (they must be compiled); 0.89.5 installed fine on Windows. First sentence took 16 s (slower than real time) and load took 50 s, so it needs saved lines. Waiting for: the listening verdict (female? good?) and the 0.89.6 speed and memory numbers. Then decide how to install it for everyone (own private environment). a tester runs run_try_australian_voice.bat and sends australian_test\log.txt plus a note on the sample (female? good?). Then build a safe one-click install (separate private environment, so it cannot break her normal voice). Older note: a tester installs MeloTTS and listens (is it female and good enough?); then decide on bundling it into the exe, a download button, and running 'prepare her voice' for it.
+- [ ] Australian voice one-click install (0.89.7) is built but UNTESTED on a real PC: a tester presses 'Install Australian voice' on the Voice page and reports (install log is data/melo_env/install_log.txt). Check idle shutdown and that lines are not choppy. Older notes (0.89.3 to 0.89.5): first try (0.89.4) failed on fugashi and tokenizers (they must be compiled); 0.89.5 installed fine on Windows. First sentence took 16 s (slower than real time) and load took 50 s, so it needs saved lines. Waiting for: the listening verdict (female? good?) and the 0.89.6 speed and memory numbers. Then decide how to install it for everyone (own private environment). a tester runs run_try_australian_voice.bat and sends australian_test\log.txt plus a note on the sample (female? good?). Then build a safe one-click install (separate private environment, so it cannot break her normal voice). Older note: a tester installs MeloTTS and listens (is it female and good enough?); then decide on bundling it into the exe, a download button, and running 'prepare her voice' for it.
 - [ ] Australian wording pack (mate, no worries) as a personality option (offered, not built).
 - [ ] Dashboard list of missed sentences with a tap to teach (the voice version, 'I meant ...', is done).
 - [ ] "Next weapon" sub-target command.
@@ -42,6 +42,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] UI_Down shares a key with ResetPowerDistribution (Benny), and UI_Select with PlaceSettlement (Woz).
 
 ## DONE (newest first)
+- [x] 0.89.7 Australian voice one-click install in a private environment + worker (untested on real Windows).
 - [x] 0.89.3 Optional Australian voice via MeloTTS (built against a pretend model; real MeloTTS untried).
 - [x] 0.89.2 Teach-by-voice and miss list, small reactions, welcome-back for viewers, six more sub-target parts, thread owner names. (She already asked 'Did you mean...?' before this.)
 - [x] 0.89.0 She notices the night (kills, interdictions, scans, systems, jumps since a scoop), looks back on earlier moments, calm combat lines by mood.

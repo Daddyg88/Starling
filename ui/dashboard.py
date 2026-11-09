@@ -797,6 +797,7 @@ class Dashboard:
         if page.id == "voice":
             extra.append(("Test her voice", self.test_voice))
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
+            extra.append(("Install Australian voice (downloads several GB)", self.install_australian_voice))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
             extra.append(("Install AI chat (downloads about 450 MB)", self.install_ai_chat))
@@ -1330,6 +1331,26 @@ class Dashboard:
                 self._ai_busy = False
             say(message + ("" if ok else " Nothing else is affected."), T.GOOD if ok else T.BAD)
         threading.Thread(target=work, name="install-ai-chat", daemon=True).start()
+
+    def install_australian_voice(self):
+        """Voice page: install the optional Australian voice (MeloTTS) in the background, in its own private folder."""
+        import threading
+        if getattr(self, "_aus_busy", False):
+            self._controls_result("The Australian voice is already being installed. Please wait.", T.WARN)
+            return
+        self._aus_busy = True
+        say = lambda text, colour=None: self.root.after(0, lambda: self._controls_result(text, colour))
+        say("Installing the Australian voice. It downloads several GB and can take 10-20 minutes. You can keep using Starling.", T.WARN)
+
+        def work():
+            try:
+                ok, message = self.app.install_australian_voice(progress=lambda text: say(str(text).strip(), T.WARN))
+            except Exception as exc:
+                ok, message = False, "The install failed: %s" % exc
+            finally:
+                self._aus_busy = False
+            say(message + ("" if ok else " Nothing else is affected."), T.GOOD if ok else T.BAD)
+        threading.Thread(target=work, name="install-australian-voice", daemon=True).start()
 
     def test_ai_chat(self):
         """Personality page: start the AI chat and ask it for one sentence."""

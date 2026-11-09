@@ -587,6 +587,20 @@ class App:
                 self.llm.unload()
         return ok, message
 
+    def install_australian_voice(self, progress=print):
+        """Installs the Australian voice (MeloTTS) into its own private folder and picks it. Returns (ok, sentence for the screen)."""
+        from tts import melo_install
+
+        def note(text):
+            self.log.info("Australian voice install: %s", str(text).strip())
+            progress(text)
+        ok, message = melo_install.install(progress=note)
+        self.log.info("Australian voice install %s: %s", "finished" if ok else "FAILED", message)
+        if ok:
+            self.settings.set("tts.voice", "melo_en_au")
+            self.settings.save()
+        return ok, message
+
     def test_ai_chat(self):
         """Starts the AI chat and asks for one sentence. Returns (ok, sentence for the screen)."""
         from personality.llm import LocalLLM

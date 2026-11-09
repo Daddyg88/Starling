@@ -1463,3 +1463,7 @@ window use the same code as the biology list.
 ## 0.89.6 - try-out measures speed and memory
 
 * 0.89.5 worked on Windows (Python 3.12, modern add-ons, --no-deps for MeloTTS). First sentence 16 s, load 50 s. tools/try_melo.py now times four sentences and prints memory.
+
+## 0.89.7 - Australian voice one-click install
+
+* Voice page button installs MeloTTS in data/melo_env; runs as a separate worker (tts/melo_worker.py) with idle shutdown; warm-up limited to 400 lines for this voice.

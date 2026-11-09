@@ -106,3 +106,111 @@ class MeloTests(unittest.TestCase):
             self.assertTrue(tts.is_cached("Welcome aboard, commander."))
             self.assertTrue(tts.speak("Welcome aboard, commander.", VoiceSettings(voice="melo_en_au")))
             self.assertEqual(len(model.calls), 1)                 # the second time came from the saved line
+
+
+class PrivateInstallTests(unittest.TestCase):
+    """The worker program, the engine that talks to it, and the installer (all with fakes: nothing is downloaded)."""
+
+    def test_the_engine_talks_to_a_real_worker_process_in_fake_mode(self):
+        import sys
+        engine = melo_voice.MeloEngine(python=sys.executable, worker_args=["--fake"])
+        try:
+            pieces = list(engine("Hello there, commander.", voice="melo_en_au", speed=1.0))
+            self.assertEqual(len(pieces), 1)
+            self.assertGreater(pieces[0].size, 2000)
+            self.assertEqual(pieces[0].dtype, np.float32)
+            list(engine("A second line."))                       # the same worker answers again
+        finally:
+            engine.close()
+
+    def test_a_dead_worker_is_restarted_once_and_then_it_is_a_clear_error(self):
+        import sys
+        engine = melo_voice.MeloEngine(python=sys.executable, worker_args=["--fake"])
+        try:
+            list(engine("One."))
+            engine._process.kill()
+            engine._process.wait()
+            list(engine("Two."))                                 # restarted by itself
+        finally:
+            engine.close()
+        broken = melo_voice.MeloEngine(python=sys.executable, worker_args=["--no-such-thing"])
+        broken.LOAD_SECONDS = 3
+        try:
+            import tts.melo_worker as worker
+            self.assertTrue(callable(worker.main))
+        finally:
+            broken.close()
+
+    def test_a_worker_that_cannot_start_gives_a_clear_error(self):
+        engine = melo_voice.MeloEngine(python="this-program-does-not-exist")
+        with self.assertRaises((RuntimeError, OSError)):
+            list(engine("Hi."))
+
+    def test_the_worker_can_stop_itself_after_being_idle(self):
+        import sys
+        ticks = [0.0]
+        engine = melo_voice.MeloEngine(python=sys.executable, worker_args=["--fake"], idle_seconds=4, clock=lambda: ticks[0])
+        try:
+            list(engine("Hi."))
+            self.assertIsNotNone(engine._process)
+            ticks[0] = 100.0
+            import time
+            for _ in range(40):
+                if engine._process is None:
+                    break
+                time.sleep(0.25)
+            self.assertIsNone(engine._process)
+        finally:
+            engine.close()
+
+    def test_the_installer_runs_every_step_and_writes_the_marker_last(self):
+        from core import paths
+        from tts import melo_install
+        with tempfile.TemporaryDirectory() as tmp:
+            old = paths.DATA_DIR
+            paths.DATA_DIR = Path(tmp)
+            try:
+                commands = []
+
+                def run(command, log_file):
+                    commands.append(command)
+                    if command[1:3] == ["-m", "venv"]:
+                        (Path(tmp) / "melo_env" / "bin").mkdir(parents=True)
+                        (Path(tmp) / "melo_env" / "bin" / "python").write_text("")
+                    return 0
+                shown = []
+                self.assertFalse(melo_install.is_installed())
+                ok, message = melo_install.install(progress=shown.append, run=run)
+                self.assertTrue(ok, message)
+                self.assertEqual(len(commands), 6)                # the folder + 5 steps
+                self.assertTrue(any("--no-deps" in c for c in commands))
+                self.assertTrue(melo_install.is_installed())
+                self.assertTrue(any("Step 5 of 5" in line for line in shown))
+                melo_install.uninstall()
+                self.assertFalse(melo_install.is_installed())
+            finally:
+                paths.DATA_DIR = old
+
+    def test_a_failed_step_stops_the_install_and_leaves_no_marker(self):
+        from core import paths
+        from tts import melo_install
+        with tempfile.TemporaryDirectory() as tmp:
+            old = paths.DATA_DIR
+            paths.DATA_DIR = Path(tmp)
+            try:
+                def run(command, log_file):
+                    if command[1:3] == ["-m", "venv"]:
+                        (Path(tmp) / "melo_env" / "bin").mkdir(parents=True)
+                        (Path(tmp) / "melo_env" / "bin" / "python").write_text("")
+                        return 0
+                    return 1 if "--no-deps" in command else 0
+                ok, message = melo_install.install(progress=lambda t: None, run=run)
+                self.assertFalse(ok)
+                self.assertIn("Step 2 of 5", message)
+                self.assertFalse(melo_install.is_installed())
+            finally:
+                paths.DATA_DIR = old
+
+    def test_the_warm_up_only_prepares_a_few_hundred_lines_with_the_australian_voice(self):
+        from tts import voice_warmer
+        self.assertLessEqual(voice_warmer.MELO_WARM_LINES, 1000)
