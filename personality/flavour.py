@@ -55,6 +55,10 @@ class Flavour:
         except Exception:
             return False
 
+    def quiet_now(self):
+        """True in red alert or a fight: no extras of any kind."""
+        return bool(getattr(self, "red_alert", False)) or self.in_combat()
+
     # ---- what is she like right now? ----
     def active(self):
         return self.settings.get("personality.style", "personality") == "personality"

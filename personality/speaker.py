@@ -12,7 +12,9 @@ event's own summary instead, so a warning is never silent.
 
 import re
 import json
+import random
 import time
+from collections import defaultdict, deque
 
 from core.logger import get_logger
 from personality.mood_engine import effective_mood
@@ -21,6 +23,12 @@ from core.identity import personalise
 from personality import categories, line_keys
 
 log = get_logger("speaker")
+
+REACTION_CHANCE = 0.12             # how often a small 'Hm.' / 'Oh.' comes before an ordinary line
+REPEAT_CHANCE = 0.30               # ... and how often 'Again.' comes before a line about something that keeps happening
+REPEAT_AFTER = 4                   # this many of the same event within REPEAT_WINDOW seconds counts as 'keeps happening'
+REPEAT_WINDOW = 600.0
+REACTION_REST = 90.0               # at least this long between two reactions
 
 _SKIP_PREFIXES = ("app.", "journal.", "speech.", "voice.", "personality.", "ask.")
 
@@ -58,7 +66,7 @@ def fix_articles(text, data):
 
 
 class EventSpeaker:
-    def __init__(self, bus, speech, dialogue, settings, rules=None, clock=time.monotonic, flavour=None, echo=None):
+    def __init__(self, bus, speech, dialogue, settings, rules=None, clock=time.monotonic, flavour=None, echo=None, rng=None):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
@@ -68,6 +76,9 @@ class EventSpeaker:
         self._last_spoken = {}
         self.echo = echo            # optional: control/echo.py, skips events caused by her own voice commands
         self.flavour = flavour      # optional: adds pet names and remarks (personality style only)
+        self.rng = rng                # None = no little reactions (the tests); the app passes a real generator
+        self._times = defaultdict(lambda: deque(maxlen=12))      # event name -> when it was spoken about lately
+        self._last_reaction = -REACTION_REST
 
     def attach(self):
         self.bus.subscribe("*", self.on_event)
@@ -120,6 +131,7 @@ class EventSpeaker:
         text = personalise(self._fill_in(line.text, event), self.settings)
         if self.flavour is not None and not line.audio:
             text = self.flavour.apply(text, priority)
+        text = self._with_reaction(text, event, line, priority, mood, allow_mature, now)
         after = personalise(self._fill_in(line.after_text, event, use_summary=False), self.settings) if line.after_text else None
         self._last_spoken[event.name] = now
         self.speech.say(
@@ -130,6 +142,30 @@ class EventSpeaker:
             priority=priority,
             event_name=event.name,
         )
+
+    def _with_reaction(self, text, event, line, priority, mood, allow_mature, now):
+        """A small human touch: now and then a short reaction comes first ('Hm.', 'Oh.'), and a line about something that keeps happening
+        gets an 'Again.' Never before warnings, recorded voice lines, two-part lines, in a fight or in red alert, and never twice in 90 s."""
+        if self.rng is None:
+            return text
+        times = self._times[event.name]
+        times.append(now)
+        recent = sum(1 for t in times if now - t <= REPEAT_WINDOW)
+        if (priority == "critical" or line.audio or line.then_speak or line.after_text
+                or not self.settings.get("personality.reactions", True)
+                or self.settings.get("personality.style", "personality") != "personality"
+                or now - self._last_reaction < REACTION_REST):
+            return text
+        if self.flavour is not None and self.flavour.quiet_now():
+            return text
+        repeating = recent >= REPEAT_AFTER
+        if self.rng.random() >= (REPEAT_CHANCE if repeating else REACTION_CHANCE):
+            return text
+        opener = self.dialogue.pick("Opener_Repeat" if repeating else "Opener_General", mood, allow_mature, False)
+        if opener is None:
+            return text
+        self._last_reaction = now
+        return "%s %s" % (opener.text.strip(), text)
 
     @staticmethod
     def _fill_in(text, event, use_summary=True):

@@ -78,7 +78,7 @@ GROUPS = [
      ['request_docking', 'auto_launch', 'plot_waypoint', 'show_off']),
     ('role', 'Role panel: Nomad, fighter, SRV, disembark', 'She opens the role (bottom) panel and looks at it: she goes to the right tab, checks the vessel is on board, and only presses Deploy when the button is lit. If it is not there or greyed out she tells you why (for example: you have to be landed for the SRV and to disembark, the fighter needs 500 metres or higher, the Rhino 30 metres or lower).',
      ['deploy_nomad', 'deploy_slf', 'deploy_srv', 'deploy_rhino', 'deploy_scarab', 'disembark']),
-    ('subtarget', 'Sub targeting (combat)', 'After a ship is locked and fully scanned you can pick a part to shoot. Say "sub target the power plant" and she presses Next Subsystem, checking the game journal until that part is selected. The first few presses are checked one by one; on a ship with many weapons she then presses ahead quickly and steps back over any extra presses with Previous Subsystem (about 40% quicker; a Settings switch turns it off). If nothing is locked, the ship is not fully scanned yet, or that ship does not show that part, she tells you instead of pressing on. Needs a keyboard key on Cycle Next Subsystem.',
+    ('subtarget', 'Sub targeting (combat)', 'After a ship is locked and fully scanned you can pick a part to shoot. Say "sub target the power plant" and she presses Next Subsystem, checking the game journal until that part is selected. The first few presses are checked one by one; on a ship with many weapons she then presses ahead quickly and steps back over any extra presses with Previous Subsystem (about 40% quicker; a Settings switch turns it off). If nothing is locked, the ship is not fully scanned yet, or that ship does not show that part, she tells you instead of pressing on. Also the chaff launcher, heat sink launcher, point defence, shield booster, electronic countermeasure and manifest scanner. Needs a keyboard key on Cycle Next Subsystem.',
      [i for i in C if i.startswith('sub_')]),
     ('panels', 'Panel tabs (left and right)', 'She opens the panel and looks at it to find the tab, so it works whichever tab was open last. Left panel: Navigation, Transactions, Contacts, Target. Right panel: Home, Modules, Fire Groups, Ship, Inventory, Storage, Status. If she cannot see the panel she says so and presses nothing more.',
      [i for i in C if i.startswith('panel_')] + ['close_panels']),
@@ -213,6 +213,7 @@ EXTRA = [
     ('learn', 'Teaching her your voice', 'Details are in the setup steps above. These work any time. Outside the training, "stop" means all stop (throttle to zero).', [
         ('Start the training', ['Teach me your voice']),
         ('During the training', ['Skip', 'Stop']),
+        ('When she did not understand you', ['What did you miss?', 'I meant lower the landing gear (said right after she missed it: she does it and remembers)']),
         ('Save what she heard to a file', ['Hearing report']),
         ('Biology overlay', ['Hide the biology overlay', 'Show the biology overlay']),
         ('Viewer chat (Twitch and YouTube)', ['Pause the chat', 'Chat on']),

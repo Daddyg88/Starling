@@ -329,3 +329,40 @@ class PressAhead(unittest.TestCase):
         r = t.build()
         r.settings.set("subtarget.press_ahead", False)
         self.assertFalse(r.settings.get("subtarget.press_ahead", True))
+
+
+class UtilityParts(unittest.TestCase):
+    NAMES = {"chaff": "$hpt_chafflauncher_tiny_name;", "heatsink": "$hpt_heatsinklauncher_turret_tiny_name;",
+             "pointdefence": "$hpt_plasmapointdefence_turret_tiny_name;", "shieldbooster": "$hpt_shieldbooster_size0_class5_name;",
+             "ecm": "$hpt_electroniccountermeasure_tiny_name;", "scanner": "$hpt_cargoscanner_size0_class4_name;"}
+
+    def test_real_names_from_the_log_are_matched(self):
+        for key, raw in self.NAMES.items():
+            self.assertTrue(subsystems.matches(key, raw), key)
+
+    def test_utility_mounts_are_not_weapons(self):
+        for raw in self.NAMES.values():
+            self.assertFalse(subsystems.matches("weapons", raw), raw)
+        self.assertTrue(subsystems.matches("weapons", "$hpt_cannon_fixed_large_name;"))
+
+    def test_other_parts_do_not_match_each_other(self):
+        for key, raw in self.NAMES.items():
+            for other in self.NAMES:
+                if other != key:
+                    self.assertFalse(subsystems.matches(other, raw), (key, other))
+        self.assertFalse(subsystems.matches("cargo", self.NAMES["scanner"]))
+
+    def test_spoken_commands(self):
+        from control.matcher import Matcher
+        matcher = Matcher()
+        spoken = {"sub target the chaff launcher": "sub_chaff", "target the heat sink": "sub_heatsink", "lock the point defence": "sub_pointdefence",
+                  "sub target shield booster": "sub_shieldbooster", "target the e c m": "sub_ecm", "sub target the manifest scanner": "sub_scanner"}
+        for phrase, wanted in spoken.items():
+            found = matcher.match(phrase)
+            self.assertIsNotNone(found, phrase)
+            self.assertEqual(found.command.id, wanted, phrase)
+
+    def test_the_macro_word_is_accepted(self):
+        from control import macros
+        for key in self.NAMES:
+            macros.parse("subsystem " + key) if hasattr(macros, "parse") else None

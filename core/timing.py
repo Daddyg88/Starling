@@ -59,11 +59,56 @@ def thread_cpu_times():
         return {}
 
 
-def busiest_threads(before, after, names=None, top=3):
-    """Plain text: the threads that used the most CPU between two thread_cpu_times() readings."""
+def thread_owner(tid):
+    """Which program file a thread started in, e.g. 'ctranslate2.dll' or 'onnxruntime.dll' (Windows only; '' when Windows will not say).
+    Used only to put a name to busy threads that Python did not start (0.89.2: Woz's log blamed 'native thread 39052')."""
+    if sys.platform != "win32":
+        return ""
+    try:
+        import ctypes
+        from ctypes import wintypes
+        k32 = ctypes.windll.kernel32
+        k32.OpenThread.restype = wintypes.HANDLE
+        handle = k32.OpenThread(0x0040, False, int(tid))                 # THREAD_QUERY_INFORMATION
+        if not handle:
+            return ""
+        try:
+            address = ctypes.c_void_p()
+            status = ctypes.windll.ntdll.NtQueryInformationThread(handle, 9, ctypes.byref(address), ctypes.sizeof(address), None)   # ThreadQuerySetWin32StartAddress
+            if status != 0 or not address.value:
+                return ""
+            module = wintypes.HMODULE()
+            if not k32.GetModuleHandleExW(0x4 | 0x2, ctypes.c_void_p(address.value), ctypes.byref(module)):     # FROM_ADDRESS | UNCHANGED_REFCOUNT
+                return ""
+            buffer = ctypes.create_unicode_buffer(520)
+            k32.GetModuleFileNameW(module, buffer, 520)
+            return buffer.value.replace("\\", "/").rsplit("/", 1)[-1]
+        finally:
+            k32.CloseHandle(handle)
+    except Exception:
+        return ""
+
+
+def busiest_threads(before, after, names=None, top=3, owner=None):
+    """Plain text: the threads that used the most CPU between two thread_cpu_times() readings.
+    A thread Python did not name is shown with the file it started in (owner(tid) -> 'ctranslate2.dll'), when that is known."""
     names = names or {}
     used = sorted(((after[t] - before.get(t, 0.0), t) for t in after), reverse=True)[:top]
-    return ", ".join("%s %.1f s" % (names.get(t, "native thread %d" % t), secs) for secs, t in used if secs >= 0.5)
+    parts = []
+    for secs, tid in used:
+        if secs < 0.5:
+            continue
+        name = names.get(tid)
+        if not name:
+            where = ""
+            if owner is not None:
+                try:
+                    where = owner(tid)
+                except Exception:
+                    where = ""
+            name = "native thread %d%s" % (tid, (" (started in %s)" % where) if where else "")
+        parts.append("%s %.1f s" % (name, secs))
+    return ", ".join(parts)
 
 
 class JobTimer:
@@ -106,7 +151,7 @@ class JobTimer:
             after = thread_cpu_times()
             import threading
             names = {t.native_id: t.name for t in threading.enumerate() if t.native_id}
-            busy = busiest_threads(self._threads_start, after, names)
+            busy = busiest_threads(self._threads_start, after, names, owner=thread_owner)
             if busy and used / elapsed > 0.5:
                 log.info("Busiest threads in that time: %s", busy)
             self._threads_start = after

@@ -29,5 +29,17 @@
   "Chat is back on.",
   "Chat can talk to me again.",
   "Okay, I'm listening to chat."
- ]
+ ],
+  "StreamChat_Asks_Again": [
+    "{user} is back with another one: {question}",
+    "Welcome back, {user}. You ask: {question}",
+    "{user} again! {question}",
+    "Second question from {user}: {question}"
+  ],
+  "StreamChat_Asks_Regular": [
+    "{user}, my favourite regular, asks: {question}",
+    "Question number {times} from {user}: {question}",
+    "{user} is keeping me busy tonight: {question}",
+    "Our regular {user} wants to know: {question}"
+  ]
 }

@@ -1,0 +1,29 @@
+{
+  "_help": "Tiny reactions that sometimes come before an ordinary line (about 1 in 8). Opener_Repeat is used when the same thing keeps happening. Keep them very short. Never used before warnings or in a fight.",
+  "Opener_General": [
+    "Hm.",
+    "Oh.",
+    "Right.",
+    "Ah.",
+    "Well.",
+    "Okay.",
+    "Huh.",
+    "Mm."
+  ],
+  "Opener_Repeat": [
+    "Again.",
+    "Another one.",
+    "Here we go again.",
+    "And again."
+  ],
+  "Opener_General_Sarcastic": [
+    "Oh, wonderful.",
+    "Hm, fascinating.",
+    "Well, well."
+  ],
+  "Opener_General_Friendly": [
+    "Oh!",
+    "Ooh.",
+    "Nice."
+  ]
+}

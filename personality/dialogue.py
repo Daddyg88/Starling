@@ -150,6 +150,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "freechat.json"))      # free chat: reactions, remarks and questions back
             self._merge(_read_json(self.pack_dir / "brain2.json"))        # "say that again", "what were we talking about"
             self._merge(_read_json(self.pack_dir / "chitchat.json"))      # small talk when it is quiet
+            self._merge(_read_json(self.pack_dir / "openers.json"))        # tiny reactions before an ordinary line (Hm. / Oh. / Again.)
             self._merge(_read_json(self.pack_dir / "combat.json"))        # ship changes, wings, fighting (space and on foot)
             self._merge(_read_json(self.pack_dir / "memory.json"))        # what she remembers about you
             self._merge(_read_json(self.pack_dir / "eoc.json"))           # the East Orion Company: CEO, systems, tour

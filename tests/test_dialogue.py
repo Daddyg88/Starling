@@ -3,6 +3,7 @@ import random
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 from core import paths
 from core.event_bus import Event
@@ -418,3 +419,72 @@ class DistanceSpeechTests(ExobiologySpeechTests):
         text = self.say(ScanType="Log", SampleNumber=1)
         self.assertIn("Bacterium Informem", text)
         self.assertNotIn("metres", text)
+
+
+class SmallReactions(unittest.TestCase):
+    """0.89.2: now and then a short 'Hm.' comes first, 'Again.' when something keeps happening; never in a fight / before warnings."""
+
+    def build(self, chance=1.0, quiet=False, style="personality"):
+        import random
+        from types import SimpleNamespace
+        from personality import speaker as sp
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        settings = Settings(Path(self.tmp.name) / "s.json").load()
+        settings.set("personality.style", style)
+        said = []
+        speech = SimpleNamespace(say=lambda **kw: said.append(kw) or True)
+
+        class Rng(random.Random):
+            def random(self_inner):
+                return 0.0 if chance else 0.99
+        flavour = SimpleNamespace(quiet_now=lambda: quiet, apply=lambda text, priority: text)
+        speaker = sp.EventSpeaker(None, speech, real_dialogue(), settings, sp.DEFAULT_RULES, flavour=flavour, rng=Rng())
+        return speaker, said
+
+    def event(self, name="FuelScoop", priority="normal"):
+        from core.event_bus import Event
+        return Event(name, {"summary": "x", "fuel_percent": 50}, priority) if True else None
+
+    def test_a_reaction_can_come_first(self):
+        speaker, said = self.build()
+        speaker.on_event(self.event())
+        if said:                                    # (the event has to have a line)
+            self.assertTrue(any(said[0]["text"].startswith(o) for o in ("Hm.", "Oh.", "Right.", "Ah.", "Well.", "Okay.", "Huh.", "Mm.", "Oh, wonderful.", "Hm, fascinating.", "Well, well.", "Oh!", "Ooh.", "Nice.")), said[0]["text"])
+
+    def test_never_in_a_fight_or_red_alert(self):
+        speaker, said = self.build(quiet=True)
+        speaker.on_event(self.event())
+        for item in said:
+            self.assertNotRegex(item["text"], r"^(Hm|Oh|Right|Ah|Well|Okay|Huh|Mm|Nice|Ooh)\b")
+
+    def test_never_before_a_warning(self):
+        speaker, _said = self.build()
+        text = speaker._with_reaction("Shields down.", self.event(priority="critical"), SimpleNamespace(audio=None, then_speak=None, after_text=None), "critical", "", False, 100.0)
+        self.assertEqual(text, "Shields down.")
+
+    def test_not_twice_in_a_row_and_repeat_wording(self):
+        speaker, _said = self.build()
+        line = SimpleNamespace(audio=None, then_speak=None, after_text=None)
+        ev = self.event()
+        first = speaker._with_reaction("Fuel.", ev, line, "normal", "", False, 1000.0)
+        self.assertNotEqual(first, "Fuel.")
+        second = speaker._with_reaction("Fuel.", ev, line, "normal", "", False, 1010.0)
+        self.assertEqual(second, "Fuel.")                                          # too soon after the last one
+        for step in range(5):
+            last = speaker._with_reaction("Fuel.", ev, line, "normal", "", False, 2000.0 + step * 120)
+        self.assertTrue(any(last.startswith(o) for o in ("Again.", "Another one.", "Here we go again.", "And again.")), last)
+
+    def test_off_switch_and_info_style(self):
+        speaker, _ = self.build()
+        speaker.settings.set("personality.reactions", False)
+        line = SimpleNamespace(audio=None, then_speak=None, after_text=None)
+        self.assertEqual(speaker._with_reaction("Fuel.", self.event(), line, "normal", "", False, 100.0), "Fuel.")
+        speaker2, _ = self.build(style="info")
+        self.assertEqual(speaker2._with_reaction("Fuel.", self.event(), line, "normal", "", False, 100.0), "Fuel.")
+
+    def test_without_a_generator_nothing_changes(self):
+        speaker, _ = self.build()
+        speaker.rng = None
+        line = SimpleNamespace(audio=None, then_speak=None, after_text=None)
+        self.assertEqual(speaker._with_reaction("Fuel.", self.event(), line, "normal", "", False, 100.0), "Fuel.")

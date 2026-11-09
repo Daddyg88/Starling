@@ -23,6 +23,8 @@ log = get_logger("learning")
 
 PROMOTE_AFTER = 2          # times it must be understood the same way before she trusts it
 MAX_ENTRIES = 600
+MAX_MISSES = 40
+MISS_MAX_WORDS = 8             # longer sentences are chat, not a command she missed
 
 
 class VoiceLearning:
@@ -31,6 +33,8 @@ class VoiceLearning:
         self.enabled = enabled
         self._lock = threading.Lock()
         self.seen = {}                 # heard sentence -> {canonical sentence: count}
+        self.misses = {}               # sentences she did not understand -> how many times (so you can teach her: 'I meant ...')
+        self.last_miss = None          # (the sentence, when): what 'I meant ...' refers to
         self._dirty = False
         self._load()
 
@@ -38,6 +42,10 @@ class VoiceLearning:
         try:
             with open(self.path, "r", encoding="utf-8") as handle:
                 data = json.load(handle)
+            missed = data.get("missed", {}) if isinstance(data, dict) else {}
+            for heard, count in missed.items():
+                if isinstance(count, (int, float)):
+                    self.misses[str(heard)] = int(count)
             seen = data.get("heard", {}) if isinstance(data, dict) else {}
             for heard, options in seen.items():
                 if isinstance(options, dict):
@@ -73,6 +81,34 @@ class VoiceLearning:
             self._dirty = True
         self.save()
 
+    def note_miss(self, heard, now=0.0):
+        """A sentence she could not turn into any command (and was not a chat question)."""
+        heard = (heard or "").strip().lower()
+        if not self.enabled() or len(heard) < 4 or len(heard.split()) > MISS_MAX_WORDS:
+            return
+        with self._lock:
+            self.misses[heard] = self.misses.get(heard, 0) + 1
+            if len(self.misses) > MAX_MISSES:
+                self.misses.pop(min(self.misses, key=self.misses.get), None)
+            self.last_miss = (heard, now)
+            self._dirty = True
+        self.save()
+
+    def recent_misses(self, limit=3):
+        return [h for h, _ in sorted(self.misses.items(), key=lambda kv: -kv[1])[:limit]]
+
+    def teach(self, heard, sentence):
+        """You told her what `heard` meant: trusted at once (no waiting for two close matches)."""
+        heard = (heard or "").strip().lower()
+        if not self.enabled() or not heard or heard == sentence:
+            return False
+        with self._lock:
+            self.seen[heard] = {sentence: PROMOTE_AFTER}
+            self.misses.pop(heard, None)
+            self._dirty = True
+        self.save()
+        return True
+
     def top_phrases(self, limit=8):
         """The sentences this player's mishearings have turned into most often (used as a hint for the recogniser)."""
         totals = {}
@@ -91,7 +127,7 @@ class VoiceLearning:
             os.makedirs(os.path.dirname(str(self.path)) or ".", exist_ok=True)
             handle, temp = tempfile.mkstemp(dir=os.path.dirname(str(self.path)) or ".", suffix=".tmp")
             with os.fdopen(handle, "w", encoding="utf-8") as out:
-                json.dump({"_help": "How the speech recogniser mis-hears you. Safe to delete.", "heard": self.seen}, out, indent=1)
+                json.dump({"_help": "How the speech recogniser mis-hears you. Safe to delete.", "heard": self.seen, "missed": self.misses}, out, indent=1)
             os.replace(temp, self.path)
             self._dirty = False
         except Exception:

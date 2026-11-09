@@ -4,6 +4,7 @@ The App class: starts STARLING's parts in the right order and stops them safely.
 Later phases will plug the voice, dashboard and so on in here.
 """
 
+import random
 import platform
 import sys
 from datetime import datetime
@@ -197,7 +198,7 @@ class App:
                           lambda: self.state.exobiology.carried_total() if self.state and self.state.exobiology else 0,
                           combat_provider=self._in_combat)
         self.flavour = flavour
-        self.speaker = EventSpeaker(self.bus, self.speech, self.dialogue, self.settings, rules, flavour=flavour, echo=self.echo)
+        self.speaker = EventSpeaker(self.bus, self.speech, self.dialogue, self.settings, rules, flavour=flavour, echo=self.echo, rng=random.Random())
         self.speaker.attach()
 
         # Her mood follows what you do in the game (not saved during --demo).
@@ -408,6 +409,8 @@ class App:
                 state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route(),
                 macro_hooks=self._macro_hooks(),
                 memory=self.memory_recall, smalltalk=self.smalltalk, brain=self.brain)
+            from control.teach import TeachHelper
+            self.commands.extra_helpers.append(TeachHelper(lambda: self.commands))
             self.commands.journal_boost = lambda seconds: self.monitor.look_fast(seconds) if self.monitor is not None else None
             # Void Compass overlays: the runner makes its own client from settings voidcompass.port on first use
             try:

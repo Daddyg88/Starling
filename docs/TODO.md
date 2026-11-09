@@ -1,10 +1,11 @@
 # Starling: what is done and what is left
 
-Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.89.1.
+Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.89.2.
 
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.89.2: 'I meant ...' teaching and 'what did you miss'; small reactions (Hm./Oh./Again.); welcome-back lines for returning chat viewers; sub target chaff, heat sink, point defence, shield booster, ECM, manifest scanner; thread owner names (Windows only, untested).
 - [ ] Red alert banner (0.88.1): does RED ALERT show at the bottom centre, right size, never takes the mouse or focus? The log says "RED ALERT banner shown" when it appears.
 - [ ] Red alert switches the cockpit to combat mode.
 - [ ] Sub targeting press-ahead (0.88.3): lands on the right part on a heavily armed ship and is faster. The game may drop keys pressed too close together; if so the gap in runner.py (FAST_HOLD / FAST_STEPS) needs widening.
@@ -16,14 +17,12 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Crash 0xc0000409: cause unknown.
 
 ### To build
-- [ ] Liveliness stage: timing touches (a short reaction before a line, different wording first time versus tenth time).
-- [ ] Liveliness stage: viewer and chat awareness on stream, in her own voice.
-- [ ] Better understanding: "did you mean...?" fuzzy matching for near-miss commands, using the Yes handling.
-- [ ] Better understanding: a "heard but not understood" list on the dashboard where a tap teaches her what it meant.
+- [ ] Dashboard list of missed sentences with a tap to teach (the voice version, 'I meant ...', is done).
+- [ ] "Next weapon" sub-target command.
+- [ ] Read the next Woz zip: the 10-minute CPU line should now say which program file the busy threads started in.
+- [ ] Viewer awareness beyond the welcome-back lines (reacting to a run of messages), and remembering viewers between sessions.
 - [ ] Follow-up commands after sub targeting ("next one", "the drive").
-- [ ] More sub-target parts: chaff launcher, heatsink, point defence, shield booster, "next weapon".
 - [ ] Pre-generate voice for common lines (cuts "Slow start" delays and CPU).
-- [ ] Name the busy background threads in the diagnostics (Woz sees 30 to 55% of one core; the cause is not yet known).
 - [ ] Pre-generate chat answers (offered, not done).
 - [ ] Crew tab.
 - [ ] Website "if something is wrong" feature list.
@@ -41,6 +40,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] UI_Down shares a key with ResetPowerDistribution (Benny), and UI_Select with PlaceSettlement (Woz).
 
 ## DONE (newest first)
+- [x] 0.89.2 Teach-by-voice and miss list, small reactions, welcome-back for viewers, six more sub-target parts, thread owner names. (She already asked 'Did you mean...?' before this.)
 - [x] 0.89.0 She notices the night (kills, interdictions, scans, systems, jumps since a scoop), looks back on earlier moments, calm combat lines by mood.
 - [x] 0.88.4 Detects chord letters that fire their own action (night vision against heat sink).
 - [x] 0.88.3 Sub targeting presses ahead on big ships (about 40% faster in a simulated game).

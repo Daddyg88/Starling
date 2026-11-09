@@ -189,6 +189,7 @@ class ChatDirector:
         self.say = say                  # (key, fields) -> speaks one of her streaming lines
         self.cool = Cooldowns(clock)
         self.log = deque(maxlen=40)     # what happened lately, for the dashboard
+        self.asked = {}                 # viewer -> how many of their questions she has answered this session (so she can say 'welcome back')
 
     def option(self, name, default=None):
         return self.settings.get("streaming." + name, default)

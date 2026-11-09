@@ -1443,3 +1443,7 @@ window use the same code as the biology list.
 ## 0.89.1 - docs/TODO.md
 
 * The running done / to-do list lives in docs/TODO.md. Update it with every version.
+
+## 0.89.2 - Teach, reactions, welcome back, utility sub targets, thread owners
+
+* control/teach.py (TeachHelper: 'I meant ...', 'what did you miss'), learning.misses/teach; speaker._with_reaction + voicepacks/default/openers.json (rng must be passed in, tests leave it off); streaming/wiring.asks_key + ChatDirector.asked; subsystems.UTILITY keys + catalog sub_chaff etc.; timing.thread_owner (Windows).

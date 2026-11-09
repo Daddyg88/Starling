@@ -563,3 +563,33 @@ class HeldQuestions(unittest.TestCase):
     def test_switching_hold_off_answers_at_once(self):
         director, clock, asked = self.build(hold=False)
         self.assertEqual(director.handle(msg("!starling hi")).status, "answered")
+
+
+class ReturningViewers(unittest.TestCase):
+    def test_which_announcement(self):
+        from streaming import wiring
+        from core.settings import Settings
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            settings = Settings(Path(tmp) / "s.json").load()
+            self.assertEqual(wiring.asks_key(0, settings), "StreamChat_Asks")
+            self.assertEqual(wiring.asks_key(1, settings), "StreamChat_Asks_Again")
+            self.assertEqual(wiring.asks_key(2, settings), "StreamChat_Asks_Regular")
+            self.assertEqual(wiring.asks_key(7, settings), "StreamChat_Asks_Regular")
+            settings.set("streaming.recognise_viewers", False)
+            self.assertEqual(wiring.asks_key(5, settings), "StreamChat_Asks")
+
+    def test_the_director_starts_with_nobody_known(self):
+        director = chat.ChatDirector(None, lambda: None, lambda a: True, lambda u, q: True, lambda k, f=None: None, lambda: 0.0)
+        self.assertEqual(director.asked, {})
+
+    def test_the_new_lines_exist_and_use_known_fields(self):
+        import json
+        import re
+        from core import paths
+        data = json.load(open(paths.VOICEPACKS_DIR / "default" / "streaming.json", encoding="utf-8"))
+        for key in ("StreamChat_Asks_Again", "StreamChat_Asks_Regular"):
+            self.assertGreaterEqual(len(data[key]), 4)
+            for text in data[key]:
+                self.assertTrue(set(re.findall(r"{(\w+)}", text)) <= {"user", "question", "times"}, text)

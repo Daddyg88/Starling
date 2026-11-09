@@ -17,7 +17,15 @@ SUBSYSTEMS = {
     "sensors": ("the sensors", ("sensor",)),
     "cargo": ("the cargo hatch", ("modularcargobaydoor", "cargohatch")),   # NOT "cargo": the Manifest Scanner is $hpt_cargoscanner
     "weapons": ("the weapons", ("hpt",)),                            # every weapon is $hpt_... (Beam Laser, Cannon, Pulse Laser ...)
+    # utility mounts are $hpt_ names too, from the real log of 8 Nov 2026 (they are NOT counted as "weapons", see UTILITY below)
+    "chaff": ("the chaff launcher", ("chafflauncher",)),
+    "heatsink": ("the heat sink launcher", ("heatsinklauncher",)),
+    "pointdefence": ("the point defence", ("pointdefence", "pointdefense")),
+    "shieldbooster": ("the shield booster", ("shieldbooster",)),
+    "ecm": ("the electronic countermeasure", ("electroniccountermeasure",)),
+    "scanner": ("the manifest scanner", ("cargoscanner", "manifestscanner")),
 }
+UTILITY = ("chaff", "heatsink", "pointdefence", "shieldbooster", "ecm", "scanner")
 
 
 def squash(*names):
@@ -30,6 +38,8 @@ def matches(key, raw, readable=""):
     if key not in SUBSYSTEMS:
         return False
     text = squash(raw, readable)
+    if key == "weapons" and any(piece in text for name in UTILITY for piece in SUBSYSTEMS[name][1]):
+        return False                                      # "the weapons" means the guns, not the chaff launcher
     return any(piece in text for piece in SUBSYSTEMS[key][1])
 
 

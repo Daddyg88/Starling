@@ -24,6 +24,18 @@ def make_chat_brain(app):
     return brain
 
 
+def asks_key(times, settings):
+    """Which announcement to use: a first question gets the normal one; a viewer who has asked before gets a 'welcome back' one,
+    and a regular (three or more) a friendlier one. Off with streaming.recognise_viewers."""
+    if not settings.get("streaming.recognise_viewers", True):
+        return "StreamChat_Asks"
+    if times >= 2:
+        return "StreamChat_Asks_Regular"
+    if times == 1:
+        return "StreamChat_Asks_Again"
+    return "StreamChat_Asks"
+
+
 def build(app):
     """The chat bridge for this app, or None if something it needs is missing."""
     from navigation.voice import Narrator
@@ -45,12 +57,14 @@ def build(app):
             return False
         if "brain" not in holder:
             holder["brain"] = make_chat_brain(app)
+        times = director.asked.get(user, 0)
         if app.settings.get("streaming.announce", True):
-            say("StreamChat_Asks", {"user": user, "question": question[:90]})
+            say(asks_key(times, app.settings), {"user": user, "question": question[:90], "times": times + 1})
         reply = holder["brain"].try_handle(question, deliberate=True)
         if reply is None:
             say("StreamChat_NoAnswer", {"user": user})
             return False
+        director.asked[user] = times + 1
         return True
 
     def quiet():

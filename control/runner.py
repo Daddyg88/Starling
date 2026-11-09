@@ -84,6 +84,10 @@ class Outcome:
     detail: str = ""           # the sentence she would say (without personality)
 
 
+def speak_ok(runner):
+    return not getattr(runner, "auto_run", False)       # sentences she makes up herself (the route plotter) are not your misses
+
+
 class CommandRunner:
     def __init__(self, bus, speech, dialogue, settings, book=None, sender=None, state_provider=None,
                  matcher=None, flavour=None, clock=time.monotonic, sleep=time.sleep, echo=None, voidcompass=None, route=None, macro_hooks=None, memory=None, smalltalk=None, brain=None):
@@ -276,12 +280,14 @@ class CommandRunner:
             if (suggestion is not None and not self.confirmer.is_refused(normalise(text), suggestion.phrase)
                     and suggestion.command.id not in (self.settings.get("commands.disabled", []) or [])):
                 self.confirmer.ask(suggestion, text)
+                self._note_miss(text)
                 question = "Did you mean %s?" % suggestion.phrase
                 self._speak("CommandConfirm", {"phrase": suggestion.phrase}, fallback=question)
                 outcome = Outcome("asked", text, suggestion.command, suggestion.intent, detail=question)
                 self._finish([outcome], False, text)
                 return [outcome]
         if not matches:
+            self._note_miss(text)
             outcome = Outcome("unknown", text=text, detail="I didn't recognise that command.")
             self._finish([outcome], speak and speak_unknown, text)
             return [outcome]
@@ -292,6 +298,14 @@ class CommandRunner:
             outcomes.append(self.execute(match, text))
         self._finish(outcomes, speak, text)
         return outcomes
+
+    def _note_miss(self, text):
+        learning = getattr(self.matcher, "learning", None)
+        if learning is not None and speak_ok(self):
+            try:
+                learning.note_miss(normalise(text), self.clock())
+            except Exception:
+                log.exception("Could not note a missed sentence")
 
     def voice_helpers(self):
         """[(name, helper)] in the order they get to answer a spoken sentence, before the command list and her brain.

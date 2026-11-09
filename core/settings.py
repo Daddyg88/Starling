@@ -34,7 +34,7 @@ DEFAULTS = {
     "plans": {"ask": True},
     "overlay": {"screen": "auto", "bio_enabled": True, "bio_x": 3, "bio_up": 25, "bio_size": "Medium", "bio_dark": False,
                 "route_map": "route", "route_size": "Medium", "route_right": 2, "route_top": 10, "route_cockpit_only": True, "route_hide_with_voidcompass": True},
-    "streaming": {"enabled": False, "twitch_channel": "", "youtube_key": "", "youtube_video": "", "prefix": "!starling", "who": "everyone", "ask_enabled": True, "announce": True,
+    "streaming": {"enabled": False, "twitch_channel": "", "youtube_key": "", "youtube_video": "", "prefix": "!starling", "who": "everyone", "ask_enabled": True, "announce": True, "recognise_viewers": True,
                   "user_cooldown": 45, "action_cooldown": 20, "ask_cooldown": 10, "hold": True, "hold_max": 4, "hold_max_age": 300, "blocked_words": "",
                   "act_lights": True, "act_night_vision": True, "act_head_look": False, "act_scoop": False, "act_gear": False},
     "exobiology": {"distance_alert": True, "distance_beep": True, "guess": True, "top_hint": True, "progress": True},
@@ -77,7 +77,7 @@ DEFAULTS = {
     "recorder": {"seconds": 20, "countdown": 5},
     "ptt": {"mode": "off", "button": "", "beep": True, "skip_wake": True},
     "personality": {"active_voicepack": "default", "mood": "Friendly", "style": "personality", "mood_mode": "auto", "login_greeting": True, "mood_live": "Friendly", "mood_level": 3, "mood_level_live": 3,
-                    "remarks": "sometimes", "pet_names": True, "custom_pet_names": "", "innuendo": False, "dark_humour": True, "affection_credits": 500000000},
+                    "remarks": "sometimes", "reactions": True, "pet_names": True, "custom_pet_names": "", "innuendo": False, "dark_humour": True, "affection_credits": 500000000},
     "speech": {"enabled": True, "use_recordings": True, "allow_mature": False,
                "windows_emergency_voice": False},
     "ai": {

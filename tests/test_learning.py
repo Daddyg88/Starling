@@ -82,3 +82,65 @@ class SafetyTests(unittest.TestCase):
             hit = m.match(said)
             self.assertIsNotNone(hit, said)
             self.assertEqual(hit.command.id, command, said)
+
+
+class TeachingTests(unittest.TestCase):
+    """0.89.2: sentences she missed are kept, and 'I meant ...' teaches her at once."""
+
+    def setUp(self):
+        from tests import test_macros
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.t = test_macros.MacroTests()
+        self.runner = self.t.build()
+        self.learning = VoiceLearning(Path(self.tmp.name) / "learn.json")
+        self.runner.matcher.learning = self.learning
+        self.now = [100.0]
+        self.runner.clock = lambda: self.now[0]
+        from control.teach import TeachHelper
+        self.helper = TeachHelper(lambda: self.runner, clock=lambda: self.now[0])
+        self.runner.extra_helpers.append(self.helper)
+
+    def test_a_missed_sentence_is_kept_and_listed(self):
+        self.runner.run_text("blorp zanzibar")
+        self.assertIn("blorp zanzibar", self.learning.misses)
+        self.assertEqual(self.learning.last_miss[0], "blorp zanzibar")
+        self.assertIn("blorp zanzibar", self.helper.try_handle("what did you miss"))
+
+    def test_nothing_missed_says_so(self):
+        self.assertIn("haven't missed", self.helper.try_handle("what did you not catch"))
+
+    def test_long_chat_sentences_are_not_kept(self):
+        self.learning.note_miss("tell me all about the history of the empire and its many fine ships")
+        self.assertEqual(self.learning.misses, {})
+
+    def test_i_meant_teaches_her_at_once(self):
+        command = next(s for s in sorted(self.runner.matcher.index, key=len) if len(s) > 8 and not self.runner.matcher.index[s][0].strict)
+        self.runner.run_text("blorp zanzibar")
+        reply = self.helper.try_handle("I meant " + command)
+        self.assertIn("Got it", reply)
+        self.assertEqual(self.learning.learned("blorp zanzibar"), command)
+        self.assertNotIn("blorp zanzibar", self.learning.misses)
+        self.assertEqual(self.runner.matcher.match("blorp zanzibar").phrase, command)       # understood exactly from now on
+
+    def test_i_meant_without_a_recent_miss_is_left_alone(self):
+        self.assertIsNone(self.helper.try_handle("I meant lower the landing gear"))
+        self.learning.note_miss("blorp zanzibar", now=self.now[0])
+        self.now[0] += 400
+        self.assertIsNone(self.helper.try_handle("I meant lower the landing gear"))
+
+    def test_it_must_be_a_real_command(self):
+        self.runner.run_text("blorp zanzibar")
+        self.assertIn("don't know", self.helper.try_handle("I meant fly to the moon on a spoon"))
+        self.assertIsNone(self.learning.learned("blorp zanzibar"))
+
+    def test_big_actions_are_never_taught(self):
+        strict = next(s for s in self.runner.matcher.index if self.runner.matcher.index[s][0].strict)
+        self.runner.run_text("blorp zanzibar")
+        self.assertIn("don't know", self.helper.try_handle("I meant " + strict))
+        self.assertIsNone(self.learning.learned("blorp zanzibar"))
+
+    def test_misses_survive_a_restart(self):
+        self.learning.note_miss("blorp zanzibar")
+        again = VoiceLearning(Path(self.tmp.name) / "learn.json")
+        self.assertIn("blorp zanzibar", again.misses)
