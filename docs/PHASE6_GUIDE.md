@@ -1451,3 +1451,7 @@ window use the same code as the biology list.
 ## 0.89.3 - Optional Australian voice (MeloTTS)
 
 * tts/melo_voice.py (MeloEngine, resample 44100 -> 24000, is_installed); KokoroTTS._engine returns it for the voice name melo_en_au (BUILT_IN_VOICES); falls back to the cloned voice with one log line when MeloTTS is missing. tests/test_melo.py uses a fake model.
+
+## 0.89.4 - run_try_australian_voice.bat
+
+* Private-folder MeloTTS try-out (tools/try_melo.py). MeloTTS stays out of requirements.txt (the launcher installs that for everyone; MeloTTS pins old versions).

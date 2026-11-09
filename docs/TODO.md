@@ -1,6 +1,6 @@
 # Starling: what is done and what is left
 
-Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.89.3.
+Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.89.4.
 
 ## STILL TO DO
 
@@ -17,7 +17,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Crash 0xc0000409: cause unknown.
 
 ### To build
-- [ ] Australian voice (MeloTTS, 0.89.3): a tester installs MeloTTS and listens (is it female and good enough?); then decide on bundling it into the exe, a download button, and running 'prepare her voice' for it.
+- [ ] Australian voice (MeloTTS, 0.89.3/0.89.4): a tester runs run_try_australian_voice.bat and sends australian_test\log.txt plus a note on the sample (female? good?). Then build a safe one-click install (separate private environment, so it cannot break her normal voice). Older note: a tester installs MeloTTS and listens (is it female and good enough?); then decide on bundling it into the exe, a download button, and running 'prepare her voice' for it.
 - [ ] Australian wording pack (mate, no worries) as a personality option (offered, not built).
 - [ ] Dashboard list of missed sentences with a tap to teach (the voice version, 'I meant ...', is done).
 - [ ] "Next weapon" sub-target command.
