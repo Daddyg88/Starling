@@ -1467,3 +1467,7 @@ window use the same code as the biology list.
 ## 0.89.7 - Australian voice one-click install
 
 * Voice page button installs MeloTTS in data/melo_env; runs as a separate worker (tts/melo_worker.py) with idle shutdown; warm-up limited to 400 lines for this voice.
+
+## 0.89.8 - updater moves her files instead of copying
+
+* core/updater.py: _copy_keep moves (instant) with restore on failure/rollback.

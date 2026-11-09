@@ -175,6 +175,27 @@ class StageAndApplyTests(unittest.TestCase):
         updater.apply_pending(self.app, self.updates)
         self.assertTrue(updater.roll_back(self.app))
         self.assertEqual((self.app / "main.py").read_text(), "print('old')")
+        self.assertEqual((self.app / "data" / "mood.json").read_text(), '{"score": 42}')       # her files came back too
+
+    def test_her_files_are_moved_not_copied(self):
+        """Copying a data folder of several GB made the update sit for minutes: it must be an instant move."""
+        self.stage()
+        copied = []
+        real = updater.shutil.copytree
+        updater.shutil.copytree = lambda *a, **k: copied.append(a) or real(*a, **k)
+        try:
+            updater.apply_pending(self.app, self.updates)
+        finally:
+            updater.shutil.copytree = real
+        self.assertEqual(copied, [])
+        self.assertFalse((self.root / "app.previous" / "data" / "mood.json").exists())
+
+    def test_a_failed_start_up_test_gives_her_files_back_to_the_old_version(self):
+        self.stage()
+        with self.assertRaises(UpdateError):
+            updater.apply_pending(self.app, self.updates, check=lambda folder: False)
+        self.assertEqual((self.app / "data" / "mood.json").read_text(), '{"score": 42}')
+        self.assertEqual((self.app / "config" / "settings.json").read_text(), '{"mine": true}')
         self.assertFalse(updater.roll_back(self.root / "nowhere"))
 
 

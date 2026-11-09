@@ -175,16 +175,46 @@ def pending_version(updates_dir):
 
 
 def _copy_keep(old, new):
+    """Brings the person's own files (data, settings, recordings...) into the new version.
+
+    They are MOVED, not copied: data\\ can be several GB (saved voice lines, and the optional Australian voice), and copying it
+    made the update sit on 'Installing the downloaded update...' for minutes. Moving is instant. Returns the list of
+    (relative path) that were moved, so a failed update can put them back with _restore_keep()."""
+    moved = []
     for relative in KEEP:
         source, target = Path(old) / relative, Path(new) / relative
         if not source.exists():
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
-        if source.is_dir():
+        if target.is_dir():
             shutil.rmtree(target, ignore_errors=True)
-            shutil.copytree(source, target)
-        else:
-            shutil.copy2(source, target)
+        elif target.exists():
+            target.unlink()
+        try:
+            os.replace(str(source), str(target))
+            moved.append(relative)
+        except OSError:                                    # something has it open: fall back to a copy (slower, but safe)
+            if source.is_dir():
+                shutil.copytree(source, target)
+            else:
+                shutil.copy2(source, target)
+    return moved
+
+
+def _restore_keep(moved, holder, home):
+    """Puts moved files back from 'holder' (the folder they were moved into) to 'home' (the old version)."""
+    for relative in moved:
+        source, target = Path(holder) / relative, Path(home) / relative
+        try:
+            if source.exists():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if target.is_dir():
+                    shutil.rmtree(target, ignore_errors=True)
+                elif target.exists():
+                    target.unlink()
+                os.replace(str(source), str(target))
+        except OSError:
+            pass
 
 
 def apply_pending(app_dir, updates_dir, check=None):
@@ -198,16 +228,19 @@ def apply_pending(app_dir, updates_dir, check=None):
     if not pending.is_dir() or version is None:
         return None
     previous = app.with_name(app.name + ".previous")
+    moved = []
     try:
-        _copy_keep(app, pending)
+        moved = _copy_keep(app, pending)
         shutil.rmtree(previous, ignore_errors=True)
         app.rename(previous)
     except Exception as error:
+        _restore_keep(moved, pending, app)
         raise UpdateError("Couldn't prepare the update (%s). Nothing was changed." % error)
     try:
         pending.rename(app)
     except Exception as error:
         previous.rename(app)                                  # put the old one straight back
+        _restore_keep(moved, pending, app)
         raise UpdateError("Couldn't switch to the new version (%s). The old one is back in place." % error)
     if check is not None:
         try:
@@ -219,6 +252,7 @@ def apply_pending(app_dir, updates_dir, check=None):
             shutil.rmtree(failed, ignore_errors=True)
             app.rename(failed)
             previous.rename(app)
+            _restore_keep(moved, failed, app)             # her data goes back to the old version
             shutil.rmtree(failed, ignore_errors=True)
             _clear(updates)
             raise UpdateError("Version %s failed its start-up test, so I went back to the old version." % version)
@@ -240,6 +274,7 @@ def roll_back(app_dir):
     previous = app.with_name(app.name + ".previous")
     if not previous.is_dir():
         return False
+    _restore_keep(KEEP, app, previous)                       # her files were moved into the new version: take them back with her
     swap = app.with_name(app.name + ".swap")
     shutil.rmtree(swap, ignore_errors=True)
     app.rename(swap)
