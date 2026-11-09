@@ -1459,3 +1459,7 @@ window use the same code as the biology list.
 ## 0.89.5 - try-out v2
 
 * First try (Windows, Python 3.12) failed on fugashi (needs C++ Build Tools) and tokenizers (needs Rust) pinned by MeloTTS (transformers==4.27.4, fugashi==1.3.0). Now --no-deps plus modern add-ons.
+
+## 0.89.6 - try-out measures speed and memory
+
+* 0.89.5 worked on Windows (Python 3.12, modern add-ons, --no-deps for MeloTTS). First sentence 16 s, load 50 s. tools/try_melo.py now times four sentences and prints memory.
