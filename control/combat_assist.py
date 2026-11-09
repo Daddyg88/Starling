@@ -6,7 +6,7 @@ and the action needs a KEYBOARD key as well as any joystick button).
 
 Auto pips
     A flight stick's buttons 1 and 2 (the two trigger stages) always count as fire buttons, any make (setting combat_assist.x52_trigger).
-    While your hardpoints are out (or you are in analysis mode, for mining lasers) and you HOLD a fire button, she moves the power pips to weapons.
+    While your hardpoints are out (or you are in analysis mode AND mining, for mining lasers; the discovery and composition scanners get no auto pips) and you HOLD a fire button, she moves the power pips to weapons.
     When you let go (and stay off the button for a moment) she resets and sends pips to systems and engines.
     She finds your fire buttons from Elite's controls file (Primary fire and Secondary fire): keyboard keys, and
     joystick buttons on the X52. You can also list extra buttons in settings.json under combat_assist.fire_buttons.
@@ -160,7 +160,10 @@ class CombatAssist:
             return False                      # a panel or map is open (docking request, galaxy map...): the fire key is only a menu key there
         if getattr(state, "in_nomad", False):
             return False                      # the Nomad reports "hardpoints out" all the time: no auto pips there
-        armed = hardpoints_out(state) or (bool(self.option("pips_analysis", True)) and _flag(state, ANALYSIS_BIT))
+        # Analysis mode with the hardpoints in is mining lasers OR the discovery / composition scanner, and the game flags look the same.
+        # So analysis mode only counts while you are mining (a limpet, prospector or refinery event in the last few minutes).
+        mining_now = time.monotonic() < float(getattr(state, "mining_until", 0.0) or 0.0)
+        armed = hardpoints_out(state) or (bool(self.option("pips_analysis", True)) and _flag(state, ANALYSIS_BIT) and mining_now)
         return armed and not _flag(state, DOCKED_BIT) and not _flag(state, LANDED_BIT) and not _flag(state, SUPERCRUISE_BIT)
 
     # ---- heat sinks ----

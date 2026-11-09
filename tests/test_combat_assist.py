@@ -314,6 +314,18 @@ if __name__ == "__main__":
 
 
 class AnalysisModeTests(Base):
+    def setUp(self):
+        super().setUp()
+        import time
+        self.state.mining_until = time.monotonic() + 600        # these tests are about mining; the scanner test below clears it
+
+    def test_no_pips_for_the_discovery_or_composition_scanner(self):
+        self.state.status_flags = 1 << 27                       # analysis mode, hardpoints in, NOT mining: that is a scanner
+        self.state.mining_until = 0.0
+        self.reader.down.add("key:Space")
+        self.assertEqual(self.assist.poll_once(), "")
+        self.assertEqual(self.keys(), "")
+
     def test_pips_work_in_analysis_mode_for_mining_lasers(self):
         self.state.status_flags = 1 << 27                       # analysis mode, hardpoints in
         self.reader.down.add("key:Space")
