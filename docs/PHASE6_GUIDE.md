@@ -1455,3 +1455,7 @@ window use the same code as the biology list.
 ## 0.89.4 - run_try_australian_voice.bat
 
 * Private-folder MeloTTS try-out (tools/try_melo.py). MeloTTS stays out of requirements.txt (the launcher installs that for everyone; MeloTTS pins old versions).
+
+## 0.89.5 - try-out v2
+
+* First try (Windows, Python 3.12) failed on fugashi (needs C++ Build Tools) and tokenizers (needs Rust) pinned by MeloTTS (transformers==4.27.4, fugashi==1.3.0). Now --no-deps plus modern add-ons.
