@@ -1447,3 +1447,7 @@ window use the same code as the biology list.
 ## 0.89.2 - Teach, reactions, welcome back, utility sub targets, thread owners
 
 * control/teach.py (TeachHelper: 'I meant ...', 'what did you miss'), learning.misses/teach; speaker._with_reaction + voicepacks/default/openers.json (rng must be passed in, tests leave it off); streaming/wiring.asks_key + ChatDirector.asked; subsystems.UTILITY keys + catalog sub_chaff etc.; timing.thread_owner (Windows).
+
+## 0.89.3 - Optional Australian voice (MeloTTS)
+
+* tts/melo_voice.py (MeloEngine, resample 44100 -> 24000, is_installed); KokoroTTS._engine returns it for the voice name melo_en_au (BUILT_IN_VOICES); falls back to the cloned voice with one log line when MeloTTS is missing. tests/test_melo.py uses a fake model.

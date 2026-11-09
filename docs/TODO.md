@@ -1,6 +1,6 @@
 # Starling: what is done and what is left
 
-Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.89.2.
+Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.89.3.
 
 ## STILL TO DO
 
@@ -17,6 +17,8 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Crash 0xc0000409: cause unknown.
 
 ### To build
+- [ ] Australian voice (MeloTTS, 0.89.3): a tester installs MeloTTS and listens (is it female and good enough?); then decide on bundling it into the exe, a download button, and running 'prepare her voice' for it.
+- [ ] Australian wording pack (mate, no worries) as a personality option (offered, not built).
 - [ ] Dashboard list of missed sentences with a tap to teach (the voice version, 'I meant ...', is done).
 - [ ] "Next weapon" sub-target command.
 - [ ] Read the next Woz zip: the 10-minute CPU line should now say which program file the busy threads started in.
@@ -40,6 +42,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] UI_Down shares a key with ResetPowerDistribution (Benny), and UI_Select with PlaceSettlement (Woz).
 
 ## DONE (newest first)
+- [x] 0.89.3 Optional Australian voice via MeloTTS (built against a pretend model; real MeloTTS untried).
 - [x] 0.89.2 Teach-by-voice and miss list, small reactions, welcome-back for viewers, six more sub-target parts, thread owner names. (She already asked 'Did you mean...?' before this.)
 - [x] 0.89.0 She notices the night (kills, interdictions, scans, systems, jumps since a scoop), looks back on earlier moments, calm combat lines by mood.
 - [x] 0.88.4 Detects chord letters that fire their own action (night vision against heat sink).

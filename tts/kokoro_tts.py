@@ -99,6 +99,7 @@ BUILT_IN_VOICES = {
     "am_liam": "Liam", "am_onyx": "Onyx", "am_puck": "Puck", "am_fenrir": "Fenrir", "am_santa": "Santa",
     "bf_alice": "Alice", "bf_emma": "Emma", "bf_isabella": "Isabella", "bf_lily": "Lily",
     "bm_daniel": "Daniel", "bm_fable": "Fable", "bm_george": "George", "bm_lewis": "Lewis",
+    "melo_en_au": "Australian (MeloTTS, optional extra)",       # tts/melo_voice.py: needs MeloTTS installed, else she uses her normal voice
 }
 
 
@@ -137,7 +138,15 @@ class KokoroTTS(BaseTTS):
         return self.voice_pack if not self._voice_name else self._voice_name
 
     def _engine(self):
-        """The American engine, or (for bf_/bm_ voices) the British one, so British words are pronounced the British way."""
+        """The American engine, or (for bf_/bm_ voices) the British one, so British words are pronounced the British way.
+        The Australian voice (melo_en_au) is MeloTTS, which needs to be installed (tts/melo_voice.py)."""
+        if self._voice_name == "melo_en_au":
+            if getattr(self, "_melo", None) is None:
+                from tts import melo_voice
+                if self._pipeline_factory is None and not melo_voice.is_installed():
+                    raise RuntimeError("MeloTTS is not installed (see tts/melo_voice.py), so the Australian voice cannot be used")
+                self._melo = melo_voice.MeloEngine(getattr(self, "_melo_factory", None))
+            return self._melo
         if self._voice_name[:2] in ("bf", "bm") and self._pipeline_factory is None:
             if self._british is None:
                 import warnings
@@ -147,6 +156,17 @@ class KokoroTTS(BaseTTS):
                     self._british = KPipeline(lang_code="b", repo_id="hexgrad/Kokoro-82M")
             return self._british
         return self.pipeline
+
+    def _melo_usable(self):
+        from tts import melo_voice
+        if self._pipeline_factory is not None and getattr(self, "_melo_factory", None) is None:
+            return False if not melo_voice.is_installed() else True
+        if getattr(self, "_melo_factory", None) is not None or melo_voice.is_installed():
+            return True
+        if not getattr(self, "_melo_warned", False):
+            self._melo_warned = True
+            log.warning("The Australian voice needs MeloTTS, which is not installed (see tts/melo_voice.py). Using her normal voice.")
+        return False
 
     def _choose_voice(self, name):
         name = (name or "").strip()
@@ -274,6 +294,8 @@ class KokoroTTS(BaseTTS):
             if sound is None:
                 return False
             self._choose_voice(getattr(voice, "voice", ""))
+            if self._voice_name == "melo_en_au" and not self._melo_usable():
+                self._voice_name = ""                       # MeloTTS is not installed: her normal voice (said once in the log)
             done = self._synthesise_and_play(text, voice, sound)
             if not done and self._voice_name and not self._stop_flag.is_set():
                 # A built-in voice could not be made (for example no internet for its first download).
