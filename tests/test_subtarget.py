@@ -123,7 +123,7 @@ class Commands(unittest.TestCase):
     def test_journal_silent_stops_after_one_press(self):
         outcome, presses = self.run_command("sub target the power plant", silent=True)
         self.assertEqual(outcome.status, "sub_unread")
-        self.assertEqual(len(presses), 1)
+        self.assertEqual(len(presses), 2)                       # the first press is tried once more
 
     def test_target_lost_midway(self):
         outcome, presses = self.run_command("sub target the shield generator", drop_lock_at=2)
@@ -266,6 +266,7 @@ class PressAhead(unittest.TestCase):
     def run_lagged(self, phrase, order, lag=0.55, start=None, drop_every=0):
         t = test_macros.MacroTests()
         r = t.build()
+        r.settings.set("subtarget.press_ahead", True)               # off by default now (0.92.8); these tests are about how it works when on
         from control.binds import Keystroke
         r.book.table = dict(r.book.table)
         r.book.table["CycleNextSubsystem"] = (Keystroke("Key_N"), "")
@@ -346,6 +347,11 @@ class PressAhead(unittest.TestCase):
         outcome, presses, _s, _state = self.run_lagged("sub target the sensors", order)
         self.assertEqual(outcome.status, "no_subsystem")
         self.assertLess(len(presses), 45)
+
+    def test_it_is_off_unless_switched_on(self):
+        t = test_macros.MacroTests()
+        r = t.build()
+        self.assertFalse(r.settings.get("subtarget.press_ahead", False))
 
     def test_can_be_switched_off(self):
         t = test_macros.MacroTests()

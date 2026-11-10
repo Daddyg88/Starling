@@ -12,5 +12,7 @@ def make_processor(event_config=None):
     heard = []
     bus.subscribe("*", heard.append)
     config = load_event_config() if event_config is None else event_config
+    if event_config is None and "InDanger" in config:
+        config["InDanger"] = dict(config["InDanger"], enabled=True)      # off in the shipped file (0.92.8); the tests here check how the reader behaves when it is on
     processor = EventProcessor(bus, config, GameState(), load_registry())
     return processor, bus, heard

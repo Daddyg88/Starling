@@ -1542,3 +1542,9 @@ window use the same code as the biology list.
 ## 0.92.7 - a stricter line-up
 
 * Diagnostics 20261110-183217: extraction_3 lined up from 3 stops (miss 1 unit, scale 0.276) and was wrong. Simulation (spots sampled from one layout, solved against another): false accepts 15/120 with 3 spots, 3/120 with 4, 0/120 with 5 and 6. navigation/settlement_solve.py: `_cost` matches each feature to one spot only; `clear` needs scale 0.295-0.355; MIN_SPOTS 4, SPOTS_TO_CHOOSE 5 (used when no layout is chosen yet). Calibration JSON carries `v: 2`; saved line-ups without it are ignored (navigation/settlement_track.py). Tests updated.
+
+## 0.92.8 - no press ahead, no Danger warning
+
+* Diagnostics 20261110-220020: every `_subsystem_press_ahead` run read 1 answer for 27 presses (the game drops quick presses) and ended in 'fast-fixed' or 'none'. `subtarget.press_ahead` default is now False (core/settings.py, config/settings.json, control/runner.py); the slow loop retries the first press once. tests/test_subtarget.py PressAhead tests switch it on explicitly.
+* config/events.json InDanger: enabled false, priority normal (critical events cannot be switched off); events/in_danger.py priority NORMAL; tests/helpers.py turns it on for the reader tests; tests `DangerIsOffByDefault`.
+

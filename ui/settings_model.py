@@ -259,7 +259,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("talk.combat", "She comments on combat", "toggle",
                   help="Ship names, bounties, wanted targets, interdictions, wings and kills. Off = quiet, but safety warnings (under attack, shields, heat, hull) are never silenced"),
             Field("subtarget.press_ahead", "Sub targeting: press ahead on big ships", "toggle",
-                  help="On a ship with many weapons she presses Next Subsystem quickly without waiting for each answer, then steps back over the extra presses (about 40% quicker). Off = one careful press at a time. Press-ahead also uses your Previous Subsystem key if you have one set"),
+                  help="OFF by default since 0.92.8: in Benny's real game the game ignored most quick presses, so she overshot the part. On = on a ship with many weapons she presses Next Subsystem quickly without waiting for each answer, then steps back. Off = one careful press at a time, which stops exactly on the part. Press-ahead also uses your Previous Subsystem key if you have one set"),
             Field("combat_assist.pips", "Combat: pips to weapons while I fire", "toggle",
                   help="While your hardpoints are out she puts the pips in weapons when you hold a fire button, and back to systems and engines when you let go. Uses your Primary/Secondary fire buttons from Elite"),
             Field("combat_assist.pips_analysis", "Combat: also in analysis mode while mining (mining lasers)", "toggle",

@@ -784,7 +784,8 @@ class CommandRunner:
             if back is not None:
                 strokes = dict(strokes)
                 strokes[opposite] = back
-        can_press_ahead = opposite in strokes and self.settings.get("subtarget.press_ahead", True)
+        can_press_ahead = opposite in strokes and self.settings.get("subtarget.press_ahead", False)
+        retried = False
         for number in range(self.SUBSYSTEM_PRESSES):
             if number == self.SLOW_PRESSES and can_press_ahead:
                 return self._subsystem_press_ahead(key, state, strokes, action, opposite, seen, number, pressed, trace)
@@ -802,6 +803,11 @@ class CommandRunner:
             if not state.target_locked:
                 self._role_status = "no_target"
                 return None
+            if state.target_seq == before and not retried:
+                retried = True                                      # the game sometimes swallows the very first press (Benny's 11-10 red alert log)
+                log.info("Sub target: no answer to the first press, one more try")
+                self.sleep(0.6)
+                continue
             if state.target_seq == before:
                 log.warning("Sub target: pressed Next Subsystem but the journal said nothing (seen so far: %s)", seen)
                 trace.append("sub>unread")

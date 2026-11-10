@@ -330,3 +330,20 @@ class NomadTests(unittest.TestCase):
     def test_boarding_the_main_ship_afterwards_clears_the_nomad(self):
         self.play_the_session()
         self.assertFalse(self.processor.state.in_nomad)
+
+
+class DangerIsOffByDefault(unittest.TestCase):
+    def test_the_shipped_settings_keep_danger_quiet(self):
+        from core.settings import load_event_config
+        self.assertFalse(load_event_config()["InDanger"]["enabled"])
+
+    def test_it_really_is_silent_with_the_shipped_settings(self):
+        from tests.helpers import make_processor as build
+        from core.settings import load_event_config
+        processor, _bus, heard = build(load_event_config())
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        reader.danger_hold = 0
+        reader.handle_status({"Flags": 0})
+        reader.handle_status({"Flags": FLAG_IN_DANGER})
+        self.assertEqual([e.name for e in heard if e.name == "InDanger"], [])
+

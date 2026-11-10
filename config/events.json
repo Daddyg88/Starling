@@ -120,7 +120,7 @@
     "SupercruiseEntry":            { "enabled": true, "priority": "low", "source": "journal" },
     "SupercruiseExit":             { "enabled": true, "priority": "low", "source": "journal" },
     "Synthesis":                   { "enabled": true, "priority": "low", "source": "journal" },
-    "InDanger":                    { "enabled": true, "priority": "critical", "source": "status" },
+    "InDanger":                    { "enabled": false, "priority": "normal", "source": "status" },
     "InterdictionInProgress":      { "enabled": true, "priority": "critical", "source": "status" },
     "LowFuel":                     { "enabled": true, "priority": "critical", "source": "status" },
     "LowHealth":                   { "enabled": true, "priority": "critical", "source": "status" },
