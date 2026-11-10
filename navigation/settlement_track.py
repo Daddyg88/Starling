@@ -56,6 +56,16 @@ def known_settlements():
         return {}
 
 
+def known_calibrations():
+    """MarketID -> saved line-up that ships with the app (maps/known_calibrations.json)."""
+    try:
+        with open(paths.ROOT / "maps" / "known_calibrations.json", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return {str(k): v for k, v in data.items() if not str(k).startswith("_") and isinstance(v, dict)}
+    except (OSError, ValueError, AttributeError):
+        return {}
+
+
 def default_path():
     return paths.DATA_DIR / "settlement_calibration.json"
 
@@ -162,6 +172,7 @@ class SettlementTracker:
         self.say = None                 # (text) -> speaks a sentence; set by the app (voice helpers' answers are not spoken by themselves)
         self._asked = False
         self.known = known_settlements()
+        self.shipped = known_calibrations()
         self.auto_shown = False         # the map on screen was put there by this tracker (so this tracker may take it down)
         self.saved = {}
         self._load()
@@ -218,7 +229,7 @@ class SettlementTracker:
         self.view.position = None
         if self.known.get(market) and self.maps.get(self.known[market]) is not None:
             self.settlement["map"] = self.known[market]
-        known = self.saved.get(market)
+        known = self.saved.get(market) or self.shipped.get(market)
         if known:
             try:
                 self.calibration = Calibration.from_json(known)

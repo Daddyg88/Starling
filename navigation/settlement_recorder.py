@@ -134,6 +134,11 @@ class SettlementRecorder:
             return
         now = self.clock()
         on_foot = bool(getattr(state, "status_flags2", 0) & 1)
+        focus = int(getattr(state, "gui_focus", 0) or 0)
+        if on_foot and focus != getattr(self, "_last_focus", 0) and len(visit.setdefault("focus", [])) < 200:
+            visit["focus"].append([self.stamp(), focus, round(state.latitude, 7), round(state.longitude, 7)])      # which screen opened where (terminals?)
+            self._touch(force=True)
+        self._last_focus = focus
         if on_foot and now - self._last_trail >= TRAIL_SECONDS and len(visit["trail"]) < TRAIL_MAX:
             self._last_trail = now
             visit["trail"].append([round(state.latitude, 7), round(state.longitude, 7), getattr(state, "heading", None),

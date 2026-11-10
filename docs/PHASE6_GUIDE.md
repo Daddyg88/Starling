@@ -1526,3 +1526,7 @@ window use the same code as the biology list.
 
 * control/runner.py finishes helper answers with speak=False, so helpers must speak for themselves: SettlementMapVoice and SettlementTracker get a `say` callback (core/app.py, speech.say). Asks once on foot when several layouts match.
 * maps/known_settlements.json (MarketID -> map id, loaded by settlement_track.known_settlements): Shi Construction = industrial_2. Found in diagnostics 20261110-152207. tests `KnownSettlements`.
+
+## 0.92.4 - Shi Construction ships lined up
+
+* maps/known_calibrations.json (MarketID -> Calibration JSON, from the power/alarm/pad fit, rms 2.2 m) loaded as `shipped` in navigation/settlement_track.py; recorder keeps `focus` changes on foot (visit['focus']). Found in diagnostics 20261110-155722. tests `ShippedLineUp`.

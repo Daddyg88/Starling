@@ -1,0 +1,19 @@
+{
+ "_note": "Lined-up maps shipped with the app (MarketID -> calibration), measured by walking the settlement. Same format as data/settlement_calibration.json.",
+ "4365483779": {
+  "map": "industrial_2",
+  "a": [
+   -0.12385403476459075,
+   0.30037527339703
+  ],
+  "t": [
+   2.7568550707954316,
+   -374.5717278692299
+  ],
+  "ref": [
+   50.642288,
+   -110.657997
+  ],
+  "radius": 1074442.625
+ }
+}

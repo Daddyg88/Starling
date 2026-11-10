@@ -35,6 +35,7 @@ class Setup(unittest.TestCase):
         self.view = MapView()
         self.path = Path(self.tmp.name) / "cal.json"
         self.tracker = SettlementTracker(lambda: self.state, self.maps, self.view, self.path)
+        self.tracker.shipped = {}
         self.tracker.known = {}                    # (the shipped list of certain settlements is tested on its own)
 
     def arrive(self):
@@ -389,3 +390,15 @@ class KnownSettlements(Setup):
         voice = SettlementMapVoice(self.maps, self.view, say=said.append)
         voice.try_handle("show settlement map industrial two")
         self.assertEqual(len(said), 1)
+
+
+class ShippedLineUp(Setup):
+    def test_shi_construction_is_lined_up_from_the_start(self):
+        self.tracker.shipped = settlement_track.known_calibrations()
+        self.tracker.on_entry(dict(APPROACH))
+        self.assertIsNotNone(self.tracker.calibration)
+        self.state.latitude, self.state.longitude, self.state.status_flags2, self.state.heading = ALARM[0], ALARM[1], 1, 20.0
+        self.tracker.on_status(self.state)
+        self.assertAlmostEqual(self.view.position["x"], 630, delta=40)           # standing at the alarm console
+        self.assertAlmostEqual(self.view.position["y"], 290, delta=40)
+        self.assertEqual(self.view.position["angle"], 20.0)
