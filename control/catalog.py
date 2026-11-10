@@ -166,7 +166,7 @@ CATALOG = [
       doing={"on": "Opening the codex"}),
     C("fss_enter", "ExplorationFSSEnter", "the full spectrum scanner",
       on=["{OPEN_V} fss", "(enter|start|use|begin|activate|engage|go into) fss", "fss", "scan the system"],
-      off=["{CLOSE_V} fss", "(leave|quit|exit|stop|finish) fss"],
+      off=["{CLOSE_V} fss", "(leave|quit|exit|stop|finish) fss", "fss (off|closed|done|finished)", "(turn|switch) off (the )?fss"],
       doing={"on": "Opening the full spectrum scanner", "off": "Closing the full spectrum scanner"}),
 
     # ------------------------------------------------------------------ ship systems with a known on/off state

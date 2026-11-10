@@ -87,6 +87,15 @@ class Voice(unittest.TestCase):
             self.assertEqual(voice.try_handle(text), "Biology overlay shown.", text)
             self.assertFalse(state.bio.hidden)
 
+    def test_hide_biology_with_no_word_for_the_overlay(self):
+        _, state = run([planet("Test A 1", k=177), fss("Test A 1", 1)])
+        voice = BioOverlayVoice(lambda: state)
+        self.assertEqual(voice.try_handle("hide biology"), "Biology overlay hidden.")      # heard in a real log, was "not a command"
+        self.assertTrue(state.bio.hidden)
+        self.assertEqual(voice.try_handle("show biology"), "Biology overlay shown.")
+        self.assertFalse(state.bio.hidden)
+        self.assertIsNone(voice.try_handle("what is biology"))
+
     def test_ignores_everything_else(self):
         _, state = run([])
         voice = BioOverlayVoice(lambda: state)

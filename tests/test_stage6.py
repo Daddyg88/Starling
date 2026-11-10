@@ -80,6 +80,14 @@ class NyxLogTests(unittest.TestCase):
             self.assertEqual(m.match(text).command.id, "hyperspace", text)
         self.assertEqual(m.match("engage fss").command.id, "fss_enter")
 
+    def test_fss_off_closes_the_scanner(self):
+        from control.matcher import Matcher
+        m = Matcher()
+        for text in ("fss off", "turn off fss", "fss closed"):          # "fss off" was 'not a command' in a tester's log
+            hit = m.match(text)
+            self.assertEqual((hit.command.id, hit.intent), ("fss_enter", "off"), text)
+        self.assertEqual(m.match("fss").intent, "on")
+
     def test_danger_must_stay_on_and_is_quiet_just_after_a_jump(self):
         processor, _bus, heard = make_processor()
         reader = StatusReader(None, processor, min_gap_seconds={})

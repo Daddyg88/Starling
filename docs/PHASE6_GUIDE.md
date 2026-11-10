@@ -1487,3 +1487,7 @@ window use the same code as the biology list.
 ## 0.90.2 - Australian voice install fix
 
 * tts/melo_install.py online_env() strips HF_HUB_OFFLINE/TRANSFORMERS_OFFLINE for the install and the worker (tts/melo_voice.py); tests/test_melo.py.
+
+## 0.90.3 - two commands from a tester's log
+
+* control/catalog.py fss_enter off phrases; control/bio_voice.py short hide/show forms; tests/test_stage6.py, tests/test_bio_overlay.py.

@@ -6,6 +6,9 @@ _TOPIC = r"(?:bio|by o|biology|biological|exobiology|exo biology|exo|life)"
 _THING = r"(?:overlay|over lay|box|panel|list|display|window)"
 _HIDE = re.compile(r"\b(?:hide|hidden|closed|close|closing|remove|dismiss|clear|get rid of|turn off|switch off|disable)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
 _SHOW = re.compile(r"\b(?:show|open|opened|bring up|display|turn on|switch on|enable|put up)\b.*\b%s\b.*\b%s\b" % (_TOPIC, _THING))
+# "hide biology" / "show bio" with no word for the overlay itself
+_HIDE_SHORT = re.compile(r"^(?:hide|close|remove|dismiss|clear|turn off|switch off|disable) (?:the |my )?%s$" % _TOPIC)
+_SHOW_SHORT = re.compile(r"^(?:show|open|bring up|display|turn on|switch on|enable) (?:the |my )?%s$" % _TOPIC)
 
 
 class BioOverlayVoice:
@@ -18,8 +21,8 @@ class BioOverlayVoice:
         said = re.sub(r"\s+", " ", said).strip()
         if not said:
             return None
-        hide = _HIDE.search(said)
-        show = _SHOW.search(said)
+        hide = _HIDE.search(said) or _HIDE_SHORT.search(said)
+        show = _SHOW.search(said) or _SHOW_SHORT.search(said)
         if not (hide or show):
             return None
         state = self.state_provider()
