@@ -49,6 +49,7 @@ class GameState:
     suit_energy: object = None        # Status.json suit energy 0-1, only if the game provides one (the manual lists none)
     health: object = None             # Status.json Health, 0-1 on foot (None when absent)
     bodies: dict = field(default_factory=dict)       # body name -> {"temperature": kelvin, "gravity": g} from Scan events
+    notable: dict = field(default_factory=dict)      # body name -> {"kind": "terraformable water world", "system": ...}: what is worth remembering from Scan events
     current_body: Optional[str] = None      # the planet or moon you are near (ApproachBody / SupercruiseExit / Status.json)
     awaiting_discovery: bool = False        # just arrived: the first Scan tells us whether anyone discovered this system
     jet_boosts: int = 0                     # jet cone boosts in the current run (events/jet_cone_boost.py)

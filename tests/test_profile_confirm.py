@@ -90,6 +90,15 @@ class InTheBrain(Base):
         self.profile = PlayerProfile(Path(self.tmp2.name) / "p.json")
         self.brain.profile = self.profile
 
+    def test_asking_for_pet_names_in_other_words_never_makes_names_up(self):
+        for text in ("can you remember my dogs names", "what are my dogs names", "do you know my dogs name"):
+            self.assertIn("haven't told me", self.ask(text), text)          # a tester's log: the chat model once made up "Luna and Charlie"
+        self.profile.learn("my dog is called hamish")
+        self.profile.learn("my dog is called bonnie")
+        reply = self.ask("can you remember my dogs names")
+        self.assertIn("Hamish", reply)
+        self.assertIn("Bonnie", reply)
+
     def test_she_says_what_she_learned(self):
         reply = self.ask("i love pizza")
         self.assertIn("pizza", reply.lower())

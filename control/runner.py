@@ -104,6 +104,8 @@ class CommandRunner:
         self.echo = echo                 # control/echo.py: tells the event speaker not to repeat what she just did
         self.macro_hooks = macro_hooks or {}     # command id -> function run before its macro; returns (ok, sentence)
         self.brain = brain               # personality/brain.py: answers anything that is not a command
+        self.background_chat = False     # the app turns this on: chat answers then run on their own thread
+        self._chat_queue = None
         self.smalltalk = smalltalk       # personality/smalltalk.py: "how are you?", "tell me a joke"
         self.memory = memory             # memory/recall.py: "what do you remember"
         self._tab_memory = {"left": {}, "right": {}}   # where she last saw each tab of each panel (a faster tab walk next time)
@@ -197,7 +199,7 @@ class CommandRunner:
         if only_thanks(text):
             return                      # a plain "thank you" is not a command; Manners answers it
         deliberate = bool(data.get("wake") or data.get("ptt"))
-        self.run_text(text, speak_unknown=deliberate)
+        self.run_text(text, speak_unknown=deliberate, background=self.background_chat)
 
     def _confirm_answer(self, answer):
         """You said yes or no to 'did you mean...?'."""
@@ -231,20 +233,20 @@ class CommandRunner:
             log.exception("The chat window failed")
 
     # ---- doing ----
-    def run_text(self, text, speak_unknown=True, speak=True, auto=False):
+    def run_text(self, text, speak_unknown=True, speak=True, auto=False, background=False):
         """Understand and carry out a sentence. Returns the list of Outcomes.
         auto=True is for things she does by herself (the hands-free route plotting): she only speaks if it goes wrong."""
         started = self.clock()
         self.auto_run = bool(auto)
         try:
-            outcomes = self._run_text(text, speak_unknown, speak)
+            outcomes = self._run_text(text, speak_unknown, speak, background)
         finally:
             self.auto_run = False
         took = self.clock() - started
         (log.info if took > 1.0 else log.debug)("Command %r took %.2f s", text, took)
         return outcomes
 
-    def _run_text(self, text, speak_unknown=True, speak=True):
+    def _run_text(self, text, speak_unknown=True, speak=True, background=False):
         secret = easter_eggs.rewrite(text)
         if secret is not None:
             text = secret                                  # a private phrase: carry out the ordinary command it stands for
@@ -265,32 +267,11 @@ class CommandRunner:
             matches = [single]
         else:
             matches = self.matcher.split(text)
-        if not matches and self.brain is not None:
-            try:
-                answer = self.brain.try_handle(text, deliberate=speak_unknown)
-            except Exception:
-                log.exception("Her brain failed")
-                answer = None
-            if answer is not None:
-                outcome = Outcome("route", text, None, "press", detail=answer)
-                self._finish([outcome], False, text)
-                return [outcome]
-        if not matches and speak and speak_unknown and self.settings.get("commands.ask_guess", True):
-            suggestion = self.matcher.suggest(text)
-            if (suggestion is not None and not self.confirmer.is_refused(normalise(text), suggestion.phrase)
-                    and suggestion.command.id not in (self.settings.get("commands.disabled", []) or [])):
-                self.confirmer.ask(suggestion, text)
-                self._note_miss(text)
-                question = "Did you mean %s?" % suggestion.phrase
-                self._speak("CommandConfirm", {"phrase": suggestion.phrase}, fallback=question)
-                outcome = Outcome("asked", text, suggestion.command, suggestion.intent, detail=question)
-                self._finish([outcome], False, text)
-                return [outcome]
         if not matches:
-            self._note_miss(text)
-            outcome = Outcome("unknown", text=text, detail="I didn't recognise that command.")
-            self._finish([outcome], speak and speak_unknown, text)
-            return [outcome]
+            if background and self.brain is not None:
+                self._chat_jobs().put((text, speak, speak_unknown))      # a slow chat answer must not hold up the next command
+                return [Outcome("route", text, None, "press", detail="(thinking about it)")]
+            return self._unmatched(text, speak, speak_unknown)
         outcomes = []
         for index, match in enumerate(matches):
             if index:
@@ -323,6 +304,51 @@ class CommandRunner:
             self.extra_helpers.insert(0, helper)
         else:
             self.extra_helpers.append(helper)
+
+    def _unmatched(self, text, speak, speak_unknown):
+        """A sentence that is not a command: her brain gets it, then 'did you mean...?', then 'I don't know that'."""
+        if self.brain is not None:
+            try:
+                answer = self.brain.try_handle(text, deliberate=speak_unknown)
+            except Exception:
+                log.exception("Her brain failed")
+                answer = None
+            if answer is not None:
+                outcome = Outcome("route", text, None, "press", detail=answer)
+                self._finish([outcome], False, text)
+                return [outcome]
+        if speak and speak_unknown and self.settings.get("commands.ask_guess", True):
+            suggestion = self.matcher.suggest(text)
+            if (suggestion is not None and not self.confirmer.is_refused(normalise(text), suggestion.phrase)
+                    and suggestion.command.id not in (self.settings.get("commands.disabled", []) or [])):
+                self.confirmer.ask(suggestion, text)
+                self._note_miss(text)
+                question = "Did you mean %s?" % suggestion.phrase
+                self._speak("CommandConfirm", {"phrase": suggestion.phrase}, fallback=question)
+                outcome = Outcome("asked", text, suggestion.command, suggestion.intent, detail=question)
+                self._finish([outcome], False, text)
+                return [outcome]
+        self._note_miss(text)
+        outcome = Outcome("unknown", text=text, detail="I didn't recognise that command.")
+        self._finish([outcome], speak and speak_unknown, text)
+        return [outcome]
+
+    def _chat_jobs(self):
+        """A queue and ONE worker thread for slow answers (the small chat model takes 3-6 s), so key presses never wait behind chat."""
+        if self._chat_queue is None:
+            import queue
+            import threading
+            self._chat_queue = queue.Queue()
+
+            def work():
+                while True:
+                    text, speak, speak_unknown = self._chat_queue.get()
+                    try:
+                        self._unmatched(text, speak, speak_unknown)
+                    except Exception:
+                        log.exception("The chat answer failed")
+            threading.Thread(target=work, name="chat-answers", daemon=True).start()
+        return self._chat_queue
 
     def _brain_owns(self, text):
         """A sentence that is NOT an exact command but IS one of her chat intents goes to her brain, not to a guessed command.

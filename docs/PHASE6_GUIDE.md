@@ -1495,3 +1495,7 @@ window use the same code as the biology list.
 ## 0.90.4 - fixes from a stream log
 
 * control/sender.py find_game and ui/screens.py use a private WinDLL('user32').EnumWindows (the shared one had its argtypes changed by the other); personality/smalltalk.py greeting + how-are-you, slang hellos, chat/everyone filler; control/catalog.py hide-all-overlays mishearings and bare 'hardpoints'; streaming/bridge.py logs the YouTube wait once; tests/test_talk.py.
+
+## 0.90.5 - she feels more alive
+
+* control/runner.py `_unmatched` + `_chat_jobs` (one worker thread, `background_chat`, set in core/app.py); journal/game_state.py `notable` filled by events/scan.py; config/brain_intents.json `system_finds` + personality/brain.py `_system_finds`; brain `_ASK_PET` wider and honest; personality/manners.py `THANKS_FOR`; personality/llm.py helpdesk LEAKS; tests in test_commands, test_brain, test_profile_confirm, test_manners, test_llm.

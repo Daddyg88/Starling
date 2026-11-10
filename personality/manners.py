@@ -18,6 +18,8 @@ log = get_logger("manners")
 THANKS = re.compile(r"\b(thank you|thank-you|thankyou|thank u|thanks|many thanks|cheers|much appreciated|i appreciate (it|that))\b")
 FILLER = re.compile(r"\b(very much|so much|a lot|a million|starling|commander|cmdr|love|darling|mate|please|ok|okay|"
                     r"and|that was|that's|great|lovely|brilliant|perfect|for that|for the help|for your help|then|again)\b")
+THANKS_FOR = re.compile(r"^(?:starling )?(?:thank you|thanks|thankyou|many thanks|cheers)(?: so much| very much| a lot)?(?: starling| commander)? "
+                        r"for (?:being|all|the|your|doing|helping|that|today|tonight|everything|coming|being there|keeping|looking after|getting)\b[a-z0-9' ]{0,45}$")
 THANK_WINDOW_SECONDS = 30.0
 
 
@@ -30,6 +32,8 @@ def only_thanks(text):
     lowered = (text or "").lower()
     if not THANKS.search(lowered):
         return False
+    if THANKS_FOR.match(re.sub(r"[^a-z0-9' ]+", " ", re.sub(r"\s+", " ", lowered)).strip()):
+        return True                                           # "thank you for being a good ship": still only a thank-you
     rest = FILLER.sub(" ", THANKS.sub(" ", lowered))
     return not re.sub(r"[^a-z0-9]+", "", rest)
 

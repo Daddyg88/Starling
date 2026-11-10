@@ -193,6 +193,33 @@ class GameTests(Base):
         self.assertNotEqual(self.topic(), "Brain_Opinion")           # too long to be an opinion topic (free chat may still answer)
 
 
+class SystemFindsTests(Base):
+    """A tester asked 'what was the terraformable world in this system?' straight after she had announced one."""
+
+    def test_she_remembers_the_notable_bodies_she_scanned_here(self):
+        from events.scan import Scan
+        from journal.game_state import GameState
+        state = GameState()
+        state.system = "Sol"
+        Scan().update_state({"BodyName": "Sol B 2", "PlanetClass": "High metal content body", "TerraformState": "Terraformable"}, state)
+        Scan().update_state({"BodyName": "Sol A 1", "PlanetClass": "Water world"}, state)
+        Scan().update_state({"BodyName": "Sol C 1", "PlanetClass": "Icy body"}, state)
+        state.system = "Elsewhere"
+        Scan().update_state({"BodyName": "Elsewhere 1", "PlanetClass": "Earthlike body"}, state)    # another system: not mentioned
+        state.system = "Sol"
+        self.state.notable = state.notable
+        reply = self.ask("what was the terraformable world in this system")
+        self.assertIn("B 2", reply)
+        self.assertIn("terraformable", reply)
+        self.assertIn("A 1", reply)
+        self.assertNotIn("C 1", reply)
+        self.assertNotIn("Elsewhere", reply)
+
+    def test_nothing_scanned_is_said_plainly(self):
+        self.state.notable = {}
+        self.assertIn("Nothing worth a mention", self.ask("what did we find in this system"))
+
+
 class FollowUpTests(Base):
     def test_why_more_you_really(self):
         self.ask("what's your favourite colour")

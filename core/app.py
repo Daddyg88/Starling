@@ -422,6 +422,7 @@ class App:
                 state_provider=lambda: self.state, flavour=self.flavour, echo=self.echo, route=self.ensure_route(),
                 macro_hooks=self._macro_hooks(),
                 memory=self.memory_recall, smalltalk=self.smalltalk, brain=self.brain)
+            self.commands.background_chat = True       # a slow chat answer (3-6 s) must not make a key-press command wait behind it
             from control.teach import TeachHelper
             self.commands.extra_helpers.append(TeachHelper(lambda: self.commands))
             self.commands.journal_boost = lambda seconds: self.monitor.look_fast(seconds) if self.monitor is not None else None

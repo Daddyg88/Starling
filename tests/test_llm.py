@@ -33,6 +33,8 @@ def make(base, model, enabled=True):
 class Cleaning(unittest.TestCase):
     def test_good_text_passes_and_is_trimmed_to_two_sentences(self):
         self.assertEqual(clean_reply("Sounds fun. I like that. And a third thing here."), "Sounds fun. I like that.")
+        for helpdesk in ("You're welcome! If there's anything else I can help with, just let me know.", "Happy to help, feel free to ask more."):
+            self.assertIsNone(clean_reply(helpdesk), helpdesk)            # a tester's log: the helpdesk voice, not a ship's computer
 
     def test_bad_text_is_refused(self):
         for bad in ("", "ok", "As an AI language model I cannot help", "Visit www.example.com now please", "I will kill myself soon ok",

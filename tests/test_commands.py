@@ -891,6 +891,46 @@ class FakeApp:
         return self._reader
 
 
+class SlowChatDoesNotBlockCommandsTests(unittest.TestCase):
+    """A tester's log: 'weapons away' waited about 5 s behind a slow chat answer."""
+
+    def test_a_slow_chat_answer_runs_on_its_own_thread(self):
+        import threading
+        gate = threading.Event()
+        started = threading.Event()
+        answered = []
+
+        class SlowBrain:
+            def try_handle(self, text, deliberate=True):
+                started.set()
+                gate.wait(5)
+                answered.append(text)
+                return "A long chatty answer."
+
+        book = FakeBook({"LandingGearToggle": (Keystroke("Key_L"), "")})
+        runner = CommandRunner(EventBus(), None, None, make_settings(), book=book, sender=FakeSender(), sleep=lambda s: None, brain=SlowBrain())
+        runner.background_chat = True
+        out = runner.run_text("tell me about the weather on mars", background=True)
+        self.assertEqual(out[0].status, "route")                    # came straight back
+        self.assertTrue(started.wait(2))
+        self.assertEqual(answered, [])                              # the chat answer is still being thought about...
+        gate.set()
+        for _ in range(100):
+            if answered:
+                break
+            time.sleep(0.02)
+        self.assertEqual(answered, ["tell me about the weather on mars"])
+
+    def test_without_the_background_switch_everything_is_as_before(self):
+        class Brain:
+            def try_handle(self, text, deliberate=True):
+                return "Right here."
+
+        runner = CommandRunner(EventBus(), None, None, make_settings(), book=FakeBook({}), sender=FakeSender(), sleep=lambda s: None, brain=Brain())
+        out = runner.run_text("tell me about the weather on mars")
+        self.assertEqual(out[0].detail, "Right here.")
+
+
 class ControlsTestScreenTests(unittest.TestCase):
     def make(self):
         kb, joy = FakeKeys(), FakeJoysticks([X52])

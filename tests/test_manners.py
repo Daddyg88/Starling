@@ -38,6 +38,11 @@ class DetectionTests(unittest.TestCase):
             self.assertTrue(has_thanks(text))
             self.assertTrue(only_thanks(text), text)
 
+    def test_thanking_her_for_something_is_still_only_a_thank_you(self):
+        for text in ("thank you for being a good ship", "thanks so much for the help today", "Thanks for everything, Starling."):
+            self.assertTrue(only_thanks(text), text)           # a tester's log: the chat brain AND manners both answered
+        self.assertFalse(only_thanks("thanks for nothing, now plot a route to Sol"))
+
     def test_thanks_inside_a_request_is_not_only_thanks(self):
         self.assertTrue(has_thanks("open the galaxy map thank you"))
         self.assertFalse(only_thanks("open the galaxy map thank you"))

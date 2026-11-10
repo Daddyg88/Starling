@@ -32,7 +32,8 @@ IDLE_UNLOAD_SECONDS = 600
 MAX_REPLY_CHARS = 200
 MAX_REPLY_SENTENCES = 2
 MIN_REPLY_WORDS = 3
-LEAKS = ("as an ai", "language model", "openai", "alibaba", "qwen", "chatgpt", "i am an ai assistant", "i'm an ai assistant",
+LEAKS = ("anything else i can help", "anything else i can do", "just let me know", "feel free to", "don't hesitate", "do not hesitate",
+         "i'm here to help", "i am here to help", "happy to help", "glad to help", "let me know if", "as an ai", "language model", "openai", "alibaba", "qwen", "chatgpt", "i am an ai assistant", "i'm an ai assistant",
          "i am a large", "i don't have personal", "i do not have personal", "my training data", "knowledge cutoff", "as a virtual assistant",
          "i don't have emotions", "i do not have emotions", "don't have feelings", "do not have feelings", "no emotions", "no feelings",
          "can't assist", "cannot assist", "can't help with that", "cannot help with that", "inappropriate", "unethical", "i'm just an",

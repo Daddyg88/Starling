@@ -424,8 +424,11 @@ class Brain:
                           r"what do you remember about me|what have i told you|tell me what you know about me|what do you know)$")
     _ASK_LIKES = re.compile(r"^(?:what do i (?:like|love|enjoy)|what things do i like|what am i into)$")
     _ASK_DISLIKES = re.compile(r"^(?:what do i (?:hate|dislike)|what dont i like|what things do i hate)$")
-    _ASK_PET = re.compile(r"^(?:whats|what is|do you remember|remember) my (?:dog|cat|puppy|kitten|hamster|rabbit|parrot|horse|bird|tortoise|"
-                          r"guinea pig|goldfish|snake|lizard|budgie|ferret)(?:s name| called| named|s called)?$|^what(?:s| is) my pets? (?:name|called)$")
+    _PET_WORDS = (r"dog|cat|puppy|kitten|hamster|rabbit|parrot|horse|bird|tortoise|guinea pig|goldfish|snake|lizard|budgie|ferret|"
+                  r"dogs|cats|puppies|kittens|hamsters|rabbits|parrots|horses|birds|tortoises|guinea pigs|goldfish|snakes|lizards|budgies|ferrets|pets?")
+    _ASK_PET = re.compile(r"^(?:(?:can|could) you )?(?:whats|what is|what are|whats|do you remember|do you know|remember|recall|tell me|what were) "
+                          r"(?:my|the names of my|the name of my) (?:" + _PET_WORDS + r")(?:s? names?| called| named|s called)?(?: again)?$|"
+                          r"^what(?:s| is| are) my pets? (?:names?|called)$|^what(?:s| is| are) (?:the )?names? of my (?:" + _PET_WORDS + r")$")
     _ASK_FAV = re.compile(r"^(?:whats|what is|do you remember) my (?:favou?rite|fave) (?P<cat>[a-z ]{3,24})$")
 
     @staticmethod
@@ -458,9 +461,15 @@ class Brain:
             return self._say_pool("Profile_Sum_Dislikes", values) if "dislikes" in values else self._say_pool("Profile_NoDislikes", {})
         if self._ASK_PET.match(tidy):
             if profile.pets:
-                pet = profile.pets[-1]
+                asked = re.search(r"\bmy (" + self._PET_WORDS + r")", tidy)
+                word = asked.group(1).rstrip("s") if asked and asked.group(1) not in ("pet", "pets") else ""
+                same = [p for p in profile.pets if not word or p["kind"].startswith(word[:3])] or list(profile.pets)
+                if len(same) > 1:
+                    names = [p["name"].capitalize() for p in same]
+                    return self._say("You told me about %s and %s." % (", ".join(names[:-1]), names[-1]))
+                pet = same[-1]
                 return self._say_pool("Profile_PetName", {"kind": pet["kind"], "name": pet["name"].capitalize()})
-            return self._say_pool("Profile_NoPet", {})
+            return self._say("You haven't told me their names yet, Commander. Tell me, and I'll remember them.")
         found = self._ASK_FAV.match(tidy)
         if found:
             category = found.group("cat").strip()
@@ -807,6 +816,8 @@ class Brain:
     def _do_stats(self, item, found, tidy):
         """'How many kills have I got?', 'how many times have I been here?': answers from her own counts."""
         keeper = self.stats
+        if item.get("topic") == "system_finds":
+            return self._system_finds()                   # from the Scan events, not from her counts
         if keeper is None or not self.settings.get("stats.enabled", True):
             return self._say_pool("Stats_Off", {}, remember=False)
         topic = item.get("topic")
@@ -831,6 +842,19 @@ class Brain:
             count = len(keeper.terraformable)
             return self._say_pool("Stats_Terra" if count else "Stats_TerraNone", {"Count": count}, remember=True)
         return None
+
+    def _system_finds(self):
+        """'What was the terraformable world in this system?': from the bodies she was told about by the Scan events."""
+        state = self._state()
+        system = getattr(state, "system", "") or ""
+        here = [(name, info["kind"]) for name, info in (getattr(state, "notable", None) or {}).items() if info.get("system", "") == system]
+        if not here:
+            return self._say("Nothing worth a mention scanned in this system yet, Commander. I only know what the scanner has shown me.")
+        from journal.bio_predict import short_body
+        spoken = ["%s, %s %s" % (short_body(name, system), "an" if kind[0] in "aeiou" else "a", kind) for name, kind in here[:4]]
+        more = len(here) - len(spoken)
+        text = "Worth remembering here: " + "; ".join(spoken) + ("; and %d more." % more if more > 0 else ".")
+        return self._say(text)
 
     def _do_service(self, item, found, tidy):
         """'Where is the nearest material trader / black market / tech broker?' Looks it up on Spansh in the background."""
