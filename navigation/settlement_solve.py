@@ -19,8 +19,8 @@ SEPARATE_DEGREES = 20.0             # answers closer in turn than this are the s
 
 
 def features(data):
-    """kind -> [(x, y)] for one map. Kinds: terminal, entry (doors and airlocks), power, alarm, pad."""
-    found = {"terminal": [], "entry": [], "power": [], "alarm": [], "pad": []}
+    """kind -> [(x, y)] for one map. Kinds: terminal, entry (doors and airlocks), power, alarm, pad, stop (a terminal, the power regulator or the alarm)."""
+    found = {"terminal": [], "entry": [], "power": [], "alarm": [], "pad": [], "stop": []}
     for marker in data.get("markers", []):
         kind = str(marker.get("type") or "")
         point = (float(marker["x"]), float(marker["y"]))
@@ -30,6 +30,7 @@ def features(data):
             found["entry"].append(point)
         elif kind in ("power", "alarm"):
             found[kind].append(point)
+    found["stop"] = found["terminal"] + found["power"] + found["alarm"]      # somewhere you stand still to use something
     centres = {(round(float(c["x"])), round(float(c["y"]))) for c in data.get("circles", [])}
     pads = data.get("pads")
     if len(centres) == 1 and pads and sum(int(v or 0) for v in pads.values()) == 1:

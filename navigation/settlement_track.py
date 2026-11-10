@@ -31,7 +31,9 @@ FORGET_AFTER_METRES = 2500.0
 SHOW_WITHIN_METRES = 700.0           # the map pops up when you are on foot this close to the settlement
 ARRIVED_METRES = 6.0                 # the arrow goes away when you are this close to what it points at
 SAME_SPOT_METRES = 6.0               # two spots of the same kind closer than this are one spot
-FOCUS_AT_TERMINAL = 5                # Status.json GuiFocus 5 = station services: the screen a terminal opens (NOT yet confirmed in the real game)
+DWELL_SECONDS = 6.0                  # standing still this long on foot = using a terminal (real visits: 6-10 s at each terminal)
+STILL_METRES = 2.5
+GOT_OUT_METRES = 15.0                # standing still this close to where you stepped out of the ship does not count
 _FIND = re.compile(r"\b(?:where is|where s|where are|find|locate|point|show me|take me to|guide me to|lead me to|navigate to|direct me to|nearest|closest|which way)\b")
 _STOP = re.compile(r"\b(?:stop|clear|remove|hide|cancel|turn off|switch off)\b.*\b(?:arrow|pointing|pointer|guiding|guide)\b")
 # what you can ask the arrow for: (words, kind, name to say)
@@ -168,7 +170,9 @@ class SettlementTracker:
         self.calibration = None
         self.dismissed = False          # you said "hide the settlement map": it stays hidden until the next settlement
         self._was_on_foot = False
-        self._last_focus = 0
+        self._still = None              # (east, north, since, counted): where you have been standing
+        self._foot_start = None
+        self.clock = time.monotonic
         self.say = None                 # (text) -> speaks a sentence; set by the app (voice helpers' answers are not spoken by themselves)
         self._asked = False
         self.known = known_settlements()
@@ -416,7 +420,6 @@ class SettlementTracker:
         lat = getattr(state, "latitude", None)
         s = self.settlement
         on_foot = bool(getattr(state, "status_flags2", 0) & 1)
-        focus = int(getattr(state, "gui_focus", 0) or 0)
         near = None
         if s is not None and lat is not None:
             radius = s.get("radius") or getattr(state, "planet_radius", None)
@@ -424,10 +427,7 @@ class SettlementTracker:
                 east, north = world_xy(lat, state.longitude, s["lat"], s["lon"], radius)
                 near = math.hypot(east, north)
                 s["radius"] = radius
-                self._maybe_terminal(on_foot, focus, east, north, near)
-        if on_foot and near is not None and near <= SHOW_WITHIN_METRES and focus != self._last_focus:
-            log.info("Settlement: on-foot screen number changed %s -> %s (%.0f m from the reference point)", self._last_focus, focus, near)
-        self._last_focus = focus
+                self._dwell(on_foot, east, north, near)
         self._show_or_hide(on_foot, near)
         cal = self.calibration
         if cal is None or lat is None or near is None or near > FORGET_AFTER_METRES:
@@ -446,15 +446,28 @@ class SettlementTracker:
         if target is not None and math.hypot(x - target["x"], y - target["y"]) * abs(cal.a) < ARRIVED_METRES:
             self.view.target = None                               # you are there
 
-    def _maybe_terminal(self, on_foot, focus, east, north, near):
-        """Opening a terminal screen while on foot is a free "I am at a terminal" mark. (Whether focus 5 really is that screen at a
-        settlement is a guess: the recorder keeps the focus numbers so the next visit settles it.)"""
-        if self.calibration is not None or not on_foot or near > SHOW_WITHIN_METRES:
+    def _dwell(self, on_foot, east, north, near):
+        """Using a terminal makes the game write nothing (no journal line, no screen number on foot: seen in real visits), but you
+        STAND STILL for several seconds. Standing still on foot, away from where you got out, counts as 'I am at something'."""
+        now = self.clock()
+        if not on_foot or near > SHOW_WITHIN_METRES:
+            self._still = None
+            self._foot_start = None
             return
-        if focus == FOCUS_AT_TERMINAL and self._last_focus != FOCUS_AT_TERMINAL:
-            if self._add_spot("terminal", (east, north)):
-                log.info("Settlement: terminal screen opened %.0f m from the reference point (%d spots)", near, len(self.spots))
-                self._line_up(speak=False)
+        if self._foot_start is None:
+            self._foot_start = (east, north)
+        if self._still is None or math.hypot(east - self._still[0], north - self._still[1]) > STILL_METRES:
+            self._still = (east, north, now, False)
+            return
+        x, y, since, counted = self._still
+        if counted or now - since < DWELL_SECONDS or self.calibration is not None:
+            return
+        self._still = (x, y, since, True)
+        if math.hypot(x - self._foot_start[0], y - self._foot_start[1]) < GOT_OUT_METRES:
+            return                                                 # just stepped out of the ship
+        if self._add_spot("stop", (x, y)):
+            log.info("Settlement: stood still %.0f s, %.0f m from the reference point (%d spots)", now - since, near, len(self.spots))
+            self._line_up(speak=False)
 
     def _show_or_hide(self, on_foot, near):
         """The map comes up when you step out near a settlement we have a map for, and goes when you get back in or leave."""

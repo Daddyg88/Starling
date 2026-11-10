@@ -217,22 +217,49 @@ class WithoutPowerOrAlarm(Helpers):
         self.assertIsNone(self.tracker.calibration)
         self.assertIn("more", said)
 
-    def test_an_opened_terminal_screen_counts_without_saying_anything(self):
+    def stand(self, lat, lon, seconds, clock):
+        """Stand still on foot for `seconds`, with a Status reading every second."""
+        self.state.latitude, self.state.longitude, self.state.status_flags2 = lat, lon, 1
+        for _ in range(int(seconds) + 1):
+            self.tracker.on_status(self.state)
+            clock[0] += 1.0
+
+    def test_standing_still_at_three_terminals_lines_the_map_up(self):
+        clock = [100.0]
+        self.tracker.clock = lambda: clock[0]
         self.arrive()
+        self.state.latitude, self.state.longitude, self.state.status_flags2 = SHIP[0], SHIP[1], 1
+        self.tracker.on_status(self.state)                                  # stepping out of the ship
         for lat, lon in (T1, T2, T3):
-            self.state.latitude, self.state.longitude, self.state.status_flags2, self.state.gui_focus = lat, lon, 1, 0
-            self.tracker.on_status(self.state)
-            self.state.gui_focus = 5
-            self.tracker.on_status(self.state)
+            self.stand(lat, lon, 8, clock)
         self.assertIsNotNone(self.tracker.calibration)
         self.assertEqual(self.tracker.suggestion(), "industrial_2")
 
-    def test_a_screen_that_stays_open_is_one_spot(self):
+    def test_waiting_beside_the_ship_is_not_a_terminal(self):
+        clock = [100.0]
+        self.tracker.clock = lambda: clock[0]
         self.arrive()
-        self.state.latitude, self.state.longitude, self.state.status_flags2, self.state.gui_focus = T1[0], T1[1], 1, 5
-        for _ in range(5):
-            self.tracker.on_status(self.state)
-        self.assertEqual(len([s for s in self.tracker.spots if s[0] == "terminal"]), 1)
+        self.stand(SHIP[0], SHIP[1], 20, clock)
+        self.assertEqual(self.tracker.spots, [s for s in self.tracker.spots if s[0] == "pad"])
+
+    def test_one_long_stop_is_one_spot(self):
+        clock = [100.0]
+        self.tracker.clock = lambda: clock[0]
+        self.arrive()
+        self.state.latitude, self.state.longitude, self.state.status_flags2 = SHIP[0], SHIP[1], 1
+        self.tracker.on_status(self.state)
+        self.stand(T1[0], T1[1], 30, clock)
+        self.assertEqual(len([s for s in self.tracker.spots if s[0] == "stop"]), 1)
+
+    def test_walking_past_is_not_a_stop(self):
+        clock = [100.0]
+        self.tracker.clock = lambda: clock[0]
+        self.arrive()
+        self.state.latitude, self.state.longitude, self.state.status_flags2 = SHIP[0], SHIP[1], 1
+        self.tracker.on_status(self.state)
+        for step in range(20):
+            self.stand(T1[0] + step * 0.0001, T1[1], 0, clock)
+        self.assertEqual([s for s in self.tracker.spots if s[0] == "stop"], [])
 
     def test_it_is_remembered_for_next_time(self):
         self.arrive()

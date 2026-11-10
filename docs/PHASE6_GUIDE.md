@@ -1534,3 +1534,7 @@ window use the same code as the biology list.
 ## 0.92.5 - recorder resumes after a restart, lists events
 
 * navigation/settlement_recorder.py: silent (catch-up) ApproachSettlement resumes the unended visit with the same MarketID instead of starting a copy; silent SupercruiseEntry/FSDJump/Shutdown end it; `visit['events']` lists other journal events (QUIET_EVENTS skipped, 300 max). navigation/settlement_track.py logs on-foot GuiFocus changes near a settlement. Found in diagnostics 20261110-155722 (no terminal data). tests `AfterARestart`.
+
+## 0.92.6 - standing still on foot = a stop
+
+* Diagnostics 20261110-173027 (0.92.5): no journal event and no GuiFocus (not in the on-foot Status fields) when a terminal is used, so the GuiFocus guess is removed. Trails show 6-10 s stationary stretches exactly at terminals. navigation/settlement_track.py `_dwell` (DWELL_SECONDS 6, STILL_METRES 2.5, GOT_OUT_METRES 15) adds a 'stop' spot (matches terminal, power regulator or alarm in navigation/settlement_solve.py `features`) and calls `_line_up`. tests `WithoutPowerOrAlarm` dwell tests.
