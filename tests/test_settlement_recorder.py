@@ -118,5 +118,24 @@ class WiringTests(unittest.TestCase):
         self.assertEqual(seen, [("ApproachSettlement", False)])
 
 
+class AfterARestart(RecorderTests):
+    def test_the_visit_is_picked_up_again_when_starling_is_started_late(self):
+        self.rec.on_entry(APPROACH)
+        self.rec.save()
+        again = SettlementRecorder(lambda: self.state, self.path, clock=self.clock, stamp=lambda: "T")
+        again.on_entry(APPROACH, True)                          # the journal being caught up
+        self.assertIs(again.current, again.visits[-1])
+        self.assertEqual(len(again.visits), 1)                  # not a second copy of the same visit
+        again.on_entry({"event": "SupercruiseEntry"}, True)
+        self.assertIsNone(again.current)
+
+    def test_other_events_during_a_visit_are_listed_by_name(self):
+        self.rec.on_entry(APPROACH)
+        self.rec.on_entry({"timestamp": "T1", "event": "SomethingAtATerminal"})
+        self.rec.on_entry({"timestamp": "T2", "event": "Music"})
+        names = [row[1] for row in self.rec.current["events"]]
+        self.assertEqual(names, ["SomethingAtATerminal"])
+
+
 if __name__ == "__main__":
     unittest.main()

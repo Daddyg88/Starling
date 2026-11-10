@@ -1530,3 +1530,7 @@ window use the same code as the biology list.
 ## 0.92.4 - Shi Construction ships lined up
 
 * maps/known_calibrations.json (MarketID -> Calibration JSON, from the power/alarm/pad fit, rms 2.2 m) loaded as `shipped` in navigation/settlement_track.py; recorder keeps `focus` changes on foot (visit['focus']). Found in diagnostics 20261110-155722. tests `ShippedLineUp`.
+
+## 0.92.5 - recorder resumes after a restart, lists events
+
+* navigation/settlement_recorder.py: silent (catch-up) ApproachSettlement resumes the unended visit with the same MarketID instead of starting a copy; silent SupercruiseEntry/FSDJump/Shutdown end it; `visit['events']` lists other journal events (QUIET_EVENTS skipped, 300 max). navigation/settlement_track.py logs on-foot GuiFocus changes near a settlement. Found in diagnostics 20261110-155722 (no terminal data). tests `AfterARestart`.

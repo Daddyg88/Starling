@@ -25,6 +25,7 @@ TRAIL_MAX = 900                  # about 30 minutes on foot per visit
 VISITS_MAX = 40
 SAVE_SECONDS = 30.0
 STARTS = ("ApproachSettlement",)
+QUIET_EVENTS = ("Music", "ReceiveText", "SendText", "Status", "Cargo", "Backpack", "ShipLockerMaterials", "NavRoute", "FuelScoop", "ReservoirReplenished")
 ENDS = ("SupercruiseEntry", "FSDJump", "Shutdown")
 _MARK = re.compile(r"^(?:mark|record|log)\s+(?:this\s+)?(?:spot|place|position|location)(?:\s+(.+))?$")
 
@@ -77,10 +78,13 @@ class SettlementRecorder:
 
     # ---- journal lines (called for every line, live only) ----
     def on_entry(self, entry, silent=False):
-        if silent or not isinstance(entry, dict):
+        if not isinstance(entry, dict):
             return
         name = entry.get("event")
         try:
+            if silent:
+                self._resume(name, entry)              # Starling was started after you arrived: pick the visit up again, record nothing new
+                return
             if name in STARTS:
                 self._begin(entry)
             elif name in ENDS and self.current is not None:
@@ -92,8 +96,31 @@ class SettlementRecorder:
                 self._note(name, entry)
             elif self.current is not None:
                 self._note(name, entry)
+                self._event(name, entry)
         except Exception:
             log.exception("The settlement recorder could not handle %s", name)
+
+    def _resume(self, name, entry):
+        if name in STARTS:
+            market = entry.get("MarketID")
+            for visit in reversed(self.visits):
+                if visit.get("settlement", {}).get("MarketID") == market and not visit.get("ended"):
+                    self.current = visit
+                    return
+            self.current = None
+        elif name in ENDS:
+            if self.current is not None and not self.current.get("ended"):
+                self.current["ended"] = self.stamp()
+            self.current = None
+
+    def _event(self, name, entry):
+        """Every other journal event seen during the visit (name and place only), so the zip shows which events happen at a terminal."""
+        if name in QUIET_EVENTS:
+            return
+        events = self.current.setdefault("events", [])
+        if len(events) < 300:
+            here = self._here() or {}
+            events.append([entry.get("timestamp"), name, here.get("lat"), here.get("lon")])
 
     def _begin(self, entry):
         keep = ("Name", "MarketID", "StationEconomy", "StationEconomies", "StationGovernment", "BodyName", "BodyID", "SystemAddress",

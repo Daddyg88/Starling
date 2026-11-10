@@ -425,6 +425,8 @@ class SettlementTracker:
                 near = math.hypot(east, north)
                 s["radius"] = radius
                 self._maybe_terminal(on_foot, focus, east, north, near)
+        if on_foot and near is not None and near <= SHOW_WITHIN_METRES and focus != self._last_focus:
+            log.info("Settlement: on-foot screen number changed %s -> %s (%.0f m from the reference point)", self._last_focus, focus, near)
         self._last_focus = focus
         self._show_or_hide(on_foot, near)
         cal = self.calibration
