@@ -338,3 +338,11 @@ class ThePointer(Helpers):
     def test_nothing_in_the_ship(self):
         self.walk(*SHIP, on_foot=False)
         self.assertIsNone(self.tracker.try_handle("find the power plant"))
+
+
+class StartedLate(Setup):
+    def test_a_journal_being_caught_up_still_tells_her_where_you_are(self):
+        self.tracker.on_entry(dict(APPROACH), True)
+        self.tracker.on_entry(dict(DOCKING), True)
+        self.assertEqual(self.tracker.suggestion(), "industrial_2")
+        self.assertNotIn("pad", self.tracker.anchors)             # where the ship is NOW says nothing about where it landed

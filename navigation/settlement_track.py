@@ -173,7 +173,9 @@ class SettlementTracker:
 
     # ---- journal ----
     def on_entry(self, entry, silent=False):
-        if silent or not isinstance(entry, dict):
+        """`silent` lines are the journal being caught up after Starling started: they still tell us which settlement you are at
+        (so starting her after you arrived works), but not where the ship is now."""
+        if not isinstance(entry, dict):
             return
         name = entry.get("event")
         try:
@@ -185,7 +187,7 @@ class SettlementTracker:
                 if name in ("DockingRequested", "Docked") and "LandingPads" in entry:
                     self.settlement["pads"] = {k: int(entry["LandingPads"].get(k, 0) or 0) for k in ("Small", "Medium", "Large")}
                     self._choose()
-                if name in ("Docked", "Touchdown"):
+                if name in ("Docked", "Touchdown") and not silent:
                     self._ship_landed()
         except Exception:
             log.exception("The settlement tracker could not handle %s", name)

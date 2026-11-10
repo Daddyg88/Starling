@@ -1514,3 +1514,6 @@ window use the same code as the biology list.
 * tests/test_settlement_solve.py, tests/test_settlement_track.py (terminals only, auto show/hide, hiding by voice, the pointer).
 * Not tested in the real game: overlay, arrow, terminal-screen mark, pad counts for 26 of 28 maps.
 
+## 0.92.1 - settlement tracker reads the caught-up journal
+
+* navigation/settlement_track.py `on_entry` no longer drops `silent` (catch-up) lines, so ApproachSettlement/DockingRequested/Docked seen before Starling started still set the settlement; the ship's pad position is only taken from live lines. Found in diagnostics 20261110-143023 (Starling started after the approach, no map). tests/test_settlement_track.py `StartedLate`.
