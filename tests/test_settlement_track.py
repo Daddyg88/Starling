@@ -346,3 +346,18 @@ class StartedLate(Setup):
         self.tracker.on_entry(dict(DOCKING), True)
         self.assertEqual(self.tracker.suggestion(), "industrial_2")
         self.assertNotIn("pad", self.tracker.anchors)             # where the ship is NOW says nothing about where it landed
+
+
+class WhenSheCannotChoose(Setup):
+    def test_she_lists_the_layouts_it_could_be_and_a_named_one_sticks(self):
+        self.tracker.maps = SettlementMaps()
+        self.tracker.on_entry({"event": "ApproachSettlement", "Name": "Cheesebeard's Cave", "MarketID": 1, "StationEconomy": "$economy_Extraction;",
+                               "Latitude": -24.94, "Longitude": 33.37})
+        self.tracker.on_entry(dict(DOCKING))
+        self.assertIsNone(self.tracker.suggestion())
+        voice = SettlementMapVoice(self.tracker.maps, self.view, suggest=self.tracker.suggestion, dismissed=self.tracker.set_dismissed,
+                                   options=self.tracker.options)
+        said = voice.try_handle("show settlement map")
+        self.assertIn("Extraction 2", said)
+        voice.try_handle("show settlement map extraction two")
+        self.assertEqual(self.tracker.suggestion(), "extraction_2")

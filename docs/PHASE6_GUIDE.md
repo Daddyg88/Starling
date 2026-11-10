@@ -1517,3 +1517,7 @@ window use the same code as the biology list.
 ## 0.92.1 - settlement tracker reads the caught-up journal
 
 * navigation/settlement_track.py `on_entry` no longer drops `silent` (catch-up) lines, so ApproachSettlement/DockingRequested/Docked seen before Starling started still set the settlement; the ship's pad position is only taken from live lines. Found in diagnostics 20261110-143023 (Starling started after the approach, no map). tests/test_settlement_track.py `StartedLate`.
+
+## 0.92.2 - 'show settlement map' lists the layouts it could be
+
+* control/settlement_voice.py `options`; navigation/settlement_track.py `options()` and `set_dismissed(False)` makes a named map the settlement's map. Found in diagnostics 20261110-144526 (Cheesebeard's Cave: Extraction, Large 1, four layouts share it). tests `WhenSheCannotChoose`.

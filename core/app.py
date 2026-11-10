@@ -450,7 +450,8 @@ class App:
                     tracker = getattr(self, "settlement_tracker", None)
                     self.commands.extra_helpers.append(SettlementMapVoice(self.settlement_maps, self.settlement_view,
                                                                           suggest=tracker.suggestion if tracker is not None else None,
-                                                                          dismissed=tracker.set_dismissed if tracker is not None else None))
+                                                                          dismissed=tracker.set_dismissed if tracker is not None else None,
+                                                                          options=tracker.options if tracker is not None else None))
                     if tracker is not None:
                         self.commands.extra_helpers.append(tracker)
                 if getattr(self, "settlement_recorder", None) is not None:

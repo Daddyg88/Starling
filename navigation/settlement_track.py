@@ -248,6 +248,12 @@ class SettlementTracker:
         self.auto_shown = False
         if value:
             self.view.target = None
+        elif self.settlement is not None and not self.settlement.get("map") and self.view.current:
+            self.settlement["map"] = self.view.current              # you named the layout: from now on this is the one
+
+    def options(self):
+        """The names of the layouts it could be (group and pad counts match), for 'show settlement map' when she cannot choose."""
+        return sorted(str(d.get("name", d["id"])) for d in self.candidates())
 
     def suggestion(self):
         """The map id for the settlement you are at, or None."""

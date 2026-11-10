@@ -11,10 +11,11 @@ _NAMED = re.compile(r"\b(?:" + "|".join(re.escape(g) for g in GROUPS) + r")\b") 
 
 
 class SettlementMapVoice:
-    def __init__(self, maps, view, suggest=None, dismissed=None):
+    def __init__(self, maps, view, suggest=None, dismissed=None, options=None):
         self.maps = maps
         self.view = view
         self.dismissed = dismissed or (lambda value: None)      # (True/False): told when you hide or show the map by hand
+        self.options = options or (lambda: [])          # () -> the layout names this settlement could be
         self.suggest = suggest or (lambda: None)       # () -> the map id worked out for the settlement you are at
 
     def try_handle(self, text):
@@ -33,6 +34,9 @@ class SettlementMapVoice:
         if found is None and not _NAMED.search(said):
             found = self.maps.get(self.suggest())             # "show the settlement map" with no name: the one she worked out
         if found is None:
+            could = self.options()
+            if 1 < len(could) < 8:
+                return "I cannot tell which layout this is: %s. Say, for example, show settlement map %s." % (", ".join(could), could[0].lower())
             names = self.maps.names()
             if not names:
                 return "I have no settlement maps yet."
