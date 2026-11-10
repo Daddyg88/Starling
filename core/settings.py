@@ -71,7 +71,7 @@ DEFAULTS = {
                "fav6": "musgravite", "fav7": "serendibite", "fav8": "grandidierite", "fav9": "alexandrite", "fav10": "rhodplumsite"},
     "chitchat": {"enabled": True, "frequency": "normal", "notice": True},
     "subtarget": {"press_ahead": True},
-    "red_alert": {"minutes": 30, "banner": True, "size": "Medium", "combat_mode": True},
+    "red_alert": {"minutes": 30, "banner": True, "size": "Medium", "combat_mode": True, "auto_power_plant": True},
     "memory": {"enabled": True, "recall_at_login": True},
     "updates": {"repo": "", "auto_check": True, "ask": False, "ask_reset": False, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},

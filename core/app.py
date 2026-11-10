@@ -162,6 +162,12 @@ class App:
         except Exception:
             self.log.exception("The settlement recorder could not start")
             self.settlement_recorder = None
+        try:
+            from control.auto_subtarget import AutoSubTarget
+            self.auto_subtarget = AutoSubTarget(self.settings, lambda: self.commands, lambda: self.red_alert, lambda: self.state)
+            self.processor.raw_listeners.append(self.auto_subtarget.on_entry)
+        except Exception:
+            self.log.exception("The red alert power plant picker could not start")
         if record_events:
             saver = EventLogger(self.database, self.session_id)
             saver.trim_old()

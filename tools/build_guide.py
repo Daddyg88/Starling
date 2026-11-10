@@ -200,7 +200,7 @@ EXTRA = [
         ('The company', ['Tell me about the East Orion Company', 'Tell me more']),
         ('Who runs it', ['Who is the CEO?']),
         ('About her', ['Who are you?', 'Tell me about yourself'])]),
-    ('redalert', 'Red alert', 'A mood switch for tense moments. She stops chatting (no idle talk, pet names or remarks; safety warnings and answers to your commands stay) and the cockpit switches to combat mode and a small see-through RED ALERT shows at the bottom centre of the screen. It ends when you say so, after 30 minutes by default, or when she restarts. The banner needs Elite in Borderless or Windowed mode and nothing else on screen changes.', [
+    ('redalert', 'Red alert', 'A mood switch for tense moments. She stops chatting (no idle talk, pet names or remarks; safety warnings and answers to your commands stay) and the cockpit switches to combat mode and a small see-through RED ALERT shows at the bottom centre of the screen. It ends when you say so, after 30 minutes by default, or when she restarts. Once your scan of a locked ship is finished she also selects its power plant as the sub target by herself (once per ship, using your own Next Subsystem key; switch it off in Settings). The banner needs Elite in Borderless or Windowed mode and nothing else on screen changes.', [
         ('Start red alert', ['Red alert', 'Battle stations', 'Go to red alert']),
         ('End it', ['Stand down', 'All clear', 'Cancel red alert'])]),
     ('stream', 'For streamers', 'Say these and she talks to your viewers.', [

@@ -273,6 +273,7 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("red_alert.minutes", "Stand down by itself after", "choice", [("Never", 0), ("10 minutes", 10), ("20 minutes", 20), ("30 minutes", 30), ("60 minutes", 60)],
                   help="So red alert cannot be left on by mistake"),
             Field("red_alert.combat_mode", "Switch the cockpit to combat mode", "toggle", help="Presses your HUD mode key, only if the cockpit is in analysis mode. Needs a keyboard key on Cockpit Mode / HUD mode"),
+            Field("red_alert.auto_power_plant", "Pick the power plant once the target is scanned", "toggle", help="While red alert is on, when your scan of a locked ship finishes she presses your Next Subsystem key until its power plant is selected (the same as saying 'target power plant'). Once per ship. Needs a keyboard key on Next Subsystem"),
             Field("red_alert.banner", "Show RED ALERT on screen", "toggle", help="A small see-through RED ALERT at the bottom centre, just under the Disembark button. It does not take clicks or the keyboard. Elite must be in Borderless or Windowed mode"),
             Field("red_alert.size", "Size of the RED ALERT text", "choice", [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]),
         ]),

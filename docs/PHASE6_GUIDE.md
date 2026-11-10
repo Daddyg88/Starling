@@ -1499,3 +1499,7 @@ window use the same code as the biology list.
 ## 0.90.5 - she feels more alive
 
 * control/runner.py `_unmatched` + `_chat_jobs` (one worker thread, `background_chat`, set in core/app.py); journal/game_state.py `notable` filled by events/scan.py; config/brain_intents.json `system_finds` + personality/brain.py `_system_finds`; brain `_ASK_PET` wider and honest; personality/manners.py `THANKS_FOR`; personality/llm.py helpdesk LEAKS; tests in test_commands, test_brain, test_profile_confirm, test_manners, test_llm.
+
+## 0.91.0 - red alert picks the power plant
+
+* control/auto_subtarget.py `AutoSubTarget` (a journal raw listener, started in core/app.py): ShipTargeted with ScanStage 3 and no Subsystem, red alert active, not supercruise/docked/on foot, once per ship, runs 'target power plant' with auto=True; setting red_alert.auto_power_plant (ui/settings_model.py); tests/test_auto_subtarget.py.
