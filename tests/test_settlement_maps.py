@@ -79,3 +79,15 @@ class Voice(unittest.TestCase):
     def test_other_sentences_are_left_alone(self):
         for said in ("show the biology overlay", "what is the next jump", "settlement", ""):
             self.assertIsNone(self.voice.try_handle(said), said)
+
+
+class AllTheLayouts(unittest.TestCase):
+    def test_all_28_odyssey_layouts_are_shipped_with_the_credit(self):
+        maps = SettlementMaps()
+        self.assertEqual(len(maps.maps), 28)
+        counts = {}
+        for data in maps.maps.values():
+            counts[data["group"]] = counts.get(data["group"], 0) + 1
+            self.assertIn("Quizengine", data["credit"])
+            self.assertTrue(data["markers"])
+        self.assertEqual(counts, {"Tourist": 4, "Agriculture": 5, "Military": 5, "Industrial": 5, "Extraction": 5, "High Tech": 4})

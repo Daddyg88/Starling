@@ -1,0 +1,320 @@
+{
+ "id": "extraction_4",
+ "name": "Extraction 4",
+ "group": "Extraction",
+ "size": [
+  1634,
+  830
+ ],
+ "pads": {
+  "Small": 0,
+  "Medium": 0,
+  "Large": 1
+ },
+ "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
+ "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate.",
+ "buildings": [
+  {
+   "poly": [
+    [
+     1115,
+     120
+    ],
+    [
+     1262,
+     120
+    ],
+    [
+     1274,
+     243
+    ],
+    [
+     1176,
+     292
+    ],
+    [
+     1066,
+     243
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     1360,
+     200
+    ],
+    [
+     1501,
+     194
+    ],
+    [
+     1513,
+     267
+    ],
+    [
+     1384,
+     341
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     1127,
+     365
+    ],
+    [
+     1311,
+     377
+    ],
+    [
+     1329,
+     500
+    ],
+    [
+     1176,
+     561
+    ],
+    [
+     1115,
+     488
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     104,
+     383
+    ],
+    [
+     392,
+     353
+    ],
+    [
+     410,
+     451
+    ],
+    [
+     306,
+     537
+    ],
+    [
+     122,
+     500
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     263,
+     659
+    ],
+    [
+     496,
+     598
+    ],
+    [
+     496,
+     696
+    ],
+    [
+     282,
+     726
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     380,
+     537
+    ],
+    [
+     490,
+     561
+    ],
+    [
+     465,
+     598
+    ],
+    [
+     367,
+     598
+    ]
+   ]
+  },
+  {
+   "rect": [
+    1335,
+    481,
+    1629,
+    757
+   ]
+  }
+ ],
+ "circles": [
+  {
+   "x": 1488,
+   "y": 665,
+   "r": 98
+  }
+ ],
+ "labels": [
+  {
+   "text": "PWR",
+   "x": 1173,
+   "y": 134
+  },
+  {
+   "text": "HAB",
+   "x": 1445,
+   "y": 273
+  },
+  {
+   "text": "STO",
+   "x": 1213,
+   "y": 447
+  },
+  {
+   "text": "EXT",
+   "x": 223,
+   "y": 410
+  },
+  {
+   "text": "EXT",
+   "x": 333,
+   "y": 665
+  }
+ ],
+ "markers": [
+  {
+   "type": "terminal_l0",
+   "x": 1071,
+   "y": 325
+  },
+  {
+   "type": "terminal_l0",
+   "x": 1378,
+   "y": 408
+  },
+  {
+   "type": "terminal_l0",
+   "x": 304,
+   "y": 486
+  },
+  {
+   "type": "terminal_above",
+   "x": 1181,
+   "y": 255
+  },
+  {
+   "type": "terminal_above",
+   "x": 1383,
+   "y": 285
+  },
+  {
+   "type": "terminal_above",
+   "x": 1171,
+   "y": 458
+  },
+  {
+   "type": "terminal_above",
+   "x": 257,
+   "y": 407
+  },
+  {
+   "type": "terminal_above",
+   "x": 197,
+   "y": 507
+  },
+  {
+   "type": "terminal_above",
+   "x": 431,
+   "y": 636
+  },
+  {
+   "type": "airlock",
+   "x": 1082,
+   "y": 244,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 1205,
+   "y": 274,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 1350,
+   "y": 294,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 1134,
+   "y": 426,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 1301,
+   "y": 472,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 273,
+   "y": 390,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 218,
+   "y": 534,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 474,
+   "y": 653,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 386,
+   "y": 671,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 1184,
+   "y": 170,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 1104,
+   "y": 206,
+   "level": 3
+  },
+  {
+   "type": "power",
+   "x": 1144,
+   "y": 179
+  },
+  {
+   "type": "alarm",
+   "x": 437,
+   "y": 663
+  },
+  {
+   "type": "tip",
+   "x": 197,
+   "y": 353
+  }
+ ]
+}

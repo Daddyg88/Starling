@@ -1,0 +1,430 @@
+{
+ "id": "high_tech_1",
+ "name": "High Tech 1",
+ "group": "High Tech",
+ "size": [
+  1634,
+  830
+ ],
+ "pads": {
+  "Small": 1,
+  "Medium": 0,
+  "Large": 1
+ },
+ "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
+ "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate.",
+ "buildings": [
+  {
+   "poly": [
+    [
+     894,
+     212
+    ],
+    [
+     1047,
+     224
+    ],
+    [
+     1053,
+     328
+    ],
+    [
+     906,
+     334
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     674,
+     353
+    ],
+    [
+     906,
+     359
+    ],
+    [
+     913,
+     469
+    ],
+    [
+     680,
+     463
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     637,
+     549
+    ],
+    [
+     833,
+     543
+    ],
+    [
+     839,
+     683
+    ],
+    [
+     655,
+     683
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     876,
+     567
+    ],
+    [
+     1035,
+     567
+    ],
+    [
+     1041,
+     763
+    ],
+    [
+     870,
+     757
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     753,
+     708
+    ],
+    [
+     833,
+     708
+    ],
+    [
+     833,
+     781
+    ],
+    [
+     747,
+     781
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     1127,
+     71
+    ],
+    [
+     1225,
+     77
+    ],
+    [
+     1219,
+     120
+    ],
+    [
+     1133,
+     126
+    ]
+   ]
+  },
+  {
+   "rect": [
+    1090,
+    102,
+    1433,
+    592
+   ]
+  },
+  {
+   "rect": [
+    416,
+    530,
+    606,
+    683
+   ]
+  },
+  {
+   "rect": [
+    1347,
+    696,
+    1409,
+    763
+   ]
+  }
+ ],
+ "circles": [
+  {
+   "x": 1280,
+   "y": 402,
+   "r": 55
+  },
+  {
+   "x": 508,
+   "y": 604,
+   "r": 55
+  }
+ ],
+ "labels": [
+  {
+   "text": "RES",
+   "x": 992,
+   "y": 337
+  },
+  {
+   "text": "RES",
+   "x": 807,
+   "y": 461
+  },
+  {
+   "text": "CMD",
+   "x": 692,
+   "y": 550
+  },
+  {
+   "text": "HAB",
+   "x": 1007,
+   "y": 621
+  },
+  {
+   "text": "PWR",
+   "x": 728,
+   "y": 764
+  }
+ ],
+ "markers": [
+  {
+   "type": "terminal_l0",
+   "x": 1147,
+   "y": 88
+  },
+  {
+   "type": "terminal_l0",
+   "x": 748,
+   "y": 375
+  },
+  {
+   "type": "terminal_l0",
+   "x": 908,
+   "y": 606
+  },
+  {
+   "type": "terminal_l0",
+   "x": 951,
+   "y": 627
+  },
+  {
+   "type": "terminal_above",
+   "x": 1012,
+   "y": 268
+  },
+  {
+   "type": "terminal_above",
+   "x": 924,
+   "y": 304
+  },
+  {
+   "type": "terminal_above",
+   "x": 737,
+   "y": 420
+  },
+  {
+   "type": "terminal_above",
+   "x": 839,
+   "y": 420
+  },
+  {
+   "type": "terminal_above",
+   "x": 748,
+   "y": 594
+  },
+  {
+   "type": "terminal_above",
+   "x": 813,
+   "y": 780
+  },
+  {
+   "type": "airlock",
+   "x": 879,
+   "y": 299,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 993,
+   "y": 364,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 696,
+   "y": 434,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 881,
+   "y": 419,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 746,
+   "y": 560,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 947,
+   "y": 583,
+   "level": 0
+  },
+  {
+   "type": "door",
+   "x": 987,
+   "y": 227,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 987,
+   "y": 254,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 932,
+   "y": 252,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 932,
+   "y": 277,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 728,
+   "y": 398,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 764,
+   "y": 396,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 783,
+   "y": 421,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 714,
+   "y": 606,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 683,
+   "y": 606,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 717,
+   "y": 606,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 781,
+   "y": 582,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 781,
+   "y": 619,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 686,
+   "y": 643,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 717,
+   "y": 655,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 794,
+   "y": 721,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 910,
+   "y": 686,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 951,
+   "y": 674,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 987,
+   "y": 686,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 910,
+   "y": 728,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 987,
+   "y": 728,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 947,
+   "y": 746,
+   "level": 1
+  },
+  {
+   "type": "power",
+   "x": 791,
+   "y": 763
+  },
+  {
+   "type": "alarm",
+   "x": 669,
+   "y": 663
+  },
+  {
+   "type": "tip",
+   "x": 856,
+   "y": 540
+  }
+ ]
+}

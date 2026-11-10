@@ -15,7 +15,10 @@ RIGHT_MARGIN = 0.015
 TOP_SHARE = 0.10
 AUTO_HIDE_SECONDS = 900
 IDLE_MS = 1000
-ACTIVE_MS = 1000
+ACTIVE_MS = 500                 # the "you are here" arrow follows you twice a second (Status.json changes about once a second)
+ME = "#00e5ff"
+TARGET = "#ff4fd8"
+MAX_HEIGHT_SHARE = 0.62         # a turned map can be taller than it is wide: never taller than this share of the screen
 
 
 class SettlementOverlay(RedAlertOverlay):
@@ -37,7 +40,7 @@ class SettlementOverlay(RedAlertOverlay):
             if not self._broken:
                 if self._wanted():
                     self._show()
-                    delay = ACTIVE_MS
+                    delay = ACTIVE_MS if getattr(self.view, "position", None) else 1000
                 elif self._shown:
                     self._hide()
         except Exception:
@@ -49,6 +52,35 @@ class SettlementOverlay(RedAlertOverlay):
         except Exception:
             pass
 
+    def _draw_me(self):
+        """You are here: a bright arrow (or a dot when the heading is not known), redrawn every tick. Only this one item changes."""
+        self.canvas.delete("me")
+        where = getattr(self.view, "position", None)
+        geom = getattr(self, "_geom", None)
+        if not where or geom is None:
+            return
+        project, width = geom
+        x, y = project(where["x"], where["y"])
+        size = max(8, int(width * 0.016))
+        target = getattr(self.view, "target", None)
+        if target:                                    # "find the power plant": a ring on it and a line from you to it
+            tx, ty = project(target["x"], target["y"])
+            ring = size * 1.4
+            self.canvas.create_line(x, y, tx, ty, fill=TARGET, width=3, dash=(6, 4), arrow="last", arrowshape=(14, 16, 6), tags="me")
+            self.canvas.create_oval(tx - ring, ty - ring, tx + ring, ty + ring, outline=TARGET, width=3, tags="me")
+            if getattr(self, "_font", None) is not None:
+                self.canvas.create_text(tx, ty - ring - 8, text=str(target.get("label") or ""), fill=TARGET, font=self._font, tags="me")
+        angle = where.get("angle")
+        if angle is None:
+            self.canvas.create_oval(x - size / 2, y - size / 2, x + size / 2, y + size / 2, fill=ME, outline="#000000", width=2, tags="me")
+            return
+        import math
+        points = []
+        for turn, length in ((0, size * 1.3), (140, size), (180, size * 0.45), (220, size)):        # a pointed arrow
+            a = math.radians(angle + turn)
+            points += [x + math.sin(a) * length, y - math.cos(a) * length]
+        self.canvas.create_polygon(points, fill=ME, outline="#000000", width=2, tags="me")
+
     def _show(self):
         import tkinter.font as tkfont
         data = self.maps.get(self.view.current)
@@ -59,12 +91,14 @@ class SettlementOverlay(RedAlertOverlay):
         first = self.window is None
         if first:
             self.window = self._make()
-        key = (x, y, w, h, self.view.current)
+        turn = getattr(self.view, "turn", None)
+        key = (x, y, w, h, self.view.current, None if turn is None else round(turn))
         if key != self._last or first:
             self._last = key
-            width = int(w * WIDTH_SHARE)
-            height = int(width * float(data["size"][1]) / float(data["size"][0])) 
-            shape = settlement_maps.layout(data, width, height)
+            tw, th = settlement_maps.turned_size(data, turn)
+            width = int(min(w * WIDTH_SHARE, h * MAX_HEIGHT_SHARE * tw / th))
+            height = int(width * th / tw)
+            shape = settlement_maps.layout(data, width, height, turn)
             font = tkfont.Font(family="Segoe UI", size=-max(10, int(width * 0.022)), weight="bold")
             self.canvas.delete("all")
             self.canvas.configure(width=width, height=height)
@@ -83,6 +117,8 @@ class SettlementOverlay(RedAlertOverlay):
             top = y + int(h * TOP_SHARE)
             self.window.geometry("%dx%d+%d+%d" % (width, height, left, top))
             self._font = font
+            self._geom = (shape["project"], width)
+        self._draw_me()
         if not self._shown:
             self.window.deiconify()
         self.window.attributes("-topmost", True)

@@ -2,10 +2,12 @@
 console are), shown as a see-through drawing on top of the game. No window code here, so it can be tested.
 
 The maps are small JSON files in maps/settlements/ (credit: CMDR Quizengine's Odyssey Map Guide, see CREDITS.md there).
-A map file has: id, name, group, size [width, height], credit, buildings [{rect}], circles [{x, y, r}], labels [{text, x, y}],
+A map file has: id, name, group, size [width, height], credit, buildings [{rect} or {poly}], pads {Small, Medium, Large} (the game's LandingPads counts, or null if not known), circles [{x, y, r}], labels [{text, x, y}],
 markers [{type, x, y, level}] and tips. Types: terminal_l0, terminal_above, airlock, door, power, alarm, tip.
 """
+import cmath
 import json
+import math
 import re
 from pathlib import Path
 
@@ -73,20 +75,47 @@ class MapView:
     def __init__(self):
         self.current = None
         self.shown_at = 0.0
+        self.position = None        # {"x", "y", "angle", "heading"} in map units: where you are on the map (navigation/settlement_track.py)
+        self.turn = None            # degrees: how far the drawing is turned so that north is at the top (None = drawn as the picture is)
+        self.target = None          # {"x", "y", "label"}: the thing the arrow points at ("find the power plant")
 
 
-def layout(data, width, height):
-    """Scales a map to a box of width x height pixels (keeping its shape). Returns what to draw:
-    {"size": (w, h), "lines": [(x1, y1, x2, y2)...], "circles": [(x, y, r)...], "labels": [(text, x, y)...],
-     "markers": [(x, y, colour, text)...], "credit": str}"""
+def turned_size(data, turn):
+    """The width and height of the map once it is turned by `turn` degrees (None = not turned)."""
     mw, mh = float(data["size"][0]), float(data["size"][1])
-    scale = min(width / mw, height / mh)
-    ox, oy = (width - mw * scale) / 2.0, (height - mh * scale) / 2.0
+    if not turn:
+        return mw, mh
+    c, s = abs(math.cos(math.radians(turn))), abs(math.sin(math.radians(turn)))
+    return mw * c + mh * s, mw * s + mh * c
 
-    def px(x, y):
-        return ox + float(x) * scale, oy + float(y) * scale
+
+def projector(data, width, height, turn=None):
+    """Returns (project, scale): project(x, y) turns a point on the map picture into a pixel in a box of width x height.
+    `turn` (degrees, anticlockwise as the compass sees it) is what puts north at the top: the picture is turned about its middle."""
+    mw, mh = float(data["size"][0]), float(data["size"][1])
+    tw, th = turned_size(data, turn)
+    scale = min(width / tw, height / th)
+    spin = cmath.exp(1j * math.radians(turn)) if turn else 1
+    cx, cy = mw / 2.0, mh / 2.0
+
+    def project(x, y):
+        z = complex(float(x) - cx, -(float(y) - cy)) * spin
+        return width / 2.0 + z.real * scale, height / 2.0 - z.imag * scale
+    return project, scale
+
+
+def layout(data, width, height, turn=None):
+    """Scales a map to a box of width x height pixels (keeping its shape; `turn` degrees puts north at the top). Returns what to draw:
+    {"size": (w, h), "lines": [(x1, y1, x2, y2)...], "circles": [(x, y, r)...], "labels": [(text, x, y)...],
+     "markers": [(x, y, colour, text)...], "credit": str, "project": function}"""
+    px, scale = projector(data, width, height, turn)
+    ox, oy = (width - float(data["size"][0]) * scale) / 2.0, (height - float(data["size"][1]) * scale) / 2.0      # (only right when not turned)
     lines, circles, labels, markers = [], [], [], []
     for building in data.get("buildings", []):
+        if "poly" in building:
+            points = [px(x, y) for x, y in building["poly"]]
+            lines += [(points[i][0], points[i][1], points[(i + 1) % len(points)][0], points[(i + 1) % len(points)][1]) for i in range(len(points))]
+            continue
         x1, y1, x2, y2 = building["rect"]
         (a, b), (c, d) = px(x1, y1), px(x2, y2)
         lines += [(a, b, c, b), (c, b, c, d), (c, d, a, d), (a, d, a, b)]
@@ -99,7 +128,7 @@ def layout(data, width, height):
     for marker in data.get("markers", []):
         kind = str(marker.get("type"))
         x, y = px(marker["x"], marker["y"])
-        text = LETTERS.get(kind) or ("" if marker.get("level") is None else str(marker["level"]))
+        text = LETTERS.get(kind) or ("" if marker.get("level") is None else str(marker["level"]) + ("^" if marker.get("up") else ""))
         markers.append((x, y, COLOURS.get(kind, "#ffffff"), text))
-    return {"size": (width, height), "lines": lines, "circles": circles, "labels": labels, "markers": markers,
+    return {"size": (width, height), "scale": scale, "offset": (ox, oy), "project": px, "lines": lines, "circles": circles, "labels": labels, "markers": markers,
             "credit": str(data.get("credit") or "")}

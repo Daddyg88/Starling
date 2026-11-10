@@ -64,7 +64,11 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - The secret hardpoints phrase never appears in any list, doc, README or site.
 - Do not give any information about Payden.
 
-## Settlement maps (work in progress, NOT pushed)
+## Settlement maps (0.92.0)
+- [x] All 28 Odyssey layouts traced by eye from the Odyssey Map Guide (maps/settlements/*.json, all marked PROTOTYPE). Pad counts for everything except Tourist 1/Industrial 2 are guesses from the pictures; several layouts share a pad count, so she only suggests a map when exactly one matches, otherwise say "show settlement map <name>". Needs real visits to confirm pad counts, airlock/door colours and positions.
 - [ ] Prototype wireframe map Tourist 1 (maps/settlements/tourist_1.json), overlay (ui/settlement_overlay.py), voice "show settlement map tourist one" / "hide settlement map". Credit: CMDR Quizengine's Odyssey Map Guide (maps/settlements/CREDITS.md). Still to add: credit in README + website when shipped.
 - [ ] Settlement recorder (navigation/settlement_recorder.py) writes data/settlement_samples.json (journal details, on-foot trail, voice marks "mark spot <name>"); goes into the diagnostics zip. Needs real visits to learn: what the approach coordinates mean, how pad counts (LandingPads) match layouts, whether Status Heading works on foot.
 - [ ] Then: group (StationEconomy) + pad counts -> suggest layout; two-point calibration; position/heading arrow on the map.
+- [x] 0.92.0: rotation finder from terminals alone, auto show/hide, north-up map, 'you are here', voice arrow (nearest terminal, power plant, alarm, door, airlock, ship).
+- [ ] Real-game tests: overlay on screen, arrow, whether a terminal screen is GuiFocus 5 (the recorder trail keeps it as the 5th value), pad counts (26 of 28 are guesses), whether the scale (about 0.325 m per unit) is the same at every settlement, in-ship heading.
+- [ ] Shared calibrations file shipped with the app once testers have visited settlements.

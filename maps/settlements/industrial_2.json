@@ -1,0 +1,401 @@
+{
+ "id": "industrial_2",
+ "name": "Industrial 2",
+ "group": "Industrial",
+ "size": [
+  1634,
+  830
+ ],
+ "pads": {
+  "Small": 0,
+  "Medium": 0,
+  "Large": 1
+ },
+ "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
+ "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate (markers were checked against a real walk at Shi Construction: within about 10 m).",
+ "buildings": [
+  {
+   "poly": [
+    [
+     712,
+     55
+    ],
+    [
+     840,
+     45
+    ],
+    [
+     885,
+     90
+    ],
+    [
+     885,
+     185
+    ],
+    [
+     840,
+     215
+    ],
+    [
+     770,
+     220
+    ],
+    [
+     730,
+     200
+    ],
+    [
+     712,
+     140
+    ]
+   ]
+  },
+  {
+   "rect": [
+    768,
+    185,
+    852,
+    272
+   ]
+  },
+  {
+   "poly": [
+    [
+     610,
+     240
+    ],
+    [
+     720,
+     235
+    ],
+    [
+     745,
+     280
+    ],
+    [
+     745,
+     380
+    ],
+    [
+     715,
+     430
+    ],
+    [
+     620,
+     440
+    ],
+    [
+     585,
+     380
+    ],
+    [
+     600,
+     280
+    ]
+   ]
+  },
+  {
+   "rect": [
+    460,
+    210,
+    545,
+    285
+   ]
+  },
+  {
+   "rect": [
+    455,
+    330,
+    545,
+    425
+   ]
+  },
+  {
+   "rect": [
+    880,
+    205,
+    945,
+    270
+   ]
+  },
+  {
+   "poly": [
+    [
+     700,
+     510
+    ],
+    [
+     830,
+     505
+    ],
+    [
+     835,
+     620
+    ],
+    [
+     815,
+     720
+    ],
+    [
+     745,
+     745
+    ],
+    [
+     705,
+     700
+    ],
+    [
+     695,
+     580
+    ]
+   ]
+  },
+  {
+   "rect": [
+    865,
+    505,
+    945,
+    610
+   ]
+  },
+  {
+   "rect": [
+    1160,
+    10,
+    1260,
+    90
+   ]
+  },
+  {
+   "rect": [
+    1165,
+    105,
+    1445,
+    615
+   ]
+  }
+ ],
+ "circles": [
+  {
+   "x": 1305,
+   "y": 355,
+   "r": 150
+  },
+  {
+   "x": 1305,
+   "y": 355,
+   "r": 90
+  }
+ ],
+ "labels": [
+  {
+   "text": "PWR",
+   "x": 819,
+   "y": 38
+  },
+  {
+   "text": "LAB",
+   "x": 907,
+   "y": 147
+  },
+  {
+   "text": "CMD",
+   "x": 639,
+   "y": 223
+  },
+  {
+   "text": "LAB",
+   "x": 824,
+   "y": 646
+  },
+  {
+   "text": "HAB",
+   "x": 909,
+   "y": 631
+  },
+  {
+   "text": "IND",
+   "x": 792,
+   "y": 734
+  }
+ ],
+ "markers": [
+  {
+   "type": "terminal_l0",
+   "x": 1180,
+   "y": 28
+  },
+  {
+   "type": "terminal_l0",
+   "x": 570,
+   "y": 315
+  },
+  {
+   "type": "terminal_l0",
+   "x": 820,
+   "y": 315
+  },
+  {
+   "type": "terminal_l0",
+   "x": 869,
+   "y": 470
+  },
+  {
+   "type": "terminal_above",
+   "x": 846,
+   "y": 110
+  },
+  {
+   "type": "terminal_above",
+   "x": 806,
+   "y": 230
+  },
+  {
+   "type": "terminal_above",
+   "x": 749,
+   "y": 569
+  },
+  {
+   "type": "terminal_above",
+   "x": 897,
+   "y": 577
+  },
+  {
+   "type": "terminal_above",
+   "x": 780,
+   "y": 648
+  },
+  {
+   "type": "door",
+   "x": 813,
+   "y": 88,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 737,
+   "y": 113,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 827,
+   "y": 134,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 796,
+   "y": 206,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 637,
+   "y": 261,
+   "level": 2,
+   "up": true
+  },
+  {
+   "type": "door",
+   "x": 675,
+   "y": 261,
+   "level": 3,
+   "up": true
+  },
+  {
+   "type": "door",
+   "x": 698,
+   "y": 278,
+   "level": 3,
+   "up": true
+  },
+  {
+   "type": "door",
+   "x": 653,
+   "y": 321,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 615,
+   "y": 353,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 707,
+   "y": 309,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 722,
+   "y": 625,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 857,
+   "y": 88,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 806,
+   "y": 261,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 753,
+   "y": 348,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 585,
+   "y": 396,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 801,
+   "y": 509,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 722,
+   "y": 544,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 907,
+   "y": 520,
+   "level": 0
+  },
+  {
+   "type": "power",
+   "x": 771,
+   "y": 97
+  },
+  {
+   "type": "alarm",
+   "x": 630,
+   "y": 290
+  },
+  {
+   "type": "tip",
+   "x": 943,
+   "y": 44
+  },
+  {
+   "type": "tip",
+   "x": 907,
+   "y": 663
+  }
+ ],
+ "tips": []
+}

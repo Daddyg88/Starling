@@ -44,6 +44,7 @@ class SettlementRecorder:
         self._last_trail = -1e9
         self._last_save = 0.0
         self._dirty = False
+        self.mark_hook = None            # (label, here) -> extra sentence: the map tracker uses marks to line the map up
         self._lock = threading.Lock()
         self._load()
 
@@ -136,7 +137,7 @@ class SettlementRecorder:
         if on_foot and now - self._last_trail >= TRAIL_SECONDS and len(visit["trail"]) < TRAIL_MAX:
             self._last_trail = now
             visit["trail"].append([round(state.latitude, 7), round(state.longitude, 7), getattr(state, "heading", None),
-                                   getattr(state, "altitude", None)])
+                                   getattr(state, "altitude", None), getattr(state, "gui_focus", 0)])
             self._touch()
         elif self._dirty and now - self._last_save >= SAVE_SECONDS:
             self.save()
@@ -156,4 +157,10 @@ class SettlementRecorder:
         label = (found.group(1) or "").strip() or "spot %d" % (len(self.current["marks"]) + 1)
         self.current["marks"].append({"label": label, "time": self.stamp(), **here, "on_foot": bool(getattr(self.state_provider(), "status_flags2", 0) & 1)})
         self._touch(force=True)
-        return "Marked %s." % label
+        extra = None
+        if self.mark_hook is not None:
+            try:
+                extra = self.mark_hook(label, here)
+            except Exception:
+                log.exception("The map could not use the marked spot")
+        return ("Marked %s. %s" % (label, extra)) if extra else "Marked %s." % label

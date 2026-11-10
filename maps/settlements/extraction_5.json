@@ -1,0 +1,288 @@
+{
+ "id": "extraction_5",
+ "name": "Extraction 5",
+ "group": "Extraction",
+ "size": [
+  1634,
+  830
+ ],
+ "pads": {
+  "Small": 0,
+  "Medium": 0,
+  "Large": 1
+ },
+ "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
+ "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate.",
+ "buildings": [
+  {
+   "poly": [
+    [
+     435,
+     96
+    ],
+    [
+     661,
+     77
+    ],
+    [
+     723,
+     169
+    ],
+    [
+     710,
+     218
+    ],
+    [
+     527,
+     218
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     392,
+     145
+    ],
+    [
+     527,
+     145
+    ],
+    [
+     539,
+     267
+    ],
+    [
+     404,
+     279
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     527,
+     243
+    ],
+    [
+     668,
+     243
+    ],
+    [
+     668,
+     402
+    ],
+    [
+     539,
+     402
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     710,
+     316
+    ],
+    [
+     857,
+     316
+    ],
+    [
+     870,
+     622
+    ],
+    [
+     784,
+     659
+    ],
+    [
+     723,
+     598
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     404,
+     598
+    ],
+    [
+     539,
+     598
+    ],
+    [
+     545,
+     781
+    ],
+    [
+     404,
+     794
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     943,
+     47
+    ],
+    [
+     1060,
+     47
+    ],
+    [
+     1053,
+     120
+    ],
+    [
+     955,
+     132
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     1127,
+     151
+    ],
+    [
+     1207,
+     157
+    ],
+    [
+     1200,
+     255
+    ],
+    [
+     1139,
+     267
+    ]
+   ]
+  },
+  {
+   "rect": [
+    937,
+    377,
+    1249,
+    763
+   ]
+  }
+ ],
+ "circles": [
+  {
+   "x": 1090,
+   "y": 561,
+   "r": 110
+  }
+ ],
+ "labels": [
+  {
+   "text": "PWR",
+   "x": 594,
+   "y": 252
+  },
+  {
+   "text": "EXT",
+   "x": 788,
+   "y": 415
+  },
+  {
+   "text": "HAB",
+   "x": 491,
+   "y": 724
+  }
+ ],
+ "markers": [
+  {
+   "type": "terminal_l0",
+   "x": 1020,
+   "y": 71
+  },
+  {
+   "type": "terminal_l0",
+   "x": 729,
+   "y": 382
+  },
+  {
+   "type": "terminal_above",
+   "x": 686,
+   "y": 175
+  },
+  {
+   "type": "terminal_above",
+   "x": 784,
+   "y": 390
+  },
+  {
+   "type": "terminal_above",
+   "x": 464,
+   "y": 657
+  },
+  {
+   "type": "airlock",
+   "x": 721,
+   "y": 162,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 594,
+   "y": 401,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 789,
+   "y": 337,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 795,
+   "y": 463,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 469,
+   "y": 621,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 570,
+   "y": 723,
+   "level": 0
+  },
+  {
+   "type": "door",
+   "x": 499,
+   "y": 131,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 499,
+   "y": 276,
+   "level": 3
+  },
+  {
+   "type": "power",
+   "x": 453,
+   "y": 205
+  },
+  {
+   "type": "alarm",
+   "x": 490,
+   "y": 180
+  },
+  {
+   "type": "tip",
+   "x": 801,
+   "y": 279
+  }
+ ]
+}

@@ -218,7 +218,7 @@ EXTRA = [
         ('Biology overlay', ['Hide the biology overlay', 'Show the biology overlay']),
         ('Viewer chat (Twitch and YouTube)', ['Pause the chat', 'Chat on']),
         ('Route map overlay', ['Hide the route map', 'Show the route map']),
-        ('Settlement map (Tourist 1 so far, more to come)', ['Show settlement map tourist one', 'Hide the settlement map']),
+        ('Settlement maps (all 28 layouts; they pop up by themselves when you step out near a settlement)', ['Show settlement map tourist one', 'Hide the settlement map', 'Where is the nearest terminal', 'Find the power plant', 'Where is the alarm', 'Nearest airlock', 'Where is my ship', 'Stop pointing', 'Mark spot terminal (at three terminals, she lines the map up)', 'Reset the settlement map']),
         ('Recording a settlement visit (helps us build more maps)', ['Mark spot power regulator (stand at it first; any name works)']),
         ('Credits', ['Settlement maps are based on the Odyssey Map Guide by CMDR Quizengine (elitedangereuse.fr). Thank you, Commander.'])]),
 ]

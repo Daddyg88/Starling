@@ -1,0 +1,337 @@
+{
+ "id": "military_3",
+ "name": "Military 3",
+ "group": "Military",
+ "size": [
+  1634,
+  830
+ ],
+ "pads": {
+  "Small": 0,
+  "Medium": 2,
+  "Large": 0
+ },
+ "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
+ "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate.",
+ "buildings": [
+  {
+   "poly": [
+    [
+     600,
+     120
+    ],
+    [
+     747,
+     114
+    ],
+    [
+     759,
+     194
+    ],
+    [
+     686,
+     255
+    ],
+    [
+     600,
+     236
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     453,
+     304
+    ],
+    [
+     637,
+     304
+    ],
+    [
+     649,
+     475
+    ],
+    [
+     465,
+     500
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     514,
+     549
+    ],
+    [
+     698,
+     549
+    ],
+    [
+     704,
+     683
+    ],
+    [
+     539,
+     708
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     913,
+     206
+    ],
+    [
+     1041,
+     194
+    ],
+    [
+     1115,
+     279
+    ],
+    [
+     1102,
+     475
+    ],
+    [
+     943,
+     500
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     827,
+     537
+    ],
+    [
+     937,
+     549
+    ],
+    [
+     949,
+     647
+    ],
+    [
+     845,
+     659
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     735,
+     683
+    ],
+    [
+     808,
+     683
+    ],
+    [
+     808,
+     757
+    ],
+    [
+     735,
+     763
+    ]
+   ]
+  },
+  {
+   "rect": [
+    202,
+    353,
+    288,
+    451
+   ]
+  },
+  {
+   "rect": [
+    1409,
+    328,
+    1531,
+    426
+   ]
+  }
+ ],
+ "circles": [
+  {
+   "x": 796,
+   "y": 426,
+   "r": 404
+  }
+ ],
+ "labels": [
+  {
+   "text": "STO",
+   "x": 677,
+   "y": 169
+  },
+  {
+   "text": "HAB",
+   "x": 506,
+   "y": 320
+  },
+  {
+   "text": "CMD",
+   "x": 1014,
+   "y": 405
+  },
+  {
+   "text": "HAB / PUB",
+   "x": 612,
+   "y": 664
+  },
+  {
+   "text": "PWR",
+   "x": 919,
+   "y": 674
+  }
+ ],
+ "markers": [
+  {
+   "type": "terminal_l0",
+   "x": 650,
+   "y": 464
+  },
+  {
+   "type": "terminal_l0",
+   "x": 1120,
+   "y": 371
+  },
+  {
+   "type": "terminal_l0",
+   "x": 636,
+   "y": 611
+  },
+  {
+   "type": "terminal_l0",
+   "x": 653,
+   "y": 627
+  },
+  {
+   "type": "terminal_above",
+   "x": 650,
+   "y": 181
+  },
+  {
+   "type": "terminal_above",
+   "x": 609,
+   "y": 396
+  },
+  {
+   "type": "terminal_above",
+   "x": 1091,
+   "y": 358
+  },
+  {
+   "type": "airlock",
+   "x": 622,
+   "y": 214,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 744,
+   "y": 195,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 648,
+   "y": 396,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 927,
+   "y": 365,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 1113,
+   "y": 345,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 641,
+   "y": 571,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 691,
+   "y": 617,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 854,
+   "y": 566,
+   "level": 3
+  },
+  {
+   "type": "airlock",
+   "x": 873,
+   "y": 653,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 951,
+   "y": 207,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 968,
+   "y": 296,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 980,
+   "y": 414,
+   "level": 2
+  },
+  {
+   "type": "door",
+   "x": 1025,
+   "y": 456,
+   "level": 3
+  },
+  {
+   "type": "door",
+   "x": 958,
+   "y": 426,
+   "level": 2
+  },
+  {
+   "type": "power",
+   "x": 891,
+   "y": 593
+  },
+  {
+   "type": "alarm",
+   "x": 1072,
+   "y": 473
+  },
+  {
+   "type": "tip",
+   "x": 543,
+   "y": 545
+  },
+  {
+   "type": "tip",
+   "x": 1004,
+   "y": 615
+  }
+ ]
+}

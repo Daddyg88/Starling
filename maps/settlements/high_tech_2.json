@@ -1,0 +1,274 @@
+{
+ "id": "high_tech_2",
+ "name": "High Tech 2",
+ "group": "High Tech",
+ "size": [
+  1634,
+  830
+ ],
+ "pads": {
+  "Small": 0,
+  "Medium": 0,
+  "Large": 1
+ },
+ "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
+ "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate.",
+ "buildings": [
+  {
+   "poly": [
+    [
+     968,
+     34
+    ],
+    [
+     1145,
+     47
+    ],
+    [
+     1139,
+     175
+    ],
+    [
+     992,
+     206
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     821,
+     255
+    ],
+    [
+     992,
+     255
+    ],
+    [
+     992,
+     390
+    ],
+    [
+     845,
+     420
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     551,
+     451
+    ],
+    [
+     906,
+     475
+    ],
+    [
+     913,
+     696
+    ],
+    [
+     661,
+     708
+    ],
+    [
+     551,
+     622
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     1200,
+     371
+    ],
+    [
+     1458,
+     377
+    ],
+    [
+     1458,
+     524
+    ],
+    [
+     1225,
+     561
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     1151,
+     586
+    ],
+    [
+     1384,
+     586
+    ],
+    [
+     1396,
+     757
+    ],
+    [
+     1188,
+     781
+    ]
+   ]
+  },
+  {
+   "poly": [
+    [
+     870,
+     647
+    ],
+    [
+     968,
+     647
+    ],
+    [
+     968,
+     806
+    ],
+    [
+     870,
+     806
+    ]
+   ]
+  },
+  {
+   "rect": [
+    122,
+    328,
+    355,
+    537
+   ]
+  }
+ ],
+ "circles": [],
+ "labels": [
+  {
+   "text": "PWR",
+   "x": 1018,
+   "y": 152
+  },
+  {
+   "text": "RES",
+   "x": 1012,
+   "y": 306
+  },
+  {
+   "text": "HAB",
+   "x": 1463,
+   "y": 427
+  },
+  {
+   "text": "HAB",
+   "x": 1394,
+   "y": 646
+  }
+ ],
+ "markers": [
+  {
+   "type": "terminal_l0",
+   "x": 721,
+   "y": 486
+  },
+  {
+   "type": "terminal_l0",
+   "x": 1258,
+   "y": 442
+  },
+  {
+   "type": "terminal_l0",
+   "x": 1183,
+   "y": 668
+  },
+  {
+   "type": "terminal_above",
+   "x": 882,
+   "y": 282
+  },
+  {
+   "type": "terminal_above",
+   "x": 634,
+   "y": 546
+  },
+  {
+   "type": "airlock",
+   "x": 1128,
+   "y": 121,
+   "level": 3
+  },
+  {
+   "type": "airlock",
+   "x": 1002,
+   "y": 191,
+   "level": 3
+  },
+  {
+   "type": "airlock",
+   "x": 946,
+   "y": 269,
+   "level": 2
+  },
+  {
+   "type": "airlock",
+   "x": 588,
+   "y": 544,
+   "level": 1
+  },
+  {
+   "type": "airlock",
+   "x": 1224,
+   "y": 409,
+   "level": 0
+  },
+  {
+   "type": "airlock",
+   "x": 1165,
+   "y": 627,
+   "level": 0
+  },
+  {
+   "type": "door",
+   "x": 1286,
+   "y": 425,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 1222,
+   "y": 646,
+   "level": 1
+  },
+  {
+   "type": "door",
+   "x": 668,
+   "y": 567,
+   "level": 2
+  },
+  {
+   "type": "power",
+   "x": 1037,
+   "y": 85
+  },
+  {
+   "type": "alarm",
+   "x": 1025,
+   "y": 54
+  },
+  {
+   "type": "tip",
+   "x": 1089,
+   "y": 223
+  },
+  {
+   "type": "tip",
+   "x": 837,
+   "y": 445
+  }
+ ]
+}

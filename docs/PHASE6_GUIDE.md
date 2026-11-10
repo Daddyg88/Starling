@@ -1503,3 +1503,14 @@ window use the same code as the biology list.
 ## 0.91.0 - red alert picks the power plant
 
 * control/auto_subtarget.py `AutoSubTarget` (a journal raw listener, started in core/app.py): ShipTargeted with ScanStage 3 and no Subsystem, red alert active, not supercruise/docked/on foot, once per ship, runs 'target power plant' with auto=True; setting red_alert.auto_power_plant (ui/settings_model.py); tests/test_auto_subtarget.py.
+
+## 0.92.0 - settlement maps: all 28 layouts, rotation finder, auto show/hide, north-up map, voice arrow
+
+* maps/settlements/*.json: 28 layouts (tourist 1-4, agriculture 1-5, military 1-5, industrial 1-5, extraction 1-5, high tech 1-4), traced by eye from CMDR Quizengine's Odyssey Map Guide.
+* navigation/settlement_solve.py: tries every turn (3 degree steps) and three scales around 0.325 m per map unit for the spots you stood at (terminals, doors, power, alarm; the ship's pad is left out, it is only roughly placed), keeps the best of each different turn, tightens it with a least squares fit, and says yes only if the average miss is small and the next different turn is clearly worse (`clear`). Several candidate layouts are compared the same way.
+* navigation/settlement_track.py: `SettlementTracker` collects `spots` (voice marks, plus a terminal screen opening on foot = Status GuiFocus 5, a guess), calls the solver, saves the result per MarketID; shows the map on foot within 700 m and hides it when you embark or leave; `dismissed` after 'hide the settlement map'; sets `MapView.turn` (north up) and `MapView.target`; voice 'find / where is / nearest' + terminal, power plant, alarm, airlock, door, ship; 'stop pointing'.
+* navigation/settlement_maps.py: `projector` / `layout(..., turn)` turn the drawing so north is up; ui/settlement_overlay.py draws the north-up map, your arrow (your heading) and a dashed arrow with a ring at the target.
+* navigation/settlement_recorder.py: trail rows now hold the GuiFocus number as the 5th value, to confirm what the terminal screen number is.
+* tests/test_settlement_solve.py, tests/test_settlement_track.py (terminals only, auto show/hide, hiding by voice, the pointer).
+* Not tested in the real game: overlay, arrow, terminal-screen mark, pad counts for 26 of 28 maps.
+

@@ -159,9 +159,13 @@ class App:
             from navigation.settlement_recorder import SettlementRecorder
             self.settlement_recorder = SettlementRecorder(lambda: self.state)
             self.processor.raw_listeners.append(self.settlement_recorder.on_entry)
+            from navigation.settlement_track import SettlementTracker
+            self.settlement_tracker = SettlementTracker(lambda: self.state, self.settlement_maps, self.settlement_view)
+            self.processor.raw_listeners.append(self.settlement_tracker.on_entry)
+            self.settlement_recorder.mark_hook = self.settlement_tracker.on_mark
         except Exception:
             self.log.exception("The settlement recorder could not start")
-            self.settlement_recorder = None
+            self.settlement_recorder = self.settlement_tracker = None
         try:
             from control.auto_subtarget import AutoSubTarget
             self.auto_subtarget = AutoSubTarget(self.settings, lambda: self.commands, lambda: self.red_alert, lambda: self.state)
@@ -443,7 +447,12 @@ class App:
             try:
                 from control.settlement_voice import SettlementMapVoice
                 if self.settlement_maps is not None:
-                    self.commands.extra_helpers.append(SettlementMapVoice(self.settlement_maps, self.settlement_view))
+                    tracker = getattr(self, "settlement_tracker", None)
+                    self.commands.extra_helpers.append(SettlementMapVoice(self.settlement_maps, self.settlement_view,
+                                                                          suggest=tracker.suggestion if tracker is not None else None,
+                                                                          dismissed=tracker.set_dismissed if tracker is not None else None))
+                    if tracker is not None:
+                        self.commands.extra_helpers.append(tracker)
                 if getattr(self, "settlement_recorder", None) is not None:
                     self.commands.extra_helpers.append(self.settlement_recorder)
             except Exception:
@@ -992,6 +1001,8 @@ class App:
         self.monitor = JournalMonitor(self.journal_folder, self.processor, self.bus, poll)
         if getattr(self, "settlement_recorder", None) is not None:
             self.monitor.status.listeners.append(self.settlement_recorder.on_status)
+        if getattr(self, "settlement_tracker", None) is not None:
+            self.monitor.status.listeners.append(self.settlement_tracker.on_status)
         self.ensure_bio_distance()
         self.start_bio_codex_scan()
         self.start_stats_history()

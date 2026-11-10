@@ -1,0 +1,527 @@
+"""SETTLEMENT TRACKING: works out which settlement map belongs to the settlement you are at, how that map sits on the planet, and where
+you are on it. No window code, so it can be tested.
+
+How it knows (all learned from real visits, see settlement_recorder.py):
+  * the GROUP comes from the journal's StationEconomy (Industrial, Agriculture...), the PADS from LandingPads (how many Small / Medium /
+    Large). A map whose group and pad counts match is the suggestion; if two match she cannot choose and you say which.
+  * the way the map sits (its turn and size) comes from named spots you mark by voice: "mark spot power regulator", "mark spot alarm
+    console". Two spots are enough; the ship's own pad is used too when the map has a single pad and it agrees. Saved per settlement
+    (data/settlement_calibration.json), so you only do it once.
+  * after that every Status.json reading becomes a point and a direction on the map.
+Positions on the map are in the map file's own units (pixels of the original picture).
+"""
+import json
+import math
+import os
+import re
+import time
+
+from core import paths
+from core.logger import get_logger
+from navigation import settlement_solve
+
+log = get_logger("settlement_track")
+
+GROUP_OF_ECONOMY = {"$economy_agri;": "Agriculture", "$economy_industrial;": "Industrial", "$economy_extraction;": "Extraction",
+                    "$economy_military;": "Military", "$economy_tourism;": "Tourist", "$economy_hightech;": "High Tech"}
+MIN_APART_METRES = 20.0
+METRES_PER_UNIT = (0.15, 0.8)        # a sensible size for a map unit (the maps are about 1600 units wide; settlements 250-600 m)
+MAX_PAD_ERROR_METRES = 12.0
+FORGET_AFTER_METRES = 2500.0
+SHOW_WITHIN_METRES = 700.0           # the map pops up when you are on foot this close to the settlement
+ARRIVED_METRES = 6.0                 # the arrow goes away when you are this close to what it points at
+SAME_SPOT_METRES = 6.0               # two spots of the same kind closer than this are one spot
+FOCUS_AT_TERMINAL = 5                # Status.json GuiFocus 5 = station services: the screen a terminal opens (NOT yet confirmed in the real game)
+_FIND = re.compile(r"\b(?:where is|where s|where are|find|locate|point|show me|take me to|guide me to|lead me to|navigate to|direct me to|nearest|closest|which way)\b")
+_STOP = re.compile(r"\b(?:stop|clear|remove|hide|cancel|turn off|switch off)\b.*\b(?:arrow|pointing|pointer|guiding|guide)\b")
+# what you can ask the arrow for: (words, kind, name to say)
+_TARGETS = (
+    (re.compile(r"\b(?:power plant|power regulator|power station|power|generator|regulator)\b"), "power", "power regulator"),
+    (re.compile(r"\b(?:alarm|alarms|alarm console)\b"), "alarm", "alarm console"),
+    (re.compile(r"\b(?:terminal|terminals|kiosk)\b"), "terminal", "terminal"),
+    (re.compile(r"\b(?:airlock|air lock|airlocks)\b"), "airlock", "airlock"),
+    (re.compile(r"\b(?:door|doors|locked door)\b"), "door", "locked door"),
+    (re.compile(r"\b(?:ship|my ship|pad|landing pad)\b"), "ship", "ship"),
+)
+_RESET = re.compile(r"\b(?:reset|forget|redo)\b.*\bsettlement\b.*\b(?:map|calibration|maps)\b")
+
+
+def default_path():
+    return paths.DATA_DIR / "settlement_calibration.json"
+
+
+def cmath_phase(z):
+    return math.atan2(z.imag, z.real)
+
+
+def world_xy(lat, lon, ref_lat, ref_lon, radius):
+    """Metres east and north of the reference point."""
+    k = radius * math.pi / 180.0
+    return (lon - ref_lon) * k * math.cos(math.radians(ref_lat)), (lat - ref_lat) * k
+
+
+def map_points(data):
+    """The named spots a map has: power regulator, alarm console and (when it has exactly one landing pad) the pad's centre."""
+    found = {}
+    for marker in data.get("markers", []):
+        kind = marker.get("type")
+        if kind == "power" and "power" not in found:
+            found["power"] = (float(marker["x"]), float(marker["y"]))
+        elif kind == "alarm" and "alarm" not in found:
+            found["alarm"] = (float(marker["x"]), float(marker["y"]))
+    centres = {(round(float(c["x"])), round(float(c["y"]))) for c in data.get("circles", [])}
+    pads = data.get("pads")
+    if len(centres) == 1 and pads and sum(int(v or 0) for v in pads.values()) == 1:
+        found["pad"] = (float(data["circles"][0]["x"]), float(data["circles"][0]["y"]))
+    return found
+
+
+def feature_of(label):
+    said = str(label or "").lower()
+    if "power" in said:
+        return "power"
+    if "alarm" in said:
+        return "alarm"
+    if said.strip() in ("pad", "landing pad", "my pad", "the pad"):
+        return "pad"
+    if "terminal" in said or "kiosk" in said:
+        return "terminal"
+    if any(word in said for word in ("door", "airlock", "air lock", "entrance")):
+        return "entry"
+    return None
+
+
+def fit(pairs):
+    """pairs: [((map_x, map_y_down), (east, north))...]. Returns (a, t, rms metres): world = a * map + t, with the map drawn y UP."""
+    z = [complex(p[0], -p[1]) for p, _ in pairs]
+    w = [complex(q[0], q[1]) for _, q in pairs]
+    zc, wc = sum(z) / len(z), sum(w) / len(w)
+    num = sum((zi - zc).conjugate() * (wi - wc) for zi, wi in zip(z, w))
+    den = sum(abs(zi - zc) ** 2 for zi in z)
+    a = num / den
+    t = wc - a * zc
+    rms = math.sqrt(sum(abs(wi - (a * zi + t)) ** 2 for zi, wi in zip(z, w)) / len(z))
+    return a, t, rms
+
+
+class Calibration:
+    def __init__(self, map_id, a, t, ref_lat, ref_lon, radius):
+        self.map_id, self.a, self.t = map_id, complex(a), complex(t)
+        self.ref_lat, self.ref_lon, self.radius = ref_lat, ref_lon, radius
+
+    def to_map(self, lat, lon):
+        east, north = world_xy(lat, lon, self.ref_lat, self.ref_lon, self.radius)
+        z = (complex(east, north) - self.t) / self.a
+        return z.real, -z.imag
+
+    def from_world(self, east, north):
+        """A place given as metres east and north of the reference point, as a point on the map."""
+        z = (complex(east, north) - self.t) / self.a
+        return z.real, -z.imag
+
+    def turn_degrees(self):
+        """How far to turn the map picture so that north is at the top."""
+        return math.degrees(math.atan2(self.a.imag, self.a.real))
+
+    def arrow_angle(self, heading):
+        """Degrees clockwise from the top of the map for a game heading (0 = north, clockwise)."""
+        h = math.radians(float(heading))
+        u = complex(math.sin(h), math.cos(h)) / self.a
+        return math.degrees(math.atan2(u.real, u.imag)) % 360.0
+
+    def to_json(self):
+        return {"map": self.map_id, "a": [self.a.real, self.a.imag], "t": [self.t.real, self.t.imag],
+                "ref": [self.ref_lat, self.ref_lon], "radius": self.radius}
+
+    @classmethod
+    def from_json(cls, data):
+        return cls(data["map"], complex(*data["a"]), complex(*data["t"]), data["ref"][0], data["ref"][1], data["radius"])
+
+
+class SettlementTracker:
+    def __init__(self, state_provider, maps, view, path=None):
+        self.state_provider, self.maps, self.view = state_provider, maps, view
+        self.path = path or default_path()
+        self.settlement = None          # what the journal said about the settlement you are at
+        self.anchors = {}               # feature -> (east, north) metres from the settlement's reference point
+        self.spots = []                 # [(kind, east, north)] every place you stood at that the map can match (terminals, power...)
+        self.calibration = None
+        self.dismissed = False          # you said "hide the settlement map": it stays hidden until the next settlement
+        self._was_on_foot = False
+        self._last_focus = 0
+        self.auto_shown = False         # the map on screen was put there by this tracker (so this tracker may take it down)
+        self.saved = {}
+        self._load()
+
+    # ---- file ----
+    def _load(self):
+        try:
+            with open(self.path, encoding="utf-8") as handle:
+                data = json.load(handle)
+            self.saved = data if isinstance(data, dict) else {}
+        except (OSError, ValueError):
+            self.saved = {}
+
+    def _save(self):
+        try:
+            temp = str(self.path) + ".tmp"
+            with open(temp, "w", encoding="utf-8") as handle:
+                json.dump(self.saved, handle, indent=1)
+            os.replace(temp, self.path)
+        except OSError:
+            log.exception("Could not save the settlement calibration")
+
+    # ---- journal ----
+    def on_entry(self, entry, silent=False):
+        if silent or not isinstance(entry, dict):
+            return
+        name = entry.get("event")
+        try:
+            if name == "ApproachSettlement" and entry.get("Latitude") is not None:
+                self._approach(entry)
+            elif name in ("SupercruiseEntry", "FSDJump", "Shutdown"):
+                self._leave()
+            elif self.settlement is not None:
+                if name in ("DockingRequested", "Docked") and "LandingPads" in entry:
+                    self.settlement["pads"] = {k: int(entry["LandingPads"].get(k, 0) or 0) for k in ("Small", "Medium", "Large")}
+                    self._choose()
+                if name in ("Docked", "Touchdown"):
+                    self._ship_landed()
+        except Exception:
+            log.exception("The settlement tracker could not handle %s", name)
+
+    def _approach(self, entry):
+        economy = str(entry.get("StationEconomy") or "").lower()
+        market = str(entry.get("MarketID") or entry.get("Name") or "")
+        self.settlement = {"name": entry.get("Name"), "market": market, "group": GROUP_OF_ECONOMY.get(economy), "pads": None,
+                           "lat": float(entry["Latitude"]), "lon": float(entry["Longitude"]), "radius": None, "map": None}
+        self.anchors = {}
+        self.spots = []
+        self.calibration = None
+        self.dismissed = False
+        self.view.position = None
+        known = self.saved.get(market)
+        if known:
+            try:
+                self.calibration = Calibration.from_json(known)
+                self.settlement["map"] = known["map"]
+                log.info("Settlement %s: map %s, calibration remembered", self.settlement["name"], known["map"])
+            except (KeyError, TypeError, ValueError, IndexError):
+                self.calibration = None
+
+    def _leave(self):
+        self.settlement, self.anchors, self.calibration, self.spots = None, {}, None, []
+        self.view.position = None
+        if self.auto_shown:
+            self.view.current = None
+        self.auto_shown = False
+
+    def _choose(self):
+        """Group + pad counts: when exactly one map matches it is the suggestion."""
+        s = self.settlement
+        if s is None or s.get("map"):
+            return
+        candidates = self.candidates()
+        if len(candidates) == 1:
+            s["map"] = candidates[0]["id"]
+            log.info("Settlement %s looks like %s (group %s, pads %s)", s["name"], s["map"], s["group"], s["pads"])
+
+    def candidates(self):
+        s = self.settlement
+        if s is None or not s.get("group"):
+            return []
+        found = []
+        for data in self.maps.maps.values():
+            if data.get("group") != s["group"]:
+                continue
+            pads = data.get("pads")
+            if s.get("pads") is not None and pads is not None and {k: int(pads.get(k, 0) or 0) for k in ("Small", "Medium", "Large")} != s["pads"]:
+                continue
+            found.append(data)
+        return found
+
+    def set_dismissed(self, value):
+        """The voice command hid (True) or showed (False) the map by hand: the tracker must not fight that."""
+        self.dismissed = bool(value)
+        self.auto_shown = False
+        if value:
+            self.view.target = None
+
+    def suggestion(self):
+        """The map id for the settlement you are at, or None."""
+        if self.settlement is None:
+            return None
+        return self.settlement.get("map")
+
+    def _ship_landed(self):
+        state = self.state_provider()
+        if state is None or getattr(state, "latitude", None) is None or self.settlement is None:
+            return
+        self.settlement["radius"] = state.planet_radius
+        self.anchors["pad"] = world_xy(state.latitude, state.longitude, self.settlement["lat"], self.settlement["lon"], state.planet_radius)
+        self._add_spot("pad", self.anchors["pad"])
+
+    # ---- marking spots ----
+    def on_mark(self, label, here):
+        """Called when you mark a spot. Returns an extra sentence (or None)."""
+        feature = feature_of(label)
+        s = self.settlement
+        if feature is None or s is None or here is None:
+            return None
+        radius = here.get("radius") or s.get("radius")
+        if not radius:
+            return None
+        s["radius"] = radius
+        point = world_xy(here["lat"], here["lon"], s["lat"], s["lon"], radius)
+        self.anchors[feature] = point
+        self._add_spot(feature, point)
+        return self._line_up()
+
+    def _add_spot(self, kind, point):
+        for other, east, north in self.spots:
+            if other == kind and math.hypot(east - point[0], north - point[1]) < SAME_SPOT_METRES:
+                return False
+        self.spots.append((kind, point[0], point[1]))
+        del self.spots[:-40]
+        return True
+
+    def _line_up(self, speak=True):
+        """Tries to line the map up with the spots so far. Returns a sentence for the marking command (or None)."""
+        s = self.settlement
+        if s is None or self.calibration is not None:
+            return None
+        map_id = s.get("map") or self.view.current
+        if "power" in self.anchors and "alarm" in self.anchors and map_id:
+            done = self._calibrate(map_id)                         # the two-spot way, as before
+            if done:
+                return done
+        found = self._solve(map_id)
+        if found:
+            return found
+        have = [f for f in ("power", "alarm") if f in self.anchors]
+        if len(have) == 1 and map_id:
+            return "Now mark the %s, or stand at a few terminals and mark those." % ("alarm console" if have[0] == "power" else "power regulator")
+        count = len([1 for kind, _, _ in self.spots if kind != "pad"])
+        if not speak:
+            return None
+        if count < settlement_solve.MIN_SPOTS:
+            return "Stand at %d more terminals (or the power regulator, or the alarm console) and the map will line itself up." % (settlement_solve.MIN_SPOTS - count)
+        return "I cannot tell which way the map turns yet. Mark another terminal that is further away."
+
+    def _solve(self, map_id):
+        s = self.settlement
+        if map_id:
+            options = [self.maps.get(map_id)]
+        else:
+            options = self.candidates()
+        results = []
+        for data in options:
+            if data is None:
+                continue
+            result = settlement_solve.solve(data, self.spots)
+            if result and settlement_solve.clear(result) and METRES_PER_UNIT[0] <= abs(result["a"]) <= METRES_PER_UNIT[1]:
+                results.append((result["error"], data, result))
+        if not results:
+            return None
+        results.sort(key=lambda row: row[0])
+        if len(results) > 1 and results[1][0] < results[0][0] * 1.4 + 5.0:
+            return None                                              # two layouts fit about equally: not sure which one this is
+        error, data, result = results[0]
+        self.calibration = Calibration(data["id"], result["a"], result["t"], s["lat"], s["lon"], s["radius"])
+        s["map"] = data["id"]
+        self.saved[s["market"]] = self.calibration.to_json()
+        self._save()
+        log.info("Settlement map %s lined up from %d spots: %.3f m per unit, turned %.0f degrees, average miss %.0f units",
+                 data["id"], result["n"], abs(result["a"]), math.degrees(cmath_phase(result["a"])), error)
+        return "Got it: this is the %s map and it is lined up. You are on it now." % data.get("name", data["id"])
+
+    def _calibrate(self, map_id):
+        data = self.maps.get(map_id)
+        s = self.settlement
+        if data is None or s is None or not s.get("radius"):
+            return None
+        points = map_points(data)
+        pairs = [(points[f], self.anchors[f][:2]) for f in ("power", "alarm") if f in self.anchors and f in points]
+        if len(pairs) < 2:
+            return None
+        if math.hypot(pairs[0][1][0] - pairs[1][1][0], pairs[0][1][1] - pairs[1][1][1]) < MIN_APART_METRES:
+            return "Those two spots are too close together: stand at the power regulator and at the alarm console, which are further apart."
+        a, t, rms = fit(pairs)
+        if not METRES_PER_UNIT[0] <= abs(a) <= METRES_PER_UNIT[1]:
+            return "That does not fit the %s map (the distances are the wrong size), so I did not use it. Say reset settlement map and try again." % data.get("name", map_id)
+        note = ""
+        pad = self.anchors.get("pad")
+        if pad and "pad" in points:                                  # the ship's own pad as a check (not used when it disagrees)
+            a3, t3, rms3 = fit(pairs + [(points["pad"], pad[:2])])
+            if rms3 <= MAX_PAD_ERROR_METRES:
+                a, t, note = a3, t3, " (checked against your landing pad too)"
+        self.calibration = Calibration(map_id, a, t, s["lat"], s["lon"], s["radius"])
+        s["map"] = map_id
+        self.saved[s["market"]] = self.calibration.to_json()
+        self._save()
+        self.view.current = self.view.current or map_id
+        log.info("Settlement map %s fitted: %.3f m per unit, turned %.0f degrees%s", map_id, abs(a), math.degrees(math.atan2(a.imag, a.real)), note)
+        return "Got it: the %s map is lined up%s. You are on it now." % (data.get("name", map_id), note)
+
+    # ---- Status.json ----
+    def on_status(self, state):
+        try:
+            self._status(state)
+        except Exception:
+            log.exception("The settlement tracker could not use a position")
+
+    def _status(self, state):
+        lat = getattr(state, "latitude", None)
+        s = self.settlement
+        on_foot = bool(getattr(state, "status_flags2", 0) & 1)
+        focus = int(getattr(state, "gui_focus", 0) or 0)
+        near = None
+        if s is not None and lat is not None:
+            radius = s.get("radius") or getattr(state, "planet_radius", None)
+            if radius:
+                east, north = world_xy(lat, state.longitude, s["lat"], s["lon"], radius)
+                near = math.hypot(east, north)
+                s["radius"] = radius
+                self._maybe_terminal(on_foot, focus, east, north, near)
+        self._last_focus = focus
+        self._show_or_hide(on_foot, near)
+        cal = self.calibration
+        if cal is None or lat is None or near is None or near > FORGET_AFTER_METRES:
+            self.view.position = None
+            self.view.turn = None
+            self.view.target = None
+            return
+        x, y = cal.to_map(lat, state.longitude)
+        heading = getattr(state, "heading", None)
+        self.view.turn = cal.turn_degrees() if self.view.current == cal.map_id else None
+        angle = None
+        if heading is not None:
+            angle = float(heading) % 360.0 if self.view.turn is not None else cal.arrow_angle(heading)      # turned north-up: the heading is the arrow
+        self.view.position = {"x": x, "y": y, "angle": angle}
+        target = self.view.target
+        if target is not None and math.hypot(x - target["x"], y - target["y"]) * abs(cal.a) < ARRIVED_METRES:
+            self.view.target = None                               # you are there
+
+    def _maybe_terminal(self, on_foot, focus, east, north, near):
+        """Opening a terminal screen while on foot is a free "I am at a terminal" mark. (Whether focus 5 really is that screen at a
+        settlement is a guess: the recorder keeps the focus numbers so the next visit settles it.)"""
+        if self.calibration is not None or not on_foot or near > SHOW_WITHIN_METRES:
+            return
+        if focus == FOCUS_AT_TERMINAL and self._last_focus != FOCUS_AT_TERMINAL:
+            if self._add_spot("terminal", (east, north)):
+                log.info("Settlement: terminal screen opened %.0f m from the reference point (%d spots)", near, len(self.spots))
+                self._line_up(speak=False)
+
+    def _show_or_hide(self, on_foot, near):
+        """The map comes up when you step out near a settlement we have a map for, and goes when you get back in or leave."""
+        s = self.settlement
+        want = (s is not None and not self.dismissed and on_foot and near is not None and near <= SHOW_WITHIN_METRES
+                and bool(s.get("map")))
+        if want and self.view.current is None:
+            self.view.current = s["map"]
+            self.view.shown_at = time.monotonic()
+            self.auto_shown = True
+        elif want and self.view.current is not None and self.auto_shown:
+            self.view.shown_at = time.monotonic()              # still here: do not let the 15 minute timer take it down
+        elif not want and self.auto_shown and self.view.current is not None:
+            self.view.current = None
+            self.auto_shown = False
+        if self.view.current is None:
+            self.auto_shown = False
+
+    # ---- voice ----
+    def try_handle(self, text):
+        said = re.sub(r"[^a-z ]", " ", str(text or "").lower())
+        said = re.sub(r"\s+", " ", said).strip()
+        pointed = self._point(said)
+        if pointed is not None:
+            return pointed
+        if not _RESET.search(said):
+            return None
+        s = self.settlement
+        if s is not None:
+            self.saved.pop(s["market"], None)
+            self._save()
+            s["map"] = None
+            self._choose()
+        self.anchors, self.calibration, self.spots = {}, None, []
+        self.view.position = None
+        return "Settlement map reset. Walk to a few terminals and say mark spot terminal at each."
+
+    # ---- the arrow ("find the power plant") ----
+    def _on_foot(self):
+        state = self.state_provider()
+        return state is not None and bool(getattr(state, "status_flags2", 0) & 1)
+
+    def _point(self, said):
+        """Voice: point the arrow at something, or take it away. Only answers when you are on foot at a settlement we know."""
+        if self.settlement is None or not self._on_foot():
+            return None
+        if _STOP.search(said) and self.view.target is not None:
+            self.view.target = None
+            return "Arrow off."
+        if not _FIND.search(said):
+            return None
+        wanted = next(((kind, name) for pattern, kind, name in _TARGETS if pattern.search(said)), None)
+        if wanted is None:
+            return None
+        kind, name = wanted
+        cal, where = self.calibration, self.view.position
+        if cal is None or not where:
+            return "I cannot place you on the settlement map yet, so I cannot point. Open a few terminals, or say mark spot terminal at each, and I will line the map up."
+        found = self._nearest(kind, where, cal)
+        if found is None:
+            return "I do not see a %s on this map." % name
+        x, y, metres, floor = found
+        label = ("nearest " if kind in ("terminal", "door", "airlock") else "") + name
+        self.view.target = {"x": x, "y": y, "label": label}
+        self.view.shown_at = time.monotonic()
+        if self.view.current is None:
+            self.view.current, self.auto_shown = cal.map_id, False
+        step = cal.a * complex(x - where["x"], -(y - where["y"]))          # the way to it in metres east / north
+        east, north = step.real, step.imag
+        bearing = math.degrees(math.atan2(east, north)) % 360.0
+        state = self.state_provider()
+        heading = getattr(state, "heading", None)
+        way = relative_words(bearing, heading) if heading is not None else compass_words(bearing)
+        extra = ", upstairs" if floor == "up" else ""
+        return "The %s is about %d metres %s%s. The arrow on the map points to it." % (label, max(1, round(metres / 5.0) * 5 if metres > 12 else round(metres)), way, extra)
+
+    def _nearest(self, kind, where, cal):
+        if kind == "ship":
+            pad = self.anchors.get("pad")
+            if pad is None:
+                return None
+            x, y = cal.from_world(pad[0], pad[1])
+            return x, y, math.hypot(x - where["x"], y - where["y"]) * abs(cal.a), None
+        data = self.maps.get(cal.map_id)
+        if data is None:
+            return None
+        best = None
+        for marker in data.get("markers", []):
+            mtype = str(marker.get("type") or "")
+            if kind == "terminal" and not mtype.startswith("terminal"):
+                continue
+            if kind in ("power", "alarm", "airlock", "door") and mtype != kind:
+                continue
+            x, y = float(marker["x"]), float(marker["y"])
+            dist = math.hypot(x - where["x"], y - where["y"]) * abs(cal.a)
+            if best is None or dist < best[2]:
+                best = (x, y, dist, "up" if mtype == "terminal_above" else None)
+        return best
+
+
+def compass_words(bearing):
+    names = ("north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west")
+    return "to the " + names[int(((bearing % 360.0) + 22.5) // 45) % 8]
+
+
+def relative_words(bearing, heading):
+    """Where something is compared with the way you are facing."""
+    turn = (bearing - float(heading) + 180.0) % 360.0 - 180.0
+    if abs(turn) <= 25:
+        return "straight ahead"
+    if abs(turn) >= 155:
+        return "behind you"
+    side = "right" if turn > 0 else "left"
+    return ("ahead and to the %s" if abs(turn) < 70 else "to the %s" if abs(turn) < 110 else "behind you and to the %s") % side
