@@ -13,7 +13,8 @@ SCALES = (0.30, 0.325, 0.35)
 TURN_STEP = 3                       # degrees
 CAP_UNITS = 60.0                    # a spot further than this from every matching feature counts as 60 (a miss)
 GOOD_UNITS = 22.0                   # average error (map units, about 7 m) a believable answer must beat
-MIN_SPOTS = 3
+MIN_SPOTS = 4                       # when the layout is already known; 5 when she has to choose between layouts (SPOTS_TO_CHOOSE)
+SPOTS_TO_CHOOSE = 5
 MIN_APART_METRES = 20.0
 SEPARATE_DEGREES = 20.0             # answers closer in turn than this are the same answer
 
@@ -44,13 +45,26 @@ def _to_map(a, t, east, north):
 
 
 def _cost(a, t, spots, feats):
-    total = 0.0
-    for kind, east, north in spots:
+    """Average miss in map units. Each feature can explain only ONE spot (two spots 20 m apart cannot both be the same terminal)."""
+    options = []
+    for index, (kind, east, north) in enumerate(spots):
         x, y = _to_map(a, t, east, north)
-        points = feats.get(kind) or ()
-        best = min((math.hypot(x - u, y - v) for u, v in points), default=CAP_UNITS)
-        total += min(best, CAP_UNITS)
-    return total / len(spots)
+        for number, (u, v) in enumerate(feats.get(kind) or ()):
+            miss = math.hypot(x - u, y - v)
+            if miss < CAP_UNITS:
+                options.append((miss, index, kind, number))
+    options.sort()
+    taken, used, total = set(), set(), 0.0
+    for miss, index, kind, number in options:
+        if index in used or (kind, number) in taken:
+            continue
+        used.add(index)
+        taken.add((kind, number))
+        total += miss
+        # a feature of the combined 'stop' kind is also a feature of its own kind: block both names
+        if kind == "stop":
+            taken.add(("alias", number))
+    return (total + CAP_UNITS * (len(spots) - len(used))) / len(spots)
 
 
 def _spread(spots):
@@ -61,12 +75,12 @@ def _spread(spots):
     return far
 
 
-def solve(data, spots):
+def solve(data, spots, minimum=None):
     """spots: [(kind, east_m, north_m)]. Returns {"a", "t", "error", "next", "n"} or None when there is no clear answer.
     error = average miss in map units for the best answer, next = the same for the best answer that turns the map differently."""
     feats = features(data)
     spots = [s for s in spots if s[0] != "pad" and feats.get(s[0])]          # the pad is only roughly where the ship sat on the circle: left out
-    if len(spots) < MIN_SPOTS or _spread(spots) < MIN_APART_METRES:
+    if len(spots) < (minimum or MIN_SPOTS) or _spread(spots) < MIN_APART_METRES:
         return None
     anchor = spots[0]
     tries = []
@@ -119,8 +133,13 @@ def _refine(a, t, spots, feats):
     return na, wc - na * zc
 
 
+SCALE_RANGE = (0.295, 0.355)         # every real settlement measured so far is 0.325 m per unit (Shi); a fit far from that is a coincidence
+
+
 def clear(result):
     """True when the answer is good enough and clearly better than the best different one."""
     if not result:
+        return False
+    if not SCALE_RANGE[0] <= abs(result["a"]) <= SCALE_RANGE[1]:
         return False
     return result["error"] <= GOOD_UNITS and result["next"] >= result["error"] * 1.4 + 5.0

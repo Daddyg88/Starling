@@ -187,6 +187,8 @@ class Helpers(Setup):
         said = None
         for lat, lon in (T1, T2, T3)[:count]:
             said = self.tracker.on_mark("terminal", here(lat, lon))
+        if count >= 3:
+            said = self.tracker.on_mark("power regulator", here(*POWER))          # a fourth spot: four are needed
         return said
 
     def walk(self, lat, lon, on_foot=True, heading=90.0):
@@ -203,7 +205,7 @@ class Helpers(Setup):
 class WithoutPowerOrAlarm(Helpers):
     """The map lines itself up from terminals alone: nobody has to visit the power regulator or the alarm."""
 
-    def test_three_terminals_line_the_map_up(self):
+    def test_three_terminals_and_the_power_regulator_line_the_map_up(self):
         self.arrive()
         self.terminals()
         cal = self.tracker.calibration
@@ -224,13 +226,13 @@ class WithoutPowerOrAlarm(Helpers):
             self.tracker.on_status(self.state)
             clock[0] += 1.0
 
-    def test_standing_still_at_three_terminals_lines_the_map_up(self):
+    def test_standing_still_at_four_places_lines_the_map_up(self):
         clock = [100.0]
         self.tracker.clock = lambda: clock[0]
         self.arrive()
         self.state.latitude, self.state.longitude, self.state.status_flags2 = SHIP[0], SHIP[1], 1
         self.tracker.on_status(self.state)                                  # stepping out of the ship
-        for lat, lon in (T1, T2, T3):
+        for lat, lon in (T1, T2, T3, POWER):
             self.stand(lat, lon, 8, clock)
         self.assertIsNotNone(self.tracker.calibration)
         self.assertEqual(self.tracker.suggestion(), "industrial_2")
@@ -429,3 +431,13 @@ class ShippedLineUp(Setup):
         self.assertAlmostEqual(self.view.position["x"], 630, delta=40)           # standing at the alarm console
         self.assertAlmostEqual(self.view.position["y"], 290, delta=40)
         self.assertEqual(self.view.position["angle"], 20.0)
+
+
+class OldSavedLineUps(Setup):
+    def test_a_line_up_saved_by_an_older_version_is_not_trusted(self):
+        import json
+        self.path.write_text(json.dumps({"4365483779": {"map": "industrial_2", "a": [0.1, 0.3], "t": [0, 0], "ref": [50.64, -110.65], "radius": RADIUS}}))
+        again = SettlementTracker(lambda: self.state, self.maps, MapView(), self.path)
+        again.known = again.shipped = {}
+        again.on_entry(dict(APPROACH))
+        self.assertIsNone(again.calibration)

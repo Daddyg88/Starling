@@ -1538,3 +1538,7 @@ window use the same code as the biology list.
 ## 0.92.6 - standing still on foot = a stop
 
 * Diagnostics 20261110-173027 (0.92.5): no journal event and no GuiFocus (not in the on-foot Status fields) when a terminal is used, so the GuiFocus guess is removed. Trails show 6-10 s stationary stretches exactly at terminals. navigation/settlement_track.py `_dwell` (DWELL_SECONDS 6, STILL_METRES 2.5, GOT_OUT_METRES 15) adds a 'stop' spot (matches terminal, power regulator or alarm in navigation/settlement_solve.py `features`) and calls `_line_up`. tests `WithoutPowerOrAlarm` dwell tests.
+
+## 0.92.7 - a stricter line-up
+
+* Diagnostics 20261110-183217: extraction_3 lined up from 3 stops (miss 1 unit, scale 0.276) and was wrong. Simulation (spots sampled from one layout, solved against another): false accepts 15/120 with 3 spots, 3/120 with 4, 0/120 with 5 and 6. navigation/settlement_solve.py: `_cost` matches each feature to one spot only; `clear` needs scale 0.295-0.355; MIN_SPOTS 4, SPOTS_TO_CHOOSE 5 (used when no layout is chosen yet). Calibration JSON carries `v: 2`; saved line-ups without it are ignored (navigation/settlement_track.py). Tests updated.

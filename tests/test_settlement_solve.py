@@ -12,6 +12,9 @@ REF = (50.642288, -110.657997)
 TERMINALS = [(50.641743, -110.668892), (50.639, -110.653786), (50.640373, -110.651436)]
 
 
+POWER_SPOT = [("power",) + world_xy(50.635338, -110.663132, REF[0], REF[1], RADIUS)]
+
+
 def spots(points=TERMINALS):
     return [("terminal",) + world_xy(lat, lon, REF[0], REF[1], RADIUS) for lat, lon in points]
 
@@ -20,19 +23,20 @@ class Solving(unittest.TestCase):
     def setUp(self):
         self.maps = SettlementMaps()
 
-    def test_three_real_terminals_find_the_right_turn(self):
-        result = settlement_solve.solve(self.maps.get("industrial_2"), spots())
+    def test_real_terminals_find_the_right_turn(self):
+        result = settlement_solve.solve(self.maps.get("industrial_2"), spots() + POWER_SPOT)
         self.assertTrue(settlement_solve.clear(result))
         self.assertAlmostEqual(math.degrees(cmath.phase(result["a"])), 111, delta=8)
         self.assertAlmostEqual(abs(result["a"]), 0.33, delta=0.03)
 
     def test_the_other_layouts_do_not_fit(self):
         for map_id in ("industrial_1", "industrial_3", "extraction_1", "military_2", "tourist_1", "agriculture_3"):
-            self.assertFalse(settlement_solve.clear(settlement_solve.solve(self.maps.get(map_id), spots())), map_id)
+            self.assertFalse(settlement_solve.clear(settlement_solve.solve(self.maps.get(map_id), spots() + POWER_SPOT)), map_id)
 
     def test_too_few_spots_or_spots_too_close_give_nothing(self):
         data = self.maps.get("industrial_2")
         self.assertIsNone(settlement_solve.solve(data, spots(TERMINALS[:2])))
+        self.assertIsNone(settlement_solve.solve(data, spots()))                  # three are not enough any more
         close = [("terminal", 0.0, 0.0), ("terminal", 3.0, 1.0), ("terminal", 5.0, 5.0)]
         self.assertIsNone(settlement_solve.solve(data, close))
 
@@ -40,9 +44,15 @@ class Solving(unittest.TestCase):
         data = self.maps.get("industrial_2")
         self.assertIsNone(settlement_solve.solve(data, spots(TERMINALS[:2]) + [("coffee",) + (0.0, 0.0)]))
 
+    def test_two_spots_cannot_be_the_same_terminal(self):
+        data = self.maps.get("industrial_2")
+        spot = spots()[0]
+        same = [spot, (spot[0], spot[1] + 25.0, spot[2]), (spot[0], spot[1] - 25.0, spot[2]), (spot[0], spot[1], spot[2] + 25.0)]
+        self.assertFalse(settlement_solve.clear(settlement_solve.solve(data, [("terminal",) + s[1:] for s in same])))
+
     def test_one_stray_spot_among_four_does_not_spoil_it(self):
         stray = ("terminal", 400.0, 400.0)
-        result = settlement_solve.solve(self.maps.get("industrial_2"), spots() + [stray])
+        result = settlement_solve.solve(self.maps.get("industrial_2"), spots() + POWER_SPOT + [stray])
         self.assertAlmostEqual(math.degrees(cmath.phase(result["a"])), 111, delta=10)
 
 

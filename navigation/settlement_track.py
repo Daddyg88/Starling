@@ -152,7 +152,7 @@ class Calibration:
         return math.degrees(math.atan2(u.real, u.imag)) % 360.0
 
     def to_json(self):
-        return {"map": self.map_id, "a": [self.a.real, self.a.imag], "t": [self.t.real, self.t.imag],
+        return {"v": 2, "map": self.map_id, "a": [self.a.real, self.a.imag], "t": [self.t.real, self.t.imag],
                 "ref": [self.ref_lat, self.ref_lon], "radius": self.radius}
 
     @classmethod
@@ -233,7 +233,10 @@ class SettlementTracker:
         self.view.position = None
         if self.known.get(market) and self.maps.get(self.known[market]) is not None:
             self.settlement["map"] = self.known[market]
-        known = self.saved.get(market) or self.shipped.get(market)
+        known = self.saved.get(market)
+        if known is not None and known.get("v") != 2:
+            known = None                       # saved by an older, less careful line-up: not trusted
+        known = known or self.shipped.get(market)
         if known:
             try:
                 self.calibration = Calibration.from_json(known)
@@ -350,8 +353,9 @@ class SettlementTracker:
         count = len([1 for kind, _, _ in self.spots if kind != "pad"])
         if not speak:
             return None
-        if count < settlement_solve.MIN_SPOTS:
-            return "Stand at %d more terminals (or the power regulator, or the alarm console) and the map will line itself up." % (settlement_solve.MIN_SPOTS - count)
+        need = settlement_solve.MIN_SPOTS if map_id else settlement_solve.SPOTS_TO_CHOOSE
+        if count < need:
+            return "Stand at %d more terminals (or the power regulator, or the alarm console) and the map will line itself up." % (need - count)
         return "I cannot tell which way the map turns yet. Mark another terminal that is further away."
 
     def _solve(self, map_id):
@@ -364,7 +368,7 @@ class SettlementTracker:
         for data in options:
             if data is None:
                 continue
-            result = settlement_solve.solve(data, self.spots)
+            result = settlement_solve.solve(data, self.spots, None if map_id else settlement_solve.SPOTS_TO_CHOOSE)
             if result and settlement_solve.clear(result) and METRES_PER_UNIT[0] <= abs(result["a"]) <= METRES_PER_UNIT[1]:
                 results.append((result["error"], data, result))
         if not results:
