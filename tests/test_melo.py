@@ -111,6 +111,20 @@ class MeloTests(unittest.TestCase):
 class PrivateInstallTests(unittest.TestCase):
     """The worker program, the engine that talks to it, and the installer (all with fakes: nothing is downloaded)."""
 
+    def test_the_install_programs_are_never_told_to_stay_offline(self):
+        import os
+        from tts import melo_install
+        os.environ["HF_HUB_OFFLINE"] = "1"          # Starling sets this in itself after the Kokoro voice is downloaded
+        os.environ["TRANSFORMERS_OFFLINE"] = "1"
+        try:
+            env = melo_install.online_env()
+            self.assertNotIn("HF_HUB_OFFLINE", env)
+            self.assertNotIn("TRANSFORMERS_OFFLINE", env)
+            self.assertEqual(os.environ["HF_HUB_OFFLINE"], "1")      # her own process is left alone
+        finally:
+            os.environ.pop("HF_HUB_OFFLINE", None)
+            os.environ.pop("TRANSFORMERS_OFFLINE", None)
+
     def test_the_engine_talks_to_a_real_worker_process_in_fake_mode(self):
         import sys
         engine = melo_voice.MeloEngine(python=sys.executable, worker_args=["--fake"])

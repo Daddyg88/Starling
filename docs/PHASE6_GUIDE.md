@@ -1483,3 +1483,7 @@ window use the same code as the biology list.
 ## 0.90.1 - no auto pips for the scanners
 
 * control/combat_assist.py fighting(): analysis mode (hardpoints in) only counts while mining_until is in the future, so the Discovery and Composition scanners get no pips; tests/test_combat_assist.py.
+
+## 0.90.2 - Australian voice install fix
+
+* tts/melo_install.py online_env() strips HF_HUB_OFFLINE/TRANSFORMERS_OFFLINE for the install and the worker (tts/melo_voice.py); tests/test_melo.py.

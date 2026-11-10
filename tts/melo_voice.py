@@ -59,6 +59,11 @@ def resample(audio, source_rate, target_rate=OUTPUT_RATE):
         return np.interp(positions, np.arange(audio.size), audio).astype(np.float32)
 
 
+def _online_env():
+    from tts.melo_install import online_env
+    return online_env()
+
+
 class MeloEngine:
     """Looks like Kokoro's engine: engine(text, voice=..., speed=...) gives pieces of sound at 24000 Hz.
 
@@ -117,7 +122,7 @@ class MeloEngine:
         script = Path(__file__).with_name("melo_worker.py")
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         process = self._popen([str(python), str(script)] + self._worker_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                              stderr=subprocess.DEVNULL, text=True, bufsize=1, creationflags=flags)
+                              stderr=subprocess.DEVNULL, text=True, bufsize=1, creationflags=flags, env=_online_env())
         replies = queue.Queue()
 
         def read():

@@ -4,6 +4,7 @@ It makes a separate Python environment there (the same steps the tester's try-ou
 old version pins, and writes installed.txt when everything worked. Deleting the folder data/melo_env removes the voice completely.
 Needs the internet and several GB of space; it can take 10-20 minutes. install() returns (ok, sentence for the screen).
 """
+import os
 import subprocess
 import sys
 
@@ -96,9 +97,18 @@ def install(progress=print, run=None, python_for_venv=None, free_bytes=None, min
         return False, "The Australian voice install failed: %s" % error
 
 
+def online_env():
+    """The environment for the Australian voice's own programs. Starling switches the Hugging Face 'offline' flag on in itself once the
+    Kokoro voice is downloaded, and a child program inherits it: the install then could not download the voice models (step 5 failed)."""
+    env = dict(os.environ)
+    for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_DATASETS_OFFLINE"):
+        env.pop(name, None)
+    return env
+
+
 def _run(command, log_file):
     with open(log_file, "ab") as handle:
         handle.write(("\n$ " + " ".join(command[:6]) + "\n").encode("utf-8", "replace"))
         handle.flush()
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-        return subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT, creationflags=flags).returncode
+        return subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT, creationflags=flags, env=online_env()).returncode
