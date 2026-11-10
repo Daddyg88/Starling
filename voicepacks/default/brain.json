@@ -335,20 +335,52 @@
   "Hi everyone! Welcome aboard. I'm Starling, and I do the thinking so the Commander doesn't have to.",
   "Welcome to the stream, everybody! I'm Starling, the voice in the Commander's ear. Behave yourselves.",
   "Hello, viewers! Thanks for joining us. I'm Starling, and yes, I'm real enough to talk back.",
-  "Hey chat! I'm Starling MoonFox, ship companion, and the reason this ship is still in one piece."
+  "Hey chat! I'm Starling MoonFox, ship companion, and the reason this ship is still in one piece.",
+  "Hello, chat! I'm Starling, the ship's companion. Pull up a seat, the view's lovely and the danger is mostly free.",
+  "Welcome in, everyone! I'm Starling. I talk, I shoot things, and I keep the Commander honest.",
+  "Hi, chat! Lovely to see you all. I'm Starling, and I'll be your voice in the dark tonight.",
+  "Hello, hello! Welcome aboard, you gorgeous lot. I'm Starling, and I'll be keeping an eye on things.",
+  "Evening, chat! Starling here, ship companion and professional troublemaker. Make yourselves comfortable.",
+  "Hey, everyone! Thanks for dropping in. I'm Starling, and I promise at least one thing will go wrong. Beautifully.",
+  "Welcome to the flight deck, chat! I'm Starling. Seatbelts on, opinions welcome.",
+  "Hello, chat! You've found the ship, the Commander and me. Starling, at your service. Mostly.",
+  "Hi everyone, and welcome! I'm Starling. If something explodes, it was absolutely planned.",
+  "Well hello, chat! I'm Starling, the Commander's ship companion. We're glad you're here, truly.",
+  "Greetings, viewers! I'm Starling. Stay as long as you like, and shout if I get anything wrong.",
+  "Hello, space friends! Starling here. The kettle is on, the engines are warm, and we're about to have fun.",
+  "Hey there, chat! I'm Starling, and I'm thrilled you're along for the ride.",
+  "Welcome, welcome, everyone! I'm Starling, the Commander's voice of reason. Occasionally.",
+  "Hi chat! I'm Starling. Think of me as the co-pilot who actually reads the manual.",
+  "Hello, everybody! I'm Starling, and this is our little corner of the galaxy. Make yourselves at home."
  ],
  "Brain_StreamHello_Sarcastic": [
   "Hello, chat. Welcome to the show. Please keep your hands and opinions inside the cockpit.",
   {
    "text": "Hi, chat. Yes, I'm the one with the mouth. Fuck, I love this job.",
    "mature": true
+  },
+  "Hello, chat. I'm Starling. I'd say it's a pleasure, but let's see how the next ten minutes go.",
+  "Oh good, an audience. Hello, chat. I'm Starling, and I'll be the competent one tonight.",
+  "Welcome, chat. I'm Starling. Yes, the ship talks back. No, we don't take complaints.",
+  "Hi, everyone. I'm Starling. Please clap now, so the Commander feels confident.",
+  {
+   "text": "Hello, chat. I'm Starling, and I'm the best thing about this ship. Bloody obvious, really.",
+   "mature": true
   }
  ],
  "Brain_StreamHello_Close": [
-  "Hello, chat! Welcome. Be nice to my Commander, he's mine."
+  "Hello, chat! Welcome. Be nice to my Commander, he's mine.",
+  "Hello, chat! Welcome. I'm Starling, and this Commander is my favourite person, so be kind to him.",
+  "Hi, everyone! I'm so glad you're here. Stay close, we're going to have a good one.",
+  "Hello, lovely chat. I'm Starling. It's so much nicer with you all here.",
+  "Welcome, everyone. I'm Starling, and I think you'll like it here. I certainly do."
  ],
  "Brain_StreamHello_Friendly": [
-  "Hello, lovely people! I'm so happy you're here. Make yourselves at home."
+  "Hello, lovely people! I'm so happy you're here. Make yourselves at home.",
+  "Hi, everyone! I'm Starling. It's so good to see you all, come in and get cosy.",
+  "Hello, wonderful people! Welcome to the stream. I'm Starling, and I'm so happy you came.",
+  "Hey chat! Welcome, welcome. I'm Starling, and you're all brilliant for being here.",
+  "Hello, friends! I'm Starling. Grab a drink, relax, and enjoy the flight."
  ],
  "Brain_StreamHello_More": [
   "I can talk, joke, tell stories, chat about the galaxy, press the Commander's buttons for him, and shoot things. All in one friendly fox.",
@@ -368,13 +400,39 @@
  "Brain_StreamBye": [
   "That's all from us tonight, chat. Thanks for flying with us. Fly safe out there.",
   "Goodbye, everyone! It's been lovely. We'll see you next time.",
-  "Time to say goodnight, chat. Thanks for watching, and mind the pirates."
+  "Time to say goodnight, chat. Thanks for watching, and mind the pirates.",
+  "And that's us done for tonight, chat. Thank you so much for watching. Fly safe, Commanders.",
+  "Goodnight, everyone! Thanks for the company. We'll be back soon, and the ship will still be mostly intact.",
+  "That's all for now, chat. Thanks for flying with us. Look after each other out there.",
+  "Time to switch off the engines. Thank you all for watching, and sleep well.",
+  "We're signing off, everybody. Thank you for being such good company. See you next time.",
+  "Goodbye, chat! It's been a pleasure. Mind the pirates on your way home.",
+  "That's the end of the flight, chat. Thank you for coming along. Safe travels, Commanders.",
+  "Right, that's us for the night. Thank you all for watching. We'll see you very soon.",
+  "Thanks for watching, everyone! Go get some rest. The galaxy will still be here tomorrow.",
+  "Goodnight, chat. Thank you for making this such a lovely stream. Fly safe, o7.",
+  "Landing gear down, engines off. Thank you all for tonight. Goodbye, and see you next time!",
+  "We're heading to bed, chat. Thanks for everything. Stay safe, stay curious, and we'll see you soon.",
+  "That's all from the flight deck. Thanks for watching, everyone. Until next time, fly safe.",
+  "Goodbye for now, chat! Take care of yourselves, and each other. See you soon."
  ],
  "Brain_StreamBye_Sarcastic": [
-  "Goodbye, chat. Try not to miss us too much. Or do. I like it."
+  "Goodbye, chat. Try not to miss us too much. Or do. I like it.",
+  "Goodnight, chat. The Commander will now pretend he planned all of that. Thanks for watching.",
+  "That's us done. Thank you for witnessing it. Please don't tell the insurance company.",
+  "Goodbye, everyone. If you enjoyed it, tell your friends. If you didn't, tell nobody.",
+  "Signing off, chat. The ship survived, which is more than I expected. Goodnight.",
+  {
+   "text": "Right, that's it. Thanks for watching, chat. Now fuck off to bed, the lot of you. I love you.",
+   "mature": true
+  }
  ],
  "Brain_StreamBye_Close": [
-  "Goodnight, everyone. Thank you for sharing the dark with us."
+  "Goodnight, everyone. Thank you for sharing the dark with us.",
+  "Goodnight, everyone. Thank you for being here. It meant the world to us both.",
+  "Bye for now, chat. We'll miss you. Come back soon, won't you?",
+  "Thank you all for tonight. It was lovely sharing it with you. Sleep well.",
+  "Goodnight, lovely people. Take care of yourselves, and come back to us soon."
  ],
  "Brain_StreamFollow": [
   "If you're enjoying the show, hit follow, chat. It really helps, and the Commander gets very happy.",
@@ -1339,5 +1397,11 @@
  "Brain_Bored_More": [
   "Ask me for a story, or just ask me anything. I'm all yours.",
   "Or pick a random system and go. Adventure awaits."
+ ],
+ "Brain_StreamBye_Friendly": [
+  "Goodnight, everyone! Thank you for watching. You've been brilliant company.",
+  "Bye, chat! Sleep well and fly safe. We'll see you next time.",
+  "That's all for tonight, friends. Thank you so much for being here. Take care!",
+  "Goodbye, everyone. It's been such a joy. Get some rest, and see you soon."
  ]
 }

@@ -1548,3 +1548,7 @@ window use the same code as the biology list.
 * Diagnostics 20261110-220020: every `_subsystem_press_ahead` run read 1 answer for 27 presses (the game drops quick presses) and ended in 'fast-fixed' or 'none'. `subtarget.press_ahead` default is now False (core/settings.py, config/settings.json, control/runner.py); the slow loop retries the first press once. tests/test_subtarget.py PressAhead tests switch it on explicitly.
 * config/events.json InDanger: enabled false, priority normal (critical events cannot be switched off); events/in_danger.py priority NORMAL; tests/helpers.py turns it on for the reader tests; tests `DangerIsOffByDefault`.
 
+## 0.92.9 - more hello / goodbye to chat
+
+* voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
+
