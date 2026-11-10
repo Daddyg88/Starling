@@ -448,10 +448,14 @@ class App:
                 from control.settlement_voice import SettlementMapVoice
                 if self.settlement_maps is not None:
                     tracker = getattr(self, "settlement_tracker", None)
+                    say_it = lambda text: self.speech.say(text=text, priority="normal", event_name="settlement.map")
+                    if tracker is not None:
+                        tracker.say = say_it
                     self.commands.extra_helpers.append(SettlementMapVoice(self.settlement_maps, self.settlement_view,
                                                                           suggest=tracker.suggestion if tracker is not None else None,
                                                                           dismissed=tracker.set_dismissed if tracker is not None else None,
-                                                                          options=tracker.options if tracker is not None else None))
+                                                                          options=tracker.options if tracker is not None else None,
+                                                                          say=say_it))
                     if tracker is not None:
                         self.commands.extra_helpers.append(tracker)
                 if getattr(self, "settlement_recorder", None) is not None:

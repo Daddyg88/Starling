@@ -46,6 +46,16 @@ _TARGETS = (
 _RESET = re.compile(r"\b(?:reset|forget|redo)\b.*\bsettlement\b.*\b(?:map|calibration|maps)\b")
 
 
+def known_settlements():
+    """MarketID -> map id for settlements whose layout is certain (maps/known_settlements.json)."""
+    try:
+        with open(paths.ROOT / "maps" / "known_settlements.json", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return {str(k): str(v) for k, v in data.items() if not str(k).startswith("_")}
+    except (OSError, ValueError, AttributeError):
+        return {}
+
+
 def default_path():
     return paths.DATA_DIR / "settlement_calibration.json"
 
@@ -149,6 +159,9 @@ class SettlementTracker:
         self.dismissed = False          # you said "hide the settlement map": it stays hidden until the next settlement
         self._was_on_foot = False
         self._last_focus = 0
+        self.say = None                 # (text) -> speaks a sentence; set by the app (voice helpers' answers are not spoken by themselves)
+        self._asked = False
+        self.known = known_settlements()
         self.auto_shown = False         # the map on screen was put there by this tracker (so this tracker may take it down)
         self.saved = {}
         self._load()
@@ -201,7 +214,10 @@ class SettlementTracker:
         self.spots = []
         self.calibration = None
         self.dismissed = False
+        self._asked = False
         self.view.position = None
+        if self.known.get(market) and self.maps.get(self.known[market]) is not None:
+            self.settlement["map"] = self.known[market]
         known = self.saved.get(market)
         if known:
             try:
@@ -241,6 +257,13 @@ class SettlementTracker:
                 continue
             found.append(data)
         return found
+
+    def _speak(self, text):
+        if self.say is not None and text:
+            try:
+                self.say(text)
+            except Exception:
+                log.exception("The settlement tracker could not speak")
 
     def set_dismissed(self, value):
         """The voice command hid (True) or showed (False) the map by hand: the tracker must not fight that."""
@@ -425,6 +448,13 @@ class SettlementTracker:
         s = self.settlement
         want = (s is not None and not self.dismissed and on_foot and near is not None and near <= SHOW_WITHIN_METRES
                 and bool(s.get("map")))
+        if (s is not None and not self.dismissed and on_foot and near is not None and near <= SHOW_WITHIN_METRES and not s.get("map")
+                and not self._asked and self.view.current is None):
+            could = self.options()
+            self._asked = True
+            if 1 < len(could) < 8:
+                self._speak("I cannot tell which %s layout this is: %s. Say show settlement map and the name, for example %s."
+                            % (s.get("group") or "settlement", ", ".join(could), could[0].lower()))
         if want and self.view.current is None:
             self.view.current = s["map"]
             self.view.shown_at = time.monotonic()
@@ -443,6 +473,7 @@ class SettlementTracker:
         said = re.sub(r"\s+", " ", said).strip()
         pointed = self._point(said)
         if pointed is not None:
+            self._speak(pointed)
             return pointed
         if not _RESET.search(said):
             return None
@@ -454,6 +485,7 @@ class SettlementTracker:
             self._choose()
         self.anchors, self.calibration, self.spots = {}, None, []
         self.view.position = None
+        self._speak("Settlement map reset.")
         return "Settlement map reset. Walk to a few terminals and say mark spot terminal at each."
 
     # ---- the arrow ("find the power plant") ----

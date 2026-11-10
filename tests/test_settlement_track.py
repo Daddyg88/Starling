@@ -35,6 +35,7 @@ class Setup(unittest.TestCase):
         self.view = MapView()
         self.path = Path(self.tmp.name) / "cal.json"
         self.tracker = SettlementTracker(lambda: self.state, self.maps, self.view, self.path)
+        self.tracker.known = {}                    # (the shipped list of certain settlements is tested on its own)
 
     def arrive(self):
         self.tracker.on_entry(dict(APPROACH))
@@ -361,3 +362,30 @@ class WhenSheCannotChoose(Setup):
         self.assertIn("Extraction 2", said)
         voice.try_handle("show settlement map extraction two")
         self.assertEqual(self.tracker.suggestion(), "extraction_2")
+
+
+class KnownSettlements(Setup):
+    def test_a_settlement_we_have_walked_is_known_at_once(self):
+        self.tracker.known = settlement_track.known_settlements()
+        self.assertEqual(self.tracker.known.get("4365483779"), "industrial_2")
+        self.tracker.maps = SettlementMaps()                          # the whole set: three Industrial layouts share one large pad
+        self.tracker.on_entry(dict(APPROACH))
+        self.assertEqual(self.tracker.suggestion(), "industrial_2")
+
+    def test_she_speaks_once_when_she_cannot_choose(self):
+        said = []
+        self.tracker.say = said.append
+        self.tracker.maps = SettlementMaps()
+        self.tracker.on_entry(dict(APPROACH))
+        self.tracker.on_entry(dict(DOCKING))
+        self.state.latitude, self.state.longitude, self.state.status_flags2 = SHIP[0], SHIP[1], 1
+        self.tracker.on_status(self.state)
+        self.tracker.on_status(self.state)
+        self.assertEqual(len(said), 1)
+        self.assertIn("Industrial 2", said[0])
+
+    def test_the_voice_answer_is_spoken(self):
+        said = []
+        voice = SettlementMapVoice(self.maps, self.view, say=said.append)
+        voice.try_handle("show settlement map industrial two")
+        self.assertEqual(len(said), 1)

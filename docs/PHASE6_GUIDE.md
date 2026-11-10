@@ -1521,3 +1521,8 @@ window use the same code as the biology list.
 ## 0.92.2 - 'show settlement map' lists the layouts it could be
 
 * control/settlement_voice.py `options`; navigation/settlement_track.py `options()` and `set_dismissed(False)` makes a named map the settlement's map. Found in diagnostics 20261110-144526 (Cheesebeard's Cave: Extraction, Large 1, four layouts share it). tests `WhenSheCannotChoose`.
+
+## 0.92.3 - spoken settlement answers, known settlements list
+
+* control/runner.py finishes helper answers with speak=False, so helpers must speak for themselves: SettlementMapVoice and SettlementTracker get a `say` callback (core/app.py, speech.say). Asks once on foot when several layouts match.
+* maps/known_settlements.json (MarketID -> map id, loaded by settlement_track.known_settlements): Shi Construction = industrial_2. Found in diagnostics 20261110-152207. tests `KnownSettlements`.

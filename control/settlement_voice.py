@@ -11,14 +11,24 @@ _NAMED = re.compile(r"\b(?:" + "|".join(re.escape(g) for g in GROUPS) + r")\b") 
 
 
 class SettlementMapVoice:
-    def __init__(self, maps, view, suggest=None, dismissed=None, options=None):
+    def __init__(self, maps, view, suggest=None, dismissed=None, options=None, say=None):
         self.maps = maps
         self.view = view
         self.dismissed = dismissed or (lambda value: None)      # (True/False): told when you hide or show the map by hand
         self.options = options or (lambda: [])          # () -> the layout names this settlement could be
+        self.say = say                                  # (text) -> speaks it (a helper's answer is only logged otherwise)
         self.suggest = suggest or (lambda: None)       # () -> the map id worked out for the settlement you are at
 
     def try_handle(self, text):
+        reply = self._answer(text)
+        if reply and self.say is not None:
+            try:
+                self.say(reply)
+            except Exception:
+                pass
+        return reply
+
+    def _answer(self, text):
         said = re.sub(r"[^a-z0-9 ]", " ", str(text or "").lower())
         said = re.sub(r"\s+", " ", said).strip()
         if not said:

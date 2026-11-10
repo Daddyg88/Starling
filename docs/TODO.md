@@ -72,3 +72,4 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [x] 0.92.0: rotation finder from terminals alone, auto show/hide, north-up map, 'you are here', voice arrow (nearest terminal, power plant, alarm, door, airlock, ship).
 - [ ] Real-game tests: overlay on screen, arrow, whether a terminal screen is GuiFocus 5 (the recorder trail keeps it as the 5th value), pad counts (26 of 28 are guesses), whether the scale (about 0.325 m per unit) is the same at every settlement, in-ship heading.
 - [ ] Shared calibrations file shipped with the app once testers have visited settlements.
+- [ ] Add each visited settlement to maps/known_settlements.json (MarketID -> layout) once its layout is confirmed; Cheesebeard's Cave (4385255427, Extraction, one large pad) layout still unknown.
