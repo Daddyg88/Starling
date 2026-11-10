@@ -18,7 +18,7 @@ import time
 
 from core import paths
 from core.logger import get_logger
-from navigation import settlement_solve
+from navigation import settlement_share, settlement_solve
 
 log = get_logger("settlement_track")
 
@@ -63,7 +63,8 @@ def known_calibrations():
     try:
         with open(paths.ROOT / "maps" / "known_calibrations.json", encoding="utf-8") as handle:
             data = json.load(handle)
-        return {str(k): v for k, v in data.items() if not str(k).startswith("_") and isinstance(v, dict)}
+        return {str(k): v for k, v in data.items()
+                if not str(k).startswith("_") and settlement_share.problem(v) is None}      # a bad entry is skipped, never trusted
     except (OSError, ValueError, AttributeError):
         return {}
 
@@ -127,9 +128,10 @@ def fit(pairs):
 
 
 class Calibration:
-    def __init__(self, map_id, a, t, ref_lat, ref_lon, radius):
+    def __init__(self, map_id, a, t, ref_lat, ref_lon, radius, meta=None):
         self.map_id, self.a, self.t = map_id, complex(a), complex(t)
         self.ref_lat, self.ref_lon, self.radius = ref_lat, ref_lon, radius
+        self.meta = dict(meta or {})        # name, n (places stood at), err (average miss, map units), how: for sharing (navigation/settlement_share.py)
 
     def to_map(self, lat, lon):
         east, north = world_xy(lat, lon, self.ref_lat, self.ref_lon, self.radius)
@@ -152,12 +154,15 @@ class Calibration:
         return math.degrees(math.atan2(u.real, u.imag)) % 360.0
 
     def to_json(self):
-        return {"v": 2, "map": self.map_id, "a": [self.a.real, self.a.imag], "t": [self.t.real, self.t.imag],
-                "ref": [self.ref_lat, self.ref_lon], "radius": self.radius}
+        out = {"v": 2, "map": self.map_id, "a": [self.a.real, self.a.imag], "t": [self.t.real, self.t.imag],
+               "ref": [self.ref_lat, self.ref_lon], "radius": self.radius}
+        out.update({k: v for k, v in self.meta.items() if k in ("name", "n", "err", "how")})
+        return out
 
     @classmethod
     def from_json(cls, data):
-        return cls(data["map"], complex(*data["a"]), complex(*data["t"]), data["ref"][0], data["ref"][1], data["radius"])
+        return cls(data["map"], complex(*data["a"]), complex(*data["t"]), data["ref"][0], data["ref"][1], data["radius"],
+                   {k: data[k] for k in ("name", "n", "err", "how") if k in data})
 
 
 class SettlementTracker:
@@ -234,9 +239,12 @@ class SettlementTracker:
         if self.known.get(market) and self.maps.get(self.known[market]) is not None:
             self.settlement["map"] = self.known[market]
         known = self.saved.get(market)
-        if known is not None and known.get("v") != 2:
-            known = None                       # saved by an older, less careful line-up: not trusted
-        known = known or self.shipped.get(market)
+        if isinstance(known, dict) and known.get("disabled"):
+            known = None                       # you said "reset settlement map" here: neither your old line-up nor the shipped one
+        else:
+            if known is not None and known.get("v") != 2:
+                known = None                   # saved by an older, less careful line-up: not trusted
+            known = known or self.shipped.get(market)
         if known:
             try:
                 self.calibration = Calibration.from_json(known)
@@ -377,7 +385,8 @@ class SettlementTracker:
         if len(results) > 1 and results[1][0] < results[0][0] * 1.4 + 5.0:
             return None                                              # two layouts fit about equally: not sure which one this is
         error, data, result = results[0]
-        self.calibration = Calibration(data["id"], result["a"], result["t"], s["lat"], s["lon"], s["radius"])
+        self.calibration = Calibration(data["id"], result["a"], result["t"], s["lat"], s["lon"], s["radius"],
+                                       {"name": s.get("name"), "n": result["n"], "err": round(result["error"], 1), "how": "stops"})
         s["map"] = data["id"]
         self.saved[s["market"]] = self.calibration.to_json()
         self._save()
@@ -405,7 +414,8 @@ class SettlementTracker:
             a3, t3, rms3 = fit(pairs + [(points["pad"], pad[:2])])
             if rms3 <= MAX_PAD_ERROR_METRES:
                 a, t, note = a3, t3, " (checked against your landing pad too)"
-        self.calibration = Calibration(map_id, a, t, s["lat"], s["lon"], s["radius"])
+        self.calibration = Calibration(map_id, a, t, s["lat"], s["lon"], s["radius"],
+                                       {"name": s.get("name"), "n": len(pairs) + (1 if note else 0), "err": round(rms / 0.325, 1), "how": "marks"})
         s["map"] = map_id
         self.saved[s["market"]] = self.calibration.to_json()
         self._save()
@@ -509,7 +519,7 @@ class SettlementTracker:
             return None
         s = self.settlement
         if s is not None:
-            self.saved.pop(s["market"], None)
+            self.saved[s["market"]] = {"v": 2, "disabled": True}         # remembered, so the shipped line-up is not put straight back
             self._save()
             s["map"] = None
             self._choose()

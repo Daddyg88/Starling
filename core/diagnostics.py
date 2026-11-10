@@ -80,6 +80,12 @@ def make_bundle(settings_path, logs_dir, data_dir, version, target_dir):
                 bundle.write(sample, "settlement_samples.json")
         except OSError:
             pass
+        try:                                                  # the settlement line-ups she worked out (shared via tools/merge_calibrations.py)
+            lined = Path(data_dir) / "settlement_calibration.json"
+            if lined.exists() and lined.stat().st_size < 200_000:
+                bundle.write(lined, "settlement_calibration.json")
+        except OSError:
+            pass
         try:                                                  # the little black-and-white maps of failed panel looks (no game pictures)
             for png in sorted((Path(data_dir) / "panel_debug").glob("*.png"), key=lambda f: f.stat().st_mtime)[-24:]:
                 bundle.write(png, "panel_debug/" + png.name)

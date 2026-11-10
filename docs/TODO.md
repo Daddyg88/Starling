@@ -73,3 +73,5 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Real-game tests: overlay on screen, arrow, whether standing still 6 s = a terminal works at other settlements (terminals write no journal line and no screen number on foot), pad counts (26 of 28 are guesses), whether the scale (about 0.325 m per unit) is the same at every settlement, in-ship heading.
 - [ ] Shared calibrations file shipped with the app once testers have visited settlements.
 - [ ] Add each visited settlement to maps/known_settlements.json (MarketID -> layout) once its layout is confirmed; Cheesebeard's Cave (4385255427, Extraction, one large pad) layout still unknown.
+- [ ] Collect testers' diagnostics zips and run tools/merge_calibrations.py so more settlements ship lined up (needs the pad counts fixed first so layouts are chosen right).
+- [ ] Benny: read the real pad counts for all 28 layouts from the Odyssey Map Guide, then fix them in maps/settlements/*.json and add a test.

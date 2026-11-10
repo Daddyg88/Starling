@@ -1,5 +1,5 @@
 {
- "_note": "Lined-up maps shipped with the app (MarketID -> calibration), measured by walking the settlement. Same format as data/settlement_calibration.json.",
+ "_note": "Lined-up maps shipped with the app (MarketID -> line-up), worked out by players walking the settlement. Same format as data/settlement_calibration.json. Add more with tools/merge_calibrations.py (never by hand).",
  "4365483779": {
   "map": "industrial_2",
   "a": [
@@ -14,6 +14,11 @@
    50.642288,
    -110.657997
   ],
-  "radius": 1074442.625
+  "radius": 1074442.625,
+  "v": 2,
+  "name": "Shi Construction",
+  "n": 3,
+  "err": 3.0,
+  "how": "marks"
  }
 }

@@ -1552,3 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.93.0 - shared settlement line-ups
+
+* navigation/settlement_share.py: `problem` (sanity check of one line-up: v 2, believable size 0.27-0.38 m/unit, real map, sane numbers), `merge` (adds good ones; replaces only a better-proved one that agrees within 12 degrees; reports CONFLICT otherwise).
+* navigation/settlement_track.py: `Calibration.meta` (name, n, err, how) saved in data/settlement_calibration.json; `known_calibrations()` loads only entries that pass `problem`; reset by voice stores `{"v": 2, "disabled": true}` so the shipped line-up is not applied again at that settlement.
+* core/diagnostics.py includes settlement_calibration.json in the zip.
+* tools/merge_calibrations.py zip-or-json ... [--dry-run] rewrites maps/known_calibrations.json. Maintainer steps: collect testers' diagnostics zips, run the tool, read the report, run the tests, bump the version, push.
+* maps/known_calibrations.json now carries v/name/n/err/how for Shi Construction (it had no v and would have been rejected by the new check).
+* tests/test_settlement_share.py.
+

@@ -147,7 +147,7 @@ class Lining_up(Setup):
         self.calibrate()
         self.assertIn("reset", self.tracker.try_handle("reset the settlement map"))
         self.assertIsNone(self.tracker.calibration)
-        self.assertNotIn("4365483779", self.tracker.saved)
+        self.assertTrue(self.tracker.saved["4365483779"].get("disabled"))              # remembered as reset, so the shipped one is not put back
         self.assertIsNone(self.tracker.try_handle("show the settlement map"))
 
     def test_marking_without_a_settlement_or_for_other_spots_does_nothing(self):
