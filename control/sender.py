@@ -192,8 +192,9 @@ class WindowsWindows:
         ctypes = self.ctypes
         found = []
 
-        @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
-        def visit(handle, _param):
+        proc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+
+        def callback(handle, _param):
             try:
                 if handle and self.user32.IsWindowVisible(handle) and _is_game(self._title(handle)):
                     found.append(handle)
@@ -201,8 +202,13 @@ class WindowsWindows:
             except Exception:
                 pass                                   # one odd window must not stop the search
             return True
+        visit = proc(callback)
         try:
-            self.user32.EnumWindows(visit, 0)
+            # A private copy of user32 for this call: another part of Starling (the screen finder) sets a different callback type on the
+            # shared EnumWindows, which once made this call fail with "expected WinFunctionType instance instead of WinFunctionType".
+            enum = ctypes.WinDLL("user32").EnumWindows
+            enum.argtypes = [proc, ctypes.c_void_p]
+            enum(visit, 0)
         except Exception:
             log.exception("Could not list windows to find Elite Dangerous")
         return found[0] if found else 0

@@ -1491,3 +1491,7 @@ window use the same code as the biology list.
 ## 0.90.3 - two commands from a tester's log
 
 * control/catalog.py fss_enter off phrases; control/bio_voice.py short hide/show forms; tests/test_stage6.py, tests/test_bio_overlay.py.
+
+## 0.90.4 - fixes from a stream log
+
+* control/sender.py find_game and ui/screens.py use a private WinDLL('user32').EnumWindows (the shared one had its argtypes changed by the other); personality/smalltalk.py greeting + how-are-you, slang hellos, chat/everyone filler; control/catalog.py hide-all-overlays mishearings and bare 'hardpoints'; streaming/bridge.py logs the YouTube wait once; tests/test_talk.py.

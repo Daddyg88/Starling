@@ -174,5 +174,28 @@ class LongLineTests(unittest.TestCase):
             self.assertGreaterEqual(len(longer), 3, key)
 
 
+class RealLogGreetings(unittest.TestCase):
+    """Things a tester and his chat actually said, which got a stranger's answer ("How long have you felt that way?")."""
+
+    def test_greeting_and_how_are_you_together(self):
+        from personality.smalltalk import intent_for
+        for text in ("Hello, how are you?", "hey how are you doing", "good morning how are you"):
+            self.assertEqual(intent_for(text), "Talk_HowAreYou", text)
+
+    def test_slang_hellos(self):
+        from personality.smalltalk import intent_for
+        for text in ("wuzzzzzzzup", "whats up", "wassup chat"):
+            self.assertEqual(intent_for(text), "Talk_HowAreYou", text)
+        self.assertEqual(intent_for("yo"), "Talk_Hello")
+
+    def test_misheard_hide_all_overlays_and_bare_hardpoints(self):
+        from control.matcher import Matcher
+        m = Matcher()
+        for text in ("hide all overlays", "hide at all overlays", "height overlays"):
+            self.assertEqual(m.match(text).command.id, "vc_hide_all", text)
+        hit = m.match("hardpoints")
+        self.assertEqual((hit.command.id, hit.intent), ("weapons", "toggle"))
+
+
 if __name__ == "__main__":
     unittest.main()

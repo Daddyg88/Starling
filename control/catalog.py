@@ -183,7 +183,7 @@ CATALOG = [
           "(get|make) weapons ready", "battle stations", "combat ready", "go weapons hot"],
       off=["{RETRACT_V} weapons", "weapons (away|retracted|in|down|safe|cold)", "(stand|stand down) weapons",
            "safe weapons", "stand down", "weapons offline"],
-      toggle=["{TOGGLE_V} weapons", "weapons toggle"],
+      toggle=["{TOGGLE_V} weapons", "weapons toggle", "hardpoints"],
       doing={"on": "Deploying hardpoints", "off": "Retracting hardpoints", "toggle": "Toggling hardpoints"},
       flag=("Flags", 6, False), words=("deployed", "retracted")),
     C("scoop", "ToggleCargoScoop", "The cargo scoop",
@@ -594,7 +594,7 @@ def _overlay_commands():
     commands = [overlay_command(*row) for row in OVERLAYS]
     commands.append(C(
         "vc_hide_all", "", "the overlays",
-        press=["(hide|clear|remove|dismiss|close|get rid of|turn off|switch off|disable|kill) [every|all] overlays",
+        press=["(hide|clear|remove|dismiss|close|get rid of|turn off|switch off|disable|kill) [at] [every|all] overlays", "(height|hi) [all] overlays",
                "overlays (off|away|hidden|out of the way)", "(hide|clear) [the] screen"],
         doing={"press": "Hiding the overlays"}, service=("voidcompass", HIDE_ALL)))
     commands.append(C(

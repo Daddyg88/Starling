@@ -87,8 +87,9 @@ def elite_point():
                     hits.append(hwnd)
         return 1
     keep = proc(callback)
-    user32.EnumWindows.argtypes = [proc, wintypes.LPARAM]
-    user32.EnumWindows(keep, 0)
+    enum = ctypes.WinDLL("user32").EnumWindows         # a private copy, so it cannot clash with the sender's EnumWindows
+    enum.argtypes = [proc, wintypes.LPARAM]
+    enum(keep, 0)
     if not hits:
         return None
     rect = wintypes.RECT()

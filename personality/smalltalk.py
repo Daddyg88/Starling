@@ -19,15 +19,15 @@ from personality.mood_engine import effective_mood
 
 log = get_logger("smalltalk")
 
-_FILL = r"(?:\s+(?:please|starling|commander|then|today|there|now))*"
+_FILL = r"(?:\s+(?:please|starling|commander|then|today|there|now|chat|everyone|guys))*"
 
 # (key, regex). The text is lower case with punctuation removed.
 INTENTS = [
-    ("Talk_HowAreYou", r"(?:how are you(?: doing| feeling| today| holding up)?|how(?: is|s) it going|are you (?:ok|okay|alright|all right|well|good)|you (?:ok|okay|alright)|how do you feel)"),
+    ("Talk_HowAreYou", r"(?:(?:hello|hi|hey|hiya|heya|howdy|yo|good (?:morning|afternoon|evening)|morning|evening)(?: there| everyone| chat)? )?(?:whats up|wh?[au]z+u+p|wh?[au]s+u+p|sup|how are you(?: doing| feeling| today| holding up)?|how(?: is|s) it going|are you (?:ok|okay|alright|all right|well|good)|you (?:ok|okay|alright)|how do you feel)"),
     ("Talk_Joke", r"(?:tell me a joke|got any jokes|do you know any jokes|make me laugh|say something funny|tell a joke|joke|tell me (?:another|a different|one more|a new) joke|tell me another|another joke|one more joke|do you have another joke|got another joke|any more jokes|more jokes|a different joke)"),
     ("Talk_Chat", r"(?:talk to me|chat to me|chat with me|say something|keep me company|tell me something|i(?: am|m) bored|im bored|entertain me|speak to me)"),
     ("Talk_Here", r"(?:are you (?:there|listening|awake|still there|with me)|you there|can you hear me)"),
-    ("Talk_Hello", r"(?:hello|hi|hey|hiya|howdy|good (?:morning|afternoon|evening)|morning|evening)"),
+    ("Talk_Hello", r"(?:hello|hi|hey|hiya|heya|yo|ello|howdy|good (?:morning|afternoon|evening)|morning|evening)"),
     ("Talk_Goodnight", r"(?:good night|goodnight|night night|i(?: am|m) (?:going to bed|off to bed|off|done for (?:the night|today)|signing off|logging off)|i have to go|i(?: am|m) heading off)"),
     ("Talk_Back", r"(?:i(?: am|m) back|im back|i(?: have|ve) returned)"),
     ("Talk_Compliment", r"(?:good (?:job|girl|work)|well done|nice (?:one|work|job)|great (?:job|work)|you(?: are|re) (?:amazing|brilliant|the best|great|wonderful|awesome|clever|good)|you(?: are|re) doing (?:great|well|brilliantly)|i like you|i appreciate you|i(?: am|m) glad you(?: are|re) here)"),

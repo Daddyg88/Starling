@@ -136,8 +136,11 @@ class ChatBridge:
             text = "Off" if not on else "Chat is on: type your Twitch channel name or add your YouTube key and link"
         else:
             text = " | ".join(parts)
-        if text != self.state_text:
+        # YouTube flips between "Looking for the live chat..." and "no live chat right now" every 30 s while you are not live: log that once
+        shown = text.replace("Looking for the live chat...", "That video has no live chat right now. Waiting for the stream to go live...")
+        if shown != getattr(self, "logged_text", None):
             log.info("Streaming: %s", text)
+            self.logged_text = shown
         self.state_text = text
 
     def _stop_source(self, source):
