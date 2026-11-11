@@ -2,6 +2,7 @@ import json
 import random
 import tempfile
 import unittest
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -34,7 +35,7 @@ class Base(unittest.TestCase):
         self.active = [True]
         self.dialogue = DialogueManager(paths.VOICEPACKS_DIR / "default", rng=random.Random(3)).load()
         self.chat = ChitChat(self.bus, self.speech, self.dialogue, self.settings, lambda: self.state, lambda: self.active[0],
-                             clock=lambda: self.t[0], rng=random.Random(1))
+                             clock=lambda: self.t[0], rng=random.Random(1), wall=lambda: datetime(2026, 11, 11, 14, 0))
         self.chat.attach()
 
     def later(self, seconds):

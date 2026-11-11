@@ -25,10 +25,11 @@ IDLE_POLL_SECONDS = 0.3
 
 
 class PushToTalk:
-    def __init__(self, settings, reader, beep=None, clock=time.monotonic):
+    def __init__(self, settings, reader, beep=None, clock=time.monotonic, on_open=None):
         self.settings = settings
         self.reader = reader
         self.beep = beep                 # beep(opening: bool), optional
+        self.on_open = on_open           # called with no arguments the moment the microphone opens (she stops talking so she can hear you)
         self.clock = clock
         self._open = False
         self._was_down = False
@@ -71,6 +72,11 @@ class PushToTalk:
     def _set(self, opening):
         self._open = opening
         log.debug("Microphone %s", "open" if opening else "closed")
+        if opening and self.on_open is not None and self.settings.get("speech.ptt_interrupts", True):
+            try:
+                self.on_open()
+            except Exception:
+                log.exception("Stopping her speech failed")
         if self.beep is not None and self.settings.get("ptt.beep", True):
             try:
                 self.beep(opening)

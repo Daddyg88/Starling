@@ -74,6 +74,7 @@ class App:
         self.prices = None
         self.services = None
         self.stats = None
+        self.habits = None
         self.lore = None
         self.eoc = None
         self._record_events = True
@@ -308,6 +309,17 @@ class App:
         self.stats.attach()
         import atexit
         atexit.register(self.stats.flush)
+        from memory.habits import HabitKeeper
+        self.habits = HabitKeeper(
+            self.bus, paths.DATA_DIR / "habits.json",
+            announce=lambda key, values: _stats_narrator.say(key, values),
+            hours=self.hours_together, jumps=lambda: self.stats.jumps_total if self.stats is not None else 0,
+            enabled=lambda: bool(self.settings.get("memory.habits", True)) and bool(self.settings.get("memory.enabled", True)),
+            system=lambda: getattr(self.state, "system", None))
+        self.habits.attach()
+        atexit.register(self.habits.flush)
+        if self.chitchat is not None:
+            self.chitchat.habits = self.habits
         from mining.services import ServiceFinder
         self.services = ServiceFinder(self.settings)
         from memory.profile import PlayerProfile
@@ -410,7 +422,8 @@ class App:
         if reader is None:
             return None
         from control.ptt import PushToTalk, windows_beep
-        self.ptt = PushToTalk(self.settings, reader, beep=windows_beep)
+        self.ptt = PushToTalk(self.settings, reader, beep=windows_beep,
+                              on_open=lambda: self.speech.interrupt() if self.speech is not None else None)
         self.ptt.start()
         return self.ptt
 
@@ -607,6 +620,8 @@ class App:
             self.profile.clear()                 # what you told her about yourself goes too
         if getattr(self, "people", None) is not None:
             self.people.clear()                  # and the people you told her about
+        if getattr(self, "habits", None) is not None:
+            self.habits.clear()                  # and what she noticed you keep doing
         if self.memory_store is None:
             return "Memory is not running."
         self.memory_store.forget_everything()
@@ -770,6 +785,16 @@ class App:
             threading.Thread(target=codex.scan_history, args=(self.journal_folder,), name="bio-codex", daemon=True).start()
         except Exception:
             self.log.exception("The codex history scan could not start")
+
+    def hours_together(self):
+        """Hours you have flown with her: everything saved before, plus this session so far."""
+        try:
+            saved = float((self.memory_store.stats().get("hours_together", 0) or 0)) if self.memory_store is not None else 0.0
+            started = getattr(self.memory_keeper, "started", None)
+            now = self.memory_keeper.clock() if started is not None else None
+            return saved + (max(0.0, (now - started) / 3600.0) if started is not None else 0.0)
+        except Exception:
+            return 0.0
 
     def start_stats_history(self):
         """Once, in the background: reads the old journals so she knows which systems you have been in and scanned."""

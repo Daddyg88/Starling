@@ -77,3 +77,4 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [x] Benny read the pad counts for all 28 layouts from the Odyssey Map Guide (0.93.1, in maps/settlements/*.json + test). Still best guesses from pictures: confirm against real LandingPads as settlements are visited.
 
 - [ ] 0.94.0 chat awareness: check on a real stream that Twitch's anonymous reader delivers subs, gifts, raids and watch streaks (USERNOTICE), and that YouTube Super Chats and members arrive. Follows need a Twitch login (not built).
+- [ ] 0.95.0: check in the real game that habit remarks land at calm moments (Docked, FSDJump), that the late-night and system remarks sound right, and that push-to-talk cuts her off. Maybe later: she listens for your answer when she asks 'why do you keep going back to...?' and remembers it (needs the answer listener).

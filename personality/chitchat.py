@@ -15,6 +15,7 @@ when she knows every value in it. She may also bring up a memory (memory/recall.
 import random
 import threading
 import time
+from datetime import datetime
 
 from core.identity import personalise
 from core.ships import ship_name
@@ -30,7 +31,13 @@ MINING_SECONDS = 600.0           # she talks about mining for 10 minutes after t
 ALARMS = ("UnderAttack", "Interdicted", "InterdictionInProgress", "LowFuel", "Overheating", "HeatWarning", "HeatDamage",
           "HullDamage", "InDanger", "LowHealth", "LowOxygen", "Died", "CockpitBreached", "ShieldState")
 ALARM_QUIET_SECONDS = 75.0
-STATE_KEYS = ("ChitChat_Hull", "ChitChat_Wanted", "ChitChat_Long", "ChitChat_Callback_Interdicted", "ChitChat_Callback_Kill")
+STATE_KEYS = ("ChitChat_Hull", "ChitChat_Wanted", "ChitChat_Long", "ChitChat_Callback_Interdicted", "ChitChat_Callback_Kill",
+              "ChitChat_Late", "ChitChat_Early", "ChitChat_World", "ChitChat_Habits",
+              "ChitChat_Rapport_Crew", "ChitChat_Rapport_Friend", "ChitChat_Rapport_Family")
+LATE_HOURS = range(0, 5)         # local time: 'it's gone midnight' / 'the small hours'
+EARLY_HOURS = range(5, 8)
+MIN_SESSION_MINUTES = 20         # she does not comment on the time of day the moment you log in
+WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 CALLBACK_AFTER_SECONDS = 600.0      # she looks back on a moment from 10 minutes to 90 minutes ago
 CALLBACK_UNTIL_SECONDS = 5400.0
 STATE_REST = 1200.0              # and says the same kind of remark at most once in 20 minutes
@@ -48,9 +55,18 @@ MILESTONES = (
 )
 
 
+def people_text(number):
+    """4200000000 -> '4.2 billion', 1500000 -> '1.5 million', 12345 -> '12,345'."""
+    if number >= 1_000_000_000:
+        return ("%.1f" % (number / 1_000_000_000)).rstrip("0").rstrip(".") + " billion"
+    if number >= 1_000_000:
+        return ("%.1f" % (number / 1_000_000)).rstrip("0").rstrip(".") + " million"
+    return format(number, ",")
+
+
 class ChitChat:
     def __init__(self, bus, speech, dialogue, settings, state_provider=None, active_provider=None,
-                 clock=time.monotonic, rng=None, memory=None):
+                 clock=time.monotonic, rng=None, memory=None, wall=datetime.now):
         self.bus = bus
         self.speech = speech
         self.dialogue = dialogue
@@ -60,6 +76,8 @@ class ChitChat:
         self.clock = clock
         self.rng = rng or random.Random()
         self.memory = memory             # memory/recall.py (optional): she sometimes brings up something she remembers
+        self.habits = None               # memory/habits.py (optional, set by the app): what you keep doing, and how well she knows you
+        self.wall = wall                 # the real clock on your wall (for 'it's gone midnight')
         self.started = clock()
         self.jumps = 0
         self.distance = 0.0
@@ -179,7 +197,7 @@ class ChitChat:
         notice = self.milestone_keys()
         if self.mode == "combat":
             return (["ChitChat_Kills"] if "ChitChat_Kills" in notice else []) + ["ChitChat_Combat"]
-        extra = notice + self.state_keys(state)
+        extra = notice + self.state_keys(state) + self.world_keys(state)
         if extra:
             return extra + self._normal_keys(state, docked)
         return self._normal_keys(state, docked)
@@ -200,6 +218,28 @@ class ChitChat:
                 moment = self.last_moment.get(what)
                 if moment and CALLBACK_AFTER_SECONDS <= now - moment[0] <= CALLBACK_UNTIL_SECONDS and moment[1] != getattr(state, "system", None):
                     keys.append(key)                         # (only when you have moved on: "back in X", not "right here")
+        return [k for k in keys if now - self.state_said.get(k, -STATE_REST) >= STATE_REST]
+
+    def world_keys(self, state):
+        """Remarks about the world around you: the time on your clock, the system you are in, what you keep doing, how well she knows you."""
+        if not self.settings.get("chitchat.world", True):
+            return []
+        keys = []
+        now = self.clock()
+        values = self.context(now)
+        minutes = int((now - self.started) / 60)
+        hour = self.wall().hour
+        if hour in LATE_HOURS and minutes >= MIN_SESSION_MINUTES:
+            keys.append("ChitChat_Late")
+        elif hour in EARLY_HOURS and minutes >= MIN_SESSION_MINUTES:
+            keys.append("ChitChat_Early")
+        if values.get("security") or values.get("allegiance"):
+            keys.append("ChitChat_World")
+        if values.get("fav_station") or values.get("days_in_row"):
+            keys.append("ChitChat_Habits")
+        stage = values.get("rapport")
+        if stage in ("crew", "friend", "family"):
+            keys.append("ChitChat_Rapport_" + stage.capitalize())
         return [k for k in keys if now - self.state_said.get(k, -STATE_REST) >= STATE_REST]
 
     def _normal_keys(self, state, docked):
@@ -248,7 +288,32 @@ class ChitChat:
         for name in ("kills", "interdictions", "scans", "systems", "since_scoop"):
             if self.counts.get(name, 0) > 0:
                 values[name] = self.counts[name]
+        self._world_values(values, state)
         return values
+
+    def _world_values(self, values, state):
+        """The time on your clock, the facts the journal gives about this system, and your habits."""
+        try:
+            moment = self.wall()
+            hour12 = moment.hour % 12 or 12
+            values["clock"] = "%d:%02d %s" % (hour12, moment.minute, "AM" if moment.hour < 12 else "PM")
+            values["weekday"] = WEEKDAYS[moment.weekday()]
+        except Exception:
+            pass
+        security = getattr(state, "system_security", None)
+        if isinstance(security, str) and security:
+            values["security"] = security.lower()
+        allegiance = getattr(state, "system_allegiance", None)
+        if isinstance(allegiance, str) and allegiance and allegiance.lower() != "none":
+            values["allegiance"] = allegiance
+        population = getattr(state, "system_population", None)
+        if isinstance(population, int) and population > 0:
+            values["population"] = people_text(population)
+        if self.habits is not None:
+            try:
+                values.update(self.habits.context())
+            except Exception:
+                log.exception("Chit-chat could not read the habits")
 
     def _pick_text(self, now, mood, allow):
         values = self.context(now)

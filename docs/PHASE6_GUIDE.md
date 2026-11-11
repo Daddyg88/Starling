@@ -1552,6 +1552,18 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.95.0 - she notices you (habits, rapport, the world, push-to-talk interrupt)
+
+- memory/habits.py `HabitKeeper` (data/habits.json): stations (count + recent days), deaths per system, days played, told steps. Remarks: `Habit_Station_Week` (3/5/8/12 landings in 7 days), `Habit_Station_Home` (10/25/50/100 ever), `Habit_Death_Place` (2nd death or more in a system, said at Resurrect/Location/FSDJump/Docked), `Habit_Streak` (3/7/14/30/60/100 days, said at the next Docked or FSDJump after LoadGame), `Habit_Jumps`, `Rapport_Hours`. One remark per 20 minutes; milestones ignore the gap. First run marks passed milestones as told.
+- `rapport(hours)`: new, crew (25h), friend (100h), family (1000h). `core/app.py hours_together()` = saved hours plus this session.
+- personality/chitchat.py: new pools `ChitChat_Late` (00:00 to 04:59 on your clock, after 20 minutes), `ChitChat_Early` (05:00 to 07:59), `ChitChat_World` (security, allegiance, population), `ChitChat_Habits` (fav_station, fav_count, days_in_row), `ChitChat_Rapport_Crew/Friend/Family`. Each at most once per 20 minutes; never in combat mode. New line values: clock, weekday, security, allegiance, population, fav_station, fav_count, days_in_row, rapport. `ChitChat(..., wall=datetime.now)` so tests can set the time.
+- control/ptt.py: `PushToTalk(..., on_open=)`; the app passes `speech.interrupt()`. Setting `speech.ptt_interrupts` (default on). Safety warnings are never cut off (SpeechManager.interrupt).
+- Settings: `memory.habits`, `chitchat.world`, `speech.ptt_interrupts`.
+- Lines: voicepacks/default/habits.json, chitchat.json (new keys).
+- Already existed (not rebuilt): quiet-time remarks, session milestones and callbacks, 'we've been here before', recap of last session, varied sentence openings, quieter chatter in combat.
+- Not built, and why: voice interrupt (she is deaf while talking so she doesn't hear herself, no echo cancellation), a reply delay (adds latency for little gain), asking you things and keeping your answers (needs the answer listener; later).
+- tests/test_habits.py.
+
 ## 0.94.0 - chat awareness
 
 - streaming/events.py: `StreamEvent(kind, user, amount, platform)`; `from_twitch(parsed)` reads USERNOTICE lines (msg-id sub, resub, subgift, anonsubgift, submysterygift, raid, viewermilestone/watch-streak), `from_youtube(item)` reads superChatEvent, superStickerEvent, newSponsorEvent, memberMilestoneChatEvent, membershipGiftingEvent. Names go through `clean`, numbers through `whole` (0 to 100000).

@@ -220,6 +220,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("ptt.button", "Push-to-talk button", "text", placeholder="Use the Learn button below",
                   help="A keyboard key, mouse side button or joystick button (your X52)"),
             Field("ptt.beep", "Beep when the microphone opens", "toggle"),
+            Field("speech.ptt_interrupts", "She stops talking when I press the button", "toggle",
+                  help="Pressing push-to-talk cuts her off so she can hear you. A safety warning is never cut off"),
             Field("ptt.skip_wake", "No need to say her name with push-to-talk", "toggle"),
         ]),
         Page("controls", "Controls", "Voice commands and your joystick. (Push-to-talk is on the Listening page, under Voice.)", [
@@ -408,6 +410,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("memory.enabled", "She remembers milestones", "toggle",
                   help="Longest jump, biggest sales, times destroyed, big missions, hours together. Off = nothing new is saved"),
             Field("memory.recall_at_login", "She mentions one memory when I log in", "toggle"),
+            Field("memory.habits", "She notices what you keep doing", "toggle",
+                  help="'Third time at this station this week', 'that's the 4th time we've been destroyed in this system', days in a row you have played, jump and hours-together milestones. Counted from the day she learned this, kept in data/habits.json"),
         ]),
         Page("streaming", "Streaming", "Let your viewers talk to Starling. They ask questions in your Twitch or YouTube chat and she answers out loud on stream, "
              "and they can flip a few harmless things on your ship (lights, night vision...). It only READS chat: Twitch needs no password or login; YouTube needs a free API key. "
@@ -501,6 +505,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.notice", "She notices how the night is going", "toggle",
                   help="At a quiet moment she remarks on counts such as kills, interdictions, scans, systems visited or jumps since a fuel scoop. Only when the count passes a step, and never in red alert"),
+            Field("chitchat.world", "She notices the world around you", "toggle",
+                  help="At a quiet moment she may mention the time on your clock ('it's gone midnight'), the system you are in (security, allegiance, population), the station you keep coming back to, how many days in a row you have played, and how long you have flown together"),
             Field("chitchat.frequency", "How often she chats", "choice", CHITCHAT,
                   help="Normal is about every 5 to 8 quiet minutes, Chatty about every 2 to 3"),
             Field("personality.reactions", "Small reactions", "toggle",

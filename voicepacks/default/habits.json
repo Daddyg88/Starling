@@ -1,0 +1,73 @@
+{
+ "Habit_Station_Week": [
+  "That's the {ordinal} time we've docked at {station} this week. Do they know you by name yet?",
+  "{station} again. {count} times this week. I'm starting to think you like it here.",
+  "Back at {station}, {count} times in a week. At this point we should ask for a discount.",
+  "We keep ending up at {station}. {count} times this week, in fact.",
+  "{station} for the {ordinal} time this week. Creature of habit, Commander."
+ ],
+ "Habit_Station_Week_Sarcastic": [
+  "{station} again. {count} times this week. Is it the view, or can you not find another station?"
+ ],
+ "Habit_Station_Week_Close": [
+  "{station} again, {count} times this week. I don't mind. I like it when we have a routine."
+ ],
+ "Habit_Station_Home": [
+  "That's {count} landings at {station}. You practically live here.",
+  "{count} times at {station}. Shall I start getting your mail forwarded?",
+  "Landing number {count} at {station}. I'd say it's home, but I've seen the decor.",
+  "We've docked at {station} {count} times now. Home sweet home, Commander."
+ ],
+ "Habit_Station_Home_Sarcastic": [
+  "{count} landings at {station}. Loyalty, or lack of imagination? I'll let you decide."
+ ],
+ "Habit_Station_Home_Close": [
+  "{count} times at {station}, and every one with you. I'd say it's our place."
+ ],
+ "Habit_Death_Place": [
+  "That's the {ordinal} time we've been destroyed in {system}. The system clearly has it in for us.",
+  "{system} again. That's {count} times it's killed us. I'd suggest avoiding it, but you won't.",
+  "The {ordinal} death in {system}. At this point it's a tradition.",
+  "We've died in {system} {count} times now. I'm keeping a tally, in case you were wondering."
+ ],
+ "Habit_Death_Place_Sarcastic": [
+  "{system}, {count} deaths. Some people never learn. I'm not naming names."
+ ],
+ "Habit_Death_Place_Close": [
+  "That's {count} times in {system}. Be careful, I'd rather not lose you again."
+ ],
+ "Habit_Streak": [
+  "That's {days} days in a row we've flown together. Dedication.",
+  "{days} days in a row, Commander. You do know there's a real world out there, don't you?",
+  "Day {days} of our streak. I'm not tired, I'm a ship."
+ ],
+ "Habit_Streak_Close": [
+  "{days} days in a row. You keep coming back to me, and I notice every time."
+ ],
+ "Habit_Streak_Sarcastic": [
+  "{days} days in a row. Somebody has a lot of free time."
+ ],
+ "Habit_Jumps": [
+  "That's {count} jumps together. Every one of them in my logbook.",
+  "Jump number {count}. Not bad for a Commander and a fox.",
+  "{count} jumps! The galaxy's getting smaller, Commander."
+ ],
+ "Habit_Jumps_Sarcastic": [
+  "{count} jumps. And you still ask me where we are."
+ ],
+ "Habit_Jumps_Close": [
+  "{count} jumps together. I'd do every one again."
+ ],
+ "Rapport_Hours": [
+  "We've flown {hours} hours together now. I'd say that's more than a working relationship.",
+  "{hours} hours together, Commander. I know your habits better than you do.",
+  "That's {hours} hours of us. Thank you for the company.",
+  "Hours together: {hours}. I'm keeping count. I think you'd be surprised."
+ ],
+ "Rapport_Hours_Sarcastic": [
+  "{hours} hours together. I have seen you at your worst, and it was frequent."
+ ],
+ "Rapport_Hours_Close": [
+  "{hours} hours together. I wouldn't trade a single one."
+ ]
+}

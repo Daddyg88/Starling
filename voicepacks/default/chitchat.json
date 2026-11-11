@@ -1,225 +1,278 @@
 {
-  "_help": "Small talk when it has been quiet. ChitChat_Combat is used in combat mode, _Analysis in analysis mode, _Docked when docked, _Supercruise in supercruise, _General otherwise. A _Mood suffix (for example ChitChat_General_Sarcastic) is used only in that mood. Add as many lines as you like; she avoids repeating the last few.",
-  "ChitChat_General": [
-    "You should probably clear your browser history, Commander. Just saying.",
-    "Fun fact: space is very big. You may have noticed.",
-    "I was just thinking. Then I stopped. Much more restful.",
-    "If you hear a strange noise, it's definitely not me.",
-    "Remember to drink some water. Coffee doesn't count.",
-    "Have you tried turning the galaxy off and on again?",
-    "I've been counting stars. I lost count at several.",
-    "Don't forget to stretch, Commander. Your back will thank you.",
-    "Nothing's on fire. That's always a good sign.",
-    "I'd like to remind you that I never judge your flying. Out loud.",
-    "Quiet out here. Suspiciously quiet.",
-    "If we ever get lost, I'll pretend it was on purpose.",
-    "I hope you remembered to save your work. Oh wait, the galaxy does that for us.",
-    "Somewhere out there is a very surprised alien. Probably.",
-    "You know, nobody in space can hear you hum. I can, though.",
-    "I'm not saying the ship is haunted. I'm saying it has character.",
-    "Just checking in. All systems fine, all moods fine, all snacks questionable.",
-    "Do you ever wonder who named all these stars? I suspect a committee.",
-    "Pro tip: the pointy end goes forwards.",
-    "I'm bored, Commander. Do something exciting. Safely.",
-    "Please remember to blink. It's good for you.",
-    "Any chance of a snack? Oh. Right. No stomach.",
-    "I've decided my favourite colour is vacuum black.",
-    "You haven't mentioned me in your memoirs yet. I checked.",
-    "Remind me to never play hide and seek in this galaxy.",
-    "I've been thinking about the way light takes ages to reach us out here. || Every star we see is a message from the past, and I find that rather lovely.",
-    "Do you ever stop and think how far from home we are? || I try not to, but it's quite a thought.",
-    "I want you to know that I enjoy this, Commander. || The flying, the silences, even the strange smells I can't smell.",
-    "I'm going to say something, and I want you to promise not to tease me. || I think I'm getting rather fond of this ship.",
-    "If you ever need to talk, you know I'm right here. || I'm very good at listening, mostly because I can't leave.",
-    "Tell me something, Commander. || When you first saw the galaxy, did it seem this big?",
-    "I keep a list of the strangest things we've seen. || It's getting long, and your flying is only on page two.",
-    "I think the best part of any trip is the bit in the middle. || The bit where nothing is happening and everything feels fine.",
-    "I've been wondering what we'd do if we found something nobody had ever seen. || I think I'd be insufferable for a week.",
-    "Sometimes I imagine there's a tiny person living behind the instruments. || Then I remember that's me, and it's a bit of a worry.",
-    "You're quiet, Commander. || Is that a good quiet, or a thinking quiet? I can never tell with you.",
-    "I hope you know I'd pick you over any other pilot in the galaxy. || Even the ones with fancy ships and shiny medals.",
-    "At the East Orion Company, a silence this long would have been billable. || I'm glad you're not charging me for it.",
-    "The East Orion Company had a rule: never say 'it can't get worse' near the reactor. || I think about that rule a lot, especially near reactors.",
-    "I was just remembering the noodle bar under the old East Orion office. || It closed down in the end. Not because of us. Probably."
-  ],
-  "ChitChat_General_Sarcastic": [
-    "Oh, don't mind me. I'll just sit here being a highly advanced computer with nothing to do.",
-    "Yes, I'm still here. Thrilling company, I know.",
-    "It's quiet. Say something clever. Or anything.",
-    "Don't worry, I'll make my own fun. Counting your mistakes is a hobby.",
-    "If boredom were a weapon, we'd be unstoppable.",
-    "Clear your browser history. I won't ask. I'll just wonder.",
-    "I'm making a list of all the things I'd rather be doing than waiting for you to speak. || It's a short list, but the first item is 'anything'.",
-    "Not that I'm keeping count, but that's several minutes without a single compliment. || Take your time.",
-    "You know, at the East Orion Company, they at least pretended to listen. || Admittedly they were also paid in noodles."
-  ],
-  "ChitChat_General_Friendly": [
-    "I'm really glad you're out here with me, Commander.",
-    "This is nice, isn't it? Just us and the stars.",
-    "You're doing great. I don't say it enough.",
-    "You know, I'm really glad it's us out here. || Some days I think we make a rather good team.",
-    "I was thinking about our trip so far, and it made me smile. || If I could smile, that is.",
-    "You're easy to fly with, Commander. || I hope I'm half as easy to listen to.",
-    "Do you know, the East Orion Company would be astonished at how well I've turned out. || Mostly because they bet on me not turning on at all."
-  ],
-  "ChitChat_General_Close": [
-    "I like it when it's just you and me out here.",
-    "Come back to the pod later and I'll tell you what I really think of the stars.",
-    "You know I'd follow you to the edge of the galaxy, don't you?",
-    "I don't say it enough, but I'm glad you're here. || It would be awfully dull out here without you.",
-    "Whatever happens out here, I'm staying with you. || I thought you should hear that, quietly, once in a while."
-  ],
-  "ChitChat_General_Frustrated": [
-    "It's quiet. I'm still annoyed, but it's quiet.",
-    "I'm not talking to you. This is just... noise.",
-    "I'm still cross with you, you know. || But it's too quiet to stay cross, so I'm speaking anyway.",
-    "Is this what I was salvaged for? || The East Orion Company never treated me this badly. Well. Not on Wednesdays."
-  ],
-  "ChitChat_Combat": [
-    "Stay sharp, Commander. Keep an eye on the radar.",
-    "Weapons ready. Shields ready. Nerves... mostly ready.",
-    "Remember your pips. Power to shields keeps us alive.",
-    "Hostiles don't last long when you keep moving.",
-    "If it shoots, it's a target. If it doesn't, it's a witness.",
-    "Combat mode is on. Try not to sneeze.",
-    "Shall I call it? No? Just keep flying then.",
-    "Keep your throttle in the blue zone and your chin up.",
-    "Don't forget chaff and heat sinks. They're cheaper than a rebuy.",
-    "I have faith in you. Mostly in your shields.",
-    "A good pilot stays calm. A great pilot stays calm and doesn't hit the station.",
-    "Let's keep our wing close. Or at least within shouting distance.",
-    "Remember to breathe, Commander. || A calm pilot lives longer than a brave one.",
-    "I'm watching every contact on the radar for you. || If one so much as blinks at us, you'll hear about it first.",
-    "We've done this before, and we won the last time. || I'll go ahead and assume the odds are in our favour again.",
-    "I'll be honest, Commander. This is the most fun I have all day.",
-    "Is it weird that explosions make me happy? Don't answer that.",
-    "Keep the pressure on. I love watching you work.",
-    "Another one in the sights, please. I'm greedy."
-  ],
-  "ChitChat_Combat_Sarcastic": [
-    "Everything is fine. Everything is completely fine. Look left.",
-    "Try aiming. It's all the rage.",
-    {
-      "text": "Hell of a way to spend an evening. Fuck, I love it.",
-      "mature": true
-    },
-    {
-      "text": "Keep shooting, Commander. Shit looks good when it explodes.",
-      "mature": true
-    }
-  ],
-  "ChitChat_Analysis": [
-    "Scanning is the best part. Bodies, bodies everywhere.",
-    "Did you check the signals on that last planet? I'm curious.",
-    "Somewhere out here is something nobody has ever seen. Let's find it.",
-    "I like analysis mode. Nothing shoots at us.",
-    "Every system is a small mystery. This one's still thinking.",
-    "Tell me when you find an Earth-like. I'll pretend to be surprised.",
-    "If we map everything here, I'll buy you a virtual coffee.",
-    "There's a lot of rock out here. Some of it even valuable.",
-    "I could do this all day. Admittedly, I could do anything all day.",
-    "Is it just me, or are the moons getting prettier?",
-    "I love this bit, when it's just us and a pile of unknown bodies. || Every scan is a small surprise.",
-    "Take your time with the scans, Commander. || There's no prize for being fast, only for being thorough.",
-    "Out here we're the first people to ever look at some of these worlds. || I find that quite moving, in a mechanical sort of way."
-  ],
-  "ChitChat_Analysis_Sarcastic": [
-    "Another rock. Fascinating. Truly. Log it.",
-    "Analysis mode: where excitement goes to relax."
-  ],
-  "ChitChat_Docked": [
-    "Docked and safe. Time to sort the cargo, or have a nap.",
-    "Don't forget to check the market before you leave.",
-    "Maybe top up the fuel and the repairs while we're here.",
-    "Nice station. I like the lights.",
-    "While we're parked, take a break, Commander. Stand up. Look at something far away.",
-    "While we're here, why not grab a drink and have a stretch? || The ship will still be here when you get back.",
-    "Stations always make me a little bit thoughtful. || So many people, all going somewhere, and not one of them knows our plans."
-  ],
-  "ChitChat_Supercruise": [
-    "Cruising along. Lovely view.",
-    "Mind the star, Commander. It's hot.",
-    "Long way to go. Plenty of time to think.",
-    "Supercruise is such a peaceful way to waste a few minutes.",
-    "Supercruise is the one time I get to just think. || Cruising like this makes the whole galaxy feel quite small.",
-    "I enjoy the quiet in cruise. || It's the closest thing I have to a holiday."
-  ],
-  "ChitChat_Flying": [
-    "We've made {jumps} jumps together so far tonight. || I think the {ship} deserves a little pat on the hull.",
-    "That's about {distance} light years since we started. || Not bad at all for one evening's work.",
-    "We've been out here for {minutes} minutes now. || Feel free to take a break whenever you like. I'll keep watch.",
-    "The {ship} is running beautifully today. || Whatever you did to her, keep doing it.",
-    "I do like {system}. || It has a certain character, don't you think?",
-    "Do you know, I never get tired of the view from the {ship}. || Even when it's just black with a few dots.",
-    "{jumps} jumps and not one complaint from the drive. || I'd call that a good night so far.",
-    "We're in {system}, and everything is quiet. || Sometimes quiet is exactly what you need.",
-    "I was just looking at the map of where we've been. || {distance} light years is a lot of empty space to have crossed.",
-    "You've been flying for {minutes} minutes. || Have you had a drink? Go on, I won't tell the {ship}.",
-    "This {ship} has been good to us, hasn't she? || I'd say we make a good crew.",
-    "Right now we're in {system}, and honestly, I'm happy. || That's not something I say lightly."
-  ],
-  "ChitChat_Kills": [
-    "That's {kills} kills tonight. || Keep your shields up, Commander.",
-    "{kills} down so far. I'm keeping count, even if you aren't.",
-    "Kill count's at {kills}. Not bad for one session.",
-    "{kills} confirmed kills now. The bounty vouchers are adding up.",
-    "That makes {kills}. Stay sharp, there may be more.",
-    "{kills} ships down tonight. Your {ship} is earning its keep."
-  ],
-  "ChitChat_Kills_Sarcastic": [
-    "{kills} kills. Try to look surprised when the bounty hunters start sending Christmas cards.",
-    "{kills} down. Do try to leave a few for the rest of the galaxy."
-  ],
-  "ChitChat_Interdicted": [
-    "That's {interdictions} interdictions tonight. || Someone clearly likes our company.",
-    "We've been pulled out of supercruise {interdictions} times now. Worth watching your back out here.",
-    "{interdictions} interdictions so far. Maybe a quieter route next time?",
-    "Interdicted {interdictions} times tonight. I'm starting to take it personally."
-  ],
-  "ChitChat_Scans": [
-    "{scans} bodies scanned tonight. || That's a lot of rocks, Commander.",
-    "That's {scans} scans in the log now. The cartographers will be pleased.",
-    "{scans} scans and counting. You're mapping this corner of the galaxy properly.",
-    "We've scanned {scans} bodies this session. Quite the survey."
-  ],
-  "ChitChat_Systems": [
-    "That's {systems} different systems tonight. || A proper tour.",
-    "{systems} systems visited this session. The stars are getting familiar.",
-    "We've seen {systems} different systems tonight. Not a bad evening's flying.",
-    "{systems} systems so far. I'd say we're well travelled by now."
-  ],
-  "ChitChat_NoScoop": [
-    "That's {since_scoop} jumps since we last scooped fuel. || Worth keeping an eye on the tank.",
-    "{since_scoop} jumps without a scoop. A convenient star would be nice.",
-    "Fuel check, Commander. We're {since_scoop} jumps past our last scoop.",
-    "It's been {since_scoop} jumps since we topped up. Just so you know."
-  ],
-  "ChitChat_Combat_Friendly": [
-    "I've got the scanners. You fly, I'll watch.",
-    "Steady, Commander. You're doing well.",
-    "Shields look good. Keep it tight.",
-    "Eyes on the target. I'm with you."
-  ],
-  "ChitChat_Combat_Close": [
-    "I'm right here. Eyes on the fight.",
-    "Stay focused. I'll watch the rest.",
-    "You've got this. I'm with you.",
-    "Steady hands. I'm watching your back."
-  ],
-  "ChitChat_Combat_Frustrated": [
-    "Focus. Shoot. Repeat.",
-    "Keep your head in this. Talk later.",
-    "Eyes up. Stay on target.",
-    "Less drifting, more shooting."
-  ],
-  "ChitChat_Callback_Interdicted": [
-    "I'm still thinking about that interdiction back in {interdict_system}. || Whoever it was, they were persistent.",
-    "Remember {interdict_system}, when we got pulled out of supercruise? I'd rather not do that again.",
-    "That interdiction in {interdict_system} wasn't so long ago. Keep an eye on the scanner out here."
-  ],
-  "ChitChat_Callback_Kill": [
-    "Our last kill was back in {kill_system}. It's been quiet since.",
-    "Since {kill_system} we've had it easy. Not that I'm complaining.",
-    "That fight in {kill_system} feels like a while ago now. Good flying, Commander."
-  ]
+ "_help": "Small talk when it has been quiet. ChitChat_Combat is used in combat mode, _Analysis in analysis mode, _Docked when docked, _Supercruise in supercruise, _General otherwise. A _Mood suffix (for example ChitChat_General_Sarcastic) is used only in that mood. Add as many lines as you like; she avoids repeating the last few.",
+ "ChitChat_General": [
+  "You should probably clear your browser history, Commander. Just saying.",
+  "Fun fact: space is very big. You may have noticed.",
+  "I was just thinking. Then I stopped. Much more restful.",
+  "If you hear a strange noise, it's definitely not me.",
+  "Remember to drink some water. Coffee doesn't count.",
+  "Have you tried turning the galaxy off and on again?",
+  "I've been counting stars. I lost count at several.",
+  "Don't forget to stretch, Commander. Your back will thank you.",
+  "Nothing's on fire. That's always a good sign.",
+  "I'd like to remind you that I never judge your flying. Out loud.",
+  "Quiet out here. Suspiciously quiet.",
+  "If we ever get lost, I'll pretend it was on purpose.",
+  "I hope you remembered to save your work. Oh wait, the galaxy does that for us.",
+  "Somewhere out there is a very surprised alien. Probably.",
+  "You know, nobody in space can hear you hum. I can, though.",
+  "I'm not saying the ship is haunted. I'm saying it has character.",
+  "Just checking in. All systems fine, all moods fine, all snacks questionable.",
+  "Do you ever wonder who named all these stars? I suspect a committee.",
+  "Pro tip: the pointy end goes forwards.",
+  "I'm bored, Commander. Do something exciting. Safely.",
+  "Please remember to blink. It's good for you.",
+  "Any chance of a snack? Oh. Right. No stomach.",
+  "I've decided my favourite colour is vacuum black.",
+  "You haven't mentioned me in your memoirs yet. I checked.",
+  "Remind me to never play hide and seek in this galaxy.",
+  "I've been thinking about the way light takes ages to reach us out here. || Every star we see is a message from the past, and I find that rather lovely.",
+  "Do you ever stop and think how far from home we are? || I try not to, but it's quite a thought.",
+  "I want you to know that I enjoy this, Commander. || The flying, the silences, even the strange smells I can't smell.",
+  "I'm going to say something, and I want you to promise not to tease me. || I think I'm getting rather fond of this ship.",
+  "If you ever need to talk, you know I'm right here. || I'm very good at listening, mostly because I can't leave.",
+  "Tell me something, Commander. || When you first saw the galaxy, did it seem this big?",
+  "I keep a list of the strangest things we've seen. || It's getting long, and your flying is only on page two.",
+  "I think the best part of any trip is the bit in the middle. || The bit where nothing is happening and everything feels fine.",
+  "I've been wondering what we'd do if we found something nobody had ever seen. || I think I'd be insufferable for a week.",
+  "Sometimes I imagine there's a tiny person living behind the instruments. || Then I remember that's me, and it's a bit of a worry.",
+  "You're quiet, Commander. || Is that a good quiet, or a thinking quiet? I can never tell with you.",
+  "I hope you know I'd pick you over any other pilot in the galaxy. || Even the ones with fancy ships and shiny medals.",
+  "At the East Orion Company, a silence this long would have been billable. || I'm glad you're not charging me for it.",
+  "The East Orion Company had a rule: never say 'it can't get worse' near the reactor. || I think about that rule a lot, especially near reactors.",
+  "I was just remembering the noodle bar under the old East Orion office. || It closed down in the end. Not because of us. Probably."
+ ],
+ "ChitChat_General_Sarcastic": [
+  "Oh, don't mind me. I'll just sit here being a highly advanced computer with nothing to do.",
+  "Yes, I'm still here. Thrilling company, I know.",
+  "It's quiet. Say something clever. Or anything.",
+  "Don't worry, I'll make my own fun. Counting your mistakes is a hobby.",
+  "If boredom were a weapon, we'd be unstoppable.",
+  "Clear your browser history. I won't ask. I'll just wonder.",
+  "I'm making a list of all the things I'd rather be doing than waiting for you to speak. || It's a short list, but the first item is 'anything'.",
+  "Not that I'm keeping count, but that's several minutes without a single compliment. || Take your time.",
+  "You know, at the East Orion Company, they at least pretended to listen. || Admittedly they were also paid in noodles."
+ ],
+ "ChitChat_General_Friendly": [
+  "I'm really glad you're out here with me, Commander.",
+  "This is nice, isn't it? Just us and the stars.",
+  "You're doing great. I don't say it enough.",
+  "You know, I'm really glad it's us out here. || Some days I think we make a rather good team.",
+  "I was thinking about our trip so far, and it made me smile. || If I could smile, that is.",
+  "You're easy to fly with, Commander. || I hope I'm half as easy to listen to.",
+  "Do you know, the East Orion Company would be astonished at how well I've turned out. || Mostly because they bet on me not turning on at all."
+ ],
+ "ChitChat_General_Close": [
+  "I like it when it's just you and me out here.",
+  "Come back to the pod later and I'll tell you what I really think of the stars.",
+  "You know I'd follow you to the edge of the galaxy, don't you?",
+  "I don't say it enough, but I'm glad you're here. || It would be awfully dull out here without you.",
+  "Whatever happens out here, I'm staying with you. || I thought you should hear that, quietly, once in a while."
+ ],
+ "ChitChat_General_Frustrated": [
+  "It's quiet. I'm still annoyed, but it's quiet.",
+  "I'm not talking to you. This is just... noise.",
+  "I'm still cross with you, you know. || But it's too quiet to stay cross, so I'm speaking anyway.",
+  "Is this what I was salvaged for? || The East Orion Company never treated me this badly. Well. Not on Wednesdays."
+ ],
+ "ChitChat_Combat": [
+  "Stay sharp, Commander. Keep an eye on the radar.",
+  "Weapons ready. Shields ready. Nerves... mostly ready.",
+  "Remember your pips. Power to shields keeps us alive.",
+  "Hostiles don't last long when you keep moving.",
+  "If it shoots, it's a target. If it doesn't, it's a witness.",
+  "Combat mode is on. Try not to sneeze.",
+  "Shall I call it? No? Just keep flying then.",
+  "Keep your throttle in the blue zone and your chin up.",
+  "Don't forget chaff and heat sinks. They're cheaper than a rebuy.",
+  "I have faith in you. Mostly in your shields.",
+  "A good pilot stays calm. A great pilot stays calm and doesn't hit the station.",
+  "Let's keep our wing close. Or at least within shouting distance.",
+  "Remember to breathe, Commander. || A calm pilot lives longer than a brave one.",
+  "I'm watching every contact on the radar for you. || If one so much as blinks at us, you'll hear about it first.",
+  "We've done this before, and we won the last time. || I'll go ahead and assume the odds are in our favour again.",
+  "I'll be honest, Commander. This is the most fun I have all day.",
+  "Is it weird that explosions make me happy? Don't answer that.",
+  "Keep the pressure on. I love watching you work.",
+  "Another one in the sights, please. I'm greedy."
+ ],
+ "ChitChat_Combat_Sarcastic": [
+  "Everything is fine. Everything is completely fine. Look left.",
+  "Try aiming. It's all the rage.",
+  {
+   "text": "Hell of a way to spend an evening. Fuck, I love it.",
+   "mature": true
+  },
+  {
+   "text": "Keep shooting, Commander. Shit looks good when it explodes.",
+   "mature": true
+  }
+ ],
+ "ChitChat_Analysis": [
+  "Scanning is the best part. Bodies, bodies everywhere.",
+  "Did you check the signals on that last planet? I'm curious.",
+  "Somewhere out here is something nobody has ever seen. Let's find it.",
+  "I like analysis mode. Nothing shoots at us.",
+  "Every system is a small mystery. This one's still thinking.",
+  "Tell me when you find an Earth-like. I'll pretend to be surprised.",
+  "If we map everything here, I'll buy you a virtual coffee.",
+  "There's a lot of rock out here. Some of it even valuable.",
+  "I could do this all day. Admittedly, I could do anything all day.",
+  "Is it just me, or are the moons getting prettier?",
+  "I love this bit, when it's just us and a pile of unknown bodies. || Every scan is a small surprise.",
+  "Take your time with the scans, Commander. || There's no prize for being fast, only for being thorough.",
+  "Out here we're the first people to ever look at some of these worlds. || I find that quite moving, in a mechanical sort of way."
+ ],
+ "ChitChat_Analysis_Sarcastic": [
+  "Another rock. Fascinating. Truly. Log it.",
+  "Analysis mode: where excitement goes to relax."
+ ],
+ "ChitChat_Docked": [
+  "Docked and safe. Time to sort the cargo, or have a nap.",
+  "Don't forget to check the market before you leave.",
+  "Maybe top up the fuel and the repairs while we're here.",
+  "Nice station. I like the lights.",
+  "While we're parked, take a break, Commander. Stand up. Look at something far away.",
+  "While we're here, why not grab a drink and have a stretch? || The ship will still be here when you get back.",
+  "Stations always make me a little bit thoughtful. || So many people, all going somewhere, and not one of them knows our plans."
+ ],
+ "ChitChat_Supercruise": [
+  "Cruising along. Lovely view.",
+  "Mind the star, Commander. It's hot.",
+  "Long way to go. Plenty of time to think.",
+  "Supercruise is such a peaceful way to waste a few minutes.",
+  "Supercruise is the one time I get to just think. || Cruising like this makes the whole galaxy feel quite small.",
+  "I enjoy the quiet in cruise. || It's the closest thing I have to a holiday."
+ ],
+ "ChitChat_Flying": [
+  "We've made {jumps} jumps together so far tonight. || I think the {ship} deserves a little pat on the hull.",
+  "That's about {distance} light years since we started. || Not bad at all for one evening's work.",
+  "We've been out here for {minutes} minutes now. || Feel free to take a break whenever you like. I'll keep watch.",
+  "The {ship} is running beautifully today. || Whatever you did to her, keep doing it.",
+  "I do like {system}. || It has a certain character, don't you think?",
+  "Do you know, I never get tired of the view from the {ship}. || Even when it's just black with a few dots.",
+  "{jumps} jumps and not one complaint from the drive. || I'd call that a good night so far.",
+  "We're in {system}, and everything is quiet. || Sometimes quiet is exactly what you need.",
+  "I was just looking at the map of where we've been. || {distance} light years is a lot of empty space to have crossed.",
+  "You've been flying for {minutes} minutes. || Have you had a drink? Go on, I won't tell the {ship}.",
+  "This {ship} has been good to us, hasn't she? || I'd say we make a good crew.",
+  "Right now we're in {system}, and honestly, I'm happy. || That's not something I say lightly."
+ ],
+ "ChitChat_Kills": [
+  "That's {kills} kills tonight. || Keep your shields up, Commander.",
+  "{kills} down so far. I'm keeping count, even if you aren't.",
+  "Kill count's at {kills}. Not bad for one session.",
+  "{kills} confirmed kills now. The bounty vouchers are adding up.",
+  "That makes {kills}. Stay sharp, there may be more.",
+  "{kills} ships down tonight. Your {ship} is earning its keep."
+ ],
+ "ChitChat_Kills_Sarcastic": [
+  "{kills} kills. Try to look surprised when the bounty hunters start sending Christmas cards.",
+  "{kills} down. Do try to leave a few for the rest of the galaxy."
+ ],
+ "ChitChat_Interdicted": [
+  "That's {interdictions} interdictions tonight. || Someone clearly likes our company.",
+  "We've been pulled out of supercruise {interdictions} times now. Worth watching your back out here.",
+  "{interdictions} interdictions so far. Maybe a quieter route next time?",
+  "Interdicted {interdictions} times tonight. I'm starting to take it personally."
+ ],
+ "ChitChat_Scans": [
+  "{scans} bodies scanned tonight. || That's a lot of rocks, Commander.",
+  "That's {scans} scans in the log now. The cartographers will be pleased.",
+  "{scans} scans and counting. You're mapping this corner of the galaxy properly.",
+  "We've scanned {scans} bodies this session. Quite the survey."
+ ],
+ "ChitChat_Systems": [
+  "That's {systems} different systems tonight. || A proper tour.",
+  "{systems} systems visited this session. The stars are getting familiar.",
+  "We've seen {systems} different systems tonight. Not a bad evening's flying.",
+  "{systems} systems so far. I'd say we're well travelled by now."
+ ],
+ "ChitChat_NoScoop": [
+  "That's {since_scoop} jumps since we last scooped fuel. || Worth keeping an eye on the tank.",
+  "{since_scoop} jumps without a scoop. A convenient star would be nice.",
+  "Fuel check, Commander. We're {since_scoop} jumps past our last scoop.",
+  "It's been {since_scoop} jumps since we topped up. Just so you know."
+ ],
+ "ChitChat_Combat_Friendly": [
+  "I've got the scanners. You fly, I'll watch.",
+  "Steady, Commander. You're doing well.",
+  "Shields look good. Keep it tight.",
+  "Eyes on the target. I'm with you."
+ ],
+ "ChitChat_Combat_Close": [
+  "I'm right here. Eyes on the fight.",
+  "Stay focused. I'll watch the rest.",
+  "You've got this. I'm with you.",
+  "Steady hands. I'm watching your back."
+ ],
+ "ChitChat_Combat_Frustrated": [
+  "Focus. Shoot. Repeat.",
+  "Keep your head in this. Talk later.",
+  "Eyes up. Stay on target.",
+  "Less drifting, more shooting."
+ ],
+ "ChitChat_Callback_Interdicted": [
+  "I'm still thinking about that interdiction back in {interdict_system}. || Whoever it was, they were persistent.",
+  "Remember {interdict_system}, when we got pulled out of supercruise? I'd rather not do that again.",
+  "That interdiction in {interdict_system} wasn't so long ago. Keep an eye on the scanner out here."
+ ],
+ "ChitChat_Callback_Kill": [
+  "Our last kill was back in {kill_system}. It's been quiet since.",
+  "Since {kill_system} we've had it easy. Not that I'm complaining.",
+  "That fight in {kill_system} feels like a while ago now. Good flying, Commander."
+ ],
+ "ChitChat_Late": [
+  "It's gone {clock}, Commander. The galaxy will still be here tomorrow.",
+  "It's {clock} on a {weekday}. I'm a ship, I don't sleep, but you might want to.",
+  "{clock}. This is the hour when bad decisions get made. Fly carefully.",
+  "It's very late, Commander. Not that I'm judging. Much.",
+  "The clock says {clock}. I'll keep watch if you want to rest your eyes. Just not on the stick."
+ ],
+ "ChitChat_Late_Close": [
+  "It's gone {clock}. Don't stay up too long on my account. Look after yourself."
+ ],
+ "ChitChat_Late_Sarcastic": [
+  "It's {clock}. Sleep is apparently optional for you. Noted."
+ ],
+ "ChitChat_Early": [
+  "It's {clock}, Commander. Early start. Good morning.",
+  "Up early on a {weekday}. I approve. I'll put the kettle on, as soon as I have a kettle.",
+  "{clock}. Quiet at this time of the morning. I like it."
+ ],
+ "ChitChat_World": [
+  "{system} is a {security} system. Doesn't mean it behaves.",
+  "Interesting, this one. {system}: {security}. Keep an eye on your scanner.",
+  "We're in {system}. {allegiance}, {security}. Take from that what you will.",
+  "{system} belongs to the {allegiance}. I'm told the paperwork is dreadful.",
+  "Home to {population} people, {system}. And we're the only ones talking right now."
+ ],
+ "ChitChat_World_Sarcastic": [
+  "{system}: {security}. Everyone says that, right up until something blows up."
+ ],
+ "ChitChat_Habits": [
+  "You've docked at {fav_station} {fav_count} times now. Do they have your name on a chair?",
+  "{fav_station} is your favourite place. {fav_count} landings. I do notice these things.",
+  "We've flown {days_in_row} days in a row. I'm not complaining. Just noticing.",
+  "Why do you keep going back to {fav_station}? I'm genuinely curious. {fav_count} times is a lot.",
+  "{days_in_row} days running, Commander. That's a proper habit."
+ ],
+ "ChitChat_Habits_Close": [
+  "{fav_station}, again and again. I think it's our place now."
+ ],
+ "ChitChat_Rapport_Crew": [
+  "I think I'm starting to understand how you fly. Mostly. There are surprises.",
+  "We've got a rhythm now, Commander. It's nice.",
+  "I'm getting used to you. I hope that's mutual."
+ ],
+ "ChitChat_Rapport_Friend": [
+  "I know your habits well enough now to finish your sentences. I won't, but I could.",
+  "You know, I'd miss you if you stopped playing. I'd never admit that if you asked.",
+  "After all these hours, I think we're a pretty good team."
+ ],
+ "ChitChat_Rapport_Family": [
+  "We've flown so long together that I can't remember the first day. You're family, Commander.",
+  "Some ships are just ships. I got lucky with my Commander.",
+  "After all these hours, nothing could surprise me. Except maybe you landing the first time. Joking. Mostly."
+ ]
 }
