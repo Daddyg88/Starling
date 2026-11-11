@@ -6,11 +6,7 @@
   1634,
   830
  ],
- "pads": {
-  "Small": 0,
-  "Medium": 0,
-  "Large": 1
- },
+ "pads": {"Small": 1, "Medium": 0, "Large": 0},
  "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
  "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate.",
  "buildings": [

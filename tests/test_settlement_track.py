@@ -438,17 +438,24 @@ class StartedLate(Setup):
 class WhenSheCannotChoose(Setup):
     def test_she_lists_the_layouts_it_could_be_and_a_named_one_sticks(self):
         self.tracker.maps = SettlementMaps()
-        self.tracker.on_entry({"event": "ApproachSettlement", "Name": "Cheesebeard's Cave", "MarketID": 1, "StationEconomy": "$economy_Extraction;",
+        self.tracker.on_entry({"event": "ApproachSettlement", "Name": "Some Foundry", "MarketID": 1, "StationEconomy": "$economy_Industrial;",
                                "Latitude": -24.94, "Longitude": 33.37})
         self.tracker.on_entry(dict(DOCKING))
         self.assertIsNone(self.tracker.suggestion())
         voice = SettlementMapVoice(self.tracker.maps, self.view, suggest=self.tracker.suggestion, dismissed=self.tracker.set_dismissed,
                                    options=self.tracker.options)
         said = voice.try_handle("show settlement map")
-        self.assertIn("Extraction 1", said)
-        self.assertIn("Extraction 3", said)
-        self.assertNotIn("Extraction 2", said)               # Extraction 2 has a small pad as well
-        voice.try_handle("show settlement map extraction three")
+        self.assertIn("Industrial 2", said)
+        self.assertIn("Industrial 5", said)
+        self.assertNotIn("Industrial 3", said)               # Industrial 3 has a medium pad, not a large one
+        voice.try_handle("show settlement map industrial five")
+        self.assertEqual(self.tracker.suggestion(), "industrial_5")
+
+    def test_one_large_extraction_pad_is_only_extraction_3(self):
+        self.tracker.maps = SettlementMaps()
+        self.tracker.on_entry({"event": "ApproachSettlement", "Name": "Cheesebeard's Cave", "MarketID": 1, "StationEconomy": "$economy_Extraction;",
+                               "Latitude": -24.94, "Longitude": 33.37})
+        self.tracker.on_entry(dict(DOCKING))
         self.assertEqual(self.tracker.suggestion(), "extraction_3")
 
 
@@ -456,7 +463,7 @@ class KnownSettlements(Setup):
     def test_a_settlement_we_have_walked_is_known_at_once(self):
         self.tracker.known = settlement_track.known_settlements()
         self.assertEqual(self.tracker.known.get("4365483779"), "industrial_2")
-        self.tracker.maps = SettlementMaps()                          # the whole set: Industrial 2 and 3 share one large pad
+        self.tracker.maps = SettlementMaps()                          # the whole set: Industrial 2 and 5 share one large pad
         self.tracker.on_entry(dict(APPROACH))
         self.assertEqual(self.tracker.suggestion(), "industrial_2")
 
@@ -499,3 +506,107 @@ class OldSavedLineUps(Setup):
         again.known = again.shipped = {}
         again.on_entry(dict(APPROACH))
         self.assertIsNone(again.calibration)
+
+
+class LinedUpFromTheLanding(Setup):
+    """On pad 1 the ship faces the way the layout is turned (the idea SrvSurvey uses). Real headings at Shi Construction were 251 to 265."""
+
+    def land(self, pad=1, heading=253.0):
+        self.state.heading = heading
+        self.tracker.on_entry(dict(APPROACH))
+        self.tracker.on_entry(dict(DOCKING))
+        self.tracker.on_entry({"event": "DockingGranted", "LandingPad": pad})
+        self.tracker.on_entry({"event": "Docked", "StationType": "OnFootSettlement", "LandingPads": DOCKING["LandingPads"]})
+
+    def terminal_world(self, index):
+        lat, lon = TERMINALS[index][0]
+        return world_xy(lat, lon, APPROACH["Latitude"], APPROACH["Longitude"], RADIUS)
+
+    def test_pad_one_and_a_known_frame_line_the_map_up_at_once(self):
+        said = []
+        self.tracker.say = said.append
+        self.land()
+        cal = self.tracker.calibration
+        self.assertIsNotNone(cal)
+        self.assertEqual(cal.meta["how"], "dock")
+        self.assertTrue(self.tracker.provisional)
+        self.assertAlmostEqual(abs(cal.a), 0.325, places=3)
+        self.assertEqual(len(said), 1)
+        # the ship's own pad lands near the pad on the picture (real heading wobble is about 8 degrees, so allow a few tens of metres)
+        x, y = cal.to_map(*SHIP)
+        pad = self.maps.get("industrial_2")["circles"][0]
+        self.assertLess(math.hypot(x - pad["x"], y - pad["y"]) * 0.325, 40)
+
+    def test_only_pad_one_tells_the_heading(self):
+        self.land(pad=2)
+        self.assertIsNone(self.tracker.calibration)
+
+    def test_no_frame_for_the_map_means_no_guess(self):
+        self.tracker.frames = {}
+        self.land()
+        self.assertIsNone(self.tracker.calibration)
+
+    def test_a_different_heading_turns_the_map_the_same_amount(self):
+        self.land(heading=253.0)
+        first = self.tracker.calibration.turn_degrees()
+        self.tracker._leave()
+        self.land(heading=263.0)
+        second = self.tracker.calibration.turn_degrees()
+        self.assertAlmostEqual((first - second + 180) % 360 - 180, 10.0, places=3)
+
+    def test_two_terminals_that_fit_keep_it_and_save_it(self):
+        self.land()
+        self.assertTrue(self.tracker.provisional)
+        cal = self.tracker.calibration
+        # stand exactly where the map says a terminal is
+        for kind, (x, y) in [("t", p) for p in [tuple(u) for u in settlement_track.settlement_solve.features(self.maps.get("industrial_2"))["stop"][:2]]]:
+            east, north = cal.t.real + (cal.a * complex(x, -y)).real, cal.t.imag + (cal.a * complex(x, -y)).imag
+            self.tracker._check_stop(east, north)
+        self.assertFalse(self.tracker.provisional)
+        self.assertIn("4365483779", self.tracker.saved)
+
+    def test_two_stops_that_do_not_fit_take_it_back_and_it_is_not_tried_again(self):
+        said = []
+        self.tracker.say = said.append
+        self.land()
+        self.tracker._check_stop(900.0, 900.0)            # far outside the settlement
+        self.tracker._check_stop(-900.0, 900.0)
+        self.assertIsNone(self.tracker.calibration)
+        self.assertNotIn("4365483779", self.tracker.saved)
+        self.assertTrue(any("taken it back" in line for line in said))
+        self.tracker.on_entry({"event": "Touchdown"})
+        self.assertIsNone(self.tracker.calibration)       # not guessed again at this visit
+
+
+class LearningTheFrame(Setup):
+    def test_a_line_up_from_your_own_marks_teaches_the_frame(self):
+        self.state.heading = 253.0
+        self.tracker.frames = {}
+        self.tracker.on_entry(dict(APPROACH))
+        self.tracker.on_entry(dict(DOCKING))
+        self.tracker.on_entry({"event": "DockingGranted", "LandingPad": 1})
+        self.tracker.on_entry({"event": "Docked", "StationType": "OnFootSettlement", "LandingPads": DOCKING["LandingPads"]})
+        self.tracker.on_mark("alarms", here(*ALARM))
+        self.tracker.on_mark("power regulator", here(*POWER))
+        frame = self.tracker.frames.get("industrial_2")
+        self.assertIsNotNone(frame)
+        self.assertTrue(frame["learned"])
+        self.assertLess(math.hypot(frame["origin"][0] - 1069, frame["origin"][1] - 432), 120)      # near what the Shi walk measured
+        self.assertLess(abs(frame["offset"] - 8.7), 25)
+        again = SettlementTracker(lambda: self.state, self.maps, MapView(), self.path)               # remembered for next time
+        self.assertEqual(again.frames["industrial_2"]["origin"], frame["origin"])
+
+    def test_a_line_up_without_a_pad_one_landing_teaches_nothing(self):
+        self.tracker.frames = {}
+        self.calibrate()                                                   # no DockingGranted line
+        self.assertEqual(self.tracker.frames, {})
+
+    def test_bad_frames_are_refused(self):
+        self.assertIsNone(settlement_track.frame_problem({"origin": [1000, 400], "offset": 8.7}))
+        for bad in ({}, {"origin": [1, 2]}, {"origin": ["x", 2], "offset": 1}, {"origin": [1e9, 2], "offset": 1},
+                    {"origin": [1, 2], "offset": 900}, {"origin": [1, 2], "offset": 1, "scale": 50}):
+            self.assertIsNotNone(settlement_track.frame_problem(bad), bad)
+
+    def test_the_shipped_frames_are_valid(self):
+        frames = settlement_track.known_frames()
+        self.assertIn("industrial_2", frames)

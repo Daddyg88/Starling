@@ -84,11 +84,11 @@ class Voice(unittest.TestCase):
 class AllTheLayouts(unittest.TestCase):
     # Pad counts as (Small, Medium, Large). Read by Benny from the Odyssey Map Guide pictures (best guesses, not game data),
     # except Industrial 2 (Shi) and Tourist 1 which came from real journal LandingPads. If one is wrong, fix the map file AND this table.
-    PADS = {"tourist_1": (2, 0, 2), "tourist_2": (0, 0, 1), "tourist_3": (2, 0, 1), "tourist_4": (1, 0, 1),
-            "agriculture_1": (1, 0, 1), "agriculture_2": (1, 0, 0), "agriculture_3": (0, 0, 1), "agriculture_4": (2, 0, 1), "agriculture_5": (0, 0, 1),
-            "military_1": (0, 0, 1), "military_2": (2, 0, 1), "military_3": (1, 0, 1), "military_4": (0, 0, 1), "military_5": (1, 0, 1),
-            "industrial_1": (1, 0, 0), "industrial_2": (0, 0, 1), "industrial_3": (0, 0, 1), "industrial_4": (1, 0, 1), "industrial_5": (0, 1, 0),
-            "extraction_1": (0, 0, 1), "extraction_2": (1, 0, 1), "extraction_3": (0, 0, 1), "extraction_4": (0, 1, 0), "extraction_5": (1, 0, 0),
+    PADS = {"tourist_1": (2, 0, 2), "tourist_2": (0, 1, 0), "tourist_3": (2, 0, 1), "tourist_4": (1, 0, 1),
+            "agriculture_1": (1, 0, 1), "agriculture_2": (1, 0, 0), "agriculture_3": (1, 0, 1), "agriculture_4": (2, 0, 1), "agriculture_5": (1, 0, 0),
+            "military_1": (0, 1, 0), "military_2": (2, 0, 1), "military_3": (1, 1, 0), "military_4": (1, 0, 0), "military_5": (1, 1, 0),
+            "industrial_1": (1, 0, 0), "industrial_2": (0, 0, 1), "industrial_3": (0, 1, 0), "industrial_4": (1, 0, 1), "industrial_5": (0, 0, 1),
+            "extraction_1": (1, 0, 1), "extraction_2": (1, 0, 1), "extraction_3": (0, 0, 1), "extraction_4": (0, 1, 0), "extraction_5": (1, 0, 0),
             "high_tech_1": (1, 0, 1), "high_tech_2": (1, 0, 0), "high_tech_3": (1, 0, 0), "high_tech_4": (3, 0, 0)}
 
     def test_every_layout_has_the_pad_counts_from_the_guide(self):

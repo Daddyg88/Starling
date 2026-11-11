@@ -10,6 +10,7 @@ How it knows (all learned from real visits, see settlement_recorder.py):
   * after that every Status.json reading becomes a point and a direction on the map.
 Positions on the map are in the map file's own units (pixels of the original picture).
 """
+import cmath
 import json
 import math
 import os
@@ -72,6 +73,48 @@ def known_calibrations():
 
 def default_path():
     return paths.DATA_DIR / "settlement_calibration.json"
+
+
+FRAME_SCALE = 0.325                  # metres per map unit (every real line-up so far)
+
+
+def known_frames():
+    """Map id -> how that map picture sits against the settlement's own frame (maps/map_frames.json): where the reference point is on the
+    picture (origin, map units), and offset (degrees): the map's turn plus the ship's heading on pad 1. Measured from real line-ups."""
+    try:
+        with open(paths.ROOT / "maps" / "map_frames.json", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return {str(k): v for k, v in data.items() if not str(k).startswith("_") and frame_problem(v) is None}
+    except (OSError, ValueError, AttributeError):
+        return {}
+
+
+def frame_problem(frame):
+    """None when a frame entry is usable, else why not (never trust a hand-edited or shared file blindly)."""
+    try:
+        ox, oy = frame["origin"]
+        offset = float(frame["offset"])
+        scale = float(frame.get("scale") or FRAME_SCALE)
+        if not all(math.isfinite(float(v)) for v in (ox, oy, offset, scale)):
+            return "not numbers"
+        if not (-20000 <= float(ox) <= 20000 and -20000 <= float(oy) <= 20000):
+            return "origin outside any map"
+        if not (-360 <= offset <= 360):
+            return "offset is not degrees"
+        if not (METRES_PER_UNIT[0] <= scale <= METRES_PER_UNIT[1]):
+            return "wrong size"
+    except (KeyError, TypeError, ValueError):
+        return "incomplete"
+    return None
+
+
+def frame_calibration(map_id, frame, heading, ref_lat, ref_lon, radius, name=None):
+    """The map's line-up worked out from nothing but the ship's heading on pad 1 (the layout is turned the way pad 1 faces)."""
+    scale = float(frame.get("scale") or FRAME_SCALE)
+    a = cmath.rect(scale, math.radians(float(frame["offset"]) - float(heading)))
+    ox, oy = frame["origin"]
+    t = -a * complex(float(ox), -float(oy))
+    return Calibration(map_id, a, t, ref_lat, ref_lon, radius, {"name": name, "n": 0, "err": 0.0, "how": "dock"})
 
 
 def cmath_phase(z):
@@ -185,6 +228,9 @@ class SettlementTracker:
         self._asked = False
         self.known = known_settlements()
         self.shipped = known_calibrations()
+        self.frames = known_frames()           # map id -> frame: shipped ones, then the ones learned from your own line-ups
+        self.frames_path = str(self.path) + ".frames"
+        self._load_frames()
         self.auto_shown = False         # the map on screen was put there by this tracker (so this tracker may take it down)
         self.saved = {}
         self._load()
@@ -197,6 +243,26 @@ class SettlementTracker:
             self.saved = data if isinstance(data, dict) else {}
         except (OSError, ValueError):
             self.saved = {}
+
+    def _load_frames(self):
+        try:
+            with open(self.frames_path, encoding="utf-8") as handle:
+                data = json.load(handle)
+            for key, value in (data.items() if isinstance(data, dict) else []):
+                if frame_problem(value) is None:
+                    self.frames[str(key)] = value
+        except (OSError, ValueError):
+            pass
+
+    def _save_frames(self):
+        try:
+            learned = {k: v for k, v in self.frames.items() if v.get("learned")}
+            temp = self.frames_path + ".tmp"
+            with open(temp, "w", encoding="utf-8") as handle:
+                json.dump(learned, handle, indent=1)
+            os.replace(temp, self.frames_path)
+        except OSError:
+            log.exception("Could not save the settlement frames")
 
     def _save(self):
         try:
@@ -220,6 +286,8 @@ class SettlementTracker:
             elif name in ("SupercruiseEntry", "FSDJump", "Shutdown"):
                 self._leave()
             elif self.settlement is not None:
+                if name == "DockingGranted" and entry.get("LandingPad") is not None:
+                    self.settlement["pad_number"] = entry.get("LandingPad")
                 if name in ("DockingRequested", "Docked") and "LandingPads" in entry:
                     self.settlement["pads"] = {k: int(entry["LandingPads"].get(k, 0) or 0) for k in ("Small", "Medium", "Large")}
                     self._choose()
@@ -323,6 +391,49 @@ class SettlementTracker:
         self.settlement["radius"] = state.planet_radius
         self.anchors["pad"] = world_xy(state.latitude, state.longitude, self.settlement["lat"], self.settlement["lon"], state.planet_radius)
         self._add_spot("pad", self.anchors["pad"])
+        heading = getattr(state, "heading", None)
+        if heading is not None:
+            self.settlement["dock_heading"] = float(heading)
+            self._dock_line_up()
+
+    def _dock_line_up(self):
+        """On pad 1 the ship faces the way the whole layout is turned. When this layout's frame is known (from an earlier line-up of the same
+        layout, here or at another settlement) the map can be lined up from the landing alone, then the next stops check it."""
+        s = self.settlement
+        if self.calibration is not None or s is None or s.get("dock_rejected") or str(s.get("pad_number")) != "1":
+            return
+        map_id = s.get("map")
+        frame = self.frames.get(map_id) if map_id else None
+        if frame is None or not s.get("radius") or s.get("dock_heading") is None:
+            return
+        self.calibration = frame_calibration(map_id, frame, s["dock_heading"], s["lat"], s["lon"], s["radius"], s.get("name"))
+        self.provisional, self.checks = True, [0, 0]
+        self.view.current = self.view.current or map_id
+        log.info("Settlement map %s lined up from the landing (ship heading %.0f on pad 1): the next stops will check it", map_id, s["dock_heading"])
+        self._speak("I have lined up the map from the way you landed. I will check it as you walk to the terminals.")
+
+    def _remember_frame(self):
+        """A line-up worth trusting also teaches the layout's frame, so the next settlement with this layout can be lined up from the landing."""
+        s, cal = self.settlement, self.calibration
+        if s is None or cal is None or cal.meta.get("how") == "dock" or s.get("dock_heading") is None or str(s.get("pad_number")) != "1":
+            return
+        if abs(cal.a) == 0:
+            return
+        z = -cal.t / cal.a
+        offset = (self.calibration.turn_degrees() + s["dock_heading"] + 180.0) % 360.0 - 180.0
+        new = {"origin": [round(z.real, 1), round(-z.imag, 1)], "offset": round(offset, 1), "scale": round(abs(cal.a), 4),
+               "learned": True, "n": 1}
+        old = self.frames.get(cal.map_id)
+        if old and old.get("learned") and old.get("n"):
+            n = min(int(old["n"]), 9)               # a running average: later line-ups count a little less each time
+            mix = lambda a, b: (a * n + b) / (n + 1)
+            diff = (offset - float(old["offset"]) + 180.0) % 360.0 - 180.0
+            new = {"origin": [round(mix(float(old["origin"][0]), z.real), 1), round(mix(float(old["origin"][1]), -z.imag), 1)],
+                   "offset": round(float(old["offset"]) + diff / (n + 1), 1), "scale": round(mix(float(old.get("scale") or FRAME_SCALE), abs(cal.a)), 4),
+                   "learned": True, "n": n + 1}
+        if frame_problem(new) is None:
+            self.frames[cal.map_id] = new
+            self._save_frames()
 
     # ---- marking spots ----
     def on_mark(self, label, here):
@@ -415,6 +526,8 @@ class SettlementTracker:
         self.checks = [0, 0]
         self.saved[s["market"]] = self.calibration.to_json()
         self._save()
+        if not self.provisional:
+            self._remember_frame()
         log.info("Settlement map %s lined up from %d spots (%s size): %.3f m per unit, turned %.0f degrees, average miss %.0f units",
                  data["id"], result["n"], "fixed" if scales else "free", abs(result["a"]), math.degrees(cmath_phase(result["a"])), error)
         return "Got it: this is the %s map and it is lined up. You are on it now." % data.get("name", data["id"])
@@ -444,6 +557,7 @@ class SettlementTracker:
         s["map"] = map_id
         self.saved[s["market"]] = self.calibration.to_json()
         self._save()
+        self._remember_frame()
         self.view.current = self.view.current or map_id
         log.info("Settlement map %s fitted: %.3f m per unit, turned %.0f degrees%s", map_id, abs(a), math.degrees(math.atan2(a.imag, a.real)), note)
         return "Got it: the %s map is lined up%s. You are on it now." % (data.get("name", map_id), note)
@@ -527,6 +641,11 @@ class SettlementTracker:
             self.checks[0] += 1
             if self.checks[0] >= 2:
                 self.provisional = False                           # two later stops agree: it is right
+                if cal.meta.get("how") == "dock" and self.settlement is not None:
+                    self.saved[self.settlement["market"]] = cal.to_json()       # a landing-only line-up the walk has proved: keep it
+                    self._save()
+                else:
+                    self._remember_frame()
                 log.info("Settlement map %s confirmed by later stops", cal.map_id)
         else:
             self.checks[1] += 1
@@ -539,6 +658,7 @@ class SettlementTracker:
         s = self.settlement
         log.info("Settlement map %s taken back: later stops did not fit", self.calibration.map_id)
         if s is not None:
+            s["dock_rejected"] = True                              # do not line it up from the landing again at this visit
             self.saved.pop(s["market"], None)
             self._save()
             if not (self.known.get(s["market"])):
