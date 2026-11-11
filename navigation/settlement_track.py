@@ -30,6 +30,7 @@ MAX_PAD_ERROR_METRES = 12.0
 FORGET_AFTER_METRES = 2500.0
 SHOW_WITHIN_METRES = 700.0           # the map pops up when you are on foot this close to the settlement
 ARRIVED_METRES = 6.0                 # the arrow goes away when you are this close to what it points at
+TRUST_UNITS = 30.0                   # a later stop this close (map units, about 10 m) to a terminal, the power regulator or the alarm fits the line-up
 SAME_SPOT_METRES = 6.0               # two spots of the same kind closer than this are one spot
 DWELL_SECONDS = 6.0                  # standing still this long on foot = using a terminal (real visits: 6-10 s at each terminal)
 STILL_METRES = 2.5
@@ -173,6 +174,8 @@ class SettlementTracker:
         self.anchors = {}               # feature -> (east, north) metres from the settlement's reference point
         self.spots = []                 # [(kind, east, north)] every place you stood at that the map can match (terminals, power...)
         self.calibration = None
+        self.provisional = False        # lined up from only three stops: the next stops check it (see _check_stop)
+        self.checks = [0, 0]            # [stops that fit the line-up, stops that did not]
         self.dismissed = False          # you said "hide the settlement map": it stays hidden until the next settlement
         self._was_on_foot = False
         self._still = None              # (east, north, since, counted): where you have been standing
@@ -249,12 +252,15 @@ class SettlementTracker:
             try:
                 self.calibration = Calibration.from_json(known)
                 self.settlement["map"] = known["map"]
+                self.provisional = known.get("how") == "stops" and int(known.get("n") or 0) <= settlement_solve.MIN_SPOTS_LOCKED
+                self.checks = [0, 0]
                 log.info("Settlement %s: map %s, calibration remembered", self.settlement["name"], known["map"])
             except (KeyError, TypeError, ValueError, IndexError):
                 self.calibration = None
 
     def _leave(self):
         self.settlement, self.anchors, self.calibration, self.spots = None, {}, None, []
+        self.provisional, self.checks = False, [0, 0]
         self.view.position = None
         if self.auto_shown:
             self.view.current = None
@@ -361,12 +367,29 @@ class SettlementTracker:
         count = len([1 for kind, _, _ in self.spots if kind != "pad"])
         if not speak:
             return None
-        need = settlement_solve.MIN_SPOTS if map_id else settlement_solve.SPOTS_TO_CHOOSE
+        need = settlement_solve.MIN_SPOTS_LOCKED if map_id else settlement_solve.SPOTS_TO_CHOOSE_LOCKED
         if count < need:
             return "Stand at %d more terminals (or the power regulator, or the alarm console) and the map will line itself up." % (need - count)
         return "I cannot tell which way the map turns yet. Mark another terminal that is further away."
 
     def _solve(self, map_id):
+        s = self.settlement
+        count = len([1 for kind, _, _ in self.spots if kind != "pad"])
+        # first with the map's size fixed (three stops are enough), then with any size (four or five stops)
+        passes = (
+            (settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE,
+             settlement_solve.MIN_SPOTS_LOCKED if map_id else settlement_solve.SPOTS_TO_CHOOSE_LOCKED),
+            (None, None, settlement_solve.MIN_SPOTS if map_id else settlement_solve.SPOTS_TO_CHOOSE),
+        )
+        for scales, scale_range, minimum in passes:
+            if count < minimum:
+                continue
+            found = self._solve_with(map_id, scales, scale_range, minimum)
+            if found:
+                return found
+        return None
+
+    def _solve_with(self, map_id, scales, scale_range, minimum):
         s = self.settlement
         if map_id:
             options = [self.maps.get(map_id)]
@@ -376,8 +399,8 @@ class SettlementTracker:
         for data in options:
             if data is None:
                 continue
-            result = settlement_solve.solve(data, self.spots, None if map_id else settlement_solve.SPOTS_TO_CHOOSE)
-            if result and settlement_solve.clear(result) and METRES_PER_UNIT[0] <= abs(result["a"]) <= METRES_PER_UNIT[1]:
+            result = settlement_solve.solve(data, self.spots, minimum, scales)
+            if result and settlement_solve.clear(result, scale_range) and METRES_PER_UNIT[0] <= abs(result["a"]) <= METRES_PER_UNIT[1]:
                 results.append((result["error"], data, result))
         if not results:
             return None
@@ -388,10 +411,12 @@ class SettlementTracker:
         self.calibration = Calibration(data["id"], result["a"], result["t"], s["lat"], s["lon"], s["radius"],
                                        {"name": s.get("name"), "n": result["n"], "err": round(result["error"], 1), "how": "stops"})
         s["map"] = data["id"]
+        self.provisional = result["n"] <= settlement_solve.MIN_SPOTS_LOCKED
+        self.checks = [0, 0]
         self.saved[s["market"]] = self.calibration.to_json()
         self._save()
-        log.info("Settlement map %s lined up from %d spots: %.3f m per unit, turned %.0f degrees, average miss %.0f units",
-                 data["id"], result["n"], abs(result["a"]), math.degrees(cmath_phase(result["a"])), error)
+        log.info("Settlement map %s lined up from %d spots (%s size): %.3f m per unit, turned %.0f degrees, average miss %.0f units",
+                 data["id"], result["n"], "fixed" if scales else "free", abs(result["a"]), math.degrees(cmath_phase(result["a"])), error)
         return "Got it: this is the %s map and it is lined up. You are on it now." % data.get("name", data["id"])
 
     def _calibrate(self, map_id):
@@ -474,14 +499,55 @@ class SettlementTracker:
             self._still = (east, north, now, False)
             return
         x, y, since, counted = self._still
-        if counted or now - since < DWELL_SECONDS or self.calibration is not None:
+        if counted or now - since < DWELL_SECONDS:
+            return
+        if self.calibration is not None:
+            if self.provisional:
+                self._still = (x, y, since, True)
+                if math.hypot(x - self._foot_start[0], y - self._foot_start[1]) >= GOT_OUT_METRES:
+                    self._check_stop(x, y)
             return
         self._still = (x, y, since, True)
         if math.hypot(x - self._foot_start[0], y - self._foot_start[1]) < GOT_OUT_METRES:
             return                                                 # just stepped out of the ship
         if self._add_spot("stop", (x, y)):
-            log.info("Settlement: stood still %.0f s, %.0f m from the reference point (%d spots)", now - since, near, len(self.spots))
+            log.info("Settlement: stood still %.0f s, %.0f m from the reference point (%d stops, not counting your ship)", now - since, near,
+                     len([1 for kind, _, _ in self.spots if kind != "pad"]))
             self._line_up(speak=False)
+
+    def _check_stop(self, east, north):
+        """A line-up made from only three stops is checked by the stops that follow: a terminal (or the power regulator, or the alarm) should
+        be where the map says. Suit recharges and other stops that are not on the map do not count against it more than twice."""
+        cal, data = self.calibration, self.maps.get(self.calibration.map_id)
+        if data is None:
+            return
+        x, y = cal.from_world(east, north)
+        near = min((math.hypot(x - u, y - v) for u, v in settlement_solve.features(data)["stop"]), default=1e9)
+        if near <= TRUST_UNITS:
+            self.checks[0] += 1
+            if self.checks[0] >= 2:
+                self.provisional = False                           # two later stops agree: it is right
+                log.info("Settlement map %s confirmed by later stops", cal.map_id)
+        else:
+            self.checks[1] += 1
+            log.info("Settlement: a later stop is %.0f map units from any terminal (%d fit, %d do not)", near, *self.checks)
+            if self.checks[1] >= 2 and self.checks[1] > self.checks[0]:
+                self._take_back()
+
+    def _take_back(self):
+        """The three-stop line-up was probably wrong: forget it and start collecting stops again."""
+        s = self.settlement
+        log.info("Settlement map %s taken back: later stops did not fit", self.calibration.map_id)
+        if s is not None:
+            self.saved.pop(s["market"], None)
+            self._save()
+            if not (self.known.get(s["market"])):
+                s["map"] = None
+        self.calibration, self.provisional, self.checks = None, False, [0, 0]
+        self.view.position = None
+        self._choose()
+        if self.say is not None:
+            self._speak("That map does not fit where you have been standing, so I have taken it back. Stand at a few more terminals and I will try again.")
 
     def _show_or_hide(self, on_foot, near):
         """The map comes up when you step out near a settlement we have a map for, and goes when you get back in or leave."""

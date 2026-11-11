@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.95.1 - three stops are enough
+
+- Trigger: Benny's zip 20261111-190558 (Sharma Hydroponics Farm, Agriculture 4). Recognised from the pads (matches the 2S 1L in the table), but only three terminal stops (the pad does not count, and two stops were suit recharges that are not on the map), so the 4-stop rule gave no line-up.
+- navigation/settlement_solve.py: `solve(..., scales=LOCKED_SCALES)` fixes the map size at 0.325 m per unit (turn and shift only); the refine keeps the size. `clear(result, scale_range, good, margin)`. `MIN_SPOTS_LOCKED` 3 (layout known), `SPOTS_TO_CHOOSE_LOCKED` 4 (choosing). The old wide search (4 / 5 stops) still runs second.
+- Evidence for one common size: Shi 0.3249; a free fit of the Sharma stops that best matched Agriculture 4 gave 0.329 (only 3 of 7 stops matched, so weak evidence). NOT proven. Needs more real settlements.
+- Check made: random walks (jitter 8 units per axis, 0 to 2 junk stops) over all 28 layouts. Fixed size, 3 stops: 99 right, 2 wrong, 39 unsure out of 140. Wide search, 4 stops: 116 right, 4 wrong, 20 unsure. One junk stop with 3 true stops mostly stays unsure; 4 true stops plus 1 junk: 64 right, 1 wrong, 75 unsure. tests/test_settlement_solve.py `LockedSize` repeats a smaller version (87 sure, 4 wrong with 6 units of jitter: about 5 in 100 wrong, which is why a 3-stop line-up is only provisional).
+- navigation/settlement_track.py: a line-up from 3 stops is `provisional`; `_check_stop` counts later dwell stops (within `TRUST_UNITS` 30 map units of a terminal, power or alarm = fit). 2 fits confirm; 2 misses and more misses than fits `_take_back` (forgets the saved line-up, says so). Loaded saved 3-stop line-ups are provisional again.
+- navigation/settlement_recorder.py: trail rows now carry `status_flags2` and `status_flags` (items 6 and 7) so we can look for flags that change when walking in or out of buildings.
+- Idea not built: using those flags (or the walking trail through doors and airlocks) to line the map up without any terminals. Needs a zip with the flags first.
+
 ## 0.95.0 - she notices you (habits, rapport, the world, push-to-talk interrupt)
 
 - memory/habits.py `HabitKeeper` (data/habits.json): stations (count + recent days), deaths per system, days played, told steps. Remarks: `Habit_Station_Week` (3/5/8/12 landings in 7 days), `Habit_Station_Home` (10/25/50/100 ever), `Habit_Death_Place` (2nd death or more in a system, said at Resurrect/Location/FSDJump/Docked), `Habit_Streak` (3/7/14/30/60/100 days, said at the next Docked or FSDJump after LoadGame), `Habit_Jumps`, `Rapport_Hours`. One remark per 20 minutes; milestones ignore the gap. First run marks passed milestones as told.

@@ -4,7 +4,7 @@ recognise a layout and how to place you on its map. It only LISTENS (journal lin
 For every visit it keeps (data/settlement_samples.json):
   * the settlement: name, economy, government, pad counts, the settlement's own coordinates (from ApproachSettlement)
   * your ship: the pad you were given, where it landed, which way it faced
-  * a walking trail: your position and heading every 2 seconds while you are on foot near the settlement
+  * a walking trail: your position, heading and the game's status flags every 2 seconds while you are on foot near the settlement (the flags may show when you walk into and out of buildings: for a later, lighter way to line up)
   * marks you make by voice: "mark spot power regulator" stores the position with that label (stand at a feature first)
 The file is small (the trail is capped) and goes into the diagnostics zip, so you can send it back.
 """
@@ -169,7 +169,8 @@ class SettlementRecorder:
         if on_foot and now - self._last_trail >= TRAIL_SECONDS and len(visit["trail"]) < TRAIL_MAX:
             self._last_trail = now
             visit["trail"].append([round(state.latitude, 7), round(state.longitude, 7), getattr(state, "heading", None),
-                                   getattr(state, "altitude", None), getattr(state, "gui_focus", 0)])
+                                   getattr(state, "altitude", None), getattr(state, "gui_focus", 0),
+                                   getattr(state, "status_flags2", 0), getattr(state, "status_flags", 0)])
             self._touch()
         elif self._dirty and now - self._last_save >= SAVE_SECONDS:
             self.save()

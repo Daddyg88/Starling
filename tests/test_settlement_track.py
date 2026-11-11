@@ -237,6 +237,62 @@ class WithoutPowerOrAlarm(Helpers):
         self.assertIsNotNone(self.tracker.calibration)
         self.assertEqual(self.tracker.suggestion(), "industrial_2")
 
+    def test_standing_still_at_just_three_places_is_enough_with_the_known_map_size(self):
+        clock = [100.0]
+        self.tracker.clock = lambda: clock[0]
+        self.arrive()
+        self.state.latitude, self.state.longitude, self.state.status_flags2 = SHIP[0], SHIP[1], 1
+        self.tracker.on_status(self.state)
+        for lat, lon in (T1, T2, T3):
+            self.stand(lat, lon, 8, clock)
+        self.assertIsNotNone(self.tracker.calibration)
+        self.assertEqual(self.tracker.suggestion(), "industrial_2")
+
+    def test_two_stops_and_your_ship_are_still_not_enough(self):
+        clock = [100.0]
+        self.tracker.clock = lambda: clock[0]
+        self.arrive()
+        self.tracker.on_mark("pad", here(*SHIP))
+        for lat, lon in (T1, T2):
+            self.stand(lat, lon, 8, clock)
+        self.assertIsNone(self.tracker.calibration)
+
+    def three_stop_lineup(self):
+        clock = [100.0]
+        self.tracker.clock = lambda: clock[0]
+        self.arrive()
+        self.state.latitude, self.state.longitude, self.state.status_flags2 = SHIP[0], SHIP[1], 1
+        self.tracker.on_status(self.state)
+        for lat, lon in (T1, T2, T3):
+            self.stand(lat, lon, 8, clock)
+        self.assertIsNotNone(self.tracker.calibration)
+        return clock
+
+    def test_a_three_stop_lineup_is_confirmed_by_two_later_stops_that_fit(self):
+        clock = self.three_stop_lineup()
+        self.assertTrue(self.tracker.provisional)
+        self.stand(*POWER, 8, clock)
+        self.assertTrue(self.tracker.provisional)
+        self.stand(T1[0] + 0.0004, T1[1], 3, clock)                      # walk away, then back
+        self.stand(*T1, 8, clock)
+        self.assertFalse(self.tracker.provisional)
+        self.assertIsNotNone(self.tracker.calibration)
+
+    def test_one_stop_that_is_not_on_the_map_does_not_undo_it(self):
+        clock = self.three_stop_lineup()
+        self.stand(SHIP[0] - 0.003, SHIP[1] + 0.003, 8, clock)           # a suit recharge, say
+        self.assertIsNotNone(self.tracker.calibration)
+
+    def test_two_stops_that_do_not_fit_take_a_three_stop_lineup_back(self):
+        clock = self.three_stop_lineup()
+        said = []
+        self.tracker.say = said.append
+        self.stand(SHIP[0] - 0.003, SHIP[1] + 0.003, 8, clock)
+        self.stand(SHIP[0] - 0.006, SHIP[1] - 0.003, 8, clock)
+        self.assertIsNone(self.tracker.calibration)
+        self.assertNotIn(self.tracker.settlement["market"], self.tracker.saved)
+        self.assertTrue(any("taken it back" in text for text in said))
+
     def test_waiting_beside_the_ship_is_not_a_terminal(self):
         clock = [100.0]
         self.tracker.clock = lambda: clock[0]

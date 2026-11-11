@@ -15,6 +15,14 @@ CAP_UNITS = 60.0                    # a spot further than this from every matchi
 GOOD_UNITS = 22.0                   # average error (map units, about 7 m) a believable answer must beat
 MIN_SPOTS = 4                       # when the layout is already known; 5 when she has to choose between layouts (SPOTS_TO_CHOOSE)
 SPOTS_TO_CHOOSE = 5
+# FIRST TRY, with the size of the map fixed: Shi Construction measured 0.3249 m per map unit and a second set of stops fitted 0.329, so
+# the guide maps look like they share one scale. With the size known only the turn and the shift are unknown, so THREE stops are enough
+# to be as sure as four were before (checked on made-up walks over all 28 layouts). If a settlement does not fit this way, the wider search
+# above (any size from 0.295 to 0.355, four or five stops) still runs afterwards.
+LOCKED_SCALES = (0.325,)
+LOCKED_RANGE = (0.31, 0.34)
+MIN_SPOTS_LOCKED = 3                # when the layout is known
+SPOTS_TO_CHOOSE_LOCKED = 4          # when she has to choose between layouts
 MIN_APART_METRES = 20.0
 SEPARATE_DEGREES = 20.0             # answers closer in turn than this are the same answer
 
@@ -75,7 +83,7 @@ def _spread(spots):
     return far
 
 
-def solve(data, spots, minimum=None):
+def solve(data, spots, minimum=None, scales=None):
     """spots: [(kind, east_m, north_m)]. Returns {"a", "t", "error", "next", "n"} or None when there is no clear answer.
     error = average miss in map units for the best answer, next = the same for the best answer that turns the map differently."""
     feats = features(data)
@@ -84,19 +92,19 @@ def solve(data, spots, minimum=None):
         return None
     anchor = spots[0]
     tries = []
-    for scale in SCALES:
+    for scale in (scales or SCALES):
         for turn in range(0, 360, TURN_STEP):
             a = scale * cmath.exp(1j * math.radians(turn))
             for fx, fy in feats[anchor[0]]:
                 t = complex(anchor[1], anchor[2]) - a * complex(fx, -fy)
-                tries.append((_cost(a, t, spots, feats), turn, a, t))
+                tries.append((_cost(a, t, spots, feats), turn, a, t, scale if scales else None))
     tries.sort(key=lambda row: row[0])
     kept = []                                               # the best try of each different turn, each tightened with the same fit
     for row in tries:
         if all(_turn_apart(row[1], other[1]) > SEPARATE_DEGREES for other in kept):
             a, t = row[2], row[3]
             for _ in range(2):
-                a, t = _refine(a, t, spots, feats)
+                a, t = _refine(a, t, spots, feats, row[4])
             kept.append((_cost(a, t, spots, feats), row[1], a, t))
             if len(kept) >= 6:
                 break
@@ -110,7 +118,7 @@ def _turn_apart(one, two):
     return abs((one - two + 180) % 360 - 180)
 
 
-def _refine(a, t, spots, feats):
+def _refine(a, t, spots, feats, fixed=None):
     """Tighten the fit: match every spot to its nearest feature and fit a clean turn, size and shift to those pairs."""
     zs, ws = [], []
     for kind, east, north in spots:
@@ -128,6 +136,10 @@ def _refine(a, t, spots, feats):
     if den <= 0:
         return a, t
     na = sum((z - zc).conjugate() * (w - wc) for z, w in zip(zs, ws)) / den
+    if fixed:                                                # the size is known: keep it, only tighten the turn and the shift
+        if abs(na) <= 0:
+            return a, t
+        na = na / abs(na) * fixed
     if not 0.27 <= abs(na) <= 0.38:
         return a, t
     return na, wc - na * zc
@@ -136,10 +148,13 @@ def _refine(a, t, spots, feats):
 SCALE_RANGE = (0.295, 0.355)         # every real settlement measured so far is 0.325 m per unit (Shi); a fit far from that is a coincidence
 
 
-def clear(result):
+def clear(result, scale_range=None, good=None, margin=None):
     """True when the answer is good enough and clearly better than the best different one."""
     if not result:
         return False
-    if not SCALE_RANGE[0] <= abs(result["a"]) <= SCALE_RANGE[1]:
+    low, high = scale_range or SCALE_RANGE
+    if not low <= abs(result["a"]) <= high:
         return False
-    return result["error"] <= GOOD_UNITS and result["next"] >= result["error"] * 1.4 + 5.0
+    good = GOOD_UNITS if good is None else good
+    ratio, extra = margin or (1.4, 5.0)
+    return result["error"] <= good and result["next"] >= result["error"] * ratio + extra
