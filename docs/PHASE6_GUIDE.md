@@ -1552,6 +1552,13 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.93.1 - pad counts for the 28 layouts
+
+- The `pads` field of every maps/settlements/*.json now holds the counts Benny read from the Odyssey Map Guide pictures. They are best guesses, except Industrial 2 and Tourist 1 (real LandingPads). 18 files changed.
+- tests/test_settlement_maps.py `AllTheLayouts.PADS` holds the same table; if you fix a map file, fix the table too.
+- Pads still shared: Tourist (none), Agriculture 3/5 (1L), Military 1/4 (1L), Industrial 2/3 (1L), Extraction 1/3 (1L), Agriculture 1 / Military 3,5 / Industrial 4 / Extraction 2 / High Tech 1 (1S 1L), Agriculture 2 / Industrial 1 / Extraction 5 / High Tech 2, 3 (1S), Industrial 5 / Extraction 4 (1M). When several match she lists them and you pick, or the stops solver picks (5 stops).
+- Cheesebeard's Cave (Extraction, 1 large) is now Extraction 1 or 3 only.
+
 ## 0.93.0 - shared settlement line-ups
 
 * navigation/settlement_share.py: `problem` (sanity check of one line-up: v 2, believable size 0.27-0.38 m/unit, real map, sane numbers), `merge` (adds good ones; replaces only a better-proved one that agrees within 12 degrees; reports CONFLICT otherwise).

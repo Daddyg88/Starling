@@ -336,5 +336,9 @@
   }
  ],
  "tips": [],
- "pads": null
+ "pads": {
+  "Small": 2,
+  "Medium": 0,
+  "Large": 2
+ }
 }

@@ -389,16 +389,18 @@ class WhenSheCannotChoose(Setup):
         voice = SettlementMapVoice(self.tracker.maps, self.view, suggest=self.tracker.suggestion, dismissed=self.tracker.set_dismissed,
                                    options=self.tracker.options)
         said = voice.try_handle("show settlement map")
-        self.assertIn("Extraction 2", said)
-        voice.try_handle("show settlement map extraction two")
-        self.assertEqual(self.tracker.suggestion(), "extraction_2")
+        self.assertIn("Extraction 1", said)
+        self.assertIn("Extraction 3", said)
+        self.assertNotIn("Extraction 2", said)               # Extraction 2 has a small pad as well
+        voice.try_handle("show settlement map extraction three")
+        self.assertEqual(self.tracker.suggestion(), "extraction_3")
 
 
 class KnownSettlements(Setup):
     def test_a_settlement_we_have_walked_is_known_at_once(self):
         self.tracker.known = settlement_track.known_settlements()
         self.assertEqual(self.tracker.known.get("4365483779"), "industrial_2")
-        self.tracker.maps = SettlementMaps()                          # the whole set: three Industrial layouts share one large pad
+        self.tracker.maps = SettlementMaps()                          # the whole set: Industrial 2 and 3 share one large pad
         self.tracker.on_entry(dict(APPROACH))
         self.assertEqual(self.tracker.suggestion(), "industrial_2")
 
