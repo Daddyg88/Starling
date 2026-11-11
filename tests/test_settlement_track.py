@@ -610,3 +610,21 @@ class LearningTheFrame(Setup):
     def test_the_shipped_frames_are_valid(self):
         frames = settlement_track.known_frames()
         self.assertIn("industrial_2", frames)
+
+
+class SameLayoutDifferentSettlements(Setup):
+    def test_peng_and_makubuya_are_known_to_be_industrial_2(self):
+        known = settlement_track.known_settlements()
+        self.assertEqual(known.get("4367086339"), "industrial_2")      # Peng Synthetics Foundry
+        self.assertEqual(known.get("4358173443"), "industrial_2")      # Makubuya Engineering Silo
+
+    def test_the_real_visits_land_near_terminals_when_lined_up_from_the_landing(self):
+        # real stops (metres east, north of the reference point) and the ship's heading on pad 1, 2026-11-11
+        from navigation import settlement_solve
+        feats = settlement_solve.features(self.maps.get("industrial_2"))["stop"]
+        frame = settlement_track.known_frames()["industrial_2"]
+        visits = [(181, [(-19, -128), (82, -24), (72, 36)]), (172, [(-19, -128), (80, -24), (72, 36)]), (74, [(130, 3), (10, 84), (-47, 64)])]
+        for heading, stops in visits:
+            cal = settlement_track.frame_calibration("industrial_2", frame, heading, 0, 0, 1e6)
+            misses = [min(math.hypot(x - u, y - v) for u, v in feats) for x, y in (cal.from_world(e, n) for e, n in stops)]
+            self.assertLess(sum(misses) / len(misses), settlement_track.DOCK_TRUST_UNITS, (heading, misses))

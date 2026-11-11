@@ -1,4 +1,4 @@
 {
- "_note": "How a map picture sits against its settlement's own frame, measured from real line-ups: origin = where the settlement's reference point is on the picture (map units), offset = the map's turn plus the ship's heading on pad 1 (degrees), scale = metres per map unit. Starling learns more of these from your own line-ups.",
- "industrial_2": {"origin": [1069, 432], "offset": 8.7, "scale": 0.325}
+ "_note": "How a map picture sits against its settlement's own frame, measured from real line-ups: origin = where the settlement's reference point is on the picture (map units), offset = the map's turn plus the ship's heading on pad 1 (degrees), scale = metres per map unit. Starling learns more of these from your own line-ups. industrial_2: Shi Construction walk, then adjusted with the Peng Synthetics Foundry and Makubuya Engineering Silo stops (same layout).",
+ "industrial_2": {"origin": [1075, 416], "offset": 5, "scale": 0.325}
 }

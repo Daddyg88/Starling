@@ -1552,6 +1552,17 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.95.3 - the landing rule checked on three more visits
+
+- Trigger: Benny's zip 20261111-224857 (Peng Synthetics Foundry x2, Makubuya Engineering Silo, both Industrial, 1 large pad).
+- Stops (east, north metres from the reference point): Peng (-19,-128), (82,-24), (72,36); Makubuya (130,3), (10,84), (-47,64). Distances 129/130, 85, 81/79 match; bearings differ by -99.7 degrees for all three pairs. Ship heading on pad 1: Peng 172 to 181, Makubuya 74: difference -102 to -107. So the rule holds to about 3 degrees and the two settlements share a layout.
+- Same as Shi: Shi's terminals are 130, 79 and 86 m from its reference point; two of three bearings differ from Peng's by -77 (heading says -80). The free solver could not name Industrial 2 or 5 for Peng (average miss 35 to 40 map units for 2, 5 and 3 alike): the guide maps' terminal positions are traced by eye, so a free fit from 3 stops has little to hold on to.
+- maps/known_settlements.json: Peng (4367086339) and Makubuya (4358173443) -> industrial_2. Judged very likely, not certain (Industrial 5 is the other one-large-pad Industrial).
+- maps/map_frames.json: industrial_2 origin (1075, 416), offset 5 (was 1069, 432, 8.7 from Shi alone). A grid search over the three visits preferred (1080, 400, 1); this is a compromise with Shi. With it the nine stops miss a terminal by 13 to 50 map units, average about 30.
+- navigation/settlement_track.py: `DOCK_TRUST_UNITS` 50: `_check_stop` uses it for a `how: dock` line-up (the heading wobble makes it looser than a line-up from stops, 30).
+- tests/test_settlement_track.py `SameLayoutDifferentSettlements`.
+- Open: still no real-game check that the landing line-up appears and confirms.
+
 ## 0.95.2 - the landing lines up the map
 
 - Source of the idea: SrvSurvey (GPL v3; we read how it works but copied none of its files). It works from the pad: pad 1 faces the settlement's heading, other pads add a fixed rotation per layout, and the layout origin is the ApproachSettlement latitude/longitude.

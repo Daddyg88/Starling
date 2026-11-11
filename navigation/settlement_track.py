@@ -31,6 +31,7 @@ MAX_PAD_ERROR_METRES = 12.0
 FORGET_AFTER_METRES = 2500.0
 SHOW_WITHIN_METRES = 700.0           # the map pops up when you are on foot this close to the settlement
 ARRIVED_METRES = 6.0                 # the arrow goes away when you are this close to what it points at
+DOCK_TRUST_UNITS = 50.0              # a line-up made from the landing alone is looser (the ship's heading wobbles 5 to 8 degrees), so a stop fits within this
 TRUST_UNITS = 30.0                   # a later stop this close (map units, about 10 m) to a terminal, the power regulator or the alarm fits the line-up
 SAME_SPOT_METRES = 6.0               # two spots of the same kind closer than this are one spot
 DWELL_SECONDS = 6.0                  # standing still this long on foot = using a terminal (real visits: 6-10 s at each terminal)
@@ -637,7 +638,7 @@ class SettlementTracker:
             return
         x, y = cal.from_world(east, north)
         near = min((math.hypot(x - u, y - v) for u, v in settlement_solve.features(data)["stop"]), default=1e9)
-        if near <= TRUST_UNITS:
+        if near <= (DOCK_TRUST_UNITS if cal.meta.get("how") == "dock" else TRUST_UNITS):
             self.checks[0] += 1
             if self.checks[0] >= 2:
                 self.provisional = False                           # two later stops agree: it is right
