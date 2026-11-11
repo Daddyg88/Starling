@@ -152,6 +152,46 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(setup_mod._extract_tensor(9), 9)
 
 
+class InnoKokoroVersions(unittest.TestCase):
+    """inno-kokoro 0.4.0 made backend a required argument of Tuner; the voice tuning crashed on it for a tester."""
+
+    def _fake_library(self, needs_backend):
+        import sys
+        import types
+        calls = {}
+
+        class Tuner:
+            def __init__(self, path=None, device="cpu", check_update=True, *, backend=None if not needs_backend else ...):
+                if needs_backend and backend is ...:
+                    raise TypeError("Tuner.__init__() missing 1 required keyword-only argument: 'backend'")
+                calls["backend"] = None if backend is ... else backend
+
+        def enroll(wav, sr, tuner, fmax=None, head=True, return_pt=False):
+            calls["return_pt"] = return_pt
+            return ("PACK", [0.5])
+
+        module = types.ModuleType("inno_kokoro.enroll")
+        module.Tuner, module.enroll, module.read = Tuner, enroll, lambda path: ([0.0], 24000)
+        package = types.ModuleType("inno_kokoro")
+        package.enroll = module
+        saved = {k: sys.modules.get(k) for k in ("inno_kokoro", "inno_kokoro.enroll")}
+        sys.modules["inno_kokoro"], sys.modules["inno_kokoro.enroll"] = package, module
+
+        def restore():
+            for key, value in saved.items():
+                if value is None:
+                    sys.modules.pop(key, None)
+                else:
+                    sys.modules[key] = value
+        self.addCleanup(restore)
+        return calls
+
+    def test_new_library_gets_the_torch_backend_and_a_torch_pack(self):
+        calls = self._fake_library(needs_backend=True)
+        self.assertEqual(setup_mod.enroll_with_inno_kokoro("ref.wav"), "PACK")
+        self.assertEqual(calls, {"backend": "torch", "return_pt": True})
+
+
 class KokoroTests(unittest.TestCase):
     def test_speed_mapping(self):
         self.assertEqual(speed_from_rate(0), 1.0)

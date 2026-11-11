@@ -113,11 +113,16 @@ def enroll_with_inno_kokoro(wav_path):
             "inno-kokoro is not installed. Re-run setup.bat (it installs it).") from error
 
     log.info("Loading the inno-kokoro tuner (first time downloads about 24 MB)...")
-    tuner = Tuner()
+    try:
+        tuner = Tuner(backend="torch")           # inno-kokoro 0.4.0 and newer: the backend must be named
+        newer = True
+    except TypeError:
+        tuner = Tuner()                          # older inno-kokoro has no backend argument
+        newer = False
     log.info("Working out the voice fingerprint...")
-    # This is the exact pattern from the inno-kokoro documentation:
-    #   pack, _ = enroll(*read("my_ref.wav"), tuner)
-    result = enroll(*read(str(wav_path)), tuner)
+    # Same pattern as the inno-kokoro documentation:  pack, _ = enroll(*read("my_ref.wav"), tuner, return_pt=True)
+    samples = read(str(wav_path))
+    result = enroll(*samples, tuner, return_pt=True) if newer else enroll(*samples, tuner)
     return _extract_tensor(result)
 
 

@@ -1552,6 +1552,13 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.93.2 - voice tuning with inno-kokoro 0.4.0
+
+- Tester report: `Tuner.__init__() missing 1 required keyword-only argument: 'backend'`, then "No voice is available". Cause: inno-kokoro 0.4.0 (10 Nov 2026) made `backend` required, moved torch to the `[torch]` extra and made `enroll()` return NumPy unless `return_pt=True`.
+- tts/kokoro_voice_setup.py `enroll_with_inno_kokoro` (the only place that talks to the library) now uses `Tuner(backend="torch")` and `enroll(..., return_pt=True)`; falls back to the old no-argument call if the library is older.
+- Test: tests/test_kokoro.py `InnoKokoroVersions`. Real library untested (no network access to install it here).
+- Fix on the tester's side: update Starling, restart; the tuning runs once and saves custom_covas.pt.
+
 ## 0.93.1 - pad counts for the 28 layouts
 
 - The `pads` field of every maps/settlements/*.json now holds the counts Benny read from the Odyssey Map Guide pictures. They are best guesses, except Industrial 2 and Tourist 1 (real LandingPads). 18 files changed.
