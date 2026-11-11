@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.94.0 - chat awareness
+
+- streaming/events.py: `StreamEvent(kind, user, amount, platform)`; `from_twitch(parsed)` reads USERNOTICE lines (msg-id sub, resub, subgift, anonsubgift, submysterygift, raid, viewermilestone/watch-streak), `from_youtube(item)` reads superChatEvent, superStickerEvent, newSponsorEvent, memberMilestoneChatEvent, membershipGiftingEvent. Names go through `clean`, numbers through `whole` (0 to 100000).
+- streaming/twitch.py and youtube.py hand events to the same `on_message` callback as chat messages; streaming/bridge.py sends a StreamEvent to `director.react` and a ChatMessage to `director.handle`.
+- streaming/chat.py `ChatDirector.react / pump_events`: waits for `quiet_provider`, one line per kind per gap (sub 8 s, gift 20 s, raid 60 s, chat milestones 120 s), drops news older than 3 to 10 minutes, keeps at most 6 waiting, collapses the single gift lines that follow a big gift. `_count_chat` counts messages and different people for the chat milestones.
+- Lines: voicepacks/default/streaming.json `StreamEvent_Sub / Resub / Gift / Raid / Streak / Tip / ChatMessages / ChatPeople`, with `_Big` (gift 10+, raid 50+), `_Long` (resub 12+ months) and mood sets (`_Sarcastic`, `_Close`, `_Friendly`).
+- Settings: `streaming.react`, `streaming.react_milestones` (both default on).
+- Honest limits: untested on a live stream. Twitch's anonymous reader should receive USERNOTICE lines, but that is the first thing to check. Twitch "follows" are not in chat, so she cannot react to those without a login (later). Counts are for this session only.
+- tests/test_stream_events.py.
+
 ## 0.93.2 - voice tuning with inno-kokoro 0.4.0
 
 - Tester report: `Tuner.__init__() missing 1 required keyword-only argument: 'backend'`, then "No voice is available". Cause: inno-kokoro 0.4.0 (10 Nov 2026) made `backend` required, moved torch to the `[torch]` extra and made `enroll()` return NumPy unless `return_pt=True`.

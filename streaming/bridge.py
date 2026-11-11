@@ -12,6 +12,7 @@ import time
 
 from core.logger import get_logger
 from streaming import chat, twitch, youtube
+from streaming.events import StreamEvent
 
 log = get_logger("chat_bridge")
 
@@ -172,7 +173,10 @@ class ChatBridge:
                 self._pump()
                 continue
             try:
-                self.director.handle(message)
+                if isinstance(message, StreamEvent):
+                    self.director.react(message)
+                else:
+                    self.director.handle(message)
                 self._pump()
             except Exception:
                 log.exception("Chat message failed")
@@ -182,6 +186,10 @@ class ChatBridge:
             self.director.pump()
         except Exception:
             log.exception("Answering a held chat question failed")
+        try:
+            self.director.pump_events()
+        except Exception:
+            log.exception("Reacting to a stream event failed")
 
     def pretend(self, user, text, mod=False, sub=False, owner=False, done=None):
         """The dashboard's test box: runs a made-up message through the same rules, even when chat is switched off."""

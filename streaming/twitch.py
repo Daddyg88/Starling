@@ -14,6 +14,7 @@ import time
 
 from core.logger import get_logger
 from streaming.chat import ChatMessage
+from streaming.events import from_twitch
 
 log = get_logger("twitch")
 
@@ -158,4 +159,8 @@ class TwitchChat:
             self.on_status("Twitch refused the connection: %s" % parsed["text"])
         elif command == "PRIVMSG":
             self.on_message(message_from(parsed, self.channel))
+        elif command == "USERNOTICE":
+            event = from_twitch(parsed)               # a sub, resub, gift, raid or watch streak: the bridge gives it to the director
+            if event is not None:
+                self.on_message(event)
         return False

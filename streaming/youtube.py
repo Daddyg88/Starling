@@ -68,6 +68,20 @@ def parse_messages(page):
     return found
 
 
+def parse_events(page):
+    """A liveChat/messages answer -> list of StreamEvent (Super Chats, new members, member milestones, gifted memberships)."""
+    from streaming.events import from_youtube
+    found = []
+    for item in (page or {}).get("items") or []:
+        try:
+            event = from_youtube(item)
+        except (AttributeError, TypeError):
+            event = None
+        if event is not None:
+            found.append(event)
+    return found
+
+
 def error_reason(body):
     """The 'reason' word out of a Google error answer ('quotaExceeded', 'keyInvalid'...), or ''."""
     try:
@@ -177,7 +191,7 @@ class YouTubeChat:
         if getattr(self, "_first", False):
             self._first = False                       # the chat already had a backlog: never act on old messages
         else:
-            for message in messages:
+            for message in messages + parse_events(page):
                 self.on_message(message)
         self._refused = 0
         self.on_status("Connected to the YouTube live chat")

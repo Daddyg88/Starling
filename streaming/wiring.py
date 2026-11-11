@@ -43,7 +43,7 @@ def build(app):
     holder = {}
 
     def say(key, fields=None):
-        narrator.say(key, fields)
+        return narrator.say(key, fields)
 
     def do_action(action):
         runner = app.ensure_commands()

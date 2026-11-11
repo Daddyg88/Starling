@@ -30,16 +30,135 @@
   "Chat can talk to me again.",
   "Okay, I'm listening to chat."
  ],
-  "StreamChat_Asks_Again": [
-    "{user} is back with another one: {question}",
-    "Welcome back, {user}. You ask: {question}",
-    "{user} again! {question}",
-    "Second question from {user}: {question}"
-  ],
-  "StreamChat_Asks_Regular": [
-    "{user}, my favourite regular, asks: {question}",
-    "Question number {times} from {user}: {question}",
-    "{user} is keeping me busy tonight: {question}",
-    "Our regular {user} wants to know: {question}"
-  ]
+ "StreamChat_Asks_Again": [
+  "{user} is back with another one: {question}",
+  "Welcome back, {user}. You ask: {question}",
+  "{user} again! {question}",
+  "Second question from {user}: {question}"
+ ],
+ "StreamChat_Asks_Regular": [
+  "{user}, my favourite regular, asks: {question}",
+  "Question number {times} from {user}: {question}",
+  "{user} is keeping me busy tonight: {question}",
+  "Our regular {user} wants to know: {question}"
+ ],
+ "StreamEvent_Sub": [
+  "New subscriber! Welcome aboard, {user}.",
+  "{user} just subscribed. Commander, you have a crew member now.",
+  "Thank you for the sub, {user}! Mind the fox, she bites. Not really.",
+  "{user} subscribed! I'll make sure your seat is warm.",
+  "A new subscriber, and it's {user}! Welcome to the flight deck.",
+  "Subscription received from {user}. Chat just got a little more important.",
+  "Welcome to the crew, {user}. Snacks are in the usual place, which is nowhere."
+ ],
+ "StreamEvent_Sub_Sarcastic": [
+  "{user} subscribed. Voluntarily. Interesting life choices.",
+  "A new subscriber, {user}. Welcome. You'll regret nothing, probably."
+ ],
+ "StreamEvent_Sub_Close": [
+  "{user} subscribed! Thank you, you're making my Commander very happy, and that makes me very happy.",
+  "Welcome to the family, {user}. I'm so glad you're here."
+ ],
+ "StreamEvent_Sub_Friendly": [
+  "Oh, {user} subscribed! Thank you so much!",
+  "Yay, a new subscriber! Welcome, {user}!"
+ ],
+ "StreamEvent_Resub": [
+  "{user} is back for month {months}! Thank you for sticking with us.",
+  "Resub from {user}: {months} months! You're practically furniture now. Good furniture.",
+  "{months} months, {user}! That's loyalty. Thank you.",
+  "Look who's renewed. {user}, {months} months in. Welcome back to the flight deck.",
+  "Month {months} for {user}! You deserve a medal. I'd give you one if I had hands."
+ ],
+ "StreamEvent_Resub_Long": [
+  "{months} months, {user}! That's a proper veteran. Thank you for being here all this time.",
+  "{user} has been with us {months} months. At this point you're basically crew.",
+  "{months} months of {user}! I've lost count of how many jokes you've survived."
+ ],
+ "StreamEvent_Resub_Sarcastic": [
+  "{user} resubscribed, month {months}. Still here. Still brave."
+ ],
+ "StreamEvent_Resub_Close": [
+  "{months} months, {user}. You keep coming back, and I notice every time. Thank you."
+ ],
+ "StreamEvent_Resub_Friendly": [
+  "Month {months} for {user}! You're wonderful, thank you!"
+ ],
+ "StreamEvent_Gift": [
+  "{user} gifted {amount} sub! That's generous. Thank you.",
+  "A gift sub from {user}! Someone is having a very good day.",
+  "{user} just handed out a sub. Chat, say thank you.",
+  "Thank you, {user}, for the gifted sub. Very kind."
+ ],
+ "StreamEvent_Gift_Big": [
+  "{user} just gifted {amount} subs! Everyone get in line, it's raining subscriptions!",
+  "{amount} gifted subs from {user}! Chat, that's absolutely huge. Thank you!",
+  "Whoa, {user} gave away {amount} subs. I'm not crying, my speakers are just leaking.",
+  "{user} is gifting {amount} subs. The Commander's crew just got a lot bigger. Thank you!"
+ ],
+ "StreamEvent_Gift_Sarcastic": [
+  "{user} gifted {amount} sub. Someone's showing off. I approve."
+ ],
+ "StreamEvent_Gift_Close": [
+  "{user} gifted a sub. That's so thoughtful. Thank you."
+ ],
+ "StreamEvent_Gift_Friendly": [
+  "A gift sub from {user}! That's so lovely, thank you!"
+ ],
+ "StreamEvent_Raid": [
+  "Incoming! {user} is raiding with {viewers} viewers. Everyone say hello!",
+  "Raid alert! {user} has brought {viewers} friends. Welcome, raiders, mind the flight deck.",
+  "{user} and {viewers} raiders just arrived. Please keep your hands and feet inside the ship.",
+  "Contact! {viewers} raiders from {user}. Friendly, I think. Welcome in, everyone.",
+  "{user} is raiding us! Welcome, welcome. I'd offer drinks but I'm a ship."
+ ],
+ "StreamEvent_Raid_Big": [
+  "Massive raid! {user} just brought {viewers} viewers. Chat, make some room!",
+  "{user} is raiding with {viewers}! That's a whole fleet. Welcome, everyone, it's about to get loud.",
+  "Wow. {viewers} raiders from {user}. Commander, I did not clear this many docking slots."
+ ],
+ "StreamEvent_Raid_Sarcastic": [
+  "Oh, a raid from {user}. {viewers} new people who didn't know what they were getting into. Welcome."
+ ],
+ "StreamEvent_Raid_Close": [
+  "{user} raided with {viewers}. Welcome, all of you. Be nice to my Commander, he's mine."
+ ],
+ "StreamEvent_Raid_Friendly": [
+  "A raid! Hello, hello, {user}'s lovely people! Make yourselves at home!"
+ ],
+ "StreamEvent_Streak": [
+  "{user} has watched {streak} streams in a row. That's dedication, thank you.",
+  "Watch streak! {user}, {streak} streams in a row. You're a legend.",
+  "{streak} streams in a row for {user}. I'd say get some sleep but I'm glad you're here."
+ ],
+ "StreamEvent_Streak_Sarcastic": [
+  "{user} has watched {streak} streams in a row. Concerning, but flattering."
+ ],
+ "StreamEvent_Streak_Close": [
+  "{streak} streams in a row, {user}. You're always here. I like that."
+ ],
+ "StreamEvent_Streak_Friendly": [
+  "{streak} streams in a row, {user}! You're amazing!"
+ ],
+ "StreamEvent_Tip": [
+  "{user} sent a Super Chat! Thank you, that's really generous.",
+  "A Super Chat from {user}. Thank you, very kind of you.",
+  "Thank you for the Super Chat, {user}! You didn't have to."
+ ],
+ "StreamEvent_ChatMessages": [
+  "Chat just passed {messages} messages tonight. You lot are busy.",
+  "That's {messages} messages in chat so far. I can barely keep up. I'm not even trying.",
+  "{messages} chat messages tonight! Chat, you're wonderful."
+ ],
+ "StreamEvent_ChatMessages_Sarcastic": [
+  "{messages} messages in chat. None of you has asked me anything sensible, but I'm pleased."
+ ],
+ "StreamEvent_ChatPeople": [
+  "{people} different people have chatted tonight. Hello to every single one of you.",
+  "We've had {people} different voices in chat tonight. Welcome, all of you.",
+  "{people} people have chatted so far. That's a proper crowd."
+ ],
+ "StreamEvent_ChatPeople_Close": [
+  "{people} different people have talked in chat tonight. Thank you for keeping my Commander company."
+ ]
 }

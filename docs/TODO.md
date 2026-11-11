@@ -75,3 +75,5 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 - [ ] Add each visited settlement to maps/known_settlements.json (MarketID -> layout) once its layout is confirmed; Cheesebeard's Cave (4385255427, Extraction, one large pad) layout still unknown.
 - [ ] Collect testers' diagnostics zips and run tools/merge_calibrations.py so more settlements ship lined up (needs the pad counts fixed first so layouts are chosen right).
 - [x] Benny read the pad counts for all 28 layouts from the Odyssey Map Guide (0.93.1, in maps/settlements/*.json + test). Still best guesses from pictures: confirm against real LandingPads as settlements are visited.
+
+- [ ] 0.94.0 chat awareness: check on a real stream that Twitch's anonymous reader delivers subs, gifts, raids and watch streaks (USERNOTICE), and that YouTube Super Chats and members arrive. Follows need a Twitch login (not built).

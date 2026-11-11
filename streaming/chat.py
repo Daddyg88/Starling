@@ -21,6 +21,8 @@ import unicodedata
 from collections import deque
 from dataclasses import dataclass
 
+from streaming import events as stream_events
+
 DEFAULT_PREFIX = "!starling"
 MAX_QUESTION = 140
 MAX_NAME = 25
@@ -190,6 +192,12 @@ class ChatDirector:
         self.cool = Cooldowns(clock)
         self.log = deque(maxlen=40)     # what happened lately, for the dashboard
         self.asked = {}                 # viewer -> how many of their questions she has answered this session (so she can say 'welcome back')
+        self.pending = deque()          # (time, StreamEvent) waiting for a quiet moment to be reacted to
+        self.event_last = {}            # kind -> when she last reacted to one
+        self.mass_gift = {}             # gifter -> until when the single gift lines that follow a big gift are ignored
+        self.chat_messages = 0          # chat messages seen this session (for the chat milestones)
+        self.chatters = set()           # different people who have chatted this session
+        self.told = {"chat_messages": 0, "chat_people": 0}
 
     def option(self, name, default=None):
         return self.settings.get("streaming." + name, default)
@@ -201,6 +209,8 @@ class ChatDirector:
             return float(default)
 
     def handle(self, message, test=False):
+        if not test:
+            self._count_chat(message)
         result = self._handle(message, test)
         if result.status != "ignored":
             self.log.append(result)
@@ -298,5 +308,77 @@ class ChatDirector:
         self.cool.last["ask"] = self.clock()
         ok = self.do_ask(user, question)
         result = Result("answered" if ok else "failed", "ask", user, question, "was held")
+        self.log.append(result)
+        return result
+
+
+    # ---- subs, raids and milestones (streaming/events.py) ----
+    EVENT_GAP = {"sub": 8.0, "resub": 8.0, "gift": 20.0, "raid": 60.0, "streak": 15.0, "tip": 8.0, "chat_messages": 120.0, "chat_people": 120.0}
+    EVENT_MAX_AGE = {"raid": 600.0, "gift": 300.0, "sub": 300.0, "resub": 300.0, "tip": 300.0, "streak": 180.0,
+                     "chat_messages": 180.0, "chat_people": 180.0}      # a milestone that is no longer news is dropped
+    MAX_PENDING = 6
+
+    def _count_chat(self, message):
+        """Counts every chat message and every different person, and notes when a round number is passed."""
+        if not self.option("enabled", False) or not self.option("react_milestones", True):
+            return
+        self.chat_messages += 1
+        user = clean_name(message.user).lower()
+        if user not in self.chatters and len(self.chatters) < stream_events.MAX_PEOPLE_TRACKED:
+            self.chatters.add(user)
+        for kind, count in (("chat_messages", self.chat_messages), ("chat_people", len(self.chatters))):
+            reached = stream_events.next_milestone(kind, count, self.told[kind])
+            if reached:
+                self.told[kind] = reached
+                self.react(stream_events.StreamEvent(kind, "", reached))
+
+    def react(self, event, test=False):
+        """A sub, raid, gift or milestone happened. She says something when it is quiet (otherwise it waits a little). Returns True if kept."""
+        if event.kind not in stream_events.KINDS:
+            return False
+        if not test and not (self.option("enabled", False) and self.option("react", True)):
+            return False
+        now = self.clock()
+        if event.kind == "gift":                                   # a big gift is followed by one line per gifted sub: say it once
+            if event.amount > 1:
+                self.mass_gift[event.user] = now + 30.0
+            elif self.mass_gift.get(event.user, 0.0) > now:
+                return False
+            if len(self.mass_gift) > 50:
+                self.mass_gift = {k: v for k, v in self.mass_gift.items() if v > now}
+        if len(self.pending) >= self.MAX_PENDING:
+            self.pending.popleft()                                 # the oldest news is the first to go
+        self.pending.append((now, event))
+        self.pump_events()
+        return True
+
+    def pump_events(self):
+        """Says the OLDEST waiting event when she is free. Called about once a second, and whenever one arrives."""
+        now = self.clock()
+        while self.pending and now - self.pending[0][0] > self.EVENT_MAX_AGE.get(self.pending[0][1].kind, 300.0):
+            self.log.append(Result("blocked", "event", self.pending[0][1].user, self.pending[0][1].kind, "waited too long"))
+            self.pending.popleft()
+        if not self.pending:
+            return None
+        if not self.option("enabled", False) or not self.option("react", True):
+            self.pending.clear()
+            return None
+        _t, event = self.pending[0]
+        gap = self.EVENT_GAP.get(event.kind, 10.0)
+        if now - self.event_last.get(event.kind, -1e9) < gap:
+            return None
+        try:
+            if self.quiet_provider is not None and not self.quiet_provider():
+                return None
+        except Exception:
+            return None
+        self.pending.popleft()
+        self.event_last[event.kind] = now
+        fields = {"user": event.user, "amount": event.amount, "months": event.amount, "viewers": event.amount or "a whole crowd of", "streak": event.amount,
+                  "count": event.amount, "people": event.amount, "messages": event.amount, "platform": event.platform}
+        pool = stream_events.pick_pool(event)
+        if self.say(pool, fields) is False and pool != stream_events.KINDS[event.kind]:
+            self.say(stream_events.KINDS[event.kind], fields)       # no bigger-sounding pool: the ordinary one
+        result = Result("reacted", "event", event.user, event.kind, str(event.amount) if event.amount else "")
         self.log.append(result)
         return result
