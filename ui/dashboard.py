@@ -559,8 +559,9 @@ class Dashboard:
 
     def _current_mood(self):
         mood = getattr(self.app, "mood", None)
-        if self.app.settings.get("personality.mood_mode", "auto") == "fixed" or mood is None:
-            word = str(self.app.settings.get("personality.mood", "Friendly"))
+        from personality.mood_engine import effective_mood, mood_mode
+        if mood_mode(self.app.settings) != "auto" or mood is None:
+            word = str(effective_mood(self.app.settings))
         else:
             word = str(mood.mood)
         return word if word in portraits.MOODS else "Neutral"

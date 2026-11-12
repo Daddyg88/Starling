@@ -31,6 +31,7 @@ The engine never speaks over safety warnings: she only reacts to ordinary events
 """
 
 import json
+import random
 import shutil
 import threading
 import time
@@ -65,11 +66,23 @@ LEVELS = 5
 SCALE_OVERRIDE = None        # the older tests set this to 1 (tests/__init__.py) so they keep using the old -100..100 numbers
 
 
+MODES = ("auto", "fixed", "random")
+
+
+def mood_mode(settings):
+    """auto (follows the game), fixed (your choice) or random (a new mood every few minutes). Anything else counts as auto."""
+    mode = settings.get("personality.mood_mode", "auto")
+    return mode if mode in MODES else "auto"
+
+
 def effective_level(settings):
-    """Which of her 5 levels inside the mood (1-5): automatic (from the score) or fixed (your dashboard choice)."""
+    """Which of her 5 levels inside the mood (1-5): automatic (from the score), fixed (your dashboard choice) or the random one."""
     try:
-        if settings.get("personality.mood_mode", "auto") == "fixed":
+        mode = mood_mode(settings)
+        if mode == "fixed":
             value = settings.get("personality.mood_level", 3)
+        elif mode == "random":
+            value = settings.get("personality.mood_random_level", 3)
         else:
             value = settings.get("personality.mood_level_live", 3)
         return max(1, min(LEVELS, int(value)))
@@ -83,9 +96,13 @@ LEGACY_LANDING = 0.3          # a converted score lands this far (0-1) into its 
 
 
 def effective_mood(settings):
-    """The mood she is actually in: automatic (from the game) or fixed (your dashboard choice)."""
-    if settings.get("personality.mood_mode", "auto") == "fixed":
+    """The mood she is actually in: automatic (from the game), fixed (your dashboard choice) or the random one."""
+    mode = mood_mode(settings)
+    if mode == "fixed":
         return settings.get("personality.mood", "Friendly")
+    if mode == "random":
+        mood = settings.get("personality.mood_random", "Friendly")
+        return mood if mood in BANDS else "Friendly"
     return settings.get("personality.mood_live", "Friendly")
 
 
@@ -174,11 +191,13 @@ class MoodEngine:
     max_score = 100.0
 
     def __init__(self, bus, settings, rules_path=None, save_path=None, dialogue=None, speak=None,
-                 clock=time.time, persist=True, wanted_provider=None, scale=None):
+                 clock=time.time, persist=True, wanted_provider=None, scale=None, rng=None):
         self.bus = bus
         self.settings = settings
         self.options, self.rules = load_rules(rules_path)
         self.swings = load_swings(rules_path)
+        self.rng = rng or random.Random()
+        self._random_next = None            # when the random mood changes next (None = not decided yet)
         self.exo_provider = None            # () -> credits of unsold exobiology on board (set by the app)
         self._exo_seen = 0
         self._swing = None                 # {"mood", "until", "forgive", "label"} while she is in a temporary mood
@@ -317,9 +336,39 @@ class MoodEngine:
             if text:
                 self.speak(text)
 
+    def _frozen(self):
+        """True while she is NOT in Automatic (Fixed or Random) and 'keep my points' is on (the default): the hidden score then stays exactly
+        as it was, so switching back never loses what you earned. Nothing adds to it, takes from it, or calms it down meanwhile."""
+        return mood_mode(self.settings) != "auto" and bool(self.settings.get("personality.keep_points", True))
+
+    def check_random(self, now=None):
+        """Random mode: pick a new mood (and level) every few minutes (default 20). Returns True when it just changed."""
+        if mood_mode(self.settings) != "random":
+            self._random_next = None
+            return False
+        now = self.clock() if now is None else now
+        if self._random_next is not None and now < self._random_next:
+            return False
+        try:
+            minutes = max(1, min(240, int(self.settings.get("personality.mood_random_minutes", 20) or 20)))
+        except (TypeError, ValueError):
+            minutes = 20
+        self._random_next = now + 60.0 * minutes
+        current = self.settings.get("personality.mood_random")
+        band = self.rng.choice([b for b in BANDS if b != current])
+        level = self.rng.randint(1, LEVELS)
+        self.settings.set("personality.mood_random", band)
+        self.settings.set("personality.mood_random_level", level)
+        log.info("Random mood: now %s %d/%d (next change in %d minutes)", band, level, LEVELS, minutes)
+        return True
+
     def refresh(self, now=None):
         """Let time pass: she calms down toward neutral, and her mood band follows."""
         now = self.clock() if now is None else now
+        if self._frozen():
+            self.updated = self._drain_stamp = self._paint_stamp = now        # time that passes while she is not in Automatic costs nothing
+            self.check_swing(now)
+            return
         self._notoriety_drain(now)
         self._paint_drain(now)
         self._calm(self._active_seconds(self.updated, now))
@@ -560,6 +609,7 @@ class MoodEngine:
             while not self._timer_stop.wait(seconds):
                 try:
                     self.check_swing()
+                    self.check_random()
                 except Exception:
                     log.exception("Mood swing timer problem")
         self._timer_stop = threading.Event()
@@ -611,6 +661,8 @@ class MoodEngine:
         self._maybe_time_together(now)
         self.refresh(now)                 # calming and notoriety use the time since the previous event
         self._last_event = now
+        if self._frozen():
+            return                        # not in Automatic: the score is kept as it is (see _frozen)
         if name == "FSDJump":
             self._paint_jump(now)
         elif name == "Repair":
@@ -716,6 +768,8 @@ class MoodEngine:
         return float(rule.get("delta", 0))
 
     def _apply(self, rule, event, now):
+        if self._frozen():
+            return
         data = (event.data if event is not None else {}) or {}
         base = self._base_delta(rule, data)
         if base == 0:

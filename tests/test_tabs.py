@@ -63,7 +63,7 @@ class MergedPageTests(unittest.TestCase):
             self.assertNotIn(gone, shown)
         homes = {p.id: p.parent for p in model.pages if p.parent}
         self.assertEqual(homes, {"listening": "voice", "controls": "game", "chat": "personality",
-                                 "memory": "personality", "bookmarks": "navigation"})
+                                 "memory": "personality", "bookmarks": "navigation", "redalert": "combat"})
         for parent in set(homes.values()):
             self.assertIn(parent, shown)
         self.assertEqual(shown[-1], "developer")                  # the Developer tab holds the tests

@@ -2,6 +2,10 @@
 
 Her mood follows what you do in the game. Choose **Automatic** under *Personality > Mood control* on the dashboard (or **Fixed** to pick her mood yourself). *Info only* style switches the banter off but she still keeps score quietly.
 
+## Fixed and Random moods, and keeping your points (0.96.0)
+
+*Personality > Mood control* has three choices: **Automatic** (she follows what you do), **Fixed** (always the mood you pick) and **Random** (a new mood and level every 20 minutes; you can change that to 10, 30 or 60). While she is on Fixed or Random your hidden score is **frozen**: it does not go up, down or calm down, so when you go back to Automatic she is exactly where you left her. The switch *Keep my points safe when she is not in Automatic* (on by default) turns this off if you would rather the score keep following the game.
+
 ## The mood levels
 
 | Score | Mood |

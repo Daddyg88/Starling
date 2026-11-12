@@ -128,8 +128,10 @@ def collect_status(app):
             rows.append(("Exobiology on board", "about %s credits" % spoken_credits(carried), "muted"))
 
     mood = getattr(app, "mood", None)
-    if app.settings.get("personality.mood_mode", "auto") == "fixed" or mood is None:
-        rows.append(("Mood", "%s %s/5 (fixed)" % (app.settings.get("personality.mood", "Friendly"), app.settings.get("personality.mood_level", 3)), "muted"))
+    from personality.mood_engine import effective_level, effective_mood, mood_mode
+    if mood_mode(app.settings) != "auto" or mood is None:
+        kind = "random" if mood_mode(app.settings) == "random" else "fixed"
+        rows.append(("Mood", "%s %s/5 (%s)" % (effective_mood(app.settings), effective_level(app.settings), kind), "muted"))
     else:
         rows.append(("Mood", mood.describe(), "muted"))
         if mood.history:
@@ -208,10 +210,11 @@ def home_data(app, now=None):
     mood_text = ""
     mood = getattr(app, "mood", None)
     try:
-        if mood is not None and app.settings.get("personality.mood_mode", "auto") != "fixed":
+        from personality.mood_engine import effective_level, effective_mood, mood_mode
+        if mood is not None and mood_mode(app.settings) == "auto":
             mood_text = mood.describe()
         else:
-            mood_text = "%s %s/5" % (app.settings.get("personality.mood", "Friendly"), app.settings.get("personality.mood_level", 3))
+            mood_text = "%s %s/5" % (effective_mood(app.settings), effective_level(app.settings))
     except Exception:
         mood_text = ""
     commander = get("commander") or ""

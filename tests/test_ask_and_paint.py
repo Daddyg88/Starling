@@ -38,6 +38,7 @@ class Rig:
     def __init__(self, **values):
         values.setdefault("facts__frequency", "often")
         values.setdefault("personality__mood_mode", "fixed")
+        values.setdefault("personality__keep_points", False)      # these tests pin her spoken mood but still check the hidden score moves
         values.setdefault("personality__mood", "Neutral")
         self.settings = make_settings(**values)
         self.bus, self.speech = EventBus(), FakeSpeech()

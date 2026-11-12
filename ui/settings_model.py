@@ -79,7 +79,9 @@ EDGE_PERCENTS = [("%d%%" % v, v) for v in range(0, 41)]
 MINERAL_CHOICES = minerals.choices()      # every mineral, metal and ice you can mine (mining/minerals.py)
 MINING_CHATTER = [("Quiet (first of each, every 10 tonnes)", "quiet"), ("Normal (every 5 tonnes, a few cheers)", "normal"),
                   ("Chatty (every 3 tonnes, lots of cheers)", "chatty")]
-MOOD_MODES = [("Automatic (follows what I do in the game)", "auto"), ("Fixed (always the mood below)", "fixed")]
+MOOD_MODES = [("Automatic (follows what I do in the game)", "auto"), ("Fixed (always the mood below)", "fixed"),
+              ("Random (a new mood every 20 minutes)", "random")]
+RANDOM_EVERY = [("10 minutes", 10), ("20 minutes", 20), ("30 minutes", 30), ("60 minutes", 60)]
 PTT_MODES = [("Off (say her name instead)", "off"), ("Hold the button while I talk", "hold"),
              ("Press once to start, again to stop", "toggle")]
 HONK_MODES = [("Off", "off"), ("Primary fire button", "primary"), ("Secondary fire button", "secondary")]
@@ -171,7 +173,7 @@ def voicepack_choices(folder=None):
 
 # These pages are not in the sidebar: they appear as a section inside the page named on the right.
 SECTION_OF = {"listening": "voice", "controls": "game", "chat": "personality", "memory": "personality",
-              "bookmarks": "navigation"}
+              "bookmarks": "navigation", "redalert": "combat"}
 
 
 # ---------------------------------------------------------------------------
@@ -480,7 +482,11 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("personality.style", "Style", "choice", STYLES,
                   help="Info only = no jokes, pet names or moods"),
             Field("personality.mood_mode", "Mood control", "choice", MOOD_MODES,
-                  help="Automatic: her mood changes with your actions (see Home)"),
+                  help="Automatic: her mood changes with your actions (see Home). Random: a new mood every few minutes, for fun. Your points are kept safe either way (see below)"),
+            Field("personality.mood_random_minutes", "Random mood changes every", "choice", RANDOM_EVERY,
+                  help="Only used when Mood control is Random. She picks a new mood and level at random (any of the seven) this often"),
+            Field("personality.keep_points", "Keep my points safe when she is not in Automatic", "toggle",
+                  help="ON (recommended): while she is Fixed or Random the hidden score does not move at all (no gains, no losses, no calming down), so when you go back to Automatic she is exactly as warm as you left her. OFF: the score keeps following the game in the background"),
             Field("personality.mood", "Fixed mood", "choice", MOODS,
                   help="Only used when Mood control is Fixed"),
             Field("personality.mood_level", "Fixed mood level (1-5)", "choice", MOOD_LEVELS,

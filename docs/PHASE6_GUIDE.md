@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.0 - random mood, points kept safe, red alert inside Combat
+
+- personality/mood_engine.py: `MODES` (auto, fixed, random) and `mood_mode(settings)`; `effective_mood` / `effective_level` return the random mood and level in random mode (`personality.mood_random`, `personality.mood_random_level`; an unknown name falls back to Friendly). `MoodEngine.check_random(now)` picks a new mood (never the one before) and level every `personality.mood_random_minutes` (default 20, choices 10/20/30/60); it runs on the existing 5-second mood timer (`start_timer`), and picks straight away when random is switched on. `rng` can be injected for tests.
+- Keeping points: `MoodEngine._frozen()` is True while the mode is not auto and `personality.keep_points` (default True). Then `refresh` only moves the time stamps (so no calming, notoriety or paint drain is charged later), `_handle` returns before any rule, swing, paint jump or lost-data logic, and `_apply` does nothing. `check_swing` still runs so an old swing ends. Fixed mode used to keep scoring in the background; with the switch off it still does.
+- Everything that reads her mood already went through `effective_mood`, so no other file needed a change. The dashboard picture and the status rows (ui/dashboard.py `_current_mood`, ui/status.py) use `effective_mood` / `effective_level` and show "(random)" or "(fixed)".
+- ui/settings_model.py: Mood control choice "Random (a new mood every 20 minutes)", fields `personality.mood_random_minutes` and `personality.keep_points`; `SECTION_OF["redalert"] = "combat"` puts the Red alert page (and its buttons) inside the Combat page.
+- Defaults added to core/settings.py (config/settings.json is the commander's own and not in git).
+- tests/test_mood_modes.py.
+- Open: random mood does not announce the change out loud (she just sounds different from the next line); easy to add (`MoodShift_<band>` lines exist) if wanted.
+
 ## 0.95.4 - she repairs her own damaged language helper
 
 - Tester log: Kokoro failed to load at 13:43 and 14:36 with `AttributeError: 'int' object has no attribute 'items'` in `spacy/vectors.pyx load_key2row` (spaCy `en_core_web_sm` vocab/key2row file damaged: it is a msgpack dict, and the loader got an int). It had loaded fine at 12:42 (engine 335 s, the first load that also installed the model), so the file was most likely damaged after an interrupted install or shutdown.
