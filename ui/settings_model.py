@@ -487,6 +487,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Only used when Mood control is Random. She picks a new mood and level at random (any of the seven) this often"),
             Field("personality.keep_points", "Keep my points safe when she is not in Automatic", "toggle",
                   help="ON (recommended): while she is Fixed or Random the hidden score does not move at all (no gains, no losses, no calming down), so when you go back to Automatic she is exactly as warm as you left her. OFF: the score keeps following the game in the background"),
+            Field("personality.aussie_slang", "Australian slang with the Australian voice", "toggle",
+                  help="Only does anything while the Voice page is set to the Australian voice. She then uses Australian and Melbourne slang now and then (G'day, no worries, mate, parma, hook turn). With any other voice she never does. Never used in warnings or fights"),
             Field("personality.mood", "Fixed mood", "choice", MOODS,
                   help="Only used when Mood control is Fixed"),
             Field("personality.mood_level", "Fixed mood level (1-5)", "choice", MOOD_LEVELS,

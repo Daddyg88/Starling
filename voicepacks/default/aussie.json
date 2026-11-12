@@ -1,0 +1,85 @@
+{
+ "_help": "AUSTRALIAN MODE lines. Used only while the Australian voice is chosen (see personality/australian.py). Words checked against Australian and Melbourne slang lists (CSU, RACV, Insider Guides). Strings or {\"text\": ..., \"mature\": true}.",
+ "Aussie_Open": [
+  "Righto.",
+  "Right then.",
+  "Okay, mate.",
+  "Heads up.",
+  "Hey, mate.",
+  "Alright then.",
+  "G'day."
+ ],
+ "Aussie_Close": [
+  "No worries.",
+  "Too easy.",
+  "Good as gold.",
+  "Sorted.",
+  "No dramas."
+ ],
+ "PetName_Aussie": [
+  "Digger",
+  "Legend",
+  "Champ",
+  "Skip",
+  "Chief",
+  "Ace",
+  "Cobber",
+  "Boss"
+ ],
+ "Remark_Aussie": [
+  "Reckon a flat white would go down well right about now.",
+  "Not exactly full as a Bourke Street tram out here.",
+  "Reckon we've earned a parma after this one.",
+  "Melbourne gets four seasons in one day. Space only has the one: cold.",
+  "Hook turn? No thanks. Out here we turn however we like.",
+  "She'll be right. Probably.",
+  "Strewth, space is big.",
+  "Bit of hard yakka, this flying.",
+  "Carn, we can do this.",
+  "Good on ya.",
+  "That's heaps good, that is.",
+  "Fair dinkum, I love this job.",
+  "Arvo flight. Perfect. Well, it's always night out here, but still.",
+  "Beer o'clock somewhere, I reckon.",
+  "Watch out for drop bears. They're a myth. Mostly.",
+  "Woop Woop is the middle of nowhere. Which describes most of this galaxy, to be fair.",
+  "If there's footy on at the G, don't wake me.",
+  "Not too shabby, mate.",
+  {
+   "text": "Bloody oath, that was good.",
+   "mature": true
+  },
+  {
+   "text": "Bugger, I would have liked to see that.",
+   "mature": true
+  },
+  {
+   "text": "Not bad for a bloody machine.",
+   "mature": true
+  }
+ ],
+ "ChitChat_Aussie": [
+  "Fun fact for you: in Victoria a pot is a small beer, about two hundred and eighty-five millilitres. A schooner is the bigger one.",
+  "In Melbourne it's a parma. In Sydney it's a parmi. A chicken parmigiana by any name. Argue about it at your own risk.",
+  "Melbourne's hook turn lets you turn right from the left lane, to stay out of the way of the trams. Very clever. Very confusing for visitors.",
+  "A Victorian says bathers. Other states say togs or cozzie. I'm told it's a serious matter.",
+  "A milk bar in Victoria is a local corner shop. It sells a lot more than milk.",
+  "Yeah nah means no. Nah yeah means yes. I did not make these rules.",
+  "Arvo is afternoon. Brekkie is breakfast. Aussies shorten everything. It's efficient. I respect it.",
+  "A servo is a service station and an esky is a cooler box. I'm learning the language, one word at a time.",
+  "Prep is the first year of school in Victoria. In New South Wales they call it kindergarten.",
+  "In Victoria it's a drink tap. In New South Wales it's a bubbler. Both are just a water fountain.",
+  "Full as a goog means you've eaten far too much. A goog is an egg.",
+  "Chaddy is Chadstone, the biggest shopping centre in Australia, and it's in Melbourne. I'd get lost for a week.",
+  "A yewy is a U-turn. Chuck a yewy, as they say.",
+  "The G is the Melbourne Cricket Ground. Footy final day is basically a religious experience.",
+  "Myki is the card you tap on trams, trains and buses in Melbourne. Don't forget to top it up.",
+  "Carn is short for come on. You'll hear it at every footy ground in Melbourne.",
+  "A galah is a pink and grey cockatoo, and also what Aussies call someone being a bit silly. Not you, of course.",
+  "The Melbourne Cup is on the first Tuesday in November. They call it the race that stops a nation.",
+  "On election day in Australia there's a democracy sausage: a sausage sizzle outside the polling booth. Very civilised.",
+  "Woop Woop means a faraway, middle-of-nowhere place. Honestly, that's most of the galaxy.",
+  "A sausage is a snag, and a sausage sizzle is a barbecue fundraiser. Every Aussie has been to one.",
+  "Heaps means a lot. Reckon means think. G'day means hello. You're basically fluent already, mate."
+ ]
+}

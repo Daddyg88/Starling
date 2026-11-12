@@ -20,6 +20,7 @@ from datetime import datetime
 from core.identity import personalise
 from core.ships import ship_name
 from core.logger import get_logger
+from personality.australian import australian_on
 from personality.mood_engine import effective_mood
 
 log = get_logger("chitchat")
@@ -33,7 +34,7 @@ ALARMS = ("UnderAttack", "Interdicted", "InterdictionInProgress", "LowFuel", "Ov
 ALARM_QUIET_SECONDS = 75.0
 STATE_KEYS = ("ChitChat_Hull", "ChitChat_Wanted", "ChitChat_Long", "ChitChat_Callback_Interdicted", "ChitChat_Callback_Kill",
               "ChitChat_Late", "ChitChat_Early", "ChitChat_World", "ChitChat_Habits",
-              "ChitChat_Rapport_Crew", "ChitChat_Rapport_Friend", "ChitChat_Rapport_Family")
+              "ChitChat_Rapport_Crew", "ChitChat_Rapport_Friend", "ChitChat_Rapport_Family", "ChitChat_Aussie")
 LATE_HOURS = range(0, 5)         # local time: 'it's gone midnight' / 'the small hours'
 EARLY_HOURS = range(5, 8)
 MIN_SESSION_MINUTES = 20         # she does not comment on the time of day the moment you log in
@@ -218,6 +219,8 @@ class ChitChat:
                 moment = self.last_moment.get(what)
                 if moment and CALLBACK_AFTER_SECONDS <= now - moment[0] <= CALLBACK_UNTIL_SECONDS and moment[1] != getattr(state, "system", None):
                     keys.append(key)                         # (only when you have moved on: "back in X", not "right here")
+        if australian_on(self.settings):
+            keys.append("ChitChat_Aussie")
         return [k for k in keys if now - self.state_said.get(k, -STATE_REST) >= STATE_REST]
 
     def world_keys(self, state):

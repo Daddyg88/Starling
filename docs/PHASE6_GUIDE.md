@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.1 - Australian slang (only with the Australian voice)
+
+**What to do:** install the Australian voice (Voice page button), choose it, and talk to her for a while. Settings, Personality has the switch "Australian slang with the Australian voice" (ON by default).
+
+**What you should see:** short Aussie words on some lines (Righto / No worries), pet names like Mate, Aussie remarks (parma, hook turn, flat white), and quiet-moment chat about Victoria and Melbourne. Switch to any other voice: all of it stops.
+
+**Where it lives:** personality/australian.py (the one rule: voice is melo_en_au), voicepacks/default/aussie.json (all the lines), hooks in personality/flavour.py and personality/chitchat.py. Mild swearing is only used with "Allow mature" on.
+
+**Not tested:** how MeloTTS says the words; slang is from research, not an Aussie ear.
+
 ## 0.96.0 - random mood, points kept safe, red alert inside Combat
 
 - personality/mood_engine.py: `MODES` (auto, fixed, random) and `mood_mode(settings)`; `effective_mood` / `effective_level` return the random mood and level in random mode (`personality.mood_random`, `personality.mood_random_level`; an unknown name falls back to Friendly). `MoodEngine.check_random(now)` picks a new mood (never the one before) and level every `personality.mood_random_minutes` (default 20, choices 10/20/30/60); it runs on the existing 5-second mood timer (`start_timer`), and picks straight away when random is switched on. `rng` can be injected for tests.

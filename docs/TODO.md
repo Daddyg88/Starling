@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.1: Australian slang with the Australian voice: Aussie words/pet names/remarks appear, and stop with another voice; ask an Aussie if the slang is right and how MeloTTS says it.
 - [ ] 0.89.2: 'I meant ...' teaching and 'what did you miss'; small reactions (Hm./Oh./Again.); welcome-back lines for returning chat viewers; sub target chaff, heat sink, point defence, shield booster, ECM, manifest scanner; thread owner names (Windows only, untested).
 - [ ] Red alert banner (0.88.1): does RED ALERT show at the bottom centre, right size, never takes the mouse or focus? The log says "RED ALERT banner shown" when it appears.
 - [ ] Red alert switches the cockpit to combat mode.

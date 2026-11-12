@@ -21,6 +21,7 @@ import random
 import re
 
 from personality import moods
+from personality.australian import australian_on
 from personality.mood_engine import effective_level, effective_mood
 import time
 
@@ -36,6 +37,9 @@ BAD_MOODS = ("Sarcastic", "Frustrated", "Upset")
 DRY_CHANCE = 0.35              # of the other remarks, about a third are plain and dry
 TONE_CHANCE = 0.45               # of the remarks she makes, this share come from her mood-and-level lines (Tone_<Mood>_L<1-5>)
 NEUTRAL_BOOST = 1.6              # she keeps her personality when calm: Neutral makes remarks this much more often
+AUSSIE_PET_CHANCE = 0.5            # Australian mode: this share of pet names are Australian (Mate, Legend...)
+AUSSIE_REMARK_CHANCE = 0.4         # Australian mode: this share of her remarks are Australian
+AUSSIE_FRAME_CHANCE = 0.2          # Australian mode: this share of ordinary lines get a short Australian word at the start or end
 DARK_HUMOUR_CHANCE = 0.2          # of the remarks she makes, about one in five is gallows humour
 
 
@@ -113,6 +117,10 @@ class Flavour:
         mine = self.custom_names()
         if mine and self.rng.random() < (0.15 if mood in ("Frustrated", "Upset") else 0.55):
             return self.rng.choice(mine)
+        if australian_on(self.settings) and self.rng.random() < AUSSIE_PET_CHANCE:
+            name = self._pick("PetName_Aussie")
+            if name:
+                return name
         if self.innuendo_on(mood) and self.rng.random() < self._innuendo_chance(mood, 0.4):
             name = self._pick("PetName_Naughty_Grumpy" if mood in BAD_MOODS else "PetName_Naughty")
             if name:
@@ -146,6 +154,10 @@ class Flavour:
         return self._pick(key) or self._pick("Tone_%s_L%d" % (mood, level))
 
     def _remark(self, mood):
+        if australian_on(self.settings) and self.rng.random() < AUSSIE_REMARK_CHANCE:
+            remark = self._pick("Remark_Aussie")
+            if remark:
+                return remark
         if self.rng.random() < TONE_CHANCE:
             tone = self._tone(mood)
             if tone:
@@ -188,6 +200,16 @@ class Flavour:
                 return _COMMANDER.sub(name, text, count=1)
         return text
 
+    def _aussie_frame(self, text):
+        """Australian mode: a short Australian word before the line, or after it (never after a question)."""
+        if self.rng.random() >= AUSSIE_FRAME_CHANCE:
+            return text
+        if text.rstrip().endswith("?") or self.rng.random() < 0.5:
+            word = self._pick("Aussie_Open")
+            return "%s %s" % (word, text.lstrip()) if word else text
+        word = self._pick("Aussie_Close")
+        return "%s %s" % (text.rstrip(), word) if word else text
+
     # ---- the one call the speaker makes ----
     def apply(self, text, priority="normal"):
         """Return `text`, possibly with a pet name and/or a remark added."""
@@ -198,6 +220,8 @@ class Flavour:
 
         if "||" in text or len(text) > MAX_LINE_CHARS or "{" in text:
             return text
+        if australian_on(self.settings):
+            text = self._aussie_frame(text)
         chance = REMARK_CHANCE.get(str(self.settings.get("personality.remarks", "sometimes")).lower(), 0.18)
         if chance > 0:
             chance = min(0.7, chance * self.level_factor(mood))
