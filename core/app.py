@@ -473,6 +473,14 @@ class App:
                         self.commands.extra_helpers.append(tracker)
                 if getattr(self, "settlement_recorder", None) is not None:
                     self.commands.extra_helpers.append(self.settlement_recorder)
+                try:
+                    from navigation.radar_test import RadarTest
+                    recorder = getattr(self, "settlement_recorder", None)
+                    self.commands.extra_helpers.append(RadarTest(
+                        lambda: self.state,
+                        settlement_name=(lambda: ((recorder.current or {}).get("settlement") or {}).get("Name")) if recorder is not None else None))
+                except Exception:
+                    self.log.exception("The radar test could not start")
             except Exception:
                 self.log.exception("The settlement map voice command could not start")
             try:

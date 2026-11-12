@@ -86,6 +86,15 @@ def make_bundle(settings_path, logs_dir, data_dir, version, target_dir):
                 bundle.write(lined, "settlement_calibration.json")
         except OSError:
             pass
+        try:                                                  # the radar test (0.96.2): small radar crops only, plus where each was taken
+            samples = Path(data_dir) / "radar_samples.json"
+            if samples.exists() and samples.stat().st_size < 500_000:
+                bundle.write(samples, "radar_samples.json")
+            for png in sorted((Path(data_dir) / "radar_tests").glob("*.png"), key=lambda f: f.stat().st_mtime)[-60:]:
+                if png.stat().st_size < 400_000:
+                    bundle.write(png, "radar_tests/" + png.name)
+        except OSError:
+            pass
         try:                                                  # the little black-and-white maps of failed panel looks (no game pictures)
             for png in sorted((Path(data_dir) / "panel_debug").glob("*.png"), key=lambda f: f.stat().st_mtime)[-24:]:
                 bundle.write(png, "panel_debug/" + png.name)

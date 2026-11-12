@@ -1552,6 +1552,18 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.2 - Radar test (collecting pictures)
+
+**What to do:** be on foot at a settlement with the game in Windowed or Borderless. Stand next to a terminal, a recharge point or an ammo point and say "radar test". Do it a few times: at a terminal, at the edge of the radar, facing different ways. Then make the diagnostics zip and send it.
+
+**What you should hear:** "Radar picture 1 saved." (She says "I do not have your position..." if you are not on a planet, "I could not see the game window..." if the game is in exclusive fullscreen.)
+
+**Where it is saved:** the small radar crops are in data/radar_tests, and data/radar_samples.json says where each was taken (latitude, longitude, heading, settlement). Both go into the diagnostics zip. It stops at 60 pictures.
+
+**Not tested:** the real screen grab on your PC. The crop box was checked against your 1920x1080 screenshots (it holds the whole radar and the N marker).
+
+**Code:** navigation/radar_test.py, wired in core/app.py, files added in core/diagnostics.py, tests in tests/test_radar_test.py.
+
 ## 0.96.1 - Australian slang (only with the Australian voice)
 
 **What to do:** install the Australian voice (Voice page button), choose it, and talk to her for a while. Settings, Personality has the switch "Australian slang with the Australian voice" (ON by default).
