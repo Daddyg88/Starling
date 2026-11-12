@@ -504,3 +504,70 @@ class BuiltInVoiceTests(unittest.TestCase):
         labels = [l for l, _ in VOICES]
         self.assertTrue(any("female" in l for l in labels) and any(l.endswith("- male") for l in labels))
         self.assertEqual(VOICES[0][1], "")
+
+
+def spacy_error():
+    """An AttributeError raised from inside spaCy's model loading, like the one on a tester's damaged install."""
+    namespace = {}
+    exec(compile("def from_disk():\n    raise AttributeError(\"'int' object has no attribute 'items'\")", "/site-packages/spacy/vocab.pyx", "exec"), namespace)
+    try:
+        namespace["from_disk"]()
+    except AttributeError as error:
+        return error
+
+
+class DamagedLanguageHelper(unittest.TestCase):
+    def test_it_recognises_a_damaged_spacy_model_but_not_other_errors(self):
+        from tts import kokoro_tts
+        self.assertTrue(kokoro_tts.looks_like_spacy_damage(spacy_error()))
+        self.assertFalse(kokoro_tts.looks_like_spacy_damage(ValueError("no sound card")))
+        self.assertFalse(kokoro_tts.looks_like_spacy_damage(ImportError("no module named spacy")))
+
+    def test_a_damaged_helper_is_repaired_once_and_the_voice_then_loads(self):
+        calls = {"build": 0, "repair": 0}
+        pipe = FakePipeline()
+
+        def factory():
+            calls["build"] += 1
+            if calls["build"] == 1:
+                raise spacy_error()
+            return pipe
+
+        def repair():
+            calls["repair"] += 1
+            return True
+        tts = KokoroTTS(Path("x.pt"), Path("x.mp3"), pipeline_factory=factory, torch_load=lambda p: "PACK", sound_module=FakeSound(),
+                        setup_function=ok_setup, spacy_repair=repair)
+        tts.start_loading()
+        self.assertTrue(tts.ready.wait(10))
+        self.assertEqual(calls, {"build": 2, "repair": 1})
+
+    def test_if_the_repair_fails_the_voice_fails_plainly(self):
+        def factory():
+            raise spacy_error()
+        tts = KokoroTTS(Path("x.pt"), Path("x.mp3"), pipeline_factory=factory, torch_load=lambda p: "PACK", sound_module=FakeSound(),
+                        setup_function=ok_setup, spacy_repair=lambda: False)
+        tts.start_loading()
+        for _ in range(100):
+            if tts.failed_reason:
+                break
+            time.sleep(0.05)
+        self.assertIn("Kokoro failed to load", tts.failed_reason)
+
+    def test_the_repair_removes_the_model_then_downloads_it_again(self):
+        from tts import kokoro_tts
+        seen = []
+
+        class Done:
+            returncode = 0
+        ok = kokoro_tts.repair_spacy_model(run=lambda command, **kw: (seen.append(command), Done())[1], python="py")
+        self.assertTrue(ok)
+        self.assertEqual(seen[0], ["py", "-m", "pip", "uninstall", "-y", "en_core_web_sm"])
+        self.assertEqual(seen[1], ["py", "-m", "spacy", "download", "en_core_web_sm"])
+
+    def test_a_repair_that_cannot_run_returns_false(self):
+        from tts import kokoro_tts
+
+        def boom(command, **kw):
+            raise OSError("no pip")
+        self.assertFalse(kokoro_tts.repair_spacy_model(run=boom, python="py"))

@@ -16,8 +16,11 @@ import hashlib
 import os
 import re
 import queue
+import subprocess
+import sys
 import threading
 import time
+import traceback
 from pathlib import Path
 
 from core.logger import get_logger
@@ -25,6 +28,32 @@ from tts.base_tts import BaseTTS
 from tts import kokoro_voice_setup
 
 log = get_logger("kokoro")
+
+SPACY_MODEL = "en_core_web_sm"      # the small English word-and-grammar helper the voice engine needs (about 13 MB)
+SPACY_REPAIR_SECONDS = 600
+
+
+def looks_like_spacy_damage(error):
+    """True when the voice engine failed inside spaCy's model files (a tester's copy was damaged: 'int' object has no attribute 'items')."""
+    if isinstance(error, ImportError):
+        return False
+    try:
+        text = "".join(traceback.format_exception(type(error), error, error.__traceback__)).lower()
+    except Exception:
+        return False
+    return "spacy" in text and ("from_disk" in text or SPACY_MODEL in text)
+
+
+def repair_spacy_model(run=subprocess.run, python=None):
+    """Throw the damaged spaCy model away and download it again (needs the internet, about 13 MB). Returns True when it worked."""
+    python = python or sys.executable
+    try:
+        run([python, "-m", "pip", "uninstall", "-y", SPACY_MODEL], timeout=SPACY_REPAIR_SECONDS, capture_output=True, check=False)
+        done = run([python, "-m", "spacy", "download", SPACY_MODEL], timeout=SPACY_REPAIR_SECONDS, capture_output=True, check=False)
+        return getattr(done, "returncode", 1) == 0
+    except Exception:
+        log.exception("Could not repair the voice engine's language helper")
+        return False
 
 SAMPLE_RATE = 24000
 BLOCK_SECONDS = 0.1          # play in 100 ms pieces so stop() reacts quickly
@@ -109,8 +138,9 @@ class KokoroTTS(BaseTTS):
 
     def __init__(self, pack_path, reference_mp3, pipeline_factory=None, torch_load=None,
                  sound_module=None, setup_function=None, wait_for_ready=DEFAULT_WAIT_FOR_READY,
-                 cache_dir=None):
+                 cache_dir=None, spacy_repair=None):
         self.pack_path = Path(pack_path)
+        self._spacy_repair = spacy_repair or repair_spacy_model
         self.reference_mp3 = Path(reference_mp3)
         # The four "plug-in points" below exist so tests can use fakes instead of the real libraries.
         self._pipeline_factory = pipeline_factory
@@ -225,7 +255,7 @@ class KokoroTTS(BaseTTS):
                 log.info("Voice model is already on this computer: not checking the internet for it.")
             factory = self._pipeline_factory or self._default_pipeline_factory
             step = time.monotonic()
-            self.pipeline = factory()
+            self.pipeline = self._build_pipeline(factory)
             engine_seconds = time.monotonic() - step
 
             # 3. Load the cloned voice tensor.
@@ -249,6 +279,20 @@ class KokoroTTS(BaseTTS):
         except Exception as error:
             log.exception("Kokoro failed to load")
             self._fail("Kokoro failed to load: %s" % error)
+
+    def _build_pipeline(self, factory):
+        """Make the voice engine. If it fails because its language helper (spaCy model) is damaged, repair that once and try again."""
+        try:
+            return factory()
+        except Exception as error:
+            if not looks_like_spacy_damage(error):
+                raise
+            log.warning("The voice engine's language helper (%s) is damaged (%s). Downloading it again; this needs the internet.", SPACY_MODEL, error)
+            self.status_message = "repairing the language helper"
+            if not self._spacy_repair():
+                raise
+            log.info("The language helper was reinstalled. Starting the voice engine again.")
+            return factory()
 
     def _fail(self, reason):
         self.failed_reason = reason

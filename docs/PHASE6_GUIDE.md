@@ -1552,6 +1552,14 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.95.4 - she repairs her own damaged language helper
+
+- Tester log: Kokoro failed to load at 13:43 and 14:36 with `AttributeError: 'int' object has no attribute 'items'` in `spacy/vectors.pyx load_key2row` (spaCy `en_core_web_sm` vocab/key2row file damaged: it is a msgpack dict, and the loader got an int). It had loaded fine at 12:42 (engine 335 s, the first load that also installed the model), so the file was most likely damaged after an interrupted install or shutdown.
+- tts/kokoro_tts.py: `looks_like_spacy_damage(error)` (traceback mentions spacy and from_disk or en_core_web_sm; not ImportError), `repair_spacy_model(run, python)` (pip uninstall -y en_core_web_sm, then `python -m spacy download en_core_web_sm`, 600 s each), `KokoroTTS._build_pipeline(factory)` (one repair, one retry; status "repairing the language helper"), constructor argument `spacy_repair` for tests.
+- Same log, not bugs: the old `Tuner()` crash (fixed 0.93.2), a one-off `PortAudioError -9996` at 12:45 (device not ready; later starts listened fine), key clashes (the key check list), Void Compass not running.
+- Not done: retrying the microphone when it is not ready at start (it worked on every later start).
+- tests/test_kokoro.py `DamagedLanguageHelper`.
+
 ## 0.95.3 - the landing rule checked on three more visits
 
 - Trigger: Benny's zip 20261111-224857 (Peng Synthetics Foundry x2, Makubuya Engineering Silo, both Industrial, 1 large pad).
