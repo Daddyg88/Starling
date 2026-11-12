@@ -72,6 +72,7 @@ DEFAULTS = {
     "chitchat": {"enabled": True, "frequency": "normal", "notice": True, "world": True},
     "subtarget": {"press_ahead": False},
     "red_alert": {"minutes": 30, "banner": True, "size": "Medium", "combat_mode": True, "auto_power_plant": True},
+    "hack": {"enabled": True, "announce": True, "overlay": True, "position": "Left", "size": "Medium", "sound": "Normal", "minutes": 10, "next_target": True, "mood": True},
     "memory": {"enabled": True, "recall_at_login": True, "habits": True},
     "updates": {"repo": "", "auto_check": True, "ask": False, "ask_reset": False, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},

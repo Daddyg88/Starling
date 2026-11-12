@@ -157,3 +157,32 @@ class Dashboard(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Reward(MoodBase):
+    """A finished base hack lifts her mood (0.96.3)."""
+
+    def test_the_score_goes_up_in_automatic(self):
+        before = self.engine.score
+        self.assertTrue(self.engine.reward(6.0, "Base hack"))
+        self.assertAlmostEqual(self.engine.score, before + 6.0 * self.engine.scale)
+
+    def test_it_never_passes_the_top(self):
+        self.engine.score = self.engine.max_score - 1
+        self.engine.reward(50.0)
+        self.assertEqual(self.engine.score, self.engine.max_score)
+
+    def test_it_does_nothing_while_the_points_are_kept_safe(self):
+        self.settings.set("personality.mood_mode", "fixed")
+        before = self.engine.score
+        self.assertFalse(self.engine.reward(6.0))
+        self.assertEqual(self.engine.score, before)
+
+    def test_it_counts_again_when_the_points_are_not_kept(self):
+        self.settings.set("personality.mood_mode", "fixed")
+        self.settings.set("personality.keep_points", False)
+        self.assertTrue(self.engine.reward(6.0))
+
+    def test_it_shows_in_the_history(self):
+        self.engine.reward(6.0, "Base hack")
+        self.assertEqual(self.engine.history[0][1], "Base hack")

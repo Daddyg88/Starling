@@ -1,0 +1,94 @@
+{
+ "_help": "THE HACK (navigation/hack.py): her lines while she maps a settlement for the East Orion Company. Fields: {settlement} {found} {percent} {need} {layout} {next_name} {next_system} {next_distance} {next_group}. Keep them short and clear: some testers are in their 70s.",
+ "Hack_Offer": [
+  "The East Orion Company has no map of {settlement}. I can make one, but I need to be near the terminals, gun posts and supply points. Say start hack when you're ready.",
+  "Nobody has mapped this base for the EOC yet. Say start hack, then walk me round the terminals and the gun posts. I'll do the rest.",
+  "This one is not on the EOC's books. Say start hack and stay close to the terminals and gun posts. Keep walking, and I'll get the data."
+ ],
+ "Hack_Known": [
+  "The EOC already has this base on file. A second look never hurts, though. Say start hack if you want to double check it.",
+  "We've mapped this one before. Say start hack if you'd like me to check it again."
+ ],
+ "Hack_Start": [
+  "Opening a line to the East Orion Company. Please hold. It's old technology, but it works.",
+  "Linking up with the EOC. Dialling in now. Stay close to the terminals and the gun posts, and keep walking.",
+  "Connecting to the East Orion Company. Walk the whole base for me. Terminals, gun posts and supply points are what I need."
+ ],
+ "Hack_Progress_25": [
+  "Handshake complete. The base's security is asleep, as usual. Keep moving.",
+  "A quarter of the way in. Nobody has noticed us yet. That's the best kind of hack."
+ ],
+ "Hack_Progress_50": [
+  "Halfway there. I can feel the layout now. The rooms are starting to fit together.",
+  "Fifty percent. The doors are starting to line up. I've always been good with doors."
+ ],
+ "Hack_Progress_75": [
+  "Nearly through. The last part is always the quiet corners.",
+  "Seventy five percent. Just the awkward bits left. Keep walking."
+ ],
+ "Hack_Need": [
+  "{need}",
+  "Still not done. {need}"
+ ],
+ "Hack_Complete": [
+  "Hack complete. {settlement} is mapped. The East Orion Company will be delighted, and they will never say so.",
+  "That's it. {settlement} is in the EOC's files. Good work, Commander.",
+  "Base mapped. I have what I need from {settlement}. Sending it to the EOC. Well, to the zip file."
+ ],
+ "Hack_Layout": [
+  "My best guess is that this base is {layout}.",
+  "I think this is {layout}. The EOC can check me."
+ ],
+ "Hack_NoLayout": [
+  "I can't tell which layout this is yet. I'll leave that one for the EOC to work out.",
+  "I couldn't work out the layout. I've kept everything I saw."
+ ],
+ "Hack_Timeout": [
+  "The link timed out. I've kept what I saw, but a second walk round would help.",
+  "Out of time. I've saved everything, though I'd like another go at the quiet corners."
+ ],
+ "Hack_Aborted": [
+  "Hack cancelled. Whatever I already have is saved.",
+  "Line closed. I've kept what I found."
+ ],
+ "Hack_Lost": [
+  "I've lost the link, because you've left the base. I've kept what I had.",
+  "Signal lost. You've wandered off. What I saw is saved."
+ ],
+ "Hack_NoSettlement": [
+  "There's no base to hack here. Walk up to a settlement on foot first.",
+  "I can't find a base near you. Get out of the ship and walk up to one first."
+ ],
+ "Hack_NotOnFoot": [
+  "I can only read the radar when you're on foot. Step out of the ship and try again.",
+  "Get out of the ship first, Commander. The radar only shows when you're on foot."
+ ],
+ "Hack_NoRadar": [
+  "I can't see the radar. Is the game in windowed or borderless mode, and is the radar showing?",
+  "No radar, no hack. Check the game is in borderless or windowed mode, then try again."
+ ],
+ "Hack_AlreadyRunning": [
+  "The hack is already running. Keep walking.",
+  "We're already connected. Keep going."
+ ],
+ "Hack_NotRunning": [
+  "There's no hack running at the moment.",
+  "Nothing to stop. Say start hack when you're on foot at a base."
+ ],
+ "Hack_Disabled": [
+  "The hack game is switched off in the settings.",
+  "That's switched off in the settings, I'm afraid."
+ ],
+ "Hack_Next": [
+  "Next target: {next_name}, in the {next_system} system, about {next_distance} light years away. A {next_group} base, if the files are right.",
+  "The EOC would like {next_name} next. It's in {next_system}, about {next_distance} light years from here."
+ ],
+ "Hack_NextNone": [
+  "I can't find the next target just now. Try again later, or pick any base you like.",
+  "No next target from here. Fly to any settlement you haven't done and say start hack."
+ ],
+ "Hack_Reward": [
+  "That went well. I'm in a better mood now.",
+  "A good day's work. I feel better for it."
+ ]
+}

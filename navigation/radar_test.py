@@ -38,13 +38,14 @@ def crop_box(width, height, fractions=RADAR_BOX):
 
 
 class RadarTest:
-    def __init__(self, state_provider, capture=None, out_folder=None, samples_file=None, settlement_name=None, stamp=None):
+    def __init__(self, state_provider, capture=None, out_folder=None, samples_file=None, settlement_name=None, stamp=None, say=None):
         self.state_provider = state_provider
         self.capture = capture
         self.out_folder = out_folder or folder()
         self.samples_file = samples_file or samples_path()
         self.settlement_name = settlement_name or (lambda: None)
         self.stamp = stamp or (lambda: datetime.now().strftime("%Y%m%d-%H%M%S"))
+        self.say = say                  # (text) speaks it: a voice helper's answer is NOT spoken by the command runner itself
 
     # ---- the voice command ----
     def try_handle(self, text):
@@ -52,7 +53,13 @@ class RadarTest:
         said = re.sub(r"\s+", " ", said).strip()
         if not _ASK.match(said):
             return None
-        return self.take()
+        text = self.take()
+        if self.say is not None and text:
+            try:
+                self.say(text)
+            except Exception:
+                log.exception("The radar test could not speak")
+        return text
 
     def take(self):
         state = self.state_provider()

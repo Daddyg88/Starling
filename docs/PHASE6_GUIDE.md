@@ -1552,6 +1552,21 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.3 - The EOC base hack (a game) and the radar reader
+
+**What to do (simple):**
+1. Be on foot (out of the ship) at a settlement. The game must be in Windowed or Borderless mode.
+2. Say **"start hack"**. You will hear an old modem sound and a small green box appears on the screen.
+3. Walk around the base, near the terminals, the recharge and ammo points and the gun posts. Do not stand still in one place: she needs to see them from different spots. The box shows what she still needs.
+4. When it says BASE MAPPED she tells you a piece of her story, and tells you where to go next.
+5. Say **"stop hack"** to cancel, **"how is the hack going"** to ask, **"replay the last chapter"** to hear the story again.
+
+**What you should hear:** when you arrive at a base she says if it is mapped. If not, she asks you to hack it. Every finished hack makes her a bit happier.
+
+**Where it lives:** navigation/radar_read.py (reads the radar), radar_points.py (saves positions to data/radar_points.json), radar_match.py (which layout is it), hack.py (the game), hack_after.py (story, mood, next target), hack_next.py (Spansh), personality/hack_lore.py and voicepacks/default/hack_lore.json (the 28 chapters), ui/hack_overlay.py (the panel), tools/merge_radar.py (merges tester zips, only moves a terminal when two sightings agree and a backup is made). Settings: On foot page, "Base hack". Tests: test_radar_read, test_radar_points, test_merge_radar, test_hack, test_hack_lore.
+
+**Not tested in the real game:** the screen grab, modem sound, panel position, the story delivery, the mood boost, and the Spansh next-target (filter names are a guess; if it fails she says she has nothing to suggest). The radar reader was only checked on Ben's four pictures (orange HUD, 1920x1080).
+
 ## 0.96.2 - Radar test (collecting pictures)
 
 **What to do:** be on foot at a settlement with the game in Windowed or Borderless. Stand next to a terminal, a recharge point or an ammo point and say "radar test". Do it a few times: at a terminal, at the edge of the radar, facing different ways. Then make the diagnostics zip and send it.

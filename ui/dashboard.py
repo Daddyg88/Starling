@@ -104,6 +104,12 @@ class Dashboard:
             log.exception("The red alert glow could not start")
             self.red_alert_overlay = None
         try:
+            from ui.hack_overlay import HackOverlay
+            self.hack_overlay = HackOverlay(self.root, app.settings, lambda: getattr(app, "hack", None))
+        except Exception:
+            log.exception("The hack panel could not start")
+            self.hack_overlay = None
+        try:
             from ui.settlement_overlay import SettlementOverlay
             maps, view = getattr(app, "settlement_maps", None), getattr(app, "settlement_view", None)
             self.settlement_overlay = SettlementOverlay(self.root, app.settings, maps, view) if maps is not None and view is not None else None

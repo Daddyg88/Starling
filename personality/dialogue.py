@@ -134,6 +134,8 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "travel.json"))        # more arrival / departure lines
             self._merge(_read_json(self.pack_dir / "innuendo.json"))      # the cheeky lines (only with the dashboard switch on)
             self._merge(_read_json(self.pack_dir / "aussie.json"))        # Australian slang (only with the Australian voice)
+            self._merge(_read_json(self.pack_dir / "hack.json"))          # the base-mapping game
+            self._merge(_read_json(self.pack_dir / "hack_lore.json"))     # her story, one chapter per base
             self._merge(_read_json(self.pack_dir / "dark.json"))          # gallows humour
             self._merge(_read_json(self.pack_dir / "route.json"))         # neutron route plotter
             self._merge(_read_json(self.pack_dir / "watcher.json"))       # her answers to the Watcher (Void Compass)

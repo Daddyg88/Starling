@@ -86,6 +86,15 @@ def make_bundle(settings_path, logs_dir, data_dir, version, target_dir):
                 bundle.write(lined, "settlement_calibration.json")
         except OSError:
             pass
+        try:                                                  # the base hack (0.96.3): positions only, never pictures
+            points = Path(data_dir) / "radar_points.json"
+            if points.exists() and points.stat().st_size < 2_000_000:
+                bundle.write(points, "radar_points.json")
+            story = Path(data_dir) / "hack_lore.json"
+            if story.exists() and story.stat().st_size < 20_000:
+                bundle.write(story, "hack_lore.json")
+        except OSError:
+            pass
         try:                                                  # the radar test (0.96.2): small radar crops only, plus where each was taken
             samples = Path(data_dir) / "radar_samples.json"
             if samples.exists() and samples.stat().st_size < 500_000:

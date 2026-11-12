@@ -59,6 +59,8 @@ class App:
         self.speaker = None
         self.listener = None
         self.mood = None
+        self.hack = None
+        self.hack_lore = None
         self.greeter = None
         self.memory_store = None
         self.event_logger = None
@@ -478,9 +480,14 @@ class App:
                     recorder = getattr(self, "settlement_recorder", None)
                     self.commands.extra_helpers.append(RadarTest(
                         lambda: self.state,
-                        settlement_name=(lambda: ((recorder.current or {}).get("settlement") or {}).get("Name")) if recorder is not None else None))
+                        settlement_name=(lambda: ((recorder.current or {}).get("settlement") or {}).get("Name")) if recorder is not None else None,
+                        say=lambda text: self.speech.say(text=text, priority="normal", event_name="radar.test")))
                 except Exception:
                     self.log.exception("The radar test could not start")
+                try:
+                    self._start_hack()
+                except Exception:
+                    self.log.exception("The base hack could not start")
             except Exception:
                 self.log.exception("The settlement map voice command could not start")
             try:
@@ -1009,6 +1016,51 @@ class App:
         if getattr(state, "target_locked", False):
             return True
         return time.monotonic() - getattr(state, "attacked_at", -999.0) < 120.0
+
+    def _start_hack(self):
+        """The EOC base hack game (navigation/hack.py) and what follows it (story, mood, next target). Optional: any failure leaves her as before."""
+        import json
+        from core import paths
+        from navigation.hack import HackMode
+        from navigation.hack_after import AfterHack
+        from navigation.hack_next import NextTarget
+        from navigation.radar_points import PointStore
+        from navigation.voice import Narrator
+        from personality.hack_lore import HackLore
+        tracker = getattr(self, "settlement_tracker", None)
+        recorder = getattr(self, "settlement_recorder", None)
+
+        def settlement():
+            s = getattr(tracker, "settlement", None) if tracker is not None else None
+            if s is None:
+                return None
+            out = dict(s)
+            out["market"] = s.get("market") or s.get("name")
+            try:
+                out["candidate_ids"] = [c["id"] for c in tracker.candidates()]
+            except Exception:
+                out["candidate_ids"] = []
+            return out
+
+        def read(name):
+            try:
+                with open(paths.ROOT / "maps" / name, encoding="utf-8") as handle:
+                    return json.load(handle)
+            except (OSError, ValueError):
+                return {}
+        narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+        store = PointStore()
+        hack = HackMode(self.settings, lambda: self.state, settlement, store, getattr(self, "settlement_maps", None), narrator,
+                        known_layouts=read("known_settlements.json"), survey=read("radar_survey.json"))
+        lore = HackLore(lambda: self.speech, lambda: self.dialogue, self.settings, path=paths.DATA_DIR / "hack_lore.json")
+        hack.on_complete.append(AfterHack(self.settings, lore, self.mood, narrator, store, next_target=NextTarget(),
+                                          system_provider=lambda: getattr(self.state, "system", None)))
+        self.hack = hack
+        self.hack_lore = lore
+        self.commands.extra_helpers.append(hack)
+        self.commands.extra_helpers.append(lore)
+        if getattr(self, "processor", None) is not None:
+            self.processor.raw_listeners.append(hack.on_entry)
 
     def _red_alert_combat_mode(self):
         """Red alert: switch the cockpit to combat mode in the background (it says nothing and does nothing if it already is)."""

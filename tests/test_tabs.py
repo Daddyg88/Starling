@@ -59,11 +59,11 @@ class MergedPageTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             model = SettingsModel(Settings(Path(tmp) / "s.json").load())
         shown = [p.id for p in model.sidebar_pages]
-        for gone in ("listening", "controls", "chat", "memory", "bookmarks"):
+        for gone in ("listening", "controls", "chat", "memory", "bookmarks", "hack"):
             self.assertNotIn(gone, shown)
         homes = {p.id: p.parent for p in model.pages if p.parent}
         self.assertEqual(homes, {"listening": "voice", "controls": "game", "chat": "personality",
-                                 "memory": "personality", "bookmarks": "navigation", "redalert": "combat"})
+                                 "memory": "personality", "bookmarks": "navigation", "redalert": "combat", "hack": "onfoot"})
         for parent in set(homes.values()):
             self.assertIn(parent, shown)
         self.assertEqual(shown[-1], "developer")                  # the Developer tab holds the tests

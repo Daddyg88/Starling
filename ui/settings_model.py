@@ -173,7 +173,7 @@ def voicepack_choices(folder=None):
 
 # These pages are not in the sidebar: they appear as a section inside the page named on the right.
 SECTION_OF = {"listening": "voice", "controls": "game", "chat": "personality", "memory": "personality",
-              "bookmarks": "navigation", "redalert": "combat"}
+              "bookmarks": "navigation", "redalert": "combat", "hack": "onfoot"}
 
 
 # ---------------------------------------------------------------------------
@@ -280,6 +280,17 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("red_alert.auto_power_plant", "Pick the power plant once the target is scanned", "toggle", help="While red alert is on, when your scan of a locked ship finishes she presses your Next Subsystem key until its power plant is selected (the same as saying 'target power plant'). Once per ship. Needs a keyboard key on Next Subsystem"),
             Field("red_alert.banner", "Show RED ALERT on screen", "toggle", help="A small see-through RED ALERT at the bottom centre, just under the Disembark button. It does not take clicks or the keyboard. Elite must be in Borderless or Windowed mode"),
             Field("red_alert.size", "Size of the RED ALERT text", "choice", [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]),
+        ]),
+        Page("hack", "Base hack (EOC mapping game)", "A game for settlements. Walk up to a base on foot and say 'start hack': Starling 'hacks' it for the East Orion Company, which really means she watches the radar in the corner of the screen and writes down where the terminals, gun posts, ammo and recharge points are. A small green progress panel shows on screen with an old modem sound. You get a chapter of her story each time, her mood goes up a little, and she suggests the next base to do. Nothing is sent anywhere: it all goes into the diagnostics zip (data/radar_points.json). Needs Elite in Windowed or Borderless mode.", [
+            Field("hack.enabled", "Base hack game", "toggle", help="Turns the whole thing on or off (say 'start hack', 'stop hack', 'how is the hack going')"),
+            Field("hack.announce", "Tell me when a base has not been mapped", "toggle", help="When you step out near a base nobody has mapped, she says so once and explains what to do"),
+            Field("hack.overlay", "Show the progress panel on screen", "toggle", help="A small green box that never takes clicks or the keyboard. It never shows coordinates"),
+            Field("hack.position", "Where the panel goes", "choice", [("Left (under the radar)", "Left"), ("Right", "Right"), ("Top middle", "Top")]),
+            Field("hack.size", "Size of the panel", "choice", [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]),
+            Field("hack.sound", "Old modem sound", "choice", [("Off", "Off"), ("Quiet", "Quiet"), ("Normal", "Normal"), ("Loud", "Loud")], help="Plays when the hack starts, and a small chirp each time she finds something new"),
+            Field("hack.minutes", "Longest a hack can run", "choice", [("5 minutes", 5), ("10 minutes", 10), ("15 minutes", 15), ("20 minutes", 20)]),
+            Field("hack.mood", "A finished hack lifts her mood", "toggle", help="Only while she is on Automatic mood"),
+            Field("hack.next_target", "Suggest the next base to hack", "toggle", help="Asks Spansh (spansh.co.uk) for the nearest base of a type that has not been mapped. Sends only your system name"),
         ]),
         Page("onfoot", "On foot", "Voice control for everything on foot. Say 'suit shields', 'torch', 'next grenade type', 'select EMP grenades', 'use a health pack', 'use a battery', 'helmet night vision', 'energy link', 'crouch', 'wave'... Each needs a keyboard key in Elite's on-foot controls. Emote words are in config/emotes.json (docs/PHASE6_GUIDE.md).", [
             Field("onfoot.auto_shields", "On foot: raise my suit shields when I draw a weapon or take damage", "toggle",

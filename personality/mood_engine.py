@@ -341,6 +341,24 @@ class MoodEngine:
         as it was, so switching back never loses what you earned. Nothing adds to it, takes from it, or calms it down meanwhile."""
         return mood_mode(self.settings) != "auto" and bool(self.settings.get("personality.keep_points", True))
 
+    def reward(self, points, label="Reward"):
+        """A bonus from something that is not a game event (a finished base hack). Adds `points` (scaled like every other score, so it means the
+        same at any difficulty) to the hidden score. Does nothing while she is Fixed or Random with 'keep my points' on (the score is frozen
+        then). Returns True when the score moved."""
+        if self._frozen():
+            return False
+        gained = float(points) * float(self.scale)
+        before = self.band
+        self.score = min(self.max_score, self.score + gained)
+        self.band = self._band_for(self.score, self.band)
+        now = self.clock()
+        self.history.appendleft((datetime.fromtimestamp(now).strftime("%H:%M"), label, gained))
+        self._dirty = True
+        self._publish_live()
+        if self.band != before:
+            self._announce_shift()
+        return True
+
     def check_random(self, now=None):
         """Random mode: pick a new mood (and level) every few minutes (default 20). Returns True when it just changed."""
         if mood_mode(self.settings) != "random":
