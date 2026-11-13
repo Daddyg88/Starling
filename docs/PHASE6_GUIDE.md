@@ -1552,6 +1552,14 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.8 - Sub target names in the log
+
+**What to do:** hunt as normal. Cycle through the sub targets of a Thargoid yourself (Next Subsystem key) so each part is selected once. Then send the diagnostics zip.
+
+**What you should see in the log:** lines starting "Sub target seen:" with the ship, the game's name for the part and the readable name. Nothing changes in what she says.
+
+**Where it lives:** events/combat_events.py. Test: test_events (SubTargetLogged).
+
 ## 0.96.7 - Hacking a base we already have a map of
 
 **What to do:** the same as before: "start hack", walk around the terminals.

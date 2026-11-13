@@ -147,3 +147,27 @@ class CompletenessTests(unittest.TestCase):
         self.assertEqual([e.name for e in heard], ["HeatWarning", "DockingGranted"])
         self.assertEqual(heard[0].priority, CRITICAL)
         self.assertIn("pad 7", heard[1].data["summary"])
+
+
+class SubTargetLogged(unittest.TestCase):
+    """0.96.8: every different sub target is written to the log once, so a zip shows what the game calls a Thargoid's parts."""
+
+    def test_logged_once(self):
+        from types import SimpleNamespace
+        from events import combat_events
+        combat_events._SUB_TARGETS_LOGGED.clear()
+        state = SimpleNamespace(target_locked=True, target_subsystem="$x_heart;", target_subsystem_readable="Heart")
+        entry = {"Ship_Localised": "Thargoid Interceptor"}
+        with self.assertLogs("starling.sub_targets", level="INFO") as logs:
+            combat_events._note_sub_target(entry, state)
+            combat_events._note_sub_target(entry, state)
+        self.assertEqual(len(logs.output), 1)
+        self.assertIn("Heart", logs.output[0])
+        self.assertIn("Thargoid Interceptor", logs.output[0])
+
+    def test_nothing_without_a_part(self):
+        from types import SimpleNamespace
+        from events import combat_events
+        combat_events._SUB_TARGETS_LOGGED.clear()
+        combat_events._note_sub_target({}, SimpleNamespace(target_locked=True, target_subsystem="", target_subsystem_readable=""))
+        self.assertEqual(len(combat_events._SUB_TARGETS_LOGGED), 0)

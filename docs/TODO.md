@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.8: after a Thargoid hunt look in the zip's log for 'Sub target seen:' lines (is the part called Heart?), then add those names to control/subsystems.py so 'target heart' works.
 - [ ] 0.96.7: hack a base that has a map and check she says the 'checking our map' lines. Not built yet: keep offering until 3 testers have done a base; a 'we have a map, I can sharpen it' arrival line.
 - [ ] 0.96.6: Ben to read the rewritten story (PDF) and change anything; real game: does the Spansh 'government: Anarchy' filter work (check the log for 'Next target search failed'), does she say 'Anarchy space' for a pirate base; she does not say anything about whether a pirate base is dangerous beyond a general warning.
 - [ ] 0.96.5: hack a base for real and check the map comes up when she names the layout; leave and come back: it should come up at once; note any wrong map (which base, which layout). Still not built: placing the player on the map from the radar.

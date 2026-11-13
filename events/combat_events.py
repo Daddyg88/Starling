@@ -7,6 +7,7 @@ import re
 import time
 
 from core.event_bus import NORMAL
+from core.logger import get_logger
 from core.ships import ship_name
 from events.base_event import BaseEvent
 
@@ -57,6 +58,21 @@ def _same_target(seen, ship, pilot):
     return seen is not None and seen[0] == ship and (not pilot or not seen[1] or pilot == seen[1])
 
 
+_SUB_TARGETS_LOGGED = set()
+
+
+def _note_sub_target(entry, state):
+    """Writes each different sub target (ship + the game's name + the readable name) to the log ONCE per run, so the diagnostics zip shows what the
+    game really calls them, e.g. a Thargoid's parts (0.96.8). Only names, nothing else."""
+    if not (state.target_locked and (state.target_subsystem or state.target_subsystem_readable)):
+        return
+    seen = (str(entry.get("Ship_Localised") or entry.get("Ship") or ""), state.target_subsystem, state.target_subsystem_readable)
+    if seen in _SUB_TARGETS_LOGGED or len(_SUB_TARGETS_LOGGED) > 300:
+        return
+    _SUB_TARGETS_LOGGED.add(seen)
+    get_logger("sub_targets").info("Sub target seen: ship=%r part=%r readable=%r", *seen)
+
+
 def _target_update(self, entry, state):
     """Decide what (if anything) is worth saying about the ship you just targeted or scanned."""
     try:                                                    # what sub targeting needs to know (control/subsystems.py)
@@ -70,6 +86,7 @@ def _target_update(self, entry, state):
         if history is not None:
             history.append((state.target_seq, state.target_subsystem, state.target_subsystem_readable))
             del history[:-80]
+        _note_sub_target(entry, state)
     except Exception:
         pass
     ship = entry.get("Ship_Localised") or entry.get("Ship") or ""
