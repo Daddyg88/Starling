@@ -25,6 +25,7 @@ ACTION = "HumanoidToggleShieldsButton"
 ON_FOOT_BIT = 0                       # Status.json Flags2
 NOT_WEAPONS = ("fists", "fist", "none", "tool", "scanner", "analyser", "analyzer", "recharge", "energylink", "energy link", "sampler")
 COOLDOWN_SECONDS = 8.0
+PRESS_WINDOW_SECONDS = 6.0           # a ShieldState this soon after her own key press is the result of it
 FIGHT_SECONDS = 120.0                 # after a combat sign, she treats you as "in a fight" this long
 HURT_DROP = 0.02                      # health must fall by this much (of 1.0) to count as damage
 
@@ -50,10 +51,20 @@ class AutoShields:
         self._armed = None            # was a weapon in hand last time?
         self._health = None
         self._last = None
+        self._pressed = None          # (shields up after the press?, time): her own key press, so the game's ShieldState line about it is not a surprise
         self.last_result = ""
 
     def enabled(self):
         return bool(self.settings.get("onfoot.auto_shields", False))
+
+    def caused(self, shields_up):
+        """True (once) when the ShieldState the game just wrote is the result of HER key press a moment ago (she raised or lowered them).
+        Then it is not news: no 'No shields! Kill them!' and no mood loss (seen on a stream: six times in three minutes)."""
+        pressed = self._pressed
+        if pressed is None or bool(pressed[0]) != bool(shields_up) or self.clock() - pressed[1] > PRESS_WINDOW_SECONDS:
+            return False
+        self._pressed = None
+        return True
 
     def mark_fight(self):
         """A sign of combat on foot (a combat bond, a bounty, or damage). Keeps the shields up for a couple of minutes."""
@@ -112,6 +123,7 @@ class AutoShields:
         self.last_result = problem or "lowered"
         if not problem:
             self.up = False
+            self._pressed = (False, self.clock())
             log.info("Auto shields: weapon holstered, pressed the shields key to lower them")
         else:
             log.warning("Auto shields could not lower the shields: %s", problem)
@@ -135,6 +147,7 @@ class AutoShields:
         self.last_result = problem or "done"
         if not problem:
             self.up = True
+            self._pressed = (True, self.clock())
             log.info("Auto shields: pressed the shields key (%s)", reason)
         else:
             log.warning("Auto shields could not press the key: %s", problem)

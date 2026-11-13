@@ -25,7 +25,7 @@ from pathlib import Path
 
 from core.logger import get_logger
 from tts.base_tts import BaseTTS
-from tts import kokoro_voice_setup
+from tts import kokoro_voice_setup, pronounce
 
 log = get_logger("kokoro")
 
@@ -430,6 +430,7 @@ class KokoroTTS(BaseTTS):
         every one of its sentences is."""
         if self.cache_dir is None:
             return False
+        text = pronounce.prepare(text, self._voice_name)
         for unit in self._units(text):
             path = self._cache_file(unit, speed)
             if path is not None and not path.is_file():              # (a piece that can never be kept is not worth making again and again)
@@ -438,6 +439,7 @@ class KokoroTTS(BaseTTS):
 
     def render(self, text, speed=1.0):
         """Make the sound for `text` WITHOUT playing it (and cache it). Returns True on success."""
+        text = pronounce.prepare(text, self._voice_name)
         parts = [part.strip() for part in text.split(PAUSE_MARK) if part.strip()]
         if len(parts) != 1:
             return bool(parts) and all([self.render(part, speed) for part in parts])
@@ -493,6 +495,7 @@ class KokoroTTS(BaseTTS):
 
     def _synthesise_and_play(self, text, voice, sound):
         import numpy as np
+        text = pronounce.prepare(text, self._voice_name)           # "7.9" -> "7 point 9", Latin names respelled (tts/pronounce.py)
         gain = max(0.0, min(1.0, voice.volume / 100.0))
         speed = min(2.0, speed_from_rate(voice.rate) * float(getattr(self, "speed_boost", 1.0) or 1.0))      # red alert makes this 1.5
         pieces = queue.Queue(maxsize=QUEUE_PIECES)

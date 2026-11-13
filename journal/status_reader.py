@@ -369,8 +369,11 @@ class StatusReader:
         facts = (getattr(state, "bodies", None) or {}).get(getattr(state, "current_body", None))
         if not facts:
             return {}
-        return {"temperature": int(round(facts["temperature"])), "gravity": "%.2f" % facts["gravity"],
-                "heavy": facts["gravity"] >= 2.0}
+        out = {"temperature": int(round(facts["temperature"])), "gravity": "%.2f" % facts["gravity"],
+               "heavy": facts["gravity"] >= 2.0}
+        if facts.get("atmosphere"):
+            out["atmosphere"] = facts["atmosphere"]
+        return out
 
     _foot_fields_logged = False
 

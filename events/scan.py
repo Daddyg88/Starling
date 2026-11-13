@@ -4,6 +4,20 @@ from events.base_event import BaseEvent
 from core.event_bus import LOW
 
 
+def atmosphere_phrase(entry):
+    """What the planet's air is like, in words she can say: 'no atmosphere', 'a thin argon atmosphere', 'an atmosphere suitable for water based life'.
+    None when the scan does not say (a star, or an old journal line)."""
+    text, kind = entry.get("Atmosphere"), entry.get("AtmosphereType")
+    if text is None and kind is None:
+        return None
+    text = str(text or "").strip().lower().replace("_", " ")
+    if not text or str(kind or "").strip().lower() == "none" or text in ("none", "no atmosphere"):
+        return "no atmosphere"
+    if "atmosphere" not in text:
+        return "an atmosphere that is " + text
+    return ("an " if text[0] in "aeiou" else "a ") + text
+
+
 class Scan(BaseEvent):
     name = "Scan"
     priority = LOW
@@ -17,7 +31,8 @@ class Scan(BaseEvent):
         if name and isinstance(gravity, (int, float)) and isinstance(kelvin, (int, float)):
             if len(state.bodies) > 400:
                 state.bodies.clear()          # a long trip must not grow this forever
-            state.bodies[name] = {"temperature": float(kelvin), "gravity": float(gravity) / 9.80665}    # the game gives m/s2
+            state.bodies[name] = {"temperature": float(kelvin), "gravity": float(gravity) / 9.80665,    # the game gives m/s2
+                                  "atmosphere": atmosphere_phrase(entry)}
         self._note_notable(entry, state)
         if state.awaiting_discovery:
             state.awaiting_discovery = False

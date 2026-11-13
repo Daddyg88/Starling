@@ -830,6 +830,8 @@ class App:
             book, sender = BindingBook(), KeySender()
             self.auto_shields = AutoShields(self.settings, book, sender)
             self.monitor.status.listeners.append(self.auto_shields.check)
+            from events.shield_state import ShieldState
+            ShieldState.own_press = self.auto_shields.caused
             for name in ("FactionKillBond", "Bounty"):              # signs of a fight on foot
                 self.bus.subscribe(name, self.auto_shields.on_combat_event)
             from control.onfoot_care import OnFootCare

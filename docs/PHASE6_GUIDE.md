@@ -1552,6 +1552,21 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.4 - glide air, decimals, pronunciation, "she'll be right", shield fix
+
+**What to do:** nothing special. Glide down to a planet you have scanned and listen. Play with the Australian voice on for a while. Hear her read prices and distances.
+
+**What you should hear:**
+- Glide: gravity, temperature and the atmosphere ("a thin argon atmosphere", "no atmosphere"). If the planet was never scanned she says the short version as before.
+- Numbers: "seven point nine", not "seven nine". "500 m" becomes "500 metres".
+- Hard words: Latin species names and "terraformable" should sound right. If one still sounds wrong, tell Ben the word. It is fixed by editing config/pronunciations.json (the word on the left is replaced by how it sounds on the right).
+- Australian mode: now and then "She'll be right, luv."
+- With auto shields on: putting your weapon away no longer makes her shout "No shields!".
+
+**Where it lives:** tts/pronounce.py and config/pronunciations.json (numbers and words), events/scan.py + journal/status_reader.py + personality/line_keys.py + voicepacks/default/callouts.json (glide air), voicepacks/default/aussie.json, control/auto_shields.py + events/shield_state.py (shield fix). Tests: test_pronounce, test_glide_air, test_shield_own_press.
+
+**Not tested by ear or in the game:** every respelling (best guesses), the air line in a real glide, the shield fix with the real game.
+
 ## 0.96.3 - The EOC base hack (a game) and the radar reader
 
 **What to do (simple):**

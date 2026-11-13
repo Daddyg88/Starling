@@ -112,7 +112,9 @@ def _keys_for(event):
 
     if name == "GlideStarted":
         if data.get("temperature") is not None and data.get("gravity") is not None:
-            return (["GlideStarted_Heavy"] if data.get("heavy") else []) + ["GlideStarted_Info", "GlideStarted"]
+            air = bool(data.get("atmosphere"))          # a scan told us what the air is like: say it (0.96.4)
+            first = (["GlideStarted_HeavyAir"] if air else ["GlideStarted_Heavy"]) if data.get("heavy") else []
+            return first + (["GlideStarted_Air"] if air else []) + ["GlideStarted_Info", "GlideStarted"]
         return ["GlideStarted"]
 
     if name == "JumpsLeft":

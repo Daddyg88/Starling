@@ -14,7 +14,9 @@
   "Too easy.",
   "Good as gold.",
   "Sorted.",
-  "No dramas."
+  "No dramas.",
+  "She'll be right, luv.",
+  "She'll be right."
  ],
  "PetName_Aussie": [
   "Digger",
@@ -56,7 +58,9 @@
   {
    "text": "Not bad for a bloody machine.",
    "mature": true
-  }
+  },
+  "Don't stress, luv. She'll be right.",
+  "Something go wrong? She'll be right, luv. She usually is."
  ],
  "ChitChat_Aussie": [
   "Fun fact for you: in Victoria a pot is a small beer, about two hundred and eighty-five millilitres. A schooner is the bigger one.",

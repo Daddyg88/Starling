@@ -341,5 +341,30 @@
   "Quarter of a tank, {fuel_percent} percent. Not another one of your specials, please.",
   "{fuel_percent} percent fuel. Let's refuel before it becomes a story people tell.",
   "Fuel is low, {fuel_percent} percent. The last time this happened, it took an hour of drifting. Just saying."
+ ],
+ "GlideStarted_Air": [
+  "Gliding in. Gravity {gravity} g, and {atmosphere}. {temperature} kelvin at the surface.",
+  "Glide engaged. You'll find {gravity} g down there, with {atmosphere}.",
+  "Going down. {atmosphere}, gravity {gravity} g, and {temperature} kelvin outside.",
+  "Here we go. That's {gravity} g and {atmosphere}, Commander.",
+  "Gliding. Expect {gravity} g, {temperature} kelvin, and {atmosphere}.",
+  "Entering the glide. The surface has {atmosphere}, gravity {gravity} g."
+ ],
+ "GlideStarted_Air_Sarcastic": [
+  "Gliding. {gravity} g, {atmosphere}, {temperature} kelvin. Try not to park it.",
+  "Going down. {atmosphere} and {gravity} g. I'm sure you've got this."
+ ],
+ "GlideStarted_Air_Close": [
+  "Gliding in, love. {gravity} g, and {atmosphere}. I've got you.",
+  "Going down together. {atmosphere}, {gravity} g. Gently now."
+ ],
+ "GlideStarted_Air_Frustrated": [
+  "Gliding. {gravity} g, {atmosphere}. Concentrate.",
+  "Glide on. {atmosphere}, {gravity} g. Don't crash."
+ ],
+ "GlideStarted_HeavyAir": [
+  "Careful, Commander. Heavy world: {gravity} g, with {atmosphere}. {temperature} kelvin on the surface.",
+  "Glide engaged. High gravity, {gravity} g, and {atmosphere}. Surface {temperature} kelvin.",
+  "Fair warning: {gravity} g and {atmosphere}. That's a heavy one."
  ]
 }

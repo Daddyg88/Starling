@@ -226,7 +226,7 @@ class DialogueTests(unittest.TestCase):
         cls.d = DialogueManager(paths.VOICEPACKS_DIR / "default").load()
 
     def test_every_new_key_has_lines(self):
-        for key in ("GlideStarted_Info", "GlideStarted_Heavy", "StartJump_Scoop", "StartJump_NoScoop", "UndiscoveredSystem",
+        for key in ("GlideStarted_Info", "GlideStarted_Heavy", "GlideStarted_Air", "GlideStarted_HeavyAir", "StartJump_Scoop", "StartJump_NoScoop", "UndiscoveredSystem",
                     "JumpsLeft", "JumpsLeft_Last", "NomadDocked"):
             self.assertTrue(self.d.lines.get(key), key)
 
@@ -234,7 +234,7 @@ class DialogueTests(unittest.TestCase):
         self.assertGreaterEqual(len(self.d.lines["UndiscoveredSystem"]), 50)
 
     def test_placeholders_are_known(self):
-        allowed = {"FuelHalf": set(), "FuelPanic": {"fuel_percent"}, "LowFuel": {"fuel_percent"}, "GlideStarted": {"temperature", "gravity"}, "StartJump": {"StarSystem"}, "UndiscoveredSystem": {"StarSystem"},
+        allowed = {"FuelHalf": set(), "FuelPanic": {"fuel_percent"}, "LowFuel": {"fuel_percent"}, "GlideStarted": {"temperature", "gravity", "atmosphere"}, "StartJump": {"StarSystem"}, "UndiscoveredSystem": {"StarSystem"},
                    "JumpsLeft": {"jumps"}, "NomadDocked": set()}
         import string
         for key, lines in self.d.lines.items():
