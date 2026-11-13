@@ -191,7 +191,7 @@ class RunningTests(unittest.TestCase):
         self.assertFalse(self.hack.active)
         self.assertEqual(self.hack.result["how"], "complete")
         self.assertEqual(self.hack.result["layout"], "industrial_2")
-        self.assertIn("Hack_Complete", self.rig.narrator.said)
+        self.assertIn("Hack_CompleteMapped", self.rig.narrator.said)       # the map was already known
         self.assertIn("Hack_Layout", self.rig.narrator.said)
         self.assertTrue(store.get("4358173443")["done"])
         self.assertEqual(len(done), 1)
@@ -241,6 +241,24 @@ class RunningTests(unittest.TestCase):
         self.rig.clock.now += 11 * 60
         self.hack.tick()
         self.assertEqual(len(calls), 1)
+
+
+class HackWithAMap(unittest.TestCase):
+    def test_a_base_with_a_map_gets_the_checking_lines(self):
+        rig = Rig()
+        self.addCleanup(rig.cleanup)
+        rig.settlement["map"] = "industrial_2"
+        rig.hack.start()
+        self.assertEqual(rig.narrator.said, ["Hack_StartMapped"])
+        self.assertTrue(rig.hack.mapped)
+
+    def test_a_base_without_a_map_keeps_the_normal_lines(self):
+        rig = Rig()
+        self.addCleanup(rig.cleanup)
+        rig.settlement["map"] = None
+        rig.hack.known_layouts = {}
+        rig.hack.start()
+        self.assertEqual(rig.narrator.said, ["Hack_Start"])
 
 
 class MappedTests(unittest.TestCase):

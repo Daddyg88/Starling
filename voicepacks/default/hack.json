@@ -99,5 +99,15 @@
   "{settlement} is anarchy-run. Pirates. This is exactly where they hide copies of the East Orion Company's files. It's a good place to hack, Commander. Say start hack.",
   "Anarchy flag on {settlement}. Pirate base. If they took a piece of the Archive, it's in here. Good place to hack. Say start hack.",
   "{settlement} answers to no government. That makes it a pirate den, and a good place to hack. Walk me past the terminals and say start hack."
+ ],
+ "Hack_StartMapped": [
+  "The East Orion Company already has a map of this base. The pirates kept a copy of it, and theirs may be better than ours. I'm checking the two against each other. Stay close to the terminals.",
+  "We hold a map of {settlement}, but the pirates' copy of it is in here somewhere. I'll compare them. Walk me past the terminals, Commander.",
+  "Line open. Our map of this base is old and rough. If the pirates' copy is cleaner, I'll take it. Keep moving."
+ ],
+ "Hack_CompleteMapped": [
+  "Done. I've checked our map of {settlement} against the pirates' copy and taken their corrections. One more fragment of my file is back. Listen.",
+  "Link closed. {settlement} is checked, and our map is sharper for it. I have a piece of my own file too. Listen.",
+  "That's {settlement} compared. Where the pirates' map was better than ours, I kept theirs. Here's the fragment I recovered."
  ]
 }

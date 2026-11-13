@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.7 - Hacking a base we already have a map of
+
+**What to do:** the same as before: "start hack", walk around the terminals.
+
+**What you should hear:** at a base whose map we already have, she says she is checking our map against the pirates' copy, and at the end that our map is sharper. Bases without a map keep the old lines.
+
+**Why it matters:** the radar measurements from these bases are used to correct the map (tools/merge_radar.py, only when two or more sightings agree, with a backup).
+
+**Where it lives:** navigation/hack.py, voicepacks/default/hack.json (Hack_StartMapped, Hack_CompleteMapped). Tests: test_hack. Not tested in the real game.
+
 ## 0.96.6 - A darker story, and pirate bases as targets
 
 **What to do:** nothing new. Hack a base as before ("start hack", walk around).

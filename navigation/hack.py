@@ -168,6 +168,7 @@ class HackMode:
         self.capture = capture
         self.sound = sound if sound is not None else play
         self.clock = clock
+        self.mapped = False                                   # this hack is at a base whose map we already have
         self.on_layout = []                                   # called with (map id, market) when a hack settles the layout clearly
         self.known_layouts = known_layouts or {}              # MarketID -> map id (maps/known_settlements.json)
         self.survey = survey or {}                            # MarketID -> {terminals, pictures...} (maps/radar_survey.json, from tester zips)
@@ -319,7 +320,8 @@ class HackMode:
             self._stop.clear()
         self.store.describe(self.key, name=self.name, group=s.get("group"), pads=s.get("pads"), layout=s.get("map"))
         self.items = self._progress()[1]
-        self.say("Hack_Start", {"settlement": self.name})
+        self.mapped = self._has_map(s)
+        self.say("Hack_StartMapped" if self.mapped else "Hack_Start", {"settlement": self.name})
         self._play(modem_wav)
         self.spawn(self._run)
         log.info("Hack started at %s (%s)", self.name, self.key)
@@ -347,6 +349,11 @@ class HackMode:
                 log.exception("The hack stopped because of a problem")
                 self._finish("error")
                 break
+
+    def _has_map(self, s):
+        """True when we already have a traced map of this base: the hack then checks the map against the radar instead of finding the layout."""
+        layout = (s or {}).get("map") or self.known_layouts.get(self.key)
+        return bool(layout and self.maps is not None and self.maps.get(layout) is not None)
 
     def _expected_terminals(self):
         s = self.settlement_provider() or {}
@@ -461,7 +468,7 @@ class HackMode:
                     except Exception:
                         log.exception("Could not hand the layout to the map")
             self.store.save()
-            self.say("Hack_Complete", fields)
+            self.say("Hack_CompleteMapped" if self.mapped else "Hack_Complete", fields)
             self._say_layout(result)
         elif how == "timeout":
             self.say("Hack_Timeout", fields)
