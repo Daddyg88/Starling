@@ -1,4 +1,4 @@
-"""NEXT TARGET (0.96.3): after a hack she looks up the nearest settlement that nobody has mapped yet, using Spansh.
+"""NEXT TARGET (0.96.3, pirates 0.96.6): after a hack she looks up the nearest settlement that nobody has mapped yet, using Spansh. Bases in systems run by an Anarchy government (pirate bases) come first.
 
 UNTESTED against the real Spansh: the station search is the same one the black-market finder uses (mining/services.py, which works), but
 the settlement and economy filter names below are a best guess. So the reply is also checked here, on our side (type contains "settlement",
@@ -20,13 +20,26 @@ GROUP_OF_ECONOMY = {v.lower(): k for k, v in ECONOMY_OF_GROUP.items()}
 CACHE_SECONDS = 15 * 60
 
 
-def request_body(system, size=60):
-    return {"filters": {"type": {"value": ["Settlement", "Odyssey Settlement", "Planetary Settlement"]}},
-            "sort": [{"distance": {"direction": "asc"}}], "size": size, "page": 0, "reference_system": system}
+def request_body(system, size=60, anarchy=True):
+    """The station search. With anarchy=True it also asks for systems run by an Anarchy government (pirate bases: easy to raid, and where the
+    stolen files went). The filter name 'government' is a GUESS: if Spansh refuses it, find() asks again without it and sorts the pirates first itself."""
+    filters = {"type": {"value": ["Settlement", "Odyssey Settlement", "Planetary Settlement"]}}
+    if anarchy:
+        filters["government"] = {"value": ["Anarchy"]}
+    return {"filters": filters, "sort": [{"distance": {"direction": "asc"}}], "size": size, "page": 0, "reference_system": system}
+
+
+def is_anarchy(item):
+    """True when the reply says the system's controlling faction is an Anarchy (pirates). The field names are guesses; anything else is False."""
+    for key in ("controlling_minor_faction_government", "government", "system_government", "controlling_faction_government"):
+        value = item.get(key)
+        if isinstance(value, str) and value.strip().lower() == "anarchy":
+            return True
+    return False
 
 
 def parse(raw, skip_markets=(), prefer_groups=(), limit=1):
-    """Spansh reply -> [{name, system, distance, group, market}] nearest first. Settlements only, never one in skip_markets. Never raises."""
+    """Spansh reply -> [{name, system, distance, group, market, pirate}] pirate bases first, then nearest. Settlements only, never one in skip_markets. Never raises."""
     results = raw.get("results") if isinstance(raw, dict) else None
     out = []
     for item in results or []:
@@ -46,9 +59,9 @@ def parse(raw, skip_markets=(), prefer_groups=(), limit=1):
         if prefer_groups and group not in prefer_groups:
             continue
         distance = item.get("distance")
-        out.append({"name": str(name), "system": str(system), "market": market, "group": group,
+        out.append({"name": str(name), "system": str(system), "market": market, "group": group, "pirate": is_anarchy(item),
                     "distance": round(distance, 1) if isinstance(distance, (int, float)) else None})
-    out.sort(key=lambda r: (r["distance"] is None, r["distance"] or 0))
+    out.sort(key=lambda r: (not r["pirate"], r["distance"] is None, r["distance"] or 0))             # pirate bases first, then the nearest
     return out[:limit]
 
 
@@ -64,20 +77,27 @@ class NextTarget:
         if not system:
             return None
         now = self.clock()
-        with self._lock:
-            cached = self._cache.get(system.lower())
-        if cached and now - cached[0] < CACHE_SECONDS:
-            raw = cached[1]
-        else:
-            try:
-                raw = self.post("/stations/search", request_body(system))
-            except (urllib.error.URLError, OSError, ValueError, TimeoutError) as error:
-                log.warning("Next target search failed (%s)", error)
-                return None
-            except Exception:
-                log.exception("Next target search crashed")
-                return None
+        raw = None
+        for anarchy in (True, False):
+            cache_key = (system.lower(), anarchy)
             with self._lock:
-                self._cache[system.lower()] = (now, raw)
+                cached = self._cache.get(cache_key)
+            if cached and now - cached[0] < CACHE_SECONDS:
+                raw = cached[1]
+            else:
+                try:
+                    raw = self.post("/stations/search", request_body(system, anarchy=anarchy))
+                except (urllib.error.URLError, OSError, ValueError, TimeoutError) as error:
+                    log.warning("Next target search failed (anarchy filter %s): %s", anarchy, error)
+                    continue                       # Spansh may not know the anarchy filter: try the plain search
+                except Exception:
+                    log.exception("Next target search crashed")
+                    return None
+                with self._lock:
+                    self._cache[cache_key] = (now, raw)
+            if parse(raw, skip_markets, prefer_groups):
+                break
+        if raw is None:
+            return None
         found = parse(raw, skip_markets, prefer_groups)
         return found[0] if found else None

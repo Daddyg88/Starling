@@ -244,7 +244,9 @@ class HackMode:
         state = self.mapped_state(key)
         if state == "mine":
             return
-        self.say("Hack_Known" if state == "known" else "Hack_Offer", {"settlement": entry.get("Name") or "this base"})
+        pirate = "anarchy" in str(entry.get("StationGovernment") or "").lower()          # an anarchy base is a pirate base: the best place to hack
+        key_to_say = "Hack_Known" if state == "known" else ("Hack_Pirate" if pirate else "Hack_Offer")
+        self.say(key_to_say, {"settlement": entry.get("Name") or "this base"})
 
     # ---- voice ----
     def try_handle(self, text):

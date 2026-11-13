@@ -255,6 +255,20 @@ class MappedTests(unittest.TestCase):
         h.on_entry(dict(approach, MarketID=5), silent=True)
         self.assertEqual(len(rig.narrator.said), 1)
 
+    def test_an_anarchy_base_is_called_out_as_a_good_place(self):
+        rig = Rig()
+        self.addCleanup(rig.cleanup)
+        rig.hack.on_entry({"event": "ApproachSettlement", "Name": "Den", "MarketID": 11, "StationGovernment": "$government_Anarchy;"})
+        rig.hack.on_entry({"event": "ApproachSettlement", "Name": "Calm", "MarketID": 12, "StationGovernment": "$government_Democracy;"})
+        self.assertEqual(rig.narrator.said, ["Hack_Pirate", "Hack_Offer"])
+
+    def test_a_mapped_anarchy_base_is_not_called_out(self):
+        rig = Rig()
+        self.addCleanup(rig.cleanup)
+        rig.hack.survey = {"11": {"terminals": 9, "pictures": 40}}
+        rig.hack.on_entry({"event": "ApproachSettlement", "Name": "Den", "MarketID": 11, "StationGovernment": "$government_Anarchy;"})
+        self.assertEqual(rig.narrator.said, ["Hack_Known"])
+
     def test_known_from_the_testers_survey(self):
         rig = Rig()
         self.addCleanup(rig.cleanup)

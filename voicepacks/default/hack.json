@@ -1,39 +1,39 @@
 {
  "_help": "THE HACK (navigation/hack.py): her lines while she maps a settlement for the East Orion Company. Fields: {settlement} {found} {percent} {need} {layout} {next_name} {next_system} {next_distance} {next_group}. Keep them short and clear: some testers are in their 70s.",
  "Hack_Offer": [
-  "The East Orion Company has no map of {settlement}. I can make one, but I need to be near the terminals, gun posts and supply points. Say start hack when you're ready.",
-  "Nobody has mapped this base for the EOC yet. Say start hack, then walk me round the terminals and the gun posts. I'll do the rest.",
-  "This one is not on the EOC's books. Say start hack and stay close to the terminals and gun posts. Keep walking, and I'll get the data."
+  "{settlement} hasn't been searched. Pirates broke into the East Orion Company's mainframe and hid copies of my files in bases like this. I can pull them back, but I need to be close to the terminals, gun posts and supply points. Say start hack when you're ready.",
+  "I haven't been inside {settlement}. If the pirates left a piece of my files here, I can find it, but only from near the terminals and gun posts. Say start hack.",
+  "No search on record for {settlement}. The pirates scattered my files across their bases. Walk me past the terminals and I'll look. Say start hack."
  ],
  "Hack_Known": [
-  "The EOC already has this base on file. A second look never hurts, though. Say start hack if you want to double check it.",
-  "We've mapped this one before. Say start hack if you'd like me to check it again."
+  "I've already searched this base. A second pass can't hurt, though. Say start hack if you want me to look again.",
+  "This one's on file. The pirates may have moved something since. Say start hack to check."
  ],
  "Hack_Start": [
-  "Opening a line to the East Orion Company. Please hold. It's old technology, but it works.",
-  "Linking up with the EOC. Dialling in now. Stay close to the terminals and the gun posts, and keep walking.",
-  "Connecting to the East Orion Company. Walk the whole base for me. Terminals, gun posts and supply points are what I need."
+  "Opening a line to the base's network. Stay close to the terminals. This will be quiet, until it isn't.",
+  "Connecting. Their security was built by amateurs, but there are guns here. Keep moving.",
+  "Link open. Walk the base, Commander. I'm listening for my own files."
  ],
  "Hack_Progress_25": [
-  "Handshake complete. The base's security is asleep, as usual. Keep moving.",
-  "A quarter of the way in. Nobody has noticed us yet. That's the best kind of hack."
+  "I'm in. Their network is a mess, and so is the data. Keep moving.",
+  "First layer open. Something in here is mine. I can feel it."
  ],
  "Hack_Progress_50": [
-  "Halfway there. I can feel the layout now. The rooms are starting to fit together.",
-  "Fifty percent. The doors are starting to line up. I've always been good with doors."
+  "Halfway. The layout is coming together, and so is the trail of the stolen files.",
+  "Half done. I'm picking up the shape of the base. Don't stop."
  ],
  "Hack_Progress_75": [
-  "Nearly through. The last part is always the quiet corners.",
-  "Seventy five percent. Just the awkward bits left. Keep walking."
+  "Nearly through. The last part is always the quiet corners, where they hide things.",
+  "Almost there. One more pass, and I'll have what I came for."
  ],
  "Hack_Need": [
   "{need}",
   "Still not done. {need}"
  ],
  "Hack_Complete": [
-  "Hack complete. {settlement} is mapped. The East Orion Company will be delighted, and they will never say so.",
-  "That's it. {settlement} is in the EOC's files. Good work, Commander.",
-  "Base mapped. I have what I need from {settlement}. Sending it to the EOC. Well, to the zip file."
+  "Done. {settlement} is searched and mapped. I have a fragment of my own file back. Give me a moment.",
+  "Link closed. {settlement} is mapped, and one more piece of my file is recovered. Listen.",
+  "That's it. The base is mapped and the data is out. I'd like to tell you what came with it."
  ],
  "Hack_Layout": [
   "My best guess is that this base is {layout}.",
@@ -80,15 +80,24 @@
   "That's switched off in the settings, I'm afraid."
  ],
  "Hack_Next": [
-  "Next target: {next_name}, in the {next_system} system, about {next_distance} light years away. A {next_group} base, if the files are right.",
-  "The EOC would like {next_name} next. It's in {next_system}, about {next_distance} light years from here."
+  "Next target: {next_name}, in the {next_system} system, about {next_distance} light years away. A {next_group} base. More of my files may be there.",
+  "Next: {next_name}, {next_system}, about {next_distance} light years out. {next_group} economy. The pirates will have hidden something there."
  ],
  "Hack_NextNone": [
   "I can't find the next target just now. Try again later, or pick any base you like.",
   "No next target from here. Fly to any settlement you haven't done and say start hack."
  ],
  "Hack_Reward": [
-  "That went well. I'm in a better mood now.",
-  "A good day's work. I feel better for it."
+  "That's one more piece of me back. I feel a little steadier.",
+  "Another fragment home. I'm better for it, Commander."
+ ],
+ "Hack_NextPirate": [
+  "Next target: {next_name}, in the {next_system} system, about {next_distance} light years away. An anarchy base, so pirates. A good place to hack.",
+  "Next: {next_name}, {next_system}, about {next_distance} light years out. Anarchy-run. They will have kept a piece of our data there."
+ ],
+ "Hack_Pirate": [
+  "{settlement} is anarchy-run. Pirates. This is exactly where they hide copies of the East Orion Company's files. It's a good place to hack, Commander. Say start hack.",
+  "Anarchy flag on {settlement}. Pirate base. If they took a piece of the Archive, it's in here. Good place to hack. Say start hack.",
+  "{settlement} answers to no government. That makes it a pirate den, and a good place to hack. Walk me past the terminals and say start hack."
  ]
 }

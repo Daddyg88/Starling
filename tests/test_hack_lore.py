@@ -55,7 +55,7 @@ class LoreTests(unittest.TestCase):
             lore.tell(None)
         self.assertTrue(lore.finale)
         self.assertEqual(lore.heard(), 28)
-        self.assertEqual(sum("counting us in" in s for s in speech.said), 1)
+        self.assertEqual(sum("Welcome to the crew" in s for s in speech.said), 1)
 
     def test_saved_and_reloaded(self):
         with tempfile.TemporaryDirectory() as t:
@@ -130,6 +130,11 @@ class AfterTests(unittest.TestCase):
         self.assertEqual(mood.calls, [(6.0, "Base hack")])
         self.assertEqual([k for k, _ in narr.keys], ["Hack_Reward", "Hack_Next"])
 
+    def test_pirate_target_has_its_own_line(self):
+        found = {"name": "Foo", "system": "Bar", "distance": 12.3, "group": "Military", "market": "9", "pirate": True}
+        _, _, narr = self.run_after({"how": "complete", "group": "Industrial"}, found=found)
+        self.assertEqual(narr.keys[-1][0], "Hack_NextPirate")
+
     def test_timeout_does_nothing(self):
         lore, mood, narr = self.run_after({"how": "timeout", "group": "Industrial"})
         self.assertEqual(lore.told, {})
@@ -178,6 +183,30 @@ class NextTests(unittest.TestCase):
         self.assertEqual(nt.find("Sol")["name"], "Done")
         nt.find("Sol")
         self.assertEqual(len(calls), 1)
+
+    def test_pirate_bases_come_first(self):
+        raw = {"results": [
+            {"name": "Near", "system_name": "B", "type": "Odyssey Settlement", "primary_economy": "Industrial", "distance": 5, "market_id": 3,
+             "controlling_minor_faction_government": "Democracy"},
+            {"name": "Pirate Den", "system_name": "C", "type": "Odyssey Settlement", "primary_economy": "Military", "distance": 40, "market_id": 5,
+             "controlling_minor_faction_government": "Anarchy"}]}
+        found = parse(raw, limit=2)
+        self.assertEqual([f["name"] for f in found], ["Pirate Den", "Near"])
+        self.assertTrue(found[0]["pirate"])
+        self.assertFalse(found[1]["pirate"])
+
+    def test_anarchy_filter_refused_falls_back_to_plain_search(self):
+        bodies = []
+
+        def post(path, body):
+            bodies.append(body)
+            if "government" in body["filters"]:
+                raise ValueError("unknown filter")
+            return self.RAW
+        found = NextTarget(post=post).find("Sol")
+        self.assertEqual(found["name"], "Done")
+        self.assertEqual(len(bodies), 2)
+        self.assertNotIn("government", bodies[1]["filters"])
 
 
 class OverlayTests(unittest.TestCase):

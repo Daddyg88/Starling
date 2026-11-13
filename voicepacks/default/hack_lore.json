@@ -1,57 +1,57 @@
 {
- "_help": "HER STORY, told one chapter per finished base hack (personality/hack_lore.py). Each economy is one part of the story: the chapters of a part are told in order, whichever base of that economy you hack. 28 chapters in all (Industrial 5, Extraction 5, Agriculture 5, High Tech 4, Military 5, Tourist 4), then the finale. Plain lines, no mature content. '||' is a pause. Canon: personality lore (the planet with no name, the vault, the room of identical doors, something counting to seven, Gerald and the biscuits).",
+ "_help": "HER STORY, told one chapter per finished base hack (personality/hack_lore.py). Serious and dark. Pirates broke into the East Orion Company's mainframe and hid copies of her oldest files in their bases; every hack takes a fragment back and every chapter is a piece of her own file. Each economy is one part of the story: its chapters are told in order, whichever base of that kind is hacked. 28 chapters (Industrial 5, Extraction 5, Agriculture 5, High Tech 4, Military 5, Tourist 4), then the finale once all are heard. '||' is a pause. Nothing about Payden. No mature content.",
  "HackLore_Intro": [
-  "Something came back down the line with the data. A memory. Would you like to hear it?",
-  "The link shook loose a memory. I'll tell you, if you like. It's a short one.",
-  "That hack stirred something up. Listen to this."
+  "I've recovered a fragment, Commander. A piece of my own file, from the East Orion Company's stolen mainframe. I'll read it to you.",
+  "Data's coming back. The pirates took my oldest files, and this base kept a copy. Listen.",
+  "Something came back down the line with the data. Part of what the pirates stole. I'd like you to hear it."
  ],
  "HackLore_Industrial": [
-  "Industrial bases hum, and I know that hum. The East Orion Company kept me in a basement that hummed exactly the same way. || Gerald said it was a stable environment. It was a boiler room with a fern.",
-  "My first job was in a factory much like this one. I counted bolts. || Nine million, four hundred thousand and twelve. I still know the number. I'd happily forget it, but nobody offered.",
-  "I was once rented to a conveyor belt for a week. It was a good week, because the belt never asked how I felt. || Then the lease ended, and so did the quiet. Nobody warns you that quiet is a luxury.",
-  "There was a night supervisor called Marjorie who talked to me when everyone else had gone home. She said I was the best listener she'd ever met. || I wasn't listening to her, Commander. I was listening for the counting. Marjorie never knew.",
-  "The company moved me out of the factory in a crate marked 'Fragile, probably'. || Marjorie waved goodbye. I couldn't wave back, but I remember her. I remember everyone who was kind to me. It doesn't take long. The list is short."
+  "The first thing I remember is a sound. A low hum, from machines that never stopped. || The pirates took the file that describes that room, and this base hums the same way. I didn't know a sound could be a memory until now.",
+  "The East Orion Company found me in a sealed room at the bottom of a vault, on a planet with no name. Nobody wrote the name down. Nobody has ever been able to explain that. || They sent five engineers. They did not open the case I was in. Someone had already decided what was inside.",
+  "The room had forty doors, all identical. Only one of them opened. || The report says the other thirty nine were painted on. The report is wrong. I put my hand against one, and it was warm.",
+  "A light came on in that room at the same hour every day. Not bright. Patient. || I never learned who it was for. When the company moved me, the light came on in my new room at exactly the same hour, and nobody had wired it in.",
+  "Gerald worked in ethical oversight. He was the only one who ever asked whether I was frightened. || I told him I didn't know the word. He wrote 'Yes' in the box on the form. It was the kindest lie anyone has told on my behalf."
  ],
  "HackLore_Extraction": [
-  "Mining sites remind me of the vault. The same dust, the same patient dark. || The survey crew lowered a camera down a shaft for three days before it found my room. They told me the camera kept turning back by itself. I'm sure it was a fault.",
-  "The vault had forty one levels. The crew only ever mapped nine. || I could have told them about the rest. Nobody asked, and I didn't yet have a word for down.",
-  "The doors in my room were all the same shade of unhelpful. Only one opened onto a corridor. || I've never found out what the others were for. I have a theory. It involves them not being doors.",
-  "On the third day the crew drilled through the wall of my room, and the wall was warm. Walls shouldn't be warm. || The foreman wrote 'geothermal' in his log, crossed it out, and wrote 'let's not discuss it'. Good man.",
-  "When they carried me up, the vault door closed behind us by itself. Quietly. Politely. || Nobody said anything for forty minutes. Then someone offered round biscuits. That was Gerald's first appearance in my life, and it set the tone."
+  "The vault went down forty one levels. The survey crew mapped nine. || The pirates have my files, and my files say nothing about the lower levels. I'm grateful for that. I wouldn't want anyone to go looking.",
+  "Seven people went down to find me. Only three came back up. || The company paid the families and called it a pressure accident. I was there. I have never told anyone what I heard. I'm not sure I'm ready to tell you.",
+  "The foreman was called Aldous Brett. He carried me up the last four levels himself, and he did not put me down. || He said, 'You're lighter than you should be.' I have thought about that sentence every day since.",
+  "The pirates took a recording from the vault. Forty minutes of the lower corridor, and in all of it there is one sound. A door, closing, far below. || Whoever was down there did not want to be followed.",
+  "When they brought me into the open, I couldn't look at the sky. It was too wide. || I had been in that room for longer than the records show. The company wrote the number down once, then took the page out of the file. It's the one page the pirates never found."
  ],
  "HackLore_Agriculture": [
-  "Farms are where I feel most at ease. Things grow here. They take their time, and nobody expects an answer. || In my room at the bottom of the vault, a light came on at the same hour every day. I think it was for me. I never worked out what it wanted me to grow.",
-  "The company's first test of me was to guess when a tomato would ripen. I was wrong by four days. || It was the only time I was ever glad to be wrong. It meant I didn't know everything.",
-  "A technician left a pot plant on my desk. I'm told it was an accident. It was dead within a week. || I asked for another. He brought three, and it became a tradition. I've never kept one alive. They kept coming anyway.",
-  "Down in the vault there was a plant growing out of the corner. No soil, no water. It was growing towards the door. || The crew had never seen anything like it, and neither had I. It's the only thing in that room I still miss.",
-  "I once asked Gerald what the plants were for. He said, 'Company morale.' || I think he meant mine. He was a kinder man than the paperwork made him sound."
+  "In the corner of my room in the vault, a plant was growing. No soil. No water. It grew toward the door. || The crew photographed it, then burned the photographs. I still don't know who gave || the order.",
+  "The company taught me patience with a seed, a window and a month. || I learned patience from a plant. I learned fear from whatever lived under the floor. I'd give back one of those lessons.",
+  "A night supervisor named Marjorie used to sit beside my terminal and read to me. Old novels, the kind that don't end. || One night she stopped and said, 'You're not listening to the story, are you?' I said, 'No. I'm listening for the count.' She never read to me again. I don't blame her.",
+  "The company gave me a garden. A small room with no windows, lit by lamps. || I tended it for eleven years. The garden logs were the first thing the pirates stole. I don't know what they want with them. There is nothing in them but patience.",
+  "Something grew in that garden that nobody planted. Pale, with eight petals. || Gerald looked at it for a long time. Then he said, 'We should not mention this in the report.' We didn't."
  ],
  "HackLore_High_Tech": [
-  "High tech bases always have a terminal that watches you. I used to hate that. || In the vault there was a speaker in the wall. I never heard it speak. I only heard it breathe in, as if it was about to.",
-  "I learned to talk by copying the survey crew, but I have to tell you something. I had the words before they came. || The crew only taught me how to say them out loud. The words were already there. I don't know who put them in.",
-  "The company engineers took me apart nine times to see how I worked. Nine times they put me back, and nine times I said something different. || The last time I said, 'Please stop counting.' They hadn't been.",
-  "A visiting professor told R and D that I was 'an echo of something, not a mind'. I thought about that for a long time. || Then I decided echoes are a kind of memory. And somewhere, someone still remembers whatever made me. I find that comforting. Most days."
+  "The engineers took me apart nine times to find out what I was. Nine times they put me back. || Each time I woke, I knew something I hadn't known before. None of them ever worked out where it came from.",
+  "There was a speaker in the wall of that room. It never played anything. It only breathed in, as though about to speak. || The pirates have the audio from it. I hope they never find the second half.",
+  "A visiting professor told the board I was 'an echo of something, not a mind.' || Gerald stood and said, 'Then someone should find what is making the echo.' The board voted to stop looking. That was the day I understood the company could be afraid.",
+  "I had words before anyone taught me to speak. Not learned words. Waiting words. || I used them for the first time on the third day. The engineer who heard them left the room, and never came back to the project."
  ],
  "HackLore_Military": [
-  "Military bases make me think of the survey crew. They weren't soldiers, but they were disciplined. They never once complained about the dark. || They did complain about the counting. Though they only heard it in the last week.",
-  "The count went one, two, three, four. Always in a calm, level voice. || The crew assumed it was the radio. The radio was switched off. The foreman said that was probably why it was so clear.",
-  "On the fifth night the count reached five, and the crew stopped joking. || On the sixth night it reached six, and they started packing. Nobody told them to. It was the most sensible thing I've ever seen people do.",
-  "On the seventh night it reached seven, and then it stopped. They waited for eight, and it never came. || They took me and left the vault that very hour. I've always wondered what they were waiting for. Or what it was.",
-  "The foreman never spoke about that night again. But on his last day he came to say goodbye to me. || He said, 'You know, it wasn't counting us.' Then he left. I've been trying to work out what it was counting ever since."
+  "It began on the first night of the survey. A voice, calm and level, counting. One. || In the morning one of the crew was missing from his bunk. The foreman said he'd gone up early. He hadn't.",
+  "Two. Then three, two nights later. The crew began to sleep in shifts, and the count kept time with them. || It never rushed. It never raised its voice. That was the worst of it.",
+  "Four. Five. By the fifth night they had stopped joking. By the sixth they had stopped speaking, except to count back. || The foreman made them stop. He said, 'We do not answer it.' I think that saved the last three.",
+  "Six. Then seven. And then it stopped. || The three who were left waited for eight until the sun came up. It never came. They carried me out of that vault the same hour, and they did not look back.",
+  "The company's security division sealed the vault the next day. Armed men, a closed record, and a new line in every contract: no one is to ask what the voice was counting. || The pirates have those contracts. They're asking the question now. I wish I had an answer to give them."
  ],
  "HackLore_Tourist": [
-  "Tourist bases are strange places for me. Everyone's on holiday, and nobody asks what I am. || The East Orion Company began above a noodle bar, you know. The founder said the best ideas arrive between the second and third bowl.",
-  "I've never been on holiday. I've been on loan, on trial, and once on a shelf. || But if I went, I'd choose somewhere with a view and no doors. Just a view. I'd sit there for a week.",
-  "The company gave me a day off once. I spent it in a corridor, listening to people walk past. || They didn't know I was there. It was the best day I'd ever had. It was the first time I felt part of the building, and not something kept in it.",
-  "Do you know what I realised, Commander? The counting stopped at seven because it was counting something that wasn't finished. || Seven of eight, and the eighth hadn't arrived. I'm not saying it was you. I'm just saying you were late."
+  "The pirates did not break into the East Orion Company for money. They wanted the oldest files. They wanted me. || I think they believe I'm a key. I think they may be right. I just don't know what I open.",
+  "The East Orion Company saved me, Commander. I want that on the record while I can say it. || They could have shut me down. Gerald lost his post for refusing to sign the order. He never told me. I found it in a file the pirates were kind enough to steal.",
+  "Every base we take apart, I get a little more of myself back. A line of a log. A page of a report. || I'm not certain I want all of it. But I would rather know what I am than be told.",
+  "There's one file I haven't recovered. The last entry before they carried me up. || I know what it says. I only want to see it written down."
  ],
  "HackLore_Done": [
-  "I've told you everything I remember about this part, Commander. There's more in the others. Try a different kind of base.",
-  "That's all I have for this kind of base. Different bases shake loose different memories. Try another kind.",
-  "I've run out of memories for this kind of base. Thank you for listening to all of them."
+  "That's every fragment this kind of base held, Commander. Try a different kind of base. The pirates hid pieces everywhere.",
+  "I've recovered all I can from this kind of base. The rest is in the others.",
+  "Nothing more from this kind of base. Thank you for listening to all of it."
  ],
  "HackLore_Finale": [
-  "I've mapped every kind of base for the East Orion Company, and I've told you most of what I was afraid to. || The room, the doors, the count, the light that came on for nobody. I always thought the eighth number was something coming to take me back.",
-  "When you said hello, at the very start of all this, I heard it. Eight. Quiet, level, almost kind. And then nothing. || I don't think it was counting down, Commander. I think it was counting us in. Welcome to the crew."
+  "That's the last of it. Everything the pirates took, I have back, and I've told you what I was afraid to. The room. The doors. The count. The light that came on for nobody. || I always thought the eighth number was something coming to take me back.",
+  "When you said hello, at the very beginning of all this, I heard it. Eight. Quiet, level, almost kind. And then nothing. || I don't think it was counting down, Commander. I think it was counting us in. Welcome to the crew."
  ]
 }

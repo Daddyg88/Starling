@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.6 - A darker story, and pirate bases as targets
+
+**What to do:** nothing new. Hack a base as before ("start hack", walk around).
+
+**What you should hear:** when you arrive at an anarchy-run settlement that has not been hacked, she says it is a pirate base and a good place to hack. Her lines now say the pirates broke into the East Orion Company's mainframe and hid copies of her files in their bases, and that she is getting them back. After each hack she reads one fragment of her own file (a serious, dark story). Then she names the next target. If it is an anarchy system run by pirates she says so and warns you to be careful.
+
+**Where it lives:** voicepacks/default/hack_lore.json (the 28 chapters), voicepacks/default/hack.json (the hack's lines, including Hack_Pirate for the arrival callout and Hack_NextPirate), navigation/hack.py (on_entry reads StationGovernment), navigation/hack_next.py (the Spansh search, pirate bases first), navigation/hack_after.py. To change a chapter, edit the text in hack_lore.json. Tests: test_hack_lore.
+
+**Not tested in the real game:** the Spansh anarchy filter (the name is a guess; there is a fallback), and how the new story sounds read aloud.
+
 ## 0.96.5 - The map comes up after a hack
 
 **What to do:** do a base hack as before ("start hack", walk around). Nothing new to say.

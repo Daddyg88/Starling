@@ -50,7 +50,7 @@ class AfterHack:
             if found is None:
                 self.narrator.say("Hack_NextNone", {})
                 return
-            self.narrator.say("Hack_Next", {"next_name": found["name"], "next_system": found["system"],
+            self.narrator.say("Hack_NextPirate" if found.get("pirate") else "Hack_Next", {"next_name": found["name"], "next_system": found["system"],
                                             "next_distance": found["distance"] if found["distance"] is not None else "some",
                                             "next_group": found["group"]})
         except Exception:
