@@ -168,6 +168,7 @@ class HackMode:
         self.capture = capture
         self.sound = sound if sound is not None else play
         self.clock = clock
+        self.on_layout = []                                   # called with (map id, market) when a hack settles the layout clearly
         self.known_layouts = known_layouts or {}              # MarketID -> map id (maps/known_settlements.json)
         self.survey = survey or {}                            # MarketID -> {terminals, pictures...} (maps/radar_survey.json, from tester zips)
         self.spawn = spawn or self._thread
@@ -452,6 +453,11 @@ class HackMode:
             self.store.mark_done(self.key)
             if result["layout"]:
                 self.store.describe(self.key, layout=result["layout"])
+                for adopt in list(self.on_layout):
+                    try:
+                        adopt(result["layout"], self.key)            # the map can come up now (settlement_track.adopt_layout)
+                    except Exception:
+                        log.exception("Could not hand the layout to the map")
             self.store.save()
             self.say("Hack_Complete", fields)
             self._say_layout(result)

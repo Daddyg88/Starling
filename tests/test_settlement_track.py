@@ -628,3 +628,40 @@ class SameLayoutDifferentSettlements(Setup):
             cal = settlement_track.frame_calibration("industrial_2", frame, heading, 0, 0, 1e6)
             misses = [min(math.hypot(x - u, y - v) for u, v in feats) for x, y in (cal.from_world(e, n) for e, n in stops)]
             self.assertLess(sum(misses) / len(misses), settlement_track.DOCK_TRUST_UNITS, (heading, misses))
+
+
+class AdoptLayout(Setup):
+    """0.96.4: a finished base hack can tell the tracker which layout the base is, so the map comes up."""
+
+    def test_taken_when_nothing_chosen(self):
+        self.tracker.maps = SettlementMaps()               # several layouts share these pads, so none is chosen by itself
+        self.tracker.on_entry(dict(APPROACH))
+        self.tracker.on_entry(dict(DOCKING))
+        self.assertIsNone(self.tracker.suggestion())
+        self.assertTrue(self.tracker.adopt_layout("industrial_2", "4365483779"))
+        self.assertEqual(self.tracker.suggestion(), "industrial_2")
+
+    def test_not_taken_when_a_map_is_already_chosen_or_unknown_or_another_base(self):
+        self.tracker.on_entry(dict(APPROACH))
+        self.tracker.on_entry(dict(DOCKING))
+        self.assertEqual(self.tracker.suggestion(), "industrial_2")
+        self.assertFalse(self.tracker.adopt_layout("industrial_1", "4365483779"))
+        self.tracker.settlement["map"] = None
+        self.assertFalse(self.tracker.adopt_layout("no_such_map", "4365483779"))
+        self.assertFalse(self.tracker.adopt_layout("industrial_2", "999"))
+        self.assertFalse(self.tracker.adopt_layout(None))
+        self.tracker.settlement = None
+        self.assertFalse(self.tracker.adopt_layout("industrial_2"))
+
+    def test_hint_from_an_earlier_hack_is_used_on_the_next_visit(self):
+        self.tracker.maps = SettlementMaps()
+        self.tracker.layout_hint = lambda market: "industrial_2" if market == "4365483779" else None
+        self.tracker.on_entry(dict(APPROACH))
+        self.assertEqual(self.tracker.suggestion(), "industrial_2")
+
+    def test_a_failing_hint_never_breaks_arrival(self):
+        def boom(market):
+            raise RuntimeError("x")
+        self.tracker.layout_hint = boom
+        self.tracker.on_entry(dict(APPROACH))
+        self.assertIsNotNone(self.tracker.settlement)

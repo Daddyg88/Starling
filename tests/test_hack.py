@@ -182,6 +182,9 @@ class RunningTests(unittest.TestCase):
         self.hack.start()
         done = []
         self.hack.on_complete.append(done.append)
+        handed = []
+        self.hack.on_layout.append(lambda layout, market: handed.append((layout, market)))
+        self.hack.on_layout.append(lambda layout, market: 1 / 0)            # one failing hand-over never stops the rest
         for _ in range(hack_module.MIN_PICTURES + 1):
             if not self.hack.tick():
                 break
@@ -192,6 +195,7 @@ class RunningTests(unittest.TestCase):
         self.assertIn("Hack_Layout", self.rig.narrator.said)
         self.assertTrue(store.get("4358173443")["done"])
         self.assertEqual(len(done), 1)
+        self.assertEqual(handed, [("industrial_2", "4358173443")])
 
     def test_it_cannot_finish_before_the_minimum_pictures(self):
         e = self.rig.store.entry("4358173443")

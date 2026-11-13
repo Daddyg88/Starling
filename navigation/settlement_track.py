@@ -232,6 +232,7 @@ class SettlementTracker:
         self.frames = known_frames()           # map id -> frame: shipped ones, then the ones learned from your own line-ups
         self.frames_path = str(self.path) + ".frames"
         self._load_frames()
+        self.layout_hint = None         # (market) -> a map id found by a finished base hack (navigation/hack.py), or None
         self.auto_shown = False         # the map on screen was put there by this tracker (so this tracker may take it down)
         self.saved = {}
         self._load()
@@ -310,6 +311,11 @@ class SettlementTracker:
         self.view.position = None
         if self.known.get(market) and self.maps.get(self.known[market]) is not None:
             self.settlement["map"] = self.known[market]
+        if not self.settlement["map"] and self.layout_hint is not None:
+            try:
+                self.adopt_layout(self.layout_hint(market), market)       # an earlier hack of this very base found its layout
+            except Exception:
+                log.exception("The settlement layout hint failed")
         known = self.saved.get(market)
         if isinstance(known, dict) and known.get("disabled"):
             known = None                       # you said "reset settlement map" here: neither your old line-up nor the shipped one
@@ -344,6 +350,18 @@ class SettlementTracker:
         if len(candidates) == 1:
             s["map"] = candidates[0]["id"]
             log.info("Settlement %s looks like %s (group %s, pads %s)", s["name"], s["map"], s["group"], s["pads"])
+
+    def adopt_layout(self, map_id, market=None):
+        """A finished base hack worked out which layout this base is (the radar's terminals fit it clearly better than the others): use it, so the map
+        comes up. Only when no map is chosen yet, the base is the same one, and the map exists. Returns True when it was taken."""
+        s = self.settlement
+        if s is None or s.get("map") or not map_id or self.maps.get(map_id) is None:
+            return False
+        if market is not None and str(market) != str(s.get("market")):
+            return False
+        s["map"] = map_id
+        log.info("Settlement %s: layout %s taken from the base hack", s.get("name"), map_id)
+        return True
 
     def candidates(self):
         s = self.settlement

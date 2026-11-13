@@ -1552,6 +1552,18 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.5 - The map comes up after a hack
+
+**What to do:** do a base hack as before ("start hack", walk around). Nothing new to say.
+
+**What you should see:** when the hack finishes and she says which layout she thinks it is, the settlement map comes up for that base. Next time you arrive at the same base it comes up by itself. If she says she is not sure of the layout, no map is chosen for you.
+
+**If the wrong map comes up:** say "reset settlement map" (the existing command) and tell Ben which base it was.
+
+**Where it lives:** navigation/hack.py (hands the layout over), navigation/settlement_track.py (adopt_layout and layout_hint), core/app.py (the wiring). Tests: test_settlement_track (AdoptLayout), test_hack.
+
+**Not tested in the real game.** The layout guess has only been checked on one base.
+
 ## 0.96.4 - glide air, decimals, pronunciation, "she'll be right", shield fix
 
 **What to do:** nothing special. Glide down to a planet you have scanned and listen. Play with the Australian voice on for a while. Hear her read prices and distances.

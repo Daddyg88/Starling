@@ -1057,6 +1057,9 @@ class App:
         lore = HackLore(lambda: self.speech, lambda: self.dialogue, self.settings, path=paths.DATA_DIR / "hack_lore.json")
         hack.on_complete.append(AfterHack(self.settings, lore, self.mood, narrator, store, next_target=NextTarget(),
                                           system_provider=lambda: getattr(self.state, "system", None)))
+        if tracker is not None:
+            hack.on_layout.append(tracker.adopt_layout)
+            tracker.layout_hint = lambda market: (store.get(market) or {}).get("layout") if (store.get(market) or {}).get("done") else None
         self.hack = hack
         self.hack_lore = lore
         self.commands.extra_helpers.append(hack)
