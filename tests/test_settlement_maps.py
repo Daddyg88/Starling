@@ -125,6 +125,16 @@ class GroundOutlines(unittest.TestCase):
         data = dict(SMALL, ground=[[[0, 0], [10, 0]]])
         self.assertEqual(layout(data, 400, 400)["ground"], [])
 
+    def test_a_pictured_map_draws_only_the_picture_outline(self):
+        data = dict(SMALL, ground=[[[0, 0], [50, 0], [50, 50]]], pictured=True)
+        shape = layout(data, 400, 200)
+        self.assertEqual(shape["lines"], [])
+        self.assertEqual(shape["circles"], [])
+        self.assertTrue(shape["ground"])
+        self.assertTrue(shape["markers"])
+        plain = layout(dict(SMALL, ground=data["ground"]), 400, 200)
+        self.assertTrue(plain["lines"] and plain["circles"])
+
     def test_shipped_ground_stays_inside_the_map(self):
         import json
         from pathlib import Path

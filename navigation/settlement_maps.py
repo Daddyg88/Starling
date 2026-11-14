@@ -2,7 +2,7 @@
 console are), shown as a see-through drawing on top of the game. No window code here, so it can be tested.
 
 The maps are small JSON files in maps/settlements/ (credit: CMDR Quizengine's Odyssey Map Guide, see CREDITS.md there).
-A map file has: id, name, group, size [width, height], credit, buildings [{rect} or {poly}], pads {Small, Medium, Large} (the game's LandingPads counts, or null if not known), circles [{x, y, r}], labels [{text, x, y}],
+A map file has: id, name, group, size [width, height], credit, buildings [{rect} or {poly}], optional pictured (true: the 'ground' outline came from a picture, so the buildings and circles are kept for the data but not drawn), pads {Small, Medium, Large} (the game's LandingPads counts, or null if not known), circles [{x, y, r}], labels [{text, x, y}],
 ground [[[x, y]...]...] (optional: dim outlines of walls and pads traced from the guide's picture, drawn under everything else),
 markers [{type, x, y, level}] and tips. Types: terminal_l0, terminal_above, airlock, door, power, alarm, tip.
 """
@@ -116,7 +116,8 @@ def layout(data, width, height, turn=None):
         points = [px(x, y) for x, y in outline]
         if len(points) >= 3:
             ground += [(points[i][0], points[i][1], points[(i + 1) % len(points)][0], points[(i + 1) % len(points)][1]) for i in range(len(points))]
-    for building in data.get("buildings", []):
+    pictured = bool(data.get("pictured"))       # the outline is drawn from a picture of the real layout: the hand-drawn boxes and circles are not drawn
+    for building in ([] if pictured else data.get("buildings", [])):
         if "poly" in building:
             points = [px(x, y) for x, y in building["poly"]]
             lines += [(points[i][0], points[i][1], points[(i + 1) % len(points)][0], points[(i + 1) % len(points)][1]) for i in range(len(points))]
@@ -124,7 +125,7 @@ def layout(data, width, height, turn=None):
         x1, y1, x2, y2 = building["rect"]
         (a, b), (c, d) = px(x1, y1), px(x2, y2)
         lines += [(a, b, c, b), (c, b, c, d), (c, d, a, d), (a, d, a, b)]
-    for circle in data.get("circles", []):
+    for circle in ([] if pictured else data.get("circles", [])):
         x, y = px(circle["x"], circle["y"])
         circles.append((x, y, float(circle["r"]) * scale))
     for label in data.get("labels", []):
