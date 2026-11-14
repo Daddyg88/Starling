@@ -1552,6 +1552,14 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.13 - The log says why there is no arrow
+
+**What to do:** nothing. If the map has no arrow, send the diagnostics zip as usual.
+
+**What you should see:** in logs/starling.log a line "Settlement line-up: N stops [...] did not give a clear answer", with how each layout fitted. To get an arrow now: stand at the power regulator and say "mark spot power regulator", then at the alarm console and say "mark spot alarm console".
+
+**Where it lives:** navigation/settlement_track.py (_solve_with). Not tested in the real game.
+
 ## 0.96.12 - Her story is spoken after a hack
 
 **What to do:** finish a base hack as usual. After "Link closed ... Listen." she tells the next chapter of her story.

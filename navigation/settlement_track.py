@@ -526,13 +526,18 @@ class SettlementTracker:
         else:
             options = self.candidates()
         results = []
+        tried = []
         for data in options:
             if data is None:
                 continue
             result = settlement_solve.solve(data, self.spots, minimum, scales)
+            tried.append("%s %s" % (data["id"], "no answer" if not result else "miss %.0f, next %.0f" % (result["error"], result["next"])))
             if result and settlement_solve.clear(result, scale_range) and METRES_PER_UNIT[0] <= abs(result["a"]) <= METRES_PER_UNIT[1]:
                 results.append((result["error"], data, result))
         if not results:
+            # So a diagnostics zip shows WHY there was no arrow (0.96.13): the stops (metres east, north) and how each layout fitted them.
+            log.info("Settlement line-up: %d stops %s did not give a clear answer (%s size): %s", len(self.spots),
+                     [(k, round(e), round(n)) for k, e, n in self.spots[-12:]], "fixed" if scales else "free", "; ".join(tried[:8]))
             return None
         results.sort(key=lambda row: row[0])
         if len(results) > 1 and results[1][0] < results[0][0] * 1.4 + 5.0:
