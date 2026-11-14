@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.17 - Better outlines for Extraction 3 and Agriculture 4
+
+**What to do:** nothing. Open the settlement map at either kind of base and look at the thin brown lines under the boxes. If the screen feels slower or too busy, tell me which base.
+
+**Where it lives:** maps/settlements/extraction_3.json and agriculture_4.json (the 'ground' list). Not tested in the real game.
+
 ## 0.96.16 - the Cheesebeard's Cave line-up is taken back
 
 **What to do:** nothing. The arrow at Cheesebeard's Cave is off again until a correct line-up is worked out. Not tested in the real game.
