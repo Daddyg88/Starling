@@ -102,6 +102,8 @@ class SettlementOverlay(RedAlertOverlay):
             font = tkfont.Font(family="Segoe UI", size=-max(10, int(width * 0.022)), weight="bold")
             self.canvas.delete("all")
             self.canvas.configure(width=width, height=height)
+            for x1, y1, x2, y2 in shape["ground"]:
+                self.canvas.create_line(x1, y1, x2, y2, fill=settlement_maps.COLOURS["ground"], width=1)
             for x1, y1, x2, y2 in shape["lines"]:
                 self.canvas.create_line(x1, y1, x2, y2, fill=settlement_maps.COLOURS["building"], width=2)
             for cx, cy, r in shape["circles"]:

@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.9 - Settlement maps checked, walls added
+
+**What to do:** nothing. Open a map as usual ("show settlement map military three").
+
+**What you should see:** on Military 2 and Military 3 a dim brown outline of the walls and pads under the normal orange boxes. Other maps look as before.
+
+**What was checked:** all 28 guide pictures were compared with our maps. The icons were already in the right places, so only walls were added, and only where the automatic outlining was clean.
+
+**Where it lives:** navigation/settlement_maps.py (optional "ground" key), ui/settlement_overlay.py, maps/settlements/military_2.json and military_3.json, tools/trace_ground.py. Test: test_settlement_maps (GroundOutlines). Not tested in the real game.
+
 ## 0.96.8 - Sub target names in the log
 
 **What to do:** hunt as normal. Cycle through the sub targets of a Thargoid yourself (Next Subsystem key) so each part is selected once. Then send the diagnostics zip.

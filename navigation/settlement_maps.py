@@ -3,6 +3,7 @@ console are), shown as a see-through drawing on top of the game. No window code 
 
 The maps are small JSON files in maps/settlements/ (credit: CMDR Quizengine's Odyssey Map Guide, see CREDITS.md there).
 A map file has: id, name, group, size [width, height], credit, buildings [{rect} or {poly}], pads {Small, Medium, Large} (the game's LandingPads counts, or null if not known), circles [{x, y, r}], labels [{text, x, y}],
+ground [[[x, y]...]...] (optional: dim outlines of walls and pads traced from the guide's picture, drawn under everything else),
 markers [{type, x, y, level}] and tips. Types: terminal_l0, terminal_above, airlock, door, power, alarm, tip.
 """
 import cmath
@@ -19,7 +20,7 @@ log = get_logger("settlement_maps")
 GROUPS = {"tourist": "Tourist", "agriculture": "Agriculture", "agricultural": "Agriculture", "military": "Military", "industrial": "Industrial",
           "extraction": "Extraction", "high tech": "High Tech", "hightech": "High Tech", "high-tech": "High Tech"}
 NUMBERS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
-COLOURS = {"building": "#ff8c1a", "label": "#ffb84d", "terminal_l0": "#c6ff00", "terminal_above": "#3da5ff", "airlock": "#ff3b3b",
+COLOURS = {"ground": "#7a4a14", "building": "#ff8c1a", "label": "#ffb84d", "terminal_l0": "#c6ff00", "terminal_above": "#3da5ff", "airlock": "#ff3b3b",
            "door": "#2f6bff", "power": "#ffd42a", "alarm": "#ffd42a", "tip": "#7fd0ff"}
 LETTERS = {"power": "P", "alarm": "A", "tip": "i", "terminal_l0": "T", "terminal_above": "T"}
 
@@ -106,11 +107,15 @@ def projector(data, width, height, turn=None):
 
 def layout(data, width, height, turn=None):
     """Scales a map to a box of width x height pixels (keeping its shape; `turn` degrees puts north at the top). Returns what to draw:
-    {"size": (w, h), "lines": [(x1, y1, x2, y2)...], "circles": [(x, y, r)...], "labels": [(text, x, y)...],
+    {"size": (w, h), "lines": [(x1, y1, x2, y2)...], "ground": [(x1, y1, x2, y2)...], "circles": [(x, y, r)...], "labels": [(text, x, y)...],
      "markers": [(x, y, colour, text)...], "credit": str, "project": function}"""
     px, scale = projector(data, width, height, turn)
     ox, oy = (width - float(data["size"][0]) * scale) / 2.0, (height - float(data["size"][1]) * scale) / 2.0      # (only right when not turned)
-    lines, circles, labels, markers = [], [], [], []
+    lines, circles, labels, markers, ground = [], [], [], [], []
+    for outline in data.get("ground", []) or []:
+        points = [px(x, y) for x, y in outline]
+        if len(points) >= 3:
+            ground += [(points[i][0], points[i][1], points[(i + 1) % len(points)][0], points[(i + 1) % len(points)][1]) for i in range(len(points))]
     for building in data.get("buildings", []):
         if "poly" in building:
             points = [px(x, y) for x, y in building["poly"]]
@@ -130,5 +135,5 @@ def layout(data, width, height, turn=None):
         x, y = px(marker["x"], marker["y"])
         text = LETTERS.get(kind) or ("" if marker.get("level") is None else str(marker["level"]) + ("^" if marker.get("up") else ""))
         markers.append((x, y, COLOURS.get(kind, "#ffffff"), text))
-    return {"size": (width, height), "scale": scale, "offset": (ox, oy), "project": px, "lines": lines, "circles": circles, "labels": labels, "markers": markers,
+    return {"size": (width, height), "scale": scale, "offset": (ox, oy), "project": px, "lines": lines, "ground": ground, "circles": circles, "labels": labels, "markers": markers,
             "credit": str(data.get("credit") or "")}

@@ -107,3 +107,33 @@ class AllTheLayouts(unittest.TestCase):
             self.assertIn("Quizengine", data["credit"])
             self.assertTrue(data["markers"])
         self.assertEqual(counts, {"Tourist": 4, "Agriculture": 5, "Military": 5, "Industrial": 5, "Extraction": 5, "High Tech": 4})
+
+
+class GroundOutlines(unittest.TestCase):
+    """0.96.9: dim wall and pad outlines under the wireframe (only some maps have them)."""
+
+    def test_no_ground_means_no_ground_lines(self):
+        self.assertEqual(layout(SMALL, 400, 400)["ground"], [])
+
+    def test_ground_outlines_are_drawn_as_closed_lines(self):
+        data = dict(SMALL, ground=[[[0, 0], [10, 0], [10, 10]]])
+        lines = layout(data, 400, 400)["ground"]
+        self.assertEqual(len(lines), 3)                                  # a triangle: three sides, closed
+        self.assertEqual((lines[2][2], lines[2][3]), (lines[0][0], lines[0][1]))
+
+    def test_a_broken_outline_with_two_points_is_ignored(self):
+        data = dict(SMALL, ground=[[[0, 0], [10, 0]]])
+        self.assertEqual(layout(data, 400, 400)["ground"], [])
+
+    def test_shipped_ground_stays_inside_the_map(self):
+        import json
+        from pathlib import Path
+        found = 0
+        for path in sorted((Path(__file__).resolve().parent.parent / "maps" / "settlements").glob("*.json")):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            for outline in data.get("ground", []):
+                found += 1
+                self.assertGreaterEqual(len(outline), 3, path.name)
+                for x, y in outline:
+                    self.assertTrue(-5 <= x <= data["size"][0] + 5 and -5 <= y <= data["size"][1] + 5, (path.name, x, y))
+        self.assertGreaterEqual(found, 2)
