@@ -1552,6 +1552,14 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.12 - Her story is spoken after a hack
+
+**What to do:** finish a base hack as usual. After "Link closed ... Listen." she tells the next chapter of her story.
+
+**What you should see/hear:** the chapter, even when the first line was slow to start. Before this fix the chapter was marked as told but never heard. If you missed one, say "replay the last chapter".
+
+**Where it lives:** tts/speech_manager.py (say(..., max_age=...)), personality/hack_lore.py (STORY_MAX_AGE). Tests: test_tts, test_hack_lore. Not tested in the real game.
+
 ## 0.96.11 - Better outlines for Agriculture 1 and 2
 
 **What to do:** nothing. Open "show settlement map agriculture one" or "two".

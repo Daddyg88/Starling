@@ -14,6 +14,8 @@ from core.logger import get_logger
 
 log = get_logger("hack_lore")
 
+# A chapter waits behind the line before it ("Link closed ... Listen."). The usual 8 s limit threw it away unheard (0.96.12).
+STORY_MAX_AGE = 120.0
 GROUPS = ("Industrial", "Extraction", "Agriculture", "High Tech", "Military", "Tourist")
 _REPLAY = re.compile(r"^(?:replay|repeat|say again|tell again)\s+(?:the\s+)?(?:last\s+)?(?:hack\s+)?(?:chapter|memory|story)$")
 _PROGRESS = re.compile(r"^(?:how many|which)\s+(?:hack\s+)?(?:chapters|memories)\b.*$")
@@ -82,7 +84,7 @@ class HackLore:
         text = personalise(text.replace("{name}", assistant_name(self.settings)), self.settings)
         speech = self.speech_provider() if callable(self.speech_provider) else self.speech_provider
         if speech is not None and self.settings.get("speech.enabled", True):
-            speech.say(text=text, priority="normal", event_name="hack.lore")
+            speech.say(text=text, priority="normal", event_name="hack.lore", max_age=STORY_MAX_AGE)
         return text
 
     def _pick(self, key):

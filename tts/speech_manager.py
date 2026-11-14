@@ -41,6 +41,7 @@ class SpeechItem:
     created: float
     seq: int = 0
     cancelled: bool = field(default=False)
+    max_age: Optional[float] = None    # a line that matters (her story) can ask to wait longer than the usual 8 seconds
 
 
 class SpeechManager:
@@ -80,14 +81,17 @@ class SpeechManager:
 
     # ---- asking her to speak ----
     def say(self, text=None, audio_path=None, speak_text_after=False,
-            priority="normal", event_name="", after_text=None):
-        """Queue a line. Returns True if it was accepted, False if dropped."""
+            priority="normal", event_name="", after_text=None, max_age=None):
+        """Queue a line. Returns True if it was accepted, False if dropped.
+
+        max_age (seconds) is for a line that is worth waiting for, like a chapter of her story: it is not dropped as stale
+        before then, and it is not the one dropped when too many ordinary lines are waiting."""
         if priority not in _RANK:
             priority = "normal"
         if not text and not audio_path:
             return False
         item = SpeechItem(text, audio_path, speak_text_after, after_text, priority, event_name,
-                          self.clock(), next(self._counter))
+                          self.clock(), next(self._counter), max_age=max_age)
         with self._cond:
             if not self._running:
                 return False
@@ -102,7 +106,7 @@ class SpeechManager:
                 if self._current is not None and self._current.priority != "critical":
                     self._cancel_current()
             elif priority == "normal":
-                waiting = [q for q in self._queue if q.priority == "normal"]
+                waiting = [q for q in self._queue if q.priority == "normal" and q.max_age is None]
                 if len(waiting) >= MAX_WAITING_NORMAL:
                     self._queue.remove(waiting[0])  # drop the oldest
                     self.dropped += 1
@@ -160,7 +164,7 @@ class SpeechManager:
                 break
             try:
                 age = self.clock() - item.created
-                if item.priority != "critical" and age > self.max_age.get(item.priority, 8.0):
+                if item.priority != "critical" and age > (item.max_age if item.max_age is not None else self.max_age.get(item.priority, 8.0)):
                     self.dropped += 1
                     log.debug("Dropped a stale line for %s (%.1fs old)", item.event_name, age)
                 else:

@@ -221,6 +221,31 @@ class SpeechManagerTests(unittest.TestCase):
         manager.stop()
         self.assertEqual(win.spoken, [])
 
+    def test_a_line_that_asked_to_wait_is_not_dropped_as_stale(self):
+        win = FakeProvider("kokoro")
+        settings = Settings(Path(tempfile.gettempdir()) / "nope.json").load()
+        now = [0.0]
+        manager = SpeechManager({"kokoro": win}, settings, clock=lambda: now[0])
+        manager._running = True
+        manager.say(text="Her story.", priority="normal", max_age=120.0)
+        manager.say(text="Old news.", priority="normal")
+        now[0] = 20.0
+        manager.start()
+        self.assertTrue(manager.wait_until_idle(3))
+        manager.stop()
+        self.assertEqual([t for t, _ in win.spoken], ["Her story."])
+
+    def test_a_waiting_story_is_not_the_line_dropped_when_the_queue_is_full(self):
+        win = FakeProvider("kokoro")
+        settings = Settings(Path(tempfile.gettempdir()) / "nope.json").load()
+        manager = SpeechManager({"kokoro": win}, settings)
+        manager._running = True
+        manager.say(text="Her story.", priority="normal", max_age=120.0)
+        for i in range(5):
+            manager.say(text="Chatter %d." % i, priority="normal")
+        texts = [q.text for q in manager._queue]
+        self.assertIn("Her story.", texts)
+
     def test_queue_stays_short(self):
         win = FakeProvider("kokoro", duration=1.0)
         self.manager = make_manager(kokoro=win)

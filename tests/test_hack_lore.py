@@ -13,7 +13,7 @@ class Speech:
     def __init__(self):
         self.said = []
 
-    def say(self, text, priority="normal", event_name=""):
+    def say(self, text, priority="normal", event_name="", **extra):
         self.said.append(text)
         return True
 

@@ -5,6 +5,8 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.12: hear a hack story chapter after a finished hack (it used to be dropped after 8 s).
+- [ ] FOUND 14 Nov, Shin Prospecting Platform (Extraction, one Large pad): the only map offered was extraction_3, chosen because it was the one Extraction map with that pad count. The hack's radar points (57 'terminals', many seen only once, spread over about 190 m) did not fit any Extraction map: best average miss about 12 m on every one, so no layout was said aloud and no arrow could be placed (arrow needs 3+ stops, or marking the power regulator and alarm console). Next: check by eye which Extraction picture this base is; consider telling the player when the map is only a pad-count guess; the radar picks up too many false terminals.
 - [ ] 0.96.11: Ben is making better outlines for the other 26 maps one at a time (icons and labels left in, straight pads, no ships). Line each up with tools: reg.py then skel.py (scratch tools, not in the repo yet) and replace that map's ground layer.
 - [ ] 0.96.10: look at a few maps on screen (Agriculture 1, Tourist 2, Military 5): are the extra dim lines helpful or too busy? If too busy, the ground layer can be thinned or dimmed.
 - [ ] 0.96.9: look at Military 2 and Military 3 on screen: are the dim wall outlines helpful or messy? More maps could get walls by hand tracing (automatic outlining is poor on rough ground).
