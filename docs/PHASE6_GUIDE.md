@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.18 - Better outlines for six more maps
+
+**What to do:** nothing. Open the settlement map at an Agriculture 3 or Extraction 1-5 base and look at the thin brown lines. If it looks too busy or slow, tell me which base.
+
+**Where it lives:** the 'ground' list in maps/settlements/agriculture_3.json and extraction_1 to extraction_5. Not tested in the real game.
+
 ## 0.96.17 - Better outlines for Extraction 3 and Agriculture 4
 
 **What to do:** nothing. Open the settlement map at either kind of base and look at the thin brown lines under the boxes. If the screen feels slower or too busy, tell me which base.
