@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.11: Ben is making better outlines for the other 26 maps one at a time (icons and labels left in, straight pads, no ships). Line each up with tools: reg.py then skel.py (scratch tools, not in the repo yet) and replace that map's ground layer.
 - [ ] 0.96.10: look at a few maps on screen (Agriculture 1, Tourist 2, Military 5): are the extra dim lines helpful or too busy? If too busy, the ground layer can be thinned or dimmed.
 - [ ] 0.96.9: look at Military 2 and Military 3 on screen: are the dim wall outlines helpful or messy? More maps could get walls by hand tracing (automatic outlining is poor on rough ground).
 - [ ] 0.96.8 (finding from the 13 Nov hunt): Thargoid targets arrive as ShipTargeted with TargetLocked false and NO ship, part or scan stage, and xeno scans write no journal line, so the 'Sub target seen' log cannot see hearts. To select hearts we need either a press-count command ('target heart three') or reading the target panel on screen; Ben to send a screenshot with an Interceptor and a heart selected. ON HOLD.

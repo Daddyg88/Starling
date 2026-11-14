@@ -1552,6 +1552,14 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.11 - Better outlines for Agriculture 1 and 2
+
+**What to do:** nothing. Open "show settlement map agriculture one" or "two".
+
+**What you should see:** more detailed dim brown outlines under the orange boxes: paths, tank rows, fences, pads and the inside of the buildings.
+
+**Where it lives:** maps/settlements/agriculture_1.json and agriculture_2.json ("ground" key); ui/settlement_overlay.py now draws connected outline pieces as one line each. Not tested in the real game.
+
 ## 0.96.10 - More detail on all 28 settlement maps
 
 **What to do:** nothing. Open a map as usual ("show settlement map agriculture one").
