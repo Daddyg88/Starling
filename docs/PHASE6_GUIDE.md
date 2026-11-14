@@ -1552,6 +1552,16 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.10 - More detail on all 28 settlement maps
+
+**What to do:** nothing. Open a map as usual ("show settlement map agriculture one").
+
+**What you should see:** under the normal orange boxes, extra dim brown outlines of tanks, sheds, paths, fences and pad edges. Agriculture 1, Tourist 1 and Tourist 2 have the most.
+
+**How it was made:** Agriculture 1, Tourist 1 and Tourist 2 were traced from outline pictures lined up with the guide (within about 2 pixels). The other maps were traced by hand over a grid. Icons did not move.
+
+**Where it lives:** maps/settlements/*.json (the optional "ground" key). Test: test_settlement_maps. Not tested in the real game.
+
 ## 0.96.9 - Settlement maps checked, walls added
 
 **What to do:** nothing. Open a map as usual ("show settlement map military three").
