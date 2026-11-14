@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.20 - All 28 maps use the picture outlines
+
+**What to do:** open the settlement map at any base (especially a High Tech 2 or Military 5 one, the busiest). You should see the thin bright-orange outline, icons and labels. If it is slow or too busy, tell me which base.
+
+**Where it lives:** the 'ground' list and 'pictured' flag in the 17 map files for Agriculture 5, High Tech 1-4, Industrial 1-5, Military 1-5 and Tourist 3-4. Not tested in the real game.
+
 ## 0.96.19 - Picture maps show only the picture lines
 
 **What to do:** open the settlement map at an Agriculture 1-4, Extraction 1-5 or Tourist 1-2 base. You should see the thin, bright-orange detailed outline, the icons and the labels, without the old orange boxes. If it is hard to read, tell me and I can bring the boxes back (one flag per map).
