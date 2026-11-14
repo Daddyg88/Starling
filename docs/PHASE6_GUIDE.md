@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.14 - Cheesebeard's Cave is a known layout
+
+**What to do:** nothing. Land at Cheesebeard's Cave and step out: the Extraction 3 map comes up as a certain match.
+
+**Where it lives:** maps/known_settlements.json. Not tested in the real game.
+
 ## 0.96.13 - The log says why there is no arrow
 
 **What to do:** nothing. If the map has no arrow, send the diagnostics zip as usual.
