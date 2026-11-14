@@ -20,7 +20,7 @@ log = get_logger("settlement_maps")
 GROUPS = {"tourist": "Tourist", "agriculture": "Agriculture", "agricultural": "Agriculture", "military": "Military", "industrial": "Industrial",
           "extraction": "Extraction", "high tech": "High Tech", "hightech": "High Tech", "high-tech": "High Tech"}
 NUMBERS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
-COLOURS = {"ground": "#7a4a14", "building": "#ff8c1a", "label": "#ffb84d", "terminal_l0": "#c6ff00", "terminal_above": "#3da5ff", "airlock": "#ff3b3b",
+COLOURS = {"ground": "#7a4a14", "ground_picture": "#c9741a", "building": "#ff8c1a", "label": "#ffb84d", "terminal_l0": "#c6ff00", "terminal_above": "#3da5ff", "airlock": "#ff3b3b",
            "door": "#2f6bff", "power": "#ffd42a", "alarm": "#ffd42a", "tip": "#7fd0ff"}
 LETTERS = {"power": "P", "alarm": "A", "tip": "i", "terminal_l0": "T", "terminal_above": "T"}
 
@@ -137,4 +137,4 @@ def layout(data, width, height, turn=None):
         text = LETTERS.get(kind) or ("" if marker.get("level") is None else str(marker["level"]) + ("^" if marker.get("up") else ""))
         markers.append((x, y, COLOURS.get(kind, "#ffffff"), text))
     return {"size": (width, height), "scale": scale, "offset": (ox, oy), "project": px, "lines": lines, "ground": ground, "circles": circles, "labels": labels, "markers": markers,
-            "credit": str(data.get("credit") or "")}
+            "pictured": pictured, "credit": str(data.get("credit") or "")}

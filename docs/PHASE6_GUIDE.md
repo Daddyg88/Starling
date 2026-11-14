@@ -1554,7 +1554,7 @@ window use the same code as the biology list.
 
 ## 0.96.19 - Picture maps show only the picture lines
 
-**What to do:** open the settlement map at an Agriculture 1-4, Extraction 1-5 or Tourist 1-2 base. You should see the thin detailed outline, the icons and the labels, without the old orange boxes. If it is hard to read, tell me and I can bring the boxes back (one flag per map).
+**What to do:** open the settlement map at an Agriculture 1-4, Extraction 1-5 or Tourist 1-2 base. You should see the thin, bright-orange detailed outline, the icons and the labels, without the old orange boxes. If it is hard to read, tell me and I can bring the boxes back (one flag per map).
 
 **Where it lives:** navigation/settlement_maps.py (the 'pictured' flag) and the 11 map files. Not tested in the real game.
 

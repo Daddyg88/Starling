@@ -104,16 +104,17 @@ class SettlementOverlay(RedAlertOverlay):
             self.canvas.configure(width=width, height=height)
             # Join end-to-start ground segments into one line each. Detailed maps have
             # thousands of segments, and one canvas item per outline is far lighter.
+            ground_colour = settlement_maps.COLOURS["ground_picture" if shape.get("pictured") else "ground"]      # picture outlines are drawn brighter
             chain = []
             for x1, y1, x2, y2 in shape["ground"]:
                 if chain and abs(chain[-2] - x1) < 0.01 and abs(chain[-1] - y1) < 0.01:
                     chain += [x2, y2]
                     continue
                 if len(chain) >= 4:
-                    self.canvas.create_line(*chain, fill=settlement_maps.COLOURS["ground"], width=1)
+                    self.canvas.create_line(*chain, fill=ground_colour, width=1)
                 chain = [x1, y1, x2, y2]
             if len(chain) >= 4:
-                self.canvas.create_line(*chain, fill=settlement_maps.COLOURS["ground"], width=1)
+                self.canvas.create_line(*chain, fill=ground_colour, width=1)
             for x1, y1, x2, y2 in shape["lines"]:
                 self.canvas.create_line(x1, y1, x2, y2, fill=settlement_maps.COLOURS["building"], width=2)
             for cx, cy, r in shape["circles"]:
