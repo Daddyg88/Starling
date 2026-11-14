@@ -1552,7 +1552,11 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
-## 0.96.15 - Cheesebeard's Cave gets its arrow
+## 0.96.16 - the Cheesebeard's Cave line-up is taken back
+
+**What to do:** nothing. The arrow at Cheesebeard's Cave is off again until a correct line-up is worked out. Not tested in the real game.
+
+## 0.96.15 - Cheesebeard's Cave gets its arrow (taken back in 0.96.16)
 
 **What to do:** land at Cheesebeard's Cave and step out. The Extraction 3 map should show with your arrow straight away. If the arrow is in the wrong place, say "reset settlement map" and send the zip.
 
