@@ -674,10 +674,26 @@ class LinedUpFromThePadArrow(Setup):
         self.assertEqual(self.tracker.settlement["map"], "industrial_2")
         self.assertIsNotNone(self.tracker.calibration)
 
-    def test_a_layout_with_two_landing_pads_is_not_guessed(self):
-        self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Large", "x": 100, "y": 100, "facing": 0}, {"size": "Large", "x": 900, "y": 100, "facing": 90}]}}
-        self.land()
+    def test_a_layout_with_two_landing_pads_uses_the_pad_number(self):
+        two = {"industrial_2": {"pads": [{"size": "Large", "number": 1, "x": 100, "y": 100, "facing": 0}, {"size": "Large", "number": 2, "x": 900, "y": 100, "facing": 90}]}}
+        self.tracker.pad_frames = two
+        self.land(pad=2)
+        x, y = self.tracker.calibration.from_world(*self.tracker.anchors["pad"])
+        self.assertLess(math.hypot(x - 900, y - 100), 1.0)                     # pad 2 is the second arrow
+        self.tracker._leave()
+        self.land(pad=1)
+        x, y = self.tracker.calibration.from_world(*self.tracker.anchors["pad"])
+        self.assertLess(math.hypot(x - 100, y - 100), 1.0)
+
+    def test_two_landing_pads_and_an_unknown_pad_number_is_not_guessed(self):
+        self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Large", "number": 1, "x": 100, "y": 100, "facing": 0}, {"size": "Large", "number": 2, "x": 900, "y": 100, "facing": 90}]}}
+        self.land(pad=7)
         self.assertIsNone(self.tracker.calibration)
+
+    def test_tourist_one_has_its_pad_numbers(self):
+        large = [p for p in settlement_track.known_pad_frames()["tourist_1"]["pads"] if p["size"] == "Large"]
+        self.assertEqual(sorted(p["number"] for p in large), [1, 2])
+        self.assertLess(min(large, key=lambda p: p["number"])["y"], max(large, key=lambda p: p["number"])["y"])      # 1 is the top pad
 
     def test_a_small_pad_alone_is_not_used(self):
         self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Small", "x": 100, "y": 100, "facing": 0}]}}

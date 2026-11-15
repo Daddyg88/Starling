@@ -457,9 +457,17 @@ class SettlementTracker:
             self._dock_line_up()
 
     def _arrow_pad(self, map_id):
-        """The one Medium or Large pad this layout has on its picture (the ones a ship lands on), or None when there is none or several."""
+        """The Medium or Large pad (the ones a ship lands on) this layout has on its picture. With more than one, the pad number the game gave
+        you picks it (Ben numbered them on the picture); None when there is none, or the number does not single one out."""
         pads = [p for p in (self.pad_frames.get(map_id) or {}).get("pads", []) if p.get("size") in ("Medium", "Large")]
-        return pads[0] if len(pads) == 1 else None
+        if len(pads) == 1:
+            return pads[0]
+        try:
+            number = int((self.settlement or {}).get("pad_number"))
+        except (TypeError, ValueError):
+            return None
+        same = [p for p in pads if int(p.get("number", 1)) == number]
+        return same[0] if len(same) == 1 else None
 
     def _dock_line_up(self):
         """On pad 1 the ship faces the way the whole layout is turned. When this layout's frame is known (from an earlier line-up of the same

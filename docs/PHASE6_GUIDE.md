@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.24 - Tourist 1 pad numbers
+
+**What to do:** at a Tourist 1 base, note the pad the game gives you and check the map comes up on the matching pad (large 1 = top, large 2 = bottom on the picture). At every base now: mark about four spread-out terminals, not the power regulator or alarm.
+
+**Where it lives:** maps/pad_frames.json ('number') and navigation/settlement_track.py (_arrow_pad). Not tested in the real game.
+
 ## 0.96.23 - Rough map line-up from the landing (pad arrows)
 
 **What to do:** land on a Medium or Large pad at any base. If she suggests the right layout the map should come up lined up straight away, and she says it is rough. If her guess was wrong, say "show settlement map" and the right name after landing; it lines up then. Check the arrow roughly matches where you stand and which way you face, then mark the power regulator and alarm to make it exact. Tell me if it is turned the wrong way round (180 degrees) on any layout.

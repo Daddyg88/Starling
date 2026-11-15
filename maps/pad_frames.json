@@ -1,5 +1,5 @@
 {
- "_note": "Where each layout's landing pads are on its map and which way a ship parked on them faces (degrees clockwise from the top of the map), read from Ben's arrows drawn on the guide screenshots, 15 Nov. x,y = the middle of the arrow (the ship) in map units; good to about 15 units. size is worked out from the layout's pad counts: the longest arrows are the Large and Medium pads. Used for a rough line-up from the landing; marks make it exact.",
+ "_note": "Where each layout's landing pads are on its map and which way a ship parked on them faces (degrees clockwise from the top of the map), read from Ben's arrows drawn on the guide screenshots, 15 Nov. x,y = the middle of the arrow (the ship) in map units; good to about 15 units. size is worked out from the layout's pad counts: the longest arrows are the Large and Medium pads. Used for a rough line-up from the landing; marks make it exact. number = the pad's number on the guide picture (Ben wrote them on Tourist 1, the only layout with two Large pads; elsewhere it is 1).",
  "agriculture_1": {
   "pads": [
    {
@@ -296,27 +296,31 @@
   "pads": [
    {
     "size": "Large",
-    "x": 1112,
-    "y": 578,
-    "facing": 268
+    "x": 1119,
+    "y": 221,
+    "facing": 269,
+    "number": 1
    },
    {
     "size": "Large",
-    "x": 1119,
-    "y": 221,
-    "facing": 269
+    "x": 1112,
+    "y": 578,
+    "facing": 268,
+    "number": 2
    },
    {
     "size": "Small",
     "x": 657,
     "y": 272,
-    "facing": 276
+    "facing": 276,
+    "number": 1
    },
    {
     "size": "Small",
     "x": 702,
     "y": 483,
-    "facing": 267
+    "facing": 267,
+    "number": 2
    }
   ]
  },
