@@ -766,3 +766,41 @@ class AdoptLayout(Setup):
         self.tracker.layout_hint = boom
         self.tracker.on_entry(dict(APPROACH))
         self.assertIsNotNone(self.tracker.settlement)
+
+
+class AgricultureFourMeasured(unittest.TestCase):
+    """Ben's three stops at Sharma Hydroponics Farm (15 Nov 2026): the map's own size is 0.37 m per unit, not 0.325."""
+    A, B, C, PAD = (25.0, 25.0), (24.0, 141.5), (21.0, -255.0), (79.0, -162.0)           # metres east, north of the settlement's reference point
+
+    def setUp(self):
+        from navigation.settlement_maps import SettlementMaps
+        self.data = SettlementMaps().get("agriculture_4")
+        self.pad = next(p for p in settlement_track.known_pad_frames()["agriculture_4"]["pads"] if p["size"] == "Large")
+
+    def calibration(self, heading=240.5):
+        return settlement_track.pad_calibration("agriculture_4", self.pad, heading, self.PAD, 9.45, -94.41, 1104864.0, scale=self.pad["scale"])
+
+    def test_the_map_carries_its_own_size(self):
+        self.assertAlmostEqual(self.data["scale"], 0.37)
+        self.assertAlmostEqual(self.pad["scale"], 0.37)
+
+    def test_the_two_terminals_you_stood_at_land_on_the_two_map_terminals(self):
+        cal = self.calibration()
+        for stop, terminal in ((self.A, (840, 446)), (self.B, (962, 156))):
+            x, y = cal.from_world(*stop)
+            self.assertLess(math.hypot(x - terminal[0], y - terminal[1]), 25.0, stop)
+
+    def test_the_old_shared_size_would_have_missed_the_far_one(self):
+        old = settlement_track.pad_calibration("agriculture_4", self.pad, 240.5, self.PAD, 9.45, -94.41, 1104864.0)
+        x, y = old.from_world(*self.B)
+        self.assertGreater(math.hypot(x - 962, y - 156), 40.0)
+
+    def test_the_solver_tries_a_measured_map_at_its_own_size(self):
+        from navigation import settlement_solve
+        scales, rng = settlement_solve.locked_for(self.data, settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE)
+        self.assertEqual(scales, (0.37,))
+        self.assertLess(rng[0], 0.37 < rng[1] and 0.37 or 0)
+        other = settlement_solve.locked_for({"id": "x"}, settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE)
+        self.assertEqual(other, (settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE))
+        free = settlement_solve.locked_for(self.data, None, None)
+        self.assertEqual(free, (None, None))              # the any-size pass is left alone

@@ -40,10 +40,12 @@
   "pads": [
    {
     "size": "Large",
-    "x": 767,
-    "y": 950,
-    "facing": 274,
-    "centre_estimated": true
+    "x": 774,
+    "y": 967,
+    "facing": 264,
+    "centre_estimated": false,
+    "scale": 0.37,
+    "measured": "Ben, 15 Nov: terminals A,B + pad cross-check"
    },
    {
     "size": "Small",

@@ -24,6 +24,18 @@ LOCKED_RANGE = (0.31, 0.34)
 MIN_SPOTS_LOCKED = 3                # when the layout is known
 SPOTS_TO_CHOOSE_LOCKED = 4          # when she has to choose between layouts
 MIN_APART_METRES = 20.0
+
+
+def locked_for(data, scales, scale_range):
+    """The fixed size to try for one map. A map whose own size was measured from real stops ("scale" in its file, metres per map unit; Agriculture 4
+    is 0.37, not 0.325) is tried at that size, with 4.5% either way; every other map keeps the shared one."""
+    try:
+        own = float(data.get("scale"))
+        if scales == LOCKED_SCALES and 0.2 <= own <= 0.6:
+            return (own,), (own * 0.955, own * 1.045)
+    except (TypeError, ValueError, AttributeError):
+        pass
+    return scales, scale_range
 SEPARATE_DEGREES = 20.0             # answers closer in turn than this are the same answer
 
 

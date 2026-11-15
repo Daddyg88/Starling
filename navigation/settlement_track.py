@@ -487,7 +487,8 @@ class SettlementTracker:
             pad, ship = self._arrow_pad(map_id), self.anchors.get("pad")
             if pad is None or ship is None:
                 return
-            self.calibration = pad_calibration(map_id, pad, s["dock_heading"], ship, s["lat"], s["lon"], s["radius"], s.get("name"))
+            own = pad.get("scale") or (self.maps.get(map_id) or {}).get("scale")           # a layout measured from real stops has its own size
+            self.calibration = pad_calibration(map_id, pad, s["dock_heading"], ship, s["lat"], s["lon"], s["radius"], s.get("name"), own)
             how = "pad arrow"
         self.provisional, self.checks = True, [0, 0]
         self.view.current = self.view.current or map_id
@@ -593,9 +594,10 @@ class SettlementTracker:
         for data in options:
             if data is None:
                 continue
-            result = settlement_solve.solve(data, self.spots, minimum, scales)
+            own_scales, own_range = settlement_solve.locked_for(data, scales, scale_range)
+            result = settlement_solve.solve(data, self.spots, minimum, own_scales)
             tried.append("%s %s" % (data["id"], "no answer" if not result else "miss %.0f, next %.0f" % (result["error"], result["next"])))
-            if result and settlement_solve.clear(result, scale_range) and METRES_PER_UNIT[0] <= abs(result["a"]) <= METRES_PER_UNIT[1]:
+            if result and settlement_solve.clear(result, own_range) and METRES_PER_UNIT[0] <= abs(result["a"]) <= METRES_PER_UNIT[1]:
                 results.append((result["error"], data, result))
         if not results:
             # So a diagnostics zip shows WHY there was no arrow (0.96.13): the stops (metres east, north) and how each layout fitted them.
