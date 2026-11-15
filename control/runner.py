@@ -492,6 +492,19 @@ class CommandRunner:
         timer.daemon = True
         timer.start()
 
+    def _map_macro_problem(self, keys_ahead):
+        """Checked after every wait of the galaxy map macro: why it must stop now, or None. Its keys (Up, Select, paste, hold Select, zoom) only make
+        sense inside the galaxy map; pressed in the cockpit they do other things, and the stick can stop answering (Woz, 15 Nov 2026: the map closed
+        by itself part way, and she carried on pressing). Only a clear reading counts: Status.json unreadable (gui '?') never stops it."""
+        if not any(step[0] in ("press", "hold", "literal") and not (step[0] in ("press", "hold") and step[1] == "UI_Back") for step in keys_ahead):
+            return None                                    # only the closing Backs (or nothing) are left
+        state = self.state_provider()
+        if state is not None and (getattr(state, "status_flags", 0) or 0) >> 30 & 1:
+            return "the ship started a hyperspace jump"
+        if self._gui_focus() == 0:
+            return "the galaxy map is not on screen any more"
+        return None
+
     def galaxy_map_open(self):
         """True while Status.json says the galaxy map is the screen you are looking at (GuiFocus 6)."""
         state = self.state_provider()
@@ -544,10 +557,20 @@ class CommandRunner:
         self._role_keys_logged = set()
         self._role_status = None                     # "no_nomad", "cannot_landed"... when a role-panel pick could not be done
         self.macro_spoke = False
-        for step in steps:
+        stopped = None                               # why a map macro was stopped part way (see _map_macro_problem)
+        if command.id == "plot_waypoint":
+            state = self.state_provider()
+            log.info("Macro plot_waypoint starts (screen gui%s, status flags %s, started by %s)", self._gui_focus(),
+                     getattr(state, "status_flags", "?") if state is not None else "?", "her own route plotter" if getattr(self, "auto_run", False) else "you")
+        for position, step in enumerate(steps):
             if step[0] == "wait":
                 self.sleep(step[1])
                 trace.append("%s>gui%s" % (pressed[-1] if pressed else "-", self._gui_focus()))
+                if command.id == "plot_waypoint":
+                    stopped = self._map_macro_problem(steps[position + 1:])
+                    if stopped:
+                        trace.append("stopped>" + stopped)
+                        break
                 continue
             if step[0] in ("say", "talk") and (self._no_button or self._role_status):
                 continue                                       # she could not find the button: do not talk as if all is well
@@ -677,6 +700,9 @@ class CommandRunner:
         self._last[key] = now
         log.info("Macro %s trace (key>screen after each wait; gui 0=cockpit 1=right panel 2=left panel 6=galaxy map): %s",
                  command.id, ", ".join(trace) if trace else "none")
+        if stopped:
+            log.warning("Macro plot_waypoint stopped part way: %s. The rest of its keys were NOT pressed.", stopped)
+            return Outcome("failed", text, command, intent, detail="I stopped plotting, Commander: %s. I did not press any more keys." % stopped)
         if self._no_button:
             return Outcome("no_button", text, command, intent, detail=self._explain("no_button", command))
         if self._role_status:

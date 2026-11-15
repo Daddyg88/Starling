@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.25 - galaxy map macro stops when the map is gone
+
+Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys after the map closed (gui0), and a jump started during one run. control/runner.py `_map_macro_problem` is checked after every wait of plot_waypoint; if the screen is the cockpit or the jump bit (30) is set, and keys other than UI_Back remain, the macro stops and returns 'failed'. Status.json unreadable never stops it. Cause of the map closing is still unknown. Tests in tests/test_plot_macro.py.
+
 ## 0.96.24 - Tourist 1 pad numbers
 
 **What to do:** at a Tourist 1 base, note the pad the game gives you and check the map comes up on the matching pad (large 1 = top, large 2 = bottom on the picture). At every base now: mark about four spread-out terminals, not the power regulator or alarm.

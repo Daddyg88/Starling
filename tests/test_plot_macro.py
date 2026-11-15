@@ -147,6 +147,41 @@ class RunMacro(unittest.TestCase):
         self.assertNotIn(g, pressed)                     # the map key was never pressed (it would have closed the map)
         self.assertEqual(pressed[0], u)
 
+    def _screens(self, *focus, flags=0):
+        """A state whose galaxy-map screen reading moves on every time the macro looks at it."""
+        seq = list(focus)
+        def provider():
+            return type("S", (), {"status_seen": True, "gui_focus": seq.pop(0) if len(seq) > 1 else seq[0],
+                                  "status_flags": flags, "status_flags2": 0})()
+        return provider
+
+    def test_map_closing_part_way_stops_the_key_presses(self):
+        r = self.runner()
+        r.state_provider = self._screens(6, 6, 0)        # map open, then gone
+        outcome = r.run_text("plot the next waypoint")[0]
+        self.assertEqual(outcome.status, "failed")
+        self.assertIn("galaxy map", outcome.detail)
+        self.assertLess(len(self.rec.events), 8)         # the long run of Select/zoom/hold keys never happened
+        self.assertNotIn("hold", " ".join(str(e) for e in self.rec.events[-1:]).lower())
+
+    def test_a_jump_starting_stops_it_even_when_the_map_is_open(self):
+        r = self.runner()
+        r.state_provider = self._screens(6, flags=1 << 30)
+        outcome = r.run_text("plot the next waypoint")[0]
+        self.assertEqual(outcome.status, "failed")
+        self.assertIn("jump", outcome.detail)
+
+    def test_unreadable_status_never_stops_it(self):
+        r = self.runner()
+        r.state_provider = lambda: None
+        outcome = r.run_text("plot the next waypoint")[0]
+        self.assertEqual(outcome.status, "done")
+
+    def test_map_stays_open_runs_to_the_end(self):
+        r = self.runner()
+        r.state_provider = self._screens(6)
+        self.assertEqual(r.run_text("plot the next waypoint")[0].status, "done")
+
     def test_no_route_means_no_key_presses(self):
         r = self.runner()
         self.parts["follower"].clear()
