@@ -11,7 +11,7 @@
   "Medium": 0,
   "Large": 1
  },
- "scale": 0.435,
+ "scale": 0.413,
  "credit": "Map by CMDR Quizengine (Odyssey Map Guide, elitedangereuse.fr)",
  "note": "PROTOTYPE traced by eye from one screenshot: outlines and positions are approximate.",
  "buildings": [
@@ -348,6 +348,12 @@
    "type": "tip",
    "x": 802,
    "y": 672
+  },
+  {
+   "type": "terminal_l0",
+   "x": 1019,
+   "y": 350,
+   "marked": true
   }
  ],
  "pictured": true,

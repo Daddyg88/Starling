@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.36 - Agriculture 1 measured
+
+ZIPs 15 Nov 17:22 and 17:28: three marked yellow terminals over two visits, fits 0.413 m per unit, turn -140 and -137. Map scale 0.413, pad facing 90, extra terminal (1019,350) added (marked twice). Live line-up had tried only 0.413..0.457 around the old 0.435 so it missed; it is now centred. Twin layout Agriculture 3 is still a guess.
+
 ## 0.96.35 - mark command forgives 'stop'
 
 ZIP 15 Nov 17:05, Agnihotri Nutrition Holdings second visit: the log shows "Command 'mark, stop terminal.' -> unknown" three times, so Ben's three marks were not saved. The recorder pattern now accepts spot/spots/stop/spock. Test: tests/test_settlement_recorder.py test_misheard_stop_still_marks. Agriculture 1 needs a revisit with two yellow terminals marked.
