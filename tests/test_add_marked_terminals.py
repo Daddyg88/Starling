@@ -39,10 +39,10 @@ class Tool(unittest.TestCase):
         groups, entry, places = self.places([mark(*A, "t1"), mark(*B, "t2"), mark(*C, "t3"), mark(*C, "t4")])
         cal, matched, missing = tool.solve(self.data, places, entry["ships"])
         self.assertEqual((matched, missing), (2, 1))
-        self.assertAlmostEqual(abs(cal.a), 0.37, delta=0.02)
+        self.assertAlmostEqual(abs(cal.a), 0.44, delta=0.02)
         e, n, count = places[2]
         x, y = cal.from_world(e, n)
-        self.assertLess(math.hypot(x - 533, y - 1139), 20.0)
+        self.assertLess(math.hypot(x - 548, y - 957), 20.0)
         self.assertEqual(count, 2)
 
     def test_the_ship_tells_the_map_from_the_same_map_turned_half_way(self):
@@ -82,5 +82,5 @@ class Tool(unittest.TestCase):
     def test_the_shipped_agriculture_4_has_the_terminal_by_the_large_pad(self):
         data = SettlementMaps().get("agriculture_4")
         terminals = [m for m in data["markers"] if str(m["type"]).startswith("terminal")]
-        self.assertTrue(any(math.hypot(m["x"] - 533, m["y"] - 1139) < 25 for m in terminals))
+        self.assertTrue(any(math.hypot(m["x"] - 548, m["y"] - 957) < 25 for m in terminals))
         self.assertGreaterEqual(data["bounds"][3], max(m["y"] for m in terminals))

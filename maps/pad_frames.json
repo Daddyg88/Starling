@@ -40,12 +40,12 @@
   "pads": [
    {
     "size": "Large",
-    "x": 774,
-    "y": 967,
-    "facing": 264,
+    "x": 763,
+    "y": 824,
+    "facing": 267,
     "centre_estimated": false,
-    "scale": 0.37,
-    "measured": "Ben, 15 Nov: terminals A,B + pad cross-check"
+    "scale": 0.44,
+    "measured": "Ben, 15 Nov: yellow (outside) terminals A,B; ship (79,-162)"
    },
    {
     "size": "Small",

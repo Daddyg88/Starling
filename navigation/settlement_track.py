@@ -217,6 +217,15 @@ def fit(pairs):
     return a, t, rms
 
 
+def outside_features(data):
+    """The map's features for matching MARKED spots: the yellow (outside) terminals when the map has at least two (Ben stands at those; the blue ones
+    are up in buildings), else all its terminals."""
+    feats = dict(settlement_solve.features(data))
+    if len(feats.get("outside", [])) >= 2:
+        feats["terminal"] = list(feats["outside"])
+    return feats
+
+
 def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, shift=REFINE_SHIFT_METRES, accept=None):
     """Corrects a rough landing line-up with the terminals you MARKED (they are the trusted ones). Tries small turns and size changes around the
     landing line-up, and for each every way of putting a marked spot on a map terminal; keeps the answer that puts the most marked spots on
@@ -226,7 +235,7 @@ def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, sh
     landing line-up; tools/add_marked_terminals.py gives it every turn and a range of sizes, and `accept(a, t)` to throw out answers that put the ship
     off its pad. Returns (calibration, matched, unmatched) or None when there is no single clear answer: fewer than two
     matched, matched ones too close together, or a second, different answer that is about as good."""
-    feats = settlement_solve.features(data)
+    feats = outside_features(data)
     marked = [(kind, complex(east, north)) for kind, east, north in spots if kind in ("terminal", "power", "alarm") and feats.get(kind)]
     if len(marked) < 2:
         return None
@@ -247,7 +256,7 @@ def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, sh
                     tried.append(t)
                     if accept is not None and not accept(a, t):
                         continue
-                    used, error, hits = set(), 0.0, []
+                    used, error, hits, assign = set(), 0.0, [], []
                     for index, (k2, w2) in enumerate(marked):
                         z = (w2 - t) / a
                         options = [(math.hypot(z.real - p, -z.imag - q), number) for number, (p, q) in enumerate(feats[k2]) if (k2, number) not in used]
@@ -258,8 +267,9 @@ def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, sh
                             used.add((k2, number))
                             error += d
                             hits.append(w2)
+                            assign.append((index, number))
                     if len(hits) >= 2 and max(abs(x - y) for x in hits for y in hits) >= REFINE_APART_METRES:
-                        found.append((len(hits), error, turn, a, t, hits))
+                        found.append((len(hits), error, turn, a, t, hits, tuple(sorted(assign))))
     if not found:
         return None
     found.sort(key=lambda r: (-r[0], r[1]))
@@ -267,8 +277,7 @@ def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, sh
     for other in found[1:]:
         if other[0] < best[0]:
             break
-        apart = abs(cmath.phase(other[3] / best[3])) > math.radians(6) or abs(other[4] - best[4]) > 15.0       # a really different answer
-        if apart and other[1] <= best[1] * 1.25 + 8:
+        if other[6] != best[6] and other[1] <= best[1] * 1.25 + 8:             # a really different answer: other marks on other terminals
             return None                                       # it fits about as well: not clear
     cal = Calibration(seed.map_id, best[3], best[4], seed.ref_lat, seed.ref_lon, seed.radius,
                       {"name": seed.meta.get("name"), "n": best[0], "err": round(best[1] / best[0], 1), "how": "refined"})

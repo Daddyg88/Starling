@@ -41,12 +41,14 @@ SEPARATE_DEGREES = 20.0             # answers closer in turn than this are the s
 
 def features(data):
     """kind -> [(x, y)] for one map. Kinds: terminal, entry (doors and airlocks), power, alarm, pad, stop (a terminal, the power regulator or the alarm)."""
-    found = {"terminal": [], "entry": [], "power": [], "alarm": [], "pad": [], "stop": []}
+    found = {"terminal": [], "outside": [], "entry": [], "power": [], "alarm": [], "pad": [], "stop": []}
     for marker in data.get("markers", []):
         kind = str(marker.get("type") or "")
         point = (float(marker["x"]), float(marker["y"]))
         if kind.startswith("terminal"):
             found["terminal"].append(point)
+            if kind == "terminal_l0":
+                found["outside"].append(point)                       # the yellow icons on the guide: the terminals you reach from outside
         elif kind in ("door", "airlock"):
             found["entry"].append(point)
         elif kind in ("power", "alarm"):

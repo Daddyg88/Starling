@@ -810,7 +810,8 @@ class AdoptLayout(Setup):
 
 
 class AgricultureFourMeasured(unittest.TestCase):
-    """Ben's three stops at Sharma Hydroponics Farm (15 Nov 2026): the map's own size is 0.37 m per unit, not 0.325."""
+    """Ben's three stops at Sharma Hydroponics Farm (15 Nov 2026), matched to the YELLOW (outside) terminals: the map's own size is 0.44 m per unit,
+    not 0.325. (The first fit used a blue terminal and gave 0.37; the yellow ones agree with the pad's size on the picture.)"""
     A, B, C, PAD = (25.0, 25.0), (24.0, 141.5), (21.0, -255.0), (79.0, -162.0)           # metres east, north of the settlement's reference point
 
     def setUp(self):
@@ -822,12 +823,12 @@ class AgricultureFourMeasured(unittest.TestCase):
         return settlement_track.pad_calibration("agriculture_4", self.pad, heading, self.PAD, 9.45, -94.41, 1104864.0, scale=self.pad["scale"])
 
     def test_the_map_carries_its_own_size(self):
-        self.assertAlmostEqual(self.data["scale"], 0.37)
-        self.assertAlmostEqual(self.pad["scale"], 0.37)
+        self.assertAlmostEqual(self.data["scale"], 0.44)
+        self.assertAlmostEqual(self.pad["scale"], 0.44)
 
-    def test_the_two_terminals_you_stood_at_land_on_the_two_map_terminals(self):
+    def test_the_two_terminals_you_stood_at_land_on_the_two_yellow_map_terminals(self):
         cal = self.calibration()
-        for stop, terminal in ((self.A, (840, 446)), (self.B, (962, 156))):
+        for stop, terminal in ((self.A, (845, 392)), (self.B, (962, 156))):
             x, y = cal.from_world(*stop)
             self.assertLess(math.hypot(x - terminal[0], y - terminal[1]), 25.0, stop)
 
@@ -839,8 +840,9 @@ class AgricultureFourMeasured(unittest.TestCase):
     def test_the_solver_tries_a_measured_map_at_its_own_size(self):
         from navigation import settlement_solve
         scales, rng = settlement_solve.locked_for(self.data, settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE)
-        self.assertEqual(scales, (0.37,))
-        self.assertLess(rng[0], 0.37 < rng[1] and 0.37 or 0)
+        self.assertEqual(scales, (0.44,))
+        self.assertLess(rng[0], 0.44)
+        self.assertGreater(rng[1], 0.44)
         other = settlement_solve.locked_for({"id": "x"}, settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE)
         self.assertEqual(other, (settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE))
         free = settlement_solve.locked_for(self.data, None, None)
@@ -849,19 +851,19 @@ class AgricultureFourMeasured(unittest.TestCase):
     def test_marked_terminals_correct_all_three_real_landings(self):
         spots = [("terminal", *self.C), ("terminal", *self.A), ("terminal", *self.B)]
         for ship, heading in (((79.0, -162.0), 240.5), ((60.0, -155.0), 239.0), ((79.0, -162.0), 242.0)):
-            seed = settlement_track.pad_calibration("agriculture_4", self.pad, heading, ship, 9.45, -94.41, 1104864.0, scale=0.37)
-            cal, matched, missing = settlement_track.refine_calibration(seed, self.data, spots)
+            seed = settlement_track.pad_calibration("agriculture_4", self.pad, heading, ship, 9.45, -94.41, 1104864.0, scale=self.pad["scale"])
+            cal, matched, missing = settlement_track.refine_calibration(seed, self.data, spots, ship)
             self.assertEqual((matched, missing), (3, 0))                      # C was a terminal the map lacked; it is on the map now (0.96.30)
-            for stop, terminal in ((self.A, (840, 446)), (self.B, (962, 156))):
+            for stop, terminal in ((self.A, (845, 392)), (self.B, (962, 156))):
                 x, y = cal.from_world(*stop)
                 self.assertLess(math.hypot(x - terminal[0], y - terminal[1]), 8.0)
             cx, cy = cal.from_world(*self.C)
-            self.assertLess(math.hypot(cx - 531, cy - 1137), 12.0)            # the same place every time
+            self.assertLess(math.hypot(cx - 548, cy - 957), 12.0)             # the same place every time
 
     def test_not_enough_or_not_apart_means_no_correction(self):
-        seed = settlement_track.pad_calibration("agriculture_4", self.pad, 240.5, self.PAD, 9.45, -94.41, 1104864.0, scale=0.37)
+        seed = settlement_track.pad_calibration("agriculture_4", self.pad, 240.5, self.PAD, 9.45, -94.41, 1104864.0, scale=self.pad["scale"])
         self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", *self.A)]))
-        self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", *self.C), ("terminal", *self.A)]))     # only one is on the map
+        self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", 150.0, -300.0), ("terminal", *self.A)]))     # only one is on the map
         self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", 25.0, 25.0), ("terminal", 27.0, 30.0)]))   # too close together
 
 

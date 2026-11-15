@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.31 - yellow (outside) terminals only
+
+`settlement_solve.features` has `outside` (terminal_l0 = the yellow icons); `settlement_track.outside_features` uses them for matching marks when a map has two or more (Agriculture 4 has two: (962,156) and (845,392)). `refine_calibration` records which marks sit on which terminals (`assign`) and calls two answers different only when those differ (neighbouring turns and sizes of one answer are not a rival). tools/add_marked_terminals.py: `--rescale` re-measures with sizes 0.28 to 0.52; replaces an existing `scale`. Agriculture 4 from Ben's ZIP (A (25,25) -> (845,392), B (24,141.5) -> (962,156), ship (79,-162) on the pad): 0.442 m per unit, turn 27; the old fit (840,446), a blue terminal, gave 0.37. Pad check: picture pad 458 wide = 213 m at 0.465. Data: scale 0.44, pad frame (763,824) facing 267, pad outline centre (767,866), new terminal (548,957) marked 4x, bounds 1040.
+
 ## 0.96.30 - mark spot ship; tools/add_marked_terminals.py
 
 `feature_of` knows 'ship'; `on_mark` keeps `anchors['ship']`. `refine_calibration` takes `turns`, `scales`, `shift` and `accept`. The tool: `gather` (marks of visits whose map was known, plus each visit's first trail point and any 'ship' marks as ship positions), `distinct` (same place within 6 m, counted by number of marks), `solve` (every turn, the map's own size +-5% or 0.28 to 0.46, `pad_check` rejects answers that put the ship off its Medium/Large pad by more than 25 m, which removes the half-turn twin), then new terminals (marked 2 or more times, within 350 units of the picture) and a size when the map has none and it is clear. Written into the map's own text so the layout and git diff stay small. Run on Ben's 15 Nov ZIPs: Agriculture 4, 2 marks match, 0.370 m per unit, turn 23 degrees, new terminal at (535, 1141), marked 3x. tests/test_add_marked_terminals.py.

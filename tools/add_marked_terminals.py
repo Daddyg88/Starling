@@ -121,10 +121,10 @@ def on_pad(pad, x, y, scale, margin_metres=25.0):
     return abs(along) <= (length / 2.0 + margin_metres) / scale and abs(across) <= (width / 2.0 + margin_metres) / scale
 
 
-def solve(data, places, ships=None):
+def solve(data, places, ships=None, rescale=False):
     spots = [("terminal", e, n) for e, n, _ in places]
     own = data.get("scale")
-    scales = (float(own) * 0.95, float(own), float(own) * 1.05) if own else tuple(round(0.28 + 0.01 * i, 3) for i in range(0, 19))
+    scales = (float(own) * 0.95, float(own), float(own) * 1.05) if own and not rescale else tuple(round(0.28 + 0.005 * i, 3) for i in range(0, 49))
     seed = settlement_track.Calibration(data["id"], 1.0, 0.0, 0.0, 0.0, 1.0, {})
     return settlement_track.refine_calibration(seed, data, spots, None, turns=range(0, 360), scales=scales, shift=None, accept=pad_check(data, ships))
 
@@ -145,11 +145,14 @@ def add_markers(path, new_markers, bounds):
     path.write_text(text, encoding="utf-8")
 
 
-def set_scale(path, scale):
+def set_scale(path, scale, replace=False):
     text = path.read_text(encoding="utf-8")
-    if '"scale"' in text.split('"markers"')[0]:
-        return False
-    text = text.replace('"credit"', '"scale": %s,\n "credit"' % scale, 1)
+    if re.search(r'^ "scale": [0-9.]+,$', text, re.M):
+        if not replace:
+            return False
+        text = re.sub(r'^ "scale": [0-9.]+,$', ' "scale": %s,' % scale, text, count=1, flags=re.M)
+    else:
+        text = text.replace('"credit"', '"scale": %s,\n "credit"' % scale, 1)
     json.loads(text)
     path.write_text(text, encoding="utf-8")
     return True
@@ -159,6 +162,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("files", nargs="+", help="diagnostics ZIPs (or settlement_samples.json files)")
     parser.add_argument("--write", action="store_true", help="change the map files (default: only show)")
+    parser.add_argument("--rescale", action="store_true", help="measure the map's size again even when the map already has one (and replace it)")
     parser.add_argument("--once", action="store_true", help="add a terminal marked in one visit only")
     args = parser.parse_args(argv)
     maps = SettlementMaps()
@@ -177,13 +181,13 @@ def main(argv=None):
             continue
         places = distinct(marks)
         print("\n%s: %d marked places (%s)" % (map_id, len(places), ", ".join("marked %dx" % n for _, _, n in places)))
-        found = solve(data, places, ship_of.get(map_id))
+        found = solve(data, places, ship_of.get(map_id), args.rescale)
         if found is None:
             print("  no clear answer (fewer than two marks match map terminals 60 m or more apart, or two answers fit about as well). Nothing changed.")
             continue
         cal, matched, missing = found
         print("  %d match map terminals, %d do not; %.3f m per map unit, turned %.0f degrees" % (matched, missing, abs(cal.a), cal.turn_degrees()))
-        feats = [(float(m["x"]), float(m["y"])) for m in data.get("markers", []) if str(m.get("type", "")).startswith("terminal")]
+        feats = settlement_track.outside_features(data)["terminal"]
         new = []
         for east, north, visits in places:
             x, y = cal.from_world(east, north)
@@ -198,7 +202,7 @@ def main(argv=None):
             if sure and ok:
                 new.append((round(x), round(y)))
         scale = round(abs(cal.a), 3)
-        needs_scale = "scale" not in data and abs(scale - 0.325) > 0.325 * 0.02 and (matched >= 3 or max(
+        needs_scale = ("scale" not in data or args.rescale) and abs(scale - float(data.get("scale") or 0.325)) > 0.01 and (matched >= 3 or max(
             math.hypot(a[0] - b[0], a[1] - b[1]) for a in places for b in places) >= 100)
         if needs_scale:
             print("  this map's size looks like %s (the shared one is 0.325)" % scale)
@@ -212,7 +216,7 @@ def main(argv=None):
                 nb = [int(math.floor(v)) if i < 2 else int(math.ceil(v)) for i, v in enumerate(nb)]
                 add_markers(path, new, nb if nb != [int(bx0), int(by0), int(bx1), int(by1)] else None)
                 print("  added %d terminal(s) to %s" % (len(new), path.name))
-            if needs_scale and set_scale(path, scale):
+            if needs_scale and set_scale(path, scale, args.rescale):
                 print("  wrote scale %s to %s" % (scale, path.name))
     return 0
 
