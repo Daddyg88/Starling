@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.22 - Plan written down (no app change)
+
+**What to do:** nothing yet. Next: draw a magenta arrow on each picture's pad (where it has no yellow chevrons), pointing the way the ship's nose faces. Then at each base mark the power regulator and alarm, then about four terminals. The full plan is in docs/TODO.md.
+
 ## 0.96.21 - The ZIP says which map was on screen
 
 **What to do:** at each base, step out and, if she asks, name the layout ("show settlement map Extraction 1"). Then say "mark spot terminal" at about 4 spread-out terminals, and at any terminal the picture does not show. Send me the ZIP with the base name. You will not notice any change on screen.
