@@ -89,6 +89,18 @@ class RecorderTests(unittest.TestCase):
         for said in ("mark", "what is the next jump", "market spot"):
             self.assertIsNone(self.rec.try_handle(said))
 
+    def test_the_map_on_screen_is_written_into_the_visit_and_each_mark(self):
+        self.rec.on_entry(APPROACH)
+        self.state.status_flags2 = 1
+        self.rec.layout_provider = lambda: "extraction_3"
+        self.rec.try_handle("mark spot terminal")
+        visit = self.saved()[0]
+        self.assertEqual(visit["marks"][0]["map"], "extraction_3")
+        self.assertEqual(visit["settlement"]["map_shown"], "extraction_3")
+        self.rec.layout_provider = lambda: 1 / 0                 # a broken provider must not stop recording
+        self.assertEqual(self.rec.try_handle("mark spot terminal two"), "Marked terminal two.")
+        self.assertIsNone(self.saved()[0]["marks"][1]["map"])
+
     def test_leaving_ends_the_visit_and_the_file_survives_a_restart(self):
         self.rec.on_entry(APPROACH)
         self.rec.on_entry({"event": "SupercruiseEntry"})

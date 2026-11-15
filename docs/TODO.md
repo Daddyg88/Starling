@@ -5,6 +5,8 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.21 VISIT ROUTINE (Ben, 15 Nov): at each base step out, name the layout if she asks, "mark spot terminal" at ~4 spread-out terminals plus any the picture misses, send the ZIP with the base name. A tool to read marks and add missing terminals to maps/settlements/<layout>.json is NOT BUILT yet (radar alone is too noisy: tested 15 Nov, no better than random). Check 'map_shown' and each mark's 'map' appear in the ZIP.
+- [ ] LAYOUT CHECKLIST. Certain by economy + pads (16): agriculture_4, extraction_3 (marks 14 Nov), extraction_4, extraction_5, high_tech_1, high_tech_4, industrial_1, industrial_3, industrial_4, military_1, military_2, military_4, tourist_1, tourist_2, tourist_3, tourist_4. Pairs she cannot separate (12): agriculture_2/5, agriculture_1/3, extraction_1/2, high_tech_2/3, industrial_2/5, military_3/5. Visit the pairs first; the certain ones only if the arrow fails.
 - [ ] 0.96.20: all 28 maps now use Grok picture outlines. Check busy maps (High Tech 2 about 1,780 lines, Military 5 about 1,530) for slowness, and Tourist 3 (guide icons rough, fit about 6 px).
 - [ ] 0.96.19: check the 11 picture maps read well without the orange boxes (Ben asked for only the Grok lines 14 Nov). When a new Grok picture is added to a map, also add "pictured": true to that map file.
 - [ ] 0.96.18: look at the new outlines for Agriculture 3 and Extraction 1-5 (busy? slow?). Done from pictures: Agriculture 1-4, Extraction 1-5 (Tourist 1 and 2 earlier too). All maps are now from pictures (0.96.20).

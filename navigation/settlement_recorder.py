@@ -46,6 +46,7 @@ class SettlementRecorder:
         self._last_save = 0.0
         self._dirty = False
         self.mark_hook = None            # (label, here) -> extra sentence: the map tracker uses marks to line the map up
+        self.layout_provider = None      # () -> the map id on screen (the one you named, or her suggestion), written into the visit and each mark
         self._lock = threading.Lock()
         self._load()
 
@@ -71,7 +72,20 @@ class SettlementRecorder:
             except OSError:
                 log.exception("Could not save the settlement samples")
 
+    def _layout(self):
+        """The map on screen right now (None when unknown); a failure here must never stop recording."""
+        if self.layout_provider is None:
+            return None
+        try:
+            return self.layout_provider() or None
+        except Exception:
+            return None
+
     def _touch(self, force=False):
+        if self.current is not None:
+            shown = self._layout()
+            if shown and self.current.get("settlement", {}).get("map_shown") != shown:
+                self.current.setdefault("settlement", {})["map_shown"] = shown      # which layout she was showing (you named it, or her suggestion)
         self._dirty = True
         if force or self.clock() - self._last_save >= SAVE_SECONDS:
             self.save()
@@ -188,7 +202,8 @@ class SettlementRecorder:
         if here is None:
             return "I do not have your position yet, so I did not mark that spot."
         label = (found.group(1) or "").strip() or "spot %d" % (len(self.current["marks"]) + 1)
-        self.current["marks"].append({"label": label, "time": self.stamp(), **here, "on_foot": bool(getattr(self.state_provider(), "status_flags2", 0) & 1)})
+        self.current["marks"].append({"label": label, "time": self.stamp(), **here, "on_foot": bool(getattr(self.state_provider(), "status_flags2", 0) & 1),
+                                      "map": self._layout()})
         self._touch(force=True)
         extra = None
         if self.mark_hook is not None:

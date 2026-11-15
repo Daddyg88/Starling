@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.21 - The ZIP says which map was on screen
+
+**What to do:** at each base, step out and, if she asks, name the layout ("show settlement map Extraction 1"). Then say "mark spot terminal" at about 4 spread-out terminals, and at any terminal the picture does not show. Send me the ZIP with the base name. You will not notice any change on screen.
+
+**Where it lives:** navigation/settlement_recorder.py (layout_provider) and core/app.py. Not tested in the real game.
+
 ## 0.96.20 - All 28 maps use the picture outlines
 
 **What to do:** open the settlement map at any base (especially a High Tech 2 or Military 5 one, the busiest). You should see the thin bright-orange outline, icons and labels. If it is slow or too busy, tell me which base.

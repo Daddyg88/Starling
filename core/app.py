@@ -166,6 +166,7 @@ class App:
             self.settlement_tracker = SettlementTracker(lambda: self.state, self.settlement_maps, self.settlement_view)
             self.processor.raw_listeners.append(self.settlement_tracker.on_entry)
             self.settlement_recorder.mark_hook = self.settlement_tracker.on_mark
+            self.settlement_recorder.layout_provider = lambda: (self.settlement_tracker.settlement or {}).get("map") or self.settlement_view.current
         except Exception:
             self.log.exception("The settlement recorder could not start")
             self.settlement_recorder = self.settlement_tracker = None
