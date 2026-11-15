@@ -1,3 +1,4 @@
+import cmath
 import math
 import tempfile
 import unittest
@@ -572,6 +573,8 @@ class LinedUpFromTheLanding(Setup):
         self.land()
         self.tracker._check_stop(900.0, 900.0)            # far outside the settlement
         self.tracker._check_stop(-900.0, 900.0)
+        self.assertIsNotNone(self.tracker.calibration)    # a landing-only line-up is rough: two misses are not enough (0.96.29)
+        self.tracker._check_stop(900.0, -900.0)
         self.assertIsNone(self.tracker.calibration)
         self.assertNotIn("4365483779", self.tracker.saved)
         self.assertTrue(any("taken it back" in line for line in said))
@@ -713,6 +716,44 @@ class LinedUpFromThePadArrow(Setup):
         self.assertEqual(self.tracker.calibration.meta["how"], "dock")
 
 
+class MarkedTerminalsCorrectTheLanding(LinedUpFromThePadArrow):
+    """0.96.29: the landing line-up is rough, so terminals you MARK correct it (and a terminal the map lacks is not held against it)."""
+
+    def test_marked_terminals_correct_a_rough_landing_line_up(self):
+        from navigation import settlement_solve
+        said = []
+        self.tracker.say = said.append
+        self.land(pad=1, heading=253.0)
+        rough = self.tracker.calibration
+        self.assertEqual(rough.meta["how"], "dock")
+        # the truth: the map is turned 12 degrees more about the ship, and the ship sat 15 m away from where the arrow says
+        ship = complex(*self.tracker.anchors["pad"])
+        a = rough.a * cmath.exp(1j * math.radians(12))
+        t = ship - a * ((ship - rough.t) / rough.a) + complex(9, 12)
+        terminals = settlement_solve.features(self.maps.get("industrial_2"))["terminal"]
+        pick = [p for p in terminals if p in ((1180.0, 28.0), (570.0, 315.0), (897.0, 577.0))]
+        self.assertEqual(len(pick), 3)
+        for x, y in pick:
+            w = t + a * complex(x, -y)
+            lat = self.tracker.settlement["lat"] + math.degrees(w.imag / RADIUS)
+            lon = self.tracker.settlement["lon"] + math.degrees(w.real / (RADIUS * math.cos(math.radians(self.tracker.settlement["lat"]))))
+            said.append(self.tracker.on_mark("terminal", here(lat, lon)))
+        cal = self.tracker.calibration
+        self.assertEqual(cal.meta["how"], "refined")
+        self.assertFalse(self.tracker.provisional)
+        for x, y in pick:
+            w = t + a * complex(x, -y)
+            mx, my = cal.from_world(w.real, w.imag)
+            self.assertLess(math.hypot(mx - x, my - y), 12.0, (x, y))
+        self.assertTrue(any("terminals you marked" in str(line) for line in said))
+
+    def test_one_marked_terminal_changes_nothing(self):
+        self.land(pad=1)
+        self.tracker.on_mark("terminal", here(*TERMINALS[0][0]))
+        self.assertEqual(self.tracker.calibration.meta["how"], "dock")
+        self.assertTrue(self.tracker.provisional)
+
+
 class SameLayoutDifferentSettlements(Setup):
     def test_peng_and_makubuya_are_known_to_be_industrial_2(self):
         known = settlement_track.known_settlements()
@@ -804,3 +845,21 @@ class AgricultureFourMeasured(unittest.TestCase):
         self.assertEqual(other, (settlement_solve.LOCKED_SCALES, settlement_solve.LOCKED_RANGE))
         free = settlement_solve.locked_for(self.data, None, None)
         self.assertEqual(free, (None, None))              # the any-size pass is left alone
+
+    def test_marked_terminals_correct_all_three_real_landings(self):
+        spots = [("terminal", *self.C), ("terminal", *self.A), ("terminal", *self.B)]
+        for ship, heading in (((79.0, -162.0), 240.5), ((60.0, -155.0), 239.0), ((79.0, -162.0), 242.0)):
+            seed = settlement_track.pad_calibration("agriculture_4", self.pad, heading, ship, 9.45, -94.41, 1104864.0, scale=0.37)
+            cal, matched, missing = settlement_track.refine_calibration(seed, self.data, spots)
+            self.assertEqual((matched, missing), (2, 1))                      # C is a terminal the map does not have
+            for stop, terminal in ((self.A, (840, 446)), (self.B, (962, 156))):
+                x, y = cal.from_world(*stop)
+                self.assertLess(math.hypot(x - terminal[0], y - terminal[1]), 8.0)
+            cx, cy = cal.from_world(*self.C)
+            self.assertLess(math.hypot(cx - 531, cy - 1137), 12.0)            # the same place every time
+
+    def test_not_enough_or_not_apart_means_no_correction(self):
+        seed = settlement_track.pad_calibration("agriculture_4", self.pad, 240.5, self.PAD, 9.45, -94.41, 1104864.0, scale=0.37)
+        self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", *self.A)]))
+        self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", *self.C), ("terminal", *self.A)]))     # only one is on the map
+        self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", 25.0, 25.0), ("terminal", 27.0, 30.0)]))   # too close together

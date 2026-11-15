@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.29 - marked terminals correct the landing line-up
+
+`refine_calibration(seed, data, spots, ship)` in navigation/settlement_track.py: for turns of +-30 degrees about the pad (1 degree steps), sizes of -5%, 0 and +5%, and every way of putting a marked terminal on a map terminal, the ship's spot may move 60 m; keeps the answer with most marked spots within 22 map units of a map terminal (at least two, 60 m apart). A second really different answer (6 degrees or 15 m away) that is about as good means no answer. `_refine_from_marks` runs on every mark while the landing line-up is still provisional; the result is saved for the settlement and marked 'refined'. `_check_stop`: a landing line-up is taken back after three misses (was two). Real data: Ben's ZIP 15 Nov 13:24, three landings (ship (79,-162)/(60,-155), headings 240/239/242) with marks A (25,25), B (24,141.5), C (21,-255) all give 0.37 m per unit, turn 23, A on (840,446), B on (962,156), C at about (531,1137). Tests in tests/test_settlement_track.py.
+
 ## 0.96.28 - pads at the wiki's real size
 
 `PAD_METRES` (Large 213x128, Medium 150x90, Small 66x55 m) and `pad_corners` in navigation/settlement_maps.py draw a pad rectangle at the map's own scale (`scale`, else 0.325) with the long side along `facing`; `pad_outline_pieces` keeps only the part outside the picture. Industrial 4: the rectangle's bottom edge lands at y about 235 against the picture's visible edge at 224, which supports Ben's original arrow (y 38); Industrial 4 and Extraction 2 ship points are back to his arrows. Agriculture 4's ship spot (774, 967) stays (from the terminal fit); its pad rectangle is centred (767, 894).

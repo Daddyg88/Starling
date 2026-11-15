@@ -33,6 +33,10 @@ SHOW_WITHIN_METRES = 700.0           # the map pops up when you are on foot this
 ARRIVED_METRES = 6.0                 # the arrow goes away when you are this close to what it points at
 DOCK_TRUST_UNITS = 50.0              # a line-up made from the landing alone is looser (the ship's heading wobbles 5 to 8 degrees), so a stop fits within this
 TRUST_UNITS = 30.0                   # a later stop this close (map units, about 10 m) to a terminal, the power regulator or the alarm fits the line-up
+REFINE_MATCH_UNITS = 22.0            # a marked terminal this close (map units, about 8 m) to a terminal on the map counts as that terminal
+REFINE_TURN_DEGREES = 30            # the landing line-up's turn is rough (the ship's heading wobbles); the marks may correct it by this much
+REFINE_SHIFT_METRES = 60.0          # ... and the ship's spot on the pad by this much (a Large pad is 213 m by 128 m)
+REFINE_APART_METRES = 60.0          # the matched terminals must be at least this far apart, or the turn is not pinned down
 SAME_SPOT_METRES = 6.0               # two spots of the same kind closer than this are one spot
 DWELL_SECONDS = 6.0                  # standing still this long on foot = using a terminal (real visits: 6-10 s at each terminal)
 STILL_METRES = 2.5
@@ -209,6 +213,60 @@ def fit(pairs):
     t = wc - a * zc
     rms = math.sqrt(sum(abs(wi - (a * zi + t)) ** 2 for zi, wi in zip(z, w)) / len(z))
     return a, t, rms
+
+
+def refine_calibration(seed, data, spots, ship=None):
+    """Corrects a rough landing line-up with the terminals you MARKED (they are the trusted ones). Tries small turns and size changes around the
+    landing line-up, and for each every way of putting a marked spot on a map terminal; keeps the answer that puts the most marked spots on
+    map terminals (within REFINE_MATCH_UNITS). A marked spot with no terminal near it is simply a terminal the map does not have yet: it does
+    not count against the answer. `ship` is where the ship sat (metres east, north): the turn is corrected about the pad, and the ship's spot
+    on the pad may move by REFINE_SHIFT_METRES. Returns (calibration, matched, unmatched) or None when there is no single clear answer: fewer than two
+    matched, matched ones too close together, or a second, different answer that is about as good."""
+    feats = settlement_solve.features(data)
+    marked = [(kind, complex(east, north)) for kind, east, north in spots if kind in ("terminal", "power", "alarm") and feats.get(kind)]
+    if len(marked) < 2:
+        return None
+    s0, phase0 = abs(seed.a), cmath.phase(seed.a)
+    ship_w = complex(*ship) if ship is not None else None
+    z_pad = (ship_w - seed.t) / seed.a if ship_w is not None else 0j          # where the ship sits on the picture
+    found = []                                                 # (matched, error, turn, a, t, matched_spots)
+    for scale in (s0 * 0.95, s0, s0 * 1.05):
+        for turn in range(-REFINE_TURN_DEGREES, REFINE_TURN_DEGREES + 1):
+            a = cmath.rect(scale, phase0 + math.radians(turn))
+            tried = []
+            for kind, w in marked:
+                for u, v in feats[kind]:
+                    t = w - a * complex(u, -v)
+                    moved = abs(t + a * z_pad - ship_w) if ship_w is not None else abs(t - seed.t)
+                    if moved > REFINE_SHIFT_METRES or any(abs(t - other) < 1.0 for other in tried):
+                        continue
+                    tried.append(t)
+                    used, error, hits = set(), 0.0, []
+                    for index, (k2, w2) in enumerate(marked):
+                        z = (w2 - t) / a
+                        options = [(math.hypot(z.real - p, -z.imag - q), number) for number, (p, q) in enumerate(feats[k2]) if (k2, number) not in used]
+                        if not options:
+                            continue
+                        d, number = min(options)
+                        if d <= REFINE_MATCH_UNITS:
+                            used.add((k2, number))
+                            error += d
+                            hits.append(w2)
+                    if len(hits) >= 2 and max(abs(x - y) for x in hits for y in hits) >= REFINE_APART_METRES:
+                        found.append((len(hits), error, turn, a, t, hits))
+    if not found:
+        return None
+    found.sort(key=lambda r: (-r[0], r[1]))
+    best = found[0]
+    for other in found[1:]:
+        if other[0] < best[0]:
+            break
+        apart = abs(cmath.phase(other[3] / best[3])) > math.radians(6) or abs(other[4] - best[4]) > 15.0       # a really different answer
+        if apart and other[1] <= best[1] * 1.25 + 8:
+            return None                                       # it fits about as well: not clear
+    cal = Calibration(seed.map_id, best[3], best[4], seed.ref_lat, seed.ref_lon, seed.radius,
+                      {"name": seed.meta.get("name"), "n": best[0], "err": round(best[1] / best[0], 1), "how": "refined"})
+    return cal, best[0], len(marked) - best[0]
 
 
 class Calibration:
@@ -532,7 +590,8 @@ class SettlementTracker:
         point = world_xy(here["lat"], here["lon"], s["lat"], s["lon"], radius)
         self.anchors[feature] = point
         self._add_spot(feature, point)
-        return self._line_up()
+        refined = self._refine_from_marks()
+        return refined or self._line_up()
 
     def _add_spot(self, kind, point):
         for other, east, north in self.spots:
@@ -739,8 +798,31 @@ class SettlementTracker:
         else:
             self.checks[1] += 1
             log.info("Settlement: a later stop is %.0f map units from any terminal (%d fit, %d do not)", near, *self.checks)
-            if self.checks[1] >= 2 and self.checks[1] > self.checks[0]:
+            need = 3 if cal.meta.get("how") == "dock" else 2          # a landing-only line-up is rough, and a terminal the map lacks looks like a miss
+            if self.checks[1] >= need and self.checks[1] > self.checks[0]:
                 self._take_back()
+
+    def _refine_from_marks(self):
+        """The landing line-up is rough (where on the pad the ship sat, the ship's heading). Terminals you MARK are trusted, so once two of them
+        match terminals on the map the line-up is corrected to them and the walk no longer has to prove it. Returns a sentence or None."""
+        cal, s = self.calibration, self.settlement
+        if cal is None or s is None or not self.provisional or cal.meta.get("how") != "dock":
+            return None
+        data = self.maps.get(cal.map_id)
+        if data is None:
+            return None
+        found = refine_calibration(cal, data, self.spots, self.anchors.get("pad"))
+        if found is None:
+            return None
+        new, matched, missing = found
+        self.calibration, self.provisional, self.checks = new, False, [matched, 0]
+        self.saved[s["market"]] = new.to_json()
+        self._save()
+        self.view.position = None
+        log.info("Settlement map %s corrected by your marked terminals: %d match the map, %d are not on it (%.3f m per unit, turned %.0f degrees, "
+                 "was turned %.0f)", new.map_id, matched, missing, abs(new.a), new.turn_degrees(), cal.turn_degrees())
+        extra = " %d of your marks are not on the map yet." % missing if missing else ""
+        return "I have lined the map up on the terminals you marked.%s" % extra
 
     def _take_back(self):
         """The three-stop line-up was probably wrong: forget it and start collecting stops again."""
