@@ -757,6 +757,28 @@ class MarkedTerminalsCorrectTheLanding(LinedUpFromThePadArrow):
 class RoughLandingLineUpsAreNotKept(MarkedTerminalsCorrectTheLanding):
     """0.96.33: Ben's ZIP of 15 Nov showed a remembered rough landing line-up (made with an older map size) being reused, so the corrections never came."""
 
+    def test_a_rough_landing_line_up_survives_a_few_near_misses_but_not_a_far_one(self):
+        self.land(pad=1)
+        self.assertEqual(self.tracker.calibration.meta["how"], "dock")
+        cal = self.tracker.calibration
+        calls = []
+        self.tracker._take_back = lambda: calls.append(1)
+        original = settlement_track.settlement_solve.features
+        try:
+            settlement_track.settlement_solve.features = lambda data: {"stop": [(0.0, 0.0)]}
+            for n in range(5):                                             # 5 stops about 100 map units from any terminal
+                self.tracker._check_stop(*self.far_world(cal, 100.0))
+            self.assertEqual(calls, [])
+            self.tracker._check_stop(*self.far_world(cal, 300.0))          # one far miss: probably the wrong layout
+            self.assertEqual(len(calls), 1)
+        finally:
+            settlement_track.settlement_solve.features = original
+
+    @staticmethod
+    def far_world(cal, units):
+        w = cal.t + cal.a * complex(units, 0.0)                            # a place `units` map units from the map origin (the one fake terminal)
+        return (w.real, w.imag)
+
     def test_a_remembered_landing_only_line_up_is_ignored(self):
         self.land(pad=1)
         rough = self.tracker.calibration.to_json()

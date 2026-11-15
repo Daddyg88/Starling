@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.39 - rough line-ups are not taken back so fast
+
+ZIP 15 Nov 22:28: Agnihotri, marks ship + 3 terminals. Live log: misses 65/114/84 -> map taken back at 22:27:35, third mark at 22:27:37 had no map to correct. Replay offline with the three marks gives 3 match at 0.408, so the solver was fine. Rule in settlement_track._check_stop: dock line-up need = 3 misses if the worst miss >= DOCK_WRONG_UNITS (200), else 6. Peng Synthetics Foundry (industrial_2): marks once each fit 0.435 turn -147, but Shi Construction real data fits 0.325 on the same layout: left alone.
+
 ## 0.96.38 - Agriculture 1 at 0.43
 
 ZIP 15 Nov 19:01 (0.96.37): marks at 18:58, 18:58, 18:59 plus 'mark spot ship'. Log: 'corrected by your marked terminals: 2 match, 0.434 per unit, turned -137'. Offline fits of the 3 marks: yellow only 0.434 (residual 10-14 m), mixed yellow/blue 0.412 (5 m). Map set to 0.43 so both sit inside the live search range.

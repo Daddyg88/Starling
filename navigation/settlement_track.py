@@ -33,6 +33,7 @@ SHOW_WITHIN_METRES = 700.0           # the map pops up when you are on foot this
 ARRIVED_METRES = 6.0                 # the arrow goes away when you are this close to what it points at
 DOCK_TRUST_UNITS = 50.0              # a line-up made from the landing alone is looser (the ship's heading wobbles 5 to 8 degrees), so a stop fits within this
 TRUST_UNITS = 30.0                   # a later stop this close (map units, about 10 m) to a terminal, the power regulator or the alarm fits the line-up
+DOCK_WRONG_UNITS = 200.0                  # a landing line-up whose later stops miss by this much is probably the wrong layout
 REFINE_MATCH_UNITS = 22.0            # a marked terminal this close (map units, about 8 m) to a terminal on the map counts as that terminal
 REFINE_TURN_DEGREES = 30            # the landing line-up's turn is rough (the ship's heading wobbles); the marks may correct it by this much
 REFINE_SHIFT_METRES = 60.0          # ... and the ship's spot on the pad by this much (a Large pad is 213 m by 128 m)
@@ -836,7 +837,11 @@ class SettlementTracker:
         else:
             self.checks[1] += 1
             log.info("Settlement: a later stop is %.0f map units from any terminal (%d fit, %d do not)", near, *self.checks)
-            need = 3 if cal.meta.get("how") == "dock" else 2          # a landing-only line-up is rough, and a terminal the map lacks looks like a miss
+            if cal.meta.get("how") == "dock":
+                cal.meta["worst"] = max(float(cal.meta.get("worst") or 0.0), near)
+            # a landing-only line-up is rough (the ship can sit 50 m from the pad centre), so a few near misses are normal: it is taken back after
+            # 3 misses when one was far off (200+ units: a wrong layout), otherwise only after 6
+            need = (3 if float(cal.meta.get("worst") or 0.0) >= DOCK_WRONG_UNITS else 6) if cal.meta.get("how") == "dock" else 2
             if self.checks[1] >= need and self.checks[1] > self.checks[0]:
                 self._take_back()
 
