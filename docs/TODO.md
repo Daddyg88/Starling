@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.37: 'mark it' = mark a terminal (on foot at a settlement only; else pings). CHECK it saves, and does not break the on-foot ping elsewhere. Idea not built: with ONE mark, snap the landing line-up to the single nearest yellow terminal when it is unambiguous.
 - [ ] 0.96.35: 'mark stop terminal' / 'mark, stop ship' now save like 'mark spot ...'. Revisit Agriculture 1 and mark two yellow terminals 100 m+ apart.
 - [ ] 0.96.36: Agriculture 1 measured at 0.413 from 3 marks over 2 visits (turn -137). CHECK: land there, arrow on the yellow terminals; new terminal at (1019,350). (0.96.34 was a provisional 0.435.) Next Agriculture 1 visit: mark two yellow terminals 100 m+ apart. Pad arrows seem to read about 8 degrees high (Agriculture 4: 274 vs 267, Agriculture 1: 97 vs 88): if a third layout agrees, shift all arrows. Layouts done: Agriculture 4 and Agriculture 1; 26 to go.
 - [ ] 0.96.33: no more remembered rough landing line-ups; marks correct a landing line-up any time; corrected line-ups carry a map stamp. When Starling is started AFTER landing there is no landing to line up from: mark three terminals (yellow ones) and the solver does it. Idea if wanted: use the first on-foot spot as the ship and the Location heading as the ship's heading.

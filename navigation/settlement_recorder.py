@@ -27,6 +27,7 @@ SAVE_SECONDS = 30.0
 STARTS = ("ApproachSettlement",)
 QUIET_EVENTS = ("Music", "ReceiveText", "SendText", "Status", "Cargo", "Backpack", "ShipLockerMaterials", "NavRoute", "FuelScoop", "ReservoirReplenished")
 ENDS = ("SupercruiseEntry", "FSDJump", "Shutdown")
+_MARK_IT = re.compile(r"^marks? it$")                  # "mark it" = "mark spot terminal"; only at a settlement, on foot (elsewhere it still pings)
 _MARK = re.compile(r"^(?:mark|record|log)\s+(?:this\s+)?(?:spot|spots|stop|spock|place|position|location)(?:\s+(.+))?$")
 
 
@@ -189,11 +190,18 @@ class SettlementRecorder:
         elif self._dirty and now - self._last_save >= SAVE_SECONDS:
             self.save()
 
+    speaks_reply = True                # the runner says the answer out loud, so you hear that the mark was saved
+
     # ---- voice: "mark spot power regulator" ----
     def try_handle(self, text):
         said = re.sub(r"[^a-z ]", " ", str(text or "").lower())
         said = re.sub(r"\s+", " ", said).strip()
         found = _MARK.match(said)
+        if not found and _MARK_IT.match(said):
+            if self.current is None or not getattr(self.state_provider(), "status_flags2", 0) & 1:
+                return None                                  # not at a settlement on foot: let the on-foot "mark it" (ping) have it
+            said = "mark spot terminal"
+            found = _MARK.match(said)
         if not found:
             return None
         if self.current is None:

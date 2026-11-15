@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.37 - 'mark it' and spoken marks
+
+Helper replies were never spoken (runner._run_text finishes with speak False). The recorder now sets speaks_reply and the runner says its reply. ZIP 15 Nov 18:30: only one terminal mark was saved live (heard 'marks, top, terminal'), so the landing line-up (about 50 m out from the pad centre) was never corrected. 'mark it' is now a mark command at a settlement on foot (recorder.try_handle; elsewhere it falls through to the on-foot ping). Removed the duplicate terminal at (1019,350) from agriculture_1.json. Offline: the three marks fit terminal clusters at 0.412, turn -136; the yellow and blue icons of one terminal are about 30 units apart, so two fits are close.
+
 ## 0.96.36 - Agriculture 1 measured
 
 ZIPs 15 Nov 17:22 and 17:28: three marked yellow terminals over two visits, fits 0.413 m per unit, turn -140 and -137. Map scale 0.413, pad facing 90, extra terminal (1019,350) added (marked twice). Live line-up had tried only 0.413..0.457 around the old 0.435 so it missed; it is now centred. Twin layout Agriculture 3 is still a guess.

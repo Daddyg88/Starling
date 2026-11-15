@@ -111,6 +111,17 @@ class RunMacro(unittest.TestCase):
         self.assertEqual([h for _, h in self.rec.events if h], [0.2, 1.2])  # zoom in briefly, then hold select
         self.assertEqual(self.parts["copied"][-1], "Neutron A")             # the clipboard was filled first
 
+    def test_a_helper_that_speaks_its_reply_is_heard(self):
+        from types import SimpleNamespace
+        r = self.runner()
+        r.extra_helpers.append(SimpleNamespace(try_handle=lambda t: "Marked terminal.", speaks_reply=True))
+        r.run_text("mark it")
+        self.assertTrue(any("Marked terminal." in str(x) for x in r.speech.said))
+        r = self.runner()
+        r.extra_helpers.append(SimpleNamespace(try_handle=lambda t: "Quiet.", speaks_reply=False))
+        r.run_text("mark it")
+        self.assertFalse(any("Quiet." in str(x) for x in r.speech.said))
+
     def test_you_asking_is_answered_but_her_own_auto_plot_is_silent(self):
         r = self.runner()
         r.run_text("plot the next waypoint")

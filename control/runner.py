@@ -260,6 +260,11 @@ class CommandRunner:
                 log.debug("%r was answered by the %s helper", text, name)
                 outcome = Outcome("route", text, None, "press", detail=handled)
                 self._finish([outcome], False, text)
+                if speak and getattr(helper, "speaks_reply", False) and self.speech is not None and self.settings.get("speech.enabled", True):
+                    try:
+                        self.speech.say(text=str(handled), priority="normal", event_name="voice.command")     # so you hear that a mark was saved
+                    except Exception:
+                        log.exception("Could not say the reply of the %s helper", name)
                 return [outcome]
         matches = []
         single = None if self._brain_owns(text) else self.matcher.match(text)

@@ -89,6 +89,15 @@ class RecorderTests(unittest.TestCase):
         for said in ("mark", "what is the next jump", "market spot"):
             self.assertIsNone(self.rec.try_handle(said))
 
+    def test_mark_it_marks_a_terminal_only_on_foot_at_a_settlement(self):
+        self.assertIsNone(self.rec.try_handle("mark it"))             # no settlement: the on-foot ping keeps it
+        self.rec.on_entry(APPROACH)
+        self.state.status_flags2 = 0
+        self.assertIsNone(self.rec.try_handle("Mark it."))            # in the ship
+        self.state.status_flags2 = 1
+        self.assertEqual(self.rec.try_handle("Mark it."), "Marked terminal.")
+        self.assertEqual(self.rec.try_handle("marks it"), "Marked terminal.")
+
     def test_misheard_stop_still_marks(self):
         self.rec.on_entry(APPROACH)
         self.assertEqual(self.rec.try_handle("Mark, stop terminal."), "Marked terminal.")
