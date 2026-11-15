@@ -21,7 +21,8 @@ class Loading(unittest.TestCase):
             width, height = data["size"]
             for marker in data["markers"]:
                 self.assertIn(marker["type"], settlement_maps.COLOURS, data["id"])
-                self.assertTrue(0 <= marker["x"] <= width and 0 <= marker["y"] <= height, (data["id"], marker))
+                bx0, by0, bx1, by1 = settlement_maps.bounds(data)            # (a map may reach past its picture: 0.96.26)
+                self.assertTrue(bx0 <= marker["x"] <= bx1 and by0 <= marker["y"] <= by1, (data["id"], marker))
             self.assertTrue(data["credit"])
 
     def test_the_credit_file_is_there(self):

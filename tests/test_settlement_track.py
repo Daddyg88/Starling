@@ -851,7 +851,7 @@ class AgricultureFourMeasured(unittest.TestCase):
         for ship, heading in (((79.0, -162.0), 240.5), ((60.0, -155.0), 239.0), ((79.0, -162.0), 242.0)):
             seed = settlement_track.pad_calibration("agriculture_4", self.pad, heading, ship, 9.45, -94.41, 1104864.0, scale=0.37)
             cal, matched, missing = settlement_track.refine_calibration(seed, self.data, spots)
-            self.assertEqual((matched, missing), (2, 1))                      # C is a terminal the map does not have
+            self.assertEqual((matched, missing), (3, 0))                      # C was a terminal the map lacked; it is on the map now (0.96.30)
             for stop, terminal in ((self.A, (840, 446)), (self.B, (962, 156))):
                 x, y = cal.from_world(*stop)
                 self.assertLess(math.hypot(x - terminal[0], y - terminal[1]), 8.0)
@@ -863,3 +863,14 @@ class AgricultureFourMeasured(unittest.TestCase):
         self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", *self.A)]))
         self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", *self.C), ("terminal", *self.A)]))     # only one is on the map
         self.assertIsNone(settlement_track.refine_calibration(seed, self.data, [("terminal", 25.0, 25.0), ("terminal", 27.0, 30.0)]))   # too close together
+
+
+class ShipMark(Setup):
+    def test_mark_spot_ship_is_kept_and_not_used_to_solve(self):
+        self.arrive()
+        said = self.tracker.on_mark("ship", here(*SHIP))
+        self.assertIn("Ship spot", said)
+        self.assertIn("ship", self.tracker.anchors)
+        self.assertEqual([k for k, _, _ in self.tracker.spots if k == "ship"], [])
+        self.assertEqual(settlement_track.feature_of("my ship"), "ship")
+        self.assertEqual(settlement_track.feature_of("landing pad"), "pad")

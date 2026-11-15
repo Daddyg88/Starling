@@ -195,6 +195,8 @@ def feature_of(label):
         return "alarm"
     if said.strip() in ("pad", "landing pad", "my pad", "the pad"):
         return "pad"
+    if said.strip() in ("ship", "my ship", "the ship", "ship spot", "ship here"):
+        return "ship"
     if "terminal" in said or "kiosk" in said:
         return "terminal"
     if any(word in said for word in ("door", "airlock", "air lock", "entrance")):
@@ -215,12 +217,14 @@ def fit(pairs):
     return a, t, rms
 
 
-def refine_calibration(seed, data, spots, ship=None):
+def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, shift=REFINE_SHIFT_METRES, accept=None):
     """Corrects a rough landing line-up with the terminals you MARKED (they are the trusted ones). Tries small turns and size changes around the
     landing line-up, and for each every way of putting a marked spot on a map terminal; keeps the answer that puts the most marked spots on
     map terminals (within REFINE_MATCH_UNITS). A marked spot with no terminal near it is simply a terminal the map does not have yet: it does
     not count against the answer. `ship` is where the ship sat (metres east, north): the turn is corrected about the pad, and the ship's spot
-    on the pad may move by REFINE_SHIFT_METRES. Returns (calibration, matched, unmatched) or None when there is no single clear answer: fewer than two
+    on the pad may move by `shift` metres (None: any). `turns` (degrees) and `scales` (metres per unit) default to a small search around the
+    landing line-up; tools/add_marked_terminals.py gives it every turn and a range of sizes, and `accept(a, t)` to throw out answers that put the ship
+    off its pad. Returns (calibration, matched, unmatched) or None when there is no single clear answer: fewer than two
     matched, matched ones too close together, or a second, different answer that is about as good."""
     feats = settlement_solve.features(data)
     marked = [(kind, complex(east, north)) for kind, east, north in spots if kind in ("terminal", "power", "alarm") and feats.get(kind)]
@@ -230,17 +234,19 @@ def refine_calibration(seed, data, spots, ship=None):
     ship_w = complex(*ship) if ship is not None else None
     z_pad = (ship_w - seed.t) / seed.a if ship_w is not None else 0j          # where the ship sits on the picture
     found = []                                                 # (matched, error, turn, a, t, matched_spots)
-    for scale in (s0 * 0.95, s0, s0 * 1.05):
-        for turn in range(-REFINE_TURN_DEGREES, REFINE_TURN_DEGREES + 1):
+    for scale in (scales if scales is not None else (s0 * 0.95, s0, s0 * 1.05)):
+        for turn in (turns if turns is not None else range(-REFINE_TURN_DEGREES, REFINE_TURN_DEGREES + 1)):
             a = cmath.rect(scale, phase0 + math.radians(turn))
             tried = []
             for kind, w in marked:
                 for u, v in feats[kind]:
                     t = w - a * complex(u, -v)
                     moved = abs(t + a * z_pad - ship_w) if ship_w is not None else abs(t - seed.t)
-                    if moved > REFINE_SHIFT_METRES or any(abs(t - other) < 1.0 for other in tried):
+                    if (shift is not None and moved > shift) or any(abs(t - other) < 1.0 for other in tried):
                         continue
                     tried.append(t)
+                    if accept is not None and not accept(a, t):
+                        continue
                     used, error, hits = set(), 0.0, []
                     for index, (k2, w2) in enumerate(marked):
                         z = (w2 - t) / a
@@ -313,6 +319,7 @@ class SettlementTracker:
         self.path = path or default_path()
         self.settlement = None          # what the journal said about the settlement you are at
         self.anchors = {}               # feature -> (east, north) metres from the settlement's reference point
+        self.dock_ship = None
         self.spots = []                 # [(kind, east, north)] every place you stood at that the map can match (terminals, power...)
         self.calibration = None
         self.provisional = False        # lined up from only three stops: the next stops check it (see _check_stop)
@@ -402,6 +409,7 @@ class SettlementTracker:
         self.settlement = {"name": entry.get("Name"), "market": market, "group": GROUP_OF_ECONOMY.get(economy), "pads": None,
                            "lat": float(entry["Latitude"]), "lon": float(entry["Longitude"]), "radius": None, "map": None}
         self.anchors = {}
+        self.dock_ship = None
         self.spots = []
         self.calibration = None
         self.dismissed = False
@@ -549,6 +557,7 @@ class SettlementTracker:
             self.calibration = pad_calibration(map_id, pad, s["dock_heading"], ship, s["lat"], s["lon"], s["radius"], s.get("name"), own)
             how = "pad arrow"
         self.provisional, self.checks = True, [0, 0]
+        self.dock_ship = self.anchors.get("pad")                   # where the ship sat when it landed (the later turn is corrected about this)
         self.view.current = self.view.current or map_id
         log.info("Settlement map %s lined up from the landing (%s, ship heading %.0f): the next stops will check it", map_id, how, s["dock_heading"])
         self._speak("I have lined up the map from the way you landed. It is rough until I check it against the terminals you walk to.")
@@ -586,6 +595,10 @@ class SettlementTracker:
         radius = here.get("radius") or s.get("radius")
         if not radius:
             return None
+        if feature == "ship":                                      # "mark spot ship" when you step out: where the ship really is (kept in the ZIP, not used to solve)
+            s["radius"] = radius
+            self.anchors["ship"] = world_xy(here["lat"], here["lon"], s["lat"], s["lon"], radius)
+            return "Ship spot marked."
         s["radius"] = radius
         point = world_xy(here["lat"], here["lon"], s["lat"], s["lon"], radius)
         self.anchors[feature] = point
@@ -811,7 +824,7 @@ class SettlementTracker:
         data = self.maps.get(cal.map_id)
         if data is None:
             return None
-        found = refine_calibration(cal, data, self.spots, self.anchors.get("pad"))
+        found = refine_calibration(cal, data, self.spots, getattr(self, "dock_ship", None) or self.anchors.get("pad"))
         if found is None:
             return None
         new, matched, missing = found

@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.30: 'mark spot ship' on stepping out; send the ZIP after each visit and run `python3 tools/add_marked_terminals.py <zip>` (then `--write`) to add terminals and sizes. Agriculture 4 now has the terminal by the Large pad (535, 1141). CHECK in the real game that it shows where the terminal is.
 - [ ] 0.96.29: marked terminals correct the landing line-up (turn up to 30 degrees, ship spot up to 60 m, at least two matching marks 60 m apart). CHECK IN THE REAL GAME on Agriculture 4: land, mark the terminal between AGRI and STO, then the one outside the top AGRI; the arrow should settle on them. Marked terminals with no map terminal near them (Agriculture 4's by the Large pad, about map (531, 1137)) still need adding to the map.
 - [ ] 0.96.28: landing pads drawn at the wiki size (213x128 / 150x90 / 66x55 m). Industrial 4 and Extraction 2 ship points back to Ben's arrows. When Grok's redone pictures arrive: fit them, measure each pad's shape, compare its scale with terminal-measured scales (Agriculture 4 is 0.37).
 - [ ] 0.96.27: Agriculture 4 calibrated (0.37 m per map unit, pad ship spot (774, 967), pad facing 264). CHECK IN THE REAL GAME. Terminal C (by the Large pad, world (21, -255) from the reference point) should be added at about map (531, 1136) once a second visit confirms it. Other layouts may also be off 0.325: measure each from two terminals 100 m or more apart.
