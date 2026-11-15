@@ -147,3 +147,39 @@ class GroundOutlines(unittest.TestCase):
                 for x, y in outline:
                     self.assertTrue(-5 <= x <= data["size"][0] + 5 and -5 <= y <= data["size"][1] + 5, (path.name, x, y))
         self.assertGreaterEqual(found, 2)
+
+
+class CutOffPads(unittest.TestCase):
+    """A picture that cuts a landing pad off: the map reaches past the edge and the rest of the pad is drawn there (Ben, 15 Nov 2026)."""
+
+    def test_bounds_default_to_the_picture(self):
+        self.assertEqual(settlement_maps.bounds({"size": [200, 100]}), (0.0, 0.0, 200.0, 100.0))
+
+    def test_bounds_that_do_not_cover_the_picture_are_ignored(self):
+        self.assertEqual(settlement_maps.bounds({"size": [200, 100], "bounds": [10, 0, 150, 100]}), (0.0, 0.0, 200.0, 100.0))
+        self.assertEqual(settlement_maps.bounds({"size": [200, 100], "bounds": "junk"}), (0.0, 0.0, 200.0, 100.0))
+
+    def test_a_longer_map_keeps_its_points_in_the_right_place(self):
+        data = {"id": "x", "size": [200, 100], "bounds": [0, 0, 200, 300]}
+        project, _ = settlement_maps.projector(data, 200, 300)
+        self.assertEqual(project(100, 150), (100.0, 150.0))            # the middle of the whole area
+        self.assertEqual(project(0, 0), (0.0, 0.0))
+
+    def test_only_the_part_outside_the_picture_is_drawn(self):
+        data = {"id": "x", "size": [200, 100], "bounds": [0, 0, 200, 200], "pad_outlines": [{"x": 100, "y": 100, "half": 40, "facing": 0}]}
+        pieces = settlement_maps.pad_outline_pieces(data)
+        self.assertTrue(pieces)
+        for x1, y1, x2, y2 in pieces:
+            self.assertGreater((y1 + y2) / 2.0, 100)
+
+    def test_nothing_is_drawn_beyond_the_bounds_and_bad_pads_are_skipped(self):
+        data = {"id": "x", "size": [200, 100], "pad_outlines": [{"x": 100, "y": 150, "half": 40}, {"x": "a"}]}
+        self.assertEqual(settlement_maps.pad_outline_pieces(data), [])
+
+    def test_the_cut_off_maps_ship_in_the_game_files(self):
+        from pathlib import Path
+        for name in ("agriculture_4", "extraction_2", "industrial_4"):
+            data = json.loads((Path(__file__).resolve().parent.parent / "maps" / "settlements" / (name + ".json")).read_text(encoding="utf-8"))
+            self.assertTrue(settlement_maps.pad_outline_pieces(data), name)
+            x0, y0, x1, y1 = settlement_maps.bounds(data)
+            self.assertLessEqual(max(-y0, y1 - data["size"][1]), 400, name)         # the overlay must not shrink the map too much

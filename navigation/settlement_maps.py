@@ -81,9 +81,49 @@ class MapView:
         self.target = None          # {"x", "y", "label"}: the thing the arrow points at ("find the power plant")
 
 
+def bounds(data):
+    """(left, top, right, bottom) of what the map shows. Normally the picture (0, 0, width, height); a map whose landing pad is cut off by the
+    picture lists "bounds" that reach past the edge so the rest of the pad can be drawn there."""
+    try:
+        x0, y0, x1, y1 = (float(v) for v in data["bounds"])
+        if x1 > x0 and y1 > y0 and x0 <= 0 and y0 <= 0 and x1 >= float(data["size"][0]) and y1 >= float(data["size"][1]):
+            return x0, y0, x1, y1
+    except (KeyError, TypeError, ValueError):
+        pass
+    return 0.0, 0.0, float(data["size"][0]), float(data["size"][1])
+
+
+def pad_outline_pieces(data, step=8.0):
+    """The part of each cut-off landing pad that lies OUTSIDE the picture, as short line pieces [(x1, y1, x2, y2)]: the pad is a square of
+    'half' map units around (x, y), turned to 'facing' degrees (data["pad_outlines"], estimated; the picture shows the rest)."""
+    mw, mh = float(data["size"][0]), float(data["size"][1])
+    bx0, by0, bx1, by1 = bounds(data)
+    pieces = []
+    for pad in data.get("pad_outlines", []) or []:
+        try:
+            cx, cy, half, turn = float(pad["x"]), float(pad["y"]), float(pad["half"]), math.radians(float(pad.get("facing", 0)))
+        except (KeyError, TypeError, ValueError):
+            continue
+        spin = cmath.exp(1j * turn)
+        corners = [complex(-half, -half), complex(half, -half), complex(half, half), complex(-half, half)]
+        points = [(cx + (c * spin).real, cy - (c * spin).imag) for c in corners]       # (map y points down)
+        for i in range(4):
+            (ax, ay), (bx, by) = points[i], points[(i + 1) % 4]
+            length = math.hypot(bx - ax, by - ay)
+            count = max(1, int(length / step))
+            for k in range(count):
+                x1, y1 = ax + (bx - ax) * k / count, ay + (by - ay) * k / count
+                x2, y2 = ax + (bx - ax) * (k + 1) / count, ay + (by - ay) * (k + 1) / count
+                mx, my = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+                if not (0 <= mx <= mw and 0 <= my <= mh) and bx0 <= mx <= bx1 and by0 <= my <= by1:
+                    pieces.append((x1, y1, x2, y2))
+    return pieces
+
+
 def turned_size(data, turn):
     """The width and height of the map once it is turned by `turn` degrees (None = not turned)."""
-    mw, mh = float(data["size"][0]), float(data["size"][1])
+    x0, y0, x1, y1 = bounds(data)
+    mw, mh = x1 - x0, y1 - y0
     if not turn:
         return mw, mh
     c, s = abs(math.cos(math.radians(turn))), abs(math.sin(math.radians(turn)))
@@ -93,11 +133,11 @@ def turned_size(data, turn):
 def projector(data, width, height, turn=None):
     """Returns (project, scale): project(x, y) turns a point on the map picture into a pixel in a box of width x height.
     `turn` (degrees, anticlockwise as the compass sees it) is what puts north at the top: the picture is turned about its middle."""
-    mw, mh = float(data["size"][0]), float(data["size"][1])
+    x0, y0, x1, y1 = bounds(data)
     tw, th = turned_size(data, turn)
     scale = min(width / tw, height / th)
     spin = cmath.exp(1j * math.radians(turn)) if turn else 1
-    cx, cy = mw / 2.0, mh / 2.0
+    cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
 
     def project(x, y):
         z = complex(float(x) - cx, -(float(y) - cy)) * spin
@@ -110,8 +150,12 @@ def layout(data, width, height, turn=None):
     {"size": (w, h), "lines": [(x1, y1, x2, y2)...], "ground": [(x1, y1, x2, y2)...], "circles": [(x, y, r)...], "labels": [(text, x, y)...],
      "markers": [(x, y, colour, text)...], "credit": str, "project": function}"""
     px, scale = projector(data, width, height, turn)
-    ox, oy = (width - float(data["size"][0]) * scale) / 2.0, (height - float(data["size"][1]) * scale) / 2.0      # (only right when not turned)
+    bx0, by0, bx1, by1 = bounds(data)
+    ox, oy = (width - (bx1 - bx0) * scale) / 2.0, (height - (by1 - by0) * scale) / 2.0      # (only right when not turned)
     lines, circles, labels, markers, ground = [], [], [], [], []
+    for x1, y1, x2, y2 in pad_outline_pieces(data):          # the rest of a landing pad that the picture cuts off
+        (a, b), (c, d) = px(x1, y1), px(x2, y2)
+        ground.append((a, b, c, d))
     for outline in data.get("ground", []) or []:
         points = [px(x, y) for x, y in outline]
         if len(points) >= 3:

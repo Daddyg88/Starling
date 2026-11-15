@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.26 - the rest of a cut-off landing pad
+
+Ben's Agriculture 4 test: the blue arrow sat above the terminal between AGR and STO. The guide picture cuts the Large pad off at the bottom, so Ben's arrow midpoint (y 806 of 830) was only the visible part. navigation/settlement_maps.py: `bounds(data)` lets a map reach past the picture (projector, turned_size and layout use it); `pad_outline_pieces` draws only the part of an estimated square pad (`pad_outlines`: x, y, half, facing) outside the picture, inside the bounds. maps/pad_frames.json: the three cut-off Large pads (agriculture_4, extraction_2, industrial_4) get an estimated centre and `centre_estimated`. Agriculture 4 measured from its picture (about 458 units wide); the other two are guesses and are clipped at 350 units beyond the picture. Tests in tests/test_settlement_maps.py.
+
 ## 0.96.25 - galaxy map macro stops when the map is gone
 
 Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys after the map closed (gui0), and a jump started during one run. control/runner.py `_map_macro_problem` is checked after every wait of plot_waypoint; if the screen is the cockpit or the jump bit (30) is set, and keys other than UI_Back remain, the macro stops and returns 'failed'. Status.json unreadable never stops it. Cause of the map closing is still unknown. Tests in tests/test_plot_macro.py.

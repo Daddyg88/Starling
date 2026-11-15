@@ -40,9 +40,10 @@
   "pads": [
    {
     "size": "Large",
-    "x": 777,
-    "y": 806,
-    "facing": 274
+    "x": 767,
+    "y": 950,
+    "facing": 274,
+    "centre_estimated": true
    },
    {
     "size": "Small",
@@ -89,8 +90,9 @@
    {
     "size": "Large",
     "x": 1059,
-    "y": 19,
-    "facing": 92
+    "y": -191,
+    "facing": 92,
+    "centre_estimated": true
    },
    {
     "size": "Small",
@@ -222,9 +224,10 @@
   "pads": [
    {
     "size": "Large",
-    "x": 940,
-    "y": 38,
-    "facing": 268
+    "x": 944,
+    "y": -148,
+    "facing": 268,
+    "centre_estimated": true
    },
    {
     "size": "Small",
