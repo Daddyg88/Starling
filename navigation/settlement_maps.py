@@ -93,24 +93,38 @@ def bounds(data):
     return 0.0, 0.0, float(data["size"][0]), float(data["size"][1])
 
 
+PAD_METRES = {"Large": (213.0, 128.0), "Medium": (150.0, 90.0), "Small": (66.0, 55.0)}      # length x width (Elite Dangerous Wiki, Landing Pad)
+
+
+def pad_corners(pad, default_scale=0.325):
+    """The four corners (map units, y down) of one landing pad: a rectangle of the wiki's size for its 'size' (metres, turned into map units with the
+    map's own 'scale'), its long side along 'facing' (degrees clockwise from the top of the map). Old entries with 'half' are squares."""
+    cx, cy, turn = float(pad["x"]), float(pad["y"]), math.radians(float(pad.get("facing", 0)))
+    if "half" in pad:
+        along = across = float(pad["half"])
+    else:
+        length, width = PAD_METRES[str(pad["size"])]
+        scale = float(pad.get("scale") or default_scale)
+        along, across = length / 2.0 / scale, width / 2.0 / scale
+    ux, uy = math.sin(turn), -math.cos(turn)               # along the way the ship faces
+    vx, vy = math.cos(turn), math.sin(turn)                # across it
+    return [(cx + ux * a + vx * b, cy + uy * a + vy * b) for a, b in ((along, -across), (along, across), (-along, across), (-along, -across))]
+
+
 def pad_outline_pieces(data, step=8.0):
-    """The part of each cut-off landing pad that lies OUTSIDE the picture, as short line pieces [(x1, y1, x2, y2)]: the pad is a square of
-    'half' map units around (x, y), turned to 'facing' degrees (data["pad_outlines"], estimated; the picture shows the rest)."""
+    """The part of each cut-off landing pad that lies OUTSIDE the picture, as short line pieces [(x1, y1, x2, y2)] (data["pad_outlines"]; the
+    picture itself shows the rest of the pad), kept inside the map's bounds."""
     mw, mh = float(data["size"][0]), float(data["size"][1])
     bx0, by0, bx1, by1 = bounds(data)
     pieces = []
     for pad in data.get("pad_outlines", []) or []:
         try:
-            cx, cy, half, turn = float(pad["x"]), float(pad["y"]), float(pad["half"]), math.radians(float(pad.get("facing", 0)))
+            points = pad_corners(pad, float(data.get("scale") or 0.325))
         except (KeyError, TypeError, ValueError):
             continue
-        spin = cmath.exp(1j * turn)
-        corners = [complex(-half, -half), complex(half, -half), complex(half, half), complex(-half, half)]
-        points = [(cx + (c * spin).real, cy - (c * spin).imag) for c in corners]       # (map y points down)
         for i in range(4):
             (ax, ay), (bx, by) = points[i], points[(i + 1) % 4]
-            length = math.hypot(bx - ax, by - ay)
-            count = max(1, int(length / step))
+            count = max(1, int(math.hypot(bx - ax, by - ay) / step))
             for k in range(count):
                 x1, y1 = ax + (bx - ax) * k / count, ay + (by - ay) * k / count
                 x2, y2 = ax + (bx - ax) * (k + 1) / count, ay + (by - ay) * (k + 1) / count

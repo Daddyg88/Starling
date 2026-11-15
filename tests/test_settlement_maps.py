@@ -1,4 +1,5 @@
 import json
+import math
 import tempfile
 import unittest
 from pathlib import Path
@@ -183,3 +184,30 @@ class CutOffPads(unittest.TestCase):
             self.assertTrue(settlement_maps.pad_outline_pieces(data), name)
             x0, y0, x1, y1 = settlement_maps.bounds(data)
             self.assertLessEqual(max(-y0, y1 - data["size"][1]), 400, name)         # the overlay must not shrink the map too much
+
+
+class PadSizes(unittest.TestCase):
+    """Landing pads are drawn at the wiki's real size: Large 213 m x 128 m, Medium 150 x 90, Small 66 x 55."""
+
+    def test_a_large_pad_is_213_by_128_metres(self):
+        c = settlement_maps.pad_corners({"x": 500, "y": 500, "size": "Large", "facing": 0}, 0.5)       # 0.5 m per unit
+        sides = sorted({round(math.hypot(c[i][0] - c[(i + 1) % 4][0], c[i][1] - c[(i + 1) % 4][1])) for i in range(4)})
+        self.assertEqual(sides, [256, 426])                       # 128 m and 213 m in map units
+
+    def test_the_long_side_runs_the_way_the_ship_faces(self):
+        east = settlement_maps.pad_corners({"x": 0, "y": 0, "size": "Large", "facing": 90}, 1.0)
+        xs = [p[0] for p in east]
+        ys = [p[1] for p in east]
+        self.assertAlmostEqual(max(xs) - min(xs), 213.0, places=3)
+        self.assertAlmostEqual(max(ys) - min(ys), 128.0, places=3)
+
+    def test_the_maps_own_scale_sets_the_size(self):
+        a = settlement_maps.pad_corners({"x": 0, "y": 0, "size": "Medium", "facing": 0, "scale": 0.3})
+        self.assertAlmostEqual(max(p[1] for p in a) - min(p[1] for p in a), 150 / 0.3, places=3)
+
+    def test_the_three_cut_off_maps_use_the_real_pad_size(self):
+        from pathlib import Path
+        for name in ("agriculture_4", "extraction_2", "industrial_4"):
+            data = json.loads((Path(__file__).resolve().parent.parent / "maps" / "settlements" / (name + ".json")).read_text(encoding="utf-8"))
+            self.assertEqual(data["pad_outlines"][0]["size"], "Large", name)
+            self.assertNotIn("half", data["pad_outlines"][0], name)

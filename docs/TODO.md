@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.28: landing pads drawn at the wiki size (213x128 / 150x90 / 66x55 m). Industrial 4 and Extraction 2 ship points back to Ben's arrows. When Grok's redone pictures arrive: fit them, measure each pad's shape, compare its scale with terminal-measured scales (Agriculture 4 is 0.37).
 - [ ] 0.96.27: Agriculture 4 calibrated (0.37 m per map unit, pad ship spot (774, 967), pad facing 264). CHECK IN THE REAL GAME. Terminal C (by the Large pad, world (21, -255) from the reference point) should be added at about map (531, 1136) once a second visit confirms it. Other layouts may also be off 0.325: measure each from two terminals 100 m or more apart.
 - [ ] 0.96.26: cut-off landing pads (Agriculture 4, Industrial 4, Extraction 2) now have an estimated pad centre and the missing part of the pad drawn past the picture edge. CHECK IN THE REAL GAME: land on Agriculture 4's Large pad, name the map, and see if the player arrow sits near the terminal between AGR and STO. Industrial 4 and Extraction 2 centres are guesses.
 - [ ] 0.96.25: galaxy map macro stops if the map closes or a jump starts (Woz lost stick controls). NOT TESTED in the real game. ROOT CAUSE UNKNOWN: why the map closes mid-macro (runs since ~14 Nov). Ask Woz when exactly the stick locks; stopgap: turn off 'Plot each waypoint in the galaxy map for me'. Check the next ZIP for 'stopped part way'.

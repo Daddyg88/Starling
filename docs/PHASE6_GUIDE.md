@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.28 - pads at the wiki's real size
+
+`PAD_METRES` (Large 213x128, Medium 150x90, Small 66x55 m) and `pad_corners` in navigation/settlement_maps.py draw a pad rectangle at the map's own scale (`scale`, else 0.325) with the long side along `facing`; `pad_outline_pieces` keeps only the part outside the picture. Industrial 4: the rectangle's bottom edge lands at y about 235 against the picture's visible edge at 224, which supports Ben's original arrow (y 38); Industrial 4 and Extraction 2 ship points are back to his arrows. Agriculture 4's ship spot (774, 967) stays (from the terminal fit); its pad rectangle is centred (767, 894).
+
 ## 0.96.27 - Agriculture 4 calibrated from Ben's stops
 
 World positions (m east, north of the reference point), the same in two sessions: A (25, 25), B (24, 141.5), C (21, -255); ship on the pad (79, -162). Search over pairs of the 7 map terminals for A and B: the best pair (A -> (840,446), B -> (962,156)) gives 0.37 m per unit and a turn of 23 degrees, and predicts the pad at (774, 967), 19 units from the picture-measured centre (the pad was not in the fit; the next pair was 126 away). Changes: map files may carry `scale` (metres per unit); `settlement_solve.locked_for` tries a measured map at its own size in the fixed-size pass; the pad line-up (`_dock_line_up`) uses the pad's or the map's scale. maps/settlements/agriculture_4.json `scale` 0.37; maps/pad_frames.json Large pad x 774, y 967, facing 264, scale 0.37. Weak point: only two anchors about 117 m apart, so the size is good to roughly 5%. Terminal C would land at about (531, 1136).

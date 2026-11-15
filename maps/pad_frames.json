@@ -92,9 +92,8 @@
    {
     "size": "Large",
     "x": 1059,
-    "y": -191,
-    "facing": 92,
-    "centre_estimated": true
+    "y": 19,
+    "facing": 92
    },
    {
     "size": "Small",
@@ -226,10 +225,9 @@
   "pads": [
    {
     "size": "Large",
-    "x": 944,
-    "y": -148,
-    "facing": 268,
-    "centre_estimated": true
+    "x": 940,
+    "y": 38,
+    "facing": 268
    },
    {
     "size": "Small",
