@@ -565,7 +565,7 @@ class LinedUpFromTheLanding(Setup):
             east, north = cal.t.real + (cal.a * complex(x, -y)).real, cal.t.imag + (cal.a * complex(x, -y)).imag
             self.tracker._check_stop(east, north)
         self.assertFalse(self.tracker.provisional)
-        self.assertIn("4365483779", self.tracker.saved)
+        self.assertNotIn("4365483779", self.tracker.saved)         # a landing-only line-up is rough: not kept for next time (0.96.33)
 
     def test_two_stops_that_do_not_fit_take_it_back_and_it_is_not_tried_again(self):
         said = []
@@ -752,6 +752,61 @@ class MarkedTerminalsCorrectTheLanding(LinedUpFromThePadArrow):
         self.tracker.on_mark("terminal", here(*TERMINALS[0][0]))
         self.assertEqual(self.tracker.calibration.meta["how"], "dock")
         self.assertTrue(self.tracker.provisional)
+
+
+class RoughLandingLineUpsAreNotKept(MarkedTerminalsCorrectTheLanding):
+    """0.96.33: Ben's ZIP of 15 Nov showed a remembered rough landing line-up (made with an older map size) being reused, so the corrections never came."""
+
+    def test_a_remembered_landing_only_line_up_is_ignored(self):
+        self.land(pad=1)
+        rough = self.tracker.calibration.to_json()
+        self.assertEqual(rough["how"], "dock")
+        self.tracker.saved["4365483779"] = rough
+        self.tracker._save()
+        again = SettlementTracker(lambda: self.state, self.maps, MapView(), self.path)
+        again.pad_frames, again.shipped, again.known = {}, {}, {}
+        again.on_entry(dict(APPROACH))
+        self.assertIsNone(again.calibration)
+
+    def test_marks_still_correct_a_landing_line_up_two_stops_already_agreed_with(self):
+        from navigation import settlement_solve
+        self.land(pad=1, heading=253.0)
+        self.tracker.provisional = False                                   # two stops had agreed with the rough line-up
+        rough = self.tracker.calibration
+        ship = complex(*self.tracker.anchors["pad"])
+        a = rough.a * cmath.exp(1j * math.radians(10))
+        t = ship - a * ((ship - rough.t) / rough.a)
+        pick = [p for p in settlement_solve.features(self.maps.get("industrial_2"))["terminal"] if p in ((1180.0, 28.0), (570.0, 315.0), (897.0, 577.0))]
+        for x, y in pick:
+            w = t + a * complex(x, -y)
+            lat = self.tracker.settlement["lat"] + math.degrees(w.imag / RADIUS)
+            lon = self.tracker.settlement["lon"] + math.degrees(w.real / (RADIUS * math.cos(math.radians(self.tracker.settlement["lat"]))))
+            self.tracker.on_mark("terminal", here(lat, lon))
+        self.assertEqual(self.tracker.calibration.meta["how"], "refined")
+
+    def test_a_corrected_line_up_is_remembered_and_dropped_when_the_map_picture_changes(self):
+        from navigation import settlement_solve
+        self.land(pad=1, heading=253.0)
+        rough = self.tracker.calibration
+        ship = complex(*self.tracker.anchors["pad"])
+        a = rough.a * cmath.exp(1j * math.radians(8))
+        t = ship - a * ((ship - rough.t) / rough.a)
+        for x, y in ((1180.0, 28.0), (570.0, 315.0), (897.0, 577.0)):
+            w = t + a * complex(x, -y)
+            lat = self.tracker.settlement["lat"] + math.degrees(w.imag / RADIUS)
+            lon = self.tracker.settlement["lon"] + math.degrees(w.real / (RADIUS * math.cos(math.radians(self.tracker.settlement["lat"]))))
+            self.tracker.on_mark("terminal", here(lat, lon))
+        self.assertEqual(self.tracker.calibration.meta["how"], "refined")
+        same = SettlementTracker(lambda: self.state, self.maps, MapView(), self.path)
+        same.pad_frames, same.shipped, same.known = {}, {}, {}
+        same.on_entry(dict(APPROACH))
+        self.assertIsNotNone(same.calibration)                              # the same picture: remembered
+        data = self.maps.get("industrial_2")
+        self.maps.maps["industrial_2"] = dict(data, ground=list(data.get("ground", [])) + [[[0, 0], [1, 1], [2, 2]]])      # a new picture
+        changed = SettlementTracker(lambda: self.state, self.maps, MapView(), self.path)
+        changed.pad_frames, changed.shipped, changed.known = {}, {}, {}
+        changed.on_entry(dict(APPROACH))
+        self.assertIsNone(changed.calibration)
 
 
 class SameLayoutDifferentSettlements(Setup):

@@ -217,6 +217,11 @@ def fit(pairs):
     return a, t, rms
 
 
+def map_stamp(data):
+    """Changes when a map picture is replaced or re-measured, so a line-up remembered against the old one is not used on the new one."""
+    return "%s:%d:%d" % (data.get("scale"), len(data.get("ground") or []), len(data.get("markers") or []) - len([m for m in data.get("markers") or [] if m.get("marked")]))
+
+
 def outside_features(data):
     """The map's features for matching MARKED spots: the yellow (outside) terminals when the map has at least two (Ben stands at those; the blue ones
     are up in buildings), else all its terminals."""
@@ -227,6 +232,16 @@ def outside_features(data):
 
 
 def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, shift=REFINE_SHIFT_METRES, accept=None):
+    """Tries the yellow (outside) terminals first, as Ben stands at those; when they give no clear answer, all the map's terminals (some real
+    marks, such as Shi Construction's, sit on the blue ones). See _refine for what it does."""
+    feats = outside_features(data)
+    found = _refine(seed, feats, spots, ship, turns, scales, shift, accept)
+    if found is None and feats["terminal"] != settlement_solve.features(data)["terminal"]:
+        found = _refine(seed, settlement_solve.features(data), spots, ship, turns, scales, shift, accept)
+    return found
+
+
+def _refine(seed, feats, spots, ship, turns, scales, shift, accept):
     """Corrects a rough landing line-up with the terminals you MARKED (they are the trusted ones). Tries small turns and size changes around the
     landing line-up, and for each every way of putting a marked spot on a map terminal; keeps the answer that puts the most marked spots on
     map terminals (within REFINE_MATCH_UNITS). A marked spot with no terminal near it is simply a terminal the map does not have yet: it does
@@ -235,7 +250,6 @@ def refine_calibration(seed, data, spots, ship=None, turns=None, scales=None, sh
     landing line-up; tools/add_marked_terminals.py gives it every turn and a range of sizes, and `accept(a, t)` to throw out answers that put the ship
     off its pad. Returns (calibration, matched, unmatched) or None when there is no single clear answer: fewer than two
     matched, matched ones too close together, or a second, different answer that is about as good."""
-    feats = outside_features(data)
     marked = [(kind, complex(east, north)) for kind, east, north in spots if kind in ("terminal", "power", "alarm") and feats.get(kind)]
     if len(marked) < 2:
         return None
@@ -313,13 +327,13 @@ class Calibration:
     def to_json(self):
         out = {"v": 2, "map": self.map_id, "a": [self.a.real, self.a.imag], "t": [self.t.real, self.t.imag],
                "ref": [self.ref_lat, self.ref_lon], "radius": self.radius}
-        out.update({k: v for k, v in self.meta.items() if k in ("name", "n", "err", "how")})
+        out.update({k: v for k, v in self.meta.items() if k in ("name", "n", "err", "how", "stamp")})
         return out
 
     @classmethod
     def from_json(cls, data):
         return cls(data["map"], complex(*data["a"]), complex(*data["t"]), data["ref"][0], data["ref"][1], data["radius"],
-                   {k: data[k] for k in ("name", "n", "err", "how") if k in data})
+                   {k: data[k] for k in ("name", "n", "err", "how", "stamp") if k in data})
 
 
 class SettlementTracker:
@@ -437,6 +451,11 @@ class SettlementTracker:
         else:
             if known is not None and known.get("v") != 2:
                 known = None                   # saved by an older, less careful line-up: not trusted
+            if known is not None and known.get("how") == "dock":
+                known = None                   # a landing-only line-up is rough (and may be from an older map size): the landing makes a fresh one
+            if known is not None and known.get("stamp") and self.maps.get(known.get("map")) is not None \
+                    and known["stamp"] != map_stamp(self.maps.get(known["map"])):
+                known = None                   # the map picture has changed since: not trusted
             known = known or self.shipped.get(market)
         if known:
             try:
@@ -811,11 +830,8 @@ class SettlementTracker:
             self.checks[0] += 1
             if self.checks[0] >= 2:
                 self.provisional = False                           # two later stops agree: it is right
-                if cal.meta.get("how") == "dock" and self.settlement is not None:
-                    self.saved[self.settlement["market"]] = cal.to_json()       # a landing-only line-up the walk has proved: keep it
-                    self._save()
-                else:
-                    self._remember_frame()
+                if cal.meta.get("how") != "dock":
+                    self._remember_frame()                          # (a landing-only line-up is rough: it is not kept for next time, 0.96.33)
                 log.info("Settlement map %s confirmed by later stops", cal.map_id)
         else:
             self.checks[1] += 1
@@ -828,7 +844,7 @@ class SettlementTracker:
         """The landing line-up is rough (where on the pad the ship sat, the ship's heading). Terminals you MARK are trusted, so once two of them
         match terminals on the map the line-up is corrected to them and the walk no longer has to prove it. Returns a sentence or None."""
         cal, s = self.calibration, self.settlement
-        if cal is None or s is None or not self.provisional or cal.meta.get("how") != "dock":
+        if cal is None or s is None or cal.meta.get("how") != "dock":
             return None
         data = self.maps.get(cal.map_id)
         if data is None:
@@ -838,6 +854,7 @@ class SettlementTracker:
             return None
         new, matched, missing = found
         self.calibration, self.provisional, self.checks = new, False, [matched, 0]
+        new.meta["stamp"] = map_stamp(data)
         self.saved[s["market"]] = new.to_json()
         self._save()
         self.view.position = None

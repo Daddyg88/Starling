@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.33: no more remembered rough landing line-ups; marks correct a landing line-up any time; corrected line-ups carry a map stamp. When Starling is started AFTER landing there is no landing to line up from: mark three terminals (yellow ones) and the solver does it. Idea if wanted: use the first on-foot spot as the ship and the Location heading as the ship's heading.
 - [ ] 0.96.32: built-in voices (Bella, Nova, ...) download their small file the first time they are used. CHECK with a tester on a real computer: pick Bella, Save, Test my voice (first time takes a few seconds), voice changes. Other voice paths (British bf_/bm_ voices, the Australian Melo voice) use the same download for bf_/bm_; Melo is separate.
 - [ ] 0.96.31: yellow-only matching; Agriculture 4 is 0.44 m per unit. Other maps probably differ from 0.325 too: each guide picture may be zoomed differently. When Grok's pictures arrive, a pad's size on the picture gives a scale (Large 213 m long) to check against marks. CHECK in the real game on Agriculture 4: arrow on the yellow terminals.
 - [ ] 0.96.30: 'mark spot ship' on stepping out; send the ZIP after each visit and run `python3 tools/add_marked_terminals.py <zip>` (then `--write`) to add terminals and sizes. Agriculture 4 now has the terminal by the Large pad (535, 1141). CHECK in the real game that it shows where the terminal is.

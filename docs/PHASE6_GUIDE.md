@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.33 - rough line-ups are not remembered
+
+ZIP 15 Nov 15:37: settlement_calibration.json held a `how: dock` entry with |a| 0.37 (the 0.96.30 size) and the log said 'calibration remembered' at 15:30, so the 0.44 fit of 0.96.31 was never used. Changes in navigation/settlement_track.py: `_check_stop` no longer saves a confirmed landing-only line-up; `_approach` ignores a saved `how: dock` entry and a saved entry whose `stamp` differs from `map_stamp(map)` (scale, number of picture pieces, number of markers not added by the tool); `_refine_from_marks` no longer needs the line-up to be provisional; the corrected line-up is saved with its stamp; `refine_calibration` tries the yellow terminals then all terminals (`_refine`). Settlement solver unchanged (an outside-only solver broke the real Shi Construction data, whose marks sit on blue icons). Real data check: all 3 marked places of Agriculture 4 solve at the map's own size 0.44 (miss 1.2 against 20.5 for the next answer).
+
 ## 0.96.32 - built-in voices download on first use
 
 tts/kokoro_tts.py: `voice_is_downloaded(name)` looks for voices/<name>.pt in the Hugging Face cache; `download_voice_file(name)` lifts HF_HUB_OFFLINE (the environment variable and huggingface_hub.constants) for one `hf_hub_download` and restores it; `_ensure_voice_file` runs in `speak` before a built-in voice is first used, once per voice (a failure is logged once and she uses the cloned voice). The ZIP showed af_nova, af_heart, af_kore, af_bella and am_adam all failing with OfflineModeIsEnabled because `_load` sets HF_HUB_OFFLINE=1 when only the cloned voice is wanted. Tests in tests/test_kokoro.py.
