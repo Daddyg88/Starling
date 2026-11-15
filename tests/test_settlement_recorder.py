@@ -89,6 +89,11 @@ class RecorderTests(unittest.TestCase):
         for said in ("mark", "what is the next jump", "market spot"):
             self.assertIsNone(self.rec.try_handle(said))
 
+    def test_misheard_stop_still_marks(self):
+        self.rec.on_entry(APPROACH)
+        self.assertEqual(self.rec.try_handle("Mark, stop terminal."), "Marked terminal.")
+        self.assertEqual(self.rec.try_handle("Mark stop ship."), "Marked ship.")
+
     def test_the_map_on_screen_is_written_into_the_visit_and_each_mark(self):
         self.rec.on_entry(APPROACH)
         self.state.status_flags2 = 1

@@ -27,7 +27,7 @@ SAVE_SECONDS = 30.0
 STARTS = ("ApproachSettlement",)
 QUIET_EVENTS = ("Music", "ReceiveText", "SendText", "Status", "Cargo", "Backpack", "ShipLockerMaterials", "NavRoute", "FuelScoop", "ReservoirReplenished")
 ENDS = ("SupercruiseEntry", "FSDJump", "Shutdown")
-_MARK = re.compile(r"^(?:mark|record|log)\s+(?:this\s+)?(?:spot|place|position|location)(?:\s+(.+))?$")
+_MARK = re.compile(r"^(?:mark|record|log)\s+(?:this\s+)?(?:spot|spots|stop|spock|place|position|location)(?:\s+(.+))?$")
 
 
 def default_path():

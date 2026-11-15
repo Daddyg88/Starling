@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.35 - mark command forgives 'stop'
+
+ZIP 15 Nov 17:05, Agnihotri Nutrition Holdings second visit: the log shows "Command 'mark, stop terminal.' -> unknown" three times, so Ben's three marks were not saved. The recorder pattern now accepts spot/spots/stop/spock. Test: tests/test_settlement_recorder.py test_misheard_stop_still_marks. Agriculture 1 needs a revisit with two yellow terminals marked.
+
 ## 0.96.34 - Agriculture 1 sized
 
 ZIP 15 Nov 16:41: Agnihotri Nutrition Holdings, layout agriculture_1 (twin of agriculture_3). Landing line-up from the pad arrow (heading 221) at 0.325 missed by 146, 146 and 227 units and was taken back (3 misses, the 0.96.33 rule). One marked terminal (4,149) and the stop at (137,2) (two dwell stops 18 m apart) solved with the tool's search (free size, ship on the pad): 0.435 m per unit, turned -133 degrees, both on yellow terminals (617,644) and (654,189), 456 units (198 m) apart. Pad arrow facing 97, measured 88; Agriculture 4's was 274 -> 267: both arrows read about 8 degrees too high, worth watching on the next layouts. Data: maps/settlements/agriculture_1.json scale 0.435; maps/pad_frames.json agriculture_1 Large pad facing 88, scale 0.435. Nearby third check: the landing seed at 0.435 still misses by 109 to 180 units, but the marks correct it. Test class AgricultureOneMeasured.
