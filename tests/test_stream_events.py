@@ -223,7 +223,7 @@ class BridgeDelivery(unittest.TestCase):
         import threading
         bridge.start()
         for _ in range(50):
-            if said and director.log:
+            if len(said) >= 2 and director.log:                 # (both lines: waiting for the first only was a race under load)
                 break
             threading.Event().wait(0.1)
         bridge.stop()

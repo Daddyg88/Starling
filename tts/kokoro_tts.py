@@ -237,6 +237,60 @@ class KokoroTTS(BaseTTS):
         except (OSError, ValueError):
             return False
 
+    @staticmethod
+    def voice_is_downloaded(name):
+        """True when the built-in voice's own small file (voices/<name>.pt, about half a megabyte) is already on this computer."""
+        try:
+            home = os.environ.get("HF_HOME") or str(Path.home() / ".cache" / "huggingface")
+            hub = os.environ.get("HF_HUB_CACHE") or str(Path(home) / "hub")
+            snapshots = Path(hub) / "models--hexgrad--Kokoro-82M" / "snapshots"
+            return any((folder / "voices" / ("%s.pt" % name)).is_file() for folder in snapshots.iterdir())
+        except (OSError, ValueError):
+            return False
+
+    @staticmethod
+    def download_voice_file(name):
+        """Fetches one built-in voice's file from Hugging Face, once. Starling switches the Hugging Face 'offline' flag on in itself when the
+        cloned voice is ready (so it never waits on the internet), and that flag also stops this first download: that is why a voice picked in
+        the settings stayed her cloned voice (Bella, tester ZIP 15 Nov 2026). The flag is lifted for this one download and put back."""
+        import huggingface_hub
+        from huggingface_hub import constants
+        saved_env = os.environ.pop("HF_HUB_OFFLINE", None)
+        saved_flag = getattr(constants, "HF_HUB_OFFLINE", None)
+        try:
+            if saved_flag is not None:
+                constants.HF_HUB_OFFLINE = False
+            huggingface_hub.hf_hub_download(repo_id="hexgrad/Kokoro-82M", filename="voices/%s.pt" % name)
+        finally:
+            if saved_env is not None:
+                os.environ["HF_HUB_OFFLINE"] = saved_env
+            if saved_flag is not None:
+                constants.HF_HUB_OFFLINE = saved_flag
+
+    def _ensure_voice_file(self):
+        """Before a built-in voice is used for the first time, make sure its file is here, fetching it when it is not. Said once per voice."""
+        name = self._voice_name
+        if not name or name == "melo_en_au":
+            return
+        if self._pipeline_factory is not None and getattr(self, "_voice_downloader", None) is None:
+            return                                                  # (tests with a fake engine have no real voice files)
+        checked = self.__dict__.setdefault("_voice_checked", set())
+        if name in checked:
+            return
+        is_here = getattr(self, "_voice_here", None) or self.voice_is_downloaded
+        if is_here(name):
+            checked.add(name)
+            return
+        fetch = getattr(self, "_voice_downloader", None) or self.download_voice_file
+        log.info("The voice %s is not on this computer yet: downloading it once (it is small).", name)
+        try:
+            fetch(name)
+            checked.add(name)
+            log.info("The voice %s is downloaded.", name)
+        except Exception as error:
+            checked.add(name)                                       # do not try again on every sentence; she uses the cloned voice meanwhile
+            log.warning("The voice %s could not be downloaded (%s: the internet is needed once). Using the cloned voice.", name, type(error).__name__)
+
     def _load(self):
         self._load_started = time.monotonic()
         try:
@@ -340,6 +394,7 @@ class KokoroTTS(BaseTTS):
             self._choose_voice(getattr(voice, "voice", ""))
             if self._voice_name == "melo_en_au" and not self._melo_usable():
                 self._voice_name = ""                       # MeloTTS is not installed: her normal voice (said once in the log)
+            self._ensure_voice_file()
             done = self._synthesise_and_play(text, voice, sound)
             if not done and self._voice_name and not self._stop_flag.is_set():
                 # A built-in voice could not be made (for example no internet for its first download).

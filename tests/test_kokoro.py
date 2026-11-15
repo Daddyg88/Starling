@@ -499,6 +499,86 @@ class BuiltInVoiceTests(unittest.TestCase):
         tts.start_loading(); tts.wait_until_loaded(5)
         self.assertTrue(tts.speak("Fallback line.", VoiceSettings(voice="af_sky")))
 
+    def test_a_voice_that_is_not_on_the_computer_is_downloaded_before_it_is_used(self):
+        # tester ZIP 15 Nov 2026: Starling's own 'offline' flag stopped every first download, so Bella stayed the cloned voice
+        tts, pipe = make()
+        fetched = []
+        tts._voice_here = lambda name: False
+        tts._voice_downloader = fetched.append
+        tts.start_loading(); tts.wait_until_loaded(5)
+        tts.speak("One.", VoiceSettings(voice="af_bella"))
+        tts.speak("Two.", VoiceSettings(voice="af_bella"))
+        tts.speak("Three.", VoiceSettings(voice="am_adam"))
+        self.assertEqual(fetched, ["af_bella", "am_adam"])                # each voice once, before its first line
+        self.assertEqual([v for t, v, s in pipe.calls if t in ("One.", "Two.", "Three.")], ["af_bella", "af_bella", "am_adam"])
+
+    def test_a_voice_already_here_is_not_downloaded_and_the_cloned_voice_never_is(self):
+        tts, pipe = make()
+        fetched = []
+        tts._voice_here = lambda name: name == "af_bella"
+        tts._voice_downloader = fetched.append
+        tts.start_loading(); tts.wait_until_loaded(5)
+        tts.speak("One.", VoiceSettings(voice="af_bella"))
+        tts.speak("Two.", VoiceSettings(voice=""))
+        self.assertEqual(fetched, [])
+
+    def test_no_internet_for_the_download_is_said_once_and_she_carries_on(self):
+        tts, pipe = make()
+        attempts = []
+
+        def no_internet(name):
+            attempts.append(name)
+            raise OSError("no internet")
+        tts._voice_here = lambda name: False
+        tts._voice_downloader = no_internet
+        tts.start_loading(); tts.wait_until_loaded(5)
+        self.assertTrue(tts.speak("One.", VoiceSettings(voice="af_bella")))
+        tts.speak("Two.", VoiceSettings(voice="af_bella"))
+        self.assertEqual(attempts, ["af_bella"])
+
+    def test_the_download_lifts_the_offline_flag_and_puts_it_back(self):
+        import os
+        import sys
+        import types
+        seen = []
+        hub = types.ModuleType("huggingface_hub")
+        constants = types.ModuleType("huggingface_hub.constants")
+        constants.HF_HUB_OFFLINE = True
+        hub.constants = constants
+        hub.hf_hub_download = lambda repo_id, filename: seen.append((repo_id, filename, os.environ.get("HF_HUB_OFFLINE"), constants.HF_HUB_OFFLINE))
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        saved = {k: sys.modules.get(k) for k in ("huggingface_hub", "huggingface_hub.constants")}
+        sys.modules["huggingface_hub"], sys.modules["huggingface_hub.constants"] = hub, constants
+        try:
+            KokoroTTS.download_voice_file("af_bella")
+            self.assertEqual(seen, [("hexgrad/Kokoro-82M", "voices/af_bella.pt", None, False)])     # offline was off during the download
+            self.assertEqual(os.environ.get("HF_HUB_OFFLINE"), "1")                                   # and is back on after it
+            self.assertTrue(constants.HF_HUB_OFFLINE)
+        finally:
+            os.environ.pop("HF_HUB_OFFLINE", None)
+            for key, module in saved.items():
+                if module is None:
+                    sys.modules.pop(key, None)
+                else:
+                    sys.modules[key] = module
+
+    def test_voice_is_downloaded_looks_in_the_hugging_face_cache(self):
+        import os
+        with tempfile.TemporaryDirectory() as d:
+            snapshot = os.path.join(d, "models--hexgrad--Kokoro-82M", "snapshots", "abc", "voices")
+            os.makedirs(snapshot)
+            open(os.path.join(snapshot, "af_bella.pt"), "wb").close()
+            old = os.environ.get("HF_HUB_CACHE")
+            os.environ["HF_HUB_CACHE"] = d
+            try:
+                self.assertTrue(KokoroTTS.voice_is_downloaded("af_bella"))
+                self.assertFalse(KokoroTTS.voice_is_downloaded("af_nova"))
+            finally:
+                if old is None:
+                    os.environ.pop("HF_HUB_CACHE", None)
+                else:
+                    os.environ["HF_HUB_CACHE"] = old
+
     def test_dashboard_lists_female_and_male(self):
         from ui.settings_model import VOICES
         labels = [l for l, _ in VOICES]

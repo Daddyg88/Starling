@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.32 - built-in voices download on first use
+
+tts/kokoro_tts.py: `voice_is_downloaded(name)` looks for voices/<name>.pt in the Hugging Face cache; `download_voice_file(name)` lifts HF_HUB_OFFLINE (the environment variable and huggingface_hub.constants) for one `hf_hub_download` and restores it; `_ensure_voice_file` runs in `speak` before a built-in voice is first used, once per voice (a failure is logged once and she uses the cloned voice). The ZIP showed af_nova, af_heart, af_kore, af_bella and am_adam all failing with OfflineModeIsEnabled because `_load` sets HF_HUB_OFFLINE=1 when only the cloned voice is wanted. Tests in tests/test_kokoro.py.
+
 ## 0.96.31 - yellow (outside) terminals only
 
 `settlement_solve.features` has `outside` (terminal_l0 = the yellow icons); `settlement_track.outside_features` uses them for matching marks when a map has two or more (Agriculture 4 has two: (962,156) and (845,392)). `refine_calibration` records which marks sit on which terminals (`assign`) and calls two answers different only when those differ (neighbouring turns and sizes of one answer are not a rival). tools/add_marked_terminals.py: `--rescale` re-measures with sizes 0.28 to 0.52; replaces an existing `scale`. Agriculture 4 from Ben's ZIP (A (25,25) -> (845,392), B (24,141.5) -> (962,156), ship (79,-162) on the pad): 0.442 m per unit, turn 27; the old fit (840,446), a blue terminal, gave 0.37. Pad check: picture pad 458 wide = 213 m at 0.465. Data: scale 0.44, pad frame (763,824) facing 267, pad outline centre (767,866), new terminal (548,957) marked 4x, bounds 1040.
