@@ -37,6 +37,7 @@ class Setup(unittest.TestCase):
         self.tracker = SettlementTracker(lambda: self.state, self.maps, self.view, self.path)
         self.tracker.shipped = {}
         self.tracker.known = {}                    # (the shipped list of certain settlements is tested on its own)
+        self.tracker.pad_frames = {}               # (the pad arrows are tested on their own, so the other tests see no landing line-up)
 
     def arrive(self):
         self.tracker.on_entry(dict(APPROACH))
@@ -610,6 +611,90 @@ class LearningTheFrame(Setup):
     def test_the_shipped_frames_are_valid(self):
         frames = settlement_track.known_frames()
         self.assertIn("industrial_2", frames)
+
+
+class LinedUpFromThePadArrow(Setup):
+    """0.96.23: the arrow Ben drew on a layout's landing pad gives a rough line-up from the landing, for any pad number."""
+
+    def setUp(self):
+        super().setUp()
+        self.tracker.frames = {}                          # no pad-1 frame, so only the arrow can do it
+        self.tracker.pad_frames = settlement_track.known_pad_frames()
+
+    def land(self, pad=1, heading=253.0, name_it_after=False):
+        self.state.heading = heading
+        self.tracker.on_entry(dict(APPROACH))
+        self.tracker.on_entry(dict(DOCKING))
+        self.tracker.on_entry({"event": "DockingGranted", "LandingPad": pad})
+        self.tracker.on_entry({"event": "Docked", "StationType": "OnFootSettlement", "LandingPads": DOCKING["LandingPads"]})
+
+    def test_the_shipped_pad_frames_are_valid_and_cover_the_layouts(self):
+        frames = settlement_track.known_pad_frames()
+        self.assertGreaterEqual(len(frames), 26)
+        for map_id, entry in frames.items():
+            self.assertIsNone(settlement_track.pad_frame_problem(entry), map_id)
+        for bad in ({"pads": [{"size": "Huge", "x": 1, "y": 1, "facing": 1}]}, {}, {"pads": "x"}, {"pads": [{"size": "Large", "x": 1, "y": 1, "facing": 400}]}, {"pads": [{"size": "Large", "x": "a", "y": 1, "facing": 1}]}):
+            self.assertIsNotNone(settlement_track.pad_frame_problem(bad), bad)
+
+    def test_it_works_for_any_pad_number_and_puts_the_ship_on_the_pad(self):
+        said = []
+        self.tracker.say = said.append
+        self.land(pad=3)
+        cal = self.tracker.calibration
+        self.assertIsNotNone(cal)
+        self.assertEqual(cal.meta["how"], "dock")
+        self.assertTrue(self.tracker.provisional)
+        x, y = cal.from_world(*self.tracker.anchors["pad"])
+        pad = self.tracker.pad_frames["industrial_2"]["pads"][0]
+        self.assertLess(math.hypot(x - pad["x"], y - pad["y"]), 1.0)          # the ship lands exactly on the pad's place
+        self.assertEqual(len(said), 1)
+
+    def test_the_ships_heading_turns_the_map_so_the_pad_arrow_points_that_way(self):
+        self.land(heading=253.0)
+        cal = self.tracker.calibration
+        pad = self.tracker.pad_frames["industrial_2"]["pads"][0]
+        x0, y0 = cal.from_world(*self.tracker.anchors["pad"])
+        # a point 100 m ahead of the ship (compass heading 253) must lie along the arrow on the picture
+        ahead = (self.tracker.anchors["pad"][0] + 100 * math.sin(math.radians(253.0)), self.tracker.anchors["pad"][1] + 100 * math.cos(math.radians(253.0)))
+        x1, y1 = cal.from_world(*ahead)
+        facing = math.degrees(math.atan2(x1 - x0, -(y1 - y0))) % 360
+        self.assertAlmostEqual((facing - pad["facing"] + 180) % 360 - 180, 0.0, places=3)
+
+    def test_naming_the_layout_after_landing_lines_it_up_then(self):
+        self.tracker.maps = SettlementMaps()
+        self.state.heading = 253.0
+        self.tracker.on_entry(dict(APPROACH))
+        self.tracker.on_entry(dict(DOCKING))
+        self.tracker.on_entry({"event": "Docked", "StationType": "OnFootSettlement", "LandingPads": DOCKING["LandingPads"]})
+        self.tracker.settlement["map"] = None
+        self.tracker.calibration = None
+        self.view.current = "industrial_2"
+        self.tracker.set_dismissed(True)
+        self.tracker.set_dismissed(False)
+        self.assertEqual(self.tracker.settlement["map"], "industrial_2")
+        self.assertIsNotNone(self.tracker.calibration)
+
+    def test_a_layout_with_two_landing_pads_is_not_guessed(self):
+        self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Large", "x": 100, "y": 100, "facing": 0}, {"size": "Large", "x": 900, "y": 100, "facing": 90}]}}
+        self.land()
+        self.assertIsNone(self.tracker.calibration)
+
+    def test_a_small_pad_alone_is_not_used(self):
+        self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Small", "x": 100, "y": 100, "facing": 0}]}}
+        self.land()
+        self.assertIsNone(self.tracker.calibration)
+
+    def test_the_arrow_reading_agrees_with_the_real_shi_construction_frame(self):
+        # Ben's Industrial 2 arrow (read from his picture) must turn the map within about 10 degrees of what real walks measured
+        pad = settlement_track.known_pad_frames()["industrial_2"]["pads"][0]
+        frame = settlement_track.known_frames()["industrial_2"]
+        diff = (pad["facing"] - frame["offset"] + 180) % 360 - 180
+        self.assertLess(abs(diff), 12, (pad, frame))
+
+    def test_the_older_frame_still_wins_on_pad_one(self):
+        self.tracker.frames = settlement_track.known_frames()
+        self.land(pad=1)
+        self.assertEqual(self.tracker.calibration.meta["how"], "dock")
 
 
 class SameLayoutDifferentSettlements(Setup):

@@ -1,0 +1,371 @@
+{
+ "_note": "Where each layout's landing pads are on its map and which way a ship parked on them faces (degrees clockwise from the top of the map), read from Ben's arrows drawn on the guide screenshots, 15 Nov. x,y = the middle of the arrow (the ship) in map units; good to about 15 units. size is worked out from the layout's pad counts: the longest arrows are the Large and Medium pads. Used for a rough line-up from the landing; marks make it exact.",
+ "agriculture_1": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 976,
+    "y": 113,
+    "facing": 97
+   },
+   {
+    "size": "Small",
+    "x": 567,
+    "y": 746,
+    "facing": 94
+   }
+  ]
+ },
+ "agriculture_2": {
+  "pads": [
+   {
+    "size": "Small",
+    "x": 626,
+    "y": 608,
+    "facing": 4
+   }
+  ]
+ },
+ "agriculture_3": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 515,
+    "y": 225,
+    "facing": 157
+   }
+  ]
+ },
+ "agriculture_4": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 777,
+    "y": 806,
+    "facing": 274
+   },
+   {
+    "size": "Small",
+    "x": 546,
+    "y": 117,
+    "facing": 149
+   },
+   {
+    "size": "Small",
+    "x": 1138,
+    "y": 388,
+    "facing": 263
+   }
+  ]
+ },
+ "agriculture_5": {
+  "pads": [
+   {
+    "size": "Small",
+    "x": 703,
+    "y": 740,
+    "facing": 87
+   }
+  ]
+ },
+ "extraction_1": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 1146,
+    "y": 397,
+    "facing": 174
+   },
+   {
+    "size": "Small",
+    "x": 711,
+    "y": 258,
+    "facing": 39
+   }
+  ]
+ },
+ "extraction_2": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 1059,
+    "y": 19,
+    "facing": 92
+   },
+   {
+    "size": "Small",
+    "x": 1159,
+    "y": 703,
+    "facing": 95
+   }
+  ]
+ },
+ "extraction_3": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 1098,
+    "y": 118,
+    "facing": 296
+   }
+  ]
+ },
+ "extraction_4": {
+  "pads": [
+   {
+    "size": "Medium",
+    "x": 1482,
+    "y": 677,
+    "facing": 327
+   }
+  ]
+ },
+ "extraction_5": {
+  "pads": [
+   {
+    "size": "Small",
+    "x": 1101,
+    "y": 578,
+    "facing": 183
+   }
+  ]
+ },
+ "high_tech_1": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 1281,
+    "y": 404,
+    "facing": 356
+   },
+   {
+    "size": "Small",
+    "x": 517,
+    "y": 607,
+    "facing": 267
+   }
+  ]
+ },
+ "high_tech_2": {
+  "pads": [
+   {
+    "size": "Small",
+    "x": 248,
+    "y": 437,
+    "facing": 29
+   }
+  ]
+ },
+ "high_tech_3": {
+  "pads": [
+   {
+    "size": "Small",
+    "x": 1327,
+    "y": 429,
+    "facing": 354
+   }
+  ]
+ },
+ "high_tech_4": {
+  "pads": [
+   {
+    "size": "Small",
+    "x": 324,
+    "y": 728,
+    "facing": 74
+   },
+   {
+    "size": "Small",
+    "x": 370,
+    "y": 346,
+    "facing": 106
+   },
+   {
+    "size": "Small",
+    "x": 581,
+    "y": 112,
+    "facing": 150
+   }
+  ]
+ },
+ "industrial_1": {
+  "pads": [
+   {
+    "size": "Small",
+    "x": 787,
+    "y": 421,
+    "facing": 358
+   }
+  ]
+ },
+ "industrial_2": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 1314,
+    "y": 328,
+    "facing": 358
+   }
+  ]
+ },
+ "industrial_3": {
+  "pads": [
+   {
+    "size": "Medium",
+    "x": 257,
+    "y": 454,
+    "facing": 93
+   }
+  ]
+ },
+ "industrial_4": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 940,
+    "y": 38,
+    "facing": 268
+   },
+   {
+    "size": "Small",
+    "x": 170,
+    "y": 544,
+    "facing": 6
+   }
+  ]
+ },
+ "industrial_5": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 326,
+    "y": 462,
+    "facing": 0
+   }
+  ]
+ },
+ "military_1": {
+  "pads": [
+   {
+    "size": "Medium",
+    "x": 1164,
+    "y": 514,
+    "facing": 94
+   }
+  ]
+ },
+ "military_2": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 1263,
+    "y": 481,
+    "facing": 354
+   },
+   {
+    "size": "Small",
+    "x": 494,
+    "y": 503,
+    "facing": 266
+   },
+   {
+    "size": "Small",
+    "x": 792,
+    "y": 501,
+    "facing": 92
+   }
+  ]
+ },
+ "military_3": {
+  "pads": []
+ },
+ "military_4": {
+  "pads": []
+ },
+ "military_5": {
+  "pads": [
+   {
+    "size": "Medium",
+    "x": 1118,
+    "y": 563,
+    "facing": 266
+   }
+  ]
+ },
+ "tourist_1": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 1112,
+    "y": 578,
+    "facing": 268
+   },
+   {
+    "size": "Large",
+    "x": 1119,
+    "y": 221,
+    "facing": 269
+   },
+   {
+    "size": "Small",
+    "x": 657,
+    "y": 272,
+    "facing": 276
+   },
+   {
+    "size": "Small",
+    "x": 702,
+    "y": 483,
+    "facing": 267
+   }
+  ]
+ },
+ "tourist_2": {
+  "pads": [
+   {
+    "size": "Medium",
+    "x": 931,
+    "y": 383,
+    "facing": 95
+   }
+  ]
+ },
+ "tourist_3": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 351,
+    "y": 308,
+    "facing": 96
+   },
+   {
+    "size": "Small",
+    "x": 575,
+    "y": 470,
+    "facing": 10
+   },
+   {
+    "size": "Small",
+    "x": 615,
+    "y": 245,
+    "facing": 185
+   }
+  ]
+ },
+ "tourist_4": {
+  "pads": [
+   {
+    "size": "Large",
+    "x": 408,
+    "y": 240,
+    "facing": 96
+   },
+   {
+    "size": "Small",
+    "x": 1281,
+    "y": 666,
+    "facing": 358
+   }
+  ]
+ }
+}

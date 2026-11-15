@@ -90,6 +90,45 @@ def known_frames():
         return {}
 
 
+def pad_frame_problem(entry):
+    """None when a pad_frames entry is usable, else why not."""
+    try:
+        pads = entry["pads"]
+        if not isinstance(pads, list) or len(pads) > 12:
+            return "no pad list"
+        for pad in pads:
+            if pad["size"] not in ("Small", "Medium", "Large"):
+                return "unknown pad size"
+            if not all(math.isfinite(float(pad[key])) for key in ("x", "y", "facing")):
+                return "not numbers"
+            if not (-2000 <= float(pad["x"]) <= 20000 and -2000 <= float(pad["y"]) <= 20000):
+                return "pad outside any map"
+            if not (0 <= float(pad["facing"]) <= 360):
+                return "facing is not degrees"
+    except (KeyError, TypeError, ValueError):
+        return "incomplete"
+    return None
+
+
+def known_pad_frames():
+    """Map id -> where its landing pads are on the picture and which way a ship on them faces (maps/pad_frames.json, read from the arrows
+    drawn on the guide pictures). Only the pads a ship lands on (Medium and Large) are used for the line-up."""
+    try:
+        with open(paths.ROOT / "maps" / "pad_frames.json", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return {str(k): v for k, v in data.items() if not str(k).startswith("_") and pad_frame_problem(v) is None}
+    except (OSError, ValueError, AttributeError):
+        return {}
+
+
+def pad_calibration(map_id, pad, heading, ship_xy, ref_lat, ref_lon, radius, name=None, scale=None):
+    """A rough line-up from the landing: the ship sits on the pad (its world position is the pad's place on the picture) and its heading
+    is the way the pad's arrow points on the picture."""
+    a = cmath.rect(float(scale or FRAME_SCALE), math.radians(float(pad["facing"]) - float(heading)))
+    t = complex(float(ship_xy[0]), float(ship_xy[1])) - a * complex(float(pad["x"]), -float(pad["y"]))
+    return Calibration(map_id, a, t, ref_lat, ref_lon, radius, {"name": name, "n": 0, "err": 0.0, "how": "dock"})
+
+
 def frame_problem(frame):
     """None when a frame entry is usable, else why not (never trust a hand-edited or shared file blindly)."""
     try:
@@ -229,6 +268,7 @@ class SettlementTracker:
         self._asked = False
         self.known = known_settlements()
         self.shipped = known_calibrations()
+        self.pad_frames = known_pad_frames()   # map id -> its landing pads (place and facing on the picture), from Ben's arrows
         self.frames = known_frames()           # map id -> frame: shipped ones, then the ones learned from your own line-ups
         self.frames_path = str(self.path) + ".frames"
         self._load_frames()
@@ -392,6 +432,7 @@ class SettlementTracker:
             self.view.target = None
         elif self.settlement is not None and not self.settlement.get("map") and self.view.current:
             self.settlement["map"] = self.view.current              # you named the layout: from now on this is the one
+            self._dock_line_up()                                    # landed already? the pad's arrow lines the map up from the landing
 
     def options(self):
         """The names of the layouts it could be (group and pad counts match), for 'show settlement map' when she cannot choose."""
@@ -415,21 +456,35 @@ class SettlementTracker:
             self.settlement["dock_heading"] = float(heading)
             self._dock_line_up()
 
+    def _arrow_pad(self, map_id):
+        """The one Medium or Large pad this layout has on its picture (the ones a ship lands on), or None when there is none or several."""
+        pads = [p for p in (self.pad_frames.get(map_id) or {}).get("pads", []) if p.get("size") in ("Medium", "Large")]
+        return pads[0] if len(pads) == 1 else None
+
     def _dock_line_up(self):
         """On pad 1 the ship faces the way the whole layout is turned. When this layout's frame is known (from an earlier line-up of the same
-        layout, here or at another settlement) the map can be lined up from the landing alone, then the next stops check it."""
+        layout, here or at another settlement) the map can be lined up from the landing alone, then the next stops check it. Without a frame,
+        the arrow drawn on the layout's landing pad gives a rougher line-up the same way."""
         s = self.settlement
-        if self.calibration is not None or s is None or s.get("dock_rejected") or str(s.get("pad_number")) != "1":
+        if self.calibration is not None or s is None or s.get("dock_rejected"):
             return
         map_id = s.get("map")
-        frame = self.frames.get(map_id) if map_id else None
-        if frame is None or not s.get("radius") or s.get("dock_heading") is None:
+        if not map_id or not s.get("radius") or s.get("dock_heading") is None:
             return
-        self.calibration = frame_calibration(map_id, frame, s["dock_heading"], s["lat"], s["lon"], s["radius"], s.get("name"))
+        frame = self.frames.get(map_id) if str(s.get("pad_number")) == "1" else None
+        if frame is not None:
+            self.calibration = frame_calibration(map_id, frame, s["dock_heading"], s["lat"], s["lon"], s["radius"], s.get("name"))
+            how = "pad 1 frame"
+        else:
+            pad, ship = self._arrow_pad(map_id), self.anchors.get("pad")
+            if pad is None or ship is None:
+                return
+            self.calibration = pad_calibration(map_id, pad, s["dock_heading"], ship, s["lat"], s["lon"], s["radius"], s.get("name"))
+            how = "pad arrow"
         self.provisional, self.checks = True, [0, 0]
         self.view.current = self.view.current or map_id
-        log.info("Settlement map %s lined up from the landing (ship heading %.0f on pad 1): the next stops will check it", map_id, s["dock_heading"])
-        self._speak("I have lined up the map from the way you landed. I will check it as you walk to the terminals.")
+        log.info("Settlement map %s lined up from the landing (%s, ship heading %.0f): the next stops will check it", map_id, how, s["dock_heading"])
+        self._speak("I have lined up the map from the way you landed. It is rough until I check it against the terminals you walk to.")
 
     def _remember_frame(self):
         """A line-up worth trusting also teaches the layout's frame, so the next settlement with this layout can be lined up from the landing."""

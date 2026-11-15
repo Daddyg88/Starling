@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.23 - Rough map line-up from the landing (pad arrows)
+
+**What to do:** land on a Medium or Large pad at any base. If she suggests the right layout the map should come up lined up straight away, and she says it is rough. If her guess was wrong, say "show settlement map" and the right name after landing; it lines up then. Check the arrow roughly matches where you stand and which way you face, then mark the power regulator and alarm to make it exact. Tell me if it is turned the wrong way round (180 degrees) on any layout.
+
+**Where it lives:** maps/pad_frames.json (the arrows, 26 layouts), navigation/settlement_track.py (pad_calibration, _dock_line_up). Not tested in the real game. Military 3 and 4 still need their arrows.
+
 ## 0.96.22 - Plan written down (no app change)
 
 **What to do:** nothing yet. Next: draw a magenta arrow on each picture's pad (where it has no yellow chevrons), pointing the way the ship's nose faces. Then at each base mark the power regulator and alarm, then about four terminals. The full plan is in docs/TODO.md.
