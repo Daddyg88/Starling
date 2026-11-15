@@ -944,8 +944,8 @@ class AgricultureOneMeasured(unittest.TestCase):
         self.pad = next(p for p in settlement_track.known_pad_frames()["agriculture_1"]["pads"] if p["size"] == "Large")
 
     def test_the_map_carries_its_size(self):
-        self.assertAlmostEqual(self.data["scale"], 0.413)
-        self.assertAlmostEqual(self.pad["scale"], 0.413)
+        self.assertAlmostEqual(self.data["scale"], 0.43)
+        self.assertAlmostEqual(self.pad["scale"], 0.43)
 
     def test_two_terminals_correct_the_landing_line_up_to_the_yellow_ones(self):
         seed = settlement_track.pad_calibration("agriculture_1", self.pad, 221.0, self.SHIP, 9.0, -94.0, 1104864.0, scale=self.pad["scale"])
