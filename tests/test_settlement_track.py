@@ -931,3 +931,28 @@ class ShipMark(Setup):
         self.assertEqual([k for k, _, _ in self.tracker.spots if k == "ship"], [])
         self.assertEqual(settlement_track.feature_of("my ship"), "ship")
         self.assertEqual(settlement_track.feature_of("landing pad"), "pad")
+
+
+class AgricultureOneMeasured(unittest.TestCase):
+    """Agnihotri Nutrition Holdings (15 Nov 2026): one marked terminal and one stop, both on yellow terminals, give 0.435 m per unit, close to
+    Agriculture 4's 0.44 (the shared 0.325 made the landing line-up miss by 146 to 227 units and it was taken back)."""
+    SHIP, MARKED, STOP = (45.0, -156.0), (4.0, 149.0), (137.0, 2.0)
+
+    def setUp(self):
+        from navigation.settlement_maps import SettlementMaps
+        self.data = SettlementMaps().get("agriculture_1")
+        self.pad = next(p for p in settlement_track.known_pad_frames()["agriculture_1"]["pads"] if p["size"] == "Large")
+
+    def test_the_map_carries_its_size(self):
+        self.assertAlmostEqual(self.data["scale"], 0.435)
+        self.assertAlmostEqual(self.pad["scale"], 0.435)
+
+    def test_two_terminals_correct_the_landing_line_up_to_the_yellow_ones(self):
+        seed = settlement_track.pad_calibration("agriculture_1", self.pad, 221.0, self.SHIP, 9.0, -94.0, 1104864.0, scale=self.pad["scale"])
+        cal, matched, missing = settlement_track.refine_calibration(seed, self.data, [("terminal", *self.MARKED), ("terminal", *self.STOP)], self.SHIP)
+        self.assertEqual((matched, missing), (2, 0))
+        for world, terminal in ((self.MARKED, (617, 644)), (self.STOP, (654, 189))):
+            x, y = cal.from_world(*world)
+            self.assertLess(math.hypot(x - terminal[0], y - terminal[1]), 25.0)
+        ship_x, ship_y = cal.from_world(*self.SHIP)
+        self.assertLess(math.hypot(ship_x - self.pad["x"], ship_y - self.pad["y"]), 130.0)      # the ship is on the Large pad

@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.34 - Agriculture 1 sized
+
+ZIP 15 Nov 16:41: Agnihotri Nutrition Holdings, layout agriculture_1 (twin of agriculture_3). Landing line-up from the pad arrow (heading 221) at 0.325 missed by 146, 146 and 227 units and was taken back (3 misses, the 0.96.33 rule). One marked terminal (4,149) and the stop at (137,2) (two dwell stops 18 m apart) solved with the tool's search (free size, ship on the pad): 0.435 m per unit, turned -133 degrees, both on yellow terminals (617,644) and (654,189), 456 units (198 m) apart. Pad arrow facing 97, measured 88; Agriculture 4's was 274 -> 267: both arrows read about 8 degrees too high, worth watching on the next layouts. Data: maps/settlements/agriculture_1.json scale 0.435; maps/pad_frames.json agriculture_1 Large pad facing 88, scale 0.435. Nearby third check: the landing seed at 0.435 still misses by 109 to 180 units, but the marks correct it. Test class AgricultureOneMeasured.
+
 ## 0.96.33 - rough line-ups are not remembered
 
 ZIP 15 Nov 15:37: settlement_calibration.json held a `how: dock` entry with |a| 0.37 (the 0.96.30 size) and the log said 'calibration remembered' at 15:30, so the 0.44 fit of 0.96.31 was never used. Changes in navigation/settlement_track.py: `_check_stop` no longer saves a confirmed landing-only line-up; `_approach` ignores a saved `how: dock` entry and a saved entry whose `stamp` differs from `map_stamp(map)` (scale, number of picture pieces, number of markers not added by the tool); `_refine_from_marks` no longer needs the line-up to be provisional; the corrected line-up is saved with its stamp; `refine_calibration` tries the yellow terminals then all terminals (`_refine`). Settlement solver unchanged (an outside-only solver broke the real Shi Construction data, whose marks sit on blue icons). Real data check: all 3 marked places of Agriculture 4 solve at the map's own size 0.44 (miss 1.2 against 20.5 for the next answer).

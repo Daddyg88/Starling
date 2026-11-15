@@ -6,7 +6,9 @@
     "size": "Large",
     "x": 976,
     "y": 113,
-    "facing": 97
+    "facing": 88,
+    "scale": 0.435,
+    "measured": "Ben, 15 Nov: 1 marked terminal + 1 stop, ship (45,-156); provisional"
    },
    {
     "size": "Small",
