@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.48 - Tourist 1: pad 3 and size
+
+ZIP 16 Nov 21:45 (0.96.47), Sumlak Hospitality Zone, PadGiven 3 (Ben: the Large pad at the bottom = pad pad_frames number 2 at (1112,578)). Log: no 'lined up from the landing' (arrow_pad found nothing for pad 3) and 'I cannot tell which way the map turns' after every mark. pad_frames now has game_pad: 3 on that pad; settlement_track._arrow_pad matches game_pad first. Marks: 5 places, grid fits: turn 110-112, scale 0.415-0.435 (0.425 set), ship at (1072..1096, 583..595). Provisional: one visit.
+
 ## 0.96.47 - High Tech 1 second visit
 
 ZIP 16 Nov 21:09 (0.96.46): live 'corrected by your marked terminals: 2 match, 0 are not on it, 0.330, turned 111, was 107'; marks identical to visit 1 to 0.1 m. Third mark (890,694) now 2 visits x 2 marks: added as terminal_l0. Fits to the nearby real terminals (908,606)/(951,627) give 0.36 and 6-13 m residuals, so it is a missing terminal. Ben: 'not bad but not great' - location of the error unknown.

@@ -562,6 +562,9 @@ class SettlementTracker:
             number = int((self.settlement or {}).get("pad_number"))
         except (TypeError, ValueError):
             return None
+        given = [p for p in pads if p.get("game_pad") is not None and int(p["game_pad"]) == number]       # a pad whose number IN THE GAME was seen (Tourist 1: pad 3)
+        if len(given) == 1:
+            return given[0]
         same = [p for p in pads if int(p.get("number", 1)) == number]
         return same[0] if len(same) == 1 else None
 

@@ -698,6 +698,15 @@ class LinedUpFromThePadArrow(Setup):
         self.assertEqual(sorted(p["number"] for p in large), [1, 2])
         self.assertLess(min(large, key=lambda p: p["number"])["y"], max(large, key=lambda p: p["number"])["y"])      # 1 is the top pad
 
+    def test_tourist_one_pad_three_is_the_large_pad_at_the_bottom(self):
+        self.land(pad=3)
+        self.tracker.settlement["map"] = self.tracker.settlement.get("map") or "tourist_1"
+        pad = self.tracker._arrow_pad("tourist_1")
+        self.assertEqual((pad["x"], pad["y"]), (1112, 578))
+        self.tracker.settlement["pad_number"] = 7
+        self.assertIsNone(self.tracker._arrow_pad("tourist_1"))                # an unseen pad number is still not guessed
+        self.assertAlmostEqual(SettlementMaps().get("tourist_1")["scale"], 0.425)
+
     def test_a_small_pad_alone_is_not_used(self):
         self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Small", "x": 100, "y": 100, "facing": 0}]}}
         self.land()

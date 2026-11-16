@@ -311,7 +311,8 @@
     "x": 1112,
     "y": 578,
     "facing": 268,
-    "number": 2
+    "number": 2,
+    "game_pad": 3
    },
    {
     "size": "Small",
