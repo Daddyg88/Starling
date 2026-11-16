@@ -47,3 +47,18 @@ class WordTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AussieAndBrokenUpWords(unittest.TestCase):
+    """0.96.42: Ben heard "Geee day" for G'day, and wanted supercruise / exobiology broken up."""
+
+    def test_gday_is_said_guh_day_with_either_apostrophe(self):
+        self.assertEqual(prepare("G'day mate"), "guh day mate")
+        self.assertEqual(prepare("Well g’day"), "Well guh day")
+
+    def test_long_game_words_are_broken_up(self):
+        self.assertEqual(prepare("Dropping out of supercruise."), "Dropping out of super cruise.")
+        self.assertEqual(prepare("Exobiology scan complete."), "exo biology scan complete.")
+
+    def test_ordinary_words_are_left_alone(self):
+        self.assertEqual(prepare("Have a good day, today."), "Have a good day, today.")

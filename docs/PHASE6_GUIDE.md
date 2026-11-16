@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.42 - Aussie slang and broken-up game words
+
+config/pronunciations.json 'words' got 55 entries (applied to every voice by tts/pronounce.py): G'day -> guh day, Aussie slang from voicepacks/default/aussie.json, supercruise/exobiology/hyperdiction/scoopable broken into parts. Tests: tests/test_pronounce.py AussieAndBrokenUpWords. Untested by ear.
+
 ## 0.96.41 - Industrial 2, Extraction 3 measured; Industrial 4 terminal
 
 ZIPs 15/16 Nov (0.96.40). Dovzhenko Industrial (industrial_2): live 'corrected by your marked terminals: 2 match, 0.341, turned -51'; tool 4 places, 3 match, 0.345 -> scale 0.345 (Shi Construction tests still pass). Shin Prospecting Platform (extraction_3): live 0.341 (edge of range) turn 150; tool 3 match, 2 not on map, 0.350 -> scale 0.35, provisional. Yi's Workshop (industrial_4, 2 visits, no clear answer live because the map has only 2 terminals): terminal (358,176) marked 3x added; scale unchanged. Jung Hydroponics Range = agriculture_4 (live 0.440, average miss 5).

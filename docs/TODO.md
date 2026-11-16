@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.42: listen to G'day, supercruise, exobiology and the Aussie slang words (config/pronunciations.json); tell me which still sound wrong.
 - [ ] 0.96.41: Industrial 2 = 0.345, Extraction 3 = 0.35 (provisional, one visit), Industrial 4 terminal (358,176) added. CHECK each by landing and marking two yellow terminals. Industrial 4 still needs a size (only 2 map terminals, 64 m apart).
 - [x] 0.96.40: Agriculture 1 locked at 0.408 (confirmed by Ben, 15 Nov 23:01). Layouts done: Agriculture 4 and Agriculture 1; 26 to go.
 - [x] 0.96.39 (confirmed in the real game: marks now correct the map, no take-back): a landing line-up is not taken back until 6 misses (3 if one is 200+ units off). CHECK at Agnihotri: three marks should now correct the map. Industrial 2 size is UNSETTLED: Peng Synthetics Foundry marks say 0.435, Shi Construction data says 0.325. Visit one of them again with 'mark spot ship' and two or three 'mark spot terminal' (or 'mark it').
