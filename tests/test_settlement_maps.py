@@ -226,4 +226,4 @@ class MeasuredSizes(unittest.TestCase):
 
     def test_industrial_4_has_the_terminal_marked_three_times(self):
         marked = [m for m in SettlementMaps().get("industrial_4")["markers"] if m.get("marked")]
-        self.assertEqual([(m["x"], m["y"]) for m in marked], [(358, 176)])
+        self.assertEqual([(m["x"], m["y"]) for m in marked], [(642, 330)])

@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.45 - Industrial 4 corrected (wrong twin)
+
+ZIP 16 Nov 19:52 (0.96.43): saved line-up (0.343, turn 100) remembered; Ben: 'near the small pad when at the Large pad centre'. With only the 2 real map terminals (495,154) and (514,350), marks A(50,59) C(-13.7,38.5) ->T0,T1 give 0.340, turn -78, ship (815,134) = 41 m from the Large arrow (940,38) and B at (642,330); the twin C,A->T0,T1 (turn 102) puts the ship at (194,370) near the Small arrow: that was the wrong one and the 0.96.41 tool added (358,176) from it. Removed; (642,330) added; scale 0.34. industrial_4 pad arrows may still be off, but the Large one agrees.
+
 ## 0.96.44 - Industrial 4 at 0.333, size search +-2.5%
 
 ZIP 16 Nov 19:32 (0.96.43): live 'corrected by your marked terminals: 3 match, 0.343, turned 100' after the third mark (the wide search works). Marks of 3 visits: A (47.5,59.4)..(52.8,58.9), B (2.2,-2.5) x4, C (-13.7,38.5): a 5 m spread on A moves the fit from 0.326 to 0.341; mean 0.333, turn 101. _refine_from_marks now tries data scale x REFINE_MARK_SIZES (0.975, 1, 1.025) when the map has its own scale.

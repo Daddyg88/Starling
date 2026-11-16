@@ -981,22 +981,30 @@ class AgricultureOneMeasured(unittest.TestCase):
 
 
 class YisWorkshopWideSearch(unittest.TestCase):
-    """Yi's Workshop (16 Nov 2026): three marked terminals, the landing line-up started about 200 degrees out, so only a search of every turn finds them."""
+    """Yi's Workshop (16 Nov 2026): the landing line-up started about 200 degrees out, so only a search of every turn finds the three marked terminals.
+    Two matching terminals fit the map two ways (turned half a circle apart); the right one puts the ship on the Large pad (940, 38)."""
+
+    MARKS = [("terminal", 50.0, 59.1), ("terminal", 2.2, -2.5), ("terminal", -13.7, 38.5), ("terminal", 2.2, -2.5)]
+    SHIP = (79.9, -45.8)
+
+    def seed(self, data):
+        pad = [p for p in settlement_track.known_pad_frames()["industrial_4"]["pads"] if p["size"] == "Large"][0]
+        return settlement_track.pad_calibration("industrial_4", pad, 10.0, self.SHIP, 7.07, -90.0, 1100000.0, scale=0.34), pad
 
     def test_three_marks_correct_a_line_up_that_started_far_out(self):
         from navigation.settlement_maps import SettlementMaps
         data = SettlementMaps().get("industrial_4")
-        pad = [p for p in settlement_track.known_pad_frames()["industrial_4"]["pads"] if p["size"] == "Large"][0]
-        ship = (80.08, -45.98)
-        seed = settlement_track.pad_calibration("industrial_4", pad, 11.0, ship, 7.07, -90.0, 1100000.0, scale=0.327)
-        marks = [("terminal", 47.5, 59.4), ("terminal", 2.2, -2.5), ("terminal", -13.6, 39.4), ("terminal", 2.2, -2.5)]
-        narrow = settlement_track.refine_calibration(seed, data, marks, ship)
-        self.assertTrue(narrow is None or narrow[1] < 3)                       # the small search is wrong or finds fewer than 3
-        wide = settlement_track.refine_calibration(seed, data, marks, ship, turns=range(-180, 180), shift=None)
+        seed, pad = self.seed(data)
+        wide = settlement_track.refine_calibration(seed, data, self.MARKS, self.SHIP, turns=range(-180, 180), shift=None)
         self.assertEqual(wide[1], 3)
-        self.assertAlmostEqual(abs(wide[0].a), 0.327, delta=0.02)
-        self.assertAlmostEqual(wide[0].turn_degrees(), 102.0, delta=3.0)
+        self.assertAlmostEqual(abs(wide[0].a), 0.34, delta=0.02)
+        self.assertAlmostEqual(wide[0].turn_degrees(), -78.0, delta=4.0)
+        z = (complex(*self.SHIP) - wide[0].t) / wide[0].a                    # where the ship sits on the picture: on the Large pad, not near the small one
+        self.assertLess(abs(complex(z.real, -z.imag) - complex(pad["x"], pad["y"])), 200.0)
 
-    def test_industrial_4_carries_its_measured_size(self):
+    def test_industrial_4_carries_its_size_and_the_third_terminal_marked_four_times(self):
         from navigation.settlement_maps import SettlementMaps
-        self.assertAlmostEqual(SettlementMaps().get("industrial_4")["scale"], 0.333)
+        data = SettlementMaps().get("industrial_4")
+        self.assertAlmostEqual(data["scale"], 0.34)
+        marked = [m for m in data["markers"] if m.get("marked")]
+        self.assertEqual([(m["x"], m["y"]) for m in marked], [(642, 330)])
