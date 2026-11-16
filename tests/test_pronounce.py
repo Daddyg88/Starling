@@ -12,7 +12,7 @@ class DecimalTests(unittest.TestCase):
         self.assertEqual(prepare("Gravity is 1.25."), "Gravity is 1 point 2 5.")
 
     def test_ids_and_versions_and_thousands_untouched(self):
-        for text in ("DSSA #21.02.002 now", "version 0.96.3", "1,662 light years", "Done. 4 jumps.", "at 5."):
+        for text in ("Carrier #21.02.002 now", "version 0.96.3", "1,662 light years", "Done. 4 jumps.", "at 5."):
             self.assertEqual(prepare(text), text)
 
     def test_no_double_work(self):
@@ -62,3 +62,25 @@ class AussieAndBrokenUpWords(unittest.TestCase):
 
     def test_ordinary_words_are_left_alone(self):
         self.assertEqual(prepare("Have a good day, today."), "Have a good day, today.")
+
+
+class YearsOrdinalsCodes(unittest.TestCase):
+    def test_years(self):
+        from tts.pronounce import prepare
+        self.assertIn("nineteen ninety-four", prepare("Founded in 1994."))
+        self.assertIn("thirty-one twenty-five", prepare("They met in 3125."))
+        self.assertIn("thirty-three oh nine", prepare("It fell in 3309."))
+
+    def test_quantities_untouched(self):
+        from tts.pronounce import prepare
+        self.assertIn("1500 credits", prepare("Pays 1500 credits a tonne."))
+
+    def test_ordinals(self):
+        from tts.pronounce import prepare
+        self.assertIn("sixteenth", prepare("the 16th of May"))
+        self.assertIn("twenty-first", prepare("the 21st"))
+
+    def test_system_code_and_acronyms(self):
+        from tts.pronounce import prepare
+        self.assertIn("N L, N, C 2 3, 4", prepare("NL-N C23-4"))
+        self.assertIn("S R V", prepare("the SRV"))

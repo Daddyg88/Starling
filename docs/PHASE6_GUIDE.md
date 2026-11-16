@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.51 - her lines read more naturally
+
+Research showed her lines are already written the way people speak (contractions, short sentences, slang). Years, dates, system codes and acronyms were still read badly, so `tts/pronounce.py` now respells them for the voice only: 1994 = nineteen ninety-four, 3125 = thirty-one twenty-five, 16th = sixteenth, NL-N C23-4 = N L, N, C 2 3, 4, SRV = S R V. Amounts such as 1500 credits are left alone. Not tested by ear.
+
 ## 0.96.50 - own portraits in data/portraits; Industrial 1
 
 Portraits: ui/portraits.py USER_PORTRAITS = data/portraits (kept by core/updater.py KEEP via data); portrait_for(mood, folder=None, user_folder=None) tries the user chain, then user avatar, then ui/assets/portraits. Industrial 1 (ZIP 16 Nov 15:08, Oliveira Manufacturing Site, PadGiven 1, Small pad only): _arrow_pad falls back to a layout's single Small pad; marks (3 places x2) fit all three terminals at 0.26-0.28, turn 98, ship 30-40 units from the Small arrow (787,421); facing 358 - heading 260 = 98.
