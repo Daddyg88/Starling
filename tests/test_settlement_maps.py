@@ -241,3 +241,7 @@ class HighTechOneMeasured(unittest.TestCase):
         ship = (-80.55, 112.24)
         cal = settlement_track.pad_calibration("high_tech_1", pad, 248.0, ship, 0.0, 0.0, 1000000.0, scale=data["scale"])
         self.assertAlmostEqual(cal.turn_degrees() % 360.0, 108.0, delta=1.0)        # the pad arrow turn; the marks gave 111
+
+    def test_the_terminal_marked_twice_is_on_the_map(self):
+        marked = [m for m in SettlementMaps().get("high_tech_1")["markers"] if m.get("marked")]
+        self.assertEqual([(m["x"], m["y"]) for m in marked], [(890, 694)])

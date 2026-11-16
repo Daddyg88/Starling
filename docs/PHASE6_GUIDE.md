@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.47 - High Tech 1 second visit
+
+ZIP 16 Nov 21:09 (0.96.46): live 'corrected by your marked terminals: 2 match, 0 are not on it, 0.330, turned 111, was 107'; marks identical to visit 1 to 0.1 m. Third mark (890,694) now 2 visits x 2 marks: added as terminal_l0. Fits to the nearby real terminals (908,606)/(951,627) give 0.36 and 6-13 m residuals, so it is a missing terminal. Ben: 'not bad but not great' - location of the error unknown.
+
 ## 0.96.46 - High Tech 1 measured
 
 ZIP 16 Nov 20:44 (0.96.45): live 'corrected by your marked terminals: 2 match, 1 not on it, 0.341, turned 96 (was 108)'. Offline: yellow (1147,88)+(748,375), 162 m apart: 0.330, turn 111, ship (1295,387) vs Large arrow (1281,404): 17 units. Facing check 248+111=359 vs arrow 356. Scale 0.33 set; third mark (891,695) once: not added.

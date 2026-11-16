@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.47: High Tech 1 terminal added at (890,694). ASK Ben where the High Tech 1 line-up is out (which end of the settlement, how many metres, which way).
 - [ ] 0.96.46: High Tech 1 at 0.33 (one visit). CHECK again with 3 yellow terminals; a third terminal near (891,695) may be missing from the map.
 - [ ] 0.96.45: Industrial 4 corrected (0.34, terminal at 642,330 instead of 358,176). CHECK at Yi's Workshop. RULE: never add a terminal from marks unless the ship's spot lands on its pad; check tools/add_marked_terminals.py against Small pads too.
 - [ ] 0.96.44: Industrial 4 at 0.333; the mark correction tries only +-2.5% around a measured size. CHECK at Yi's Workshop: arrow on the terminals after 3 marks.

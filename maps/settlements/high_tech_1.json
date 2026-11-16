@@ -425,6 +425,12 @@
    "type": "tip",
    "x": 856,
    "y": 540
+  },
+  {
+   "type": "terminal_l0",
+   "x": 890,
+   "y": 694,
+   "marked": true
   }
  ],
  "pictured": true,
