@@ -707,6 +707,19 @@ class LinedUpFromThePadArrow(Setup):
         self.assertIsNone(self.tracker._arrow_pad("tourist_1"))                # an unseen pad number is still not guessed
         self.assertAlmostEqual(SettlementMaps().get("tourist_1")["scale"], 0.425)
 
+    def test_tourist_one_game_pad_numbers_are_all_four(self):
+        """Ben watched ships land (16 Nov 2026): bottom small = 1, top small = 2, bottom large = 3, top large = 4."""
+        pads = {p["game_pad"]: (p["size"], p["y"]) for p in settlement_track.known_pad_frames()["tourist_1"]["pads"]}
+        self.assertEqual(sorted(pads), [1, 2, 3, 4])
+        self.assertEqual((pads[1][0], pads[2][0], pads[3][0], pads[4][0]), ("Small", "Small", "Large", "Large"))
+        self.assertGreater(pads[1][1], pads[2][1])             # 1 is below 2 (a bigger y is further down the picture)
+        self.assertGreater(pads[3][1], pads[4][1])
+        self.land(pad=4)
+        self.tracker.settlement["map"] = self.tracker.settlement.get("map") or "tourist_1"
+        self.assertEqual(self.tracker._arrow_pad("tourist_1")["y"], 221)           # pad 4 = the top large pad
+        self.tracker.settlement["pad_number"] = 1
+        self.assertIsNone(self.tracker._arrow_pad("tourist_1"))                    # a small pad is never used as an arrow
+
     def test_a_small_pad_alone_is_not_used(self):
         self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Small", "x": 100, "y": 100, "facing": 0}]}}
         self.land()

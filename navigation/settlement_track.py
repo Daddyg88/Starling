@@ -562,9 +562,10 @@ class SettlementTracker:
             number = int((self.settlement or {}).get("pad_number"))
         except (TypeError, ValueError):
             return None
-        given = [p for p in pads if p.get("game_pad") is not None and int(p["game_pad"]) == number]       # a pad whose number IN THE GAME was seen (Tourist 1: pad 3)
-        if len(given) == 1:
-            return given[0]
+        numbered = any(p.get("game_pad") is not None for p in (self.pad_frames.get(map_id) or {}).get("pads", []))
+        if numbered:                                           # this layout's pads carry the numbers the GAME uses (Tourist 1): only those count
+            given = [p for p in pads if p.get("game_pad") is not None and int(p["game_pad"]) == number]
+            return given[0] if len(given) == 1 else None      # a small pad (not an arrow) or an unseen number gives no line-up
         same = [p for p in pads if int(p.get("number", 1)) == number]
         return same[0] if len(same) == 1 else None
 

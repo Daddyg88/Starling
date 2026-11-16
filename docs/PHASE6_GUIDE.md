@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.49 - Tourist 1 game pad numbers (all four)
+
+Ben, 16 Nov 22:01: bottom small 1, top small 2, bottom large 3, top large 4. pad_frames.json tourist_1 has game_pad on all four. settlement_track._arrow_pad: when any pad of the layout has game_pad, only game_pad matches count (old per-size numbers ignored). Test: LinedUpFromThePadArrow.test_tourist_one_game_pad_numbers_are_all_four.
+
 ## 0.96.48 - Tourist 1: pad 3 and size
 
 ZIP 16 Nov 21:45 (0.96.47), Sumlak Hospitality Zone, PadGiven 3 (Ben: the Large pad at the bottom = pad pad_frames number 2 at (1112,578)). Log: no 'lined up from the landing' (arrow_pad found nothing for pad 3) and 'I cannot tell which way the map turns' after every mark. pad_frames now has game_pad: 3 on that pad; settlement_track._arrow_pad matches game_pad first. Marks: 5 places, grid fits: turn 110-112, scale 0.415-0.435 (0.425 set), ship at (1072..1096, 583..595). Provisional: one visit.

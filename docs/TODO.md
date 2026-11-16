@@ -5,7 +5,8 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
-- [ ] 0.96.48: Tourist 1 at 0.425 (one visit, provisional) and pad 3 = bottom Large pad. CHECK: land on pad 3 again, three yellow terminals far apart. The other three Tourist 1 pads still have no game pad number: when Ben lands on them, add game_pad to the entry (docs: pad_frames.json 'game_pad').
+- [ ] 0.96.49: Tourist 1: land on pad 4 (top Large) and check the line-up; pads 1 and 2 (small) give no first guess.
+- [ ] 0.96.48: Tourist 1 at 0.425 (one visit, provisional) and pad 3 = bottom Large pad. CHECK: land on pad 3 again, three yellow terminals far apart. All four Tourist 1 pads now have their game pad numbers (0.96.49). Other layouts with several pads (Industrial 4 pad 2, Military, etc.) may need 'game_pad' the same way when Ben lands on them.
 - [ ] 0.96.47: High Tech 1 terminal added at (890,694). ASK Ben where the High Tech 1 line-up is out (which end of the settlement, how many metres, which way).
 - [ ] 0.96.46: High Tech 1 at 0.33 (one visit). CHECK again with 3 yellow terminals; a third terminal near (891,695) may be missing from the map.
 - [ ] 0.96.45: Industrial 4 corrected (0.34, terminal at 642,330 instead of 358,176). CHECK at Yi's Workshop. RULE: never add a terminal from marks unless the ship's spot lands on its pad; check tools/add_marked_terminals.py against Small pads too.
