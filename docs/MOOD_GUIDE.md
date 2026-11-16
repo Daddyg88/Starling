@@ -105,4 +105,4 @@ Everything above is in `config/mood_rules.json`. Change a `delta`, or the number
 
 
 ## Infatuated and Upset (0.26.0)
-Infatuated sits above Close and Upset sits below Frustrated. Both use every line written for Close / Frustrated and add a few of their own (voicepacks/default/moods.json). Their lines of their own are short for now; add more under keys like `FSDJump_Infatuated` or `Docked_Upset`. The lines are `infatuated_at` (60) and `upset_at` (-60) in config/mood_rules.json. Pictures: Infatuated.png and Upset.png in ui/assets/portraits/ (until you add them she shows Close and Neutral).
+Infatuated sits above Close and Upset sits below Frustrated. Both use every line written for Close / Frustrated and add a few of their own (voicepacks/default/moods.json). Their lines of their own are short for now; add more under keys like `FSDJump_Infatuated` or `Docked_Upset`. The lines are `infatuated_at` (60) and `upset_at` (-60) in config/mood_rules.json. Pictures: Infatuated.png and Upset.png in data/portraits/ (your own, kept across updates) or ui/assets/portraits/ (the ones that ship) (until you add them she shows Close and Neutral).

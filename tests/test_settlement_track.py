@@ -720,10 +720,22 @@ class LinedUpFromThePadArrow(Setup):
         self.tracker.settlement["pad_number"] = 1
         self.assertIsNone(self.tracker._arrow_pad("tourist_1"))                    # a small pad is never used as an arrow
 
-    def test_a_small_pad_alone_is_not_used(self):
+    def test_a_small_pad_is_used_only_when_it_is_the_layouts_only_pad(self):
+        """Industrial 1 (16 Nov 2026) has one Small pad, so every ship lands there; beside a Large pad a Small arrow is still not used."""
         self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Small", "x": 100, "y": 100, "facing": 0}]}}
         self.land()
-        self.assertIsNone(self.tracker.calibration)
+        self.assertIsNotNone(self.tracker.calibration)
+        self.tracker._leave()
+        self.tracker.pad_frames = {"industrial_2": {"pads": [{"size": "Small", "x": 100, "y": 100, "facing": 0}, {"size": "Small", "x": 500, "y": 100, "facing": 0}]}}
+        self.land()
+        self.assertIsNone(self.tracker.calibration)                      # two small pads and no number to tell them apart: not guessed
+
+    def test_industrial_one_arrow_agrees_with_the_marked_walk(self):
+        pad = settlement_track.known_pad_frames()["industrial_1"]["pads"][0]
+        self.assertEqual(pad["size"], "Small")
+        self.assertAlmostEqual(SettlementMaps().get("industrial_1")["scale"], 0.27)
+        turn = (pad["facing"] - 260.0) % 360.0                           # ship heading 260 when landed; the marks fitted a turn of 98
+        self.assertAlmostEqual(turn, 98.0, delta=2.0)
 
     def test_the_arrow_reading_agrees_with_the_real_shi_construction_frame(self):
         # Ben's Industrial 2 arrow (read from his picture) must turn the map within about 10 degrees of what real walks measured

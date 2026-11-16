@@ -77,6 +77,16 @@ class MoodTests(unittest.TestCase):
             self.assertTrue(key.rsplit("_", 1)[1] in ("Infatuated", "Upset"), key)
             self.assertTrue(all(isinstance(line, str) and line for line in lines))
 
+    def test_your_own_pictures_win_and_are_kept_outside_the_program_folder(self):
+        with tempfile.TemporaryDirectory() as mine:
+            self.assertEqual(portraits.USER_PORTRAITS.parts[-2:], ("data", "portraits"))          # data/ is kept by every update
+            self.assertNotEqual(portraits.portrait_for("Friendly", user_folder=mine).parent.name, "")       # nothing of yours yet: the shipped picture
+            Path(mine, "Neutral.png").write_bytes(b"x")
+            self.assertEqual(portraits.portrait_for("Friendly", user_folder=mine), Path(mine, "Neutral.png"))
+            Path(mine, "Friendly.jpg").write_bytes(b"x")
+            self.assertEqual(portraits.portrait_for("Friendly", user_folder=mine).name, "Friendly.jpg")
+            self.assertEqual(portraits.portrait_for("Sarcastic", user_folder=mine).name, "Neutral.png")
+
     def test_portrait_falls_back_to_the_parent_mood(self):
         with tempfile.TemporaryDirectory() as folder:
             (Path(folder) / "Close.png").write_bytes(b"x")

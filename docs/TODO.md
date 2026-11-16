@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.50: own portraits in data/portraits survive an update (tester to confirm after the next release). Industrial 1 at 0.27, landing on its Small pad lines the map up (one visit, provisional).
 - [ ] 0.96.49: Tourist 1: land on pad 4 (top Large) and check the line-up; pads 1 and 2 (small) give no first guess.
 - [ ] 0.96.48: Tourist 1 at 0.425 (one visit, provisional) and pad 3 = bottom Large pad. CHECK: land on pad 3 again, three yellow terminals far apart. All four Tourist 1 pads now have their game pad numbers (0.96.49). Other layouts with several pads (Industrial 4 pad 2, Military, etc.) may need 'game_pad' the same way when Ben lands on them.
 - [ ] 0.96.47: High Tech 1 terminal added at (890,694). ASK Ben where the High Tech 1 line-up is out (which end of the settlement, how many metres, which way).

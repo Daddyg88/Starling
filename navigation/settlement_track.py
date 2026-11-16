@@ -556,6 +556,8 @@ class SettlementTracker:
         """The Medium or Large pad (the ones a ship lands on) this layout has on its picture. With more than one, the pad number the game gave
         you picks it (Ben numbered them on the picture); None when there is none, or the number does not single one out."""
         pads = [p for p in (self.pad_frames.get(map_id) or {}).get("pads", []) if p.get("size") in ("Medium", "Large")]
+        if not pads:                                           # a layout whose ONLY pad is a small one (Industrial 1): that is where every ship lands
+            pads = [p for p in (self.pad_frames.get(map_id) or {}).get("pads", []) if p.get("size") == "Small"]
         if len(pads) == 1:
             return pads[0]
         try:

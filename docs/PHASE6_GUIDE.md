@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.50 - own portraits in data/portraits; Industrial 1
+
+Portraits: ui/portraits.py USER_PORTRAITS = data/portraits (kept by core/updater.py KEEP via data); portrait_for(mood, folder=None, user_folder=None) tries the user chain, then user avatar, then ui/assets/portraits. Industrial 1 (ZIP 16 Nov 15:08, Oliveira Manufacturing Site, PadGiven 1, Small pad only): _arrow_pad falls back to a layout's single Small pad; marks (3 places x2) fit all three terminals at 0.26-0.28, turn 98, ship 30-40 units from the Small arrow (787,421); facing 358 - heading 260 = 98.
+
 ## 0.96.49 - Tourist 1 game pad numbers (all four)
 
 Ben, 16 Nov 22:01: bottom small 1, top small 2, bottom large 3, top large 4. pad_frames.json tourist_1 has game_pad on all four. settlement_track._arrow_pad: when any pad of the layout has game_pad, only game_pad matches count (old per-size numbers ignored). Test: LinedUpFromThePadArrow.test_tourist_one_game_pad_numbers_are_all_four.
