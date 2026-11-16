@@ -212,3 +212,18 @@ class PadSizes(unittest.TestCase):
             data = json.loads((Path(__file__).resolve().parent.parent / "maps" / "settlements" / (name + ".json")).read_text(encoding="utf-8"))
             self.assertEqual(data["pad_outlines"][0]["size"], "Large", name)
             self.assertNotIn("half", data["pad_outlines"][0], name)
+
+
+class MeasuredSizes(unittest.TestCase):
+    """Sizes measured from Ben's marked yellow terminals (16 Nov 2026: Dovzhenko Industrial, Shin Prospecting Platform, Yi's Workshop)."""
+
+    def test_the_measured_layouts_carry_their_size(self):
+        maps = SettlementMaps()
+        self.assertAlmostEqual(maps.get("industrial_2")["scale"], 0.345)
+        self.assertAlmostEqual(maps.get("extraction_3")["scale"], 0.35)
+        self.assertAlmostEqual(maps.get("agriculture_4")["scale"], 0.44)
+        self.assertAlmostEqual(maps.get("agriculture_1")["scale"], 0.408)
+
+    def test_industrial_4_has_the_terminal_marked_three_times(self):
+        marked = [m for m in SettlementMaps().get("industrial_4")["markers"] if m.get("marked")]
+        self.assertEqual([(m["x"], m["y"]) for m in marked], [(358, 176)])

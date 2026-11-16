@@ -358,6 +358,12 @@
    "type": "tip",
    "x": 495,
    "y": 634
+  },
+  {
+   "type": "terminal_l0",
+   "x": 358,
+   "y": 176,
+   "marked": true
   }
  ],
  "pictured": true,
