@@ -227,3 +227,17 @@ class MeasuredSizes(unittest.TestCase):
     def test_industrial_4_has_the_terminal_marked_three_times(self):
         marked = [m for m in SettlementMaps().get("industrial_4")["markers"] if m.get("marked")]
         self.assertEqual([(m["x"], m["y"]) for m in marked], [(642, 330)])
+
+
+class HighTechOneMeasured(unittest.TestCase):
+    """Kolsuk Astrophysics Expedition (16 Nov 2026): two marked yellow terminals 162 m apart fit at 0.330, turned 111, and put the ship 17 map units from the Large pad arrow."""
+
+    def test_size_and_the_ship_lands_on_the_large_pad(self):
+        import cmath
+        from navigation import settlement_track
+        data = SettlementMaps().get("high_tech_1")
+        self.assertAlmostEqual(data["scale"], 0.33)
+        pad = [p for p in settlement_track.known_pad_frames()["high_tech_1"]["pads"] if p["size"] == "Large"][0]
+        ship = (-80.55, 112.24)
+        cal = settlement_track.pad_calibration("high_tech_1", pad, 248.0, ship, 0.0, 0.0, 1000000.0, scale=data["scale"])
+        self.assertAlmostEqual(cal.turn_degrees() % 360.0, 108.0, delta=1.0)        # the pad arrow turn; the marks gave 111

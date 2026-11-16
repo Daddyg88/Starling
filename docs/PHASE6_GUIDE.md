@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.46 - High Tech 1 measured
+
+ZIP 16 Nov 20:44 (0.96.45): live 'corrected by your marked terminals: 2 match, 1 not on it, 0.341, turned 96 (was 108)'. Offline: yellow (1147,88)+(748,375), 162 m apart: 0.330, turn 111, ship (1295,387) vs Large arrow (1281,404): 17 units. Facing check 248+111=359 vs arrow 356. Scale 0.33 set; third mark (891,695) once: not added.
+
 ## 0.96.45 - Industrial 4 corrected (wrong twin)
 
 ZIP 16 Nov 19:52 (0.96.43): saved line-up (0.343, turn 100) remembered; Ben: 'near the small pad when at the Large pad centre'. With only the 2 real map terminals (495,154) and (514,350), marks A(50,59) C(-13.7,38.5) ->T0,T1 give 0.340, turn -78, ship (815,134) = 41 m from the Large arrow (940,38) and B at (642,330); the twin C,A->T0,T1 (turn 102) puts the ship at (194,370) near the Small arrow: that was the wrong one and the 0.96.41 tool added (358,176) from it. Removed; (642,330) added; scale 0.34. industrial_4 pad arrows may still be off, but the Large one agrees.

@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.46: High Tech 1 at 0.33 (one visit). CHECK again with 3 yellow terminals; a third terminal near (891,695) may be missing from the map.
 - [ ] 0.96.45: Industrial 4 corrected (0.34, terminal at 642,330 instead of 358,176). CHECK at Yi's Workshop. RULE: never add a terminal from marks unless the ship's spot lands on its pad; check tools/add_marked_terminals.py against Small pads too.
 - [ ] 0.96.44: Industrial 4 at 0.333; the mark correction tries only +-2.5% around a measured size. CHECK at Yi's Workshop: arrow on the terminals after 3 marks.
 - [ ] 0.96.43: Industrial 4 at 0.327; three marks correct the map from any turn. CHECK at Yi's Workshop. OPEN: Industrial 4 pad arrows (Large 940,38 vs ship at 178,380 on the Large pad), and the ship heading on a pad varies (100 vs 11 at the same pad), so landing-heading line-ups are weak.
