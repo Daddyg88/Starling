@@ -999,4 +999,4 @@ class YisWorkshopWideSearch(unittest.TestCase):
 
     def test_industrial_4_carries_its_measured_size(self):
         from navigation.settlement_maps import SettlementMaps
-        self.assertAlmostEqual(SettlementMaps().get("industrial_4")["scale"], 0.327)
+        self.assertAlmostEqual(SettlementMaps().get("industrial_4")["scale"], 0.333)

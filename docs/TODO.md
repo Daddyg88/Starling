@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.44: Industrial 4 at 0.333; the mark correction tries only +-2.5% around a measured size. CHECK at Yi's Workshop: arrow on the terminals after 3 marks.
 - [ ] 0.96.43: Industrial 4 at 0.327; three marks correct the map from any turn. CHECK at Yi's Workshop. OPEN: Industrial 4 pad arrows (Large 940,38 vs ship at 178,380 on the Large pad), and the ship heading on a pad varies (100 vs 11 at the same pad), so landing-heading line-ups are weak.
 - [ ] 0.96.42: listen to G'day, supercruise, exobiology and the Aussie slang words (config/pronunciations.json); tell me which still sound wrong.
 - [ ] 0.96.41: Industrial 2 = 0.345, Extraction 3 = 0.35 (provisional, one visit), Industrial 4 terminal (358,176) added. CHECK each by landing and marking two yellow terminals. Industrial 4 still needs a size (only 2 map terminals, 64 m apart).

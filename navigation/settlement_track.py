@@ -33,6 +33,7 @@ SHOW_WITHIN_METRES = 700.0           # the map pops up when you are on foot this
 ARRIVED_METRES = 6.0                 # the arrow goes away when you are this close to what it points at
 DOCK_TRUST_UNITS = 50.0              # a line-up made from the landing alone is looser (the ship's heading wobbles 5 to 8 degrees), so a stop fits within this
 TRUST_UNITS = 30.0                   # a later stop this close (map units, about 10 m) to a terminal, the power regulator or the alarm fits the line-up
+REFINE_MARK_SIZES = (0.975, 1.0, 1.025)   # sizes tried around a measured layout's own size (a mark is only good to about 5 m, which is 5% of a 100 m walk)
 DOCK_WRONG_UNITS = 200.0                  # a landing line-up whose later stops miss by this much is probably the wrong layout
 REFINE_MATCH_UNITS = 22.0            # a marked terminal this close (map units, about 8 m) to a terminal on the map counts as that terminal
 REFINE_TURN_DEGREES = 30            # the landing line-up's turn is rough (the ship's heading wobbles); the marks may correct it by this much
@@ -855,11 +856,13 @@ class SettlementTracker:
         if data is None:
             return None
         ship = getattr(self, "dock_ship", None) or self.anchors.get("pad")
-        found = refine_calibration(cal, data, self.spots, ship)
+        s0 = abs(cal.a)
+        sizes = tuple(s0 * f for f in REFINE_MARK_SIZES) if data.get("scale") else None          # a measured layout: stay close to its size, a mark is only good to a few metres
+        found = refine_calibration(cal, data, self.spots, ship, scales=sizes)
         if (found is None or found[1] < 3) and sum(1 for spot in self.spots if spot[0] == "terminal") >= 3:
             # The ship's heading on the pad can be well off the way the layout is turned (Yi's Workshop, 16 Nov: the line-up started 200 degrees out), so the small
             # search around it misses. Three marked terminals that all land on map terminals are unmistakable, so then every turn and any spot on the pad is tried.
-            wide = refine_calibration(cal, data, self.spots, ship, turns=range(-180, 180), shift=None)
+            wide = refine_calibration(cal, data, self.spots, ship, scales=sizes, turns=range(-180, 180), shift=None)
             if wide is not None and wide[1] >= 3:
                 found = wide
         if found is None:

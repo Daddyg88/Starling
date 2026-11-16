@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.44 - Industrial 4 at 0.333, size search +-2.5%
+
+ZIP 16 Nov 19:32 (0.96.43): live 'corrected by your marked terminals: 3 match, 0.343, turned 100' after the third mark (the wide search works). Marks of 3 visits: A (47.5,59.4)..(52.8,58.9), B (2.2,-2.5) x4, C (-13.7,38.5): a 5 m spread on A moves the fit from 0.326 to 0.341; mean 0.333, turn 101. _refine_from_marks now tries data scale x REFINE_MARK_SIZES (0.975, 1, 1.025) when the map has its own scale.
+
 ## 0.96.43 - Industrial 4 measured, wide search
 
 ZIP 16 Nov 18:47 (0.96.39, Yi's Workshop, PadGiven 2, Ben says Large pad, ship heading 11): marks at 3 places fit the three industrial_4 terminals (514,350),(358,176),(495,154) at 0.327, turn 102, error 0.3 m. The seed (Large arrow facing 268) turned -103: 205 degrees out; the +-30 degree search returned a wrong 2-match answer. Fix: settlement_track._refine_from_marks retries with every turn, any shift, and takes it only with >=3 matched. The ship maps to (178,380) on the picture, 164 units from the 'Small' arrow (170,544) and far from the 'Large' arrow (940,38): the industrial_4 pad arrows need checking. Heading on the pad also differed 89 degrees between two visits (100 and 11), so landing heading is a weak seed.
