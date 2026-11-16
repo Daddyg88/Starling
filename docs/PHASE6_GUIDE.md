@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.43 - Industrial 4 measured, wide search
+
+ZIP 16 Nov 18:47 (0.96.39, Yi's Workshop, PadGiven 2, Ben says Large pad, ship heading 11): marks at 3 places fit the three industrial_4 terminals (514,350),(358,176),(495,154) at 0.327, turn 102, error 0.3 m. The seed (Large arrow facing 268) turned -103: 205 degrees out; the +-30 degree search returned a wrong 2-match answer. Fix: settlement_track._refine_from_marks retries with every turn, any shift, and takes it only with >=3 matched. The ship maps to (178,380) on the picture, 164 units from the 'Small' arrow (170,544) and far from the 'Large' arrow (940,38): the industrial_4 pad arrows need checking. Heading on the pad also differed 89 degrees between two visits (100 and 11), so landing heading is a weak seed.
+
 ## 0.96.42 - Aussie slang and broken-up game words
 
 config/pronunciations.json 'words' got 55 entries (applied to every voice by tts/pronounce.py): G'day -> guh day, Aussie slang from voicepacks/default/aussie.json, supercruise/exobiology/hyperdiction/scoopable broken into parts. Tests: tests/test_pronounce.py AussieAndBrokenUpWords. Untested by ear.

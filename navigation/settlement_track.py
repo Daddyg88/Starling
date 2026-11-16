@@ -854,7 +854,14 @@ class SettlementTracker:
         data = self.maps.get(cal.map_id)
         if data is None:
             return None
-        found = refine_calibration(cal, data, self.spots, getattr(self, "dock_ship", None) or self.anchors.get("pad"))
+        ship = getattr(self, "dock_ship", None) or self.anchors.get("pad")
+        found = refine_calibration(cal, data, self.spots, ship)
+        if (found is None or found[1] < 3) and sum(1 for spot in self.spots if spot[0] == "terminal") >= 3:
+            # The ship's heading on the pad can be well off the way the layout is turned (Yi's Workshop, 16 Nov: the line-up started 200 degrees out), so the small
+            # search around it misses. Three marked terminals that all land on map terminals are unmistakable, so then every turn and any spot on the pad is tried.
+            wide = refine_calibration(cal, data, self.spots, ship, turns=range(-180, 180), shift=None)
+            if wide is not None and wide[1] >= 3:
+                found = wide
         if found is None:
             return None
         new, matched, missing = found

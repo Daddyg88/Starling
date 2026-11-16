@@ -978,3 +978,25 @@ class AgricultureOneMeasured(unittest.TestCase):
             self.assertLess(math.hypot(x - terminal[0], y - terminal[1]), 25.0)
         ship_x, ship_y = cal.from_world(*self.SHIP)
         self.assertLess(math.hypot(ship_x - self.pad["x"], ship_y - self.pad["y"]), 130.0)      # the ship is on the Large pad
+
+
+class YisWorkshopWideSearch(unittest.TestCase):
+    """Yi's Workshop (16 Nov 2026): three marked terminals, the landing line-up started about 200 degrees out, so only a search of every turn finds them."""
+
+    def test_three_marks_correct_a_line_up_that_started_far_out(self):
+        from navigation.settlement_maps import SettlementMaps
+        data = SettlementMaps().get("industrial_4")
+        pad = [p for p in settlement_track.known_pad_frames()["industrial_4"]["pads"] if p["size"] == "Large"][0]
+        ship = (80.08, -45.98)
+        seed = settlement_track.pad_calibration("industrial_4", pad, 11.0, ship, 7.07, -90.0, 1100000.0, scale=0.327)
+        marks = [("terminal", 47.5, 59.4), ("terminal", 2.2, -2.5), ("terminal", -13.6, 39.4), ("terminal", 2.2, -2.5)]
+        narrow = settlement_track.refine_calibration(seed, data, marks, ship)
+        self.assertTrue(narrow is None or narrow[1] < 3)                       # the small search is wrong or finds fewer than 3
+        wide = settlement_track.refine_calibration(seed, data, marks, ship, turns=range(-180, 180), shift=None)
+        self.assertEqual(wide[1], 3)
+        self.assertAlmostEqual(abs(wide[0].a), 0.327, delta=0.02)
+        self.assertAlmostEqual(wide[0].turn_degrees(), 102.0, delta=3.0)
+
+    def test_industrial_4_carries_its_measured_size(self):
+        from navigation.settlement_maps import SettlementMaps
+        self.assertAlmostEqual(SettlementMaps().get("industrial_4")["scale"], 0.327)
