@@ -1,0 +1,45 @@
+{
+ "_help": "Once per settlement visit, about 15 seconds after you step out and the map is up, she makes a dry remark about the TYPE of settlement (Extraction, Agriculture, Industrial, Military, Tourist, High Tech). One line is picked at random. Plain text, no fields. Used by navigation/settlement_track.py.",
+ "Extraction": [
+  "Extraction site. I always get dusty at these places. Mind the boots.",
+  "Another mine. Wipe your feet before you come back aboard, Commander.",
+  "Extraction. Lots of rock, lots of noise, and very little to talk about. Lovely.",
+  "Digging for a living. I respect it. From a safe distance.",
+  "Dust, drills and a canteen with one working kettle. We must be at a mine.",
+  "An extraction site. Whatever they pull out of the ground, I hope it's worth the mess.",
+  "Right. Extraction. Everything here is covered in grit, including my mood."
+ ],
+ "Agriculture": [
+  "Agriculture. Smells like money and fertiliser. Mostly fertiliser.",
+  "A farm in space. I love it. Try not to stand on anything that's growing.",
+  "Hydroponics, Commander. Everything here is greener than you.",
+  "Agricultural settlement. If anyone offers you a salad, say yes. It's been a while.",
+  "Farm fresh, they say. Fresh from a very long way from the farm.",
+  "Crops everywhere. No pun intended, but I'm told the leaf-peeping is lovely."
+ ],
+ "Industrial": [
+  "Industrial. Lots of pipes, lots of noise. Hold your nose and your breath.",
+  "Factory floor. Everything here is either hot, loud, or both.",
+  "An industrial site. Somebody is working very hard and somebody else is on a break.",
+  "Industrial. Keep your hands off the machinery, Commander. I mean it this time.",
+  "Conveyors, vents and a health and safety sign that's seen better days."
+ ],
+ "Military": [
+  "Military settlement. Keep your hands where they can see them.",
+  "Military. Everyone here is very serious. Don't make jokes. Leave the jokes to me.",
+  "Guard posts and cameras. Walk like you belong here, Commander.",
+  "A military base. Be polite, be quick, and don't touch anything with a skull on it."
+ ],
+ "Tourist": [
+  "A tourist settlement. Try to look like you're having a nice time.",
+  "Tourist spot. Somebody sells overpriced souvenirs here, I just know it.",
+  "Tourism. Lovely views, lovely queues, and a gift shop I'm not allowed to visit.",
+  "A holiday resort in a hostile galaxy. Honestly, good for them."
+ ],
+ "High Tech": [
+  "High tech. Lots of screens, lots of wires, and a coffee machine more advanced than me.",
+  "A high tech site. Everything here costs more than our ship.",
+  "High tech. If something beeps, it's probably not for us.",
+  "Clean floors and quiet servers. I'm a bit jealous."
+ ]
+}

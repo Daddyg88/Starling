@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.52: settlement-type remark 15 s after stepping out. LISTEN for it once per visit. Extraction 5: map prototype does not fit three repeatable marks (ship, then 3 terminal spots about 75 m apart in a line); needs a better map or a game map screenshot.
 - [ ] 0.96.51: years, dates, system codes and acronyms respelled for speech. LISTEN for: a year in a fact, a system name in a guardian line, SRV/DSSA.
 - [ ] 0.96.50: own portraits in data/portraits survive an update (tester to confirm after the next release). Industrial 1 at 0.27, landing on its Small pad lines the map up (one visit, provisional).
 - [ ] 0.96.49: Tourist 1: land on pad 4 (top Large) and check the line-up; pads 1 and 2 (small) give no first guess.

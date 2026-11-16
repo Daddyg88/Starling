@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.52 - a remark on the settlement type
+
+Once per visit, 15 seconds after you step out with the map up, she says one line from voicepacks/default/settlement_types.json for the settlement's group (Extraction, Agriculture, Industrial, Military, Tourist, High Tech). Edit that file to change the lines. Not tested in the real game.
+
 ## 0.96.51 - her lines read more naturally
 
 Research showed her lines are already written the way people speak (contractions, short sentences, slang). Years, dates, system codes and acronyms were still read badly, so `tts/pronounce.py` now respells them for the voice only: 1994 = nineteen ninety-four, 3125 = thirty-one twenty-five, 16th = sixteenth, NL-N C23-4 = N L, N, C 2 3, 4, SRV = S R V. Amounts such as 1500 credits are left alone. Not tested by ear.

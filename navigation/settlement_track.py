@@ -14,14 +14,28 @@ import cmath
 import json
 import math
 import os
+import random
 import re
 import time
+from pathlib import Path
 
 from core import paths
 from core.logger import get_logger
 from navigation import settlement_share, settlement_solve
 
 log = get_logger("settlement_track")
+
+TYPE_REMARK_DELAY = 15.0              # seconds on foot, map up, before the once-a-visit remark about the settlement type
+
+
+def _type_lines():
+    path = Path(__file__).resolve().parents[1] / "voicepacks" / "default" / "settlement_types.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return {k: [x for x in v if isinstance(x, str)] for k, v in data.items() if isinstance(v, list)}
+
 
 GROUP_OF_ECONOMY = {"$economy_agri;": "Agriculture", "$economy_industrial;": "Industrial", "$economy_extraction;": "Extraction",
                     "$economy_military;": "Military", "$economy_tourism;": "Tourist", "$economy_hightech;": "High Tech"}
@@ -356,6 +370,8 @@ class SettlementTracker:
         self.clock = time.monotonic
         self.say = None                 # (text) -> speaks a sentence; set by the app (voice helpers' answers are not spoken by themselves)
         self._asked = False
+        self._quip_due = None           # when to make the once-a-visit remark about the settlement's type
+        self._quipped = False
         self.known = known_settlements()
         self.shipped = known_calibrations()
         self.pad_frames = known_pad_frames()   # map id -> its landing pads (place and facing on the picture), from Ben's arrows
@@ -439,6 +455,7 @@ class SettlementTracker:
         self.calibration = None
         self.dismissed = False
         self._asked = False
+        self._quip_due, self._quipped = None, False
         self.view.position = None
         if self.known.get(market) and self.maps.get(self.known[market]) is not None:
             self.settlement["map"] = self.known[market]
@@ -900,6 +917,22 @@ class SettlementTracker:
         if self.say is not None:
             self._speak("That map does not fit where you have been standing, so I have taken it back. Stand at a few more terminals and I will try again.")
 
+    def _type_remark(self, s, on_foot, want):
+        """Once per visit, a little while after you step out with the map up, she remarks on the TYPE of settlement (voicepacks/default/settlement_types.json)."""
+        if s is None or self._quipped or not on_foot or not want:
+            return
+        now = self.clock()
+        if self._quip_due is None:
+            self._quip_due = now + TYPE_REMARK_DELAY
+        elif now >= self._quip_due:
+            self._quipped = True
+            try:
+                lines = _type_lines().get(s.get("group") or "")
+                if lines:
+                    self._speak(random.choice(lines))
+            except Exception:
+                log.exception("The settlement tracker could not make its remark")
+
     def _show_or_hide(self, on_foot, near):
         """The map comes up when you step out near a settlement we have a map for, and goes when you get back in or leave."""
         s = self.settlement
@@ -912,6 +945,7 @@ class SettlementTracker:
             if 1 < len(could) < 8:
                 self._speak("I cannot tell which %s layout this is: %s. Say show settlement map and the name, for example %s."
                             % (s.get("group") or "settlement", ", ".join(could), could[0].lower()))
+        self._type_remark(s, on_foot, want)
         if want and self.view.current is None:
             self.view.current = s["map"]
             self.view.shown_at = time.monotonic()

@@ -377,6 +377,29 @@ class ShowingAndHiding(Helpers):
         self.assertIsNone(self.view.current)
 
 
+class TypeRemark(Helpers):
+    def test_one_remark_per_visit_after_a_delay(self):
+        self.ready()
+        said, now = [], [1000.0]
+        self.tracker.say = said.append
+        self.tracker.clock = lambda: now[0]
+        self.tracker.settlement["group"] = "Extraction"
+        self.walk(*SHIP)
+        self.assertEqual(said, [])
+        now[0] += 20
+        self.walk(*SHIP)
+        self.assertEqual(len(said), 1)
+        now[0] += 60
+        self.walk(*SHIP)
+        self.assertEqual(len(said), 1)
+
+    def test_every_group_has_lines(self):
+        from navigation.settlement_track import _type_lines
+        lines = _type_lines()
+        for group in ("Extraction", "Agriculture", "Industrial", "Military", "Tourist", "High Tech"):
+            self.assertTrue(lines.get(group), group)
+
+
 class ThePointer(Helpers):
     def setUp(self):
         super().setUp()
