@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.53 - Extraction 5 measured
+
+Delgado Mines (Extraction 5): the tester's repeated marks fit two yellow terminals and the HAB blue terminal at 0.181 metres per map unit, turned about 16 degrees. Both the layout and its small pad carry that size. Provisional, not tested in the real game.
+
 ## 0.96.52 - a remark on the settlement type
 
 Once per visit, 15 seconds after you step out with the map up, she says one line from voicepacks/default/settlement_types.json for the settlement's group (Extraction, Agriculture, Industrial, Military, Tourist, High Tech). Edit that file to change the lines. Not tested in the real game.

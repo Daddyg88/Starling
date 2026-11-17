@@ -1037,6 +1037,25 @@ class AgricultureOneMeasured(unittest.TestCase):
         self.assertLess(math.hypot(ship_x - self.pad["x"], ship_y - self.pad["y"]), 130.0)      # the ship is on the Large pad
 
 
+class DelgadoMinesExtractionFive(unittest.TestCase):
+    """Delgado Mines (16 Nov 2026, a tester, three visits with the same marks): two yellow terminals and the blue HAB one, in a line about 75 m apart.
+    The map is drawn small: 0.18 metres per unit."""
+
+    SHIP = (-17.464994, -127.591347)
+    MARKS = [("terminal", -38.6, 99.6), ("terminal", -73.7, 33.0), ("terminal", -105.8, -30.5)]
+
+    def test_the_marks_fit_the_three_terminals_at_the_layouts_size(self):
+        from navigation.settlement_maps import SettlementMaps
+        data = SettlementMaps().get("extraction_5")
+        self.assertAlmostEqual(data["scale"], 0.181)
+        pad = settlement_track.known_pad_frames()["extraction_5"]["pads"][0]
+        seed = settlement_track.pad_calibration("extraction_5", pad, -167.0, (0.0, 0.0), self.SHIP[0], self.SHIP[1], 4677772.0, scale=0.181)
+        fit = settlement_track.refine_calibration(seed, data, self.MARKS, (0.0, 0.0), turns=range(-180, 180), shift=None)
+        self.assertEqual(fit[1], 3)
+        self.assertAlmostEqual(abs(fit[0].a), 0.181, delta=0.01)
+        self.assertAlmostEqual(fit[0].turn_degrees(), 16.0, delta=6.0)
+
+
 class YisWorkshopWideSearch(unittest.TestCase):
     """Yi's Workshop (16 Nov 2026): the landing line-up started about 200 degrees out, so only a search of every turn finds the three marked terminals.
     Two matching terminals fit the map two ways (turned half a circle apart); the right one puts the ship on the Large pad (940, 38)."""
