@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.54 - calmer suit temperature warnings
+
+The on-foot cold and hot warnings flicker around the limit. Each warning now stays quiet after being said: mild ones for 5 minutes, dangerous ones for 2. Change the numbers in journal/status_reader.py (DEFAULT_MIN_GAP), or switch the mild ones off in config/events.json. Not tested in the real game.
+
 ## 0.96.53 - Extraction 5 measured
 
 Delgado Mines (Extraction 5): the tester's repeated marks fit two yellow terminals and the HAB blue terminal at 0.181 metres per map unit, turned about 16 degrees. Both the layout and its small pad carry that size. Provisional, not tested in the real game.

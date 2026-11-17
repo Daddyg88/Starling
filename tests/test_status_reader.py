@@ -2,6 +2,7 @@ import json
 import os
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 from journal.status_reader import FLAG_IN_DANGER, FLAG_LOW_FUEL, StatusReader
@@ -347,3 +348,38 @@ class DangerIsOffByDefault(unittest.TestCase):
         reader.handle_status({"Flags": FLAG_IN_DANGER})
         self.assertEqual([e.name for e in heard if e.name == "InDanger"], [])
 
+
+
+class SuitTemperatureWarningsAreCalmer(unittest.TestCase):
+    COLD, VERY_COLD = 1 << 8, 1 << 10
+
+    def setUp(self):
+        self.processor, _bus, self.heard = make_processor()
+        self.now = [100.0]
+        self.reader = StatusReader(None, self.processor)
+        self.reader._clock = lambda: self.now[0]
+        patch = unittest.mock.patch("journal.status_reader.time.monotonic", lambda: self.now[0])
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def feed(self, flags2, seconds=30.0):
+        self.now[0] += seconds
+        self.reader.handle_status({"Flags": 0, "Flags2": flags2})
+
+    def test_the_gaps_are_set(self):
+        from journal.status_reader import DEFAULT_MIN_GAP
+        self.assertEqual(DEFAULT_MIN_GAP["ColdWarning"], 300)
+        self.assertEqual(DEFAULT_MIN_GAP["VeryHotWarning"], 120)
+
+    def test_a_flickering_cold_warning_is_said_once(self):
+        self.feed(1)                                         # bit 0 = on foot
+        for flags2 in (1 | self.COLD, 1, 1 | self.COLD, 1, 1 | self.COLD):
+            self.feed(flags2)
+        self.assertEqual([e.name for e in self.heard if e.name == "ColdWarning"], ["ColdWarning"])
+
+    def test_it_comes_back_after_five_minutes(self):
+        self.feed(1)
+        self.feed(1 | self.COLD)
+        self.feed(1)
+        self.feed(1 | self.COLD, seconds=300.0)
+        self.assertEqual(len([e for e in self.heard if e.name == "ColdWarning"]), 2)

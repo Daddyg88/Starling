@@ -34,6 +34,8 @@ FLAG_IN_DANGER = 1 << 22
 DEFAULT_MIN_GAP = {
     "LowFuel": 60, "Overheating": 30, "InDanger": 20,
     "InterdictionInProgress": 30, "MassLocked": 3, "MassLockReleased": 3,
+    # the suit's temperature switches flicker around the limit: the mild ones stay quiet for 5 minutes, the dangerous ones come back after 2
+    "ColdWarning": 300, "HotWarning": 300, "VeryColdWarning": 120, "VeryHotWarning": 120,
 }
 _FALLBACK_GAP = 1.0
 
