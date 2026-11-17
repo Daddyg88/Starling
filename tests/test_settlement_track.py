@@ -740,8 +740,10 @@ class LinedUpFromThePadArrow(Setup):
         self.land(pad=4)
         self.tracker.settlement["map"] = self.tracker.settlement.get("map") or "tourist_1"
         self.assertEqual(self.tracker._arrow_pad("tourist_1")["y"], 221)           # pad 4 = the top large pad
-        self.tracker.settlement["pad_number"] = 1
-        self.assertIsNone(self.tracker._arrow_pad("tourist_1"))                    # a small pad is never used as an arrow
+        self.tracker.settlement["pad_number"] = 2
+        self.assertEqual(self.tracker._arrow_pad("tourist_1")["y"], 272)           # pad 2 = the top small pad (two Kestrel landings, 17 Nov 2026)
+        self.tracker.settlement["pad_number"] = 9
+        self.assertIsNone(self.tracker._arrow_pad("tourist_1"))                    # an unseen number is still not guessed
 
     def test_a_small_pad_is_used_only_when_it_is_the_layouts_only_pad(self):
         """Industrial 1 (16 Nov 2026) has one Small pad, so every ship lands there; beside a Large pad a Small arrow is still not used."""
@@ -1054,6 +1056,39 @@ class DelgadoMinesExtractionFive(unittest.TestCase):
         self.assertEqual(fit[1], 3)
         self.assertAlmostEqual(abs(fit[0].a), 0.181, delta=0.01)
         self.assertAlmostEqual(fit[0].turn_degrees(), 16.0, delta=6.0)
+
+
+class TouristOneSmallPadTwo(unittest.TestCase):
+    """Sumlak Hospitality Zone and Izdryk Leisure Complex (17 Nov 2026, a tester, Kestrel on pad 2): the marks put the ship at the top small pad."""
+
+    PAD = (657, 272)
+
+    def test_the_pad_two_arrow_agrees_with_the_marks_within_ten_degrees(self):
+        pad = [p for p in settlement_track.known_pad_frames()["tourist_1"]["pads"] if p.get("game_pad") == 2][0]
+        for heading, fitted in ((159.0, 110.4), (69.0, -161.8)):
+            turn = (pad["facing"] - heading + 180) % 360 - 180
+            self.assertLess(abs((turn - fitted + 180) % 360 - 180), 10.0)
+
+    def test_the_marks_put_the_ship_on_the_top_small_pad(self):
+        from navigation.settlement_maps import SettlementMaps
+        data = SettlementMaps().get("tourist_1")
+        pad = [p for p in settlement_track.known_pad_frames()["tourist_1"]["pads"] if p.get("game_pad") == 2][0]
+        self.assertEqual((pad["x"], pad["y"]), self.PAD)
+        self.assertAlmostEqual(data["scale"], 0.425)
+
+
+class HighTechOnePadNumbers(unittest.TestCase):
+    """Kolsuk Astrophysics Expedition (17 Nov 2026, a tester): the game's pad 1 was the SMALL pad (the arrow turn matched the marks to 2 degrees);
+    the layout's only other pad is the Large one, so that is pad 2."""
+
+    def test_pad_one_is_the_small_pad_and_pad_two_the_large(self):
+        pads = {p["game_pad"]: p["size"] for p in settlement_track.known_pad_frames()["high_tech_1"]["pads"]}
+        self.assertEqual(pads, {1: "Small", 2: "Large"})
+
+    def test_the_small_pad_arrow_agrees_with_the_marks(self):
+        pad = [p for p in settlement_track.known_pad_frames()["high_tech_1"]["pads"] if p.get("game_pad") == 1][0]
+        turn = (pad["facing"] - 160.0 + 180) % 360 - 180
+        self.assertLess(abs(turn - 105.0), 5.0)
 
 
 class YisWorkshopWideSearch(unittest.TestCase):

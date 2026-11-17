@@ -142,13 +142,15 @@
     "size": "Large",
     "x": 1281,
     "y": 404,
-    "facing": 356
+    "facing": 356,
+    "game_pad": 2
    },
    {
     "size": "Small",
     "x": 517,
     "y": 607,
-    "facing": 267
+    "facing": 267,
+    "game_pad": 1
    }
   ]
  },

@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.62: Tourist 1 small pad arrows (pads 1, 2) and High Tech 1 pad numbers (1 small, 2 large). CHECK: land on High Tech 1 pad 1 and Tourist 1 pad 2 and see the first line-up. Tourist 1 pad 1 (bottom small) and High Tech 1 pad 2 (Large) not seen yet.
 - [ ] 0.96.61: listening model downloads on a fresh install (offline flag lifted once). ASK the new tester: does she hear him now? (log line 'downloading it once')
 - [ ] 0.96.60: voice load waits 12 x 20 s for ESET LiveGuard. ASK the new tester (ESET Smart Security Premium): did the voice come up after updating and waiting?
 - [ ] 0.96.59: voice load waits and retries (6 x 10 s) on 'Access is denied'. ASK the new tester: did the voice come up? (Starling folder in Windows Security exclusions; his files are on E:)

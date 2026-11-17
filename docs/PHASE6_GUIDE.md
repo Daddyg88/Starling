@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.62 - small pad arrows and High Tech 1 pad numbers
+
+In a layout whose pads carry the game's pad numbers (`game_pad` in maps/pad_frames.json), the landing pad's arrow is now used for a small pad as well as a Large one. Tourist 1 pad 2 (top small) was seen twice and agrees with the marks. High Tech 1 pads are now numbered: 1 = Small, 2 = Large (the Large arrow had been used for a pad 1 landing, which was wrong). Tourist 1 stays at 0.425 and High Tech 1 at 0.33. Not tested in the real game.
+
 ## 0.96.61 - listening model can download on a fresh install
 
 The voice switches Hugging Face's offline flag on once it is ready, which also stopped the listening model (base.en) from ever being downloaded on a fresh install. stt/faster_whisper_stt.py `allowing_download` now lifts the flag for that one download and puts it back. Needs the internet once. Not tested on a real fresh install.
