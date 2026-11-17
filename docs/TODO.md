@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.59: voice load waits and retries (6 x 10 s) on 'Access is denied'. ASK the new tester: did the voice come up? (Starling folder in Windows Security exclusions; his files are on E:)
 - [ ] 0.96.58: fresh-install voice: setup.bat installs en_core_web_sm; repair retry sees the new model; 'Access is denied' hint. ASK the tester: did adding the Starling folder to Windows Security exclusions fix it? (a log from E:\\Starling, Windows 11, source install)
 - [ ] 0.96.56: system codes say "dash". LISTEN to a few system names.
 - [ ] 0.96.55: lowercase system codes (b51-7) said letter by letter. LISTEN to a few system names; ASK Ben which names still sound wrong (named systems like Synuefe, catalogue ones like HIP, Col, Sector).

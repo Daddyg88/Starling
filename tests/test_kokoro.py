@@ -663,7 +663,7 @@ class FreshInstallProblems(unittest.TestCase):
         def factory():
             raise ImportError("DLL load failed while importing numpy_ops: Access is denied.")
         tts = KokoroTTS(Path("x.pt"), Path("x.mp3"), pipeline_factory=factory, torch_load=lambda p: "PACK", sound_module=FakeSound(),
-                        setup_function=ok_setup)
+                        setup_function=ok_setup, sleep=lambda seconds: None)
         tts.start_loading()
         for _ in range(100):
             if tts.failed_reason:
@@ -685,3 +685,51 @@ class FreshInstallProblems(unittest.TestCase):
     def test_setup_installs_the_language_helper(self):
         text = (Path(__file__).resolve().parents[1] / "setup.bat").read_text(encoding="utf-8")
         self.assertIn("spacy download en_core_web_sm", text)
+
+
+class BlockedFileRetries(unittest.TestCase):
+    def test_a_file_antivirus_holds_for_a_while_is_waited_for(self):
+        calls, pauses = {"n": 0}, []
+        pipe = FakePipeline()
+
+        def factory():
+            calls["n"] += 1
+            if calls["n"] <= 3:
+                raise ImportError("DLL load failed while importing linalg: Access is denied.")
+            return pipe
+        tts = KokoroTTS(Path("x.pt"), Path("x.mp3"), pipeline_factory=factory, torch_load=lambda p: "PACK", sound_module=FakeSound(),
+                        setup_function=ok_setup, sleep=pauses.append)
+        tts.start_loading()
+        self.assertTrue(tts.ready.wait(10))
+        self.assertEqual(calls["n"], 4)
+        self.assertEqual(len(pauses), 3)
+
+    def test_it_gives_up_after_the_retries_with_the_advice(self):
+        from tts import kokoro_tts
+        pauses = []
+
+        def factory():
+            raise ImportError("DLL load failed while importing ujson: Access is denied.")
+        tts = KokoroTTS(Path("x.pt"), Path("x.mp3"), pipeline_factory=factory, torch_load=lambda p: "PACK", sound_module=FakeSound(),
+                        setup_function=ok_setup, sleep=pauses.append)
+        tts.start_loading()
+        for _ in range(100):
+            if tts.failed_reason:
+                break
+            time.sleep(0.05)
+        self.assertEqual(len(pauses), kokoro_tts.BLOCKED_RETRIES)
+        self.assertIn("exclusion", tts.failed_reason)
+
+    def test_other_errors_are_not_retried(self):
+        pauses = []
+
+        def factory():
+            raise ValueError("no sound card")
+        tts = KokoroTTS(Path("x.pt"), Path("x.mp3"), pipeline_factory=factory, torch_load=lambda p: "PACK", sound_module=FakeSound(),
+                        setup_function=ok_setup, sleep=pauses.append)
+        tts.start_loading()
+        for _ in range(100):
+            if tts.failed_reason:
+                break
+            time.sleep(0.05)
+        self.assertEqual(pauses, [])

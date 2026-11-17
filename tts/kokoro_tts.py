@@ -45,6 +45,8 @@ def looks_like_spacy_damage(error):
     return "spacy" in text and ("from_disk" in text or SPACY_MODEL in text)
 
 
+BLOCKED_RETRIES = 6              # antivirus often scans a new library file the first time it is used and holds it for a few seconds
+BLOCKED_WAIT_SECONDS = 10.0
 BLOCKED_HINT = (" | Windows is refusing to load one of the voice engine's files. Usually your antivirus or Windows Security (Controlled folder access, "
                 "or a scan of new files) is blocking it. Add the whole Starling folder as an exclusion, restart Starling, or run setup.bat again. "
                 "If it still fails, send the diagnostics zip.")
@@ -151,8 +153,9 @@ class KokoroTTS(BaseTTS):
 
     def __init__(self, pack_path, reference_mp3, pipeline_factory=None, torch_load=None,
                  sound_module=None, setup_function=None, wait_for_ready=DEFAULT_WAIT_FOR_READY,
-                 cache_dir=None, spacy_repair=None):
+                 cache_dir=None, spacy_repair=None, sleep=None):
         self.pack_path = Path(pack_path)
+        self._sleep = sleep or time.sleep
         self._spacy_repair = spacy_repair or repair_spacy_model
         self.reference_mp3 = Path(reference_mp3)
         # The four "plug-in points" below exist so tests can use fakes instead of the real libraries.
@@ -349,6 +352,18 @@ class KokoroTTS(BaseTTS):
 
     def _build_pipeline(self, factory):
         """Make the voice engine. If it fails because its language helper (spaCy model) is damaged, repair that once and try again."""
+        for attempt in range(BLOCKED_RETRIES + 1):
+            try:
+                return self._build_pipeline_once(factory)
+            except Exception as error:
+                if not looks_like_blocked_file(error) or attempt >= BLOCKED_RETRIES:
+                    raise
+                log.warning("Windows refused a voice engine file (%s). Antivirus is probably scanning it. Waiting %.0f s and trying again (%d of %d).%s",
+                            error, BLOCKED_WAIT_SECONDS, attempt + 1, BLOCKED_RETRIES, BLOCKED_HINT if attempt == 0 else "")
+                self.status_message = "waiting for Windows to release a file"
+                self._sleep(BLOCKED_WAIT_SECONDS)
+
+    def _build_pipeline_once(self, factory):
         try:
             return factory()
         except Exception as error:
