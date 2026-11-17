@@ -651,3 +651,37 @@ class DamagedLanguageHelper(unittest.TestCase):
         def boom(command, **kw):
             raise OSError("no pip")
         self.assertFalse(kokoro_tts.repair_spacy_model(run=boom, python="py"))
+
+
+class FreshInstallProblems(unittest.TestCase):
+    def test_a_blocked_library_file_is_recognised(self):
+        from tts import kokoro_tts
+        self.assertTrue(kokoro_tts.looks_like_blocked_file(ImportError("DLL load failed while importing numpy_ops: Access is denied.")))
+        self.assertFalse(kokoro_tts.looks_like_blocked_file(ImportError("No module named foo")))
+
+    def test_the_voice_failure_then_says_what_to_try(self):
+        def factory():
+            raise ImportError("DLL load failed while importing numpy_ops: Access is denied.")
+        tts = KokoroTTS(Path("x.pt"), Path("x.mp3"), pipeline_factory=factory, torch_load=lambda p: "PACK", sound_module=FakeSound(),
+                        setup_function=ok_setup)
+        tts.start_loading()
+        for _ in range(100):
+            if tts.failed_reason:
+                break
+            time.sleep(0.05)
+        self.assertIn("antivirus", tts.failed_reason)
+        self.assertIn("exclusion", tts.failed_reason)
+
+    def test_the_repair_tells_python_to_look_for_the_new_model(self):
+        from tts import kokoro_tts
+        from unittest import mock
+
+        class Done:
+            returncode = 0
+        with mock.patch("tts.kokoro_tts.importlib.invalidate_caches") as refreshed:
+            kokoro_tts.repair_spacy_model(run=lambda command, **kw: Done(), python="py")
+        refreshed.assert_called_once()
+
+    def test_setup_installs_the_language_helper(self):
+        text = (Path(__file__).resolve().parents[1] / "setup.bat").read_text(encoding="utf-8")
+        self.assertIn("spacy download en_core_web_sm", text)

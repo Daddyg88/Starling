@@ -15,6 +15,10 @@ echo Installing add-ons...
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt
 if errorlevel 1 goto pipfail
 
+echo Installing the voice engine's small English helper (about 13 MB)...
+".venv\Scripts\python.exe" -m spacy download en_core_web_sm
+if errorlevel 1 echo (The helper did not install. Starling will try again by itself the first time she speaks.)
+
 echo.
 echo Setup finished. Now double-click run_starling.bat
 pause

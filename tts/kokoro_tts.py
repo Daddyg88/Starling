@@ -13,6 +13,7 @@ How it works, in plain words:
 """
 
 import hashlib
+import importlib
 import os
 import re
 import queue
@@ -44,12 +45,24 @@ def looks_like_spacy_damage(error):
     return "spacy" in text and ("from_disk" in text or SPACY_MODEL in text)
 
 
+BLOCKED_HINT = (" | Windows is refusing to load one of the voice engine's files. Usually your antivirus or Windows Security (Controlled folder access, "
+                "or a scan of new files) is blocking it. Add the whole Starling folder as an exclusion, restart Starling, or run setup.bat again. "
+                "If it still fails, send the diagnostics zip.")
+
+
+def looks_like_blocked_file(error):
+    """True for 'DLL load failed ... Access is denied': Windows or an antivirus refused a library file (a tester's fresh install)."""
+    text = str(error).lower()
+    return "access is denied" in text and ("dll" in text or "load failed" in text)
+
+
 def repair_spacy_model(run=subprocess.run, python=None):
     """Throw the damaged spaCy model away and download it again (needs the internet, about 13 MB). Returns True when it worked."""
     python = python or sys.executable
     try:
         run([python, "-m", "pip", "uninstall", "-y", SPACY_MODEL], timeout=SPACY_REPAIR_SECONDS, capture_output=True, check=False)
         done = run([python, "-m", "spacy", "download", SPACY_MODEL], timeout=SPACY_REPAIR_SECONDS, capture_output=True, check=False)
+        importlib.invalidate_caches()           # the new model was installed while we run: Python and spaCy must be told to look again (a tester's retry failed without this)
         return getattr(done, "returncode", 1) == 0
     except Exception:
         log.exception("Could not repair the voice engine's language helper")
@@ -332,7 +345,7 @@ class KokoroTTS(BaseTTS):
                      time.monotonic() - self._load_started, engine_seconds, tensor_seconds, time.monotonic() - step_warm)
         except Exception as error:
             log.exception("Kokoro failed to load")
-            self._fail("Kokoro failed to load: %s" % error)
+            self._fail("Kokoro failed to load: %s%s" % (error, BLOCKED_HINT if looks_like_blocked_file(error) else ""))
 
     def _build_pipeline(self, factory):
         """Make the voice engine. If it fails because its language helper (spaCy model) is damaged, repair that once and try again."""
