@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.69 - o7 counts in any message
+
+She now answers `o7` wherever it appears as a word in a chat message ("hi Starling o7"), not only when it is the whole message. Everyone who says it is queued (up to 40) and answered one at a time, a few seconds apart, whenever she is free; an o7 can wait up to 15 minutes, so the pre-stream countdown is fine. One reply per viewer every 3 minutes. Same switch as before.
+
 ## 0.96.68 - o7 gets an o7 back
 
 When chat types `o7` (alone, or `o7 o7`, `o7 Commander`) she says "o7" and the viewer's name, said as "oh seven". It only happens when she is free, once per viewer every 2 minutes and once overall every 20 seconds. Switch it off under Settings > Streaming (**She salutes back when chat types o7**).

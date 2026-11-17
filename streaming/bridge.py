@@ -191,6 +191,10 @@ class ChatBridge:
         except Exception:
             log.exception("Reacting to a stream event failed")
         try:
+            self.director.pump_salutes()
+        except Exception:
+            log.exception("Answering an o7 failed")
+        try:
             self.director.pump_chime()
         except Exception:
             log.exception("Chiming in on a chat question failed")

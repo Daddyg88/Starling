@@ -426,9 +426,10 @@ class ChimeIn(unittest.TestCase):
 
 class Salute(unittest.TestCase):
     def test_what_is_a_salute(self):
-        for text in ("o7", "O7", "o7!", "o7 o7", "o7 Commander", "  o7  "):
+        for text in ("o7", "O7", "o7!", "o7 o7", "o7 Commander", "  o7  ", "hi Starling o7", "great stream everyone, thanks for having me o7",
+                     "o7 see you all tomorrow", "(o7)"):
             self.assertTrue(chat.is_salute(text), text)
-        for text in ("", "o7 what is a neutron star", "hello o7 everyone in here", "o", "07", "o7 o7 o7 o7 o7", "go7"):
+        for text in ("", "o", "07", "go7", "o70", "foo7bar", "hello everyone"):
             self.assertFalse(chat.is_salute(text), text)
 
     def test_she_salutes_back_with_the_name(self):
@@ -438,26 +439,57 @@ class Salute(unittest.TestCase):
         self.assertEqual(said, [("StreamChat_Salute", {"user": "Ann"})])
         self.assertEqual(asked, [])                                 # a salute is not a question
 
-    def test_cooldowns_and_busy_and_off(self):
+    def test_a_crowd_of_o7s_is_queued_and_all_answered_in_order(self):
+        d, clock, done, asked, said = make()
+        busy = [True]
+        d.quiet_provider = lambda: not busy[0]
+        for name in ("Ann", "Bob", "Cy", "Di"):
+            d.handle(msg("hi everyone o7", name))
+        self.assertEqual(said, [])                                  # she is busy: they wait, none are lost
+        self.assertEqual(len(d.salutes), 4)
+        busy[0] = False
+        names = []
+        for _ in range(10):
+            d.pump_salutes()
+            names = [f["user"] for _k, f in said]
+            clock.now += 4
+        self.assertEqual(names, ["Ann", "Bob", "Cy", "Di"])
+        self.assertEqual(len(d.salutes), 0)
+
+    def test_gap_between_them_and_one_per_viewer(self):
         d, clock, done, asked, said = make()
         d.handle(msg("o7", "Ann"))
-        clock.now += 5
-        d.handle(msg("o7", "Bob"))                                 # too soon after anyone's
-        clock.now += 30
-        d.handle(msg("o7", "Ann"))                                 # Ann again within her own 2 minutes
+        d.handle(msg("o7", "Bob"))
+        self.assertEqual(len(said), 1)                              # Ann now; Bob waits for the short gap
+        d.pump_salutes()
         self.assertEqual(len(said), 1)
-        clock.now += 130
-        d.handle(msg("o7", "Ann"))
+        clock.now += 4
+        d.pump_salutes()
+        self.assertEqual([f["user"] for _k, f in said], ["Ann", "Bob"])
+        clock.now += 60
+        d.handle(msg("o7 again", "Ann"))                            # Ann said it a minute ago: not twice
         self.assertEqual(len(said), 2)
-        d.quiet_provider = lambda: False                           # she is busy: dropped, not queued
         clock.now += 300
-        d.handle(msg("o7", "Cy"))
-        self.assertEqual(len(said), 2)
-        d.quiet_provider = None
+        d.handle(msg("bye o7", "Ann"))                              # the goodbye, long after the hello
+        self.assertEqual(len(said), 3)
+
+    def test_old_ones_expire_and_the_queue_is_capped(self):
+        d, clock, done, asked, said = make()
+        d.quiet_provider = lambda: False
+        for n in range(60):
+            d.handle(msg("o7", "Viewer%d" % n))
+        self.assertEqual(len(d.salutes), d.SALUTE_MAX_WAITING)
+        clock.now += 1000
+        d.pump_salutes()
+        self.assertEqual(len(d.salutes), 0)
+        self.assertEqual(said, [])
+
+    def test_switched_off(self):
+        d, clock, done, asked, said = make()
         d.settings.set("streaming.salute", False)
-        clock.now += 300
         d.handle(msg("o7", "Di"))
-        self.assertEqual(len(said), 2)
+        d.pump_salutes()
+        self.assertEqual(said, [])
 
     def test_chat_off_means_no_salute(self):
         d, clock, done, asked, said = make(enabled=False)
