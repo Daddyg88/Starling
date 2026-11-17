@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.57 - Discord link on the website
+
+site/index.html has a Discord link in the top menu and a Join the Discord button next to Download. The site is hand-written HTML, so edit it there.
+
 ## 0.96.56 - system names say dash
 
 The dashes in system codes are now spoken: `Wregoe YU-H b51-7` is said `Wregoe Y U dash H, B 5 1 dash 7`. Not tested by ear.
