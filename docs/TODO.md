@@ -6,14 +6,14 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 
 ### SETTLEMENT MAP PROGRESS (28 layouts; updated 17 Nov, 0.96.64)
 Measured = a real size (metres per map unit) from tester marks. Provisional = one visit only.
-- [x] MEASURED, 9 of 28: agriculture_1 (0.408), agriculture_4 (0.44), extraction_3 (0.35, provisional), extraction_5 (0.181, provisional), high_tech_1 (0.33), industrial_1 (0.27, provisional), industrial_2 (0.345), industrial_4 (0.34), tourist_1 (0.425, three visits).
+- [x] MEASURED, 10 of 28: agriculture_1 (0.408), agriculture_4 (0.44), extraction_3 (0.35, provisional), extraction_5 (0.181, provisional), high_tech_1 (0.33), industrial_1 (0.27, provisional), industrial_2 (0.345), industrial_4 (0.34), military_2 (0.31, two visits), tourist_1 (0.425, three visits).
 - [ ] UNRESOLVED, 1: agriculture_5 (Tutunnyk). Two fits: A 0.232 (2 m miss, ship 135 m from the drawn pad) or B 0.256 (8 m miss, ship 13 m from the pad, matches the pad arrow). NEEDS Ben's look at the map: is the pad at the bottom or top, are three terminals in a row near it, which one is blue.
-- [ ] NOT MEASURED YET, 18 (need a visit with 'mark spot ship' then 2 to 3 'mark spot terminal' 100 m+ apart, then the ZIP):
+- [ ] NOT MEASURED YET, 17 (need a visit with 'mark spot ship' then 2 to 3 'mark spot terminal' 100 m+ apart, then the ZIP):
   - Agriculture: agriculture_2, agriculture_3 (agriculture_2 and 5 look alike, 1 and 3 too, so visits also tell the pairs apart)
   - Extraction: extraction_1, extraction_2, extraction_4
   - High Tech: high_tech_2, high_tech_3, high_tech_4
   - Industrial: industrial_3, industrial_5
-  - Military: military_1, military_2, military_3, military_4, military_5
+  - Military: military_1, military_3, military_4, military_5
   - Tourist: tourist_2, tourist_3, tourist_4
 - [ ] NO PAD ARROWS: military_3 and military_4 (the pad direction is unknown).
 - [ ] PAD ARROWS SUSPECT: industrial_4 (Large 940,38 vs ship at 178,380 on the Large pad).
