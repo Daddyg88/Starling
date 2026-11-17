@@ -105,6 +105,7 @@ class App:
         self.route_voice = None
         self.route_follower = None
         self.stream_chat = None
+        self.ui_requests = []            # windows her voice asked the dashboard to open or close ('memory_window', 'memory_window_close')
         self.ask = None
         self.ptt = None
         self.buttons = None
@@ -501,6 +502,13 @@ class App:
             except Exception:
                 self.log.exception("Red alert could not start")
             try:
+                from ui.window_voice import WindowVoice
+                from navigation.voice import Narrator
+                self.commands.extra_helpers.append(WindowVoice(
+                    self.settings, self.request_ui, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
+            except Exception:
+                self.log.exception("The window voice commands could not start")
+            try:
                 from streaming.voice import StreamChatVoice
                 from navigation.voice import Narrator
                 self.commands.extra_helpers.append(StreamChatVoice(
@@ -645,6 +653,11 @@ class App:
             return "Memory is not running."
         self.memory_store.forget_everything()
         return "Done. She has forgotten everything."
+
+    def request_ui(self, name):
+        """Her voice asks the dashboard to do something with a window (it looks every half second; see Dashboard._poll_ui_requests)."""
+        self.ui_requests.append(str(name))
+        del self.ui_requests[:-10]
 
     def knowledge(self):
         """Everything she has kept about you, for the 'What she knows about you' window (memory/knowledge.py)."""

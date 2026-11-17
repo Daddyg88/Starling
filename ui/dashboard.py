@@ -133,6 +133,7 @@ class Dashboard:
         self.root.after(300, self._set_window_icon)
         self.show("home" if app.settings.get("app.first_run_done", False) else "setup")      # first time: the checklist
         self.root.after(REFRESH_MS, self._tick)
+        self.root.after(500, self._poll_ui_requests)
 
     # ------------------------------------------------------------------ layout
     def _font(self, size=None, bold=False, head=False):
@@ -1272,6 +1273,24 @@ class Dashboard:
             return
         names = ", ".join(("%s [HOTAS]" if d.is_hotas() else "%s") % d.name for d in devices)
         self._controls_result("Found: " + names, T.GOOD)
+
+    def _poll_ui_requests(self):
+        """Her voice can ask for a window ('show the memory window', 'close the memory window'); this answers it, twice a second."""
+        try:
+            requests = getattr(self.app, "ui_requests", None)
+            while requests:
+                name = requests.pop(0)
+                if name == "memory_window":
+                    self.show_knowledge()
+                elif name == "memory_window_close":
+                    if getattr(self, "knowledge_window", None) is not None:
+                        self.knowledge_window.close()
+        except Exception:
+            log.exception("A window request from her voice failed")
+        try:
+            self.root.after(500, self._poll_ui_requests)
+        except Exception:
+            pass
 
     def show_knowledge(self):
         """Opens the 'What she knows about you' window (ui/knowledge_window.py): every kept fact with its own Forget button."""

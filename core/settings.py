@@ -73,7 +73,7 @@ DEFAULTS = {
     "subtarget": {"press_ahead": False},
     "red_alert": {"minutes": 30, "banner": True, "size": "Medium", "combat_mode": True, "auto_power_plant": True},
     "hack": {"enabled": True, "announce": True, "overlay": True, "position": "Left", "size": "Medium", "sound": "Normal", "minutes": 10, "next_target": True, "mood": True},
-    "memory": {"enabled": True, "recall_at_login": True, "habits": True},
+    "memory": {"enabled": True, "recall_at_login": True, "habits": True, "window_geometry": ""},
     "updates": {"repo": "", "auto_check": True, "ask": False, "ask_reset": False, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},
     "ptt": {"mode": "off", "button": "", "beep": True, "skip_wake": True},

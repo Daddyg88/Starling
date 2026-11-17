@@ -202,5 +202,29 @@
   "Salute received. o7, {user}.",
   "o7, Commander. Fly safe, {user}.",
   "o7 {user}. Always a pleasure."
+ ],
+ "Window_ChatShown": [
+  "Chat window up.",
+  "Here's chat.",
+  "Chat window on screen."
+ ],
+ "Window_ChatHidden": [
+  "Chat window hidden.",
+  "Chat window away. I'm still listening.",
+  "Closing the chat window."
+ ],
+ "Window_ChatNeedsChat": [
+  "The chat window will appear once chat is switched on. Say chat on.",
+  "I'll show it as soon as chat is on. Say chat on."
+ ],
+ "Window_MemoryShown": [
+  "Here's everything I know about you.",
+  "Opening my notes on you. Be gentle.",
+  "Here's what I've kept."
+ ],
+ "Window_MemoryHidden": [
+  "Closed.",
+  "Notes put away.",
+  "Done."
  ]
 }

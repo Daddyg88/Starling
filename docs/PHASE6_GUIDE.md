@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.72 - close X, remembered position, voice commands for the windows
+
+The 'What she knows about you' window has an X in its corner (Escape also closes it) and remembers its position. Voice: say **show the chat window** / **hide the chat window**, and **show the memory window** / **close the memory window**. The chat window's X and remembered position were already there.
+
 ## 0.96.71 - what she knows about you, and a richer 'last time'
 
 Memory page > **What she knows about me (forget one by one)** opens a window with everything she has kept about you, grouped (You told me, People, Moments, Habits, Sessions, Totals). Press **Forget** on any line except the totals. **Forget everything** still wipes all of it and now clears the session records too. At login her 'last time' line now says where you finished and, when worth it, how many people were in chat or how often you were destroyed. The last 14 play sessions are kept as one line each in `data/stats.json` (plain text: open it, or delete the file to start again).
