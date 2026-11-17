@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.70 - the chat window
+
+Settings > Streaming > **Show the chat window** (on by default) opens a separate Starling-style window with your Twitch and YouTube chat together, while chat is switched on. Drag it by the top bar, resize it with the triangle in the bottom right, **A+** and **A-** change the text size, **Top** pins it above other windows, **X** closes it (switches the setting off). Purple dot = Twitch, red dot = YouTube; orange lines are subs, raids, gifts and Super Chats. It is read only and never takes the keyboard from the game. Its position and size are remembered. Other settings on the same page: **Keep the chat window on top** and **Chat window text size**.
+
 ## 0.96.69 - o7 counts in any message
 
 She now answers `o7` wherever it appears as a word in a chat message ("hi Starling o7"), not only when it is the whole message. Everyone who says it is queued (up to 40) and answered one at a time, a few seconds apart, whenever she is free; an o7 can wait up to 15 minutes, so the pre-stream countdown is fine. One reply per viewer every 3 minutes. Same switch as before.

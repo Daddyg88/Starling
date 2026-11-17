@@ -12,6 +12,7 @@ import time
 
 from core.logger import get_logger
 from streaming import chat, twitch, youtube
+from streaming.feed import ChatFeed
 from streaming.events import StreamEvent
 
 log = get_logger("chat_bridge")
@@ -31,6 +32,7 @@ class ChatBridge:
         self.notes = []
         self.clock = clock
         self.queue = queue.Queue(maxsize=QUEUE_SIZE)
+        self.feed = ChatFeed()          # every message, in order, for the chat window (the queue below can drop; this never does)
         self.source = None
         self.channel = ""
         self.state_text = "Off"
@@ -160,6 +162,13 @@ class ChatBridge:
 
     # ---- messages ----
     def submit(self, message):
+        try:
+            if isinstance(message, StreamEvent):
+                self.feed.add_event(message)
+            else:
+                self.feed.add_message(message)
+        except Exception:
+            log.exception("Could not add a line to the chat window feed")
         try:
             self.queue.put_nowait(message)
         except queue.Full:

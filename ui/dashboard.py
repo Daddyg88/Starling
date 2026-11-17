@@ -117,6 +117,12 @@ class Dashboard:
             log.exception("The settlement map could not start")
             self.settlement_overlay = None
         try:
+            from ui.chat_window import ChatWindow
+            self.chat_window = ChatWindow(self.root, app.settings, lambda: getattr(app, "stream_chat", None))
+        except Exception:
+            log.exception("The chat window could not start")
+            self.chat_window = None
+        try:
             from ui.route_overlay import RouteOverlay
             self.route_overlay = RouteOverlay(self.root, app.settings, lambda: app.state, lambda: app.route_follower,
                                               lambda: bool(getattr(app, "watcher", None) and app.watcher.void_compass_running()))
