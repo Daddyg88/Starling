@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.61 - listening model can download on a fresh install
+
+The voice switches Hugging Face's offline flag on once it is ready, which also stopped the listening model (base.en) from ever being downloaded on a fresh install. stt/faster_whisper_stt.py `allowing_download` now lifts the flag for that one download and puts it back. Needs the internet once. Not tested on a real fresh install.
+
 ## 0.96.60 - longer wait for ESET LiveGuard
 
 ESET LiveGuard holds each new library file for a few minutes while it analyses it, which showed up as "Access is denied" on a fresh install. The voice load now waits 20 s and retries up to 12 times (BLOCKED_RETRIES, BLOCKED_WAIT_SECONDS in tts/kokoro_tts.py). Not tested with a real ESET.

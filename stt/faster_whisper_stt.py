@@ -18,6 +18,37 @@ log = get_logger("faster_whisper")
 HINT = build_hint()
 
 
+def blocked_by_offline_flag(error):
+    """True when Hugging Face refused because its 'offline' flag is on (the voice sets it once her own voice is here, so it never waits on the internet)."""
+    text = ("%s %s" % (type(error).__name__, error)).lower()
+    return "outgoing traffic has been disabled" in text or "hf_hub_offline" in text
+
+
+def allowing_download(make):
+    """Runs make(). If it fails only because the offline flag stops the listening model's first download (a fresh install: the voice
+    is ready first and switches the flag on, so base.en could never be fetched: new tester's ZIP, 17 Nov 2026), lifts the flag for that one
+    download and puts it back."""
+    try:
+        return make()
+    except Exception as error:
+        if not blocked_by_offline_flag(error):
+            raise
+        import os
+        from huggingface_hub import constants
+        log.info("The listening model is not on this computer yet: downloading it once (about 140 MB).")
+        saved_env = os.environ.pop("HF_HUB_OFFLINE", None)
+        saved_flag = getattr(constants, "HF_HUB_OFFLINE", None)
+        try:
+            if saved_flag is not None:
+                constants.HF_HUB_OFFLINE = False
+            return make()
+        finally:
+            if saved_env is not None:
+                os.environ["HF_HUB_OFFLINE"] = saved_env
+            if saved_flag is not None:
+                constants.HF_HUB_OFFLINE = saved_flag
+
+
 class FasterWhisperSTT(BaseSTT):
     name = "faster_whisper"
     label = "Faster-Whisper (offline)"
@@ -49,8 +80,8 @@ class FasterWhisperSTT(BaseSTT):
                 return
             from faster_whisper import WhisperModel
             log.info("Loading the %s listening model (first time downloads it)...", self.model_size)
-            self._model = WhisperModel(self.model_size, device="cpu", compute_type="int8",
-                                       cpu_threads=self.cpu_threads)
+            self._model = allowing_download(lambda: WhisperModel(self.model_size, device="cpu", compute_type="int8",
+                                                                 cpu_threads=self.cpu_threads))
             log.info("Listening model ready.")
 
     def current_hint(self):

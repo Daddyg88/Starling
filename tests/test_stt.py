@@ -386,3 +386,38 @@ class SettingsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ListeningModelFirstDownload(unittest.TestCase):
+    def test_the_offline_flag_is_lifted_for_one_download_and_put_back(self):
+        import os
+        import sys
+        import types
+        from unittest import mock
+        from stt.faster_whisper_stt import allowing_download
+        constants = types.SimpleNamespace(HF_HUB_OFFLINE=True)          # a stand-in for huggingface_hub, which the build machine may not have
+        fake = types.ModuleType("huggingface_hub")
+        fake.constants = constants
+        seen = []
+
+        def make():
+            seen.append((os.environ.get("HF_HUB_OFFLINE"), constants.HF_HUB_OFFLINE))
+            if len(seen) == 1:
+                raise RuntimeError("Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled. set 'HF_HUB_OFFLINE=0'")
+            return "model"
+        with mock.patch.dict(sys.modules, {"huggingface_hub": fake}), mock.patch.dict(os.environ, {"HF_HUB_OFFLINE": "1"}):
+            self.assertEqual(allowing_download(make), "model")
+            self.assertEqual(seen[1], (None, False))
+            self.assertEqual(os.environ.get("HF_HUB_OFFLINE"), "1")
+            self.assertTrue(constants.HF_HUB_OFFLINE)
+
+    def test_other_errors_are_not_retried(self):
+        from stt.faster_whisper_stt import allowing_download
+        calls = []
+
+        def make():
+            calls.append(1)
+            raise ValueError("no microphone")
+        with self.assertRaises(ValueError):
+            allowing_download(make)
+        self.assertEqual(len(calls), 1)
