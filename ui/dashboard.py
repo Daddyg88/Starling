@@ -1318,7 +1318,8 @@ class Dashboard:
         try:
             desktop = Path.home() / "Desktop"
             target = desktop if desktop.is_dir() else paths.DATA_DIR
-            out = diagnostics.make_bundle(paths.SETTINGS_FILE, paths.LOGS_DIR, paths.DATA_DIR, APP_VERSION, target)
+            out = diagnostics.make_bundle(paths.SETTINGS_FILE, paths.LOGS_DIR, paths.DATA_DIR, APP_VERSION, target,
+                                          commander=getattr(getattr(self.app, "state", None), "commander", None))
             self._controls_result("Made %s (keys and tokens are removed). Send that file." % out.name, T.GOOD)
             try:
                 os.startfile(str(out.parent))                    # Windows: opens the folder

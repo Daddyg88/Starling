@@ -1,6 +1,6 @@
 """One zip with everything needed to work out why something is not working, with secrets taken out.
 
-Contents: the newest log files, settings (keys, tokens and passwords replaced by '***'), version and computer info, and the
+Contents: about.json (it starts with the commander's in-game name, so whoever reads the zip knows whose it is), the newest log files, settings (keys, tokens and passwords replaced by '***'), version and computer info, and the
 sizes of her data files. Nothing from the game journals or her memories is included."""
 import json
 import platform
@@ -53,7 +53,7 @@ def _tail(path, limit):
         return handle.read()
 
 
-def make_bundle(settings_path, logs_dir, data_dir, version, target_dir):
+def make_bundle(settings_path, logs_dir, data_dir, version, target_dir, commander=None):
     """Writes starling-diagnostics-<date>.zip into target_dir and returns its path."""
     target = Path(target_dir)
     target.mkdir(parents=True, exist_ok=True)
@@ -64,7 +64,9 @@ def make_bundle(settings_path, logs_dir, data_dir, version, target_dir):
             bundle.writestr("settings-without-secrets.json", json.dumps(redact(settings), indent=2))
         except (OSError, ValueError):
             bundle.writestr("settings-without-secrets.json", "{}")
-        bundle.writestr("about.json", json.dumps({**system_info(version), "data_files": data_sizes(data_dir)}, indent=2))
+        name = str(commander).strip() if commander else ""
+        bundle.writestr("about.json", json.dumps({"commander": name or "unknown (the game had not told her yet: start Elite first)",
+                                                  **system_info(version), "data_files": data_sizes(data_dir)}, indent=2))
         try:
             logs = sorted(Path(logs_dir).glob("starling.log*"), key=lambda p: p.stat().st_mtime, reverse=True)[:MAX_LOGS]
         except OSError:
