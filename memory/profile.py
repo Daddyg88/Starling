@@ -217,6 +217,28 @@ class PlayerProfile:
             return "one"
         return None
 
+    def remove(self, kind, key):
+        """Forgets ONE thing for the 'What she knows about you' window. kind: 'like', 'dislike', 'pet' (key = the pet's name) or 'fav' (key = the category).
+        True if it was there."""
+        removed = False
+        with self._lock:
+            if kind == "like" and key in self.likes:
+                self.likes.remove(key)
+                removed = True
+            elif kind == "dislike" and key in self.dislikes:
+                self.dislikes.remove(key)
+                removed = True
+            elif kind == "pet":
+                before = len(self.pets)
+                self.pets = [p for p in self.pets if p["name"] != key]
+                removed = len(self.pets) != before
+            elif kind == "fav" and key in self.favourites:
+                self.favourites.pop(key)
+                removed = True
+        if removed:
+            self.save()
+        return removed
+
     def clear(self):
         with self._lock:
             self.likes, self.dislikes, self.pets, self.favourites = [], [], [], {}

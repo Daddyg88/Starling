@@ -158,6 +158,14 @@ class People:
             return ("who", self.describe(found.group("name")))
         return None
 
+    def remove(self, name):
+        """Forgets one person (for the 'What she knows about you' window). True if she knew them."""
+        with self._lock:
+            found = self.items.pop(str(name).lower(), None) is not None
+            if found:
+                self._save()
+        return found
+
     def describe(self, name):
         item = self.items.get(name, {})
         return {"name": _pretty(name), "relation": item.get("relation", "friend"), "place": item.get("place", "")}

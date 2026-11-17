@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.71 - what she knows about you, and a richer 'last time'
+
+Memory page > **What she knows about me (forget one by one)** opens a window with everything she has kept about you, grouped (You told me, People, Moments, Habits, Sessions, Totals). Press **Forget** on any line except the totals. **Forget everything** still wipes all of it and now clears the session records too. At login her 'last time' line now says where you finished and, when worth it, how many people were in chat or how often you were destroyed. The last 14 play sessions are kept as one line each in `data/stats.json` (plain text: open it, or delete the file to start again).
+
 ## 0.96.70 - the chat window
 
 Settings > Streaming > **Show the chat window** (on by default) opens a separate Starling-style window with your Twitch and YouTube chat together, while chat is switched on. Drag it by the top bar, resize it with the triangle in the bottom right, **A+** and **A-** change the text size, **Top** pins it above other windows, **X** closes it (switches the setting off). Purple dot = Twitch, red dot = YouTube; orange lines are subs, raids, gifts and Super Chats. It is read only and never takes the keyboard from the game. Its position and size are remembered. Other settings on the same page: **Keep the chat window on top** and **Chat window text size**.

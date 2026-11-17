@@ -460,6 +460,22 @@
     "Our last trip, {when}, was {summary}.",
     "Last session, {when}, that was {summary}. Let's see if we can beat it."
   ],
+  "Login_Recap_Where": [
+    "Last time out, {when}, we made {summary} and finished in {where}.",
+    "Our last trip, {when}, was {summary}. We ended up in {where}.",
+    "{when}, we managed {summary}. That's where I left us: {where}.",
+    "Since {when}: {summary}, ending in {where}."
+  ],
+  "Login_Recap_Chat": [
+    "Chat had {people} people in it, too. Not bad.",
+    "And chat had {people} people in it. They like you, apparently.",
+    "{people} people turned up in chat that time. Let's see how many we get today."
+  ],
+  "Login_Recap_Deaths": [
+    "We were destroyed {deaths} times, though. Let's not do that today.",
+    "We lost the ship {deaths} times, mind you. I'm trying to forget it.",
+    "{deaths} explosions, though. I'd rather not do that again."
+  ],
   "Login_Docked": [
     "We're docked at {station} in the {system} system.",
     "Docked at {station}, in the {system} system.",

@@ -309,6 +309,7 @@ class App:
         _stats_narrator = _StatsNarrator(lambda: self.speech, lambda: self.dialogue, self.settings)
         self.stats = StatsKeeper(self.bus, paths.DATA_DIR / "stats.json",
                                  announce=lambda key, values: _stats_narrator.say(key, values) if self.settings.get("stats.enabled", True) else None)
+        self.stats.chat_people = lambda: len(getattr(getattr(getattr(self, "stream_chat", None), "director", None), "chatters", ()) or ())
         self.stats.attach()
         import atexit
         atexit.register(self.stats.flush)
@@ -638,10 +639,18 @@ class App:
             self.people.clear()                  # and the people you told her about
         if getattr(self, "habits", None) is not None:
             self.habits.clear()                  # and what she noticed you keep doing
+        if getattr(self, "stats", None) is not None:
+            self.stats.forget_sessions()         # and the one-line records of your play sessions
         if self.memory_store is None:
             return "Memory is not running."
         self.memory_store.forget_everything()
         return "Done. She has forgotten everything."
+
+    def knowledge(self):
+        """Everything she has kept about you, for the 'What she knows about you' window (memory/knowledge.py)."""
+        from memory.knowledge import Knowledge
+        return Knowledge(self.memory_store, getattr(self, "profile", None), getattr(self, "people", None),
+                         getattr(self, "habits", None), getattr(self, "stats", None))
 
     # ---- the optional AI chat (Personality page buttons) ----
     def install_ai_chat(self, progress=print):

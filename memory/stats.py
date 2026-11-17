@@ -22,6 +22,7 @@ MAX_SYSTEMS = 5000              # the most systems she keeps; the ones you have 
 TRIM_BY = 500
 REVISIT_COOLDOWN = 600.0        # seconds between 'we've been here' remarks
 MAX_SCANNED = 999
+MAX_SESSIONS = 14               # how many play sessions she keeps a one-line record of
 MAX_BODIES = 5000
 KILL_MILESTONES = (50, 100, 250, 500, 1000, 2500, 5000, 10000)
 
@@ -39,7 +40,11 @@ class StatsKeeper:
         self.jumps_total = 0
         self.jumps_by_day = {}
         self.terraformable = []          # body names, newest last
-        self.session = {"kills": 0, "jumps": 0}
+        self.session = {"kills": 0, "jumps": 0, "deaths": 0, "docks": 0}
+        self.session_id = now().strftime("%Y-%m-%d %H:%M")      # this play session's name in the history
+        self._started = clock()
+        self.chat_people = None          # () -> how many different people have chatted this session (set by the app when streaming)
+        self.history = []                # the last few sessions, newest last: {"id","ended","jumps","kills","deaths","docks","minutes","system","people"}
         self.history_done = False
         self.previous = {}               # how the last play session ended: {"ended": "2026-11-08", "jumps": n, "kills": n}
         self._recap_given = False
@@ -77,9 +82,38 @@ class StatsKeeper:
         self.history_done = bool(data.get("history_done", False))
         last = data.get("last_session")
         if isinstance(last, dict):
-            self.previous = {"ended": str(last.get("ended", "")), "jumps": int(last.get("jumps", 0) or 0), "kills": int(last.get("kills", 0) or 0)}
+            self.previous = self._session_entry(last)
+        sessions = data.get("sessions")
+        if isinstance(sessions, list):
+            self.history = [self._session_entry(item) for item in sessions if isinstance(item, dict)][-MAX_SESSIONS:]
         bodies = data.get("terraformable")
         self.terraformable = [str(b) for b in bodies][-MAX_BODIES:] if isinstance(bodies, list) else []
+
+    @staticmethod
+    def _session_entry(item):
+        """One saved session, with every field a whole number or short text (older files only had ended, jumps and kills)."""
+        def number(name):
+            try:
+                return max(0, int(item.get(name, 0) or 0))
+            except (TypeError, ValueError):
+                return 0
+        return {"id": str(item.get("id") or item.get("ended") or "")[:20], "ended": str(item.get("ended", ""))[:10], "jumps": number("jumps"),
+                "kills": number("kills"), "deaths": number("deaths"), "docks": number("docks"), "minutes": number("minutes"),
+                "system": str(item.get("system") or "")[:60], "people": number("people")}
+
+    def _this_session(self):
+        """This play session as a history entry, or None when nothing happened in it yet."""
+        if not any(self.session.get(k) for k in ("jumps", "kills", "deaths", "docks")):
+            return None
+        people = 0
+        if self.chat_people is not None:
+            try:
+                people = int(self.chat_people() or 0)
+            except Exception:
+                people = 0
+        return self._session_entry({"id": self.session_id, "ended": self.today(), "jumps": self.session["jumps"], "kills": self.session["kills"],
+                                    "deaths": self.session["deaths"], "docks": self.session["docks"],
+                                    "minutes": int(max(1, (self.clock() - self._started) / 60.0)), "system": self._here, "people": people})
 
     def flush(self):
         with self._lock:
@@ -87,10 +121,14 @@ class StatsKeeper:
                 return
             data = {"visits": self.visits, "kills_total": self.kills_total, "kills_by_day": self.kills_by_day,
                     "jumps_total": self.jumps_total, "jumps_by_day": self.jumps_by_day, "terraformable": self.terraformable, "history_done": self.history_done}
-            if self.session["jumps"] or self.session["kills"]:          # this session becomes "last time" for the next start
-                data["last_session"] = {"ended": self.today(), "jumps": self.session["jumps"], "kills": self.session["kills"]}
+            mine = self._this_session()
+            if mine is not None:                                        # this session becomes "last time" for the next start
+                data["last_session"] = mine
+                self.history = [h for h in self.history if h.get("id") != mine["id"]] + [mine]
+                self.history = self.history[-MAX_SESSIONS:]
             elif self.previous:
                 data["last_session"] = self.previous
+            data["sessions"] = self.history
             self._dirty = False
         try:
             folder = os.path.dirname(str(self.path)) or "."
@@ -112,15 +150,17 @@ class StatsKeeper:
         return self.now().strftime("%Y-%m-%d")
 
     def recap(self):
-        """What the last play session was, ONCE per start: {"when": "yesterday", "summary": "18 jumps and 3 kills"} or None.
+        """What the last play session was, ONCE per start: {"when": "yesterday", "summary": "18 jumps and 3 kills", ...} or None.
+        Also "where" (the system it ended in), "deaths" and "people" (different people in chat) when there were some.
         Nothing when there is no record, it was empty, or it is more than 60 days old."""
         with self._lock:
             if self._recap_given or not self.previous:
                 return None
             self._recap_given = True
-            jumps, kills = self.previous.get("jumps", 0), self.previous.get("kills", 0)
+            last = dict(self.previous)
+            jumps, kills = last.get("jumps", 0), last.get("kills", 0)
             try:
-                days = (self.now().date() - datetime.strptime(self.previous.get("ended", ""), "%Y-%m-%d").date()).days
+                days = (self.now().date() - datetime.strptime(last.get("ended", ""), "%Y-%m-%d").date()).days
             except ValueError:
                 return None
         if days < 0 or days > 60 or not (jumps or kills):
@@ -131,7 +171,45 @@ class StatsKeeper:
         if kills:
             parts.append("%d kill%s" % (kills, "" if kills == 1 else "s"))
         when = "earlier today" if days == 0 else "yesterday" if days == 1 else "%d days ago" % days
-        return {"when": when, "summary": " and ".join(parts)}
+        found = {"when": when, "summary": " and ".join(parts)}
+        if last.get("system"):
+            found["where"] = last["system"]
+        if last.get("deaths", 0) >= 2:
+            found["deaths"] = last["deaths"]
+        if last.get("people", 0) >= 5:
+            found["people"] = last["people"]
+        return found
+
+    # ---- the history (what the "What she knows about you" window lists) ----
+    def sessions(self):
+        """The recorded sessions, newest first (this one included once something has happened in it)."""
+        with self._lock:
+            mine = self._this_session()
+            rows = [h for h in self.history if mine is None or h.get("id") != mine["id"]] + ([mine] if mine else [])
+        return list(reversed(rows))
+
+    def forget_session(self, session_id):
+        """Removes one session from the history (and from 'last time' if it was that one). True if it was found."""
+        with self._lock:
+            before = len(self.history)
+            self.history = [h for h in self.history if h.get("id") != session_id]
+            found = len(self.history) != before
+            if self.previous and self.previous.get("id") == session_id:
+                self.previous, found = {}, True
+            if session_id == self.session_id:                      # this very session: stop it being saved
+                self.session = {"kills": 0, "jumps": 0, "deaths": 0, "docks": 0}
+                found = True
+            self._dirty = True
+        self.flush()
+        return found
+
+    def forget_sessions(self):
+        """Forget every recorded session (the lifetime counts stay: those are the Memory page's)."""
+        with self._lock:
+            self.history, self.previous = [], {}
+            self.session = {"kills": 0, "jumps": 0, "deaths": 0, "docks": 0}
+            self._dirty = True
+        self.flush()
 
     # ---- counting ----
     def on_event(self, event):
@@ -145,8 +223,17 @@ class StatsKeeper:
                 self._scan(data)
             elif name in ("Location", "CarrierJump"):
                 self._here = str(data.get("StarSystem") or self._here)
+            elif name == "Died":
+                self._count_session("deaths")
+            elif name == "Docked":
+                self._count_session("docks")
         except Exception:
             log.exception("Counting an event failed")
+
+    def _count_session(self, what):
+        with self._lock:
+            self.session[what] = self.session.get(what, 0) + 1
+            self._changed()
 
     def _jump(self, system):
         speak = None

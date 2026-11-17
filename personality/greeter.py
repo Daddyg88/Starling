@@ -169,7 +169,13 @@ class LoginGreeter:
         if not found:
             return None
         values.update(found)
-        return self._say("Login_Recap", mood, values)
+        main = (self._say("Login_Recap_Where", mood, values) if found.get("where") else None) or self._say("Login_Recap", mood, values)
+        extra = None
+        if found.get("people"):
+            extra = self._say("Login_Recap_Chat", mood, values)
+        elif found.get("deaths"):
+            extra = self._say("Login_Recap_Deaths", mood, values)
+        return " ".join(part for part in (main, extra) if part) or None
 
     def _swing_line(self, values):
         """While she is still in a temporary mood (she was upset with you for dying), she says so instead of the usual feeling."""

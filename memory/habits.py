@@ -327,6 +327,35 @@ class HabitKeeper:
             self._dirty = True
         self.flush()
 
+    def top_stations(self, limit=5):
+        """[(name, landings)] for the stations you dock at most (for the 'What she knows about you' window)."""
+        with self._lock:
+            rows = sorted(((n, e["count"]) for n, e in self.stations.items()), key=lambda r: -r[1])
+        return rows[:limit]
+
+    def forget_station(self, name):
+        with self._lock:
+            found = self.stations.pop(name, None) is not None
+            if found:
+                self._dirty = True
+        if found:
+            self.flush()
+        return found
+
+    def death_places(self):
+        """[(system, times)] where you have been destroyed most."""
+        with self._lock:
+            return sorted(self.deaths.items(), key=lambda r: -r[1])[:5]
+
+    def forget_death_place(self, name):
+        with self._lock:
+            found = self.deaths.pop(name, None) is not None
+            if found:
+                self._dirty = True
+        if found:
+            self.flush()
+        return found
+
     # ---- what the chit-chat may joke about ----
     def favourite_station(self):
         """(name, landings) of the station you have docked at most, once that is FAVOURITE_AT or more; else None."""

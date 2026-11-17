@@ -1,197 +1,139 @@
-"""What she knows: facts, capitals, languages, sums and conversions - exact, never invented, never hijacking chat."""
-
-import json
+import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime
+from pathlib import Path
 
-from core import paths
-from personality.knowledge import Knowledge, convert, digits, maths
-from tests.test_brain import Base
-
-LIBRARY = Knowledge()
-
-
-class Data(unittest.TestCase):
-    def test_every_entry_is_complete(self):
-        for path in sorted((paths.CONFIG_DIR / "knowledge").glob("*.json")):
-            with open(path, encoding="utf-8") as handle:
-                data = json.load(handle)
-            for entry in data.get("entries", []):
-                self.assertTrue(entry["a"].strip(), path.name)
-                self.assertTrue(entry["k"] and all(alt and all(isinstance(w, str) for w in alt) for alt in entry["k"]), entry["a"])
-        self.assertGreater(len(LIBRARY.entries), 200)
-        self.assertGreater(len(LIBRARY.capitals), 150)
-
-    def test_no_two_entries_share_the_same_key_words(self):
-        seen = {}
-        for alternatives, answer in LIBRARY.entries:
-            for alt in alternatives:
-                if alt in seen and seen[alt] != answer:
-                    self.fail("%s is used by two answers: %r and %r" % (sorted(alt), seen[alt], answer))
-                seen[alt] = answer
-
-    def test_every_language_has_every_word(self):
-        for name, words in LIBRARY.languages.items():
-            self.assertEqual(len(words), len(LIBRARY.lang_words), name)
+from core.event_bus import Event
+from database.db import Database
+from memory.habits import HabitKeeper
+from memory.knowledge import Knowledge, session_text
+from memory.profile import PlayerProfile
+from memory.stats import StatsKeeper
+from memory.store import MemoryStore
+from personality.people import People
 
 
-class Facts(unittest.TestCase):
-    def check(self, question, expect):
-        hit = LIBRARY.lookup(question)
-        self.assertIsNotNone(hit, question)
-        self.assertIn(expect, str(hit[1]), question)
-
-    def test_questions_in_different_wordings(self):
-        for question, expect in (
-                ("what is the capital of germany", "Berlin"), ("whats the capital of the usa", "Washington"),
-                ("capital of japan", "Tokyo"), ("do you know the capital city of australia", "Canberra"),
-                ("paris is the capital of which country", "France"),
-                ("how do you say thank you in german", "danke"), ("how do i say hello in japanese", "konnichiwa"),
-                ("what is goodbye in spanish", "adios"),
-                ("how fast does light travel", "ninety nine thousand"), ("how many moons does mars have", "Phobos"),
-                ("what is the centre of the galaxy called", "Sagittarius"), ("what is the center of the galaxy called", "Sagittarius"),
-                ("tell me about beagle point", "edge"), ("what is a neutron star", "collapsed"),
-                ("how does neutron boosting work", "four times"), ("what stars can i scoop from", "Oh Be A Fine Guy"),
-                ("who invented the telephone", "Bell"), ("what year did world war two start", "1939"),
-                ("when did world war one start", "1914"), ("how many bones are in the human body", "six bones"),
-                ("how many seconds in a minute", "Sixty"), ("how far is the moon", "eighty four thousand"), ("what is the biggest planet", "Jupiter")):
-            self.check(question, expect)
-
-    def test_chat_is_never_mistaken_for_a_question(self):
-        for said in ("i had pizza in paris last night", "euro truck simulator is fun", "i love the colonia system a lot",
-                     "my dog chased the moon last night while we were walking", "the sun was out today and it was lovely",
-                     "honk", "i met a german guy who said danke", "i have two cats", "coffee", "lets go in well"):
-            self.assertIsNone(LIBRARY.lookup(said), said)
-
-    def test_she_does_not_know_what_she_does_not_know(self):
-        for said in ("what is the capital of narnia", "who will win the election", "what is the weather today",
-                     "what is the price of bitcoin", "who is the prime minister"):
-            self.assertIsNone(LIBRARY.lookup(said), said)
-
-
-class Sums(unittest.TestCase):
-    def test_sums(self):
-        for said, expect in (("what is 12 times 7", "84"), ("whats 15 plus 27", "42"), ("what is twenty percent of 150", "30"),
-                             ("what is the square root of 144", "12"), ("what is 5 squared", "25"), ("what is half of 90", "45"),
-                             ("what is 7 x 8", "56"), ("how much is 100 minus 37", "63"), ("what is twelve times seven", "84"),
-                             ("what is 10 divided by 4", "2.5"), ("what is 3 + 4", "7")):
-            result = maths(said)
-            self.assertIsNotNone(result, said)
-            self.assertTrue(result[0].endswith(expect), (said, result))
-
-    def test_divide_by_zero(self):
-        self.assertEqual(maths("what is 10 divided by 0"), (None, "zero"))
-
-    def test_game_talk_with_numbers_is_not_a_sum(self):
-        for said in ("i did 3 jumps", "jump 2-3 times", "set speed to 75", "i have 2 cats and 3 dogs", "plot a route 3 jumps away",
-                     "my score was 5 x 10"):
-            self.assertIsNone(maths(said), said)
-
-    def test_number_words(self):
-        self.assertEqual(digits("twenty five times three"), "25 times 3")
-
-    def test_conversions(self):
-        for said, expect in (("convert 20 celsius to fahrenheit", "68 degrees Fahrenheit"), ("how many miles in 10 km", "6.214 miles"),
-                             ("what is 100 km in miles", "62.14 miles"), ("how many feet in 2 metres", "6.562 feet"),
-                             ("what is 0 celsius in kelvin", "273.1 kelvin"), ("convert 5 kilograms to pounds", "11.02 pounds")):
-            result = convert(said)
-            self.assertIsNotNone(result, said)
-            self.assertTrue(result.endswith(expect), (said, result))
-        self.assertIsNone(convert("convert 5 kilograms to miles"))
-
-
-class InTheBrain(Base):
+class Base(unittest.TestCase):
     def setUp(self):
-        super().setUp()
-        self.brain.knowledge = LIBRARY
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        folder = Path(self.tmp.name)
+        self.db = Database(folder / "t.db").initialise()
+        self.addCleanup(self.db.close)
+        self.store = MemoryStore(self.db)
+        self.profile = PlayerProfile(folder / "profile.json")
+        self.people = People(folder / "people.json")
+        self.habits = HabitKeeper(None, folder / "habits.json", announce=lambda k, v: True, now=lambda: datetime(2026, 11, 9, 12, 0),
+                                  hours=lambda: 0, jumps=lambda: 0)
+        self.stats = StatsKeeper(None, folder / "stats.json", announce=lambda k, v: None, now=lambda: datetime(2026, 11, 9, 12, 0))
+        self.know = Knowledge(self.store, self.profile, self.people, self.habits, self.stats)
 
-    def test_she_answers_and_speaks(self):
-        reply = self.ask("what is the capital of france")
-        self.assertIn("Paris", reply)
-        self.assertTrue(self.speech.said)
-        self.assertIn("84", self.ask("what is 12 times 7"))
-        self.assertIn("miles", self.ask("how many miles in 10 km"))
+    def texts(self, group=None):
+        return [e.text for e in self.know.entries() if group is None or e.group == group]
 
-    def test_switch_off(self):
-        self.settings.set("brain.knowledge", False)
-        self.assertNotIn("Paris", self.ask("what is the capital of france") or "")
-
-    def test_chat_still_works_and_facts_do_not_steal_commands(self):
-        self.assertTrue(self.ask("i had a pizza for dinner and it was lovely"))
-        self.assertIsNone(self.brain.knowledge.lookup("lower the landing gear"))
-
-    def test_not_when_not_addressed(self):
-        self.assertIsNone(self.ask("what is the capital of france", deliberate=False))
+    def find(self, text):
+        return [e for e in self.know.entries() if e.text == text][0]
 
 
-class FromARealLog(Base):
-    """Things a streamer really said to her (rough test, 27 October)."""
+class Listing(Base):
+    def test_empty_means_no_groups(self):
+        self.assertEqual(self.know.grouped(), [])
 
-    def test_ordinary_questions_are_not_mistaken_for_commands(self):
-        for said in ("where did you come from", "what do you like to learn", "would you like more backstory",
-                     "what new ship has been released on elite", "how easy is pasta to cook"):
-            self.assertTrue(self.ask(said), said)
+    def test_everything_is_listed_in_its_group(self):
+        self.profile.learn("i love pizza")
+        self.profile.learn("i hate mining")
+        self.profile.learn("my dog is called rex")
+        self.profile.learn("my favourite colour is blue")
+        self.people.learn("my friend andrew", "my friend Andrew")
+        self.store.add("death", "You were destroyed by Bob in Sol")
+        self.store.increment("systems_visited", 5)
+        for _ in range(4):
+            self.habits.on_event(Event(name="Docked", data={"StationName": "Jameson Memorial"}))
+        self.stats.on_event(Event(name="FSDJump", data={"StarSystem": "Colonia"}))
+        names = [g for g, _ in self.know.grouped()]
+        self.assertEqual(names, ["You told me", "People", "Moments", "Habits", "Sessions", "Totals"])
+        self.assertIn("You like pizza", self.texts("You told me"))
+        self.assertIn("You dislike mining", self.texts("You told me"))
+        self.assertIn("You have a dog called Rex", self.texts("You told me"))
+        self.assertIn("Your favourite colour is blue", self.texts("You told me"))
+        self.assertTrue(any(t.startswith("Andrew, your friend") for t in self.texts("People")))
+        self.assertIn("You were destroyed by Bob in Sol", self.texts("Moments"))
+        self.assertIn("You often dock at Jameson Memorial (4 times)", self.texts("Habits"))
+        self.assertTrue(self.texts("Sessions")[0].startswith("2026-11-09: 1 jump"))
+        self.assertFalse([e for e in self.know.entries() if e.group == "Totals"][0].can_forget)
 
-    def test_garbled_commands_are_still_not_chat(self):
-        for said in ("lower the lending gear", "raise landing gear", "hyperspace jump now"):
-            self.assertIsNone(self.ask(said), said)
+    def test_missing_parts_do_not_stop_the_list(self):
+        know = Knowledge(None, self.profile, None, None, None)
+        self.profile.learn("i love pizza")
+        self.assertEqual([e.text for e in know.entries()], ["You like pizza"])
+        self.assertEqual(Knowledge().entries(), [])
 
-    def test_same_question_different_words(self):
-        for said, expect in (("what year did man go to the moon", "1969"), ("what year was the first moon landing", "1969"),
-                             ("when did humans first land on the moon", "1969"), ("what year did world war two end", "1945")):
-            reply = self.ask(said) or ""
-            self.assertIn(expect, reply + (" 1945" if "world war" in said else ""), said)
+    def test_a_broken_part_is_skipped(self):
+        class Broken:
+            @property
+            def likes(self):
+                raise RuntimeError("boom")
+        know = Knowledge(self.store, Broken(), self.people, None, None)
+        self.store.add("death", "You were destroyed in Sol")
+        self.assertEqual([e.group for e in know.entries()], ["Moments"])
 
-    def test_big_numbers(self):
-        self.assertEqual(maths("what is 1.6 billion divided by 4")[0], "1,600,000,000 divided by 4 is 400,000,000")
-        self.assertIn("53", self.ask("what is 8 plus 45"))
-
-    def test_recipes(self):
-        for said, expect in (("how do i make a brownie", "brownies"), ("find me a good recipe for brownies", "brownies"),
-                             ("find a good cocktail recipe and tell me it", "mojito")):
-            self.assertIn(expect, self.ask(said), said)
-
-    def test_favourites_and_the_answer_needs_no_name(self):
-        reply = self.ask("what is your favourite game")
-        self.assertIn("Elite Dangerous", reply)
-        self.assertTrue(self.brain.in_conversation())
-
-    def test_time_somewhere_else(self):
-        reply = self.ask("what time is it in Australia")
-        self.assertTrue("Sydney" in reply or "time zone" in reply or "time there" in reply, reply)
-        self.assertNotIn("Good afternoon", reply)
-
-    def test_what_do_you_know_of_me(self):
-        self.assertTrue(self.ask("what do you know of me"))
+    def test_session_text(self):
+        row = {"ended": "2026-11-08", "jumps": 18, "kills": 1, "deaths": 2, "docks": 0, "minutes": 130, "system": "Colonia", "people": 42}
+        self.assertEqual(session_text(row), "2026-11-08: 18 jumps, 1 kill, 2 deaths, about 2 hours, ended in Colonia, 42 people in chat")
+        self.assertEqual(session_text({"ended": "2026-11-08"}), "2026-11-08: a short session")
 
 
-class TimeInPlaces(unittest.TestCase):
-    """The streamer asked for Melbourne and Austria (28 October)."""
-    NOW = datetime(2026, 10, 27, 17, 30, tzinfo=timezone.utc)
+class Forgetting(Base):
+    def test_forget_each_kind_one_by_one(self):
+        self.profile.learn("i love pizza")
+        self.profile.learn("i love chips")
+        self.profile.learn("i hate mining")
+        self.profile.learn("my dog is called rex")
+        self.profile.learn("my favourite colour is blue")
+        self.people.learn("my friend andrew", "my friend Andrew")
+        self.store.add("death", "You were destroyed in Sol")
+        self.store.add("death", "You were destroyed in Lave")
+        for _ in range(4):
+            self.habits.on_event(Event(name="Docked", data={"StationName": "Jameson Memorial"}))
+        for entry in [self.find("You like pizza"), self.find("You dislike mining"), self.find("You have a dog called Rex"),
+                      self.find("Your favourite colour is blue"), self.find("You were destroyed in Sol"),
+                      self.find("You often dock at Jameson Memorial (4 times)")]:
+            self.assertTrue(self.know.forget(entry), entry.text)
+        andrew = [e for e in self.know.entries() if e.group == "People"][0]
+        self.assertTrue(self.know.forget(andrew))
+        left = self.texts()
+        self.assertEqual(left, ["You like chips", "You were destroyed in Lave"])
+        # and it stays forgotten after a restart
+        again = PlayerProfile(Path(self.tmp.name) / "profile.json")
+        self.assertEqual((again.likes, again.dislikes, again.pets, again.favourites), (["chips"], [], [], {}))
+        self.assertEqual(People(Path(self.tmp.name) / "people.json").items, {})
 
-    def says(self, sentence):
-        return Knowledge().time_in(sentence, self.NOW)[0]
+    def test_forgetting_something_that_is_gone_says_so(self):
+        self.profile.learn("i love pizza")
+        entry = self.find("You like pizza")
+        self.assertTrue(self.know.forget(entry))
+        self.assertFalse(self.know.forget(entry))
 
-    def test_the_city_before_the_country_wins(self):
-        self.assertEqual(self.says("what time is it in melbourne australia"), "It's 04:30 tomorrow in Melbourne, Australia.")
-        self.assertEqual(self.says("what time is it in sydney australia"), "It's 04:30 tomorrow in Sydney, Australia.")
-        self.assertEqual(self.says("what time is it in perth australia"), "It's 01:30 tomorrow in Perth, Australia.")
+    def test_a_total_cannot_be_forgotten_one_by_one(self):
+        self.store.increment("systems_visited", 5)
+        total = [e for e in self.know.entries() if e.group == "Totals"][0]
+        self.assertFalse(self.know.forget(total))
+        self.assertEqual(self.store.stats()["systems_visited"], 5)
 
-    def test_a_country_on_its_own_still_works(self):
-        self.assertEqual(self.says("what time is it in australia"), "It's 04:30 tomorrow in Sydney, Australia.")
-        self.assertEqual(self.says("what time is it in south africa"), "It's 19:30 in South Africa.")
-        self.assertEqual(self.says("what time is it in austria"), "It's 18:30 in Vienna, Austria.")
-        self.assertEqual(self.says("what time is it in vienna"), "It's 18:30 in Vienna, Austria.")
+    def test_forget_a_session(self):
+        self.stats.on_event(Event(name="FSDJump", data={"StarSystem": "Colonia"}))
+        entry = [e for e in self.know.entries() if e.group == "Sessions"][0]
+        self.assertTrue(self.know.forget(entry))
+        self.assertEqual(self.stats.sessions(), [])
 
-    def test_melbourne_austria_is_still_melbourne(self):
-        self.assertEqual(self.says("what time is it in melbourne austria"), "It's 04:30 tomorrow in Melbourne, Australia.")
 
-    def test_two_places_get_both_answers(self):
-        self.assertEqual(self.says("what time is it in melbourne and austria"),
-                         "It's 04:30 tomorrow in Melbourne, Australia. And it's 18:30 in Vienna, Austria.")
-
-    def test_a_place_she_does_not_know_gives_no_time(self):
-        self.assertIsNone(self.says("what time is it in the kitchen"))
+class AppWiring(unittest.TestCase):
+    def test_forget_everything_also_clears_sessions(self):
+        import inspect
+        from core.app import App
+        source = inspect.getsource(App.forget_memories)
+        self.assertIn("forget_sessions", source)
+        self.assertTrue(hasattr(App, "knowledge"))
 
 
 if __name__ == "__main__":

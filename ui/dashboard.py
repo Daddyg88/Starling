@@ -830,7 +830,8 @@ class Dashboard:
         if page.id == "listening":
             extra.append(("Refresh microphone list", lambda p=page: self.refresh_mics(p)))
         if page.id == "memory":
-            extra += [("Show what she remembers", self.show_memories),
+            extra += [("What she knows about me (forget one by one)", self.show_knowledge),
+                      ("Show what she remembers", self.show_memories),
                       ("Forget everything", self.forget_memories)]
         if page.id == "updates":
             extra += [("Check for updates now", self.check_updates),
@@ -1271,6 +1272,17 @@ class Dashboard:
             return
         names = ", ".join(("%s [HOTAS]" if d.is_hotas() else "%s") % d.name for d in devices)
         self._controls_result("Found: " + names, T.GOOD)
+
+    def show_knowledge(self):
+        """Opens the 'What she knows about you' window (ui/knowledge_window.py): every kept fact with its own Forget button."""
+        try:
+            if getattr(self, "knowledge_window", None) is None:
+                from ui.knowledge_window import KnowledgeWindow
+                self.knowledge_window = KnowledgeWindow(self)
+            self.knowledge_window.open()
+        except Exception:
+            log.exception("The knowledge window could not open")
+            self._controls_result("That window could not open (details are in the log).", T.WARN)
 
     def show_memories(self):
         self._controls_result(self.app.memory_text(), T.GOOD)
