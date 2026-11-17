@@ -190,6 +190,10 @@ class ChatBridge:
             self.director.pump_events()
         except Exception:
             log.exception("Reacting to a stream event failed")
+        try:
+            self.director.pump_chime()
+        except Exception:
+            log.exception("Chiming in on a chat question failed")
 
     def pretend(self, user, text, mod=False, sub=False, owner=False, done=None):
         """The dashboard's test box: runs a made-up message through the same rules, even when chat is switched off."""

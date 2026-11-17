@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.67: more sub/raid/gift/Super Chat lines and CHIME-IN (she answers an ordinary chat question unasked, about every 10 min). CHECK on a real stream with chat on: she picks a '...?' question, says 'Chat, I'll take this one...' and answers; never in a fight; Settings > Streaming has the toggle and the gap. Twitch follow alerts need a Twitch login (EventSub) and YouTube subscriber alerts do not exist in live chat: ask Ben if he wants a Twitch login added.
 - [ ] 0.96.66: ONE workflow (starling.yml: tests, then website + release). CHECK the Actions tab after this push shows ONE run with tests, website and release all green, and a new GitHub Release v0.96.66 appears. If red, send me the failing job name.
 - [x] 0.96.64: tests.yml workflow. Green on GitHub (17 Nov, Tests #1).
 - [ ] 0.96.63: commander name first in about.json. CHECK: press the diagnostics button after Elite has started and read about.json.

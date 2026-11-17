@@ -52,14 +52,14 @@ def build(app):
         outcomes = runner.run_text(action.phrase, speak_unknown=False)
         return bool(outcomes) and outcomes[0].status == "done"
 
-    def do_ask(user, question):
+    def do_ask(user, question, chime=False):
         if app.brain is None:
             return False
         if "brain" not in holder:
             holder["brain"] = make_chat_brain(app)
         times = director.asked.get(user, 0)
         if app.settings.get("streaming.announce", True):
-            say(asks_key(times, app.settings), {"user": user, "question": question[:90], "times": times + 1})
+            say("StreamChat_Chime" if chime else asks_key(times, app.settings), {"user": user, "question": question[:90], "times": times + 1})
         reply = holder["brain"].try_handle(question, deliberate=True)
         if reply is None:
             say("StreamChat_NoAnswer", {"user": user})

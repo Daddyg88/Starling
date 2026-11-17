@@ -73,6 +73,7 @@ PERCENTS = [("%d%%" % v, v) for v in range(0, 96, 5)]
 OVERLAY_SIZES = [("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")]
 CHAT_WHO = [("Everyone", "everyone"), ("Subscribers and moderators", "subscribers"), ("Moderators only", "mods")]
 CHAT_COOLDOWNS = [("15 seconds", 15), ("30 seconds", 30), ("45 seconds", 45), ("1 minute", 60), ("2 minutes", 120), ("5 minutes", 300)]
+CHAT_CHIME_GAPS = [("5 minutes", 300), ("10 minutes", 600), ("20 minutes", 1200), ("30 minutes", 1800)]
 CHAT_GAPS = [("5 seconds", 5), ("10 seconds", 10), ("20 seconds", 20), ("30 seconds", 30), ("1 minute", 60)]
 ROUTE_MAP_MODES = [("While I have a route (recommended)", "route"), ("Always", "always"), ("Never", "off")]
 EDGE_PERCENTS = [("%d%%" % v, v) for v in range(0, 41)]
@@ -453,6 +454,10 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="A new sub, a resub, gifted subs, a raid or a watch streak on Twitch (and Super Chats and memberships on YouTube) get a thank-you line, said when it is quiet. Not in a fight, danger or a jump: it waits"),
             Field("streaming.react_milestones", "She notices chat milestones", "toggle",
                   help="When chat passes 50, 100, 250, 500... messages or 5, 10, 25, 50... different people tonight she says so. Counted for this session only"),
+            Field("streaming.chime_in", "She sometimes answers a chat question by herself", "toggle",
+                  help="Now and then, in a quiet moment, she picks one ordinary question from chat (one that ends in a question mark, with no !starling) and answers it. Same safety rules as a real question: blocked words, links and the who-can-use-it setting all apply, and she never does it in a fight, danger or a jump"),
+            Field("streaming.chime_gap", "About how often she does that", "choice", CHAT_CHIME_GAPS,
+                  help="A little random, so it never feels like a timer. Needs chat to be switched on above"),
             Field("streaming.user_cooldown", "One thing per viewer every", "choice", CHAT_COOLDOWNS),
             Field("streaming.action_cooldown", "Gap between ship actions (everyone)", "choice", CHAT_GAPS),
             Field("streaming.ask_cooldown", "Gap between questions (everyone)", "choice", CHAT_GAPS),

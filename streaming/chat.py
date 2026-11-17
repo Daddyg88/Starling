@@ -16,6 +16,7 @@ Safety, in the order it is checked:
 Chat text is NEVER treated as a free-form command. An action only happens when it matches the list exactly.
 """
 
+import random
 import re
 import unicodedata
 from collections import deque
@@ -105,6 +106,23 @@ def parse(text, prefix=DEFAULT_PREFIX):
     return None
 
 
+QUESTION_WORDS = frozenset("what whats why how hows when where who which can could do does did is are was will would should".split())
+CHIME_MIN_WORDS = 4
+CHIME_MAX_CANDIDATES = 12
+
+
+def looks_like_question(text):
+    """True for a normal chat question she could jump in on without being asked: it ends in a question mark, starts with a question
+    word, is a sensible length and is not a command, a mention of another viewer or a link."""
+    text = tidy(text)
+    if not text.endswith("?") or len(text) > MAX_QUESTION or text[:1] in ("!", "@", "/"):
+        return False
+    if re.search(r"https?://|www\.|\.com\b", text):
+        return False
+    words = re.sub(r"[^a-z' ]", " ", text.lower()).split()
+    return len(words) >= CHIME_MIN_WORDS and words[0].replace("'", "") in QUESTION_WORDS
+
+
 def has_blocked_word(text, blocked):
     low = " " + re.sub(r"[^a-z0-9 ]", " ", str(text or "").lower()) + " "
     low = re.sub(r"\s+", " ", low)
@@ -180,12 +198,15 @@ class Result:
 class ChatDirector:
     """Decides what happens to each chat message. The three `do_*` functions are the only things that touch the game or her voice."""
 
-    def __init__(self, settings, state_provider, do_action, do_ask, say, clock, quiet_provider=None):
+    def __init__(self, settings, state_provider, do_action, do_ask, say, clock, quiet_provider=None, rng=None):
         self.settings = settings
         self.clock = clock
         self.quiet_provider = quiet_provider    # () -> True when she is not busy (None = never hold anything back)
         self.held = deque()                     # (time, user, question) waiting for a quiet moment
         self.state_provider = state_provider
+        self.rng = rng or random.Random()
+        self.candidates = deque(maxlen=CHIME_MAX_CANDIDATES)   # (time, user, question): recent chat questions she could answer unasked
+        self.chime_due = None                                   # when she may next chime in (set from the first chat message)
         self.do_action = do_action      # (action) -> True when it was done
         self.do_ask = do_ask            # (user, question) -> True when she answered
         self.say = say                  # (key, fields) -> speaks one of her streaming lines
@@ -222,6 +243,8 @@ class ChatDirector:
             return Result("ignored", user=user)
         parsed = parse(message.text, self.option("prefix", DEFAULT_PREFIX))
         if parsed is None:
+            if not test:
+                self._note_candidate(message, user)
             return Result("ignored", user=user)
         kind, what = parsed
         text = tidy(message.text)
@@ -269,6 +292,64 @@ class ChatDirector:
         self.say("StreamChat_Action", {"user": user, "action": action.label})
         ok = self.do_action(action)
         return Result("done" if ok else "failed", "action", user, action.label)
+
+    # ---- chiming in: now and then she answers an ordinary chat question nobody asked her to ----
+    CHIME_FRESH = 150.0        # a question older than this has moved on
+    CHIME_AFTER_TALK = 30.0    # she stays out of it for this long after any chat reaction
+
+    def _note_candidate(self, message, user):
+        """Keeps a recent chat question as a possible chime-in. Same safety rules as a real question, and never the streamer's own."""
+        if not self.option("chime_in", True) or not self.option("ask_enabled", True) or message.owner:
+            return
+        who = str(self.option("who", "everyone"))
+        if (who == "mods" and not message.mod) or (who == "subscribers" and not (message.sub or message.mod)):
+            return
+        question = tidy(message.text)
+        if not looks_like_question(question) or has_blocked_word(question, split_words(self.option("blocked_words", ""))):
+            return
+        if self.chime_due is None:
+            self.chime_due = self.clock() + self._chime_gap()
+        self.candidates.append((self.clock(), user, question))
+
+    def _chime_gap(self):
+        """How long until the next chime-in: the chosen gap, a little random so it never feels like a timer."""
+        return self._number("chime_gap", 600) * self.rng.uniform(0.8, 1.4)
+
+    def pump_chime(self):
+        """Called about once a second. Rarely, when it is quiet and nothing else is waiting, answers one fresh chat question."""
+        if not self.candidates:
+            return None
+        now = self.clock()
+        while self.candidates and now - self.candidates[0][0] > self.CHIME_FRESH:
+            self.candidates.popleft()
+        if not self.candidates:
+            return None
+        if not (self.option("enabled", False) and self.option("chime_in", True) and self.option("ask_enabled", True)):
+            self.candidates.clear()
+            return None
+        if self.chime_due is None or now < self.chime_due or self.held or self.pending:
+            return None
+        if self.cool.wait_kind("ask", self._number("ask_cooldown", 10)) > 0:
+            return None
+        if now - max(self.event_last.values(), default=-1e9) < self.CHIME_AFTER_TALK:
+            return None
+        try:
+            if self.quiet_provider is not None and not self.quiet_provider():
+                return None
+        except Exception:
+            return None
+        fit = [c for c in self.candidates if self.cool.wait_user(c[1], self._number("user_cooldown", 45)) <= 0]
+        if not fit:
+            return None
+        chosen = self.rng.choice(fit)
+        self.candidates.remove(chosen)
+        _t, user, question = chosen
+        self.cool.mark(user, "ask")
+        self.chime_due = now + self._chime_gap()
+        ok = self.do_ask(user, question, chime=True)
+        result = Result("answered" if ok else "failed", "ask", user, question, "chimed in")
+        self.log.append(result)
+        return result
 
     # ---- held questions ----
     def _should_hold(self):

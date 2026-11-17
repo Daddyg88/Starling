@@ -322,11 +322,113 @@ class Voice(unittest.TestCase):
         self.assertTrue(s.get("streaming.enabled"))
 
 
+class ChimeIn(unittest.TestCase):
+    """Now and then she answers an ordinary chat question nobody asked her to (no !starling), in a quiet moment."""
+
+    def setUp(self):
+        self.clock = Clock()
+        self.asked, self.quiet = [], [True]
+
+    def make(self, **settings):
+        base = {"enabled": True, "chime_gap": 600}
+        base.update(settings)
+
+        class Fixed:                                   # no randomness in the tests: the gap is exactly the chosen one
+            def uniform(self, a, b): return 1.0
+            def choice(self, items): return items[0]
+        return chat.ChatDirector(Settings(**base), lambda: ship_state(), lambda a: True,
+                                 lambda u, q, chime=False: self.asked.append((u, q, chime)) or True,
+                                 lambda key, fields=None: None, self.clock, quiet_provider=lambda: self.quiet[0], rng=Fixed())
+
+    def test_what_counts_as_a_question(self):
+        yes = ("what is a neutron star?", "How do I get to Colonia from here?", "does she ever get tired of this?")
+        no = ("what", "lol nice?", "that was a great landing?", "!lights now?", "@Gav what do you think?", "see www.x.com for what?", "hello there friend")
+        for text in yes:
+            self.assertTrue(chat.looks_like_question(text), text)
+        for text in no:
+            self.assertFalse(chat.looks_like_question(text), text)
+
+    def test_waits_a_while_then_answers_one(self):
+        d = self.make()
+        d.handle(msg("what is a neutron star made of?", "Ann"))
+        self.assertIsNone(d.pump_chime())                       # too soon: the gap starts at the first question
+        self.clock.now += 601
+        d.handle(msg("is the ship the Kestrel today?", "Bob"))  # a fresh one
+        result = d.pump_chime()
+        self.assertEqual(result.status, "answered")
+        self.assertEqual(result.note, "chimed in")
+        self.assertEqual(len(self.asked), 1)
+        self.assertTrue(self.asked[0][2])                      # told it is a chime-in, so she can say so
+        d.handle(msg("how far is Colonia from here?", "Cy"))
+        self.assertIsNone(d.pump_chime())                       # and then a long gap again
+        self.assertEqual(len(self.asked), 1)
+
+    def test_not_when_busy_or_something_else_is_waiting(self):
+        d = self.make()
+        d.handle(msg("what is a neutron star made of?", "Ann"))
+        self.clock.now += 601
+        d.handle(msg("is the ship the Kestrel today?", "Bob"))
+        self.quiet[0] = False
+        self.assertIsNone(d.pump_chime())
+        self.quiet[0] = True
+        d.event_last["sub"] = self.clock.now - 5                # she just thanked someone
+        self.assertIsNone(d.pump_chime())
+        d.event_last["sub"] = self.clock.now - 60
+        d.held.append((self.clock.now, "Zed", "a real question"))
+        self.assertIsNone(d.pump_chime())
+        d.held.clear()
+        self.assertEqual(d.pump_chime().status, "answered")
+
+    def test_old_questions_are_dropped(self):
+        d = self.make()
+        d.handle(msg("what is a neutron star made of?", "Ann"))
+        self.clock.now += 2000
+        self.assertIsNone(d.pump_chime())
+        self.assertEqual(self.asked, [])
+
+    def test_same_safety_rules_as_a_real_question(self):
+        d = self.make(blocked_words="spoiler", who="subscribers")
+        for text, user, kw in (("what is the spoiler for this game?", "A", {"sub": True}),
+                               ("what is a neutron star made of?", "B", {}),               # not a subscriber
+                               ("what is the Kestrel good at doing?", "Me", {"owner": True})):   # the streamer's own message
+            d.handle(msg(text, user, **kw))
+        self.assertEqual(len(d.candidates), 0)
+        d.handle(msg("what is a neutron star made of?", "C", sub=True))
+        self.assertEqual(len(d.candidates), 1)
+
+    def test_can_be_switched_off(self):
+        d = self.make(chime_in=False)
+        d.handle(msg("what is a neutron star made of?", "Ann"))
+        self.clock.now += 700
+        self.assertIsNone(d.pump_chime())
+        self.assertEqual(len(d.candidates), 0)
+        d = self.make(ask_enabled=False)
+        d.handle(msg("what is a neutron star made of?", "Ann"))
+        self.assertEqual(len(d.candidates), 0)
+
+    def test_chat_off_means_no_chime(self):
+        d = self.make(enabled=False)
+        d.handle(msg("what is a neutron star made of?", "Ann"))
+        self.assertEqual(len(d.candidates), 0)
+
+    def test_the_viewers_own_cooldown_is_respected(self):
+        d = self.make(user_cooldown=300)
+        d.handle(msg("what is a neutron star made of?", "Ann"))
+        self.clock.now += 601
+        d.cool.mark("Ann", "ask")                               # Ann just had something answered
+        self.clock.now += 20
+        self.assertIsNone(d.pump_chime())                       # so her question waits (it is only fresh for a while)
+        self.assertEqual(self.asked, [])
+        self.clock.now += 300
+        d.handle(msg("is the ship the Kestrel today?", "Bob"))
+        self.assertEqual(d.pump_chime().user, "Bob")
+
+
 class Pieces(unittest.TestCase):
     def test_lines_and_settings_exist(self):
         with open("voicepacks/default/streaming.json", encoding="utf-8") as handle:
             data = json.load(handle)
-        for key in ("StreamChat_Asks", "StreamChat_NoAnswer", "StreamChat_Action", "StreamChat_Refused", "StreamChat_Paused", "StreamChat_Resumed"):
+        for key in ("StreamChat_Chime", "StreamChat_Asks", "StreamChat_NoAnswer", "StreamChat_Action", "StreamChat_Refused", "StreamChat_Paused", "StreamChat_Resumed"):
             self.assertTrue(data[key], key)
         from core.settings import DEFAULTS
         from ui.settings_model import build_pages
