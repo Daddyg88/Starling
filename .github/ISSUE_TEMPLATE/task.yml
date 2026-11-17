@@ -1,0 +1,42 @@
+name: Task or bug
+description: Something to build, fix or check. Each one becomes a card on the project board.
+title: "[area] short title"
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Voice and speech, Listening, Settlement maps, Install and setup, Streaming and chat, On foot, Ship and keybinds, Dialogue and personality, Website and docs, Other]
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind
+      options: [Bug, New feature, Needs a real-game test, Tester report, Chore]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Starling version it was seen on
+      placeholder: "for example 0.96.63"
+  - type: input
+    id: commander
+    attributes:
+      label: Commander name (in-game)
+      description: First line of about.json in the diagnostics zip. Do not paste real names or paths.
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong, or what should it do?
+    validations:
+      required: true
+  - type: textarea
+    id: checks
+    attributes:
+      label: How will we know it is done?
+      description: One line a tester can check in the real game.
+  - type: markdown
+    attributes:
+      value: "Do NOT attach diagnostics zips here: this repository is public and a zip holds Windows folder names. Share zips privately (Discord) and write only what they showed."

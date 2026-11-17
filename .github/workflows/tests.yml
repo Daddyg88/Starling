@@ -1,0 +1,29 @@
+# Runs Starling's tests on every push and pull request, so a change that breaks something shows up as a red cross on GitHub
+# straight away (before a release is made from it). Free for a public repo. The Windows-only parts (voice, listening, the
+# real game) are tested by people, not here; see docs/TODO.md "Needs a real-game test".
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install what the tests need
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q libportaudio2 libgl1
+          python -m pip install --upgrade pip
+          python -m pip install numpy pillow scipy opencv-python-headless requests pyyaml sounddevice tzdata
+      - name: Run the tests
+        run: python -m unittest discover -s tests -t .

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Chat and help (Discord)
+    url: https://discord.gg/dzAYfXxh3q
+    about: Questions, bug reports from testers and sending diagnostics zips go here, not in public issues.

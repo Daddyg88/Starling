@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.64 - automatic tests and a task form
+
+`.github/workflows/tests.yml` runs `python -m unittest discover -s tests -t .` on Linux for every push and pull request (a red cross means a test broke). `.github/ISSUE_TEMPLATE/task.yml` is the form for board cards: area, kind, version, commander, how we will know it is done. Public issues must not carry diagnostics zips; those go to the Discord.
+
 ## 0.96.63 - the diagnostics zip names the commander
 
 about.json in the diagnostics zip now starts with `commander`: the in-game name the game gave her (shown as unknown if Starling was started before Elite). Nothing else personal is added. Not tested in the real game.
