@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.68 - o7 gets an o7 back
+
+When chat types `o7` (alone, or `o7 o7`, `o7 Commander`) she says "o7" and the viewer's name, said as "oh seven". It only happens when she is free, once per viewer every 2 minutes and once overall every 20 seconds. Switch it off under Settings > Streaming (**She salutes back when chat types o7**).
+
 ## 0.96.67 - more thank-you lines, and she can chime in on chat
 
 She already thanked new subs, resubs, gifted subs, raids, watch streaks, Super Chats and YouTube members; there are now more lines for each. New setting (Settings > Streaming): **She sometimes answers a chat question by herself**, with **About how often she does that** (5, 10, 20 or 30 minutes; default 10). She picks one fresh ordinary question from chat (ends in `?`, starts with a word like what, why, how, is, can) and answers it with a short lead-in. She never does it in a fight, danger or a jump, within 30 seconds of thanking someone, or for your own messages, and blocked words, links, the who-can-use-it setting and each viewer's cooldown all still apply. Not possible yet: Twitch follow alerts (need a Twitch login) and YouTube subscriber alerts (YouTube does not send them in live chat).

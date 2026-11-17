@@ -454,6 +454,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="A new sub, a resub, gifted subs, a raid or a watch streak on Twitch (and Super Chats and memberships on YouTube) get a thank-you line, said when it is quiet. Not in a fight, danger or a jump: it waits"),
             Field("streaming.react_milestones", "She notices chat milestones", "toggle",
                   help="When chat passes 50, 100, 250, 500... messages or 5, 10, 25, 50... different people tonight she says so. Counted for this session only"),
+            Field("streaming.salute", "She salutes back when chat types o7", "toggle",
+                  help="A viewer types o7 and she says 'o7' and their name. Only when she is free, and a flood of o7s gets a few replies, not hundreds"),
             Field("streaming.chime_in", "She sometimes answers a chat question by herself", "toggle",
                   help="Now and then, in a quiet moment, she picks one ordinary question from chat (one that ends in a question mark, with no !starling) and answers it. Same safety rules as a real question: blocked words, links and the who-can-use-it setting all apply, and she never does it in a fight, danger or a jump"),
             Field("streaming.chime_gap", "About how often she does that", "choice", CHAT_CHIME_GAPS,

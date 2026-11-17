@@ -424,11 +424,52 @@ class ChimeIn(unittest.TestCase):
         self.assertEqual(d.pump_chime().user, "Bob")
 
 
+class Salute(unittest.TestCase):
+    def test_what_is_a_salute(self):
+        for text in ("o7", "O7", "o7!", "o7 o7", "o7 Commander", "  o7  "):
+            self.assertTrue(chat.is_salute(text), text)
+        for text in ("", "o7 what is a neutron star", "hello o7 everyone in here", "o", "07", "o7 o7 o7 o7 o7", "go7"):
+            self.assertFalse(chat.is_salute(text), text)
+
+    def test_she_salutes_back_with_the_name(self):
+        d, clock, done, asked, said = make()
+        r = d.handle(msg("o7", "Ann"))
+        self.assertEqual((r.status, r.kind), ("reacted", "salute"))
+        self.assertEqual(said, [("StreamChat_Salute", {"user": "Ann"})])
+        self.assertEqual(asked, [])                                 # a salute is not a question
+
+    def test_cooldowns_and_busy_and_off(self):
+        d, clock, done, asked, said = make()
+        d.handle(msg("o7", "Ann"))
+        clock.now += 5
+        d.handle(msg("o7", "Bob"))                                 # too soon after anyone's
+        clock.now += 30
+        d.handle(msg("o7", "Ann"))                                 # Ann again within her own 2 minutes
+        self.assertEqual(len(said), 1)
+        clock.now += 130
+        d.handle(msg("o7", "Ann"))
+        self.assertEqual(len(said), 2)
+        d.quiet_provider = lambda: False                           # she is busy: dropped, not queued
+        clock.now += 300
+        d.handle(msg("o7", "Cy"))
+        self.assertEqual(len(said), 2)
+        d.quiet_provider = None
+        d.settings.set("streaming.salute", False)
+        clock.now += 300
+        d.handle(msg("o7", "Di"))
+        self.assertEqual(len(said), 2)
+
+    def test_chat_off_means_no_salute(self):
+        d, clock, done, asked, said = make(enabled=False)
+        d.handle(msg("o7", "Ann"))
+        self.assertEqual(said, [])
+
+
 class Pieces(unittest.TestCase):
     def test_lines_and_settings_exist(self):
         with open("voicepacks/default/streaming.json", encoding="utf-8") as handle:
             data = json.load(handle)
-        for key in ("StreamChat_Chime", "StreamChat_Asks", "StreamChat_NoAnswer", "StreamChat_Action", "StreamChat_Refused", "StreamChat_Paused", "StreamChat_Resumed"):
+        for key in ("StreamChat_Salute", "StreamChat_Chime", "StreamChat_Asks", "StreamChat_NoAnswer", "StreamChat_Action", "StreamChat_Refused", "StreamChat_Paused", "StreamChat_Resumed"):
             self.assertTrue(data[key], key)
         from core.settings import DEFAULTS
         from ui.settings_model import build_pages

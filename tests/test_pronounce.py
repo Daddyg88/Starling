@@ -90,3 +90,14 @@ class YearsOrdinalsCodes(unittest.TestCase):
         self.assertEqual(prepare("Wregoe YU-H b51-7"), "Wregoe Y U dash H, B 5 1 dash 7")
         self.assertEqual(prepare("Eurybia Blu Hypa ZV-T d3-98 A 2"), "Eurybia Blu Hypa Z V dash T, D 3 dash 9 8 A 2")
         self.assertEqual(prepare("Sector YU-O b6"), "Sector Y U dash O, B 6")
+
+
+class SaluteTests(unittest.TestCase):
+    def test_o7_is_said_oh_seven(self):
+        self.assertEqual(prepare("o7 Commander"), "oh seven Commander")
+        self.assertEqual(prepare("O7, Ann."), "oh seven, Ann.")
+        self.assertEqual(prepare("Salute received. o7, Gav."), "Salute received. oh seven, Gav.")
+
+    def test_only_the_salute(self):
+        for text in ("Pro7 rocks", "room 07", "a o70 thing", "foo7"):
+            self.assertEqual(prepare(text), text)

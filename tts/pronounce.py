@@ -26,6 +26,7 @@ _YEAR = re.compile(r"(?<![\d.,$#/-])\b(?:(?<=in )|(?<=of )|(?<=by )|(?<=since )|
                    r"|(?<=October )|(?<=November )|(?<=December ))([1-3]\d{3})\b(?![\d,.]\d)(?!\s(?:credits?|tonnes?|tons?|metres?|kilometres?|light|ly|units?|cr|jumps?|percent|%))")
 _ORDINAL = re.compile(r"\b([1-9]|[12]\d|3[01])(st|nd|rd|th)\b")
 _SYSTEM_CODE = re.compile(r"\b([A-Z]{2})-([A-Z]) ([A-Ha-h])(\d{1,2})(?:-(\d{1,4}))?\b")
+_SALUTE = re.compile(r"(?<![A-Za-z0-9])[Oo]7(?![A-Za-z0-9])")      # the Elite salute o7: say "oh seven", not "o, 7"
 _ONES = ("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen").split()
 _TENS = ("", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety")
 _ORDINAL_WORDS = {1: "first", 2: "second", 3: "third", 5: "fifth", 8: "eighth", 9: "ninth", 12: "twelfth", 20: "twentieth", 30: "thirtieth"}
@@ -115,7 +116,8 @@ def prepare(text, voice_name=""):
     if not text:
         return text
     try:
-        out = _SYSTEM_CODE.sub(_system_code, text)
+        out = _SALUTE.sub("oh seven", text)
+        out = _SYSTEM_CODE.sub(_system_code, out)
         out = _YEAR.sub(lambda m: _year_words(int(m.group(1))), out)
         out = _ORDINAL.sub(_ordinal_words, out)
         out = _DECIMAL.sub(_spoken_decimal, out)

@@ -194,5 +194,13 @@
   "I couldn't resist this one. {user} asks: {question}",
   "Quick one from chat. {user} asks: {question}",
   "Chat's been busy. {user} asked: {question}"
+ ],
+ "StreamChat_Salute": [
+  "o7, {user}.",
+  "o7 Commander {user}.",
+  "o7 {user}.",
+  "Salute received. o7, {user}.",
+  "o7, Commander. Fly safe, {user}.",
+  "o7 {user}. Always a pleasure."
  ]
 }

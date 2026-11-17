@@ -123,6 +123,15 @@ def looks_like_question(text):
     return len(words) >= CHIME_MIN_WORDS and words[0].replace("'", "") in QUESTION_WORDS
 
 
+SALUTE_WORDS = frozenset(("o7", "commander", "cmdr", "starling"))
+
+
+def is_salute(text):
+    """True for the Elite salute: 'o7', 'o7 o7', 'o7 Commander'. Nothing else counts, so a longer message is never taken for one."""
+    words = [w for w in re.sub(r"[^a-z0-9 ]", " ", tidy(text).lower()).split() if w]
+    return 0 < len(words) <= 4 and "o7" in words and all(w in SALUTE_WORDS for w in words)
+
+
 def has_blocked_word(text, blocked):
     low = " " + re.sub(r"[^a-z0-9 ]", " ", str(text or "").lower()) + " "
     low = re.sub(r"\s+", " ", low)
@@ -243,6 +252,8 @@ class ChatDirector:
             return Result("ignored", user=user)
         parsed = parse(message.text, self.option("prefix", DEFAULT_PREFIX))
         if parsed is None:
+            if self._salute(message, user):
+                return Result("reacted", "salute", user, "o7")
             if not test:
                 self._note_candidate(message, user)
             return Result("ignored", user=user)
@@ -292,6 +303,27 @@ class ChatDirector:
         self.say("StreamChat_Action", {"user": user, "action": action.label})
         ok = self.do_action(action)
         return Result("done" if ok else "failed", "action", user, action.label)
+
+    # ---- o7: a viewer salutes, she salutes back ----
+    def _salute(self, message, user):
+        """'o7' in chat gets an 'o7' back. Only when she is free (it is dropped, not queued), and with cooldowns so a flood of o7s
+        gets a few replies, not a few hundred."""
+        if not self.option("salute", True) or not is_salute(message.text):
+            return False
+        now = self.clock()
+        if not message.owner and self.cool.wait_user("salute:" + user.lower(), self._number("salute_user_gap", 120)) > 0:
+            return False
+        if now - self.event_last.get("salute", -1e9) < self._number("salute_gap", 20):
+            return False
+        try:
+            if self.quiet_provider is not None and not self.quiet_provider():
+                return False
+        except Exception:
+            return False
+        self.cool.user["salute:" + user.lower()] = now
+        self.event_last["salute"] = now
+        self.say("StreamChat_Salute", {"user": user})
+        return True
 
     # ---- chiming in: now and then she answers an ordinary chat question nobody asked her to ----
     CHIME_FRESH = 150.0        # a question older than this has moved on
