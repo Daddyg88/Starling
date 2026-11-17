@@ -1091,6 +1091,27 @@ class HighTechOnePadNumbers(unittest.TestCase):
         self.assertLess(abs(turn - 105.0), 5.0)
 
 
+class UkahMilitaryTwo(unittest.TestCase):
+    """Ukah Defence Outpost (17 Nov 2026, a tester, a Kestrel on game pad 1): four terminal spots fit Military 2 at about 0.32 metres per unit,
+    and the ship's landing spot is the LEFT Small pad (494, 503)."""
+
+    SHIP = (-44.338116, -47.561104)
+    MARKS = [("terminal", -34.1, 39.3), ("terminal", -159.0, 1.8), ("terminal", -92.7, -53.1), ("terminal", -123.9, 33.7)]
+
+    def test_marks_fit_and_ship_is_on_the_left_small_pad(self):
+        from navigation.settlement_maps import SettlementMaps
+        data = SettlementMaps().get("military_2")
+        self.assertAlmostEqual(data["scale"], 0.32)
+        pad = settlement_track.known_pad_frames()["military_2"]["pads"][2]
+        seed = settlement_track.pad_calibration("military_2", pad, 86.0, (0.0, 0.0), self.SHIP[0], self.SHIP[1], 3240940.5, scale=0.32)
+        fit = settlement_track.refine_calibration(seed, data, self.MARKS, (0.0, 0.0), turns=range(-180, 180), shift=None)
+        self.assertEqual(fit[1], 4)
+        ship_x, ship_y = fit[0].from_world(0.0, 0.0)
+        left = settlement_track.known_pad_frames()["military_2"]["pads"][1]
+        self.assertLess(math.hypot(ship_x - left["x"], ship_y - left["y"]), 60.0)
+        self.assertEqual(left.get("game_pad"), 1)
+
+
 class YisWorkshopWideSearch(unittest.TestCase):
     """Yi's Workshop (16 Nov 2026): the landing line-up started about 200 degrees out, so only a search of every turn finds the three marked terminals.
     Two matching terminals fit the map two ways (turned half a circle apart); the right one puts the ship on the Large pad (940, 38)."""

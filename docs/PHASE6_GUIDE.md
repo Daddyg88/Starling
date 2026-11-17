@@ -1552,6 +1552,11 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.74 - Military 2 size and game pad number
+
+- maps/settlements/military_2.json: scale 0.32 (fits 0.31 to 0.33, one visit).
+- maps/pad_frames.json: the left Small pad (494, 503) is game pad 1.
+
 ## 0.96.73 - chat in fights, X always visible, YouTube quota
 
 - streaming/chat.py: new `free_provider` and `_free()` used for o7, events and held questions; `quiet_provider` stays for chime-ins. Setting `streaming.talk_in_combat` (default on).

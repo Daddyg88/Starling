@@ -274,7 +274,8 @@
     "size": "Small",
     "x": 494,
     "y": 503,
-    "facing": 266
+    "facing": 266,
+    "game_pad": 1
    },
    {
     "size": "Small",
