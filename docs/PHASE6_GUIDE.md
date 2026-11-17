@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.66 - one GitHub run per push
+
+The Tests, Guide website and Release workflows are now one file, `.github/workflows/starling.yml`, with three jobs: tests, then website and release. One push, one run, three ticks. The release only goes ahead if the tests pass. If a release is ever needed while a test is red, fix or skip the test first (or tell me), because the release job waits for the tests job. Nothing in the program changed.
+
 ## 0.96.65 - settlement progress on the to-do list
 
 The to-do list (docs/TODO.md) now starts with a progress section for all 28 settlement layouts: 9 measured, 1 unresolved (Agriculture 5) and 18 not measured yet, plus the missing or suspect pad arrows and the game pad numbers still to collect. Nothing in the program changed. To measure a layout: land, say 'mark spot ship' on stepping out, then 'mark spot terminal' at 2 or 3 yellow terminals 100 m or more apart, and send the diagnostics zip.

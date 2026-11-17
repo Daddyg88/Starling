@@ -19,7 +19,7 @@ Your mood, settings, recordings, plugins and logs are carried into every new ver
 ## For me (publishing a new version)
 1. Change `core/version.py` (for example `0.12.0`).
 2. Commit, then `git tag v0.12.0` and `git push origin main v0.12.0`.
-3. The GitHub Action (`.github/workflows/release.yml`) builds `Starling.exe`, `Starling-app.zip` and its fingerprint, and publishes them as a release. Everyone's Starling.exe picks it up on its next start. (The workflow refuses to run if the tag and `version.py` don't match.)
+3. The GitHub Action (`.github/workflows/starling.yml` (its "release" job)) builds `Starling.exe`, `Starling-app.zip` and its fingerprint, and publishes them as a release. Everyone's Starling.exe picks it up on its next start. (The workflow refuses to run if the tag and `version.py` don't match.)
 
 ## Not tested
 The exe build, the Windows Python install and the pip install were never run in the sandbox (it is Linux with no PyInstaller). The update engine (download check, fingerprint, safe unpack, swap, rollback) and the launcher logic are tested with fakes. Expect to fix small things on the first real run: send me `launcher.log`.

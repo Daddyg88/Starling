@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.66: ONE workflow (starling.yml: tests, then website + release). CHECK the Actions tab after this push shows ONE run with tests, website and release all green, and a new GitHub Release v0.96.66 appears. If red, send me the failing job name.
 - [x] 0.96.64: tests.yml workflow. Green on GitHub (17 Nov, Tests #1).
 - [ ] 0.96.63: commander name first in about.json. CHECK: press the diagnostics button after Elite has started and read about.json.
 - [ ] 0.96.62: Tourist 1 small pad arrows (pads 1, 2) and High Tech 1 pad numbers (1 small, 2 large). CHECK: land on High Tech 1 pad 1 and Tourist 1 pad 2 and see the first line-up. Tourist 1 pad 1 (bottom small) and High Tech 1 pad 2 (Large) not seen yet.

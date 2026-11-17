@@ -1,23 +1,72 @@
-# Builds a Starling release by itself whenever core/version.py changes on the main branch (the tag v<version> and the
-# GitHub Release are made for you), or when you push a tag like v0.12.0 by hand.
-#   git tag v0.12.0 && git push origin v0.12.0
-# It runs the tests, builds Starling.exe (the launcher) on Windows, zips the program, and publishes all of it as a
-# GitHub Release. Starling.exe on your computer then finds and installs the new version by itself.
-name: Release
+# ONE workflow for every push to main. Three jobs, in this order, so GitHub shows a single run per push:
+#   1. tests    - runs all the tests (Linux). If this fails, nothing below runs and no release is made from a broken change.
+#   2. website  - builds the guide website from the code and publishes it with GitHub Pages.
+#   3. release  - builds Starling.exe and the program zip on Windows and publishes them as a GitHub Release
+#                 (the tag v<version> is made for you from core/version.py; if that release already exists it does nothing).
+# You can also push a tag like v0.12.0 by hand (git tag v0.12.0 && git push origin v0.12.0); it must match core/version.py.
+# The Windows-only parts (voice, listening, the real game) are tested by people; see docs/TODO.md "Needs a real-game test".
+name: Starling
 
 on:
   push:
     tags: ["v*"]
     branches: [main]
-    paths: ["core/version.py"]
+  pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: starling-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install what the tests need
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q libportaudio2 libgl1
+          python -m pip install --upgrade pip
+          python -m pip install numpy pillow scipy opencv-python-headless requests pyyaml sounddevice tzdata
+      - name: Run the tests
+        run: python -m unittest discover -s tests -t .
+
+  website:
+    needs: tests
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python tools/build_guide.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
   release:
+    needs: tests
+    if: github.event_name != 'pull_request'
     runs-on: windows-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5
 
@@ -37,12 +86,6 @@ jobs:
           if [ "${GITHUB_REF_TYPE}" != "tag" ] && gh release view "v$v" >/dev/null 2>&1; then
             echo "Release v$v already exists: nothing to do"; echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Run the tests (a failure is shown but does not stop the release)
-        if: steps.tag.outputs.skip != 'true'
-        shell: bash
-        continue-on-error: true
-        run: python -m unittest discover -s tests -t .
 
       - name: Build the program zip
         if: steps.tag.outputs.skip != 'true'
