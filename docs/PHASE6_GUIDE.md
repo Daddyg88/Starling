@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.60 - longer wait for ESET LiveGuard
+
+ESET LiveGuard holds each new library file for a few minutes while it analyses it, which showed up as "Access is denied" on a fresh install. The voice load now waits 20 s and retries up to 12 times (BLOCKED_RETRIES, BLOCKED_WAIT_SECONDS in tts/kokoro_tts.py). Not tested with a real ESET.
+
 ## 0.96.59 - waiting out an antivirus scan
 
 When the voice engine's library file is refused with "Access is denied", she now waits 10 seconds and tries again, up to 6 times, instead of giving up at the first refusal. Constants BLOCKED_RETRIES and BLOCKED_WAIT_SECONDS in tts/kokoro_tts.py. The proper fix is still to add the Starling folder to the antivirus exclusions. Not tested on a real scanning antivirus.

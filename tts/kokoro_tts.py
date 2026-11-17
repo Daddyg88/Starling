@@ -45,10 +45,10 @@ def looks_like_spacy_damage(error):
     return "spacy" in text and ("from_disk" in text or SPACY_MODEL in text)
 
 
-BLOCKED_RETRIES = 6              # antivirus often scans a new library file the first time it is used and holds it for a few seconds
-BLOCKED_WAIT_SECONDS = 10.0
-BLOCKED_HINT = (" | Windows is refusing to load one of the voice engine's files. Usually your antivirus or Windows Security (Controlled folder access, "
-                "or a scan of new files) is blocking it. Add the whole Starling folder as an exclusion, restart Starling, or run setup.bat again. "
+BLOCKED_RETRIES = 12              # antivirus often scans a new library file the first time it is used and holds it (ESET LiveGuard: a few minutes)
+BLOCKED_WAIT_SECONDS = 20.0
+BLOCKED_HINT = (" | Windows is refusing to load one of the voice engine's files. Usually your antivirus (ESET LiveGuard, Windows Security, Controlled folder access...) is holding it while it checks "
+                "a new file, which can take a few minutes. Add the whole Starling folder as an exclusion, restart Starling, or run setup.bat again. "
                 "If it still fails, send the diagnostics zip.")
 
 
