@@ -1,11 +1,28 @@
 # Starling: what is done and what is left
 
-Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.89.6.
+Kept up to date by hand. Tick a box ([x]) when it is finished and note the version. Last updated at 0.96.64.
 
 ## STILL TO DO
 
+### SETTLEMENT MAP PROGRESS (28 layouts; updated 17 Nov, 0.96.64)
+Measured = a real size (metres per map unit) from tester marks. Provisional = one visit only.
+- [x] MEASURED, 9 of 28: agriculture_1 (0.408), agriculture_4 (0.44), extraction_3 (0.35, provisional), extraction_5 (0.181, provisional), high_tech_1 (0.33), industrial_1 (0.27, provisional), industrial_2 (0.345), industrial_4 (0.34), tourist_1 (0.425, three visits).
+- [ ] UNRESOLVED, 1: agriculture_5 (Tutunnyk). Two fits: A 0.232 (2 m miss, ship 135 m from the drawn pad) or B 0.256 (8 m miss, ship 13 m from the pad, matches the pad arrow). NEEDS Ben's look at the map: is the pad at the bottom or top, are three terminals in a row near it, which one is blue.
+- [ ] NOT MEASURED YET, 18 (need a visit with 'mark spot ship' then 2 to 3 'mark spot terminal' 100 m+ apart, then the ZIP):
+  - Agriculture: agriculture_2, agriculture_3 (agriculture_2 and 5 look alike, 1 and 3 too, so visits also tell the pairs apart)
+  - Extraction: extraction_1, extraction_2, extraction_4
+  - High Tech: high_tech_2, high_tech_3, high_tech_4
+  - Industrial: industrial_3, industrial_5
+  - Military: military_1, military_2, military_3, military_4, military_5
+  - Tourist: tourist_2, tourist_3, tourist_4
+- [ ] NO PAD ARROWS: military_3 and military_4 (the pad direction is unknown).
+- [ ] PAD ARROWS SUSPECT: industrial_4 (Large 940,38 vs ship at 178,380 on the Large pad).
+- [ ] GAME PAD NUMBERS known only for high_tech_1 (1 small, 2 large) and tourist_1 (1 to 4). Every layout with several pads (agriculture_1, agriculture_4, extraction_1, extraction_2, high_tech_4, industrial_4, military_2, tourist_3, tourist_4) needs them when a tester lands on each pad.
+- [ ] SECOND VISITS to confirm provisional sizes: extraction_3, extraction_5, industrial_1.
+- [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
+
 ### Needs a real-game test (built, not yet confirmed)
-- [ ] 0.96.64: tests.yml workflow. CHECK the Actions tab shows a green run for this push; if red, send me what it says (missing library on the Linux runner is the likely cause).
+- [x] 0.96.64: tests.yml workflow. Green on GitHub (17 Nov, Tests #1).
 - [ ] 0.96.63: commander name first in about.json. CHECK: press the diagnostics button after Elite has started and read about.json.
 - [ ] 0.96.62: Tourist 1 small pad arrows (pads 1, 2) and High Tech 1 pad numbers (1 small, 2 large). CHECK: land on High Tech 1 pad 1 and Tourist 1 pad 2 and see the first line-up. Tourist 1 pad 1 (bottom small) and High Tech 1 pad 2 (Large) not seen yet.
 - [ ] 0.96.61: listening model downloads on a fresh install (offline flag lifted once). ASK the new tester: does she hear him now? (log line 'downloading it once')
