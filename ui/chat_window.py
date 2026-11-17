@@ -163,16 +163,21 @@ class ChatWindow:
         bar = tk.Frame(inner, bg=theme.SIDEBAR, height=30)
         bar.pack(fill="x")
         bar.pack_propagate(False)
+        # The buttons are packed FIRST, so in a narrow window it is the title and status that get squeezed, never the X.
+        for text, command in (("✕", self._close_by_user), ("Top", self._toggle_top), ("A+", lambda: self._bump(1)), ("A−", lambda: self._bump(-1))):
+            is_close = text == "✕"
+            button = tk.Label(bar, text=text, bg=theme.SIDEBAR, fg=theme.TEXT if is_close else theme.MUTED,
+                              font=(theme.FONT, 12 if is_close else 10, "bold"), padx=10 if is_close else 7, cursor="hand2")
+            button.pack(side="right")
+            button.bind("<Button-1>", lambda event, c=command: c())
+            hover = "#ff5c5c" if is_close else theme.ACCENT_HOVER
+            rest = theme.TEXT if is_close else theme.MUTED
+            button.bind("<Enter>", lambda event, b=button, h=hover: b.configure(fg=h))
+            button.bind("<Leave>", lambda event, b=button, r=rest: b.configure(fg=r))
         title = tk.Label(bar, text="✦  STARLING CHAT", bg=theme.SIDEBAR, fg=theme.ACCENT, font=(theme.HEAD_FONT, 11, "bold"), cursor="fleur")
         title.pack(side="left", padx=(10, 6))
         self.status = tk.Label(bar, text="", bg=theme.SIDEBAR, fg=theme.MUTED, font=(theme.FONT, 9), anchor="w", cursor="fleur")
         self.status.pack(side="left", fill="x", expand=True)
-        for text, command in (("✕", self._close_by_user), ("Top", self._toggle_top), ("A+", lambda: self._bump(1)), ("A−", lambda: self._bump(-1))):
-            button = tk.Label(bar, text=text, bg=theme.SIDEBAR, fg=theme.MUTED, font=(theme.FONT, 10, "bold"), padx=7, cursor="hand2")
-            button.pack(side="right")
-            button.bind("<Button-1>", lambda event, c=command: c())
-            button.bind("<Enter>", lambda event, b=button: b.configure(fg=theme.ACCENT_HOVER))
-            button.bind("<Leave>", lambda event, b=button: b.configure(fg=theme.MUTED))
         for grab in (bar, title, self.status):
             grab.bind("<ButtonPress-1>", self._drag_start)
             grab.bind("<B1-Motion>", self._drag_move)

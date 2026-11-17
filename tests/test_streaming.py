@@ -424,6 +424,39 @@ class ChimeIn(unittest.TestCase):
         self.assertEqual(d.pump_chime().user, "Bob")
 
 
+class TalkInFights(unittest.TestCase):
+    """A fight (quiet check false) must not hold back o7, raids or a viewer's question; only real speech does."""
+    def setup(self, talking=False, **settings):
+        d, clock, done, asked, said = make(**settings)
+        fight = [True]
+        d.quiet_provider = lambda: not fight[0]
+        d.free_provider = lambda: not talking
+        return d, clock, said, asked
+
+    def test_o7_goes_through_in_a_fight(self):
+        d, clock, said, asked = self.setup()
+        d.handle(msg("o7", "Ann"))
+        d.pump_salutes()
+        self.assertEqual(said, [("StreamChat_Salute", {"user": "Ann"})])
+
+    def test_o7_still_waits_while_she_is_speaking(self):
+        d, clock, said, asked = self.setup(talking=True)
+        d.handle(msg("o7", "Ann"))
+        self.assertEqual(said, [])
+        self.assertEqual(len(d.salutes), 1)
+
+    def test_switch_off_restores_the_old_waiting(self):
+        d, clock, said, asked = self.setup(talk_in_combat=False)
+        d.handle(msg("o7", "Ann"))
+        d.pump_salutes()
+        self.assertEqual(said, [])
+
+    def test_chime_ins_stay_strict_in_a_fight(self):
+        d, clock, said, asked = self.setup()
+        self.assertTrue(d._free())                                   # free for replies
+        self.assertFalse(d.quiet_provider())                         # but the strict check (used by chime-ins) still says no
+
+
 class Salute(unittest.TestCase):
     def test_what_is_a_salute(self):
         for text in ("o7", "O7", "o7!", "o7 o7", "o7 Commander", "  o7  ", "hi Starling o7", "great stream everyone, thanks for having me o7",
@@ -576,6 +609,17 @@ class YouTubeLoop(unittest.TestCase):
             return answer
         chat_ = youtube.YouTubeChat("KEY123", "dQw4w9WgXcQ", got.append, status.append, get=fake_get, sleep=lambda s: None)
         return chat_, got, status, calls
+
+    def test_quiet_chat_is_checked_less_often(self):
+        live = {"items": [{"liveStreamingDetails": {"activeLiveChatId": "CHAT1"}}]}
+        empty = yt_page([], "t")
+        chat_, got, status, calls = self.make([live] + [empty] * 8 + [yt_page([yt_item("hi")], "u")])
+        chat_.step()
+        waits = [chat_.step() for _ in range(8)]
+        self.assertEqual(waits[0], 10.0)
+        self.assertEqual(waits[-1], 30.0)                           # quiet for a while: slower, saves quota
+        self.assertEqual(chat_.step(), 10.0)                        # someone spoke: back to normal
+        self.assertEqual(chat_.quiet_polls, 0)
 
     def test_finds_chat_skips_backlog_then_delivers_new_messages(self):
         live = {"items": [{"liveStreamingDetails": {"activeLiveChatId": "CHAT1"}}]}

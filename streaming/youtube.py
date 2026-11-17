@@ -23,6 +23,7 @@ log = get_logger("youtube")
 
 API = "https://www.googleapis.com/youtube/v3/"
 MIN_POLL, MAX_POLL = 10.0, 60.0
+QUIET_AFTER, QUIET_POLL = 6, 30.0     # after 6 empty checks in a row, check only every 30 s
 NO_CHAT_RETRY = 30.0
 QUOTA_RETRY = 600.0
 KEY_RETRY = 60.0
@@ -124,6 +125,7 @@ class YouTubeChat:
         self._thread = None
         self.chat_id = ""
         self.page_token = ""
+        self.quiet_polls = 0         # polls in a row with nothing new: the check slows down to save the daily quota
 
     def start(self):
         if self._thread is not None or not self.key or not self.video:
@@ -188,14 +190,19 @@ class YouTubeChat:
         page = self._get(self._url("liveChat/messages", **params))
         self.page_token = page.get("nextPageToken") or self.page_token
         messages = parse_messages(page)
+        events = parse_events(page)
+        self.quiet_polls = 0 if (messages or events) else self.quiet_polls + 1
         if getattr(self, "_first", False):
             self._first = False                       # the chat already had a backlog: never act on old messages
         else:
-            for message in messages + parse_events(page):
+            for message in messages + events:
                 self.on_message(message)
         self._refused = 0
         self.on_status("Connected to the YouTube live chat")
-        return poll_seconds(page.get("pollingIntervalMillis"))
+        wait = poll_seconds(page.get("pollingIntervalMillis"))
+        if self.quiet_polls >= QUIET_AFTER:
+            wait = max(wait, QUIET_POLL)              # chat is quiet: every call costs quota, so look less often until someone speaks
+        return wait
 
     def _api_problem(self, error):
         reason = error.reason

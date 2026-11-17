@@ -1552,6 +1552,14 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.73 - chat in fights, X always visible, YouTube quota
+
+- streaming/chat.py: new `free_provider` and `_free()` used for o7, events and held questions; `quiet_provider` stays for chime-ins. Setting `streaming.talk_in_combat` (default on).
+- streaming/wiring.py: `free()` = not speaking and 1.5 s since her last line; no combat/danger check.
+- ui/chat_window.py: buttons packed before title/status so the X can never be squeezed out.
+- streaming/youtube.py: `quiet_polls`; after 6 empty polls the wait is at least 30 s.
+- log lines under `stream_chat` for salutes, events and expiries.
+
 ## 0.96.72 - close X, remembered position, voice commands for the windows
 
 The 'What she knows about you' window has an X in its corner (Escape also closes it) and remembers its position. Voice: say **show the chat window** / **hide the chat window**, and **show the memory window** / **close the memory window**. The chat window's X and remembered position were already there.

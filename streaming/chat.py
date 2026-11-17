@@ -22,7 +22,10 @@ import unicodedata
 from collections import deque
 from dataclasses import dataclass
 
+from core.logger import get_logger
 from streaming import events as stream_events
+
+log = get_logger("stream_chat")
 
 DEFAULT_PREFIX = "!starling"
 MAX_QUESTION = 140
@@ -204,10 +207,11 @@ class Result:
 class ChatDirector:
     """Decides what happens to each chat message. The three `do_*` functions are the only things that touch the game or her voice."""
 
-    def __init__(self, settings, state_provider, do_action, do_ask, say, clock, quiet_provider=None, rng=None):
+    def __init__(self, settings, state_provider, do_action, do_ask, say, clock, quiet_provider=None, rng=None, free_provider=None):
         self.settings = settings
         self.clock = clock
         self.quiet_provider = quiet_provider    # () -> True when she is not busy (None = never hold anything back)
+        self.free_provider = free_provider      # () -> True when she is not TALKING (ignores combat and danger): used for thanks, o7 and direct questions
         self.held = deque()                     # (time, user, question) waiting for a quiet moment
         self.state_provider = state_provider
         self.rng = rng or random.Random()
@@ -302,6 +306,18 @@ class ChatDirector:
         ok = self.do_action(action)
         return Result("done" if ok else "failed", "action", user, action.label)
 
+    def _free(self):
+        """May she talk to chat now (a thank-you, an o7 back, a viewer's own question)? Not while she is speaking, but a fight or danger does NOT
+        hold it back (Settings > Streaming > 'She talks to chat during fights', on by default): a streamer in combat for hours would otherwise
+        never get a raid thanked. Her own chit-chat-style chime-ins stay with the stricter quiet check."""
+        provider = self.free_provider if (self.free_provider is not None and self.option("talk_in_combat", True)) else self.quiet_provider
+        if provider is None:
+            return True
+        try:
+            return bool(provider())
+        except Exception:
+            return False
+
     # ---- o7: a viewer salutes, she salutes back ----
     SALUTE_MAX_WAITING = 40       # the most o7s kept waiting (a big start or end of stream); more than this are dropped
     SALUTE_MAX_AGE = 900.0        # a waiting o7 is still said up to 15 minutes later (streams start with a countdown)
@@ -330,6 +346,7 @@ class ChatDirector:
             return None
         now = self.clock()
         while self.salutes and now - self.salutes[0][0] > self.SALUTE_MAX_AGE:
+            log.info("o7 from %s waited too long and was dropped", self.salutes[0][1])
             self.salutes.popleft()
         if not self.salutes:
             return None
@@ -338,13 +355,11 @@ class ChatDirector:
             return None
         if self.pending or now - self.event_last.get("salute", -1e9) < self._number("salute_gap", 3):
             return None
-        try:
-            if self.quiet_provider is not None and not self.quiet_provider():
-                return None
-        except Exception:
+        if not self._free():
             return None
         _t, user = self.salutes.popleft()
         self.event_last["salute"] = now
+        log.info("o7 back to %s", user)
         self.say("StreamChat_Salute", {"user": user})
         return Result("reacted", "salute", user, "o7")
 
@@ -413,10 +428,7 @@ class ChatDirector:
             return False
         if self.held:
             return True
-        try:
-            return not self.quiet_provider()
-        except Exception:
-            return False
+        return not self._free()
 
     def pump(self):
         """Called about once a second. When it is quiet, answers the OLDEST held question (one at a time).
@@ -435,10 +447,7 @@ class ChatDirector:
             return None
         if self.cool.wait_kind("ask", self._number("ask_cooldown", 10)) > 0:
             return None
-        try:
-            if self.quiet_provider is not None and not self.quiet_provider():
-                return None
-        except Exception:
+        if not self._free():
             return None
         _t, user, question = self.held.popleft()
         self.cool.last["ask"] = self.clock()
@@ -492,6 +501,7 @@ class ChatDirector:
         """Says the OLDEST waiting event when she is free. Called about once a second, and whenever one arrives."""
         now = self.clock()
         while self.pending and now - self.pending[0][0] > self.EVENT_MAX_AGE.get(self.pending[0][1].kind, 300.0):
+            log.info("%s from %s waited too long and was dropped", self.pending[0][1].kind, self.pending[0][1].user)
             self.log.append(Result("blocked", "event", self.pending[0][1].user, self.pending[0][1].kind, "waited too long"))
             self.pending.popleft()
         if not self.pending:
@@ -503,12 +513,10 @@ class ChatDirector:
         gap = self.EVENT_GAP.get(event.kind, 10.0)
         if now - self.event_last.get(event.kind, -1e9) < gap:
             return None
-        try:
-            if self.quiet_provider is not None and not self.quiet_provider():
-                return None
-        except Exception:
+        if not self._free():
             return None
         self.pending.popleft()
+        log.info("reacting to %s from %s", event.kind, event.user)
         self.event_last[event.kind] = now
         fields = {"user": event.user, "amount": event.amount, "months": event.amount, "viewers": event.amount or "a whole crowd of", "streak": event.amount,
                   "count": event.amount, "people": event.amount, "messages": event.amount, "platform": event.platform}

@@ -7,6 +7,7 @@ from streaming.bridge import ChatBridge
 from streaming.chat import FSD_CHARGING, FSD_JUMP, IN_DANGER, ChatDirector, flag
 
 log = get_logger("streaming")
+FREE_SECONDS = 1.5           # a thank-you or o7 waits only this long after she last spoke (fights do not matter)
 QUIET_SECONDS = 4.0          # she must have been silent this long before a held chat question is answered
 
 
@@ -84,5 +85,16 @@ def build(app):
             return False
         return True
 
-    director = ChatDirector(app.settings, lambda: app.state, do_action, do_ask, say, time.monotonic, quiet_provider=quiet)
+    def free():
+        """Lenient check for thank-yous, o7 and a viewer's own question: only 'is she speaking, or did she just finish'. A fight or danger does
+        not hold these back, or a streamer who fights all night never gets a raid answered."""
+        speech = app.speech
+        if speech is not None and speech.is_busy():
+            return False
+        chit = getattr(app, "chitchat", None)
+        if chit is not None and time.monotonic() - getattr(chit, "last_spoke", -1e9) < FREE_SECONDS:
+            return False
+        return True
+
+    director = ChatDirector(app.settings, lambda: app.state, do_action, do_ask, say, time.monotonic, quiet_provider=quiet, free_provider=free)
     return ChatBridge(app.settings, director)
