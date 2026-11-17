@@ -4,7 +4,7 @@
    point are said one by one ("3.14" = "three point one four"). Left alone: IDs like 21.02.002, version numbers like 0.96.3, and a full stop at the end of a sentence.
 2. Units: "500 m" -> "500 metres", "2 km" -> "2 kilometres", "1.2 g" -> "1 point 2 gee" (a lone letter is read as a letter otherwise).
 3. (0.96.51) Years are said as years ("in 1994" = "nineteen ninety-four", Elite's "in 3125" = "thirty-one twenty-five"), dates as ordinals ("16th" =
-   "sixteenth"), and Elite system codes letter by letter ("NL-N C23-4" = "N L, N, C 2 3, 4"). Acronyms such as SRV and DSSA are in the word list below.
+   "sixteenth"), and Elite system codes letter by letter ("NL-N C23-4" = "N L dash N, C 2 3 dash 4"). Acronyms such as SRV and DSSA are in the word list below.
 4. Hard words: config/pronunciations.json lists Latin and game words (Fonticulua, Tectonicas, terraformable...) with a respelling the voice reads correctly,
    plus extra changes for the Australian voice only (metres). Edit that file to fix a word; an empty list switches it off.
 """
@@ -102,8 +102,8 @@ def _ordinal_words(match):
 def _system_code(match):
     first, single, mass, number, last = match.groups()
     spelled = lambda text: " ".join(text)
-    out = "%s, %s, %s %s" % (spelled(first), single, mass.upper(), spelled(number))
-    return out + (", %s" % spelled(last) if last else "")
+    out = "%s dash %s, %s %s" % (spelled(first), single, mass.upper(), spelled(number))
+    return out + (" dash %s" % spelled(last) if last else "")
 
 
 def _spoken_decimal(match):

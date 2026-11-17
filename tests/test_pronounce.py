@@ -82,11 +82,11 @@ class YearsOrdinalsCodes(unittest.TestCase):
 
     def test_system_code_and_acronyms(self):
         from tts.pronounce import prepare
-        self.assertIn("N L, N, C 2 3, 4", prepare("NL-N C23-4"))
+        self.assertIn("N L dash N, C 2 3 dash 4", prepare("NL-N C23-4"))
         self.assertIn("S R V", prepare("the SRV"))
 
     def test_real_system_names_have_a_lowercase_mass_code(self):
         from tts.pronounce import prepare
-        self.assertEqual(prepare("Wregoe YU-H b51-7"), "Wregoe Y U, H, B 5 1, 7")
-        self.assertEqual(prepare("Eurybia Blu Hypa ZV-T d3-98 A 2"), "Eurybia Blu Hypa Z V, T, D 3, 9 8 A 2")
-        self.assertEqual(prepare("Sector YU-O b6"), "Sector Y U, O, B 6")
+        self.assertEqual(prepare("Wregoe YU-H b51-7"), "Wregoe Y U dash H, B 5 1 dash 7")
+        self.assertEqual(prepare("Eurybia Blu Hypa ZV-T d3-98 A 2"), "Eurybia Blu Hypa Z V dash T, D 3 dash 9 8 A 2")
+        self.assertEqual(prepare("Sector YU-O b6"), "Sector Y U dash O, B 6")

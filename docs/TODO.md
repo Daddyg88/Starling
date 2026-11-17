@@ -5,6 +5,7 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 ## STILL TO DO
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.56: system codes say "dash". LISTEN to a few system names.
 - [ ] 0.96.55: lowercase system codes (b51-7) said letter by letter. LISTEN to a few system names; ASK Ben which names still sound wrong (named systems like Synuefe, catalogue ones like HIP, Col, Sector).
 - [ ] 0.96.54: on-foot cold/hot warnings gapped (5 min mild, 2 min dangerous). CHECK on a hot or cold planet that she no longer repeats them; tell Ben if still too many.
 - [ ] 0.96.53: Extraction 5 at 0.181 (one tester, small pad 1). CHECK: land on the small pad, walk to the yellow terminals and the HAB one; the arrow should follow.
