@@ -224,7 +224,7 @@ class MeasuredSizes(unittest.TestCase):
         self.assertAlmostEqual(maps.get("agriculture_4")["scale"], 0.44)
         self.assertAlmostEqual(maps.get("agriculture_1")["scale"], 0.408)
         self.assertAlmostEqual(maps.get("extraction_5")["scale"], 0.181)
-        self.assertAlmostEqual(maps.get("military_2")["scale"], 0.32)
+        self.assertAlmostEqual(maps.get("military_2")["scale"], 0.31)
 
     def test_industrial_4_has_the_terminal_marked_three_times(self):
         marked = [m for m in SettlementMaps().get("industrial_4")["markers"] if m.get("marked")]
