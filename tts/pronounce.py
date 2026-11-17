@@ -25,7 +25,7 @@ _YEAR = re.compile(r"(?<![\d.,$#/-])\b(?:(?<=in )|(?<=of )|(?<=by )|(?<=since )|
                    r"|(?<=January )|(?<=February )|(?<=March )|(?<=April )|(?<=May )|(?<=June )|(?<=July )|(?<=August )|(?<=September )"
                    r"|(?<=October )|(?<=November )|(?<=December ))([1-3]\d{3})\b(?![\d,.]\d)(?!\s(?:credits?|tonnes?|tons?|metres?|kilometres?|light|ly|units?|cr|jumps?|percent|%))")
 _ORDINAL = re.compile(r"\b([1-9]|[12]\d|3[01])(st|nd|rd|th)\b")
-_SYSTEM_CODE = re.compile(r"\b([A-Z]{2})-([A-Z]) ([A-H])(\d{1,2})(?:-(\d{1,4}))?\b")
+_SYSTEM_CODE = re.compile(r"\b([A-Z]{2})-([A-Z]) ([A-Ha-h])(\d{1,2})(?:-(\d{1,4}))?\b")
 _ONES = ("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen").split()
 _TENS = ("", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety")
 _ORDINAL_WORDS = {1: "first", 2: "second", 3: "third", 5: "fifth", 8: "eighth", 9: "ninth", 12: "twelfth", 20: "twentieth", 30: "thirtieth"}
@@ -102,7 +102,7 @@ def _ordinal_words(match):
 def _system_code(match):
     first, single, mass, number, last = match.groups()
     spelled = lambda text: " ".join(text)
-    out = "%s, %s, %s %s" % (spelled(first), single, mass, spelled(number))
+    out = "%s, %s, %s %s" % (spelled(first), single, mass.upper(), spelled(number))
     return out + (", %s" % spelled(last) if last else "")
 
 
