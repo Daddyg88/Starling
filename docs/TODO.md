@@ -22,7 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
-- [ ] 0.96.74: Military 2 at 0.32 and game pad 1 = left Small pad (one tester, Kestrel). CHECK: land on pad 1, walk to a terminal, the arrow follows. Second visit wanted (Large or the other Small pad) to confirm the size.
+- [x] 0.96.74/75: Military 2 at 0.31, game pad 1 = left Small pad: two tester visits, the second one solid. Still wanted: a visit on the Large pad or the other Small pad (their game pad numbers).
 - [ ] 0.96.73: chat in fights. CHECK: in combat mode type o7 and !starling questions in chat (she should answer, not talk over herself), a raid is thanked; narrow the chat window a lot: the X must still show and close it; log shows stream_chat lines.
 - [ ] 0.96.72: window voice commands and the memory window's X / Escape / remembered position. CHECK: say 'show the memory window' (opens), drag it, 'close the memory window'; reopen: same place? Say 'hide the chat window' / 'show the chat window'. If a phrase is not heard, tell me what you said.
 - [ ] 0.96.71: 'What she knows about me' window (Memory page) and richer last-session recap. CHECK on Windows: the button opens the window; Forget works and the list updates; tell her 'I love pizza' and see it appear. At the next login after a flight: 'Last time out, yesterday, we made 18 jumps and finished in <system>.' plus the chat or deaths sentence when it applies. The window was never run on a screen.

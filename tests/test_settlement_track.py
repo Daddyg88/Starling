@@ -1101,15 +1101,33 @@ class UkahMilitaryTwo(unittest.TestCase):
     def test_marks_fit_and_ship_is_on_the_left_small_pad(self):
         from navigation.settlement_maps import SettlementMaps
         data = SettlementMaps().get("military_2")
-        self.assertAlmostEqual(data["scale"], 0.32)
+        self.assertAlmostEqual(data["scale"], 0.31)
         pad = settlement_track.known_pad_frames()["military_2"]["pads"][2]
-        seed = settlement_track.pad_calibration("military_2", pad, 86.0, (0.0, 0.0), self.SHIP[0], self.SHIP[1], 3240940.5, scale=0.32)
+        seed = settlement_track.pad_calibration("military_2", pad, 86.0, (0.0, 0.0), self.SHIP[0], self.SHIP[1], 3240940.5, scale=0.31)
         fit = settlement_track.refine_calibration(seed, data, self.MARKS, (0.0, 0.0), turns=range(-180, 180), shift=None)
         self.assertEqual(fit[1], 4)
         ship_x, ship_y = fit[0].from_world(0.0, 0.0)
         left = settlement_track.known_pad_frames()["military_2"]["pads"][1]
         self.assertLess(math.hypot(ship_x - left["x"], ship_y - left["y"]), 60.0)
         self.assertEqual(left.get("game_pad"), 1)
+
+
+class HoffmannMilitaryTwo(unittest.TestCase):
+    """Hoffmann Munitions Facility (17 Nov 2026, a tester, Kestrel on game pad 1, the map lined up from the pad frame and was confirmed): the marks fit
+    Military 2 best at 0.31 (same as Ukah), and the ship's landing spot is the left Small pad again."""
+
+    SHIP = (-61.576881, 83.898796)
+    MARKS = [("terminal", 2.0, -52.3), ("terminal", 75.8, -103.6), ("terminal", 64.9, -103.6), ("terminal", 105.6, -15.8)]
+
+    def test_marks_fit_at_the_layouts_size_and_ship_is_on_pad_1(self):
+        from navigation.settlement_maps import SettlementMaps
+        data = SettlementMaps().get("military_2")
+        pads = settlement_track.known_pad_frames()["military_2"]["pads"]
+        seed = settlement_track.pad_calibration("military_2", pads[1], 305.0, (0.0, 0.0), self.SHIP[0], self.SHIP[1], 3240940.5, scale=0.31)
+        fit = settlement_track.refine_calibration(seed, data, self.MARKS, (0.0, 0.0), turns=range(-180, 180), scales=[0.31], shift=None)
+        self.assertGreaterEqual(fit[1], 3)
+        x, y = fit[0].from_world(0.0, 0.0)
+        self.assertLess(math.hypot(x - pads[1]["x"], y - pads[1]["y"]), 60.0)
 
 
 class YisWorkshopWideSearch(unittest.TestCase):

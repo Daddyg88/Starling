@@ -1552,6 +1552,11 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.75 - Military 2 confirmed at 0.31
+
+- maps/settlements/military_2.json: scale 0.31 (two visits, both fit; was 0.32).
+- tests: HoffmannMilitaryTwo.
+
 ## 0.96.74 - Military 2 size and game pad number
 
 - maps/settlements/military_2.json: scale 0.32 (fits 0.31 to 0.33, one visit).
