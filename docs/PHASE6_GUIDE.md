@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.87 - notes only
+
+- docs/TODO.md: measured-layouts line updated. No code changed.
+
 ## 0.96.86 - voice cache name restored, hologram default on, more settlements
 
 - tts/kokoro_tts.py: CACHE_FORMAT is '' again (the key is exactly the old one). Never change it: the voice warmer would redo every line. Sidecar timing (.ph.json) is still written for newly made sounds.
