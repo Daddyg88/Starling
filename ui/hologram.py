@@ -251,6 +251,8 @@ class Hologram:
         self.level_open = 1.0         # 0 = the sound is quiet or a pause, 1 = loud
         self.levels_live = False
         self.time_scale = 1.0         # stretches the mouth track so it ends when the real sound ends
+        self.block = None             # the latest piece of sound handed to the speakers: (seconds played before it, when, length)
+        self.stalled = False          # the voice is still making the next piece: nothing is playing, so the lips wait
         self.exact_track = False      # True once the voice has told us the exact timing of every sound
         self.line_text, self.cps = "", DEFAULT_CPS
         self.listen_until = 0.0
@@ -277,10 +279,15 @@ class Hologram:
         self.track_start, self.speaking = now, True
         self.time_scale = 1.0
         self.exact_track = False
+        self.block = None
+        self.stalled = False
 
     def add_levels(self, taken, now=None):
         """taken = [(time, [four loudness numbers]), ...] from the speech manager: each group is 100 ms of sound."""
-        for stamp, values in taken:
+        for entry in taken:
+            stamp, values = entry[0], entry[1]
+            if len(entry) >= 4 and entry[2] is not None:
+                self.block = (float(entry[2]), float(stamp), float(entry[3]))      # (seconds of sound played before this block, when, its length)
             for k, value in enumerate(values):
                 self.levels.append((stamp + k * (0.1 / max(1, len(values))), float(value)))
         del self.levels[:-120]
@@ -382,9 +389,24 @@ class Hologram:
                             self.rng.randint(-8, 8)) for _ in range(5)]
         return self.power
 
+    def _elapsed(self, now):
+        """How far into the line the SOUND is. By the clock while we have no word from the speakers; otherwise by how much sound they
+        have really been given, so when the voice stalls (a long answer is still being made) the lips stop instead of running ahead."""
+        self.stalled = False
+        if self.block is None:
+            return now - self.track_start
+        before, stamp, length = self.block
+        age = now - stamp
+        if age > length + 0.3:
+            self.stalled = True
+            return before + length
+        return before + max(0.0, min(age, length))
+
     def _mouth_goal(self, now):
         if self.speaking:
-            elapsed = (now - self.track_start) / self.time_scale
+            elapsed = self._elapsed(now) / self.time_scale
+            if self.stalled:
+                return None
             if elapsed > track_length(self.track) + 0.4:
                 return None
             return shape_at(self.track, elapsed)

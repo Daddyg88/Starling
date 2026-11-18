@@ -718,6 +718,7 @@ class KokoroTTS(BaseTTS):
 
         block = int(SAMPLE_RATE * BLOCK_SECONDS)
         played_any = False
+        played_samples = 0                                         # how much sound has been handed to the speakers so far
         stream = sound.OutputStream(samplerate=SAMPLE_RATE, channels=1, dtype="float32")
         stream.start()
         try:
@@ -732,11 +733,12 @@ class KokoroTTS(BaseTTS):
                     if self._stop_flag.is_set():
                         break
                     chunk = np.ascontiguousarray(piece[start:start + block], dtype=np.float32)
-                    stream.write(chunk.reshape(-1, 1))
-                    self._audio_note("levels", loudness_slices(chunk))
                     if not played_any:
                         self._note_start_delay(time.monotonic() - started_at, parts[0])
                         self._audio_note("start")
+                    stream.write(chunk.reshape(-1, 1))
+                    self._audio_note("levels", (loudness_slices(chunk), played_samples / float(SAMPLE_RATE), chunk.size / float(SAMPLE_RATE)))
+                    played_samples += chunk.size
                     played_any = True
         finally:
             try:

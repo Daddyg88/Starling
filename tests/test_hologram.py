@@ -283,6 +283,50 @@ class ExactTiming(unittest.TestCase):
         self.assertIsNone(tts._cache_load_phonemes("other", 1.0))
 
 
+class FollowsTheSound(unittest.TestCase):
+    def talking(self):
+        holo, c = make()
+        for _ in range(40):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t)
+        holo.speech_started("Hello commander how are you today", c.t)
+        holo.set_timeline([(2.0, None, [("", 0.2), ("ɑ", 1.0), ("m", 0.6), ("", 0.2)])])
+        return holo, c
+
+    def test_lips_follow_the_sound_not_the_clock(self):
+        holo, c = self.talking()
+        holo.add_levels([(c.t, [0.1] * 4, 0.5, 0.1)])               # the speakers have been given sound 0.5 s into the line
+        self.assertAlmostEqual(holo._elapsed(c.t + 0.02), 0.52, places=2)
+        self.assertEqual(holo._mouth_goal(c.t + 0.02), "ah")
+
+    def test_a_stall_stops_the_lips_instead_of_running_ahead(self):
+        holo, c = self.talking()
+        holo.add_levels([(c.t, [0.1] * 4, 0.5, 0.1)])
+        c.t += 3.0                                                   # the voice is still being made: no new sound for 3 s
+        self.assertIsNone(holo._mouth_goal(c.t))
+        self.assertTrue(holo.stalled)
+        self.assertAlmostEqual(holo._elapsed(c.t), 0.6, places=2)    # frozen where the sound stopped
+        holo.add_levels([(c.t, [0.1] * 4, 0.6, 0.1)])                # sound starts again
+        self.assertIsNotNone(holo._mouth_goal(c.t + 0.01))
+        self.assertFalse(holo.stalled)
+
+    def test_without_word_from_the_speakers_it_uses_the_clock(self):
+        holo, c = self.talking()
+        self.assertAlmostEqual(holo._elapsed(c.t + 0.7), 0.7, places=3)
+
+    def test_timing_that_arrives_before_the_sound_is_kept(self):
+        holo, c = make()
+        app = App()
+        feed = HologramFeed(app, lambda: holo)
+        feed.attach()
+        app.bus.fire("speech.started", text="Hello there", audio="")
+        app.bus.fire("speech.audio", what="timeline", text="", seconds=[(1.0, None, [("", 0.1), ("ɑ", 0.8), ("", 0.1)])])
+        app.bus.fire("speech.audio", what="length", text="", seconds=1.0)
+        app.bus.fire("speech.audio", what="start", text="Hello there", seconds=None)
+        self.assertTrue(holo.exact_track)
+        self.assertEqual(holo._mouth_goal(holo.track_start + 0.5), "ah")
+
+
 class FlipBook(unittest.TestCase):
     def test_pictures_load_and_loop(self):
         a = h.Assets(225)

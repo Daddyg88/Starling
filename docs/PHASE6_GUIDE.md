@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.88 - lips follow the sound played
+
+- tts/kokoro_tts.py: 'start' is noted before the first block; 'levels' carries (slices, seconds played before this block, block length). tts/speech_manager.py take_levels() returns (time, slices, position, length).
+- ui/hologram.py: Hologram.block, _elapsed() (sound position while blocks arrive, frozen + stalled when none for length+0.3 s, wall clock when no word from the speakers); a stalled mouth is closed.
+- ui/hologram_window.py: timeline/length that arrive before 'start' are kept and applied after speech_started.
+
 ## 0.96.87 - notes only
 
 - docs/TODO.md: measured-layouts line updated. No code changed.

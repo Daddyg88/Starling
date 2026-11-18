@@ -237,7 +237,8 @@ class SpeechManager:
         self._announce("speech.finished", item)
 
     def take_levels(self):
-        """The loudness numbers (0 to 1, four per 100 ms) that arrived since the last call, as [(time, [four numbers])]. For the hologram's mouth."""
+        """What was played since the last call, as [(time, [loudness 0 to 1, four per block], seconds of sound played before this block, block length)].
+        For the hologram's mouth: it follows the sound that was really played, so a pause while the voice is still thinking does not run the lips ahead."""
         with self._levels_lock:
             taken, self._levels = self._levels, []
         return taken
@@ -245,7 +246,8 @@ class SpeechManager:
     def _audio_note(self, what, value, text):
         if what == "levels":
             with self._levels_lock:
-                self._levels.append((self.clock(), list(value or [])))
+                slices, position, length = value if (isinstance(value, tuple) and len(value) == 3) else (list(value or []), None, 0.1)
+                self._levels.append((self.clock(), list(slices), position, length))
                 del self._levels[:-60]                      # never grows if nobody reads it
             return
         """The real sound started, its length is known, or it ended: lets the hologram time her lips to the voice, not to the queue."""

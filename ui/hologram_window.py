@@ -64,6 +64,8 @@ class HologramFeed:
         self.get = hologram_getter          # () -> the current Hologram (it is rebuilt when the size changes)
         self._attached = False
         self.pending = ""
+        self.waiting_timeline = None   # timing that arrived before the sound started
+        self.waiting_length = None
         self.title_provider = foreground_title
         self.boot_seconds = BOOT_SECONDS
         self._focus_at = 0.0
@@ -129,12 +131,24 @@ class HologramFeed:
             what = event.data.get("what")
             if what == "start":
                 holo.speech_started(event.data.get("text") or self.pending)
+                if self.waiting_timeline:                            # the exact timing was ready before the sound started
+                    holo.set_timeline(self.waiting_timeline)
+                if self.waiting_length:
+                    holo.set_duration(self.waiting_length)
+                self.waiting_timeline, self.waiting_length = None, None
             elif what == "timeline":
-                holo.set_timeline(event.data.get("seconds") or [])
+                if holo.speaking:
+                    holo.set_timeline(event.data.get("seconds") or [])
+                else:
+                    self.waiting_timeline = event.data.get("seconds") or None
             elif what == "length":
-                holo.set_duration(event.data.get("seconds"))
+                if holo.speaking:
+                    holo.set_duration(event.data.get("seconds"))
+                else:
+                    self.waiting_length = event.data.get("seconds")
             elif what == "end":
                 holo.speech_finished()
+                self.waiting_timeline, self.waiting_length = None, None
         except Exception:
             log.exception("The hologram could not follow the sound")
 
