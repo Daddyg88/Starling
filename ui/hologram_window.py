@@ -319,6 +319,7 @@ class HologramWindow:
         holo.flicker_on = bool(s.get("hologram.flicker", True))
         holo.fx_beam = bool(s.get("hologram.sparks", True))
         holo.fx_turn = bool(s.get("hologram.turn", True))
+        holo.idle_on = bool(s.get("hologram.idle_loop", True))
         holo.moving = self.moving()
         testing = now < self.test_until
         focus = self.feed.gui_focus()

@@ -1552,6 +1552,11 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.83 - flip book
+
+- tools/make_flipbook.py: clip -> ui/assets/hologram/idle/NNN.jpg + idle.json (frames, fps, per-frame head shifts measured by phase correlation, a 12-frame cross-fade so the loop has no jump).
+- ui/hologram.py: load_idle() (cached), Assets.idle, Hologram.idle_on / idle_mix (eases to 0 when talking or smiling, back to 1 slowly), render() blends two neighbouring frames and shifts the mouth/eye pictures by the head shift. _turn() is scaled by (1 - 0.75*idle_mix). Setting hologram.idle_loop.
+
 ## 0.96.82 - depth turn, loudness mouth, chat window not on top
 
 - ui/chat_window.py / settings: streaming.window_pin (default False) replaces window_top.

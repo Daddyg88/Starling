@@ -226,6 +226,63 @@ class Effects(unittest.TestCase):
         self.assertEqual(holo.render(c.t).shape[2], 3)
 
 
+class FlipBook(unittest.TestCase):
+    def test_pictures_load_and_loop(self):
+        a = h.Assets(225)
+        frames, shifts, fps = a.idle
+        self.assertGreater(len(frames), 30)
+        self.assertEqual(len(frames), len(shifts))
+        self.assertEqual(frames[0].shape, (a.height, a.width, 3))
+        self.assertGreater(fps, 10)
+
+    def test_eases_to_still_when_she_talks_and_back(self):
+        holo, c = make()
+        for _ in range(40):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t)
+        self.assertGreater(holo.idle_mix, 0.95)
+        holo.speech_started("Hello commander how are you today", c.t)
+        for _ in range(20):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t)
+        self.assertLess(holo.idle_mix, 0.05)
+        holo.speech_finished(c.t)
+        for _ in range(200):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t)
+        self.assertGreater(holo.idle_mix, 0.95)
+
+    def test_can_be_switched_off(self):
+        holo, c = make()
+        holo.idle_on = False
+        for _ in range(40):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t)
+        self.assertLess(holo.idle_mix, 0.05)
+        self.assertEqual(holo.render(c.t).shape[2], 3)
+
+    def test_head_shifts_are_small(self):
+        a = h.Assets(225)
+        for dx, dy in a.idle[1]:
+            self.assertLess(abs(dx), a.width * 0.1)
+            self.assertLess(abs(dy), a.height * 0.1)
+
+    def test_missing_pictures_mean_no_flip_book(self):
+        import tempfile, shutil, pathlib
+        folder = pathlib.Path(tempfile.mkdtemp())
+        try:
+            for f in h.ASSET_DIR.glob("*"):
+                if f.is_file():
+                    shutil.copy(f, folder / f.name)
+            (folder / "idle.json").unlink(missing_ok=True)
+            a = h.Assets(225, folder)
+            self.assertEqual(a.idle[0], [])
+            holo = h.Hologram(a)
+            self.assertEqual(holo.render().shape[2], 3)
+        finally:
+            shutil.rmtree(folder, ignore_errors=True)
+
+
 class RealLoudness(unittest.TestCase):
     def talking(self):
         holo, c = make()

@@ -138,7 +138,16 @@ class Assets:
             self.sprites[name] = (x, y, picture[..., :3], picture[..., 3:4] / 255.0)
         self.window_w = self.width
         self.window_h = self.height + PAD_TOP + PAD_BOTTOM
+        self.directory = directory
+        self._idle = None
         self.rings = self._rings()
+
+    @property
+    def idle(self):
+        """(frames, shifts, fps) of the flip book; loaded the first time it is needed."""
+        if self._idle is None:
+            self._idle = load_idle(self.directory, self.height, self.width)
+        return self._idle
 
     def _rings(self):
         """The two glowing rings she stands on, as a 0..1 strength per pixel in window coordinates."""
@@ -151,6 +160,33 @@ class Assets:
             ry = max(3, int(rx * 0.2))
             draw.ellipse((cx - rx, cy - ry, cx + rx, cy + ry), outline=level, width=2)
         return np.asarray(layer, dtype=np.float32)[..., None] / 255.0
+
+
+_IDLE_CACHE = {}
+
+
+def load_idle(directory, height, width):
+    """The flip book (see tools/make_flipbook.py): (frames as uint8 arrays at her size, head shifts in pixels at her size, frames per second).
+    Empty when the pictures are not there. Cached, because loading takes a moment."""
+    key = (str(directory), int(height))
+    if key in _IDLE_CACHE:
+        return _IDLE_CACHE[key]
+    result = ([], [], 30.0)
+    try:
+        from PIL import Image
+        directory = Path(directory)
+        meta = json.loads((directory / "idle.json").read_text(encoding="utf-8"))
+        scale = height / float(meta["size"][1])
+        frames = []
+        for number in range(int(meta["frames"])):
+            picture = Image.open(directory / "idle" / ("%03d.jpg" % number)).convert("RGB").resize((width, height), Image.BILINEAR)
+            frames.append(np.asarray(picture, dtype=np.uint8))
+        shifts = [(dx * scale, dy * scale) for dx, dy in meta["shifts"]]
+        result = (frames, shifts, float(meta.get("fps", 30)))
+    except Exception:
+        result = ([], [], 30.0)
+    _IDLE_CACHE[key] = result
+    return result
 
 
 class Hologram:
@@ -184,6 +220,8 @@ class Hologram:
         self.fx_beam = True           # sparks rising from the ring and orbiting her chest (gives her depth)
         self.fx_turn = True           # she turns a few degrees left and right (fake 3D)
         self.first_frame = True
+        self.idle_on = True           # play the flip book (breathing, sway) while she is quiet
+        self.idle_mix = 1.0           # 1 = the flip book, 0 = the still picture that the mouth pictures fit
 
     # ---- what happens ----
     def speech_started(self, text, now=None):
@@ -254,6 +292,11 @@ class Hologram:
             self.first_frame = False
         rate = dt / (UP_SECONDS if goal_power > self.power else DOWN_SECONDS)
         self.power += max(-rate, min(rate, goal_power - self.power))
+        talking = self.speaking or now < self.smile_until or any(self.weights.get(n, 0.0) > 0.05 for n in LIVE_SHAPES)
+        goal_idle = 0.0 if (talking or not self.idle_on) else 1.0
+        rate = 0.3 if goal_idle < self.idle_mix else 0.9                                # leaves the loop fast, returns to it slowly
+        self.idle_mix += max(-1.0, min(1.0, (goal_idle - self.idle_mix) / max(0.05, rate) * dt))
+        self.idle_mix = max(0.0, min(1.0, self.idle_mix))
         level = self._level_now(now) if self.speaking else None
         self.levels_live = level is not None
         if level is not None:
@@ -298,10 +341,25 @@ class Hologram:
         now = self.clock() if now is None else now
         a = self.assets
         frame = a.base.copy()
+        shift_x = shift_y = 0
+        frames, shifts, fps = a.idle if (self.idle_on and self.idle_mix > 0.01) else ([], [], 30.0)
+        if frames:
+            position = now * fps
+            i0 = int(position) % len(frames)
+            i1 = (i0 + 1) % len(frames)
+            frac = position - int(position)
+            moving_frame = frames[i0].astype(np.float32) * (1.0 - frac) + frames[i1].astype(np.float32) * frac
+            frame = frame * (1.0 - self.idle_mix) + moving_frame * self.idle_mix
+            sx = shifts[i0][0] * (1.0 - frac) + shifts[i1][0] * frac
+            sy = shifts[i0][1] * (1.0 - frac) + shifts[i1][1] * frac
+            shift_x, shift_y = int(round(sx * self.idle_mix)), int(round(sy * self.idle_mix))   # the mouth and eye pictures follow her head
         for name, weight in self.weights.items():
             if weight < 0.02 or name not in a.sprites:
                 continue
             x, y, rgb, alpha = a.sprites[name]
+            x, y = x + shift_x, y + shift_y
+            if x < 0 or y < 0:
+                continue
             strength = min(1.0, weight) * (reach(self.open_fraction, name) if name != "eyes" else 1.0)
             if name in LIVE_SHAPES and self.levels_live:
                 strength *= 0.35 + 0.65 * self.level_open                                  # follow the real loudness
@@ -402,7 +460,7 @@ class Hologram:
         away from the light dims a little, so she looks like a solid shape turning, not a flat picture sliding."""
         a = self.assets
         swing = self.turn_angle(now) if swing is None else swing
-        amount = swing * a.width * TURN_SHIFT
+        amount = swing * a.width * TURN_SHIFT * (1.0 - 0.75 * self.idle_mix)            # the flip book already moves her, so the fake turn is smaller
         if abs(amount) < 0.05:
             return frame
         depth = self._depth_map()
