@@ -185,6 +185,37 @@ class Feed(unittest.TestCase):
         self.app.bus.fire("speech.started", text="hi")      # no hologram yet: just ignored
 
 
+class GameFocus(unittest.TestCase):
+    def setUp(self):
+        self.feed = HologramFeed(App(), lambda: None)
+        self.title = "Elite - Dangerous (CLIENT)"
+        self.feed.title_provider = lambda: self.title
+        self.feed.boot_seconds = 20.0
+
+    def test_waits_after_start_then_powers_up(self):
+        self.assertFalse(self.feed.game_in_focus(1000.0))        # game just appeared: she is still starting up
+        self.assertFalse(self.feed.game_in_focus(1010.0))
+        self.assertTrue(self.feed.game_in_focus(1021.0))
+
+    def test_powers_down_when_you_leave_the_game(self):
+        self.feed.game_in_focus(1000.0)
+        self.assertTrue(self.feed.game_in_focus(1030.0))
+        self.title = "Discord"
+        self.assertFalse(self.feed.game_in_focus(1031.0))
+        self.title = "Elite - Dangerous (CLIENT)"
+        self.assertTrue(self.feed.game_in_focus(1032.0))         # back: powers up at once, no second start-up wait
+
+    def test_new_start_waits_again(self):
+        self.feed.game_in_focus(1000.0)
+        self.assertTrue(self.feed.game_in_focus(1030.0))
+        self.feed.game_gone()
+        self.assertFalse(self.feed.game_in_focus(1031.0))
+
+    def test_unknown_window_keeps_her_on(self):
+        self.feed.title_provider = lambda: None
+        self.assertTrue(self.feed.game_in_focus(5.0))
+
+
 class Voice(unittest.TestCase):
     def test_phrases(self):
         for t in ("show the hologram", "turn on the hologram", "switch the hologram on", "please show your hologram"):

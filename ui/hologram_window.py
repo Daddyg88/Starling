@@ -37,6 +37,25 @@ def set_click_through(window, on):
         pass            # not Windows: it still works, it just takes mouse clicks
 
 
+BOOT_SECONDS = 20.0      # after the game window first appears she waits this long, then powers up ("getting herself together")
+
+
+def foreground_title():
+    """The title of the window you are in right now, or None when that cannot be found (not Windows)."""
+    try:
+        import ctypes
+        user32 = ctypes.windll.user32
+        handle = user32.GetForegroundWindow()
+        if not handle:
+            return ""
+        length = user32.GetWindowTextLengthW(handle)
+        buffer = ctypes.create_unicode_buffer(length + 1)
+        user32.GetWindowTextW(handle, buffer, length + 1)
+        return buffer.value
+    except Exception:
+        return None
+
+
 class HologramFeed:
     """Where the hologram gets its facts from: the app's events, screen focus, microphone and brain."""
 
@@ -44,6 +63,37 @@ class HologramFeed:
         self.app = app
         self.get = hologram_getter          # () -> the current Hologram (it is rebuilt when the size changes)
         self._attached = False
+        self.title_provider = foreground_title
+        self.boot_seconds = BOOT_SECONDS
+        self._focus_at = 0.0
+        self._focus = True
+        self._booted_from = None       # when the game window first came into focus
+
+    def game_in_focus(self, now):
+        """True when Elite is the window you are in AND she has finished starting up. Checked twice a second at most.
+        Where the window cannot be read she stays on (she only follows the in-game screens then)."""
+        if now - self._focus_at < 0.5:
+            return self._focus
+        self._focus_at = now
+        try:
+            title = self.title_provider()
+        except Exception:
+            title = None
+        if title is None:
+            self._focus = True
+            return True
+        from control.sender import _is_game
+        if _is_game(title):
+            if self._booted_from is None:
+                self._booted_from = now
+            self._focus = now - self._booted_from >= self.boot_seconds
+        else:
+            self._focus = False
+        return self._focus
+
+    def game_gone(self):
+        """Forget the start-up wait when the game has closed, so the next start gets a fresh one."""
+        self._booted_from = None
 
     def attach(self):
         bus = getattr(self.app, "bus", None)
@@ -215,7 +265,10 @@ class HologramWindow:
         holo.moving = self.moving()
         testing = now < self.test_until
         focus = self.feed.gui_focus()
-        powered = testing or holo.moving or not s.get("hologram.power_down", True) or focus == 0
+        if self.feed.game_quit():
+            self.feed.game_gone()
+        in_game = self.feed.game_in_focus(now)
+        powered = testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game)
         visible = holo.tick(listening=self.feed.listening(), thinking=self.feed.thinking(), powered=powered)
         if visible <= 0.03 and not holo.speaking:
             if self._shown:

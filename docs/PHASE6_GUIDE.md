@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.78 - hologram follows the game window
+
+- ui/hologram_window.py: HologramFeed.game_in_focus() reads the foreground window title (twice a second at most, control.sender._is_game), waits boot_seconds (20) after the game first appears, False whenever another window is in front. Where the title cannot be read (not Windows) she stays on. game_gone() resets the start-up wait.
+
 ## 0.96.77 - hologram
 
 - ui/hologram.py: all the looks and rules, no tkinter (tested): mouth track from the text, colour mix (cyan/green/amber), power up/down, flicker, scan lines, render() -> numpy picture where every see-through pixel is exactly (1,2,3).
