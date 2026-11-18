@@ -130,6 +130,12 @@ class Dashboard:
             log.exception("The route map could not start")
             self.route_overlay = None
         try:
+            from ui import game_watch
+            self.game_watch = game_watch.GameWatch(lambda: app.state)
+            self._watch_game()
+        except Exception:
+            log.exception("The game watcher could not start")
+        try:
             from ui.hologram_window import HologramWindow, HologramFeed
             self.hologram_window = HologramWindow(self.root, app.settings, lambda getter: HologramFeed(app, getter))
         except Exception:
@@ -1705,6 +1711,18 @@ class Dashboard:
             self.model.save()
         if getattr(self, "red_alert_overlay", None) is not None:
             self.red_alert_overlay.show_test(8)
+
+    def _watch_game(self):
+        """Every couple of seconds: is Elite's window still there? When it has been gone a while every overlay hides (see ui/game_watch.py)."""
+        try:
+            self.game_watch.poll()
+        except Exception:
+            log.exception("The game watcher failed")
+            return
+        try:
+            self.root.after(2000, self._watch_game)
+        except Exception:
+            pass
 
     def test_hologram(self):
         """Shows her hologram for 10 seconds and has her say a line, whatever the game is doing."""

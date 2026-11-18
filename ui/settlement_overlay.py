@@ -5,6 +5,7 @@ Needs Elite in Borderless or Windowed mode."""
 import time
 
 from core.logger import get_logger
+from ui import game_watch
 from navigation import settlement_maps
 from ui.red_alert_overlay import KEY, RedAlertOverlay
 
@@ -38,7 +39,7 @@ class SettlementOverlay(RedAlertOverlay):
         delay = IDLE_MS
         try:
             if not self._broken:
-                if self._wanted():
+                if self._wanted() and not game_watch.game_closed():
                     self._show()
                     delay = ACTIVE_MS if getattr(self.view, "position", None) else 1000
                 elif self._shown:

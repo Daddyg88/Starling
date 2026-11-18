@@ -12,7 +12,7 @@ this file only shows the pixels in a see-through, click-through window and lets 
 import time
 
 from core.logger import get_logger
-from ui import hologram, screens
+from ui import game_watch, hologram, screens
 
 log = get_logger("hologram_window")
 
@@ -279,7 +279,7 @@ class HologramWindow:
 
     def wanted(self, now):
         s = self.settings
-        if self.feed.game_quit() and not self.moving():
+        if (self.feed.game_quit() or game_watch.game_closed()) and not self.moving() and now >= self.test_until:
             return False
         return bool(s.get("hologram.enabled", False)) or now < self.test_until or self.moving()
 

@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.85: overlays hide on exit. CHECK: quit normally: all overlays gone within about 10 s; kill the game from Task Manager: same; start the game again: they come back (route map and bio on the next jump or load-in).
 - [ ] 0.96.84: exact lip timing. CHECK: new lines and the same lines again (from the cache): lips match the sounds; the first time each line is a touch slower (cache rebuilt).
 - [ ] 0.96.83: flip book. CHECK: she breathes and sways when quiet, no hitch at the loop point; eases to the still pose when she talks and back after; blinks and mouth sit on her face; switch works.
 - [ ] 0.96.82: CHECK: the chat window goes behind the game when you click the game; the hologram's turn looks solid; her mouth closes in pauses and opens on loud words; send a zip and look for 'Kokoro lip-sync probe' in the log.

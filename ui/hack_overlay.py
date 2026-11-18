@@ -8,6 +8,7 @@ from the game. Needs Elite in Borderless or Windowed mode. Settings: hack.overla
 import time
 
 from core.logger import get_logger
+from ui import game_watch
 from ui.red_alert_overlay import RedAlertOverlay
 
 log = get_logger("hack_overlay")
@@ -62,6 +63,8 @@ class HackOverlay(RedAlertOverlay):
             return None
 
     def _wanted(self):
+        if game_watch.game_closed():
+            return False                  # you left the game
         return self._snap() is not None
 
     def _tick(self):

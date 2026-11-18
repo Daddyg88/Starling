@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.85 - overlays hide when the game is gone
+
+- ui/game_watch.py: GameWatch.poll() (EnumWindows titles, 8 s absent = closed, sets state.game_quit and the module flag game_closed()); the dashboard polls every 2 s. hack_overlay, red_alert_overlay, settlement_overlay and hologram_window check game_watch.game_closed(); route and bio overlays already use state.game_quit. Fixed: the hologram test button was blocked while the game was closed.
+
 ## 0.96.84 - exact lip timing
 
 - tts/kokoro_tts.py: piece_phonemes() (Result.phonemes + output.pred_dur, len must be phonemes+2, scaled to the audio length), timeline of (seconds, text, phonemes) per queued piece incl. beat gaps, sent as speech.audio what='timeline'; cache sidecar <key>.ph.json; CACHE_FORMAT 'ph1' in the key so old sounds are remade once.
