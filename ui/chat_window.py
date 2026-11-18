@@ -154,7 +154,7 @@ class ChatWindow:
         window.minsize(*MIN_SIZE)
         window.geometry(start_geometry(self.settings.get("streaming.window_geometry", ""), desktop_area(self.root)))
         try:
-            window.attributes("-topmost", bool(self.settings.get("streaming.window_top", True)))
+            window.attributes("-topmost", bool(self.settings.get("streaming.window_pin", False)))
         except Exception:
             pass
         inner = tk.Frame(window, bg=theme.BG)
@@ -267,8 +267,8 @@ class ChatWindow:
         self.settings.save()
 
     def _toggle_top(self):
-        on = not bool(self.settings.get("streaming.window_top", True))
-        self.settings.set("streaming.window_top", on)
+        on = not bool(self.settings.get("streaming.window_pin", False))
+        self.settings.set("streaming.window_pin", on)
         self.settings.save()
         try:
             self.window.attributes("-topmost", on)

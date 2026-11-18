@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.82 - depth turn, loudness mouth, chat window not on top
+
+- ui/chat_window.py / settings: streaming.window_pin (default False) replaces window_top.
+- ui/hologram.py: _depth_map() (rounded shapes + a little picture brightness), _turn() with TURN_SHIFT and side shading; add_levels()/_level_now()/level_open: loudness (from tts/kokoro_tts.loudness_slices, four per 100 ms, handed over by SpeechManager.take_levels) scales the open mouth pictures (LIVE_SHAPES) and closes the mouth in pauses (below 10% of this voice's loud).
+- tts/kokoro_tts.py: _probe_timing() logs once whether Kokoro results carry pred_dur / token timestamps.
+
 ## 0.96.81 - tiny lights and the turn
 
 - ui/hologram.py: _sparks() (450 lights, random per life via a sin hash of (index, cycle), funnel, stops at y_top = 0.64 of her height), _turn() + _depth_map() (depth-weighted horizontal shift, +-2.2% of the width), rings and lights use the un-flickered power; glitch strips only tear her. Settings hologram.sparks / hologram.turn feed holo.fx_beam / fx_turn.

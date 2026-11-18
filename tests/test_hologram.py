@@ -226,6 +226,64 @@ class Effects(unittest.TestCase):
         self.assertEqual(holo.render(c.t).shape[2], 3)
 
 
+class RealLoudness(unittest.TestCase):
+    def talking(self):
+        holo, c = make()
+        for _ in range(40):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t)
+        holo.speech_started("Hello commander how are you today", c.t)
+        return holo, c
+
+    def feed_levels(self, holo, start, values, step=0.025):
+        holo.add_levels([(start + i * 0.1, values[i * 4:(i + 1) * 4]) for i in range(len(values) // 4)])
+
+    def test_a_pause_closes_the_mouth_and_loud_opens_it(self):
+        holo, c = self.talking()
+        loud, quiet = [0.15] * 8, [0.001] * 8
+        self.feed_levels(holo, c.t, loud + quiet)
+        for _ in range(6):                                   # 0.15 s into the loud sound
+            c.t += 0.025
+            holo.tick(powered=True, now=c.t)
+        self.assertTrue(holo.levels_live)
+        self.assertGreater(holo.level_open, 0.8)
+        for _ in range(24):                                  # now the quiet part
+            c.t += 0.025
+            holo.tick(powered=True, now=c.t)
+        self.assertLess(holo.level_open, 0.15)
+
+    def test_without_numbers_it_falls_back_to_the_text_timing(self):
+        holo, c = self.talking()
+        c.t += 0.1
+        holo.tick(powered=True, now=c.t)
+        self.assertFalse(holo.levels_live)
+        self.assertEqual(holo.level_open, 1.0)
+
+    def test_old_numbers_are_ignored(self):
+        holo, c = self.talking()
+        self.feed_levels(holo, c.t - 5.0, [0.1] * 4)
+        c.t += 0.1
+        holo.tick(powered=True, now=c.t)
+        self.assertFalse(holo.levels_live)
+
+    def test_loudness_slices(self):
+        from tts.kokoro_tts import loudness_slices
+        audio = np.concatenate([np.zeros(600), np.ones(600) * 0.2, np.zeros(600), np.ones(600) * 0.2]).astype(np.float32)
+        got = loudness_slices(audio)
+        self.assertEqual(len(got), 4)
+        self.assertLess(got[0], 0.01)
+        self.assertAlmostEqual(got[1], 0.2, places=2)
+
+    def test_speech_manager_hands_levels_over_once(self):
+        from tts.speech_manager import SpeechManager
+        m = SpeechManager({}, Settings())
+        m._audio_note("levels", [0.1, 0.2, 0.1, 0.0], "x")
+        taken = m.take_levels()
+        self.assertEqual(len(taken), 1)
+        self.assertEqual(taken[0][1], [0.1, 0.2, 0.1, 0.0])
+        self.assertEqual(m.take_levels(), [])
+
+
 class LipTiming(unittest.TestCase):
     def test_lips_wait_for_the_real_sound(self):
         holo, c = make()

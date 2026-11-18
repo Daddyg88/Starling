@@ -154,6 +154,19 @@ class HologramFeed:
         except Exception:
             log.exception("The hologram could not follow her name being heard")
 
+    def pull_levels(self, holo):
+        """Hands the hologram the loudness of the sound that is playing (from the speech manager), so its mouth opens and closes with it."""
+        speech = getattr(self.app, "speech", None)
+        taker = getattr(speech, "take_levels", None)
+        if taker is None or holo is None:
+            return
+        try:
+            taken = taker()
+            if taken:
+                holo.add_levels(taken)
+        except Exception:
+            log.debug("Could not read the sound levels", exc_info=True)
+
     def gui_focus(self):
         return int(getattr(getattr(self.app, "state", None), "gui_focus", 0) or 0)
 
@@ -311,6 +324,7 @@ class HologramWindow:
         focus = self.feed.gui_focus()
         if self.feed.game_quit():
             self.feed.game_gone()
+        self.feed.pull_levels(holo)
         in_game = self.feed.game_in_focus(now)
         self._why(now, None if (testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game))
                   else ("powered down: Elite is not the window in front (or still starting up)" if not in_game else "powered down: a game screen is open (GuiFocus %d)" % focus))

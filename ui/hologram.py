@@ -36,6 +36,8 @@ KEY = (1, 2, 3)                  # this exact colour becomes see-through
 KEY_HEX = "#010203"
 THRESHOLD = 24                   # anything with no channel brighter than this is see-through
 BASE_HEIGHT = 225                # pixels tall at 100% on a 1080-pixel-high screen
+LIVE_SHAPES = ("ah", "oh", "eh", "oo", "ee", "fv")      # the mouth pictures that open and close with the real loudness
+TURN_SHIFT = 0.055                # how far she turns: the nearest parts slide this fraction of her width
 PAD_TOP, PAD_BOTTOM = 8, 30      # room for her to float up and down, and for the rings she stands on
 PICTURE_ASPECT = 784 / 1168
 
@@ -163,6 +165,10 @@ class Hologram:
         self.power = 0.0
         self.weights = {name: 0.0 for name in assets.sprites}
         self.track, self.track_start, self.speaking = [], 0.0, False
+        self.levels = []              # (time, loudness) of the real sound, 40 per second while she talks
+        self.level_ref = 0.05         # what 'loud' means for this voice (adapts)
+        self.level_open = 1.0         # 0 = the sound is quiet or a pause, 1 = loud
+        self.levels_live = False
         self.time_scale = 1.0         # stretches the mouth track so it ends when the real sound ends
         self.line_text, self.cps = "", DEFAULT_CPS
         self.listen_until = 0.0
@@ -186,6 +192,23 @@ class Hologram:
         self.track = build_track(self.line_text, self.cps)
         self.track_start, self.speaking = now, True
         self.time_scale = 1.0
+
+    def add_levels(self, taken, now=None):
+        """taken = [(time, [four loudness numbers]), ...] from the speech manager: each group is 100 ms of sound."""
+        for stamp, values in taken:
+            for k, value in enumerate(values):
+                self.levels.append((stamp + k * (0.1 / max(1, len(values))), float(value)))
+        del self.levels[:-120]
+
+    def _level_now(self, now):
+        """The loudness of the sound playing right now (0 to 1 of this voice's usual loud), or None when we have no fresh numbers."""
+        while len(self.levels) > 1 and self.levels[1][0] <= now:
+            self.levels.pop(0)
+        if not self.levels or self.levels[0][0] > now + 0.05 or now - self.levels[0][0] > 0.4:
+            return None
+        value = self.levels[0][1]
+        self.level_ref = max(0.02, self.level_ref * 0.9995, value)
+        return max(0.0, min(1.0, value / self.level_ref))
 
     def set_duration(self, seconds):
         """The real length of the sound is known: stretch or squeeze the mouth so it finishes exactly when she does."""
@@ -231,7 +254,16 @@ class Hologram:
             self.first_frame = False
         rate = dt / (UP_SECONDS if goal_power > self.power else DOWN_SECONDS)
         self.power += max(-rate, min(rate, goal_power - self.power))
+        level = self._level_now(now) if self.speaking else None
+        self.levels_live = level is not None
+        if level is not None:
+            goal = 0.0 if level < 0.10 else min(1.0, (level - 0.10) / 0.45)             # a pause or a quiet bit closes the mouth
+            self.level_open += (goal - self.level_open) * min(1.0, dt / 0.04)
+        else:
+            self.level_open = 1.0
         mouth = self._mouth_goal(now)
+        if self.levels_live and self.level_open < 0.12:
+            mouth = None
         for name in self.weights:
             if name == "eyes":
                 goal = 1.0 if now < self.blink_until else 0.0
@@ -271,6 +303,8 @@ class Hologram:
                 continue
             x, y, rgb, alpha = a.sprites[name]
             strength = min(1.0, weight) * (reach(self.open_fraction, name) if name != "eyes" else 1.0)
+            if name in LIVE_SHAPES and self.levels_live:
+                strength *= 0.35 + 0.65 * self.level_open                                  # follow the real loudness
             h, w = rgb.shape[:2]
             region = frame[y:y + h, x:x + w]
             rh, rw = region.shape[:2]
@@ -326,32 +360,64 @@ class Hologram:
         return pixels
 
     def _depth_map(self):
-        """A rough 'how close to you' map for the picture (face and chest nearest), made once. Only used for the gentle turning."""
+        """A rough 'how close to you' map (0 = far, 1 = near), made once: a head with a nose, hair behind it, a neck, shoulders and a rounded chest.
+        It is built from simple rounded shapes plus a little of the picture's own brightness, so lit parts (nose, cheeks, collar) stand out."""
         a = self.assets
         if getattr(self, "_depth", None) is None or self._depth.shape != (a.height, a.width):
+            from PIL import Image, ImageFilter
             ys, xs = np.mgrid[0:a.height, 0:a.width].astype(np.float32)
-            cx = a.width / 2.0
-            face = np.exp(-(((xs - cx) / (a.width * 0.17)) ** 2 + ((ys - a.height * 0.27) / (a.height * 0.17)) ** 2))
-            chest = np.exp(-(((xs - cx) / (a.width * 0.30)) ** 2 + ((ys - a.height * 0.72) / (a.height * 0.22)) ** 2)) * 0.7
-            hair = np.exp(-(((xs - cx) / (a.width * 0.5)) ** 2 + ((ys - a.height * 0.4) / (a.height * 0.5)) ** 2)) * 0.25
-            self._depth = np.clip(face + chest + hair, 0.0, 1.0)
+            w, hgt = float(a.width), float(a.height)
+
+            def dome(cx, cy, rx, ry, top, bottom=0.0):
+                """A rounded hill: `top` in the middle, falling to `bottom` at the edge, 0 outside."""
+                d = ((xs - cx * w) / (rx * w)) ** 2 + ((ys - cy * hgt) / (ry * hgt)) ** 2
+                return np.where(d < 1.0, bottom + (top - bottom) * np.sqrt(np.clip(1.0 - d, 0.0, 1.0)), 0.0)
+
+            parts = [
+                dome(0.50, 0.38, 0.50, 0.46, 0.38, 0.12),             # hair: big and far back
+                dome(0.50, 0.46, 0.09, 0.14, 0.50, 0.30),             # neck
+                dome(0.50, 0.26, 0.15, 0.17, 0.82, 0.55),             # face: a rounded head
+                dome(0.50, 0.30, 0.035, 0.05, 1.00, 0.80),            # nose sticks out
+                dome(0.43, 0.25, 0.04, 0.03, 0.88, 0.70),             # cheeks and brow
+                dome(0.57, 0.25, 0.04, 0.03, 0.88, 0.70),
+                dome(0.50, 0.80, 0.50, 0.26, 0.66, 0.35),             # shoulders and body
+                dome(0.41, 0.70, 0.12, 0.10, 0.78, 0.62),             # chest
+                dome(0.59, 0.70, 0.12, 0.10, 0.78, 0.62),
+            ]
+            depth = np.maximum.reduce(parts)
+            picture = a.base.max(axis=2) / 255.0
+            image = Image.fromarray((picture * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(max(1.0, w / 60.0)))
+            detail = np.asarray(image, dtype=np.float32) / 255.0
+            depth = depth * (0.85 + 0.15 * detail)
+            blur = Image.fromarray((np.clip(depth, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(max(1.0, w / 45.0)))
+            self._depth = np.asarray(blur, dtype=np.float32) / 255.0
         return self._depth
 
-    def _turn(self, frame, now):
-        """Slide near parts (face, chest) a little more than far parts (hair edges), left and right, so she seems to turn on the spot."""
+    def turn_angle(self, now):
+        """How far she is turned right now, from -1 (turned one way) to +1 (the other): slow, never quite repeating."""
+        return max(-1.0, min(1.0, math.sin(now * 0.55) * 0.62 + math.sin(now * 0.23 + 1.0) * 0.38))
+
+    def _turn(self, frame, now, swing=None):
+        """Turn her on the spot: near parts (nose, face, chest) slide further than far parts (hair, shoulders' edges) and the side facing
+        away from the light dims a little, so she looks like a solid shape turning, not a flat picture sliding."""
         a = self.assets
-        swing = math.sin(now * 0.55) * 0.5 + math.sin(now * 0.23 + 1.0) * 0.3        # slow and never quite repeating
-        amount = swing * a.width * 0.022
+        swing = self.turn_angle(now) if swing is None else swing
+        amount = swing * a.width * TURN_SHIFT
         if abs(amount) < 0.05:
             return frame
-        shift = (self._depth_map() - 0.4) * amount                                    # pixels, per pixel
+        depth = self._depth_map()
+        shift = (depth - 0.45) * amount                                               # pixels, per pixel
         w = a.width
         cols = np.arange(w, dtype=np.float32)[None, :] - shift                        # where each output pixel looks in the picture
         left = np.clip(np.floor(cols).astype(np.int32), 0, w - 1)
         right = np.clip(left + 1, 0, w - 1)
         frac = (cols - np.floor(cols))[..., None]
         rows = np.arange(a.height)[:, None]
-        return frame[rows, left] * (1.0 - frac) + frame[rows, right] * frac
+        turned = frame[rows, left] * (1.0 - frac) + frame[rows, right] * frac
+        # light from one side: the side that turns away from you gets darker, the near side a touch brighter
+        across = (np.arange(w, dtype=np.float32)[None, :] / w - 0.5) * 2.0            # -1 (left) .. +1 (right)
+        shade = 1.0 - 0.28 * swing * across * depth
+        return turned * np.clip(shade, 0.55, 1.3)[..., None]
 
     def _sparks(self, now, front, behind):
         """A slow tornado of tiny lights. Every light has its own random life: where it is born, how fast it climbs, how fast it swirls, how

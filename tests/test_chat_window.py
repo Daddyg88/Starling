@@ -171,7 +171,7 @@ class Loop(unittest.TestCase):
 
     def test_pieces_exist_for_the_settings(self):
         from core.settings import DEFAULTS
-        for name in ("window", "window_top", "window_font", "window_geometry"):
+        for name in ("window", "window_pin", "window_font", "window_geometry"):
             self.assertIn(name, DEFAULTS["streaming"])
 
 

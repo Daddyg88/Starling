@@ -52,6 +52,8 @@ class SpeechManager:
         self.max_age = dict(DEFAULT_MAX_AGE if max_age is None else max_age)
         self.clock = clock
         self._queue = []
+        self._levels = []                 # loudness of what is being played, for the hologram's mouth (take_levels)
+        self._levels_lock = threading.Lock()
         self._cond = threading.Condition()
         self._current = None
         self._current_providers = []
@@ -234,7 +236,18 @@ class SpeechManager:
 
         self._announce("speech.finished", item)
 
+    def take_levels(self):
+        """The loudness numbers (0 to 1, four per 100 ms) that arrived since the last call, as [(time, [four numbers])]. For the hologram's mouth."""
+        with self._levels_lock:
+            taken, self._levels = self._levels, []
+        return taken
+
     def _audio_note(self, what, value, text):
+        if what == "levels":
+            with self._levels_lock:
+                self._levels.append((self.clock(), list(value or [])))
+                del self._levels[:-60]                      # never grows if nobody reads it
+            return
         """The real sound started, its length is known, or it ended: lets the hologram time her lips to the voice, not to the queue."""
         if self.bus is not None:
             self.bus.publish("speech.audio", {"what": what, "seconds": value, "text": (text or "").replace("||", " ")}, "low")

@@ -120,6 +120,17 @@ def speed_from_rate(rate):
     return max(0.6, min(1.6, 1.0 + rate * 0.05))
 
 
+def loudness_slices(chunk, slices=4):
+    """How loud each quarter of this 100 ms piece is (0 to 1), so the hologram's mouth can open and close with the real sound."""
+    import numpy as np
+    if chunk.size < slices:
+        return [0.0] * slices
+    out = []
+    for part in np.array_split(chunk.astype(np.float32), slices):
+        out.append(float(np.sqrt(np.mean(part * part))) if part.size else 0.0)
+    return out
+
+
 def to_float32_array(piece):
     """Kokoro gives us a Result object, a tuple, a torch tensor or a numpy array. Make it numpy float32."""
     import numpy as np
@@ -611,6 +622,7 @@ class KokoroTTS(BaseTTS):
                     for piece in self._engine()(chunk, voice=self._voice_arg(), speed=speed):
                         if self._stop_flag.is_set():
                             return 0
+                        self._probe_timing(piece)
                         audio = to_float32_array(piece)
                         if audio.size:
                             fresh.append(audio)
@@ -662,6 +674,7 @@ class KokoroTTS(BaseTTS):
                         break
                     chunk = np.ascontiguousarray(piece[start:start + block], dtype=np.float32)
                     stream.write(chunk.reshape(-1, 1))
+                    self._audio_note("levels", loudness_slices(chunk))
                     if not played_any:
                         self._note_start_delay(time.monotonic() - started_at, parts[0])
                         self._audio_note("start")
@@ -684,6 +697,23 @@ class KokoroTTS(BaseTTS):
         return played_any and not problem
 
     on_audio = None             # set by the speech manager: called as on_audio("start" | "length" | "end", seconds) so the hologram's lips follow the REAL sound
+
+    _timing_probed = False
+
+    def _probe_timing(self, piece):
+        """Once per run: write down whether Kokoro hands over per-phoneme timing (a later lip-sync upgrade could use it). A log line only."""
+        if self._timing_probed:
+            return
+        self._timing_probed = True
+        try:
+            output = getattr(piece, "output", None)
+            durations = getattr(output, "pred_dur", None)
+            tokens = getattr(piece, "tokens", None)
+            stamped = bool(tokens) and getattr(tokens[0], "start_ts", None) is not None
+            log.info("Kokoro lip-sync probe: pred_dur=%s, word timestamps=%s, phonemes=%s",
+                     "yes" if durations is not None else "no", "yes" if stamped else "no", "yes" if getattr(piece, "phonemes", None) else "no")
+        except Exception:
+            log.info("Kokoro lip-sync probe: could not check")
 
     def _audio_note(self, what, value=None):
         hook = self.on_audio
