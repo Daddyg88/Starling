@@ -226,6 +226,63 @@ class Effects(unittest.TestCase):
         self.assertEqual(holo.render(c.t).shape[2], 3)
 
 
+class ExactTiming(unittest.TestCase):
+    def test_phonemes_from_a_piece(self):
+        from tts.kokoro_tts import piece_phonemes
+
+        class Out: pred_dur = [2, 4, 6, 3, 5]
+        class Piece:
+            phonemes = "hɛj"
+            output = Out()
+        got = piece_phonemes(Piece(), 1.0)
+        self.assertEqual([c for c, _ in got], ["", "h", "ɛ", "j", ""])
+        self.assertAlmostEqual(sum(s for _, s in got), 1.0, places=5)
+        self.assertGreater(got[2][1], got[1][1])             # the vowel lasts longer than the h
+
+    def test_wrong_numbers_mean_no_timing(self):
+        from tts.kokoro_tts import piece_phonemes
+
+        class Out: pred_dur = [1, 2]
+        class Piece:
+            phonemes = "abc"
+            output = Out()
+        self.assertIsNone(piece_phonemes(Piece(), 1.0))
+        self.assertIsNone(piece_phonemes(object(), 1.0))
+
+    def test_track_follows_the_sounds(self):
+        track = h.track_from_phonemes([("", 0.1), ("p", 0.05), ("ɑ", 0.2), ("ˈ", 0.02), ("m", 0.05), (" ", 0.1)])
+        shapes = [shape for _, _, shape in track]
+        self.assertEqual(shapes, [None, "pressed", "ah", "pressed", None])
+        self.assertAlmostEqual(track[2][1] - track[2][0], 0.22, places=5)      # the stress mark lengthened the vowel
+        self.assertAlmostEqual(h.track_length(track), 0.52, places=5)
+
+    def test_timeline_mixes_exact_and_text_pieces(self):
+        entries = [(0.5, None, [("", 0.1), ("ɑ", 0.3), ("", 0.1)]), (0.3, "", None), (0.8, "hello there", None)]
+        track = h.track_from_timeline(entries)
+        self.assertAlmostEqual(h.track_length(track), 1.6, places=5)
+        self.assertEqual(h.shape_at(track, 0.2), "ah")
+        self.assertIsNone(h.shape_at(track, 0.6))                 # the pause between parts: mouth closed
+        self.assertIsNotNone([s for _, _, s in track if s])
+
+    def test_exact_timing_replaces_the_guess_and_is_not_stretched(self):
+        holo, c = make()
+        holo.speech_started("Hello there commander", c.t)
+        holo.set_timeline([(1.0, None, [("", 0.2), ("ɑ", 0.6), ("", 0.2)])])
+        self.assertTrue(holo.exact_track)
+        holo.set_duration(5.0)
+        self.assertEqual(holo.time_scale, 1.0)
+        self.assertEqual(holo._mouth_goal(c.t + 0.5), "ah")
+
+    def test_the_voice_cache_keeps_the_timing_next_to_the_sound(self):
+        import tempfile, pathlib
+        from tts.kokoro_tts import KokoroTTS
+        folder = pathlib.Path(tempfile.mkdtemp())
+        tts = KokoroTTS(folder / "p.pt", folder / "r.mp3", pipeline_factory=lambda: None, cache_dir=folder / "cache")
+        tts._cache_save("hello", 1.0, np.ones(100, dtype=np.float32) * 0.1, [("", 0.1), ("h", 0.2)])
+        self.assertEqual(tts._cache_load_phonemes("hello", 1.0), [("", 0.1), ("h", 0.2)])
+        self.assertIsNone(tts._cache_load_phonemes("other", 1.0))
+
+
 class FlipBook(unittest.TestCase):
     def test_pictures_load_and_loop(self):
         a = h.Assets(225)

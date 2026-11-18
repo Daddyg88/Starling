@@ -78,6 +78,7 @@ PAUSE_MARK = "||"            # in a line: "Four.||Three." means 'one beat betwee
 BEAT_SECONDS = 0.95          # each part STARTS about this long after the previous one (just under 1 s)
 MIN_GAP_SECONDS = 0.15
 MAX_CACHED_CHARS = 200       # longer texts are not cached
+CACHE_FORMAT = "ph1"           # change this to make every saved sound be made again (0.96.84: saved sounds now keep the timing of each sound for the hologram's lips)
 SLOW_START_SECONDS = 1.0       # a line that takes longer than this to start is logged as slow
 DEFAULT_WAIT_FOR_READY = 45  # seconds a line will wait for the engine to finish loading
 
@@ -118,6 +119,29 @@ def speed_from_rate(rate):
     except (TypeError, ValueError):
         rate = 0
     return max(0.6, min(1.6, 1.0 + rate * 0.05))
+
+
+def piece_phonemes(piece, seconds):
+    """What Kokoro says about the sounds of one piece it made: [(phoneme letter, seconds), ...] adding up to `seconds`, or None when it
+    did not hand the timing over (or the numbers do not fit the letters)."""
+    try:
+        letters = getattr(piece, "phonemes", None)
+        durations = getattr(getattr(piece, "output", None), "pred_dur", None)
+        if not letters or durations is None or seconds <= 0:
+            return None
+        values = [float(x) for x in durations]
+        if len(values) != len(letters) + 2:
+            return None
+        total = sum(values)
+        if total <= 0:
+            return None
+        scale = seconds / total
+        items = [("", values[0] * scale)]
+        items.extend((char, value * scale) for char, value in zip(letters, values[1:-1]))
+        items.append(("", values[-1] * scale))
+        return items
+    except Exception:
+        return None
 
 
 def loudness_slices(chunk, slices=4):
@@ -483,7 +507,7 @@ class KokoroTTS(BaseTTS):
         if self.cache_dir is None or len(text) > MAX_CACHED_CHARS:
             return None
         stamp = self._pack_stamp()
-        key = hashlib.sha1(("%s|%.2f|%s|%s" % (text, speed, stamp, self._voice_name)).encode("utf-8")).hexdigest()[:24]
+        key = hashlib.sha1(("%s|%.2f|%s|%s|%s" % (text, speed, stamp, self._voice_name, CACHE_FORMAT)).encode("utf-8")).hexdigest()[:24]
         return self.cache_dir / (key + ".npy")
 
     def _cache_load(self, text, speed):
@@ -496,7 +520,18 @@ class KokoroTTS(BaseTTS):
         except (OSError, ValueError):
             return None
 
-    def _cache_save(self, text, speed, audio):
+    def _cache_load_phonemes(self, text, speed):
+        path = self._cache_file(text, speed)
+        if path is None:
+            return None
+        try:
+            import json
+            data = json.loads(path.with_suffix(".ph.json").read_text(encoding="utf-8"))
+            return [(str(c), float(s)) for c, s in data]
+        except (OSError, ValueError, TypeError):
+            return None
+
+    def _cache_save(self, text, speed, audio, phonemes=None):
         import numpy as np
         path = self._cache_file(text, speed)
         if path is None or audio.size == 0:
@@ -507,6 +542,9 @@ class KokoroTTS(BaseTTS):
             with open(temp, "wb") as handle:
                 np.save(handle, (np.clip(audio, -1.0, 1.0) * 32767.0).astype(np.int16))
             temp.replace(path)
+            if phonemes:
+                import json
+                path.with_suffix(".ph.json").write_text(json.dumps([[c, round(s, 4)] for c, s in phonemes]), encoding="utf-8")
         except OSError:
             log.warning("Could not save to the voice cache", exc_info=True)
 
@@ -600,13 +638,25 @@ class KokoroTTS(BaseTTS):
         started_at = time.monotonic()
         total = [0]                                                # samples made so far, beats included (for the hologram's lips)
 
+        timeline = []                                              # one entry per piece of sound queued: (seconds, text, phonemes or None)
+
+        def joined(items):
+            """The phoneme lists of several pieces as one list, or None if any piece did not have one."""
+            if not items or any(i is None for i in items):
+                return None
+            out = []
+            for item in items:
+                out.extend(item)
+            return out
+
         def make_part(part):
             """Make (or load from the cache) one part. Returns how many samples were queued."""
             cached = self._cache_load(part, speed)
             if cached is not None:
                 self._put(pieces, cached * gain)
+                timeline.append((cached.size / float(SAMPLE_RATE), part, self._cache_load_phonemes(part, speed)))
                 return cached.size
-            made = []
+            made, made_ph = [], []
             for sentence in sentences_of(part):                    # one sentence at a time: fixed ones come from the cache, the rest start sooner
                 if len(sentence) > LONG_PART:
                     chunks = split_sentences(sentence)
@@ -616,9 +666,12 @@ class KokoroTTS(BaseTTS):
                     saved = self._cache_load(chunk, speed) if chunk != part else None
                     if saved is not None:
                         made.append(saved)
+                        saved_ph = self._cache_load_phonemes(chunk, speed)
+                        made_ph.append(saved_ph)
+                        timeline.append((saved.size / float(SAMPLE_RATE), chunk, saved_ph))
                         self._put(pieces, saved * gain)
                         continue
-                    fresh = []
+                    fresh, fresh_ph = [], []
                     for piece in self._engine()(chunk, voice=self._voice_arg(), speed=speed):
                         if self._stop_flag.is_set():
                             return 0
@@ -626,12 +679,16 @@ class KokoroTTS(BaseTTS):
                         audio = to_float32_array(piece)
                         if audio.size:
                             fresh.append(audio)
+                            phonemes = piece_phonemes(piece, audio.size / float(SAMPLE_RATE))
+                            fresh_ph.append(phonemes)
+                            timeline.append((audio.size / float(SAMPLE_RATE), chunk if len(fresh) == 1 else "", phonemes))
                             self._put(pieces, audio * gain)
                     if fresh and chunk != part and not self._stop_flag.is_set():
-                        self._cache_save(chunk, speed, np.concatenate(fresh))
+                        self._cache_save(chunk, speed, np.concatenate(fresh), joined(fresh_ph))
                     made.extend(fresh)
+                    made_ph.append(joined(fresh_ph))
             if made and not self._stop_flag.is_set():
-                self._cache_save(part, speed, np.concatenate(made))
+                self._cache_save(part, speed, np.concatenate(made), joined(made_ph))
             return sum(a.size for a in made)
 
         def make_sound():
@@ -646,7 +703,9 @@ class KokoroTTS(BaseTTS):
                         gap = max(MIN_GAP_SECONDS, BEAT_SECONDS - length / float(SAMPLE_RATE))
                         self._put(pieces, np.zeros(int(gap * SAMPLE_RATE), dtype=np.float32))
                         total[0] += int(gap * SAMPLE_RATE)
+                        timeline.append((int(gap * SAMPLE_RATE) / float(SAMPLE_RATE), "", None))
                 if not self._stop_flag.is_set():
+                    self._audio_note("timeline", list(timeline))
                     self._audio_note("length", total[0] / float(SAMPLE_RATE))
             except Exception as error:
                 problem.append(error)

@@ -97,6 +97,51 @@ def build_track(text, cps=DEFAULT_CPS):
     return track
 
 
+# The sounds Kokoro hands over (its phoneme letters) and which mouth picture each one needs.
+PHONEME_SHAPES = {}
+for _letters, _shape in (("aɑæʌɐIW", "ah"), ("eɛəɜɚᵻA", "eh"), ("iɪy", "ee"), ("oɔɒOQY", "oh"), ("uʊwɯ", "oo"),
+                         ("pbm", "pressed"), ("fv", "fv"), ("tdsznlʃʒʧʤθð", "eh")):
+    for _char in _letters:
+        PHONEME_SHAPES[_char] = _shape
+NO_TIME = "ˈˌː"                 # stress and length marks: they carry no mouth shape of their own
+
+
+def track_from_phonemes(items):
+    """items = [(phoneme letter, seconds), ...] -> a mouth track [(start, end, picture or None)] with the real timing of each sound."""
+    track, t = [], 0.0
+    for char, seconds in items:
+        seconds = max(0.0, float(seconds))
+        if char in NO_TIME and track:
+            start, end, shape = track[-1]
+            track[-1] = (start, end + seconds, shape)             # a stress mark just lengthens the sound before it
+        else:
+            track.append((t, t + seconds, PHONEME_SHAPES.get(char)))
+        t += seconds
+    return track
+
+
+def track_from_timeline(entries, cps=DEFAULT_CPS):
+    """entries = [(seconds, text or None, phonemes or None), ...] one per piece of sound actually played (beats and pauses included).
+    Pieces that know their phonemes use the exact timing; others (older cached sounds) use the letters of their text squeezed to fit."""
+    track, offset = [], 0.0
+    for seconds, text, phonemes in entries:
+        seconds = max(0.0, float(seconds))
+        if phonemes:
+            part = track_from_phonemes(phonemes)
+        elif text:
+            part = build_track(text, cps)
+        else:
+            part = []
+        length = track_length(part)
+        stretch = seconds / length if (length > 0 and seconds > 0) else 1.0
+        for start, end, shape in part:
+            track.append((offset + start * stretch, offset + end * stretch, shape))
+        offset += seconds
+        if not part and seconds > 0:
+            track.append((offset - seconds, offset, None))
+    return track
+
+
 def track_length(track):
     return track[-1][1] if track else 0.0
 
@@ -206,6 +251,7 @@ class Hologram:
         self.level_open = 1.0         # 0 = the sound is quiet or a pause, 1 = loud
         self.levels_live = False
         self.time_scale = 1.0         # stretches the mouth track so it ends when the real sound ends
+        self.exact_track = False      # True once the voice has told us the exact timing of every sound
         self.line_text, self.cps = "", DEFAULT_CPS
         self.listen_until = 0.0
         self.smile_until = 0.0
@@ -230,6 +276,7 @@ class Hologram:
         self.track = build_track(self.line_text, self.cps)
         self.track_start, self.speaking = now, True
         self.time_scale = 1.0
+        self.exact_track = False
 
     def add_levels(self, taken, now=None):
         """taken = [(time, [four loudness numbers]), ...] from the speech manager: each group is 100 ms of sound."""
@@ -248,9 +295,19 @@ class Hologram:
         self.level_ref = max(0.02, self.level_ref * 0.9995, value)
         return max(0.0, min(1.0, value / self.level_ref))
 
+    def set_timeline(self, entries):
+        """The voice has told us exactly what it played, piece by piece: replace the guessed mouth track with the real one."""
+        track = track_from_timeline(entries, self.cps)
+        if track:
+            self.track = track
+            self.time_scale = 1.0
+            self.exact_track = True
+
     def set_duration(self, seconds):
         """The real length of the sound is known: stretch or squeeze the mouth so it finishes exactly when she does."""
         length = track_length(self.track)
+        if self.exact_track:
+            return                                            # the exact timing needs no stretching
         if length > 0 and seconds and seconds > 0:
             self.time_scale = max(0.4, min(3.0, float(seconds) / length))
 

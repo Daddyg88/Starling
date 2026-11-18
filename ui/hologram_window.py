@@ -129,6 +129,8 @@ class HologramFeed:
             what = event.data.get("what")
             if what == "start":
                 holo.speech_started(event.data.get("text") or self.pending)
+            elif what == "timeline":
+                holo.set_timeline(event.data.get("seconds") or [])
             elif what == "length":
                 holo.set_duration(event.data.get("seconds"))
             elif what == "end":

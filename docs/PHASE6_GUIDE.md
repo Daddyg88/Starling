@@ -1552,6 +1552,11 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.84 - exact lip timing
+
+- tts/kokoro_tts.py: piece_phonemes() (Result.phonemes + output.pred_dur, len must be phonemes+2, scaled to the audio length), timeline of (seconds, text, phonemes) per queued piece incl. beat gaps, sent as speech.audio what='timeline'; cache sidecar <key>.ph.json; CACHE_FORMAT 'ph1' in the key so old sounds are remade once.
+- ui/hologram.py: PHONEME_SHAPES, track_from_phonemes(), track_from_timeline() (pieces without phonemes use the text track squeezed to fit), Hologram.set_timeline(); exact_track stops set_duration stretching it.
+
 ## 0.96.83 - flip book
 
 - tools/make_flipbook.py: clip -> ui/assets/hologram/idle/NNN.jpg + idle.json (frames, fps, per-frame head shifts measured by phase correlation, a 12-frame cross-fade so the loop has no jump).
