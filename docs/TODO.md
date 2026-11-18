@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.90: 'denied'. CHECK: ask for docking at a pad that refuses you; she says 'dih-nide' correctly.
 - [ ] 0.96.89: fleet carrier name. CHECK: open carrier management once, dock at your carrier: she says its name, and never 'Nth visit' remarks there.
 - [ ] 0.96.88: lips on long answers. CHECK: 'tell me about quantum mechanics' (a long new answer): lips stop when the voice pauses between sentences and restart with it; short lines still match.
 - [ ] 0.96.86: CHECK: no more 'Slow start ... prepare her voice' lines for lines that were already prepared; try the 8 new settlements (Industrial 2, Industrial 4, High Tech 1, Agriculture 1 and 4, Tourist 1): the map should line up (Agriculture and Tourist are rough prototypes).

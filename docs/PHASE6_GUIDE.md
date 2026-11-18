@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.90 - denied pronunciation
+
+'denied' respelled 'dih nide' in config/pronunciations.json (tts/pronounce.py applies it). Cache keys use the respelled text, so only lines containing the word are remade. Test: tests/test_pronounce.py DeniedWord.
+
 ## 0.96.89 - fleet carriers by name, own carrier is home
 
 Docking at your own carrier: she says its name (CarrierStats Name), not the callsign. Own carrier matched by callsign, name or CarrierID = MarketID. Habit counting skips it. Other carriers keep their serial (the journal has no name for them). Code: events/carriers.py (is_own_carrier, spoken_station), memory/habits.py (own_carrier, station_name hooks), tests/test_carrier_name.py.

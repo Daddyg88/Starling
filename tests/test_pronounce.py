@@ -101,3 +101,11 @@ class SaluteTests(unittest.TestCase):
     def test_only_the_salute(self):
         for text in ("Pro7 rocks", "room 07", "a o70 thing", "foo7"):
             self.assertEqual(prepare(text), text)
+
+
+class DeniedWord(unittest.TestCase):
+    def test_denied_is_respelled(self):
+        from tts import pronounce
+        pronounce.reload()
+        self.assertEqual(pronounce.prepare("Docking denied.", "kokoro"), "Docking dih nide.")
+        self.assertIn("dih nide", pronounce.prepare("Denied", "kokoro"))
