@@ -1552,6 +1552,13 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.76 - thinking lines
+
+- voicepacks/default/thinking.json: Brain_Thinking (12 serious, always in the pool) plus mood pools with the 12 funny ones (Friendly, Close, Sarcastic; 4 for Neutral). Infatuated also uses Close (see moods.PARENT).
+- personality/llm.py: reply() takes on_wait and wait_after; after wait_after seconds with no answer it calls on_wait once.
+- personality/brain.py: _thinking_line() says one. No combat check.
+- settings: brain.thinking_lines (toggle on Personality page), brain.thinking_after (1.5 s).
+
 ## 0.96.75 - Military 2 confirmed at 0.31
 
 - maps/settlements/military_2.json: scale 0.31 (two visits, both fit; was 0.32).

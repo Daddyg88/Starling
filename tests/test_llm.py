@@ -113,6 +113,56 @@ class Working(Base):
         self.assertEqual(model.calls, [])
 
 
+class ThinkingLines(Base):
+    """'Give me a second' while the chat model works: only when it is slow, mixed funny and serious by mood, and no combat rule."""
+    CHAT = "i spent the whole afternoon repainting the garden fence"
+
+    def slow(self, delay=0.6, **settings):
+        make(self, FakeModel(delay=delay))
+        self.settings.set("brain.thinking_after", 0.1)
+        for key, value in settings.items():
+            self.settings.set(key, value)
+        self.brain._vocab()
+
+    def spoken(self):
+        return [item["text"] for item in self.speech.said]
+
+    def test_a_slow_answer_gets_one_cover_line_before_it(self):
+        self.slow()
+        reply = self.ask(self.CHAT)
+        said = self.spoken()
+        self.assertEqual(len(said), 2)
+        self.assertIn("proper adventure", said[1])                 # the answer comes after the cover line
+        self.assertIn(said[0], [line.text for line in self.dialogue.pool("Brain_Thinking", "Friendly", True, False)])
+        self.assertTrue(reply)
+
+    def test_a_quick_answer_gets_none(self):
+        make(self, FakeModel())
+        self.brain._vocab()
+        self.ask(self.CHAT)
+        self.assertEqual(len(self.spoken()), 1)
+
+    def test_the_toggle_turns_it_off(self):
+        self.slow(**{"brain.thinking_lines": False})
+        self.ask(self.CHAT)
+        self.assertEqual(len(self.spoken()), 1)
+
+    def test_fights_do_not_stop_it(self):
+        self.state.status_flags = 1 << 6                         # in danger
+        self.slow()
+        self.ask(self.CHAT)
+        self.assertEqual(len(self.spoken()), 2)
+
+    def test_the_lines_exist_and_the_mood_changes_the_mix(self):
+        serious = {line.text for line in self.dialogue.pool("Brain_Thinking", "Upset", True, False)}
+        friendly = {line.text for line in self.dialogue.pool("Brain_Thinking", "Friendly", True, False)}
+        self.assertEqual(len(serious), 12)
+        self.assertEqual(len(friendly), 24)
+        self.assertIn("Checking my notes.", serious)
+        self.assertNotIn("Thinking cap on. It's a very small cap.", serious)
+        self.assertIn("Thinking cap on. It's a very small cap.", friendly)
+
+
 class Download(unittest.TestCase):
     def test_http_refused(self):
         ok, _ = model_download.download("http://example.com/x.gguf", Path(tempfile.mkdtemp()) / "m.gguf")

@@ -275,7 +275,7 @@ class LocalLLM:
             log.info("Chat model unloaded after being idle.")
 
     # ---- talking ----
-    def reply(self, messages, allow_mature=False, max_tokens=48, timeout=None):
+    def reply(self, messages, allow_mature=False, max_tokens=48, timeout=None, on_wait=None, wait_after=1.5):
         """One cleaned reply, or None (switched off, busy, too slow, broken, or an unusable answer)."""
         if not self.ready() or self._busy:
             return None
@@ -299,7 +299,16 @@ class LocalLLM:
         self._busy = True
         thread = threading.Thread(target=work, name="llm", daemon=True)
         thread.start()
-        thread.join(timeout)
+        if on_wait is not None and 0 < wait_after < timeout:
+            thread.join(wait_after)
+            if thread.is_alive():
+                try:
+                    on_wait()                          # still thinking: she says a short "give me a second" line
+                except Exception:
+                    log.exception("The thinking line failed")
+            thread.join(max(0.0, timeout - wait_after))
+        else:
+            thread.join(timeout)
         self._last_used = self.clock()
         if thread.is_alive():
             log.warning("The chat model took longer than %.0f s; using her normal chat lines", timeout)

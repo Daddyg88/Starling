@@ -495,6 +495,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Also the word that wakes her up (unless you set a wake word)"),
             Field("player.sex", "You are", "choice", SEXES,
                   help="Changes the pet names and compliments she uses (handsome, beautiful...)"),
+            Field("brain.thinking_lines", "Say 'give me a second' while she thinks", "toggle",
+                  help="When the optional AI chat takes longer than a moment, she says a short line (funny or serious, to suit her mood) so there is no silence. Only used with AI chat switched on"),
             Field("personality.login_greeting", "Greet me when I load the game", "toggle",
                   help="Says your ship, where you are, and how she feels"),
             Field("messages.read", "Read my incoming messages out loud", "toggle",

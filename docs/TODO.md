@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.76: thinking lines. CHECK: AI chat on, chat to her about something ordinary; a slow answer gets a 'give me a second' line first, a quick one gets none; toggle under Personality turns it off.
 - [x] 0.96.74/75: Military 2 at 0.31, game pad 1 = left Small pad: two tester visits, the second one solid. Still wanted: a visit on the Large pad or the other Small pad (their game pad numbers).
 - [ ] 0.96.73: chat in fights. CHECK: in combat mode type o7 and !starling questions in chat (she should answer, not talk over herself), a raid is thanked; narrow the chat window a lot: the X must still show and close it; log shows stream_chat lines.
 - [ ] 0.96.72: window voice commands and the memory window's X / Escape / remembered position. CHECK: say 'show the memory window' (opens), drag it, 'close the memory window'; reopen: same place? Say 'hide the chat window' / 'show the chat window'. If a phrase is not heard, tell me what you said.

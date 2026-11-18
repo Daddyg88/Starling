@@ -614,10 +614,19 @@ class Brain:
             history = [(h[2], h[3]) for h in self._recent() if h[1] == "Chat"]
             messages = build_messages(tidy, self.mood(), getattr(state, "system", "") or "", getattr(state, "ship_model", "") or "",
                                       likes, history)
-            return llm.reply(messages, allow_mature=self._allow())
+            on_wait = self._thinking_line if self.settings.get("brain.thinking_lines", True) else None
+            return llm.reply(messages, allow_mature=self._allow(), on_wait=on_wait,
+                             wait_after=float(self.settings.get("brain.thinking_after", 1.5) or 1.5))
         except Exception:
             log.exception("The AI chat failed; using her normal chat lines")
             return None
+
+    def _thinking_line(self):
+        """A short 'give me a second' line while the chat model works. Fights and danger do not matter: she says it anyway."""
+        text = self._format("Brain_Thinking", {})
+        if text is not None:
+            log.info("Brain: thinking line (the chat model is taking a while)")
+            self._say(text)
 
     # ---- answering ----
     def mood(self):
