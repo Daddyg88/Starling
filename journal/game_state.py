@@ -60,6 +60,9 @@ class GameState:
     fsd_target: Optional[str] = None        # the system selected as the jump target (FSDTarget): what "Set Target" does
     route_jumps_left: Optional[int] = None  # RemainingJumpsInRoute from the last FSDTarget
     fleet_carrier_callsign: Optional[str] = None   # your own fleet carrier (CarrierStats), so we know which carrier is yours
+    fleet_carrier_name: Optional[str] = None       # its name (CarrierStats), which she says instead of the serial
+    fleet_carrier_id: Optional[int] = None         # its id; the same number is the MarketID when you dock at it
+    carrier_names: dict = field(default_factory=dict)  # callsign -> name, for other carriers when the journal tells us
     fleet_carrier_system: Optional[str] = None     # where it is now (CarrierLocation, CarrierJump, or docking at it)
     power: Optional[str] = None                    # the Power you are pledged to (Powerplay events)
     squadron: Optional[str] = None                 # your squadron's name, if you are in one (SquadronStartup)

@@ -5,7 +5,7 @@ It is not spoken by itself; the login greeting uses it to say where you are.
 
 from events.base_event import BaseEvent
 from events.system_facts import remember_star_pos, remember_system_facts
-from events.carriers import remember_carrier_visit
+from events.carriers import remember_carrier_visit, spoken_station
 from core.event_bus import LOW
 
 
@@ -32,5 +32,5 @@ class Location(BaseEvent):
         remember_system_facts(entry, state)
         remember_star_pos(entry, state)
         state.docked = bool(entry.get("Docked", False))
-        state.station = entry.get("StationName") if state.docked else None
+        state.station = spoken_station(entry, state) if state.docked else None
         remember_carrier_visit(entry, state)

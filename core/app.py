@@ -315,12 +315,15 @@ class App:
         import atexit
         atexit.register(self.stats.flush)
         from memory.habits import HabitKeeper
+        from events.carriers import is_own_carrier, spoken_station
         self.habits = HabitKeeper(
             self.bus, paths.DATA_DIR / "habits.json",
             announce=lambda key, values: _stats_narrator.say(key, values),
             hours=self.hours_together, jumps=lambda: self.stats.jumps_total if self.stats is not None else 0,
             enabled=lambda: bool(self.settings.get("memory.habits", True)) and bool(self.settings.get("memory.enabled", True)),
-            system=lambda: getattr(self.state, "system", None))
+            system=lambda: getattr(self.state, "system", None),
+            own_carrier=lambda data: is_own_carrier(data, self.state),
+            station_name=lambda data: spoken_station(data, self.state))
         self.habits.attach()
         atexit.register(self.habits.flush)
         if self.chitchat is not None:
