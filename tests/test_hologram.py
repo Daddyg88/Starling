@@ -186,6 +186,46 @@ class Feed(unittest.TestCase):
         self.app.bus.fire("speech.started", text="hi")      # no hologram yet: just ignored
 
 
+class Effects(unittest.TestCase):
+    def powered(self):
+        holo, c = make()
+        for _ in range(40):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t)
+        return holo, c
+
+    def test_lights_stay_below_her_chest_and_come_from_the_ring(self):
+        holo, c = self.powered()
+        a = holo.assets
+        near = np.zeros((a.window_h, a.window_w), dtype=np.float32)
+        far = np.zeros_like(near)
+        for step in range(12):
+            holo._sparks(c.t + step * 0.7, near, far)
+        rows = np.where((near + far).max(axis=1) > 0)[0]
+        self.assertGreater(len(rows), 20)
+        self.assertGreaterEqual(rows.min(), h.PAD_TOP + a.height * 0.64 - 3)      # never higher than her chest
+        self.assertLessEqual(rows.max(), h.PAD_TOP + a.height + 20)               # starts down at the ring
+
+    def test_rings_and_lights_do_not_flicker(self):
+        holo, c = self.powered()
+        holo.fx_turn = False
+        holo.flicker_on = True
+        holo.rng = random.Random(5)
+        a = holo.assets
+        cy = h.PAD_TOP + a.height + 14
+        samples = []
+        for step in range(30):
+            frame = holo.render(c.t + step * 0.013)        # same time of the lights, tiny steps: only her flicker changes
+            samples.append(int(frame[cy + 1:cy + 3, :, :].astype(int).sum()))
+        self.assertLess(max(samples) - min(samples), max(samples) * 0.05 + 1)
+
+    def test_effects_can_be_switched_off(self):
+        holo, c = self.powered()
+        holo.fx_beam = False
+        holo.fx_turn = False
+        self.assertEqual(holo.render(c.t).shape[2], 3)
+
+
 class LipTiming(unittest.TestCase):
     def test_lips_wait_for_the_real_sound(self):
         holo, c = make()

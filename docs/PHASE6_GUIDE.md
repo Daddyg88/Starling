@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.81 - tiny lights and the turn
+
+- ui/hologram.py: _sparks() (450 lights, random per life via a sin hash of (index, cycle), funnel, stops at y_top = 0.64 of her height), _turn() + _depth_map() (depth-weighted horizontal shift, +-2.2% of the width), rings and lights use the un-flickered power; glitch strips only tear her. Settings hologram.sparks / hologram.turn feed holo.fx_beam / fx_turn.
+
 ## 0.96.80 - hologram hidden reasons
 
 - ui/hologram_window.py: _why() logs one 'Hologram: ...' line per change. ui/window_voice.py: 'show the hologram' also asks the dashboard for hologram_test (8 s), handled in Dashboard._poll_ui_requests.

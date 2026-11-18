@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.81: hologram lights and turn. CHECK: tiny lights rise from the ring centre and stop at her chest; rings and lights steady while she flickers; the slow turn looks like a turn, not a slide; both switches work.
 - [ ] 0.96.80: hologram reasons. CHECK: say 'show the hologram' with the game closed: she shows 8 s; log has 'Hologram:' lines; with the game running and in front she stays.
 - [ ] 0.96.79: lip timing + window positions. CHECK: lips start with her first sound and stop with her last word; chat window on the left monitor comes back in the same place after closing and reopening Starling.
 - [ ] 0.96.78: hologram window focus. CHECK: start the game: she appears about 20 s after the game window shows; click to another program: she powers down; click back to Elite: she powers up at once.

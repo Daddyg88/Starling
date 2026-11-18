@@ -175,6 +175,8 @@ class Hologram:
         self.moving = False          # "Move her" is on: draw a frame so she can be grabbed
         self.open_fraction = 0.55
         self.flicker_on = True
+        self.fx_beam = True           # sparks rising from the ring and orbiting her chest (gives her depth)
+        self.fx_turn = True           # she turns a few degrees left and right (fake 3D)
         self.first_frame = True
 
     # ---- what happens ----
@@ -276,6 +278,8 @@ class Hologram:
                 continue
             blend = alpha[:rh, :rw] * strength
             region[:] = region * (1.0 - blend) + rgb[:rh, :rw] * blend
+        if self.fx_turn:
+            frame = self._turn(frame, now)
         # scan lines and the bright sweep
         frame[::3] *= 0.84
         sweep = int((now * 70.0) % (a.height * 1.6)) - int(a.height * 0.2)
@@ -297,18 +301,94 @@ class Hologram:
         out = np.zeros((a.window_h, a.window_w, 3), dtype=np.float32)
         top = PAD_TOP + bob
         out[top:top + a.height] = frame
-        ring = a.rings * (0.8 * max(0.0, min(1.0, level)))
-        ring_colour = (np.array([70.0, 180.0, 255.0], dtype=np.float32) @ tint_matrix(self.mix).T)
-        out = np.maximum(out, ring * ring_colour)
-        if self.flicker_on and now < self.glitch_until:                       # a short torn-picture glitch
+        if self.flicker_on and now < self.glitch_until:                       # a short torn-picture glitch: only HER picture tears
             for y, h, dx in self.strips:
                 out[y:y + h] = np.roll(out[y:y + h], dx, axis=1)
+        steady = max(0.0, min(1.0, self.power))                                # the rings and the lights do not flicker, only she does
+        ring = a.rings * (0.8 * steady)
+        ring_colour = (np.array([70.0, 180.0, 255.0], dtype=np.float32) @ tint_matrix(self.mix).T)
+        out = np.maximum(out, ring * ring_colour)
+        if self.fx_beam:
+            near = np.zeros((a.window_h, a.window_w), dtype=np.float32)
+            far = np.zeros_like(near)
+            self._sparks(now, near, far)
+            strength = steady
+            body = out.max(axis=2, keepdims=True) / 90.0                              # her picture hides the far half of the loops
+            far = far[..., None] * np.clip(1.0 - body, 0.0, 1.0)
+            glow = np.array([225.0, 245.0, 255.0], dtype=np.float32) @ tint_matrix(self.mix).T
+            out = np.maximum(out, far * glow * strength)
+            out = np.maximum(out, near[..., None] * glow * strength)
         if self.moving:
             out = self._move_frame(out)
         pixels = out.astype(np.uint8)
         dark = pixels.max(axis=2) <= THRESHOLD
         pixels[dark] = KEY
         return pixels
+
+    def _depth_map(self):
+        """A rough 'how close to you' map for the picture (face and chest nearest), made once. Only used for the gentle turning."""
+        a = self.assets
+        if getattr(self, "_depth", None) is None or self._depth.shape != (a.height, a.width):
+            ys, xs = np.mgrid[0:a.height, 0:a.width].astype(np.float32)
+            cx = a.width / 2.0
+            face = np.exp(-(((xs - cx) / (a.width * 0.17)) ** 2 + ((ys - a.height * 0.27) / (a.height * 0.17)) ** 2))
+            chest = np.exp(-(((xs - cx) / (a.width * 0.30)) ** 2 + ((ys - a.height * 0.72) / (a.height * 0.22)) ** 2)) * 0.7
+            hair = np.exp(-(((xs - cx) / (a.width * 0.5)) ** 2 + ((ys - a.height * 0.4) / (a.height * 0.5)) ** 2)) * 0.25
+            self._depth = np.clip(face + chest + hair, 0.0, 1.0)
+        return self._depth
+
+    def _turn(self, frame, now):
+        """Slide near parts (face, chest) a little more than far parts (hair edges), left and right, so she seems to turn on the spot."""
+        a = self.assets
+        swing = math.sin(now * 0.55) * 0.5 + math.sin(now * 0.23 + 1.0) * 0.3        # slow and never quite repeating
+        amount = swing * a.width * 0.022
+        if abs(amount) < 0.05:
+            return frame
+        shift = (self._depth_map() - 0.4) * amount                                    # pixels, per pixel
+        w = a.width
+        cols = np.arange(w, dtype=np.float32)[None, :] - shift                        # where each output pixel looks in the picture
+        left = np.clip(np.floor(cols).astype(np.int32), 0, w - 1)
+        right = np.clip(left + 1, 0, w - 1)
+        frac = (cols - np.floor(cols))[..., None]
+        rows = np.arange(a.height)[:, None]
+        return frame[rows, left] * (1.0 - frac) + frame[rows, right] * frac
+
+    def _sparks(self, now, front, behind):
+        """A slow tornado of tiny lights. Every light has its own random life: where it is born, how fast it climbs, how fast it swirls, how
+        wide it goes and how bright it is, and it picks new random values each time it is reborn. They start in the middle of the lower ring,
+        spiral up round her (narrow low down, wider higher up) and fade out at the height of her chest, never higher. The far half of each turn
+        goes behind her (dimmer), the near half in front."""
+        a = self.assets
+        cx = a.window_w / 2.0
+        y_ring = PAD_TOP + a.height + 14.0
+        y_top = PAD_TOP + a.height * 0.64                                              # the top of her chest: nothing goes higher than this
+        radius = a.window_w * 0.40
+        count = 450
+        i = np.arange(count, dtype=np.float64)
+
+        def rnd(cycle, salt):
+            value = np.sin(i * 12.9898 + cycle * 78.233 + salt * 37.719) * 43758.5453
+            return (value - np.floor(value)).astype(np.float32)
+
+        period = 5.0 + 7.0 * rnd(0.0, 1.0)                                              # each light climbs at its own speed (5 to 12 seconds)
+        clock = now / period + rnd(0.0, 2.0)                                            # and starts at its own moment
+        cycle = np.floor(clock)
+        progress = (clock - cycle).astype(np.float32)
+        angle = rnd(cycle, 3.0) * 6.2832 + progress * (1.0 + 4.0 * rnd(cycle, 4.0)) * 6.2832 * 0.6 * np.where(rnd(0.0, 5.0) < 0.85, 1.0, -1.0)
+        wide = 0.25 + 0.95 * rnd(cycle, 6.0)                                           # how wide this light swirls
+        r = radius * wide * progress ** 0.8
+        sway = 1.0 + 0.15 * np.sin(now * 1.7 + i)                                       # a little wobble so none move in a pure curve
+        x = cx + r * np.cos(angle) * sway
+        y = y_ring + (y_top - y_ring) * progress + r * 0.2 * np.sin(angle)
+        fade = np.minimum(1.0, progress * 10.0) * np.clip((1.0 - progress) * 3.0, 0.0, 1.0)
+        near = np.sin(angle) > 0
+        bright = 0.25 + 0.75 * rnd(cycle, 7.0) ** 1.5                                   # mostly faint, a few brighter
+        strength = fade * bright * np.where(near, 1.0, 0.5)
+        ix = np.rint(x).astype(np.int32)
+        iy = np.rint(y).astype(np.int32)
+        ok = (iy >= int(math.ceil(y_top))) & (ix >= 0) & (ix < a.window_w) & (iy >= 0) & (iy < a.window_h)
+        for layer, pick in ((front, ok & near), (behind, ok & ~near)):
+            np.maximum.at(layer, (iy[pick], ix[pick]), strength[pick])
 
     def _move_frame(self, out):
         """A thin cyan frame while "Move her" is on: something solid to grab."""

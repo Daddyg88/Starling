@@ -304,6 +304,8 @@ class HologramWindow:
         s = self.settings
         holo.open_fraction = max(0.2, min(1.0, float(s.get("hologram.mouth_open", 55)) / 100.0))
         holo.flicker_on = bool(s.get("hologram.flicker", True))
+        holo.fx_beam = bool(s.get("hologram.sparks", True))
+        holo.fx_turn = bool(s.get("hologram.turn", True))
         holo.moving = self.moving()
         testing = now < self.test_until
         focus = self.feed.gui_focus()
