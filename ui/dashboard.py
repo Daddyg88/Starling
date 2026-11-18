@@ -1291,6 +1291,9 @@ class Dashboard:
                 name = requests.pop(0)
                 if name == "memory_window":
                     self.show_knowledge()
+                elif name == "hologram_test":
+                    if getattr(self, "hologram_window", None) is not None:
+                        self.hologram_window.show_test(8)
                 elif name == "memory_window_close":
                     if getattr(self, "knowledge_window", None) is not None:
                         self.knowledge_window.close()

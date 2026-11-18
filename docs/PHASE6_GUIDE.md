@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.80 - hologram hidden reasons
+
+- ui/hologram_window.py: _why() logs one 'Hologram: ...' line per change. ui/window_voice.py: 'show the hologram' also asks the dashboard for hologram_test (8 s), handled in Dashboard._poll_ui_requests.
+
 ## 0.96.79 - lip timing and negative window positions
 
 - tts/kokoro_tts.py: on_audio hook ('start' at the first written block, 'length' when all sound is made (samples incl. beats), 'end' after playback). tts/speech_manager.py turns it into bus event speech.audio {what, seconds, text}.

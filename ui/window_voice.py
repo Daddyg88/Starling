@@ -64,6 +64,8 @@ class WindowVoice:
                 self.settings.save()
             except Exception:
                 pass
+            if on:
+                self.request_ui("hologram_test")           # show her for a few seconds so you can see it worked, even with the game closed
             return self._say("Window_HologramShown" if on else "Window_HologramHidden", "Hologram on." if on else "Hologram off.")
         if what in ("chat_on", "chat_off"):
             on = what == "chat_on"

@@ -252,6 +252,13 @@ class GameFocus(unittest.TestCase):
         self.feed.game_gone()
         self.assertFalse(self.feed.game_in_focus(1031.0))
 
+    def test_game_in_front_overrules_a_wrong_closed_flag(self):
+        self.feed.app.state.game_quit = True           # Starling started while the game was idle: the journal looked old
+        self.assertFalse(self.feed.game_quit())          # but Elite is the window in front, so it is running
+        self.title = "Discord"
+        self.feed._focus_at = 0
+        self.assertTrue(self.feed.game_quit())
+
     def test_unknown_window_keeps_her_on(self):
         self.feed.title_provider = lambda: None
         self.assertTrue(self.feed.game_in_focus(5.0))
@@ -269,8 +276,10 @@ class Voice(unittest.TestCase):
         s = Settings(**{"hologram.enabled": False})
         said = []
         nar = type("N", (), {"say": lambda self, k, f=None: said.append(k)})()
-        v = WindowVoice(s, lambda name: None, nar)
+        asked = []
+        v = WindowVoice(s, asked.append, nar)
         v.try_handle("show the hologram")
+        self.assertEqual(asked, ["hologram_test"])          # she is shown for a few seconds as proof
         self.assertTrue(s.get("hologram.enabled"))
         v.try_handle("hide the hologram")
         self.assertFalse(s.get("hologram.enabled"))

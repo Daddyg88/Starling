@@ -69,6 +69,7 @@ class HologramFeed:
         self._focus_at = 0.0
         self._focus = True
         self._booted_from = None       # when the game window first came into focus
+        self.game_in_front = None      # True / False from the window title, None when it cannot be read
 
     def game_in_focus(self, now):
         """True when Elite is the window you are in AND she has finished starting up. Checked twice a second at most.
@@ -82,9 +83,11 @@ class HologramFeed:
             title = None
         if title is None:
             self._focus = True
+            self.game_in_front = None
             return True
         from control.sender import _is_game
-        if _is_game(title):
+        self.game_in_front = bool(_is_game(title))
+        if self.game_in_front:
             if self._booted_from is None:
                 self._booted_from = now
             self._focus = now - self._booted_from >= self.boot_seconds
@@ -155,7 +158,15 @@ class HologramFeed:
         return int(getattr(getattr(self.app, "state", None), "gui_focus", 0) or 0)
 
     def game_quit(self):
-        return bool(getattr(getattr(self.app, "state", None), "game_quit", False))
+        """True when the game looks closed. The journal's idea of that can be wrong (Starling started while you sat still in a station, so
+        Status.json was old), so seeing the Elite window in front overrules it."""
+        quit_flag = bool(getattr(getattr(self.app, "state", None), "game_quit", False))
+        if quit_flag:
+            import time as _time
+            self.game_in_focus(_time.monotonic())
+            if self.game_in_front:
+                return False
+        return quit_flag
 
     def listening(self):
         """Green: push-to-talk is held open, or she has asked you a question and is waiting. Never just because the microphone is open."""
@@ -245,6 +256,12 @@ class HologramWindow:
             self._rect_at = now
         return self._rect
 
+    def _why(self, now, hidden_reason):
+        """Writes one log line each time the reason she is (not) shown changes, so a missing hologram can be explained from the log."""
+        if hidden_reason != getattr(self, "_last_reason", None):
+            self._last_reason = hidden_reason
+            log.info("Hologram: %s", hidden_reason or "shown")
+
     def wanted(self, now):
         s = self.settings
         if self.feed.game_quit() and not self.moving():
@@ -267,6 +284,10 @@ class HologramWindow:
     def _update(self):
         now = time.monotonic()
         if not self.wanted(now):
+            if not self.settings.get("hologram.enabled", False):
+                self._why(now, "off in settings")
+            elif self.feed.game_quit():
+                self._why(now, "hidden: the game is not running and Elite is not in front. The 'Show her hologram for 10 seconds' button still shows her")
             if self._shown and self.holo is not None:
                 powered_down = self.holo.tick(powered=False)
                 if powered_down <= 0.03:
@@ -289,6 +310,8 @@ class HologramWindow:
         if self.feed.game_quit():
             self.feed.game_gone()
         in_game = self.feed.game_in_focus(now)
+        self._why(now, None if (testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game))
+                  else ("powered down: Elite is not the window in front (or still starting up)" if not in_game else "powered down: a game screen is open (GuiFocus %d)" % focus))
         powered = testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game)
         visible = holo.tick(listening=self.feed.listening(), thinking=self.feed.thinking(), powered=powered)
         if visible <= 0.03 and not holo.speaking:
