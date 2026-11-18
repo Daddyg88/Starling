@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.91 - more settlement line-ups
+
+maps/known_calibrations.json now holds 21 settlements, merged with tools/merge_calibrations.py from 8 diagnostics zips. Four recorded settlements (Hobbs, Bonetti, Pozandr, Benton) have raw samples only and still need maps.
+
 ## 0.96.90 - denied pronunciation
 
 'denied' respelled 'dih nide' in config/pronunciations.json (tts/pronounce.py applies it). Cache keys use the respelled text, so only lines containing the word are remade. Test: tests/test_pronounce.py DeniedWord.
