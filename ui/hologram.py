@@ -163,6 +163,7 @@ class Hologram:
         self.power = 0.0
         self.weights = {name: 0.0 for name in assets.sprites}
         self.track, self.track_start, self.speaking = [], 0.0, False
+        self.time_scale = 1.0         # stretches the mouth track so it ends when the real sound ends
         self.line_text, self.cps = "", DEFAULT_CPS
         self.listen_until = 0.0
         self.smile_until = 0.0
@@ -182,6 +183,13 @@ class Hologram:
         self.line_text = str(text or "")
         self.track = build_track(self.line_text, self.cps)
         self.track_start, self.speaking = now, True
+        self.time_scale = 1.0
+
+    def set_duration(self, seconds):
+        """The real length of the sound is known: stretch or squeeze the mouth so it finishes exactly when she does."""
+        length = track_length(self.track)
+        if length > 0 and seconds and seconds > 0:
+            self.time_scale = max(0.4, min(3.0, float(seconds) / length))
 
     def speech_finished(self, now=None):
         now = self.clock() if now is None else now
@@ -242,7 +250,7 @@ class Hologram:
 
     def _mouth_goal(self, now):
         if self.speaking:
-            elapsed = now - self.track_start
+            elapsed = (now - self.track_start) / self.time_scale
             if elapsed > track_length(self.track) + 0.4:
                 return None
             return shape_at(self.track, elapsed)

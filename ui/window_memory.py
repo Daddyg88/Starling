@@ -26,6 +26,12 @@ def make_geometry(width, height, x, y):
     return "%dx%d%s%d%s%d" % (width, height, "+" if x >= 0 else "-", abs(x), "+" if y >= 0 else "-", abs(y))
 
 
+def tk_geometry(width, height, x, y):
+    """The same, written the way Tk wants it. Tk reads '-487' as '487 pixels from the RIGHT edge', so a window on a monitor to the
+    left of the main one (x = -487) must be written '+-487'. Without this the window jumped to the wrong place on every start."""
+    return "%dx%d+%d+%d" % (width, height, x, y)
+
+
 def usable_geometry(text, screen, minimum=(1000, 640)):
     """The saved geometry if it still fits the screens, else None.
 
@@ -44,7 +50,7 @@ def usable_geometry(text, screen, minimum=(1000, 640)):
                  and y >= top and y + VISIBLE_MARGIN <= top + screen_height)
     if not on_screen:
         return None
-    return make_geometry(width, height, x, y)
+    return tk_geometry(width, height, x, y)
 
 
 def desktop_area(root):

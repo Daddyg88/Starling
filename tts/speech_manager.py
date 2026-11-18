@@ -226,11 +226,18 @@ class SpeechManager:
                     log.error("No voice is available, so STARLING cannot speak. Run run_voice_test.bat")
             else:
                 self._use(provider)
+                if provider.name == "kokoro":
+                    provider.on_audio = lambda what, value=None, text=item.text: self._audio_note(what, value, text)
                 if provider.name != "kokoro":
                     follow = follow.replace("||", " ")   # only the cloned voice knows about beats
                 provider.speak(follow, voice)
 
         self._announce("speech.finished", item)
+
+    def _audio_note(self, what, value, text):
+        """The real sound started, its length is known, or it ended: lets the hologram time her lips to the voice, not to the queue."""
+        if self.bus is not None:
+            self.bus.publish("speech.audio", {"what": what, "seconds": value, "text": (text or "").replace("||", " ")}, "low")
 
     def _announce(self, name, item):
         if self.bus is not None:

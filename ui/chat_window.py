@@ -16,7 +16,7 @@ import time
 
 from core.logger import get_logger
 from ui import theme
-from ui.window_memory import desktop_area, make_geometry, parse_geometry, usable_geometry
+from ui.window_memory import desktop_area, make_geometry, tk_geometry, parse_geometry, usable_geometry
 
 log = get_logger("chat_window")
 
@@ -94,7 +94,7 @@ def start_geometry(saved, screen):
         return usable
     left, top, width, height = screen
     w, h = min(DEFAULT_SIZE[0], width), min(DEFAULT_SIZE[1], height)
-    return make_geometry(w, h, left + max(0, width - w - 24), top + 70)
+    return tk_geometry(w, h, left + max(0, width - w - 24), top + 70)
 
 
 def resized(width, height, dx, dy, screen_size=None):

@@ -587,6 +587,7 @@ class KokoroTTS(BaseTTS):
 
         parts = [part.strip() for part in text.split(PAUSE_MARK) if part.strip()]
         started_at = time.monotonic()
+        total = [0]                                                # samples made so far, beats included (for the hologram's lips)
 
         def make_part(part):
             """Make (or load from the cache) one part. Returns how many samples were queued."""
@@ -628,9 +629,13 @@ class KokoroTTS(BaseTTS):
                     if self._stop_flag.is_set():
                         return
                     length = make_part(part)
+                    total[0] += length
                     if number < len(parts) - 1:
                         gap = max(MIN_GAP_SECONDS, BEAT_SECONDS - length / float(SAMPLE_RATE))
                         self._put(pieces, np.zeros(int(gap * SAMPLE_RATE), dtype=np.float32))
+                        total[0] += int(gap * SAMPLE_RATE)
+                if not self._stop_flag.is_set():
+                    self._audio_note("length", total[0] / float(SAMPLE_RATE))
             except Exception as error:
                 problem.append(error)
                 log.exception("Kokoro could not make the sound")
@@ -659,6 +664,7 @@ class KokoroTTS(BaseTTS):
                     stream.write(chunk.reshape(-1, 1))
                     if not played_any:
                         self._note_start_delay(time.monotonic() - started_at, parts[0])
+                        self._audio_note("start")
                     played_any = True
         finally:
             try:
@@ -671,9 +677,22 @@ class KokoroTTS(BaseTTS):
                 pass
             # Let the helper thread finish (it checks the stop flag between sentences).
             maker.join(timeout=2)
+            if played_any:
+                self._audio_note("end")
         if self._stop_flag.is_set():
             return True          # we were cut off on purpose (e.g. by a critical warning)
         return played_any and not problem
+
+    on_audio = None             # set by the speech manager: called as on_audio("start" | "length" | "end", seconds) so the hologram's lips follow the REAL sound
+
+    def _audio_note(self, what, value=None):
+        hook = self.on_audio
+        if hook is None:
+            return
+        try:
+            hook(what, value)
+        except Exception:
+            log.debug("The audio hook failed", exc_info=True)
 
     def _put(self, q, item, force=False):
         """Put into the bounded queue, but give up quickly if we were told to stop."""

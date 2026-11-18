@@ -63,6 +63,7 @@ class HologramFeed:
         self.app = app
         self.get = hologram_getter          # () -> the current Hologram (it is rebuilt when the size changes)
         self._attached = False
+        self.pending = ""
         self.title_provider = foreground_title
         self.boot_seconds = BOOT_SECONDS
         self._focus_at = 0.0
@@ -100,17 +101,37 @@ class HologramFeed:
         if bus is None or self._attached:
             return
         bus.subscribe("speech.started", self._started)
+        bus.subscribe("speech.audio", self._audio)
         bus.subscribe("speech.finished", self._finished)
         bus.subscribe("voice.heard", self._heard)
         self._attached = True
 
     def _started(self, event):
+        """The line was handed to the voice. Her lips wait for the real sound (speech.audio), because making the sound takes a moment.
+        A recorded line has no such signal, so it starts at once."""
         try:
-            holo = self.get()
-            if holo is not None:
-                holo.speech_started(event.data.get("text", ""))
+            self.pending = event.data.get("text", "")
+            if event.data.get("audio"):
+                holo = self.get()
+                if holo is not None:
+                    holo.speech_started(self.pending)
         except Exception:
             log.exception("The hologram could not follow what she said")
+
+    def _audio(self, event):
+        try:
+            holo = self.get()
+            if holo is None:
+                return
+            what = event.data.get("what")
+            if what == "start":
+                holo.speech_started(event.data.get("text") or self.pending)
+            elif what == "length":
+                holo.set_duration(event.data.get("seconds"))
+            elif what == "end":
+                holo.speech_finished()
+        except Exception:
+            log.exception("The hologram could not follow the sound")
 
     def _finished(self, event):
         try:

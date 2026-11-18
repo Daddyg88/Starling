@@ -139,6 +139,7 @@ class Feed(unittest.TestCase):
 
     def test_speech_events_drive_the_mouth(self):
         self.app.bus.fire("speech.started", text="Hello there commander")
+        self.app.bus.fire("speech.audio", what="start", text="Hello there commander", seconds=None)
         self.assertTrue(self.holo.speaking)
         self.app.bus.fire("speech.finished")
         self.assertFalse(self.holo.speaking)
@@ -183,6 +184,46 @@ class Feed(unittest.TestCase):
     def test_a_broken_event_never_raises(self):
         self.holo = None
         self.app.bus.fire("speech.started", text="hi")      # no hologram yet: just ignored
+
+
+class LipTiming(unittest.TestCase):
+    def test_lips_wait_for_the_real_sound(self):
+        holo, c = make()
+        app = App()
+        feed = HologramFeed(app, lambda: holo)
+        feed.attach()
+        app.bus.fire("speech.started", text="Hello commander", audio="")
+        self.assertFalse(holo.speaking)                      # still making the sound: no lips yet
+        app.bus.fire("speech.audio", what="start", text="Hello commander", seconds=None)
+        self.assertTrue(holo.speaking)
+        app.bus.fire("speech.audio", what="end", text="", seconds=None)
+        self.assertFalse(holo.speaking)
+
+    def test_recorded_line_starts_at_once(self):
+        holo, c = make()
+        app = App()
+        HologramFeed(app, lambda: holo).attach()
+        app.bus.fire("speech.started", text="Docking granted", audio="dock.mp3")
+        self.assertTrue(holo.speaking)
+
+    def test_mouth_is_stretched_to_the_real_length(self):
+        holo, c = make()
+        holo.speech_started("Hello commander how are you", c.t)
+        natural = h.track_length(holo.track)
+        holo.set_duration(natural * 2)
+        self.assertAlmostEqual(holo.time_scale, 2.0, places=2)
+        # one natural length in, the mouth is only half way through, so it is still moving
+        self.assertTrue(holo.speaking)
+        self.assertIsNotNone(holo._mouth_goal(c.t + natural * 0.9) or "x")
+        self.assertIsNone(holo._mouth_goal(c.t + natural * 2 + 2))
+
+    def test_stretch_is_limited(self):
+        holo, c = make()
+        holo.speech_started("Hello commander", c.t)
+        holo.set_duration(9999)
+        self.assertLessEqual(holo.time_scale, 3.0)
+        holo.set_duration(0.0001)
+        self.assertGreaterEqual(holo.time_scale, 0.4)
 
 
 class GameFocus(unittest.TestCase):

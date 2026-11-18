@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.79 - lip timing and negative window positions
+
+- tts/kokoro_tts.py: on_audio hook ('start' at the first written block, 'length' when all sound is made (samples incl. beats), 'end' after playback). tts/speech_manager.py turns it into bus event speech.audio {what, seconds, text}.
+- ui/hologram.py: set_duration() sets time_scale (0.4 to 3) so the text-timed mouth ends with the sound. ui/hologram_window.py: speech.started only remembers the text (recorded lines with audio start at once); speech.audio start/length/end drive the mouth.
+- ui/window_memory.py: tk_geometry() writes '+-487'; usable_geometry() returns it. Tk reads '-487' as from the right edge.
+
 ## 0.96.78 - hologram follows the game window
 
 - ui/hologram_window.py: HologramFeed.game_in_focus() reads the foreground window title (twice a second at most, control.sender._is_game), waits boot_seconds (20) after the game first appears, False whenever another window is in front. Where the title cannot be read (not Windows) she stays on. game_gone() resets the start-up wait.

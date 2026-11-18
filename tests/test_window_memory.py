@@ -21,7 +21,7 @@ class WindowMemoryTests(unittest.TestCase):
         self.assertEqual(usable_geometry("1360x860+120+60", ONE), "1360x860+120+60")
 
     def test_second_monitor_on_the_left_is_remembered(self):
-        self.assertEqual(usable_geometry("1360x860-1800+40", TWO_LEFT), "1360x860-1800+40")
+        self.assertEqual(usable_geometry("1360x860-1800+40", TWO_LEFT), "1360x860+-1800+40")   # Tk needs +-1800: plain -1800 means from the right edge
 
     def test_unplugged_monitor_falls_back_to_the_default(self):
         self.assertIsNone(usable_geometry("1360x860-1800+40", ONE))            # that screen is gone
@@ -38,3 +38,11 @@ class WindowMemoryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TkForm(unittest.TestCase):
+    def test_negative_positions_are_written_for_tk(self):
+        from ui.window_memory import tk_geometry
+        self.assertEqual(tk_geometry(452, 659, -487, 47), "452x659+-487+47")
+        self.assertEqual(parse_geometry("452x659+-487+47"), (452, 659, -487, 47))
+        self.assertEqual(tk_geometry(452, 659, 100, 47), "452x659+100+47")
