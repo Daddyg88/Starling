@@ -6,14 +6,27 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 
 ### SETTLEMENT MAP PROGRESS (28 layouts; updated 17 Nov, 0.96.64)
 Measured = a real size (metres per map unit) from tester marks. Provisional = one visit only.
-- [x] MEASURED, 10 of 28 (18 to go): agriculture_1 (0.408, one settlement), agriculture_4 (0.44, one), extraction_3 (0.35, provisional), extraction_5 (0.181, provisional), high_tech_1 (0.33, one), industrial_1 (0.27, provisional), industrial_2 (0.345, THREE settlements: Shi, Spark, Peng), industrial_4 (0.34, one), military_2 (0.31, two visits), tourist_1 (0.425, TWO settlements: Sumlak, Izdryk; both visits' refinement hit the +2.5% limit, so it is probably a little bigger than 0.425). Shipped line-ups: 9 settlements (0.96.86). Agriculture 5 is still unresolved.
-- [ ] UNRESOLVED, 1: agriculture_5 (Tutunnyk). Two fits: A 0.232 (2 m miss, ship 135 m from the drawn pad) or B 0.256 (8 m miss, ship 13 m from the pad, matches the pad arrow). NEEDS Ben's look at the map: is the pad at the bottom or top, are three terminals in a row near it, which one is blue.
-- [ ] NOT MEASURED YET, 17 (need a visit with 'mark spot ship' then 2 to 3 'mark spot terminal' 100 m+ apart, then the ZIP):
+- [x] MEASURED, 12 of 28 (16 to go; updated 0.96.92). Shipped line-ups: 21 settlements (0.96.91).
+  - agriculture_1 (0.408): TWO settlements (Agnihotri, Mowatt Foods)
+  - agriculture_4 (0.44): THREE settlements (Sharma, Oyawale, Jung)
+  - extraction_2 (about 0.316): NEW, one visit (Acosta Extraction Prospect), two marks only, so provisional
+  - extraction_3 (0.35): one visit (Shin Prospecting Platform), a second would confirm it
+  - extraction_4 (about 0.34): NEW, one visit (Prieto Excavation Platform), provisional
+  - extraction_5 (0.181): one visit, a second would confirm it (no line-up shipped yet)
+  - high_tech_1 (0.33): one settlement (Kolsuk)
+  - industrial_1 (0.27): one visit (Craig Manufacturing Hub), a second would confirm it
+  - industrial_2 (0.345): FIVE settlements (Shi, Spark, Peng, Dovzhenko, Martins), confirmed
+  - industrial_4 (0.34): one settlement (Yi's Workshop)
+  - military_2 (0.31): FOUR settlements now (Ukah, Hoffmann and the two earlier visits); the Large pad and the other Small pad are not landed on yet
+  - tourist_1 (0.425): TWO settlements (Sumlak, Izdryk); both refinements hit the +2.5% limit, so it is probably a little bigger than 0.425
+- [ ] UNRESOLVED, 1: agriculture_5 (Tutunnyk Hydroponics Exchange; a line-up is shipped with it but the layout size is not settled). Two earlier fits: A 0.232 (2 m miss, ship 135 m from the drawn pad) or B 0.256 (8 m miss, ship 13 m from the pad, matches the pad arrow); the shipped one is about 0.325. Benton Horticultural Site (also Agriculture 5, a second settlement) was recorded on 18 Nov and can decide it. NEEDS Ben's look at the map: is the pad at the bottom or top, are three terminals in a row near it, which one is blue.
+- [ ] RECORDED, NOT LINED UP (single pad, one or two terminals): Hobbs Genetics Complex and Bonetti Research Installation (High Tech 3), Pozandr Botanical Habitat (Agriculture 2), Benton Horticultural Site (Agriculture 5). Need a map built from the recordings.
+- [ ] NOT MEASURED YET, 15 (need a visit with 'mark spot ship' then 2 to 3 'mark spot terminal' 100 m+ apart, then the ZIP):
   - Agriculture: agriculture_2, agriculture_3 (agriculture_2 and 5 look alike, 1 and 3 too, so visits also tell the pairs apart)
-  - Extraction: extraction_1, extraction_2, extraction_4
+  - Extraction: extraction_1
   - High Tech: high_tech_2, high_tech_3, high_tech_4
   - Industrial: industrial_3, industrial_5
-  - Military: military_1, military_3, military_4, military_5
+  - Military: military_1, military_3 (pad arrows missing), military_4 (pad arrows missing), military_5
   - Tourist: tourist_2, tourist_3, tourist_4
 - [ ] NO PAD ARROWS: military_3 and military_4 (the pad direction is unknown).
 - [ ] PAD ARROWS SUSPECT: industrial_4 (Large 940,38 vs ship at 178,380 on the Large pad).

@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.92 - settlement list updated
+
+Notes only: docs/TODO.md settlement list (12 measured, 15 not measured, 1 unresolved, 4 recorded but not lined up).
+
 ## 0.96.91 - more settlement line-ups
 
 maps/known_calibrations.json now holds 21 settlements, merged with tools/merge_calibrations.py from 8 diagnostics zips. Four recorded settlements (Hobbs, Bonetti, Pozandr, Benton) have raw samples only and still need maps.
