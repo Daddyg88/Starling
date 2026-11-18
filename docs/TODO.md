@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.77: HOLOGRAM (window never run on a screen). CHECK: Personality > turn on the hologram, game in Borderless: she appears above the bottom-left panel; 'Show her hologram for 10 seconds' talks; mouth moves with the words; push-to-talk held = green; AI chat thinking = amber; open galaxy map = she powers down, back in cockpit = powers up; Move her + drag + double-click remembers the spot; 'hide the hologram' by voice; click-through works (mouse goes to the game).
 - [ ] 0.96.76: thinking lines. CHECK: AI chat on, chat to her about something ordinary; a slow answer gets a 'give me a second' line first, a quick one gets none; toggle under Personality turns it off.
 - [x] 0.96.74/75: Military 2 at 0.31, game pad 1 = left Small pad: two tester visits, the second one solid. Still wanted: a visit on the Large pad or the other Small pad (their game pad numbers).
 - [ ] 0.96.73: chat in fights. CHECK: in combat mode type o7 and !starling questions in chat (she should answer, not talk over herself), a raid is thanked; narrow the chat window a lot: the X must still show and close it; log shows stream_chat lines.

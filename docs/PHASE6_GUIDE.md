@@ -1552,6 +1552,15 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.77 - hologram
+
+- ui/hologram.py: all the looks and rules, no tkinter (tested): mouth track from the text, colour mix (cyan/green/amber), power up/down, flicker, scan lines, render() -> numpy picture where every see-through pixel is exactly (1,2,3).
+- ui/hologram_window.py: HologramFeed (events speech.started/finished, voice.heard; app.ptt, app.ask.pending, app.state.gui_focus, brain.thinking) and HologramWindow (tk Toplevel, -transparentcolor #010203, click-through except in Move mode, drag saves hologram.left/bottom).
+- personality/brain.py: self.thinking counter around llm.reply.
+- settings: hologram.* (enabled False by default). Personality page fields and two buttons (Move, Test). Voice: show/hide the hologram (window_voice.py, Window_Hologram* lines).
+- ui/assets/hologram: base picture and mouth/eye cut-outs.
+- Any exception in the window switches it off for the session and is logged under hologram_window.
+
 ## 0.96.76 - thinking lines
 
 - voicepacks/default/thinking.json: Brain_Thinking (12 serious, always in the pool) plus mood pools with the 12 funny ones (Friendly, Close, Sarcastic; 4 for Neutral). Infatuated also uses Close (see moods.PARENT).

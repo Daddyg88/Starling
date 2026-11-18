@@ -76,6 +76,7 @@ class Brain:
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
+        self.thinking = 0                   # above 0 while the AI chat is working (the hologram goes amber)
         self.state_provider = state_provider or (lambda: None)
         self.chitchat = chitchat
         self.mining = mining         # mining/tracker.py: what you have refined this session
@@ -615,8 +616,12 @@ class Brain:
             messages = build_messages(tidy, self.mood(), getattr(state, "system", "") or "", getattr(state, "ship_model", "") or "",
                                       likes, history)
             on_wait = self._thinking_line if self.settings.get("brain.thinking_lines", True) else None
-            return llm.reply(messages, allow_mature=self._allow(), on_wait=on_wait,
-                             wait_after=float(self.settings.get("brain.thinking_after", 1.5) or 1.5))
+            self.thinking += 1
+            try:
+                return llm.reply(messages, allow_mature=self._allow(), on_wait=on_wait,
+                                 wait_after=float(self.settings.get("brain.thinking_after", 1.5) or 1.5))
+            finally:
+                self.thinking = max(0, self.thinking - 1)
         except Exception:
             log.exception("The AI chat failed; using her normal chat lines")
             return None

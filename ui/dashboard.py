@@ -129,6 +129,12 @@ class Dashboard:
         except Exception:
             log.exception("The route map could not start")
             self.route_overlay = None
+        try:
+            from ui.hologram_window import HologramWindow, HologramFeed
+            self.hologram_window = HologramWindow(self.root, app.settings, lambda getter: HologramFeed(app, getter))
+        except Exception:
+            log.exception("The hologram could not start")
+            self.hologram_window = None
         self.root.bind("<Configure>", self._window_moved, add="+")
         self.root.after(300, self._set_window_icon)
         self.show("home" if app.settings.get("app.first_run_done", False) else "setup")      # first time: the checklist
@@ -843,6 +849,9 @@ class Dashboard:
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
                       ("Clear the route", self.nav_clear),
                       ("Show a test route map for 10 seconds", self.test_route_overlay)]
+        if page.id == "personality":
+            extra += [("Move her hologram (drag her, double-click to lock)", self.move_hologram),
+                      ("Show her hologram for 10 seconds (test)", self.test_hologram)]
         if page.id == "redalert":
             extra += [("Red alert: switch on / off", self.toggle_red_alert),
                       ("Show the RED ALERT banner for 8 seconds (test)", self.test_red_alert)]
@@ -1693,6 +1702,20 @@ class Dashboard:
             self.model.save()
         if getattr(self, "red_alert_overlay", None) is not None:
             self.red_alert_overlay.show_test(8)
+
+    def test_hologram(self):
+        """Shows her hologram for 10 seconds and has her say a line, whatever the game is doing."""
+        if self.model.dirty():
+            self.model.save()
+        if getattr(self, "hologram_window", None) is not None:
+            self.hologram_window.show_test(10)
+
+    def move_hologram(self):
+        """Lets you drag her hologram where you want it for 90 seconds; double-click her to lock. The spot is remembered."""
+        if self.model.dirty():
+            self.model.save()
+        if getattr(self, "hologram_window", None) is not None:
+            self.hologram_window.start_move()
 
     def test_route_overlay(self):
         """Shows a made-up Sol to Colonia route for 10 seconds, so you can check where the map sits (save settings first)."""

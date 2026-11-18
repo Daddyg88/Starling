@@ -222,6 +222,16 @@
   "Opening my notes on you. Be gentle.",
   "Here's what I've kept."
  ],
+ "Window_HologramShown": [
+  "Powering up. How do I look?",
+  "Hologram online.",
+  "Projector on. Hello, Commander."
+ ],
+ "Window_HologramHidden": [
+  "Powering down. I'll still be here.",
+  "Hologram off.",
+  "Projector off. Voice only."
+ ],
  "Window_MemoryHidden": [
   "Closed.",
   "Notes put away.",

@@ -103,6 +103,8 @@ WATCHER_REPLY = [("Every time", "always"), ("Often", "often"), ("Sometimes", "so
 ANSWER_TIMES = [("5 seconds", 5), ("8 seconds", 8), ("10 seconds", 10), ("15 seconds", 15), ("20 seconds", 20)]
 MESSAGE_CHANNELS = [("Direct messages only", "direct"), ("Direct, friends, wing and squadron", "direct_plus"),
                     ("Everything, including local and system chat", "all")]
+HOLOGRAM_SIZES = [("Small (75%)", 75), ("A bit smaller (90%)", 90), ("Normal (100%)", 100), ("A bit bigger (120%)", 120), ("Big (150%)", 150)]
+HOLOGRAM_MOUTH = [("Small", 35), ("Medium (default)", 55), ("Wide", 80), ("Full", 100)]
 SEXES = [("Not specified", "neutral"), ("Male", "male"), ("Female", "female")]
 VOICES = ([("Her own cloned voice", "")]
           + [("%s - female" % n, k) for k, n in BUILT_IN_VOICES.items() if k.startswith("af_")]
@@ -497,6 +499,17 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Changes the pet names and compliments she uses (handsome, beautiful...)"),
             Field("brain.thinking_lines", "Say 'give me a second' while she thinks", "toggle",
                   help="When the optional AI chat takes longer than a moment, she says a short line (funny or serious, to suit her mood) so there is no silence. Only used with AI chat switched on"),
+            Field("hologram.enabled", "Show her as a hologram on the dash", "toggle",
+                  help="A see-through picture of her above your bottom-left panel that moves her mouth when she talks. Needs the game in Borderless or Windowed mode. It powers down when you open any other game screen"),
+            Field("hologram.size", "Hologram size", "choice", HOLOGRAM_SIZES, help="Pick what looks right in your cockpit, then use 'Move her' on this page to place her"),
+            Field("hologram.mouth_open", "Hologram mouth opening", "choice", HOLOGRAM_MOUTH, help="How wide her mouth opens when she talks"),
+            Field("hologram.power_down", "Hologram powers down on other screens", "toggle",
+                  help="She fades out when the galaxy map, a station menu or any other screen is open, and powers up when you are back in the cockpit"),
+            Field("hologram.listening_colour", "Hologram turns green when she is listening", "toggle",
+                  help="Green while you hold push-to-talk, or after she asks you a question. Never just because the microphone is open"),
+            Field("hologram.thinking_colour", "Hologram turns amber when she is thinking", "toggle",
+                  help="Only while the optional AI chat is working on an answer"),
+            Field("hologram.flicker", "Hologram flicker", "toggle", help="The little hologram glitches and flickers. Switch off for a steady picture"),
             Field("personality.login_greeting", "Greet me when I load the game", "toggle",
                   help="Says your ship, where you are, and how she feels"),
             Field("messages.read", "Read my incoming messages out loud", "toggle",
