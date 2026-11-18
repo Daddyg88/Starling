@@ -78,7 +78,7 @@ PAUSE_MARK = "||"            # in a line: "Four.||Three." means 'one beat betwee
 BEAT_SECONDS = 0.95          # each part STARTS about this long after the previous one (just under 1 s)
 MIN_GAP_SECONDS = 0.15
 MAX_CACHED_CHARS = 200       # longer texts are not cached
-CACHE_FORMAT = "ph1"           # change this to make every saved sound be made again (0.96.84: saved sounds now keep the timing of each sound for the hologram's lips)
+CACHE_FORMAT = ""              # a non-empty text here makes every saved sound be made again. Leave it empty: the cache is worth hours of CPU time
 SLOW_START_SECONDS = 1.0       # a line that takes longer than this to start is logged as slow
 DEFAULT_WAIT_FOR_READY = 45  # seconds a line will wait for the engine to finish loading
 
@@ -507,7 +507,7 @@ class KokoroTTS(BaseTTS):
         if self.cache_dir is None or len(text) > MAX_CACHED_CHARS:
             return None
         stamp = self._pack_stamp()
-        key = hashlib.sha1(("%s|%.2f|%s|%s|%s" % (text, speed, stamp, self._voice_name, CACHE_FORMAT)).encode("utf-8")).hexdigest()[:24]
+        key = hashlib.sha1(("%s|%.2f|%s|%s" % (text, speed, stamp, self._voice_name) + ("|" + CACHE_FORMAT if CACHE_FORMAT else "")).encode("utf-8")).hexdigest()[:24]
         return self.cache_dir / (key + ".npy")
 
     def _cache_load(self, text, speed):

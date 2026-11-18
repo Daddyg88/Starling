@@ -118,3 +118,24 @@ class WhatIsSaved(Setup):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OwnSizeCheck(unittest.TestCase):
+    def entry(self, scale, map_id="agriculture_4"):
+        return {"v": 2, "map": map_id, "a": [scale, 0.0], "t": [0.0, 0.0], "ref": [10.0, 20.0], "radius": 1.1e6}
+
+    def test_a_layout_with_its_own_size_is_checked_against_that(self):
+        sizes = {"agriculture_4": 0.44, "shi": 0.325}
+        self.assertIsNone(share.problem(self.entry(0.44), sizes))
+        self.assertIsNone(share.problem(self.entry(0.40), sizes))
+        self.assertIn("believable", share.problem(self.entry(0.30), sizes))
+        self.assertIn("believable", share.problem(self.entry(0.70), sizes))
+
+    def test_without_the_layouts_size_a_wide_range_is_used(self):
+        self.assertIsNone(share.problem(self.entry(0.44)))
+        self.assertIsNone(share.problem(self.entry(0.2)))
+        self.assertIn("believable", share.problem(self.entry(1.3)))
+
+    def test_the_voice_cache_key_is_not_changed_by_updates(self):
+        from tts import kokoro_tts
+        self.assertEqual(kokoro_tts.CACHE_FORMAT, "")           # changing it throws away hours of prepared voice

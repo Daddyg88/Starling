@@ -77,7 +77,7 @@ DEFAULTS = {
     "updates": {"repo": "", "auto_check": True, "ask": False, "ask_reset": False, "token": ""},
     "recorder": {"seconds": 20, "countdown": 5},
     "ptt": {"mode": "off", "button": "", "beep": True, "skip_wake": True},
-    "hologram": {"enabled": False, "size": 100, "left": 6.5, "bottom": 24.0, "mouth_open": 55, "power_down": True, "listening_colour": True, "thinking_colour": True, "flicker": True, "sparks": True, "turn": True, "idle_loop": True},
+    "hologram": {"enabled": True, "size": 100, "left": 6.5, "bottom": 24.0, "mouth_open": 55, "power_down": True, "listening_colour": True, "thinking_colour": True, "flicker": True, "sparks": True, "turn": True, "idle_loop": True},
     "personality": {"active_voicepack": "default", "mood": "Friendly", "style": "personality", "mood_mode": "auto", "login_greeting": True, "mood_live": "Friendly", "mood_level": 3, "mood_level_live": 3,
                     "mood_random": "Friendly", "mood_random_level": 3, "mood_random_minutes": 20, "keep_points": True, "aussie_slang": True,
                     "remarks": "sometimes", "reactions": True, "pet_names": True, "custom_pet_names": "", "innuendo": False, "dark_humour": True, "affection_credits": 500000000},

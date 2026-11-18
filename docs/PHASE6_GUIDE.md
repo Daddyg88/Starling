@@ -1552,6 +1552,12 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.86 - voice cache name restored, hologram default on, more settlements
+
+- tts/kokoro_tts.py: CACHE_FORMAT is '' again (the key is exactly the old one). Never change it: the voice warmer would redo every line. Sidecar timing (.ph.json) is still written for newly made sounds.
+- navigation/settlement_share.py: problem() takes {map id: own metres per unit} (within 0.75 to 1.33 of it) else a wide range 0.15 to 0.60. tools/merge_calibrations.py passes each layout's own scale. maps/known_calibrations.json now has 9 settlements.
+- core/settings.py: hologram.enabled default True.
+
 ## 0.96.85 - overlays hide when the game is gone
 
 - ui/game_watch.py: GameWatch.poll() (EnumWindows titles, 8 s absent = closed, sets state.game_quit and the module flag game_closed()); the dashboard polls every 2 s. hack_overlay, red_alert_overlay, settlement_overlay and hologram_window check game_watch.game_closed(); route and bio overlays already use state.game_quit. Fixed: the hologram test button was blocked while the game was closed.

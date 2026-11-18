@@ -8,7 +8,8 @@ loading that shipped file and by tools/merge_calibrations.py.
 import cmath
 import math
 
-SCALE_RANGE = (0.27, 0.38)          # metres per map unit (Shi Construction measured 0.325)
+SCALE_RANGE = (0.15, 0.60)          # metres per map unit, for any layout (they differ: from about 0.18 to 0.44)
+SCALE_AGREE = (0.75, 1.33)          # when the layout's own size is known, the line-up must be within this factor of it
 TURN_TOLERANCE_DEGREES = 12.0       # two line-ups of one settlement that differ by more than this disagree
 KEYS = ("v", "map", "a", "t", "ref", "radius")
 
@@ -18,6 +19,7 @@ def _pair(value):
 
 
 def problem(entry, map_ids=None):
+    # map_ids: a set of known layout ids, or a dict {id: that layout's own metres per map unit} for the stricter size check
     """None if the line-up looks sane, otherwise a short reason it is not trusted."""
     if not isinstance(entry, dict):
         return "not an object"
@@ -35,7 +37,11 @@ def problem(entry, map_ids=None):
     if map_ids is not None and entry["map"] not in map_ids:
         return "unknown map %s" % entry["map"]
     scale = abs(complex(*entry["a"]))
-    if not SCALE_RANGE[0] <= scale <= SCALE_RANGE[1]:
+    expected = map_ids.get(entry["map"]) if isinstance(map_ids, dict) else None       # {map id: its own metres per unit} when known
+    if expected:
+        if not SCALE_AGREE[0] * expected <= scale <= SCALE_AGREE[1] * expected:
+            return "map size %.3f m per unit is not believable for %s (its own size is %.3f)" % (scale, entry["map"], expected)
+    elif not SCALE_RANGE[0] <= scale <= SCALE_RANGE[1]:
         return "map size %.3f m per unit is not believable" % scale
     if not (-90 <= entry["ref"][0] <= 90 and -180 <= entry["ref"][1] <= 180):
         return "position is not on a planet"

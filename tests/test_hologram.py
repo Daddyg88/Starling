@@ -504,9 +504,9 @@ class Voice(unittest.TestCase):
 
 
 class Defaults(unittest.TestCase):
-    def test_off_by_default(self):
+    def test_on_by_default(self):
         from core.settings import DEFAULTS
-        self.assertFalse(DEFAULTS["hologram"]["enabled"])
+        self.assertTrue(DEFAULTS["hologram"]["enabled"])
 
 if __name__ == "__main__":
     unittest.main()

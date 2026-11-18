@@ -51,7 +51,8 @@ def main(argv):
         shipped = json.loads(TARGET.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         shipped = {}
-    map_ids = set(SettlementMaps().maps)
+    maps = SettlementMaps()
+    map_ids = {name: (maps.get(name) or {}).get("scale") or 0.0 for name in maps.maps}      # each layout's own size, for the size check
     merged = {k: v for k, v in shipped.items() if not k.startswith("_")}
     for source in sources:
         merged, report = settlement_share.merge(merged, read_source(source), map_ids)

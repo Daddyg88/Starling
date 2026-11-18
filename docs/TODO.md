@@ -22,6 +22,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.86: CHECK: no more 'Slow start ... prepare her voice' lines for lines that were already prepared; try the 8 new settlements (Industrial 2, Industrial 4, High Tech 1, Agriculture 1 and 4, Tourist 1): the map should line up (Agriculture and Tourist are rough prototypes).
 - [ ] 0.96.85: overlays hide on exit. CHECK: quit normally: all overlays gone within about 10 s; kill the game from Task Manager: same; start the game again: they come back (route map and bio on the next jump or load-in).
 - [ ] 0.96.84: exact lip timing. CHECK: new lines and the same lines again (from the cache): lips match the sounds; the first time each line is a touch slower (cache rebuilt).
 - [ ] 0.96.83: flip book. CHECK: she breathes and sways when quiet, no hitch at the loop point; eases to the still pose when she talks and back after; blinks and mouth sit on her face; switch works.
