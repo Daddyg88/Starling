@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.95 - salute with her o7 lines
+
+Hologram.speech_started looks for SALUTE_LINE (o7 / oh seven) and calls salute(with_speech=True): the clip starts at once and is not cut off by speaking (salute_voice, _poses). Mouth pictures stay on during the salute clip. SALUTE_REPEAT (8 s) stops doubles. The chat o7 queue (streaming/chat.py pump_salutes, StreamChat_Salute lines) is unchanged. Tests: tests/test_hologram.py SaluteWithSpeech.
+
 ## 0.96.94 - salute
 
 salute clip (tools/make_clips.py salute=...). Hologram.salute(now, delay) sets salute_at/salute_expire; _poses plays it when calm. Triggers in ui/hologram_window.py: voice.heard text matching SALUTE_WORDS, and LoadGame (SALUTE_AFTER_LOAD 12 s). Tests: tests/test_hologram.py Salute.

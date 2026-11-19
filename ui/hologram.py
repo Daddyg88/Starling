@@ -22,6 +22,7 @@ see-through: the picture's black background simply disappears.
 import json
 import math
 import random
+import re
 import threading
 import time
 from pathlib import Path
@@ -67,6 +68,9 @@ JAW = {"ah": 1.0, "oh": 0.7, "eh": 0.45, "ee": 0.35, "oo": 0.5, "fv": 0.15}   # 
 NOD = 0.007                      # her head dips this fraction of her height on an open mouth (a speaking nod)
 SWAY = 0.0035                    # and drifts this fraction of her width from side to side while she talks
 TALK_IDLE = 0.0                  # how much of the flip book keeps playing while she talks (0 = none)
+SALUTE_LINE = re.compile(r"(?<![a-z0-9])(?:o7|oh seven)(?![a-z0-9])", re.IGNORECASE)      # a line she says that contains o7
+SALUTE_REPEAT = 8.0              # a second salute request within this many seconds of one starting is ignored
+
 # ---- pose clips (0.96.93): short recorded moments she plays at the right time ----
 CLIP_IN, CLIP_OUT, CLIP_OUT_FAST = 0.35, 0.5, 0.2      # seconds to fade a clip in, out, and out when she starts to talk
 BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this range) and she may get bored
@@ -406,6 +410,8 @@ class Hologram:
         self.bored_pick = None
         self.salute_at = None         # when a salute was asked for (o7, or the game just loaded), and when to give up on it
         self.salute_expire = 0.0
+        self.salute_voice = False     # the salute goes with a line she is saying, so it plays while she talks
+        self.last_salute = -1e9
         self._rest(clock())
         self.talk_presence = 0.0      # 0..1, fades in while she talks (the side-to-side drift follows it)
         self.nod = 0.0                # 0..1, how far the head has dipped (smoothed from how open her mouth is)
@@ -414,6 +420,8 @@ class Hologram:
     def speech_started(self, text, now=None):
         now = self.clock() if now is None else now
         self.line_text = str(text or "")
+        if SALUTE_LINE.search(self.line_text):
+            self.salute(now, with_speech=True)                     # she says o7, so she salutes while she says it
         self._rest(now)
         self.track = build_track(self.line_text, self.cps)
         self.track_start, self.speaking = now, True
@@ -568,13 +576,19 @@ class Hologram:
         self.clip, self.clip_start, self.clip_fast_out, self.clip_forced = name, now, False, forced
         self.clip_frames, self.clip_fps = frames, a.clip_rates.get(name, 12.0)
         self.next_pose = now + POSE_GAP
+        if name == "salute":
+            self.last_salute = now
         return True
 
-    def salute(self, now=None, delay=0.0):
-        """She should salute as soon as it is calm (you said o7, or the game just loaded). It waits for her to stop talking, and is dropped after 8 seconds."""
+    def salute(self, now=None, delay=0.0, with_speech=False):
+        """She should salute as soon as it is calm (you said o7, or the game just loaded). It waits for her to stop talking, and is dropped after 8 seconds.
+        with_speech: she is SAYING o7 right now (a chat reply, say), so the salute starts at once and plays while she talks."""
         now = self.clock() if now is None else now
+        if now - self.last_salute < SALUTE_REPEAT:
+            return                                                    # one is already on its way or has just played
         if self.poses_on and "salute" in self.assets.clips:
             self.salute_at, self.salute_expire = now + delay, now + delay + 8.0
+            self.salute_voice = bool(with_speech)
             get_clip(self.assets, "salute")                                          # start loading it now
 
     def stop_clip(self, fast=False):
@@ -598,9 +612,16 @@ class Hologram:
                 self.clip_forced = False
         else:
             calm = (not self.speaking) and self.power > 0.9 and not self.moving
+            if self.salute_at is not None and self.salute_voice and self.power > 0.9 and not self.moving and now >= self.salute_at:
+                if self.clip is None or self.clip != "salute":
+                    if self.clip:
+                        self.stop_clip(fast=True)
+                    if self.start_clip("salute", now):
+                        self.salute_at = None
+                        self.salute_voice = False
             if self.salute_at is not None and now > self.salute_expire:
                 self.salute_at = None                                                # she never got a calm moment: forget it
-            if self.speaking and self.clip:
+            if self.speaking and self.clip and self.clip != "salute":
                 self.stop_clip(fast=True)
             listen_now = bool(listening) or now < self.listen_until
             if calm:
@@ -744,7 +765,7 @@ class Hologram:
             x, y = x + shift_x, y + shift_y
             if x < 0 or y < 0:
                 continue
-            strength = min(1.0, weight) * (reach(self.open_fraction, name) if name != "eyes" else 1.0) * (1.0 - self.clip_mix)   # a clip has its own face
+            strength = min(1.0, weight) * (reach(self.open_fraction, name) if name != "eyes" else 1.0) * (1.0 - (0.0 if self.clip == "salute" else self.clip_mix))   # a clip has its own face (the salute keeps her head still, so her lips stay on it)
             if name in LIVE_SHAPES and self.levels_live:
                 strength *= 0.35 + 0.65 * self.level_open                                  # follow the real loudness
             h, w = rgb.shape[:2]

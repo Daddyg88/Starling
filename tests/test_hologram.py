@@ -816,3 +816,70 @@ class Salute(unittest.TestCase):
             self.assertTrue(SALUTE_WORDS.search(text), text)
         for text in ("plot a route", "dock at station 7", "open the map"):
             self.assertFalse(SALUTE_WORDS.search(text), text)
+
+
+class SaluteWithSpeech(unittest.TestCase):
+    def setUp(self):
+        h.clear_clips()
+        self.holo, self.c = make()
+        self.holo.power = 1.0
+        h.get_clip(self.holo.assets, "salute", wait=True)
+        self.addCleanup(h.clear_clips)
+
+    def run_for(self, seconds):
+        for _ in range(int(seconds / 0.05)):
+            self.c.t += 0.05
+            self.holo.tick(now=self.c.t)
+
+    def test_saying_o7_makes_her_salute_while_she_talks(self):
+        self.holo.speech_started("o7, Nyx.", self.c.t)
+        self.holo.track = [(0.0, 3.0, "oh")]
+        self.holo.exact_track = True
+        self.run_for(0.6)
+        self.assertTrue(self.holo.speaking)
+        self.assertEqual(self.holo.clip, "salute")            # not cut off by her speaking
+        self.assertGreater(self.holo.weights["oh"], 0.3)       # and her lips still move
+        self.holo.render(self.c.t)
+
+    def test_other_ways_of_writing_it(self):
+        for line in ("Salute received. o7, Ann.", "oh seven Commander Ann", "Hi O7 everyone"):
+            h.clear_clips()
+            h.get_clip(self.holo.assets, "salute", wait=True)
+            holo, c = make()
+            holo.power = 1.0
+            holo.speech_started(line, c.t)
+            for _ in range(10):
+                c.t += 0.05
+                holo.tick(now=c.t)
+            self.assertEqual(holo.clip, "salute", line)
+
+    def test_lines_without_o7_do_not_salute(self):
+        for line in ("Docking granted, pad 7.", "Go7 now", "Fly safe, Commander."):
+            holo, c = make()
+            holo.power = 1.0
+            holo.speech_started(line, c.t)
+            for _ in range(10):
+                c.t += 0.05
+                holo.tick(now=c.t)
+            self.assertIsNone(holo.clip, line)
+
+    def test_two_o7s_close_together_give_one_salute(self):
+        self.holo.speech_started("o7, Ann.", self.c.t)
+        self.run_for(0.3)
+        started = self.holo.clip_start
+        self.holo.speech_started("o7, Bob.", self.c.t)
+        self.run_for(0.3)
+        self.assertEqual(self.holo.clip_start, started)
+
+    def test_the_salute_ends_by_itself_while_she_goes_on_talking(self):
+        self.holo.speech_started("o7, Nyx.", self.c.t)
+        self.holo.track = [(0.0, 30.0, "ah")]
+        self.holo.exact_track = True
+        self.run_for(8.0)
+        self.assertIsNone(self.holo.clip)
+
+    def test_poses_off_means_no_salute_from_speech(self):
+        self.holo.poses_on = False
+        self.holo.speech_started("o7, Nyx.", self.c.t)
+        self.run_for(0.5)
+        self.assertIsNone(self.holo.clip)
