@@ -22,7 +22,7 @@ SHOWN_MS = 100           # while she is shown: ten pictures a second
 TALKING_MS = 66          # while she speaks: fifteen
 MOVE_SECONDS = 90
 TEST_SECONDS = 10
-PPOSE_TEST_SECONDS = 50
+PPOSE_TEST_SECONDS = 80
 SALUTE_AFTER_LOAD = 12.0         # seconds after the game loads, so her greeting has finished first
 SALUTE_WORDS = re.compile(r"\b(o7|o 7|oh seven|o seven|salute)\b", re.IGNORECASE)
 TEST_LINE = "Commander, this is how I will look on your dash. Gear down and nice and easy."
@@ -114,6 +114,8 @@ class HologramFeed:
         bus.subscribe("speech.finished", self._finished)
         bus.subscribe("voice.heard", self._heard)
         bus.subscribe("LoadGame", self._game_loaded)
+        for name in hologram.REACTIONS:                    # game events she may react to with a nod, a shake of the head, a startle...
+            bus.subscribe(name, self._reacted)
         self._attached = True
 
     def _started(self, event):
@@ -164,6 +166,14 @@ class HologramFeed:
                 holo.speech_finished()
         except Exception:
             log.exception("The hologram could not follow the end of a line")
+
+    def _reacted(self, event):
+        try:
+            holo = self.get()
+            if holo is not None and self.app.settings.get("hologram.reactions", True):
+                holo.react_to(getattr(event, "name", ""))
+        except Exception:
+            log.exception("The hologram could not react to a game event")
 
     def _game_loaded(self, event):
         """The game just loaded: once her greeting is done she gives you a salute."""
@@ -275,16 +285,20 @@ class HologramWindow:
     def test_poses(self):
         """Shows her and plays every pose clip once, one after another (about 35 seconds), whatever the game is doing."""
         self.test_until = time.monotonic() + POSE_TEST_SECONDS
-        self.pose_queue = ["thinking", "listening", "pleased", "salute", "bored1", "bored2"]
+        self.pose_queue = ["thinking", "listening", "pleased", "salute", "bored1", "bored2", "nod", "shake", "tilt", "glance_left", "glance_right", "startle"]
         if self.holo is not None:
             self.holo.stop_clip(fast=True)
 
     def _pose_test_step(self, holo, now):
         """Starts the next clip of the test when the one before has finished (a clip that is still loading is simply asked again next tick)."""
         queue = getattr(self, "pose_queue", None)
-        if not queue or holo.clip is not None or holo.clip_mix > 0.05 or holo.speaking:
+        if not queue or holo.clip is not None or holo.clip_mix > 0.05 or holo.speaking or holo.g_name:
             return
-        if holo.start_clip(queue[0], now, forced=True):
+        if queue[0] in hologram.GESTURES:
+            holo.poses_on = True                                        # (a test must work even with the poses switched off)
+            if holo.gesture(queue[0], now):
+                queue.pop(0)
+        elif holo.start_clip(queue[0], now, forced=True):
             queue.pop(0)
 
     def start_move(self, seconds=MOVE_SECONDS):
@@ -456,9 +470,10 @@ class HologramWindow:
 
     def _place(self, a):
         ox, oy, sw, sh = self._screen_rect()
-        x, y = hologram.window_position(sw, sh, a.window_w, a.window_h, self.settings.get("hologram.left", 6.5),
+        # her PICTURE sits where the settings say; the window is wider by the room beside her (for the salute arm), so it starts further left
+        x, y = hologram.window_position(sw, sh, a.width, a.window_h, self.settings.get("hologram.left", 6.5),
                                         self.settings.get("hologram.bottom", 24.0))
-        geometry = "%dx%d+%d+%d" % (a.window_w, a.window_h, ox + x, oy + y)
+        geometry = "%dx%d+%d+%d" % (a.window_w, a.window_h, ox + x - a.pad_left, oy + y)
         if geometry != self._geometry:
             self._geometry = geometry
             self.window.geometry(geometry)
@@ -482,8 +497,8 @@ class HologramWindow:
         try:
             ox, oy, sw, sh = self._screen_rect()
             a = self.holo.assets
-            left, bottom = hologram.percents_from_position(sw, sh, a.window_w, a.window_h,
-                                                           self.window.winfo_x() - ox, self.window.winfo_y() - oy)
+            left, bottom = hologram.percents_from_position(sw, sh, a.width, a.window_h,
+                                                           self.window.winfo_x() - ox + a.pad_left, self.window.winfo_y() - oy)
             self.settings.set("hologram.left", left)
             self.settings.set("hologram.bottom", bottom)
             self.settings.save()

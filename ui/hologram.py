@@ -77,6 +77,22 @@ BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this ra
 POSE_GAP = 60.0                  # at least this long between two clips
 PLEASED_CHANCE = 0.25            # how often a spoken line ends with the pleased clip
 CLIP_LRU = 1                     # clips other than thinking and listening that are kept in memory
+# ---- little gestures made from her one picture (no video needed) and the game events that trigger them ----
+GESTURES = {"nod": 1.0, "shake": 1.2, "tilt": 2.4, "glance_left": 2.0, "glance_right": 2.0, "startle": 0.9}      # name -> seconds
+GESTURE_GAP = 3.0                # a gesture does not start within this many seconds of the last one (a startle always may)
+REACT_GAP, STARTLE_GAP = 8.0, 5.0       # the least time between two reactions to game events
+REACTIONS = {                    # game event -> (what she does, how likely)
+    "DockingGranted": ("nod", 0.7), "DockingDenied": ("shake", 0.9),
+    "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("pleased", 0.7), "MissionFailed": ("shake", 0.8), "MissionAbandoned": ("shake", 0.4),
+    "RedeemVoucher": ("pleased", 0.3), "SellExplorationData": ("pleased", 0.3), "MultiSellExplorationData": ("pleased", 0.4), "SellOrganicData": ("pleased", 0.3),
+    "EscapeInterdiction": ("pleased", 0.6), "FSSAllBodiesFound": ("pleased", 0.8), "UndiscoveredSystem": ("pleased", 0.5), "GameMilestone": ("pleased", 0.8),
+    "UniqueBio": ("tilt", 0.5), "CodexEntry": ("tilt", 0.4), "FSSSignalDiscovered": ("tilt", 0.3), "SAASignalsFound": ("tilt", 0.4),
+    "WingJoined": ("nod", 0.6), "WingInvite": ("nod", 0.6), "WingAdd": ("nod", 0.4), "WingLeft": ("tilt", 0.4),
+    "ReceiveText": ("glance", 0.3),
+    "Interdicted": ("startle", 0.9), "UnderAttack": ("startle", 0.5), "HullDamage": ("startle", 0.5), "HeatDamage": ("startle", 0.5),
+    "CockpitBreached": ("startle", 1.0), "InDanger": ("startle", 0.6), "SelfDestruct": ("startle", 1.0), "Died": ("startle", 1.0), "FuelPanic": ("startle", 0.8),
+    "Shutdown": ("salute", 1.0),
+}
 JAW_DROP = 0.006                 # the biggest chin drop, as a fraction of her height
 JAW_TOP, JAW_FULL, JAW_CHIN, JAW_END = 0.338, 0.372, 0.42, 0.462     # where the jaw moves, as fractions of the picture height: upper lip, full, chin, back to still
 
@@ -226,7 +242,17 @@ class Assets:
             picture = np.asarray(picture.resize((w, h), Image.LANCZOS), dtype=np.float32)
             x, y = int(round(ox * scale)), int(round(oy * scale))
             self.sprites[name] = (x, y, picture[..., :3], picture[..., 3:4] / 255.0)
-        self.window_w = self.width
+        self.pad_left = self.pad_right = 0                # room beside her for a clip's arm (the salute): the window is this much wider
+        self.wide_clips = set()
+        try:
+            clips_meta = json.loads((directory / "clips.json").read_text(encoding="utf-8"))
+            pad = clips_meta.get("pad")
+            if pad and len(pad) == 2:
+                self.pad_left, self.pad_right = int(round(float(pad[0]) * self.width)), int(round(float(pad[1]) * self.width))
+            self.wide_clips = {k for k, v in clips_meta.items() if isinstance(v, dict) and v.get("wide")}
+        except Exception:
+            pass
+        self.window_w = self.width + self.pad_left + self.pad_right
         self.window_h = self.height + PAD_TOP + PAD_BOTTOM
         self.directory = directory
         self._idle = None
@@ -246,9 +272,9 @@ class Assets:
         from PIL import Image, ImageDraw
         layer = Image.new("L", (self.window_w, self.window_h), 0)
         draw = ImageDraw.Draw(layer)
-        cx, cy = self.window_w // 2, PAD_TOP + self.height + 14
+        cx, cy = self.pad_left + self.width // 2, PAD_TOP + self.height + 14
         for fraction, level in ((0.46, 235), (0.32, 140)):
-            rx = int(self.window_w * fraction)
+            rx = int(self.width * fraction)
             ry = max(3, int(rx * 0.2))
             draw.ellipse((cx - rx, cy - ry, cx + rx, cy + ry), outline=level, width=2)
         return np.asarray(layer, dtype=np.float32)[..., None] / 255.0
@@ -288,15 +314,16 @@ _CLIP_LOCK = threading.Lock()
 PINNED = ("thinking", "listening")
 
 
-def load_clip(directory, name, height, width):
-    """The pictures of one pose clip at her size (uint8 arrays), or [] when it is missing."""
+def load_clip(directory, name, height, width, pad_left=0, pad_right=0, wide=False):
+    """The pictures of one pose clip at her size (uint8 arrays), or [] when it is missing. A 'wide' clip also has room beside her (for an arm)."""
     try:
         from PIL import Image
         directory = Path(directory)
         meta = json.loads((directory / "clips.json").read_text(encoding="utf-8"))[name]
         frames = []
         for number in range(int(meta["frames"])):
-            picture = Image.open(directory / "clips" / name / ("%03d.jpg" % number)).convert("RGB").resize((width, height), Image.BILINEAR)
+            picture = Image.open(directory / "clips" / name / ("%03d.jpg" % number)).convert("RGB").resize(
+                (width + pad_left + pad_right if wide else width, height), Image.BILINEAR)
             frames.append(np.asarray(picture, dtype=np.uint8))
         return frames
     except Exception:
@@ -333,7 +360,7 @@ def get_clip(assets, name, wait=False):
         _CLIP_LOADING.add(key)
 
     def work():
-        frames = load_clip(assets.directory, name, assets.height, assets.width)
+        frames = load_clip(assets.directory, name, assets.height, assets.width, assets.pad_left, assets.pad_right, name in assets.wide_clips)
         with _CLIP_LOCK:
             _CLIP_LOADING.discard(key)
             if frames:
@@ -408,6 +435,8 @@ class Hologram:
         self.thinking_done = self.listening_done = False     # this round of thinking or listening already got its clip
         self.pose_wanted = None       # (clip name, earliest time) waiting for a calm moment
         self.bored_pick = None
+        self.g_name, self.g_start, self.g_last = None, 0.0, -1e9     # the little gesture she is making (nod, shake...)
+        self.react_last = -1e9
         self.salute_at = None         # when a salute was asked for (o7, or the game just loaded), and when to give up on it
         self.salute_expire = 0.0
         self.salute_voice = False     # the salute goes with a line she is saying, so it plays while she talks
@@ -509,6 +538,7 @@ class Hologram:
         rate = dt / (UP_SECONDS if goal_power > self.power else DOWN_SECONDS)
         self.power += max(-rate, min(rate, goal_power - self.power))
         talking = self.speaking or now < self.smile_until or any(self.weights.get(n, 0.0) > 0.05 for n in LIVE_SHAPES)
+        self._gesture_values(now)                                  # lets a finished gesture expire even when nothing is being drawn
         self._poses(listening, thinking, now, dt)
         goal_idle = 0.0 if self.clip else ((self.talk_idle if talking else 1.0) if self.idle_on else 0.0)
         rate = 0.3 if goal_idle < self.idle_mix else 0.9                                # leaves the loop fast, returns to it slowly
@@ -559,6 +589,98 @@ class Hologram:
             return before + length
         return before + max(0.0, min(age, length))
 
+    # ---- little gestures and reactions ----
+    def gesture(self, name, now=None):
+        """Make a small movement from her one picture: nod, shake, tilt, glance_left, glance_right, startle. False if she is busy or it is too soon."""
+        now = self.clock() if now is None else now
+        if name not in GESTURES or not self.poses_on or self.clip or self.moving or self.power < 0.9:
+            return False
+        if self.g_name and name != "startle":
+            return False
+        if name != "startle" and now - self.g_last < GESTURE_GAP:
+            return False
+        self.g_name, self.g_start = name, now
+        return True
+
+    def react_to(self, event_name, now=None):
+        """A game event happened: maybe she reacts (a nod, a shake of the head, a startle, a pleased clip...). Returns True if she did."""
+        now = self.clock() if now is None else now
+        item = REACTIONS.get(event_name)
+        if not item or not self.poses_on:
+            return False
+        kind, chance = item
+        if self.rng.random() > chance:
+            return False
+        if now - self.react_last < (STARTLE_GAP if kind == "startle" else REACT_GAP):
+            return False
+        if kind == "glance":
+            kind = self.rng.choice(("glance_left", "glance_right"))
+        if kind in GESTURES:
+            done = self.gesture(kind, now)
+        elif kind == "salute":
+            self.salute(now)
+            done = True
+        else:                                                         # a clip, played when she has a calm moment
+            done = self.pose_wanted is None and kind in self.assets.clips
+            if done:
+                self.pose_wanted = (kind, now)
+        if done:
+            self.react_last = now
+        return done
+
+    def _gesture_values(self, now):
+        """(sideways, up/down as fractions of her size, turn -1..1, lean, flash) for the gesture in progress; all zero when there is none."""
+        if not self.g_name:
+            return 0.0, 0.0, 0.0, 0.0, 0.0
+        t, d = now - self.g_start, GESTURES[self.g_name]
+        if t >= d:
+            self.g_name, self.g_last = None, now
+            return 0.0, 0.0, 0.0, 0.0, 0.0
+        edge = min(1.0, max(0.0, min(t / 0.12, (d - t) / 0.12)))
+        hump = math.sin(math.pi * t / d)
+        if self.g_name == "nod":
+            return 0.0, 0.02 * (1.0 - math.cos(4.0 * math.pi * t / d)) / 2.0 * edge, 0.0, 0.0, 0.0
+        if self.g_name == "shake":
+            return 0.0, 0.0, 1.5 * math.sin(2.0 * math.pi * t / 0.6) * edge, 0.0, 0.0
+        if self.g_name == "tilt":
+            return 0.0, 0.004 * hump, 0.0, 0.10 * hump ** 0.6, 0.0
+        if self.g_name in ("glance_left", "glance_right"):
+            side = -1.0 if self.g_name == "glance_left" else 1.0
+            return 0.0, 0.0, side * 1.3 * min(1.0, 2.2 * hump), 0.0, 0.0
+        if self.g_name == "startle":
+            return 0.0, -0.014 * math.exp(-t / 0.1) * (1.0 - math.exp(-t / 0.02)), 0.0, 0.0, 0.7 * math.exp(-t / 0.2)
+        return 0.0, 0.0, 0.0, 0.0, 0.0
+
+    def _shift(self, frame, dx, dy):
+        """The whole picture moved by (dx, dy) pixels (smoothly up and down); the edges repeat."""
+        h, w = frame.shape[:2]
+        ys = np.clip(np.arange(h, dtype=np.float32) - dy, 0, h - 1.001)
+        i0 = np.floor(ys).astype(np.int32)
+        frac = (ys - i0)[:, None, None]
+        out = frame[i0] * (1.0 - frac) + frame[i0 + 1] * frac
+        shift = int(round(dx))
+        if shift:
+            out = np.roll(out, shift, axis=1)
+            if shift > 0:
+                out[:, :shift] = out[:, shift:shift + 1]
+            else:
+                out[:, shift:] = out[:, shift - 1:shift]
+        return out
+
+    def _lean(self, frame, k):
+        """Tip her head to one side: from the neck up each row slides sideways, more the higher it is (k = how far, 0.07 is a clear tilt)."""
+        a = self.assets
+        h, w = frame.shape[:2]
+        neck = JAW_END * a.height
+        ys = np.arange(h, dtype=np.float32)
+        slide = np.where(ys < neck, (neck - ys) * k, 0.0)[:, None]
+        cols = np.arange(w, dtype=np.float32)[None, :] - slide
+        left = np.clip(np.floor(cols).astype(np.int32), 0, w - 1)
+        right = np.clip(left + 1, 0, w - 1)
+        frac = (cols - np.floor(cols))[..., None]
+        rows = np.arange(h)[:, None]
+        return frame[rows, left] * (1.0 - frac) + frame[rows, right] * frac
+
     # ---- pose clips ----
     def _rest(self, now):
         """She did or heard something: the 'quiet for a long time' clock starts again."""
@@ -574,6 +696,7 @@ class Hologram:
         if not frames:
             return False
         self.clip, self.clip_start, self.clip_fast_out, self.clip_forced = name, now, False, forced
+        self.g_name = None
         self.clip_frames, self.clip_fps = frames, a.clip_rates.get(name, 12.0)
         self.next_pose = now + POSE_GAP
         if name == "salute":
@@ -697,27 +820,19 @@ class Hologram:
         amount = sum(min(1.0, w) * JAW.get(name, 0.0) for name, w in self.weights.items())
         return min(1.0, amount) * JAW_DROP * self.assets.height
 
-    def _nod(self, frame, now, amount):
-        """Her whole head dips a little with each open syllable and drifts slowly from side to side, so she does not stand like a statue
-        while she talks. `amount` is how much of the effect to show (it fades in and out with the flip book)."""
+    def _nod_offsets(self, now, amount):
+        """(sideways, up/down) in pixels: her head dips a little with each open syllable and drifts slowly from side to side while she talks.
+        `amount` is how much of the effect to show (it fades in and out with the flip book)."""
         a = self.assets
         dy = self.nod * NOD * a.height * amount
         dx = math.sin(now * 1.3) * SWAY * a.width * amount * self.talk_presence
+        return dx, dy
+
+    def _nod(self, frame, now, amount):
+        dx, dy = self._nod_offsets(now, amount)
         if abs(dy) < 0.05 and abs(dx) < 0.05:
             return frame
-        h, w = frame.shape[:2]
-        ys = np.clip(np.arange(h, dtype=np.float32) - dy, 0, h - 1.001)
-        i0 = np.floor(ys).astype(np.int32)
-        frac = (ys - i0)[:, None, None]
-        out = frame[i0] * (1.0 - frac) + frame[i0 + 1] * frac
-        shift = int(round(dx))
-        if shift:
-            out = np.roll(out, shift, axis=1)
-            if shift > 0:
-                out[:, :shift] = out[:, shift:shift + 1]
-            else:
-                out[:, shift:] = out[:, shift - 1:shift]
-        return out
+        return self._shift(frame, dx, dy)
 
     def _drop_jaw(self, frame, drop, shift_y=0):
         """Slide the lower face down by `drop` pixels, most at the chin and fading to nothing at the lips above and the neck below,
@@ -755,7 +870,11 @@ class Hologram:
             sy = shifts[i0][1] * (1.0 - frac) + shifts[i1][1] * frac
             shift_x, shift_y = int(round(sx * self.idle_mix)), int(round(sy * self.idle_mix))   # the mouth and eye pictures follow her head
         picture = self._clip_picture(now)
+        margins = None
         if picture is not None:
+            if picture.shape[1] > a.width:                                              # a wide clip: the middle is her picture, the sides are her arm
+                margins = (picture[:, :a.pad_left] * self.clip_mix, picture[:, a.pad_left + a.width:] * self.clip_mix)
+                picture = picture[:, a.pad_left:a.pad_left + a.width]
             frame = frame * (1.0 - self.clip_mix) + picture * self.clip_mix
             shift_x = shift_y = 0
         for name, weight in self.weights.items():
@@ -778,31 +897,57 @@ class Hologram:
         drop = self._jaw_drop()
         if drop > 0.05:
             frame = self._drop_jaw(frame, drop, shift_y)
+        move_x = move_y = 0.0
         if self.talk_motion and self.idle_mix < 0.99 and (self.nod > 0.01 or self.talk_presence > 0.02):
-            frame = self._nod(frame, now, 1.0 - self.idle_mix)
+            move_x, move_y = self._nod_offsets(now, 1.0 - self.idle_mix)
+        g_x, g_y, g_turn, g_lean, g_flash = self._gesture_values(now)
+        move_x += g_x * a.width
+        move_y += g_y * a.height
+        if not self.fx_turn and g_turn:
+            move_x += g_turn * a.width * 0.03                                           # no fake 3D turn: a sideways nudge instead
+        if abs(move_x) > 0.05 or abs(move_y) > 0.05:
+            frame = self._shift(frame, move_x, move_y)
+        if g_lean:
+            frame = self._lean(frame, g_lean)
         if self.fx_turn:
-            frame = self._turn(frame, now)
-        # scan lines and the bright sweep
-        frame[::3] *= 0.84
-        sweep = int((now * 70.0) % (a.height * 1.6)) - int(a.height * 0.2)
-        lo, hi = max(0, sweep - 7), min(a.height, sweep + 7)
-        if hi > lo:
-            frame[lo:hi] *= 1.0 + 0.25 * np.hanning(hi - lo + 2)[1:-1, None, None]
+            if g_turn:
+                frame = self._turn(frame, now, swing=max(-1.8, min(1.8, self.turn_angle(now) * 0.4 + g_turn)), damp=False)
+            else:
+                frame = self._turn(frame, now)
+        if g_flash > 0.01:
+            frame = frame * (1.0 + g_flash)
         # a slow breathing flicker, and a rougher one while she powers up or down
         level = self.power
         if self.flicker_on:
             level *= 0.95 + 0.05 * math.sin(now * 23.0) * math.sin(now * 7.3)
             if 0.02 < self.power < 0.98:
                 level *= 0.55 + 0.45 * self.rng.random()
-        frame *= max(0.0, min(1.0, level))
-        # colour
-        frame = frame @ tint_matrix(self.mix).T
-        np.clip(frame, 0, 255, out=frame)
+        level = max(0.0, min(1.0, level))
+        tint = tint_matrix(self.mix).T
+        sweep = int((now * 70.0) % (a.height * 1.6)) - int(a.height * 0.2)
+
+        def finish(piece):
+            """Scan lines, the bright sweep, the flicker and the colour: the same for her picture and for the sides of a wide clip."""
+            piece[::3] *= 0.84
+            lo, hi = max(0, sweep - 7), min(a.height, sweep + 7)
+            if hi > lo:
+                piece[lo:hi] *= 1.0 + 0.25 * np.hanning(hi - lo + 2)[1:-1, None, None]
+            piece *= level
+            piece = piece @ tint
+            np.clip(piece, 0, 255, out=piece)
+            return piece
+
+        frame = finish(frame)
         # into the window: padded, floating up and down a pixel or two, with her rings under her
         bob = int(round(math.sin(now * 1.3) * 2.0)) if self.flicker_on else 0
         out = np.zeros((a.window_h, a.window_w, 3), dtype=np.float32)
         top = PAD_TOP + bob
-        out[top:top + a.height] = frame
+        out[top:top + a.height, a.pad_left:a.pad_left + a.width] = frame
+        if margins is not None and self.clip_mix > 0.01:
+            if margins[0].shape[1]:
+                out[top:top + a.height, :a.pad_left] = finish(np.array(margins[0], dtype=np.float32))
+            if margins[1].shape[1]:
+                out[top:top + a.height, a.pad_left + a.width:] = finish(np.array(margins[1], dtype=np.float32))
         if self.flicker_on and now < self.glitch_until:                       # a short torn-picture glitch: only HER picture tears
             for y, h, dx in self.strips:
                 out[y:y + h] = np.roll(out[y:y + h], dx, axis=1)
@@ -865,12 +1010,12 @@ class Hologram:
         """How far she is turned right now, from -1 (turned one way) to +1 (the other): slow, never quite repeating."""
         return max(-1.0, min(1.0, math.sin(now * 0.55) * 0.62 + math.sin(now * 0.23 + 1.0) * 0.38))
 
-    def _turn(self, frame, now, swing=None):
+    def _turn(self, frame, now, swing=None, damp=True):
         """Turn her on the spot: near parts (nose, face, chest) slide further than far parts (hair, shoulders' edges) and the side facing
         away from the light dims a little, so she looks like a solid shape turning, not a flat picture sliding."""
         a = self.assets
         swing = self.turn_angle(now) if swing is None else swing
-        amount = swing * a.width * TURN_SHIFT * (1.0 - 0.75 * self.idle_mix)            # the flip book already moves her, so the fake turn is smaller
+        amount = swing * a.width * TURN_SHIFT * ((1.0 - 0.75 * self.idle_mix) if damp else 1.0)   # the flip book already moves her, so the fake turn is smaller (not for a head shake: that should show)
         if abs(amount) < 0.05:
             return frame
         depth = self._depth_map()
@@ -893,10 +1038,10 @@ class Hologram:
         spiral up round her (narrow low down, wider higher up) and fade out at the height of her chest, never higher. The far half of each turn
         goes behind her (dimmer), the near half in front."""
         a = self.assets
-        cx = a.window_w / 2.0
+        cx = a.pad_left + a.width / 2.0
         y_ring = PAD_TOP + a.height + 14.0
         y_top = PAD_TOP + a.height * 0.64                                              # the top of her chest: nothing goes higher than this
-        radius = a.window_w * 0.40
+        radius = a.width * 0.40
         count = 450
         i = np.arange(count, dtype=np.float64)
 

@@ -883,3 +883,197 @@ class SaluteWithSpeech(unittest.TestCase):
         self.holo.speech_started("o7, Nyx.", self.c.t)
         self.run_for(0.5)
         self.assertIsNone(self.holo.clip)
+
+
+class WideWindowForTheArm(unittest.TestCase):
+    def test_window_is_wider_than_her_picture_and_she_is_in_the_middle_part(self):
+        holo, c = make()
+        a = holo.assets
+        self.assertGreater(a.pad_left, a.width * 0.4)
+        self.assertEqual(a.window_w, a.width + a.pad_left + a.pad_right)
+        self.assertIn("salute", a.wide_clips)
+        frame = holo.render(c.t)
+        self.assertEqual(frame.shape, (a.window_h, a.window_w, 3))
+
+    def test_nothing_is_drawn_in_the_side_room_when_no_clip_is_playing(self):
+        holo, c = make()
+        holo.power = 1.0
+        frame = np.asarray(holo.render(c.t))
+        a = holo.assets
+        side = frame[:, :a.pad_left - 8]
+        self.assertTrue((side == np.array(h.KEY, dtype=np.uint8)).all())
+
+    def test_the_salute_arm_is_drawn_in_the_side_room(self):
+        h.clear_clips()
+        holo, c = make()
+        holo.power = 1.0
+        holo.flicker_on = False
+        h.get_clip(holo.assets, "salute", wait=True)
+        holo.salute(c.t)
+        seen = False
+        for _ in range(80):
+            c.t += 0.05
+            holo.tick(now=c.t)
+            frame = np.asarray(holo.render(c.t))
+            side = frame[:, :holo.assets.pad_left]
+            if (side.max(axis=2) > 60).sum() > 200:
+                seen = True
+        self.assertTrue(seen)
+        h.clear_clips()
+
+    def test_geometry_helpers_still_agree(self):
+        x, y = h.window_position(1920, 1080, 200, 300, 6.5, 24)
+        left, bottom = h.percents_from_position(1920, 1080, 200, 300, x, y)
+        self.assertAlmostEqual(left, 6.5, delta=0.1)
+
+
+class Gestures(unittest.TestCase):
+    def setUp(self):
+        self.holo, self.c = make()
+        self.holo.power = 1.0
+        self.holo.idle_on = False
+
+    def run_for(self, seconds, step=0.05):
+        for _ in range(int(seconds / step)):
+            self.c.t += step
+            self.holo.tick(now=self.c.t)
+
+    def test_every_gesture_draws_and_finishes(self):
+        for name in h.GESTURES:
+            holo, c = make()
+            holo.power = 1.0
+            self.assertTrue(holo.gesture(name, c.t), name)
+            for _ in range(int((h.GESTURES[name] + 0.3) / 0.05)):
+                c.t += 0.05
+                holo.tick(now=c.t)
+                self.assertEqual(holo.render(c.t).shape[0], holo.assets.window_h)
+            self.assertIsNone(holo.g_name, name)
+
+    def test_nod_moves_the_head_down_and_back(self):
+        self.holo.gesture("nod", self.c.t)
+        values = []
+        for _ in range(22):
+            self.c.t += 0.05
+            values.append(self.holo._gesture_values(self.c.t)[1])
+        self.assertGreater(max(values), 0.012)
+        self.assertAlmostEqual(values[-1], 0.0, delta=0.002)
+
+    def test_shake_turns_both_ways(self):
+        self.holo.gesture("shake", self.c.t)
+        turns = []
+        for _ in range(24):
+            self.c.t += 0.05
+            turns.append(self.holo._gesture_values(self.c.t)[2])
+        self.assertGreater(max(turns), 0.5)
+        self.assertLess(min(turns), -0.5)
+
+    def test_glances_go_opposite_ways(self):
+        self.holo.gesture("glance_left", self.c.t)
+        self.c.t += 1.0
+        self.assertLess(self.holo._gesture_values(self.c.t)[2], -0.5)
+        self.run_for(6.0)
+        self.assertTrue(self.holo.gesture("glance_right", self.c.t))
+        self.c.t += 1.0
+        self.assertGreater(self.holo._gesture_values(self.c.t)[2], 0.5)
+
+    def test_startle_flashes_then_calms(self):
+        self.holo.gesture("startle", self.c.t)
+        self.c.t += 0.05
+        self.assertGreater(self.holo._gesture_values(self.c.t)[4], 0.3)
+        self.c.t += 1.0
+        self.assertEqual(self.holo._gesture_values(self.c.t)[4], 0.0)
+
+    def test_busy_or_too_soon_or_off_means_no(self):
+        self.assertTrue(self.holo.gesture("nod", self.c.t))
+        self.assertFalse(self.holo.gesture("tilt", self.c.t + 0.1))          # still nodding
+        self.assertTrue(self.holo.gesture("startle", self.c.t + 0.1))        # a startle always may
+        self.holo.poses_on = False
+        self.assertFalse(self.holo.gesture("nod", self.c.t + 100))
+        self.holo.poses_on = True
+        self.holo.power = 0.3
+        self.assertFalse(self.holo.gesture("nod", self.c.t + 100))
+
+    def test_gesture_works_without_the_fake_3d_turn(self):
+        self.holo.fx_turn = False
+        self.holo.gesture("shake", self.c.t)
+        for _ in range(10):
+            self.c.t += 0.05
+            self.holo.tick(now=self.c.t)
+            self.holo.render(self.c.t)
+
+
+class Reactions(unittest.TestCase):
+    def setUp(self):
+        h.clear_clips()
+        self.holo, self.c = make()
+        self.holo.power = 1.0
+        self.addCleanup(h.clear_clips)
+
+        class Sure(random.Random):
+            def random(self): return 0.0
+        self.holo.rng = Sure()
+
+    def test_every_reaction_names_something_she_can_do(self):
+        for event, (kind, chance) in h.REACTIONS.items():
+            self.assertTrue(kind in h.GESTURES or kind in ("glance", "pleased", "salute"), event)
+            self.assertTrue(0 < chance <= 1, event)
+
+    def test_docking_granted_nods_and_denied_shakes_the_head(self):
+        self.assertTrue(self.holo.react_to("DockingGranted", self.c.t))
+        self.assertEqual(self.holo.g_name, "nod")
+        self.c.t += 5
+        self.holo.g_name = None
+        self.holo.g_last = -1e9
+        self.assertTrue(self.holo.react_to("DockingDenied", self.c.t + 20))
+        self.assertEqual(self.holo.g_name, "shake")
+
+    def test_attack_startles_even_just_after_another_reaction(self):
+        self.holo.react_to("DockingGranted", self.c.t)
+        self.assertTrue(self.holo.react_to("Interdicted", self.c.t + 6.0))
+        self.assertEqual(self.holo.g_name, "startle")
+
+    def test_reactions_are_spaced_out(self):
+        self.assertTrue(self.holo.react_to("DockingGranted", self.c.t))
+        self.holo.g_name = None
+        self.assertFalse(self.holo.react_to("DockingDenied", self.c.t + 2.0))
+
+    def test_message_makes_her_glance_sideways(self):
+        self.assertTrue(self.holo.react_to("ReceiveText", self.c.t))
+        self.assertIn(self.holo.g_name, ("glance_left", "glance_right"))
+
+    def test_chance_is_respected(self):
+        class Never(random.Random):
+            def random(self): return 0.99
+        self.holo.rng = Never()
+        self.assertFalse(self.holo.react_to("DockingDenied", self.c.t))
+
+    def test_mission_done_asks_for_the_pleased_clip(self):
+        self.assertTrue(self.holo.react_to("MissionCompleted", self.c.t))
+        self.assertEqual(self.holo.pose_wanted[0], "pleased")
+        h.get_clip(self.holo.assets, "pleased", wait=True)
+        seen = set()
+        for _ in range(60):
+            self.c.t += 0.1
+            self.holo.tick(now=self.c.t)
+            seen.add(self.holo.clip)
+        self.assertIn("pleased", seen)
+
+    def test_game_closing_salutes(self):
+        h.get_clip(self.holo.assets, "salute", wait=True)
+        self.assertTrue(self.holo.react_to("Shutdown", self.c.t))
+        for _ in range(10):
+            self.c.t += 0.05
+            self.holo.tick(now=self.c.t)
+        self.assertEqual(self.holo.clip, "salute")
+
+    def test_unknown_events_and_switched_off_do_nothing(self):
+        self.assertFalse(self.holo.react_to("FSDJump", self.c.t))
+        self.holo.poses_on = False
+        self.assertFalse(self.holo.react_to("DockingGranted", self.c.t))
+
+    def test_every_reaction_event_is_a_real_event(self):
+        import json
+        known = set(json.load(open("config/events.json", encoding="utf-8"))["events"])
+        known |= {"Shutdown", "ReceiveText"}
+        for event in h.REACTIONS:
+            self.assertIn(event, known, event)

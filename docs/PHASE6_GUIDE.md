@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.96 - wide window, gestures, game reactions
+
+Wide window: clips.json 'pad' [left,right] as fractions of her width plus 'wide': true on the salute clip (tools/make_clips.py WIDE/PAD); Assets.pad_left/pad_right/window_w; render() splits a wide clip into her picture and side margins (finish() applies scan lines/tint to both); hologram_window places the PICTURE where the settings say (window x = picture x - pad_left). Gestures: Hologram.gesture / _gesture_values / _shift / _lean (GESTURES durations). Reactions: REACTIONS table (event -> kind, chance), react_to(), subscribed in HologramFeed.attach, setting hologram.reactions. Test button plays clips then gestures.
+
 ## 0.96.95 - salute with her o7 lines
 
 Hologram.speech_started looks for SALUTE_LINE (o7 / oh seven) and calls salute(with_speech=True): the clip starts at once and is not cut off by speaking (salute_voice, _poses). Mouth pictures stay on during the salute clip. SALUTE_REPEAT (8 s) stops doubles. The chat o7 queue (streaming/chat.py pump_salutes, StreamChat_Salute lines) is unchanged. Tests: tests/test_hologram.py SaluteWithSpeech.

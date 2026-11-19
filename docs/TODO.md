@@ -35,6 +35,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.96: wide window + gestures + reactions. CHECK: she has not moved on screen; salute arm is whole; test button plays all; dock (nod), get refused (shake), get attacked (startle); drag her with Move and see she stays put; hologram not blocking clicks beside her. TOO WEAK/STRONG gestures are single numbers in ui/hologram.py _gesture_values. NEXT VIDEOS (prompts given): wave, worried, sad, laughing, shrug, wink, pointing, thumbs up; with arms kept inside the frame.
 - [ ] 0.96.95: salute with her o7 lines. CHECK: while live, type o7 in chat: she says 'o7 name' and salutes in step with it; two o7s together give one salute.
 - [ ] 0.96.94: salute. CHECK: say 'o7' and she salutes; start the game and she salutes after her greeting; see what the log says if the recogniser writes o7 another way. The forearm is cut by the left edge.
 - [ ] 0.96.93: lips, head motion, pose clips. CHECK: Personality page > 'Play all her hologram poses once'; say 'Starling' and wait (listening); ask something slow (thinking); a long answer (maybe pleased); leave her quiet 3 minutes (bored); lips look softer on a normal line. REPLACE the five temporary clips with better ones (arm stays inside the frame) using tools/make_clips.py. The right edge cuts the arm in the thinking clip.

@@ -858,7 +858,7 @@ class Dashboard:
         if page.id == "personality":
             extra += [("Move her hologram (drag her, double-click to lock)", self.move_hologram),
                       ("Show her hologram for 10 seconds (test)", self.test_hologram),
-                      ("Play all her hologram poses once (test, about 40 seconds)", self.test_hologram_poses)]
+                      ("Play all her hologram poses and gestures once (test, about 70 seconds)", self.test_hologram_poses)]
         if page.id == "redalert":
             extra += [("Red alert: switch on / off", self.toggle_red_alert),
                       ("Show the RED ALERT banner for 8 seconds (test)", self.test_red_alert)]

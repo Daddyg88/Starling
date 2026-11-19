@@ -27,6 +27,8 @@ import make_flipbook as mf          # noqa: E402  (the same fitting helpers the 
 ASSETS = mf.ASSETS
 FPS = 12
 STORE_HEIGHT = 480
+WIDE = ("salute",)               # clips with an arm that reaches beyond her picture: stored with room at the sides
+PAD = (0.52, 0.06)               # that room, as a fraction of her picture width (left, right); her window is made this much wider
 KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2", "salute")
 
 
@@ -44,6 +46,17 @@ def best_fit(first, base):
     return best
 
 
+def fit_wide(frame, base_size, scale, move):
+    """Like fit_to_base, but on a canvas with PAD room at each side, so an arm that goes past her picture is kept."""
+    bw, bh = base_size
+    left, right = int(round(PAD[0] * bw)), int(round(PAD[1] * bw))
+    k = bh / float(frame.height) * scale
+    resized = frame.resize((max(1, int(round(frame.width * k))), max(1, int(round(frame.height * k)))), Image.LANCZOS)
+    canvas = Image.new("RGB", (bw + left + right, bh), (0, 0, 0))
+    canvas.paste(resized, (int(round((bw - resized.width) / 2.0 + move[0])) + left, int(round((bh - resized.height) / 2.0 + move[1]))))
+    return canvas
+
+
 def build(name, video, base, meta):
     with tempfile.TemporaryDirectory() as tmp:
         subprocess.run(["ffmpeg", "-v", "error", "-i", str(video), "-vf", "fps=%d" % FPS, str(Path(tmp) / "f_%04d.png")], check=True)
@@ -59,10 +72,13 @@ def build(name, video, base, meta):
         for old in folder.glob("*.jpg"):
             old.unlink()
         for number, frame in enumerate(frames):
-            fitted = mf.fit_to_base(frame, base.size, scale, move)
+            fitted = fit_wide(frame, base.size, scale, move) if name in WIDE else mf.fit_to_base(frame, base.size, scale, move)
             fitted = fitted.resize((int(round(fitted.width * STORE_HEIGHT / fitted.height)), STORE_HEIGHT), Image.LANCZOS)
             fitted.save(folder / ("%03d.jpg" % number), quality=74, optimize=True)
     meta[name] = {"frames": len(frames), "fps": FPS}
+    if name in WIDE:
+        meta[name]["wide"] = True
+        meta["pad"] = list(PAD)
     size = sum(p.stat().st_size for p in folder.glob("*.jpg")) / 1e6
     print("  wrote %.1f MB" % size)
 
@@ -78,7 +94,7 @@ def main(argv):
         meta = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         meta = {}
-    meta = {k: v for k, v in meta.items() if k in KNOWN}
+    meta = {k: v for k, v in meta.items() if k in KNOWN or k == "pad"}
     for name, video in pairs:
         if name not in KNOWN:
             print("unknown clip name %r (use one of %s)" % (name, ", ".join(KNOWN)))
