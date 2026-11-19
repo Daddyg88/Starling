@@ -815,7 +815,11 @@ class Dashboard:
                      wraplength=720).grid(row=row, column=0, sticky="w", pady=(0, 12))
         row += 1
         if page.id == "overlays":
-            row = self._build_overlay_canvas(frame, row)
+            try:
+                row = self._build_overlay_canvas(frame, row)
+            except Exception:
+                log.exception("The Overlays picture could not be built (the settings below still work)")
+                self._ovl = None
         if page.id == "bookmarks":
             return self._build_bookmarks(frame, page, row)
         if page.id == "setup":
@@ -1806,6 +1810,12 @@ class Dashboard:
         ovl = getattr(self, "_ovl", None)
         if not ovl:
             return
+        try:
+            self._overlay_paint(ovl)
+        except Exception:
+            log.exception("Could not draw the Overlays picture")
+
+    def _overlay_paint(self, ovl):
         from ui import overlay_layout
         canvas, settings = ovl["canvas"], self.model.settings
         canvas.delete("all")

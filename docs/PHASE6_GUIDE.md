@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.102 - the Overlays picture cannot break the page
+
+GitHub's test machine has tkinter but only a fake dashboard root, so `_overlay_draw` (ImageTk.PhotoImage needs a real root) raised inside Dashboard.__init__ and nine dashboard tests failed in CI in 0.96.101. `_build_section` now catches errors from `_build_overlay_canvas`, and `_overlay_draw` wraps `_overlay_paint` in try/except with a log line. Also seen: the website (GitHub Pages) deploy of 0.96.99 failed with 'Fetching artifact metadata failed' while tests and release passed; that is GitHub, not the code.
+
 ## 0.96.101 - the Overlays page
 
 ui/overlay_layout.py describes each draggable overlay once (BOXES: hologram, bio, route; which edge each gap is measured from, which settings hold it) and has the maths: `rect` (where the box is, as fractions of the screen, using the same clamping as the overlays' own `placement`), `settings_for` (what to save after a drop) and `cockpit_picture` (the drawn background). ui/dashboard.py `_build_overlay_canvas` draws the picture with one canvas box per overlay; dropping a box writes the settings (hologram.left/bottom, overlay.bio_x/bio_up, overlay.route_right/route_top) and saves, and each real overlay already re-reads its settings. The overlay settings moved to a new "overlays" page in ui/settings_model.py (the position drop-downs were removed). overlay.preview_picture holds an optional screenshot path. The Ctrl+Shift grab from 0.96.100 was removed from ui/hologram_window.py (she hides whenever Elite is not in front, so it could not work). Not yet on the page: base-hack panel (named spots Left/Right/Top) and the red-alert banner.
