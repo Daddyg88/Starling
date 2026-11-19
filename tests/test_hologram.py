@@ -1078,21 +1078,3 @@ class Reactions(unittest.TestCase):
         for event in h.REACTIONS:
             self.assertIn(event, known, event)
 
-
-class GrabAnytimeTests(unittest.TestCase):
-    """Ctrl+Shift with the pointer on her lets her be dragged without the 'Move her' button."""
-
-    def test_needs_the_keys_and_the_pointer(self):
-        from ui.hologram_window import want_grab
-        self.assertTrue(want_grab(True, True, False))
-        self.assertFalse(want_grab(True, False, False))
-        self.assertFalse(want_grab(False, True, False))
-        self.assertFalse(want_grab(False, False, False))
-
-    def test_a_drag_in_progress_is_not_dropped_when_the_keys_are_let_go(self):
-        from ui.hologram_window import want_grab
-        self.assertTrue(want_grab(False, False, True))
-
-    def test_off_windows_the_keys_read_as_not_held(self):
-        from ui.hologram_window import grab_chord_held
-        self.assertFalse(grab_chord_held())

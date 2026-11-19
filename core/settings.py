@@ -32,7 +32,7 @@ DEFAULTS = {
     "facts": {"frequency": "sometimes", "topics": "all"},
     "ask": {"scan_prompts": True, "bio_prompts": True, "answer_seconds": 10},
     "plans": {"ask": True},
-    "overlay": {"screen": "auto", "bio_enabled": True, "bio_x": 3, "bio_up": 25, "bio_size": "Medium", "bio_dark": False,
+    "overlay": {"screen": "auto", "preview_picture": "", "bio_enabled": True, "bio_x": 3, "bio_up": 25, "bio_size": "Medium", "bio_dark": False,
                 "route_map": "route", "route_size": "Medium", "route_right": 2, "route_top": 10, "route_cockpit_only": True, "route_hide_with_voidcompass": True},
     "streaming": {"enabled": False, "twitch_channel": "", "youtube_key": "", "youtube_video": "", "prefix": "!starling", "who": "everyone", "ask_enabled": True, "announce": True, "recognise_viewers": True, "react": True, "react_milestones": True, "window": True, "window_pin": False, "window_font": 12, "window_geometry": "", "chime_in": True, "salute": True, "talk_in_combat": True, "chime_gap": 600,
                   "user_cooldown": 45, "action_cooldown": 20, "ask_cooldown": 10, "hold": True, "hold_max": 4, "hold_max_age": 300, "blocked_words": "",

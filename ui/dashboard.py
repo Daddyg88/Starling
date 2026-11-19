@@ -814,6 +814,8 @@ class Dashboard:
         ctk.CTkLabel(frame, text=page.blurb, font=self._font(), text_color=T.MUTED, anchor="w", justify="left",
                      wraplength=720).grid(row=row, column=0, sticky="w", pady=(0, 12))
         row += 1
+        if page.id == "overlays":
+            row = self._build_overlay_canvas(frame, row)
         if page.id == "bookmarks":
             return self._build_bookmarks(frame, page, row)
         if page.id == "setup":
@@ -859,6 +861,12 @@ class Dashboard:
             extra += [("Move her hologram (drag her, double-click to lock)", self.move_hologram),
                       ("Show her hologram for 10 seconds (test)", self.test_hologram),
                       ("Play all her hologram poses and gestures once (test, about 70 seconds)", self.test_hologram_poses)]
+        if page.id == "overlays":
+            extra += [("Show her hologram for 10 seconds (test)", self.test_hologram),
+                      ("Show a test biology list for 10 seconds", self.test_bio_overlay),
+                      ("Show a test route map for 10 seconds", self.test_route_overlay),
+                      ("Use my own screenshot as the picture", self.overlay_pick_picture),
+                      ("Go back to the drawing", self.overlay_clear_picture)]
         if page.id == "redalert":
             extra += [("Red alert: switch on / off", self.toggle_red_alert),
                       ("Show the RED ALERT banner for 8 seconds (test)", self.test_red_alert)]
@@ -1564,6 +1572,8 @@ class Dashboard:
             self._refresh_home()
         if page_id == "setup":
             self._refresh_setup(force=True)
+        if page_id == "overlays":
+            self._overlay_draw()
         self._draw_stars()
         if page_id == "voice":
             self._start_voice_poll()
@@ -1745,6 +1755,128 @@ class Dashboard:
             self.model.save()
         if getattr(self, "hologram_window", None) is not None:
             self.hologram_window.start_move()
+
+    # ---- the Overlays page: a picture of your screen with a box per overlay to drag ----
+    def _build_overlay_canvas(self, frame, row):
+        try:
+            import tkinter as tk
+            screen_w, screen_h = int(self.root.winfo_screenwidth()), int(self.root.winfo_screenheight())
+        except Exception:
+            log.exception("The Overlays picture could not be built")
+            return row
+        width = 640
+        height = max(200, int(width * screen_h / max(1, screen_w)))
+        self._ovl = {"screen": (screen_w, screen_h), "size": (width, height), "drag": None, "photo": None}
+        canvas = tk.Canvas(frame, width=width, height=height, bg=T.PANEL, highlightthickness=1, highlightbackground=T.ACCENT_DIM, cursor="fleur")
+        canvas.grid(row=row, column=0, sticky="w", pady=(0, 6))
+        self._ovl["canvas"] = canvas
+        for box in self._overlay_boxes():
+            tag = "box_" + box.key
+            canvas.tag_bind(tag, "<ButtonPress-1>", lambda e, b=box: self._overlay_down(b, e))
+            canvas.tag_bind(tag, "<B1-Motion>", lambda e, b=box: self._overlay_move(b, e))
+            canvas.tag_bind(tag, "<ButtonRelease-1>", lambda e, b=box: self._overlay_up(b, e))
+        ctk = self.ctk
+        ctk.CTkLabel(frame, text="Drag a box and let go: its place is saved and the real overlay moves to match. A box with (off) is switched off below.",
+                     font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left", wraplength=720).grid(
+            row=row + 1, column=0, sticky="w", pady=(0, 10))
+        self._overlay_draw()
+        return row + 2
+
+    def _overlay_boxes(self):
+        from ui import overlay_layout
+        return overlay_layout.BOXES
+
+    def _overlay_background(self):
+        from PIL import Image, ImageTk
+        from ui import overlay_layout
+        width, height = self._ovl["size"]
+        picture = None
+        path = str(self.model.settings.get("overlay.preview_picture", "") or "")
+        if path:
+            try:
+                picture = Image.open(path).convert("RGB").resize((width, height))
+            except Exception:
+                log.exception("Could not open the overlay preview picture")
+        if picture is None:
+            picture = overlay_layout.cockpit_picture(width, height)
+        self._ovl["photo"] = ImageTk.PhotoImage(picture)
+        return self._ovl["photo"]
+
+    def _overlay_draw(self):
+        ovl = getattr(self, "_ovl", None)
+        if not ovl:
+            return
+        from ui import overlay_layout
+        canvas, settings = ovl["canvas"], self.model.settings
+        canvas.delete("all")
+        canvas.create_image(0, 0, image=self._overlay_background(), anchor="nw")
+        screen_w, screen_h = ovl["screen"]
+        width, height = ovl["size"]
+        for box in overlay_layout.BOXES:
+            x, y, w, h = overlay_layout.rect(box, settings, screen_w, screen_h)
+            x1, y1, x2, y2 = x * width, y * height, (x + w) * width, (y + h) * height
+            off = box.switch is not None and not settings.get(box.switch, False)
+            tag = "box_" + box.key
+            canvas.create_rectangle(x1, y1, x2, y2, outline=box.colour, width=2, fill=box.colour, stipple="gray25", dash=(4, 3) if off else (), tags=(tag,))
+            canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=box.label + ("\n(off)" if off else ""), fill=box.colour, font=("Segoe UI", 9, "bold"),
+                               justify="center", tags=(tag,))
+
+    def _overlay_down(self, box, event):
+        from ui import overlay_layout
+        ovl = self._ovl
+        screen_w, screen_h = ovl["screen"]
+        width, height = ovl["size"]
+        x, y, w, h = overlay_layout.rect(box, self.model.settings, screen_w, screen_h)
+        ovl["drag"] = (box, event.x - x * width, event.y - y * height, w, h)
+
+    def _overlay_move(self, box, event):
+        ovl = self._ovl
+        if not ovl["drag"]:
+            return
+        _box, dx, dy, w, h = ovl["drag"]
+        width, height = ovl["size"]
+        x = max(0, min(event.x - dx, width * (1 - w)))
+        y = max(0, min(event.y - dy, height * (1 - h)))
+        tag = "box_" + box.key
+        items = ovl["canvas"].find_withtag(tag)
+        if items:
+            x1, y1, _x2, _y2 = ovl["canvas"].coords(items[0])
+            ovl["canvas"].move(tag, x - x1, y - y1)
+
+    def _overlay_up(self, box, event):
+        from ui import overlay_layout
+        ovl = self._ovl
+        drag, ovl["drag"] = ovl["drag"], None
+        if not drag:
+            return
+        _box, dx, dy, w, h = drag
+        width, height = ovl["size"]
+        try:
+            values = overlay_layout.settings_for(box, (event.x - dx) / width, (event.y - dy) / height, w, h)
+            for key, value in values.items():
+                self.model.settings.set(key, value)
+            self.model.settings.save()
+        except Exception:
+            log.exception("Could not save where the overlay was dropped")
+        self._overlay_draw()
+
+    def overlay_pick_picture(self):
+        try:
+            from tkinter import filedialog
+            path = filedialog.askopenfilename(title="Pick a screenshot of your cockpit",
+                                              filetypes=[("Pictures", "*.png *.jpg *.jpeg *.bmp"), ("All files", "*.*")])
+        except Exception:
+            log.exception("Could not open the file picker")
+            return
+        if path:
+            self.model.settings.set("overlay.preview_picture", path)
+            self.model.settings.save()
+            self._overlay_draw()
+
+    def overlay_clear_picture(self):
+        self.model.settings.set("overlay.preview_picture", "")
+        self.model.settings.save()
+        self._overlay_draw()
 
     def test_route_overlay(self):
         """Shows a made-up Sol to Colonia route for 10 seconds, so you can check where the map sits (save settings first)."""

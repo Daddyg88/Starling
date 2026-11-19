@@ -3,7 +3,7 @@ Her hologram on screen (the tkinter part). What she looks like is decided in ui/
 this file only shows the pixels in a see-through, click-through window and lets you drag her to where you want her.
 
   * Settings > Personality: "Show her as a hologram on the dash" (off until you switch it on), size, mouth opening.
-  * Hold Ctrl+Shift with the pointer on her and drag, any time she is showing; the spot is remembered.
+  * The Overlays page on the dashboard: drag her box on a picture of your screen; the spot is remembered.
   * "Move her" on the Personality page: she can be dragged (a thin frame appears); double-click, or wait 90 seconds, to lock her again.
     Where you drop her is remembered.
   * The game must be in Borderless or Windowed mode, like the route map.
@@ -40,21 +40,6 @@ def set_click_through(window, on):
         ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
     except Exception:
         pass            # not Windows: it still works, it just takes mouse clicks
-
-
-def grab_chord_held():
-    """Windows: True while Ctrl and Shift are both held down. Reading the keys changes nothing in the game and no keybind is touched."""
-    try:
-        import ctypes
-        down = lambda vk: bool(ctypes.windll.user32.GetAsyncKeyState(vk) & 0x8000)
-        return down(0x11) and down(0x10)
-    except Exception:
-        return False
-
-
-def want_grab(chord_down, cursor_over, dragging):
-    """She catches the mouse (so she can be dragged) while Ctrl+Shift is held with the pointer on her, and for as long as a drag lasts."""
-    return bool(dragging or (chord_down and cursor_over))
 
 
 BOOT_SECONDS = 20.0      # after the game window first appears she waits this long, then powers up ("getting herself together")
@@ -286,7 +271,6 @@ class HologramWindow:
         self._broken = False
         self._shown = False
         self._drag = None
-        self._grabbing = False
         self._geometry = None
         self._tk_ready = None
         try:
@@ -484,12 +468,11 @@ class HologramWindow:
         else:
             self.photo.paste(image)
         moving = holo.moving
-        self._grabbing = self._grab_now()
-        want_through = not (moving or self._grabbing)
+        want_through = not moving
         if want_through != getattr(self, "_click_through_on", True):
             set_click_through(self.window, want_through)
             self._click_through_on = want_through
-        if self._drag is None:
+        if not moving or self._drag is None:
             self._place(a)
         if not self._shown:
             self.window.deiconify()
@@ -508,26 +491,14 @@ class HologramWindow:
             self._geometry = geometry
             self.window.geometry(geometry)
 
-    # ---- dragging: while "Move her" is on, or any time with Ctrl+Shift held and the pointer on her ----
-    def _grab_now(self):
-        try:
-            w = self.window
-            over = (w.winfo_rootx() <= w.winfo_pointerx() < w.winfo_rootx() + w.winfo_width()
-                    and w.winfo_rooty() <= w.winfo_pointery() < w.winfo_rooty() + w.winfo_height())
-        except Exception:
-            over = False
-        return want_grab(grab_chord_held(), over, self._drag is not None)
-
-    def _can_drag(self):
-        return self.moving() or self._grabbing
-
+    # ---- dragging (only while "Move her" is on; the Overlays page on the dashboard is the easy way to place her) ----
     def _drag_start(self, event):
-        if not self._can_drag():
+        if not self.moving():
             return
         self._drag = (event.x_root - self.window.winfo_x(), event.y_root - self.window.winfo_y())
 
     def _drag_move(self, event):
-        if self._drag is None:
+        if self._drag is None or not self.moving():
             return
         x, y = event.x_root - self._drag[0], event.y_root - self._drag[1]
         self.window.geometry("+%d+%d" % (x, y))

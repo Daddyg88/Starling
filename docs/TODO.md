@@ -36,7 +36,8 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
-- [ ] 0.96.100: synthesis lines + Ctrl+Shift grab. CHECK: synthesise ammo (one line, a nod); send me a diagnostics ZIP afterwards so I can see the real recipe names; hold Ctrl+Shift over her and drag, let go, restart Starling: she is where you left her. Still open: she cannot be dragged onto a second monitor (she stays on the overlay screen).
+- [ ] 0.96.101: Overlays page. CHECK: open the Overlays tab, drag the three boxes, press the test buttons (hologram / biology / route): each should appear where you dropped its box. Try 'Use my own screenshot'. NOT TESTED on screen. TO DO: put the base-hack panel and red-alert banner on the page, and let the boxes cross to a second monitor.
+- [ ] 0.96.100: synthesis lines + Ctrl+Shift grab. CHECK: synthesise ammo (one line, a nod); send me a diagnostics ZIP afterwards so I can see the real recipe names; hold Ctrl+Shift over her and drag, let go, restart Starling: she is where you left her.
 - [ ] 0.96.99: two more shipped settlements (Benton, Cranfield). CHECK: Cranfield Genetics Laboratory and Benton Horticultural Site line up straight away.
 - [ ] 0.96.98: she powers down at the main menu (Music MainMenu line). CHECK: quit to menu, she fades; load back in, she returns. If not, diagnostics ZIP straight after quitting.
 - [ ] 0.96.97: she only appears in the game world. CHECK: start Starling first (she stays hidden), start Elite (hidden at menu and loading), load in (powers up), go back to the main menu (powers down), on foot / SRV / fighter / Nomad (she stays). If wrong, send a diagnostics ZIP.

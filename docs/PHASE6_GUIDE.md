@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.101 - the Overlays page
+
+ui/overlay_layout.py describes each draggable overlay once (BOXES: hologram, bio, route; which edge each gap is measured from, which settings hold it) and has the maths: `rect` (where the box is, as fractions of the screen, using the same clamping as the overlays' own `placement`), `settings_for` (what to save after a drop) and `cockpit_picture` (the drawn background). ui/dashboard.py `_build_overlay_canvas` draws the picture with one canvas box per overlay; dropping a box writes the settings (hologram.left/bottom, overlay.bio_x/bio_up, overlay.route_right/route_top) and saves, and each real overlay already re-reads its settings. The overlay settings moved to a new "overlays" page in ui/settings_model.py (the position drop-downs were removed). overlay.preview_picture holds an optional screenshot path. The Ctrl+Shift grab from 0.96.100 was removed from ui/hologram_window.py (she hides whenever Elite is not in front, so it could not work). Not yet on the page: base-hack panel (named spots Left/Right/Top) and the red-alert banner.
+
 ## 0.96.100 - synthesis lines and grabbing her any time
 
 control/synthesis_talk.py subscribes to the Synthesis event, sorts the recipe name by words (kind_of: Ammo, Limpet, FSD, Heat, Chaff, Refuel, Repair, else Generic) and says Synthesis_<kind> from voicepacks/default/synthesis.json (loaded in personality/dialogue.py), at most once per 15 s; setting synthesis.callout. ui/hologram.py REACTIONS has Synthesis -> nod. ui/hologram_window.py: `want_grab` and `grab_chord_held` make the window catch the mouse while Ctrl+Shift is held with the pointer on her (and for the length of a drag), so the old 90 s Move button is no longer the only way; the dropped spot is saved as hologram.left / hologram.bottom as before, clamped to the overlay screen.
