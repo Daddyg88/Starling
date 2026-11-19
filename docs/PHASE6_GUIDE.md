@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.100 - synthesis lines and grabbing her any time
+
+control/synthesis_talk.py subscribes to the Synthesis event, sorts the recipe name by words (kind_of: Ammo, Limpet, FSD, Heat, Chaff, Refuel, Repair, else Generic) and says Synthesis_<kind> from voicepacks/default/synthesis.json (loaded in personality/dialogue.py), at most once per 15 s; setting synthesis.callout. ui/hologram.py REACTIONS has Synthesis -> nod. ui/hologram_window.py: `want_grab` and `grab_chord_held` make the window catch the mouse while Ctrl+Shift is held with the pointer on her (and for the length of a drag), so the old 90 s Move button is no longer the only way; the dropped spot is saved as hologram.left / hologram.bottom as before, clamped to the overlay screen.
+
 ## 0.96.99 - two more shipped settlements
 
 maps/known_calibrations.json now has 23 line-ups (merged with tools/merge_calibrations.py): Benton Horticultural Site (agriculture_5, turned -90) and Cranfield Genetics Laboratory (high_tech_1, turned 123). Cortes Genetics Exploration and Cukkemane Pharmacology (high_tech_2) were not added: three terminals each, no clear fit.

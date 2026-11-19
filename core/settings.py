@@ -44,6 +44,7 @@ DEFAULTS = {
     "guardian": {"auto_plot_key": True},
     "titans": {"talk": True},
     "materials": {"fill_callout": True, "fill_min_percent": 25},
+    "synthesis": {"callout": True},
     "regions": {"announce": True},
     "onfoot": {"auto_shields": False, "preset": "", "auto_health": False, "auto_battery": False, "last_grenade_callout": True},
     "keybinds": {"ship": "", "srv": "", "fighter": "", "multicrew": ""},

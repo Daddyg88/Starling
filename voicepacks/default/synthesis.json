@@ -1,0 +1,52 @@
+{
+ "Synthesis_Ammo": [
+  "Ammo synthesised. Locked and loaded.",
+  "Fresh ammunition, Commander. Do try to hit something.",
+  "Rounds made. Magazines are full again.",
+  "Ammo restocked from the materials. Waste not, want not.",
+  "There. Every gun has something to fire.",
+  "Ammunition synthesised. Aim better this time.",
+  "Restock complete. You are armed again.",
+  "Ammo is back. Don't spray it about.",
+  "Reloaded from raw materials. Rather clever, that.",
+  "Bullets sorted. Go and make a point."
+ ],
+ "Synthesis_Repair": [
+  "Repairs synthesised. Good as new, nearly.",
+  "Hull patched up. Please stop hitting things.",
+  "Repair kit made from scrap. Not bad.",
+  "Patched. That should hold, probably.",
+  "Repairs done. I do like a frugal fix."
+ ],
+ "Synthesis_FSD": [
+  "FSD boost synthesised. Longer jumps await.",
+  "Jump boost ready. Off we go, further than before.",
+  "Drive injected. Your next jump has some extra reach.",
+  "FSD boosted. Don't waste it on a short hop."
+ ],
+ "Synthesis_Limpet": [
+  "Limpets synthesised. Fresh ones in the hold.",
+  "More limpets, Commander. They do get everywhere.",
+  "Limpets made. Do try to keep hold of these."
+ ],
+ "Synthesis_Refuel": [
+  "Fuel synthesised. The tank thanks you.",
+  "Refuelled from materials. Lovely.",
+  "A little fuel, made from nothing much. Clever."
+ ],
+ "Synthesis_Heat": [
+  "Heat sinks synthesised. Stay cool.",
+  "Heat sinks made. Use them before you cook.",
+  "Fresh heat sinks. Keep your head cool, Commander."
+ ],
+ "Synthesis_Chaff": [
+  "Chaff synthesised. That should confuse them.",
+  "Chaff restocked. Let them chase the sparkles."
+ ],
+ "Synthesis_Generic": [
+  "Synthesis complete.",
+  "Done. Made from what you had.",
+  "That's synthesised. Materials well spent.",
+  "Made it. Nothing wasted."
+ ]
+}

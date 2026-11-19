@@ -91,6 +91,7 @@ REACTIONS = {                    # game event -> (what she does, how likely)
     "ReceiveText": ("glance", 0.3),
     "Interdicted": ("startle", 0.9), "UnderAttack": ("startle", 0.5), "HullDamage": ("startle", 0.5), "HeatDamage": ("startle", 0.5),
     "CockpitBreached": ("startle", 1.0), "InDanger": ("startle", 0.6), "SelfDestruct": ("startle", 1.0), "Died": ("startle", 1.0), "FuelPanic": ("startle", 0.8),
+    "Synthesis": ("nod", 0.6),
     "Shutdown": ("salute", 1.0),
 }
 JAW_DROP = 0.006                 # the biggest chin drop, as a fraction of her height

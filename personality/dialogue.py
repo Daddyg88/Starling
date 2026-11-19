@@ -175,6 +175,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "colony.json"))        # welcome home to systems you own
             self._merge(_read_json(self.pack_dir / "nsp.json"))           # notable stellar phenomena (Lagrange clouds, molluscs, crystals...)
             self._merge(_read_json(self.pack_dir / "materials.json"))     # "you are 82 percent full on iron"
+            self._merge(_read_json(self.pack_dir / "synthesis.json"))     # "ammo synthesised"
             self._merge(_read_json(self.pack_dir / "titans.json"))        # Thargoid Titans: routes, war story, how each one fell
             self._merge(_read_json(self.pack_dir / "guardian.json"))      # guardian blueprint sites and spoken guides
             self._merge(_read_json(self.pack_dir / "engineers.json"))     # "take me to Felicity Farseer"

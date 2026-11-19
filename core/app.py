@@ -930,6 +930,21 @@ class App:
             self.material_fill = None
         return self.material_fill
 
+    def ensure_synthesis_talk(self):
+        """Says a line when you synthesise ammo, repairs and so on. Safe to call twice."""
+        if getattr(self, "synthesis_talk", None) is not None:
+            return self.synthesis_talk
+        try:
+            from control.synthesis_talk import SynthesisTalk
+            from navigation.voice import Narrator
+            narrator = Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)
+            self.synthesis_talk = SynthesisTalk(self.bus, self.settings, narrator)
+            self.synthesis_talk.attach()
+        except Exception:
+            self.log.exception("The synthesis lines could not start")
+            self.synthesis_talk = None
+        return self.synthesis_talk
+
     def ensure_regions(self):
         """Announces the galaxy region you jump into (and the first time you are in it). Safe to call twice."""
         if getattr(self, "region_tracker", None) is not None:
@@ -1116,6 +1131,7 @@ class App:
         self.ensure_mission_reminder()
         self.ensure_bind_backup()
         self.ensure_material_fill()
+        self.ensure_synthesis_talk()
         self.ensure_route()
         self.ensure_regions()
         poll = self.settings.get("journal.poll_seconds", 1.0)
