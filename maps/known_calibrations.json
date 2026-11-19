@@ -1,5 +1,49 @@
 {
  "_note": "Lined-up maps shipped with the app (MarketID -> line-up), worked out by players walking the settlement. Same format as data/settlement_calibration.json. Add more with tools/merge_calibrations.py (never by hand).",
+ "3808323584": {
+  "v": 2,
+  "map": "high_tech_1",
+  "a": [
+   -0.17924756848372136,
+   0.27707455529635633
+  ],
+  "t": [
+   21.835615296703565,
+   -335.1976211503118
+  ],
+  "ref": [
+   59.421062,
+   129.94931
+  ],
+  "radius": 769791.8125,
+  "name": "Cranfield Genetics Laboratory",
+  "n": 2,
+  "err": 1.5,
+  "how": "refined",
+  "stamp": "0.33:535:40"
+ },
+ "3825853184": {
+  "v": 2,
+  "map": "agriculture_5",
+  "a": [
+   2.089553601045172e-17,
+   -0.34125000000000005
+  ],
+  "t": [
+   167.5886696474073,
+   294.135845968212
+  ],
+  "ref": [
+   71.165634,
+   5.225572
+  ],
+  "radius": 4126788.75,
+  "name": "Benton Horticultural Site",
+  "n": 2,
+  "err": 2.2,
+  "how": "refined",
+  "stamp": "None:1089:12"
+ },
  "3848447488": {
   "v": 2,
   "map": "extraction_2",

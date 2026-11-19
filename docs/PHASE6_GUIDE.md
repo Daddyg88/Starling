@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.99 - two more shipped settlements
+
+maps/known_calibrations.json now has 23 line-ups (merged with tools/merge_calibrations.py): Benton Horticultural Site (agriculture_5, turned -90) and Cranfield Genetics Laboratory (high_tech_1, turned 123). Cortes Genetics Exploration and Cukkemane Pharmacology (high_tech_2) were not added: three terminals each, no clear fit.
+
 ## 0.96.98 - she leaves at the main menu
 
 Status.json is not rewritten at the main menu, so `state.in_world` stayed True. journal/processor.py `_note_music` now sets `state.at_main_menu` from the journal's Music event (MusicTrack "MainMenu"); any other track, LoadGame or Shutdown clears it. `HologramFeed.in_world()` is in_world and not at_main_menu. Unverified against the real game.

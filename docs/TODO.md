@@ -6,14 +6,15 @@ Kept up to date by hand. Tick a box ([x]) when it is finished and note the versi
 
 ### SETTLEMENT MAP PROGRESS (28 layouts; updated 17 Nov, 0.96.64)
 Measured = a real size (metres per map unit) from tester marks. Provisional = one visit only.
-- [x] MEASURED, 12 of 28 (16 to go; updated 0.96.92). Shipped line-ups: 21 settlements (0.96.91).
+- [x] MEASURED, 12 of 28 (16 to go; updated 0.96.92). Shipped line-ups: 23 settlements (0.96.99: + Benton Horticultural Site on agriculture_5, + Cranfield Genetics Laboratory on high_tech_1).
   - agriculture_1 (0.408): TWO settlements (Agnihotri, Mowatt Foods)
   - agriculture_4 (0.44): THREE settlements (Sharma, Oyawale, Jung)
   - extraction_2 (about 0.316): NEW, one visit (Acosta Extraction Prospect), two marks only, so provisional
   - extraction_3 (0.35): one visit (Shin Prospecting Platform), a second would confirm it
   - extraction_4 (about 0.34): NEW, one visit (Prieto Excavation Platform), provisional
   - extraction_5 (0.181): one visit, a second would confirm it (no line-up shipped yet)
-  - high_tech_1 (0.33): one settlement (Kolsuk)
+  - high_tech_1 (0.33): TWO settlements (Kolsuk, Cranfield)
+  - high_tech_2: Cortes Genetics Exploration and Cukkemane Pharmacology walked (pad 1) but NOT lined up: 3 terminals each, best fit 26.7 map units with no clear winner; the map is a prototype traced by eye. Needs a better map or more terminals
   - industrial_1 (0.27): one visit (Craig Manufacturing Hub), a second would confirm it
   - industrial_2 (0.345): FIVE settlements (Shi, Spark, Peng, Dovzhenko, Martins), confirmed
   - industrial_4 (0.34): one settlement (Yi's Workshop)
@@ -35,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.99: two more shipped settlements (Benton, Cranfield). CHECK: Cranfield Genetics Laboratory and Benton Horticultural Site line up straight away.
 - [ ] 0.96.98: she powers down at the main menu (Music MainMenu line). CHECK: quit to menu, she fades; load back in, she returns. If not, diagnostics ZIP straight after quitting.
 - [ ] 0.96.97: she only appears in the game world. CHECK: start Starling first (she stays hidden), start Elite (hidden at menu and loading), load in (powers up), go back to the main menu (powers down), on foot / SRV / fighter / Nomad (she stays). If wrong, send a diagnostics ZIP.
 - [ ] 0.96.96: wide window + gestures + reactions. CHECK: she has not moved on screen; salute arm is whole; test button plays all; dock (nod), get refused (shake), get attacked (startle); drag her with Move and see she stays put; hologram not blocking clicks beside her. TOO WEAK/STRONG gestures are single numbers in ui/hologram.py _gesture_values. NEXT VIDEOS (prompts given): wave, worried, sad, laughing, shrug, wink, pointing, thumbs up; with arms kept inside the frame.
