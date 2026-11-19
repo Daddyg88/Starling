@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.97 - she waits for the cockpit
+
+`state.in_world` (journal/game_state.py) is set in journal/status_reader.py: True when Status.json Flags or Flags2 has any switch. The menu and loading screens write none; ships, SRV, fighter (Flags) and on foot (Flags2 bit 0) always have one. Shutdown clears it. ui/hologram_window.py gates `powered` on it through the setting `hologram.cockpit_only` (default on). The log says "waiting: you are at the main menu or a loading screen". Unverified against the real game; a stale Status.json from the last session could briefly show her at the menu.
+
 ## 0.96.96 - wide window, gestures, game reactions
 
 Wide window: clips.json 'pad' [left,right] as fractions of her width plus 'wide': true on the salute clip (tools/make_clips.py WIDE/PAD); Assets.pad_left/pad_right/window_w; render() splits a wide clip into her picture and side margins (finish() applies scan lines/tint to both); hologram_window places the PICTURE where the settings say (window x = picture x - pad_left). Gestures: Hologram.gesture / _gesture_values / _shift / _lean (GESTURES durations). Reactions: REACTIONS table (event -> kind, chance), react_to(), subscribed in HologramFeed.attach, setting hologram.reactions. Test button plays clips then gestures.

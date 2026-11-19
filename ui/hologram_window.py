@@ -215,6 +215,10 @@ class HologramFeed:
     def gui_focus(self):
         return int(getattr(getattr(self.app, "state", None), "gui_focus", 0) or 0)
 
+    def in_world(self):
+        """True when Status.json shows a ship, SRV, fighter or on-foot switch. The main menu and the loading screens show none."""
+        return bool(getattr(getattr(self.app, "state", None), "in_world", False))
+
     def game_quit(self):
         """True when the game looks closed. The journal's idea of that can be wrong (Starling started while you sat still in a station, so
         Status.json was old), so seeing the Elite window in front overrules it."""
@@ -396,9 +400,16 @@ class HologramWindow:
             self.feed.game_gone()
         self.feed.pull_levels(holo)
         in_game = self.feed.game_in_focus(now)
-        self._why(now, None if (testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game))
-                  else ("powered down: Elite is not the window in front (or still starting up)" if not in_game else "powered down: a game screen is open (GuiFocus %d)" % focus))
-        powered = testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game)
+        waiting = bool(s.get("hologram.cockpit_only", True)) and not self.feed.in_world()
+        shown_ok = (focus == 0 and in_game and not waiting)
+        keep_on = testing or holo.moving or not s.get("hologram.power_down", True)
+        if not s.get("hologram.power_down", True) and waiting and not (testing or holo.moving):
+            keep_on = False                       # the menu rule still applies when she does not power down on other screens
+        self._why(now, None if (keep_on or shown_ok)
+                  else ("powered down: Elite is not the window in front (or still starting up)" if not in_game
+                        else "waiting: you are at the main menu or a loading screen (no cockpit yet)" if waiting
+                        else "powered down: a game screen is open (GuiFocus %d)" % focus))
+        powered = keep_on or shown_ok
         self._pose_test_step(holo, now)
         visible = holo.tick(listening=self.feed.listening(), thinking=self.feed.thinking(), powered=powered)
         if visible <= 0.03 and not holo.speaking:

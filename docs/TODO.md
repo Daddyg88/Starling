@@ -35,6 +35,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.97: she only appears in the game world. CHECK: start Starling first (she stays hidden), start Elite (hidden at menu and loading), load in (powers up), go back to the main menu (powers down), on foot / SRV / fighter / Nomad (she stays). If wrong, send a diagnostics ZIP.
 - [ ] 0.96.96: wide window + gestures + reactions. CHECK: she has not moved on screen; salute arm is whole; test button plays all; dock (nod), get refused (shake), get attacked (startle); drag her with Move and see she stays put; hologram not blocking clicks beside her. TOO WEAK/STRONG gestures are single numbers in ui/hologram.py _gesture_values. NEXT VIDEOS (prompts given): wave, worried, sad, laughing, shrug, wink, pointing, thumbs up; with arms kept inside the frame.
 - [ ] 0.96.95: salute with her o7 lines. CHECK: while live, type o7 in chat: she says 'o7 name' and salutes in step with it; two o7s together give one salute.
 - [ ] 0.96.94: salute. CHECK: say 'o7' and she salutes; start the game and she salutes after her greeting; see what the log says if the recogniser writes o7 another way. The forearm is cut by the left edge.

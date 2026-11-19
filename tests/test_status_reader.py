@@ -383,3 +383,34 @@ class SuitTemperatureWarningsAreCalmer(unittest.TestCase):
         self.feed(1)
         self.feed(1 | self.COLD, seconds=300.0)
         self.assertEqual(len([e for e in self.heard if e.name == "ColdWarning"]), 2)
+
+
+class InTheGameWorldTests(unittest.TestCase):
+    """The hologram waits at the main menu and loading screens: no switches in Status.json means you are not in the world yet."""
+
+    def setUp(self):
+        self.processor, _bus, _heard = make_processor()
+        self.reader = StatusReader(None, self.processor, min_gap_seconds={})
+        self.state = self.processor.state
+
+    def test_menu_has_no_switches(self):
+        self.reader.handle_status({"Flags": 0, "Flags2": 0})
+        self.assertFalse(self.state.in_world)
+
+    def test_cockpit_srv_fighter_and_on_foot_count(self):
+        for status in ({"Flags": 1 << 4}, {"Flags": 1 << 26}, {"Flags": 1 << 25}, {"Flags": 0, "Flags2": 1}):
+            self.state.in_world = False
+            self.reader.handle_status(status)
+            self.assertTrue(self.state.in_world, status)
+
+    def test_back_to_the_menu_and_shutdown(self):
+        self.reader.handle_status({"Flags": 1 << 4})
+        self.reader.handle_status({"Flags": 0, "Flags2": 0})
+        self.assertFalse(self.state.in_world)
+        self.reader.handle_status({"Flags": 1 << 4})
+        self.processor.handle_line('{"event":"Shutdown"}')
+        self.assertFalse(self.state.in_world)
+
+    def test_setting_exists_and_defaults_on(self):
+        from core.settings import DEFAULTS
+        self.assertTrue(DEFAULTS["hologram"]["cockpit_only"])

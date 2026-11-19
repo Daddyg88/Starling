@@ -505,6 +505,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("hologram.mouth_open", "Hologram mouth opening", "choice", HOLOGRAM_MOUTH, help="How wide her mouth opens when she talks"),
             Field("hologram.power_down", "Hologram powers down on other screens", "toggle",
                   help="She fades out when the galaxy map, a station menu or any other screen is open, and powers up when you are back in the cockpit"),
+            Field("hologram.cockpit_only", "Hologram only appears once you are in the game", "toggle",
+                  help="She waits through the main menu and the loading screens, powers up when you are in your cockpit (or on foot, or in an SRV, fighter, Nomad or Rhino), and powers down again if you go back to the main menu. Start Starling before or after the game, it does not matter"),
             Field("hologram.listening_colour", "Hologram turns green when she is listening", "toggle",
                   help="Green while you hold push-to-talk, or after she asks you a question. Never just because the microphone is open"),
             Field("hologram.thinking_colour", "Hologram turns amber when she is thinking", "toggle",

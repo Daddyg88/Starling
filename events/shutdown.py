@@ -10,6 +10,7 @@ class Shutdown(BaseEvent):
     summary = "Game shutting down"
 
     def update_state(self, entry, state):
+        state.in_world = False
         state.game_quit = True            # every overlay hides
         try:
             state.bio.reset()             # and the biology memory of the system is dropped
