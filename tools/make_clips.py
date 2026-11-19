@@ -1,9 +1,9 @@
 """
 Turns short videos of her (thinking, listening, pleased, bored...) into the 'pose clips' Starling plays at the right moments.
 
-    python tools/make_clips.py thinking=Thinking.mp4 listening=Listening.mp4 pleased=Pleased.mp4 bored1=Bored.mp4 bored2=Bored2.mp4
+    python tools/make_clips.py thinking=Thinking.mp4 listening=Listening.mp4 pleased=Pleased.mp4 salute=Salute.mp4 bored1=Bored.mp4 bored2=Bored2.mp4
 
-The names on the left are the ones Starling knows: thinking, listening, pleased, bored1, bored2 (bored1 and bored2 are picked at random).
+The names on the left are the ones Starling knows: thinking, listening, pleased, salute, bored1, bored2 (bored1 and bored2 are picked at random).
 Each clip should start and end in her normal pose, with the watermark already removed. What this does (needs ffmpeg):
   * takes 12 pictures a second,
   * scales and moves each clip so she sits exactly where she does in her still picture (ui/assets/hologram/base.jpg), whatever shape the video was,
@@ -27,7 +27,7 @@ import make_flipbook as mf          # noqa: E402  (the same fitting helpers the 
 ASSETS = mf.ASSETS
 FPS = 12
 STORE_HEIGHT = 480
-KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2")
+KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2", "salute")
 
 
 def best_fit(first, base):

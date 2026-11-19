@@ -638,7 +638,7 @@ class PoseClips(unittest.TestCase):
             self.holo.tick(now=self.c.t, **kw)
 
     def test_the_clip_files_are_there(self):
-        self.assertEqual(sorted(self.holo.assets.clips), ["bored1", "bored2", "listening", "pleased", "thinking"])
+        self.assertEqual(sorted(self.holo.assets.clips), ["bored1", "bored2", "listening", "pleased", "salute", "thinking"])
 
     def test_thinking_plays_then_leaves_when_the_answer_comes(self):
         self.run_for(0.5, thinking=True)
@@ -757,3 +757,62 @@ class ForcedClips(unittest.TestCase):
         self.assertIsNone(holo.clip)
         self.assertFalse(holo.clip_forced)
         h.clear_clips()
+
+
+class Salute(unittest.TestCase):
+    def setUp(self):
+        h.clear_clips()
+        self.holo, self.c = make()
+        self.holo.power = 1.0
+        h.get_clip(self.holo.assets, "salute", wait=True)
+        self.addCleanup(h.clear_clips)
+
+    def run_for(self, seconds, **kw):
+        for _ in range(int(seconds / 0.05)):
+            self.c.t += 0.05
+            self.holo.tick(now=self.c.t, **kw)
+
+    def test_salutes_at_once_when_asked_and_calm(self):
+        self.holo.salute(self.c.t)
+        self.run_for(0.3)
+        self.assertEqual(self.holo.clip, "salute")
+        self.assertGreater(self.holo.clip_mix, 0.5)
+        self.holo.render(self.c.t)
+
+    def test_waits_while_she_is_talking_then_goes(self):
+        self.holo.speech_started("Welcome back commander", self.c.t)
+        self.holo.salute(self.c.t)
+        self.run_for(1.0)
+        self.assertIsNone(self.holo.clip)
+        self.holo.speech_finished(self.c.t)
+        self.run_for(0.5)
+        self.assertEqual(self.holo.clip, "salute")
+
+    def test_dropped_if_she_never_gets_a_calm_moment(self):
+        self.holo.speech_started("A very long story", self.c.t)
+        self.holo.salute(self.c.t)
+        self.run_for(10.0)
+        self.assertIsNone(self.holo.salute_at)
+        self.holo.speech_finished(self.c.t)
+        self.run_for(1.0)
+        self.assertIsNone(self.holo.clip)
+
+    def test_delay_after_the_game_loads(self):
+        self.holo.salute(self.c.t, delay=12.0)
+        self.run_for(5.0)
+        self.assertIsNone(self.holo.clip)
+        self.run_for(8.0)
+        self.assertEqual(self.holo.clip, "salute")
+
+    def test_poses_off_means_no_salute(self):
+        self.holo.poses_on = False
+        self.holo.salute(self.c.t)
+        self.run_for(1.0)
+        self.assertIsNone(self.holo.clip)
+
+    def test_the_words_that_make_her_salute(self):
+        from ui.hologram_window import SALUTE_WORDS
+        for text in ("o7 commander", "Starling, oh seven", "give me a salute", "O7"):
+            self.assertTrue(SALUTE_WORDS.search(text), text)
+        for text in ("plot a route", "dock at station 7", "open the map"):
+            self.assertFalse(SALUTE_WORDS.search(text), text)

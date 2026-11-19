@@ -404,6 +404,8 @@ class Hologram:
         self.thinking_done = self.listening_done = False     # this round of thinking or listening already got its clip
         self.pose_wanted = None       # (clip name, earliest time) waiting for a calm moment
         self.bored_pick = None
+        self.salute_at = None         # when a salute was asked for (o7, or the game just loaded), and when to give up on it
+        self.salute_expire = 0.0
         self._rest(clock())
         self.talk_presence = 0.0      # 0..1, fades in while she talks (the side-to-side drift follows it)
         self.nod = 0.0                # 0..1, how far the head has dipped (smoothed from how open her mouth is)
@@ -568,6 +570,13 @@ class Hologram:
         self.next_pose = now + POSE_GAP
         return True
 
+    def salute(self, now=None, delay=0.0):
+        """She should salute as soon as it is calm (you said o7, or the game just loaded). It waits for her to stop talking, and is dropped after 8 seconds."""
+        now = self.clock() if now is None else now
+        if self.poses_on and "salute" in self.assets.clips:
+            self.salute_at, self.salute_expire = now + delay, now + delay + 8.0
+            get_clip(self.assets, "salute")                                          # start loading it now
+
     def stop_clip(self, fast=False):
         self.clip = None
         self.clip_fast_out = fast
@@ -589,11 +598,18 @@ class Hologram:
                 self.clip_forced = False
         else:
             calm = (not self.speaking) and self.power > 0.9 and not self.moving
+            if self.salute_at is not None and now > self.salute_expire:
+                self.salute_at = None                                                # she never got a calm moment: forget it
             if self.speaking and self.clip:
                 self.stop_clip(fast=True)
             listen_now = bool(listening) or now < self.listen_until
             if calm:
-                if thinking and self.clip is None and not self.thinking_done:
+                if self.salute_at is not None and now >= self.salute_at:
+                    if now > self.salute_expire:
+                        self.salute_at = None
+                    elif self.clip is None and not thinking and self.start_clip("salute", now):
+                        self.salute_at = None
+                elif thinking and self.clip is None and not self.thinking_done:
                     self.thinking_done = self.start_clip("thinking", now)           # if it is still loading we try again on the next tick
                 elif listen_now and not thinking and self.clip is None and not self.listening_done:
                     self.listening_done = self.start_clip("listening", now)

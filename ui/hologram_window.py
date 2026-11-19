@@ -9,6 +9,7 @@ this file only shows the pixels in a see-through, click-through window and lets 
   * If anything goes wrong the hologram switches itself off for the session and says why in the log. It never touches the game.
 """
 
+import re
 import time
 
 from core.logger import get_logger
@@ -21,7 +22,9 @@ SHOWN_MS = 100           # while she is shown: ten pictures a second
 TALKING_MS = 66          # while she speaks: fifteen
 MOVE_SECONDS = 90
 TEST_SECONDS = 10
-PPOSE_TEST_SECONDS = 45
+PPOSE_TEST_SECONDS = 50
+SALUTE_AFTER_LOAD = 12.0         # seconds after the game loads, so her greeting has finished first
+SALUTE_WORDS = re.compile(r"\b(o7|o 7|oh seven|o seven|salute)\b", re.IGNORECASE)
 TEST_LINE = "Commander, this is how I will look on your dash. Gear down and nice and easy."
 
 
@@ -110,6 +113,7 @@ class HologramFeed:
         bus.subscribe("speech.audio", self._audio)
         bus.subscribe("speech.finished", self._finished)
         bus.subscribe("voice.heard", self._heard)
+        bus.subscribe("LoadGame", self._game_loaded)
         self._attached = True
 
     def _started(self, event):
@@ -161,9 +165,23 @@ class HologramFeed:
         except Exception:
             log.exception("The hologram could not follow the end of a line")
 
+    def _game_loaded(self, event):
+        """The game just loaded: once her greeting is done she gives you a salute."""
+        try:
+            holo = self.get()
+            if holo is not None:
+                holo.salute(delay=SALUTE_AFTER_LOAD)
+        except Exception:
+            log.exception("The hologram could not get ready to salute")
+
     def _heard(self, event):
         try:
             data = event.data
+            said = " ".join(str(data.get(k) or "") for k in ("command", "text"))
+            if SALUTE_WORDS.search(said):
+                holo = self.get()
+                if holo is not None:
+                    holo.salute()                    # "o7" or "salute": she salutes back
             if data.get("wake") and not (data.get("command") or "").strip():
                 holo = self.get()
                 if holo is not None and self.app.settings.get("hologram.listening_colour", True):
@@ -257,7 +275,7 @@ class HologramWindow:
     def test_poses(self):
         """Shows her and plays every pose clip once, one after another (about 35 seconds), whatever the game is doing."""
         self.test_until = time.monotonic() + POSE_TEST_SECONDS
-        self.pose_queue = ["thinking", "listening", "pleased", "bored1", "bored2"]
+        self.pose_queue = ["thinking", "listening", "pleased", "salute", "bored1", "bored2"]
         if self.holo is not None:
             self.holo.stop_clip(fast=True)
 

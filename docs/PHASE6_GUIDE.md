@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.94 - salute
+
+salute clip (tools/make_clips.py salute=...). Hologram.salute(now, delay) sets salute_at/salute_expire; _poses plays it when calm. Triggers in ui/hologram_window.py: voice.heard text matching SALUTE_WORDS, and LoadGame (SALUTE_AFTER_LOAD 12 s). Tests: tests/test_hologram.py Salute.
+
 ## 0.96.93 - natural lips, head motion and pose clips
 
 Lips: ui/hologram.py mouth_at (look-ahead LEAD, short sounds absorbed, pauses held), SOFT consonants, ATTACK/RELEASE, jaw drop (_drop_jaw). Head: _nod (NOD, SWAY, setting hologram.talk_motion). Pose clips: tools/make_clips.py turns videos into ui/assets/hologram/clips/<name>/*.jpg + clips.json; Hologram._poses decides what plays (thinking, listening, pleased after a long line 1 in 4, bored after 90-180 s quiet), get_clip loads in the background and keeps thinking+listening pinned, one other clip at a time. Setting hologram.poses. Test button: Play all her hologram poses once. A flip book kept at half strength while talking was tried and dropped (doubled face edges).
