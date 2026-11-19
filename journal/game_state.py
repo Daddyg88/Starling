@@ -81,4 +81,5 @@ class GameState:
     altitude: Optional[float] = None        # Status.json Altitude in metres (only near a planet)
     gui_focus: int = 0                      # which screen is open (Status.json GuiFocus): 6 = galaxy map
     in_world: bool = False                  # Status.json shows a ship, SRV, fighter or on-foot switch: you are in the game world, not at the main menu or a loading screen
+    at_main_menu: bool = False              # the journal's Music event says MainMenu (cleared by any other track or LoadGame)
     status_seen: bool = False               # True once Status.json has been read

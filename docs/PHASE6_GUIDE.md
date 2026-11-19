@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.98 - she leaves at the main menu
+
+Status.json is not rewritten at the main menu, so `state.in_world` stayed True. journal/processor.py `_note_music` now sets `state.at_main_menu` from the journal's Music event (MusicTrack "MainMenu"); any other track, LoadGame or Shutdown clears it. `HologramFeed.in_world()` is in_world and not at_main_menu. Unverified against the real game.
+
 ## 0.96.97 - she waits for the cockpit
 
 `state.in_world` (journal/game_state.py) is set in journal/status_reader.py: True when Status.json Flags or Flags2 has any switch. The menu and loading screens write none; ships, SRV, fighter (Flags) and on foot (Flags2 bit 0) always have one. Shutdown clears it. ui/hologram_window.py gates `powered` on it through the setting `hologram.cockpit_only` (default on). The log says "waiting: you are at the main menu or a loading screen". Unverified against the real game; a stale Status.json from the last session could briefly show her at the menu.

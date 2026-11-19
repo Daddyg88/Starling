@@ -13,6 +13,7 @@ class LoadGame(BaseEvent):
 
     def update_state(self, entry, state):
         state.game_quit = False
+        state.at_main_menu = False
         state.commander = entry.get("Commander", state.commander)
         if not entry.get("Ship") or is_ship(entry.get("Ship")):      # logging in inside the Nomad or an SRV does not change which ship is yours
             state.ship = entry.get("Ship_Localised") or entry.get("Ship") or state.ship

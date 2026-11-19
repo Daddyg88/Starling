@@ -414,3 +414,26 @@ class InTheGameWorldTests(unittest.TestCase):
     def test_setting_exists_and_defaults_on(self):
         from core.settings import DEFAULTS
         self.assertTrue(DEFAULTS["hologram"]["cockpit_only"])
+
+
+class MainMenuMusicTests(unittest.TestCase):
+    def setUp(self):
+        self.processor, _bus, _heard = make_processor()
+        self.state = self.processor.state
+
+    def test_menu_track_sets_and_other_track_clears(self):
+        self.processor.handle_line('{"event":"Music","MusicTrack":"MainMenu"}')
+        self.assertTrue(self.state.at_main_menu)
+        self.processor.handle_line('{"event":"Music","MusicTrack":"Exploration"}')
+        self.assertFalse(self.state.at_main_menu)
+
+    def test_load_game_and_shutdown_clear_it(self):
+        for event in ('{"event":"LoadGame","Commander":"B","Ship":"sidewinder"}', '{"event":"Shutdown"}'):
+            self.state.at_main_menu = True
+            self.processor.handle_line(event)
+            self.assertFalse(self.state.at_main_menu)
+
+    def test_music_is_still_not_announced(self):
+        _p, _b, heard = make_processor()
+        _p.handle_line('{"event":"Music","MusicTrack":"MainMenu"}')
+        self.assertEqual(heard, [])

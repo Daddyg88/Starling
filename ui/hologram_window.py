@@ -217,7 +217,8 @@ class HologramFeed:
 
     def in_world(self):
         """True when Status.json shows a ship, SRV, fighter or on-foot switch. The main menu and the loading screens show none."""
-        return bool(getattr(getattr(self.app, "state", None), "in_world", False))
+        state = getattr(self.app, "state", None)
+        return bool(getattr(state, "in_world", False)) and not bool(getattr(state, "at_main_menu", False))
 
     def game_quit(self):
         """True when the game looks closed. The journal's idea of that can be wrong (Starling started while you sat still in a station, so

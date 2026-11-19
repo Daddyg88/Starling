@@ -36,6 +36,8 @@ class EventProcessor:
     def handle_line(self, line, silent=False):
         """Process one journal line. silent=True updates state but says nothing."""
         name = parser.extract_event_name(line)
+        if name == "Music":
+            self._note_music(line)
         handler = self.registry.get(name) if name else None
         if handler is None or handler.source != "journal":
             self.unknown_events += 1
@@ -48,6 +50,16 @@ class EventProcessor:
             log.warning("Skipping a damaged journal line (%s)", name)
             return
         self.handle_entry(entry, silent)
+
+    def _note_music(self, line):
+        """The game plays the 'MainMenu' track when you are at the main menu, and a different one once you are back in the world.
+        Status.json is not rewritten at the menu, so this is how she knows you left the cockpit."""
+        try:
+            track = str((parser.parse_entry(line) or {}).get("MusicTrack") or "")
+        except Exception:
+            return
+        if track:
+            self.state.at_main_menu = track.lower() == "mainmenu"
 
     def handle_entry(self, entry, silent=False):
         handler = self.registry.get(entry.get("event"))
