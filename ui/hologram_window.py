@@ -21,6 +21,7 @@ SHOWN_MS = 100           # while she is shown: ten pictures a second
 TALKING_MS = 66          # while she speaks: fifteen
 MOVE_SECONDS = 90
 TEST_SECONDS = 10
+PPOSE_TEST_SECONDS = 45
 TEST_LINE = "Commander, this is how I will look on your dash. Gear down and nice and easy."
 
 
@@ -253,6 +254,21 @@ class HologramWindow:
         if self.holo is not None:
             self.holo.speech_started(TEST_LINE)
 
+    def test_poses(self):
+        """Shows her and plays every pose clip once, one after another (about 35 seconds), whatever the game is doing."""
+        self.test_until = time.monotonic() + POSE_TEST_SECONDS
+        self.pose_queue = ["thinking", "listening", "pleased", "bored1", "bored2"]
+        if self.holo is not None:
+            self.holo.stop_clip(fast=True)
+
+    def _pose_test_step(self, holo, now):
+        """Starts the next clip of the test when the one before has finished (a clip that is still loading is simply asked again next tick)."""
+        queue = getattr(self, "pose_queue", None)
+        if not queue or holo.clip is not None or holo.clip_mix > 0.05 or holo.speaking:
+            return
+        if holo.start_clip(queue[0], now, forced=True):
+            queue.pop(0)
+
     def start_move(self, seconds=MOVE_SECONDS):
         self.moving_until = time.monotonic() + seconds
 
@@ -336,6 +352,11 @@ class HologramWindow:
         holo.fx_beam = bool(s.get("hologram.sparks", True))
         holo.fx_turn = bool(s.get("hologram.turn", True))
         holo.idle_on = bool(s.get("hologram.idle_loop", True))
+        holo.poses_on = bool(s.get("hologram.poses", True))
+        holo.talk_motion = bool(s.get("hologram.talk_motion", True))
+        if holo.poses_on and not getattr(holo, "clips_preloaded", False):
+            holo.clips_preloaded = True
+            holo.preload_clips()                      # thinking and listening load in the background so they are ready when needed
         holo.moving = self.moving()
         testing = now < self.test_until
         focus = self.feed.gui_focus()
@@ -346,6 +367,7 @@ class HologramWindow:
         self._why(now, None if (testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game))
                   else ("powered down: Elite is not the window in front (or still starting up)" if not in_game else "powered down: a game screen is open (GuiFocus %d)" % focus))
         powered = testing or holo.moving or not s.get("hologram.power_down", True) or (focus == 0 and in_game)
+        self._pose_test_step(holo, now)
         visible = holo.tick(listening=self.feed.listening(), thinking=self.feed.thinking(), powered=powered)
         if visible <= 0.03 and not holo.speaking:
             if self._shown:

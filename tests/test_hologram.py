@@ -554,3 +554,206 @@ class Defaults(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SofterLips(unittest.TestCase):
+    def test_consonants_only_half_open_and_p_b_m_close(self):
+        self.assertEqual(h.VOWEL["t"], "soft")
+        self.assertEqual(h.PHONEME_SHAPES["n"], "soft")
+        self.assertEqual(h.VOWEL["m"], "pressed")
+        self.assertEqual(h.targets("soft"), {"eh": h.SOFT})
+        self.assertEqual(h.targets("ah"), {"ah": 1.0})
+        self.assertEqual(h.targets(None), {})
+
+    def test_a_very_short_sound_lends_its_time_to_the_one_before(self):
+        track = [(0.0, 0.2, "ah"), (0.2, 0.21, "oo"), (0.21, 0.4, "ee")]
+        self.assertEqual(h.mouth_at(track, 0.205), "ah")
+        self.assertEqual(h.mouth_at(track, 0.3), "ee")
+
+    def test_p_b_m_are_never_skipped(self):
+        track = [(0.0, 0.2, "ah"), (0.2, 0.21, "pressed"), (0.21, 0.4, "ee")]
+        self.assertEqual(h.mouth_at(track, 0.205), "pressed")
+
+    def test_short_pause_keeps_the_mouth_long_pause_closes_it(self):
+        short = [(0.0, 0.2, "ah"), (0.2, 0.28, None), (0.28, 0.5, "ee")]
+        long = [(0.0, 0.2, "ah"), (0.2, 0.6, None), (0.6, 0.8, "ee")]
+        self.assertEqual(h.mouth_at(short, 0.24), "ah")
+        self.assertIsNone(h.mouth_at(long, 0.4))
+
+    def test_mouth_starts_a_little_early(self):
+        holo, c = make()
+        holo.speech_started("x", c.t)
+        holo.track = [(0.0, 0.3, None), (0.3, 0.6, "ah")]
+        holo.exact_track = True
+        c.t += 0.3 - h.LEAD + 0.01
+        self.assertEqual(holo._mouth_goal(c.t), "ah")
+
+    def test_opening_is_quicker_than_closing(self):
+        self.assertLess(h.ATTACK, h.RELEASE)
+
+    def test_jaw_drops_with_an_open_mouth_and_picture_changes(self):
+        holo, c = make()
+        holo.power = 1.0
+        holo.idle_on = False
+        holo.fx_turn = holo.fx_beam = holo.flicker_on = False
+        quiet = holo.render(c.t).copy()
+        self.assertEqual(holo._jaw_drop(), 0.0)
+        holo.weights["ah"] = 1.0
+        self.assertGreater(holo._jaw_drop(), 0.5)
+        self.assertEqual(holo.render(c.t).shape, quiet.shape)
+
+    def test_head_nods_only_while_talking(self):
+        holo, c = make()
+        holo.power = 1.0
+        for _ in range(10):
+            c.t += 0.05
+            holo.tick(now=c.t)
+        self.assertLess(holo.nod, 0.01)
+        holo.speech_started("Hello commander how are you today", c.t)
+        holo.track = [(0.0, 5.0, "ah")]
+        holo.exact_track = True
+        for _ in range(20):
+            c.t += 0.05
+            holo.tick(now=c.t)
+        self.assertGreater(holo.nod, 0.3)
+        holo.render(c.t)                                     # the nod and sway must draw without a problem
+        holo.talk_motion = False
+        holo.render(c.t)
+
+
+class PoseClips(unittest.TestCase):
+    def setUp(self):
+        h.clear_clips()
+        self.holo, self.c = make()
+        self.holo.power = 1.0
+        for name in h.PINNED:
+            h.get_clip(self.holo.assets, name, wait=True)
+
+    def tearDown(self):
+        h.clear_clips()
+
+    def run_for(self, seconds, **kw):
+        for _ in range(int(seconds / 0.05)):
+            self.c.t += 0.05
+            self.holo.tick(now=self.c.t, **kw)
+
+    def test_the_clip_files_are_there(self):
+        self.assertEqual(sorted(self.holo.assets.clips), ["bored1", "bored2", "listening", "pleased", "thinking"])
+
+    def test_thinking_plays_then_leaves_when_the_answer_comes(self):
+        self.run_for(0.5, thinking=True)
+        self.assertEqual(self.holo.clip, "thinking")
+        self.assertGreater(self.holo.clip_mix, 0.9)
+        picture = self.holo.render(self.c.t)
+        self.assertEqual(picture.shape[0], self.holo.assets.window_h)
+        self.run_for(1.0, thinking=False)
+        self.assertIsNone(self.holo.clip)
+        self.assertLess(self.holo.clip_mix, 0.05)
+
+    def test_thinking_clip_ends_by_itself_and_is_not_repeated(self):
+        self.run_for(0.2, thinking=True)
+        self.assertEqual(self.holo.clip, "thinking")
+        self.run_for(7.0, thinking=True)
+        self.assertIsNone(self.holo.clip)
+        self.run_for(1.0, thinking=True)
+        self.assertIsNone(self.holo.clip)                   # the same thought does not replay it
+
+    def test_listening_clip_follows_her_name(self):
+        self.holo.heard_her_name(self.c.t)
+        self.run_for(0.5)
+        self.assertEqual(self.holo.clip, "listening")
+
+    def test_speaking_cuts_a_clip_off_quickly(self):
+        self.run_for(0.5, thinking=True)
+        self.holo.speech_started("Here you go", self.c.t)
+        self.run_for(0.4, thinking=False)
+        self.assertIsNone(self.holo.clip)
+        self.assertLess(self.holo.clip_mix, 0.1)
+
+    def test_mouth_pictures_are_hidden_while_a_clip_plays(self):
+        self.run_for(1.0, thinking=True)
+        self.holo.weights["ah"] = 1.0
+        before = self.holo.clip_mix
+        self.assertGreater(before, 0.9)
+        self.holo.render(self.c.t)                          # draws without error with the clip on top
+
+    def test_bored_after_a_long_quiet_time(self):
+        self.holo.assets.clips = ["bored1", "bored2"]
+        old, h.CLIP_LRU = h.CLIP_LRU, 2                       # both stay loaded here, so the test does not wait for a background load
+        self.addCleanup(setattr, h, "CLIP_LRU", old)
+        for name in ("bored1", "bored2"):
+            h.get_clip(self.holo.assets, name, wait=True)
+        self.run_for(h.BORED_AFTER[0] - 5)
+        self.assertIsNone(self.holo.clip)                      # not bored yet
+        seen = set()
+        for _ in range(int((h.BORED_AFTER[1] - h.BORED_AFTER[0] + 20) / 0.1)):
+            self.c.t += 0.1
+            self.holo.tick(now=self.c.t)
+            seen.add(self.holo.clip)
+        self.assertTrue(seen & {"bored1", "bored2"})
+
+    def test_pleased_after_a_long_line(self):
+        class Always(random.Random):
+            def random(self): return 0.0
+        self.holo.rng = Always()
+        h.get_clip(self.holo.assets, "pleased", wait=True)
+        self.holo.speech_started("Here is a long answer for you commander", self.c.t)
+        self.c.t += 3.0
+        self.holo.speech_finished(self.c.t)
+        seen = set()
+        for _ in range(int((h.POSE_GAP + h.SMILE_SECONDS + 3) / 0.1)):
+            self.c.t += 0.1
+            self.holo.tick(now=self.c.t)
+            seen.add(self.holo.clip)
+        self.assertIn("pleased", seen)
+
+    def test_switched_off_means_no_clip(self):
+        self.holo.poses_on = False
+        self.run_for(1.0, thinking=True)
+        self.assertIsNone(self.holo.clip)
+
+    def test_missing_clips_do_not_break_anything(self):
+        import tempfile, shutil
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("base.jpg", "hologram.json"):
+                shutil.copy(h.ASSET_DIR / name, Path(tmp) / name)
+            for png in h.ASSET_DIR.glob("*.png"):
+                shutil.copy(png, Path(tmp) / png.name)
+            holo = h.Hologram(h.Assets(225, tmp), random.Random(1), self.c)
+            holo.power = 1.0
+            for _ in range(20):
+                self.c.t += 0.05
+                holo.tick(thinking=True, now=self.c.t)
+            self.assertIsNone(holo.clip)
+            holo.render(self.c.t)
+
+    def test_only_a_few_clips_stay_in_memory(self):
+        a = self.holo.assets
+        for name in ("pleased", "bored1", "bored2"):
+            h.get_clip(a, name, wait=True)
+        kept = [key[2] for key in h._CLIPS]
+        self.assertIn("thinking", kept)
+        self.assertIn("listening", kept)
+        self.assertEqual(len([n for n in kept if n not in h.PINNED]), h.CLIP_LRU)
+
+
+class ForcedClips(unittest.TestCase):
+    def test_a_test_clip_plays_to_the_end_even_with_poses_off_and_no_thinking(self):
+        h.clear_clips()
+        holo, c = make()
+        holo.power = 1.0
+        holo.poses_on = False
+        h.get_clip(holo.assets, "thinking", wait=True)
+        self.assertTrue(holo.start_clip("thinking", c.t, forced=True))
+        for _ in range(40):
+            c.t += 0.1
+            holo.tick(thinking=False, now=c.t)
+        self.assertEqual(holo.clip, "thinking")                 # 4 seconds in, still playing
+        self.assertGreater(holo.clip_mix, 0.9)
+        for _ in range(60):
+            c.t += 0.1
+            holo.tick(thinking=False, now=c.t)
+        self.assertIsNone(holo.clip)
+        self.assertFalse(holo.clip_forced)
+        h.clear_clips()

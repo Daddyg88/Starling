@@ -35,6 +35,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.93: lips, head motion, pose clips. CHECK: Personality page > 'Play all her hologram poses once'; say 'Starling' and wait (listening); ask something slow (thinking); a long answer (maybe pleased); leave her quiet 3 minutes (bored); lips look softer on a normal line. REPLACE the five temporary clips with better ones (arm stays inside the frame) using tools/make_clips.py. The right edge cuts the arm in the thinking clip.
 - [ ] 0.96.91: 9 more shipped line-ups. CHECK: visit Prieto, Tutunnyk, Craig, Dovzhenko or Acosta; the map should line up straight away. TO BUILD: maps for Hobbs and Bonetti (High Tech 3), Pozandr (Agriculture 2), Benton (Agriculture 5) from the recordings in the zips.
 - [ ] 0.96.90: 'denied'. CHECK: ask for docking at a pad that refuses you; she says 'dih-nide' correctly.
 - [ ] 0.96.89: fleet carrier name. CHECK: open carrier management once, dock at your carrier: she says its name, and never 'Nth visit' remarks there.

@@ -857,7 +857,8 @@ class Dashboard:
                       ("Show a test route map for 10 seconds", self.test_route_overlay)]
         if page.id == "personality":
             extra += [("Move her hologram (drag her, double-click to lock)", self.move_hologram),
-                      ("Show her hologram for 10 seconds (test)", self.test_hologram)]
+                      ("Show her hologram for 10 seconds (test)", self.test_hologram),
+                      ("Play all her hologram poses once (test, about 40 seconds)", self.test_hologram_poses)]
         if page.id == "redalert":
             extra += [("Red alert: switch on / off", self.toggle_red_alert),
                       ("Show the RED ALERT banner for 8 seconds (test)", self.test_red_alert)]
@@ -1730,6 +1731,13 @@ class Dashboard:
             self.model.save()
         if getattr(self, "hologram_window", None) is not None:
             self.hologram_window.show_test(10)
+
+    def test_hologram_poses(self):
+        """Shows her hologram and plays thinking, listening, pleased and both bored clips one after another."""
+        if self.model.dirty():
+            self.model.save()
+        if getattr(self, "hologram_window", None) is not None:
+            self.hologram_window.test_poses()
 
     def move_hologram(self):
         """Lets you drag her hologram where you want it for 90 seconds; double-click her to lock. The spot is remembered."""

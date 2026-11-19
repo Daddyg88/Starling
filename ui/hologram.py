@@ -22,6 +22,7 @@ see-through: the picture's black background simply disappears.
 import json
 import math
 import random
+import threading
 import time
 from pathlib import Path
 
@@ -51,11 +52,29 @@ GHOST = 0.0                      # powered down = fully gone (the window hides)
 # ---- mouth ----
 VOWEL = {"a": "ah", "e": "eh", "i": "eh", "y": "eh", "o": "oh", "u": "oo", "w": "oo",
          "m": "pressed", "b": "pressed", "p": "pressed", "f": "fv", "v": "fv",
-         "s": "eh", "t": "eh", "d": "eh", "n": "eh", "z": "eh", "c": "eh"}
+         "s": "soft", "t": "soft", "d": "soft", "n": "soft", "z": "soft", "c": "soft", "l": "soft"}
 MOUTH_SPRITES = ("pressed", "eh", "ah", "oh", "oo", "ee", "smile", "fv")
 BIGGEST = {"ah": 1.0, "oh": 0.9, "eh": 0.85, "ee": 0.9, "oo": 0.9}      # how much "open" each needs (see MouthShape.weights)
 DEFAULT_CPS = 13.0               # letters per second, until she has spoken a few lines and we know better
 SMILE_SECONDS = 1.8
+# softer, more natural lips (0.96.93)
+LEAD = 0.05                      # the mouth starts moving this early, the way a real one does before the sound
+ATTACK, RELEASE = 0.045, 0.085   # seconds to open towards a shape, and to let go of it (letting go is slower, so shapes blend)
+SOFT = 0.8                       # t, d, n, s, l...: the tongue does the work, so the lips only part a little (the "eh" picture, a little weaker)
+MIN_HOLD = 0.04                  # a sound shorter than this does not get its own mouth shape (the one before carries on)
+GAP_HOLD = 0.12                  # a pause shorter than this between two sounds keeps the mouth where it was instead of closing it
+JAW = {"ah": 1.0, "oh": 0.7, "eh": 0.45, "ee": 0.35, "oo": 0.5, "fv": 0.15}   # how far the chin drops for each mouth picture
+NOD = 0.007                      # her head dips this fraction of her height on an open mouth (a speaking nod)
+SWAY = 0.0035                    # and drifts this fraction of her width from side to side while she talks
+TALK_IDLE = 0.0                  # how much of the flip book keeps playing while she talks (0 = none)
+# ---- pose clips (0.96.93): short recorded moments she plays at the right time ----
+CLIP_IN, CLIP_OUT, CLIP_OUT_FAST = 0.35, 0.5, 0.2      # seconds to fade a clip in, out, and out when she starts to talk
+BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this range) and she may get bored
+POSE_GAP = 60.0                  # at least this long between two clips
+PLEASED_CHANCE = 0.25            # how often a spoken line ends with the pleased clip
+CLIP_LRU = 1                     # clips other than thinking and listening that are kept in memory
+JAW_DROP = 0.006                 # the biggest chin drop, as a fraction of her height
+JAW_TOP, JAW_FULL, JAW_CHIN, JAW_END = 0.338, 0.372, 0.42, 0.462     # where the jaw moves, as fractions of the picture height: upper lip, full, chin, back to still
 
 
 def hue_matrix(degrees):
@@ -100,7 +119,7 @@ def build_track(text, cps=DEFAULT_CPS):
 # The sounds Kokoro hands over (its phoneme letters) and which mouth picture each one needs.
 PHONEME_SHAPES = {}
 for _letters, _shape in (("aɑæʌɐIW", "ah"), ("eɛəɜɚᵻA", "eh"), ("iɪy", "ee"), ("oɔɒOQY", "oh"), ("uʊwɯ", "oo"),
-                         ("pbm", "pressed"), ("fv", "fv"), ("tdsznlʃʒʧʤθð", "eh")):
+                         ("pbm", "pressed"), ("fv", "fv"), ("tdsznlʃʒʧʤθð", "soft")):
     for _char in _letters:
         PHONEME_SHAPES[_char] = _shape
 NO_TIME = "ˈˌː"                 # stress and length marks: they carry no mouth shape of their own
@@ -153,6 +172,28 @@ def shape_at(track, elapsed):
     return None
 
 
+def mouth_at(track, elapsed):
+    """Like shape_at, but kinder to the eye: a very short sound lends its time to the one before, and a short pause between two sounds
+    keeps the mouth where it was (a real mouth does not shut between every word)."""
+    for k, (start, end, shape) in enumerate(track):
+        if start <= elapsed < end:
+            if shape is None:
+                if end - start < GAP_HOLD and 0 < k < len(track) - 1 and track[k - 1][2] and track[k + 1][2]:
+                    return track[k - 1][2]
+                return None
+            if end - start < MIN_HOLD and shape != "pressed" and k > 0 and track[k - 1][2]:
+                return track[k - 1][2]
+            return shape
+    return None
+
+
+def targets(mouth):
+    """Which mouth pictures to show, and how strongly, for a shape name. 'soft' is the eh picture, half open."""
+    if mouth == "soft":
+        return {"eh": SOFT}
+    return {mouth: 1.0} if mouth else {}
+
+
 def reach(open_fraction, name):
     """How strongly to show a mouth picture. open_fraction = 1.0 is the full wide-open picture, lower is a softer, smaller mouth."""
     big = BIGGEST.get(name)
@@ -186,6 +227,8 @@ class Assets:
         self.directory = directory
         self._idle = None
         self.rings = self._rings()
+        self.clips = clip_names(directory)
+        self.clip_rates = {n: clip_fps(directory, n) for n in self.clips}
 
     @property
     def idle(self):
@@ -234,6 +277,82 @@ def load_idle(directory, height, width):
     return result
 
 
+_CLIPS = {}                       # (folder, height, name) -> frames, loaded once
+_CLIP_ORDER = []
+_CLIP_LOADING = set()
+_CLIP_LOCK = threading.Lock()
+PINNED = ("thinking", "listening")
+
+
+def load_clip(directory, name, height, width):
+    """The pictures of one pose clip at her size (uint8 arrays), or [] when it is missing."""
+    try:
+        from PIL import Image
+        directory = Path(directory)
+        meta = json.loads((directory / "clips.json").read_text(encoding="utf-8"))[name]
+        frames = []
+        for number in range(int(meta["frames"])):
+            picture = Image.open(directory / "clips" / name / ("%03d.jpg" % number)).convert("RGB").resize((width, height), Image.BILINEAR)
+            frames.append(np.asarray(picture, dtype=np.uint8))
+        return frames
+    except Exception:
+        return []
+
+
+def clip_names(directory):
+    try:
+        meta = json.loads((Path(directory) / "clips.json").read_text(encoding="utf-8"))
+        return [k for k, v in meta.items() if isinstance(v, dict) and (Path(directory) / "clips" / k).is_dir()]
+    except Exception:
+        return []
+
+
+def clip_fps(directory, name):
+    try:
+        return float(json.loads((Path(directory) / "clips.json").read_text(encoding="utf-8"))[name].get("fps", 12))
+    except Exception:
+        return 12.0
+
+
+def get_clip(assets, name, wait=False):
+    """The frames of a clip if they are in memory; otherwise start loading them in the background (so the screen never stops) and return None.
+    Only thinking and listening stay in memory for good; of the others the latest one is kept."""
+    key = (str(assets.directory), assets.height, name)
+    with _CLIP_LOCK:
+        if key in _CLIPS:
+            if name not in PINNED:
+                _CLIP_ORDER.remove(key)
+                _CLIP_ORDER.append(key)
+            return _CLIPS[key]
+        if key in _CLIP_LOADING and not wait:
+            return None
+        _CLIP_LOADING.add(key)
+
+    def work():
+        frames = load_clip(assets.directory, name, assets.height, assets.width)
+        with _CLIP_LOCK:
+            _CLIP_LOADING.discard(key)
+            if frames:
+                _CLIPS[key] = frames
+                if name not in PINNED:
+                    _CLIP_ORDER.append(key)
+                    while len(_CLIP_ORDER) > CLIP_LRU:
+                        _CLIPS.pop(_CLIP_ORDER.pop(0), None)
+        return frames
+
+    if wait:
+        return work() or None
+    threading.Thread(target=work, daemon=True, name="hologram-clip").start()
+    return None
+
+
+def clear_clips():
+    with _CLIP_LOCK:
+        _CLIPS.clear()
+        _CLIP_ORDER.clear()
+        _CLIP_LOADING.clear()
+
+
 class Hologram:
     """What she looks like right now. Feed it facts (tick), then ask for the pixels (render)."""
 
@@ -270,11 +389,30 @@ class Hologram:
         self.first_frame = True
         self.idle_on = True           # play the flip book (breathing, sway) while she is quiet
         self.idle_mix = 1.0           # 1 = the flip book, 0 = the still picture that the mouth pictures fit
+        self.talk_motion = True       # her head nods and sways a little while she talks
+        self.talk_idle = TALK_IDLE
+        self.poses_on = True          # play the recorded pose clips (thinking, listening, pleased, bored)
+        self.clip = None              # the name of the clip playing, or None
+        self.clip_frames, self.clip_fps = None, 12.0
+        self.clip_forced = False      # the test button started it: it plays to the end whatever she is doing
+        self.clip_start = 0.0
+        self.clip_mix = 0.0           # 0..1, how much of the clip shows
+        self.clip_fast_out = False
+        self.last_activity = clock()
+        self.bored_after = 0.0        # filled in by _rest(): how long she may be quiet before she gets bored
+        self.next_pose = 0.0          # no clip starts before this
+        self.thinking_done = self.listening_done = False     # this round of thinking or listening already got its clip
+        self.pose_wanted = None       # (clip name, earliest time) waiting for a calm moment
+        self.bored_pick = None
+        self._rest(clock())
+        self.talk_presence = 0.0      # 0..1, fades in while she talks (the side-to-side drift follows it)
+        self.nod = 0.0                # 0..1, how far the head has dipped (smoothed from how open her mouth is)
 
     # ---- what happens ----
     def speech_started(self, text, now=None):
         now = self.clock() if now is None else now
         self.line_text = str(text or "")
+        self._rest(now)
         self.track = build_track(self.line_text, self.cps)
         self.track_start, self.speaking = now, True
         self.time_scale = 1.0
@@ -327,11 +465,15 @@ class Hologram:
             self.cps = max(8.0, min(22.0, 0.6 * self.cps + 0.4 * measured))
         self.speaking = False
         self.smile_until = now + SMILE_SECONDS
+        self._rest(now)
+        if letters >= 25 and self.rng.random() < PLEASED_CHANCE:
+            self.pose_wanted = ("pleased", now + SMILE_SECONDS)             # after the smile, so the two do not fight
 
     def heard_her_name(self, now=None):
         """Her name was said on its own: she is waiting for the rest."""
         now = self.clock() if now is None else now
         self.listen_until = now + LISTEN_SECONDS
+        self._rest(now)
 
     # ---- one step ----
     def colour_wanted(self, listening, thinking, now):
@@ -357,7 +499,8 @@ class Hologram:
         rate = dt / (UP_SECONDS if goal_power > self.power else DOWN_SECONDS)
         self.power += max(-rate, min(rate, goal_power - self.power))
         talking = self.speaking or now < self.smile_until or any(self.weights.get(n, 0.0) > 0.05 for n in LIVE_SHAPES)
-        goal_idle = 0.0 if (talking or not self.idle_on) else 1.0
+        self._poses(listening, thinking, now, dt)
+        goal_idle = 0.0 if self.clip else ((self.talk_idle if talking else 1.0) if self.idle_on else 0.0)
         rate = 0.3 if goal_idle < self.idle_mix else 0.9                                # leaves the loop fast, returns to it slowly
         self.idle_mix += max(-1.0, min(1.0, (goal_idle - self.idle_mix) / max(0.05, rate) * dt))
         self.idle_mix = max(0.0, min(1.0, self.idle_mix))
@@ -371,14 +514,18 @@ class Hologram:
         mouth = self._mouth_goal(now)
         if self.levels_live and self.level_open < 0.12:
             mouth = None
+        wanted_mouth = targets(mouth)
         for name in self.weights:
             if name == "eyes":
                 goal = 1.0 if now < self.blink_until else 0.0
                 speed = 0.035
             else:
-                goal = 1.0 if name == mouth else 0.0
-                speed = 0.055
+                goal = wanted_mouth.get(name, 0.0)
+                speed = ATTACK if goal > self.weights[name] else RELEASE
             self.weights[name] += (goal - self.weights[name]) * min(1.0, dt / speed)
+        openness = min(1.0, sum(min(1.0, w) * JAW.get(name, 0.0) for name, w in self.weights.items()))
+        self.nod += (openness - self.nod) * min(1.0, dt / 0.12)
+        self.talk_presence += ((1.0 if talking else 0.0) - self.talk_presence) * min(1.0, dt / 0.4)
         if now >= self.blink_at:
             self.blink_until = now + 0.15
             self.blink_at = now + 2.4 + self.rng.random() * 3.2
@@ -402,6 +549,100 @@ class Hologram:
             return before + length
         return before + max(0.0, min(age, length))
 
+    # ---- pose clips ----
+    def _rest(self, now):
+        """She did or heard something: the 'quiet for a long time' clock starts again."""
+        self.last_activity = now
+        self.bored_after = self.rng.uniform(*BORED_AFTER)
+
+    def start_clip(self, name, now, forced=False):
+        """Begin a pose clip if its pictures are ready (they load in the background; if not, she simply skips it this time)."""
+        a = self.assets
+        if name not in a.clips:
+            return False
+        frames = get_clip(a, name)
+        if not frames:
+            return False
+        self.clip, self.clip_start, self.clip_fast_out, self.clip_forced = name, now, False, forced
+        self.clip_frames, self.clip_fps = frames, a.clip_rates.get(name, 12.0)
+        self.next_pose = now + POSE_GAP
+        return True
+
+    def stop_clip(self, fast=False):
+        self.clip = None
+        self.clip_fast_out = fast
+
+    def preload_clips(self):
+        """Start loading thinking and listening (the ones that must be ready at once); call it a few seconds after she appears."""
+        for name in PINNED:
+            if name in self.assets.clips:
+                get_clip(self.assets, name)
+
+    def _poses(self, listening, thinking, now, dt):
+        """Decide which clip should play, and fade it in or out."""
+        if not self.poses_on and not self.clip_forced:
+            if self.clip:
+                self.stop_clip(fast=True)
+        elif self.clip_forced and self.clip:
+            if now - self.clip_start > len(self.clip_frames) / max(1.0, self.clip_fps):
+                self.stop_clip()
+                self.clip_forced = False
+        else:
+            calm = (not self.speaking) and self.power > 0.9 and not self.moving
+            if self.speaking and self.clip:
+                self.stop_clip(fast=True)
+            listen_now = bool(listening) or now < self.listen_until
+            if calm:
+                if thinking and self.clip is None and not self.thinking_done:
+                    self.thinking_done = self.start_clip("thinking", now)           # if it is still loading we try again on the next tick
+                elif listen_now and not thinking and self.clip is None and not self.listening_done:
+                    self.listening_done = self.start_clip("listening", now)
+                elif self.clip is None and now >= self.next_pose and not thinking and not listen_now:
+                    if self.pose_wanted and now >= self.pose_wanted[1]:
+                        if now > self.pose_wanted[1] + 10.0 or self.start_clip(self.pose_wanted[0], now):
+                            self.pose_wanted = None                                 # started, or it took too long to load: forget it
+                    elif now - self.last_activity >= self.bored_after:
+                        names = [n for n in ("bored1", "bored2") if n in self.assets.clips]
+                        if names:
+                            if self.bored_pick not in names:
+                                self.bored_pick = self.rng.choice(names)             # pick once, so we wait for this one to load
+                            if self.start_clip(self.bored_pick, now):
+                                self.bored_pick = None
+                                self._rest(now)
+                        else:
+                            self._rest(now)
+            if self.clip == "thinking" and not thinking:
+                self.stop_clip()                                                    # the answer is coming
+            elif self.clip == "listening" and not listen_now:
+                self.stop_clip()
+            elif self.clip and now - self.clip_start > len(self.clip_frames) / max(1.0, self.clip_fps):
+                self.stop_clip()                                                    # the clip is over: back to the loop
+        if thinking or listening or self.speaking:
+            self.last_activity = now
+        if not thinking:
+            self.thinking_done = False
+        if not (bool(listening) or now < self.listen_until):
+            self.listening_done = False
+        goal = 1.0 if self.clip else 0.0
+        seconds = CLIP_IN if goal > self.clip_mix else (CLIP_OUT_FAST if self.clip_fast_out else CLIP_OUT)
+        self.clip_mix += max(-dt / seconds, min(dt / seconds, goal - self.clip_mix))
+        if self.clip_mix <= 0.0 and not self.clip:
+            self.clip_frames = None
+
+    def _clip_picture(self, now):
+        """The clip's picture for this moment (two neighbouring frames blended), or None."""
+        frames = getattr(self, "clip_frames", None)
+        if not frames or self.clip_mix <= 0.01:
+            return None
+        position = max(0.0, (now - self.clip_start) * self.clip_fps)
+        last = len(frames) - 1
+        i0 = min(last, int(position))
+        i1 = min(last, i0 + 1)
+        frac = position - int(position) if i0 < last else 0.0
+        if frac < 0.02:
+            return frames[i0].astype(np.float32)
+        return frames[i0].astype(np.float32) * (1.0 - frac) + frames[i1].astype(np.float32) * frac
+
     def _mouth_goal(self, now):
         if self.speaking:
             elapsed = self._elapsed(now) / self.time_scale
@@ -409,10 +650,54 @@ class Hologram:
                 return None
             if elapsed > track_length(self.track) + 0.4:
                 return None
-            return shape_at(self.track, elapsed)
+            return mouth_at(self.track, elapsed + LEAD)
         if now < self.smile_until:
             return "smile"
         return None
+
+    def _jaw_drop(self):
+        """How far her chin is down right now, in pixels (0 when her mouth is closed)."""
+        amount = sum(min(1.0, w) * JAW.get(name, 0.0) for name, w in self.weights.items())
+        return min(1.0, amount) * JAW_DROP * self.assets.height
+
+    def _nod(self, frame, now, amount):
+        """Her whole head dips a little with each open syllable and drifts slowly from side to side, so she does not stand like a statue
+        while she talks. `amount` is how much of the effect to show (it fades in and out with the flip book)."""
+        a = self.assets
+        dy = self.nod * NOD * a.height * amount
+        dx = math.sin(now * 1.3) * SWAY * a.width * amount * self.talk_presence
+        if abs(dy) < 0.05 and abs(dx) < 0.05:
+            return frame
+        h, w = frame.shape[:2]
+        ys = np.clip(np.arange(h, dtype=np.float32) - dy, 0, h - 1.001)
+        i0 = np.floor(ys).astype(np.int32)
+        frac = (ys - i0)[:, None, None]
+        out = frame[i0] * (1.0 - frac) + frame[i0 + 1] * frac
+        shift = int(round(dx))
+        if shift:
+            out = np.roll(out, shift, axis=1)
+            if shift > 0:
+                out[:, :shift] = out[:, shift:shift + 1]
+            else:
+                out[:, shift:] = out[:, shift - 1:shift]
+        return out
+
+    def _drop_jaw(self, frame, drop, shift_y=0):
+        """Slide the lower face down by `drop` pixels, most at the chin and fading to nothing at the lips above and the neck below,
+        so the mouth picture looks fixed to a face that moves instead of a sticker on a still one."""
+        h = frame.shape[0]
+        top, full, chin, end = [int(round(f * self.assets.height)) + shift_y for f in (JAW_TOP, JAW_FULL, JAW_CHIN, JAW_END)]
+        top, end = max(1, top), min(h - 2, end)
+        if end <= top + 2:
+            return frame
+        ys = np.arange(top, end + 1, dtype=np.float32)
+        ramp = np.interp(ys, [top, full, chin, end], [0.0, 1.0, 1.0, 0.0])
+        src = np.clip(ys - drop * ramp, 0, h - 2)
+        i0 = np.floor(src).astype(np.int32)
+        frac = (src - i0)[:, None, None]
+        out = frame.copy()
+        out[top:end + 1] = frame[i0] * (1.0 - frac) + frame[i0 + 1] * frac
+        return out
 
     # ---- the pixels ----
     def render(self, now=None):
@@ -432,6 +717,10 @@ class Hologram:
             sx = shifts[i0][0] * (1.0 - frac) + shifts[i1][0] * frac
             sy = shifts[i0][1] * (1.0 - frac) + shifts[i1][1] * frac
             shift_x, shift_y = int(round(sx * self.idle_mix)), int(round(sy * self.idle_mix))   # the mouth and eye pictures follow her head
+        picture = self._clip_picture(now)
+        if picture is not None:
+            frame = frame * (1.0 - self.clip_mix) + picture * self.clip_mix
+            shift_x = shift_y = 0
         for name, weight in self.weights.items():
             if weight < 0.02 or name not in a.sprites:
                 continue
@@ -439,7 +728,7 @@ class Hologram:
             x, y = x + shift_x, y + shift_y
             if x < 0 or y < 0:
                 continue
-            strength = min(1.0, weight) * (reach(self.open_fraction, name) if name != "eyes" else 1.0)
+            strength = min(1.0, weight) * (reach(self.open_fraction, name) if name != "eyes" else 1.0) * (1.0 - self.clip_mix)   # a clip has its own face
             if name in LIVE_SHAPES and self.levels_live:
                 strength *= 0.35 + 0.65 * self.level_open                                  # follow the real loudness
             h, w = rgb.shape[:2]
@@ -449,6 +738,11 @@ class Hologram:
                 continue
             blend = alpha[:rh, :rw] * strength
             region[:] = region * (1.0 - blend) + rgb[:rh, :rw] * blend
+        drop = self._jaw_drop()
+        if drop > 0.05:
+            frame = self._drop_jaw(frame, drop, shift_y)
+        if self.talk_motion and self.idle_mix < 0.99 and (self.nod > 0.01 or self.talk_presence > 0.02):
+            frame = self._nod(frame, now, 1.0 - self.idle_mix)
         if self.fx_turn:
             frame = self._turn(frame, now)
         # scan lines and the bright sweep

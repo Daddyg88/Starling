@@ -512,6 +512,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("hologram.flicker", "Hologram flicker", "toggle", help="She flickers and glitches a little (the rings and the lights stay steady). Switch off for a steady picture"),
             Field("hologram.sparks", "Hologram tiny lights", "toggle", help="A slow tornado of tiny lights rises from the middle of her bottom ring and swirls round her chest"),
             Field("hologram.idle_loop", "Hologram breathes and sways while quiet", "toggle", help="Plays a short recorded loop of her breathing, swaying and her hair moving while she is not talking; she eases back to the still picture when she speaks"),
+            Field("hologram.poses", "Hologram acts out thinking, listening, pleased and bored", "toggle", help="Short recorded moments: she scratches her head while she thinks, listens with her head tilted, looks pleased after a long answer, and gets bored if you leave her quiet for a couple of minutes. Uses a little more memory while they play"),
+            Field("hologram.talk_motion", "Hologram nods and sways while she talks", "toggle", help="Her head dips a little on each open syllable and drifts slowly from side to side while she is speaking; off = her head stays still when she talks"),
             Field("hologram.turn", "Hologram turns a little", "toggle", help="She turns a few degrees left and right, very slowly, so she looks less flat"),
             Field("personality.login_greeting", "Greet me when I load the game", "toggle",
                   help="Says your ship, where you are, and how she feels"),
