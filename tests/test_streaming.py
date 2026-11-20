@@ -551,6 +551,15 @@ class Pieces(unittest.TestCase):
         self.assertIn("StreamChat_Action", d.lines)
 
 
+class SpokenNameTests(unittest.TestCase):
+    def test_how_names_are_said(self):
+        from streaming.chat import spoken_name
+        cases = {"Dark_Wolf99": "Dark Wolf 99", "GavTheGreat": "Gav The Great", "xXSpaceCowboyXx": "Space Cowboy",
+                 "HTMLFan": "HTML Fan", "gav": "gav", "": "someone", "Ben_Can_obi": "Ben Can obi", "Bob1234567": "Bob 1 2 3 4 5 6 7"}
+        for raw, want in cases.items():
+            self.assertEqual(spoken_name(raw), want, raw)
+
+
 if __name__ == "__main__":
     unittest.main()
 
@@ -812,3 +821,4 @@ class ReturningViewers(unittest.TestCase):
             self.assertGreaterEqual(len(data[key]), 4)
             for text in data[key]:
                 self.assertTrue(set(re.findall(r"{(\w+)}", text)) <= {"user", "question", "times"}, text)
+

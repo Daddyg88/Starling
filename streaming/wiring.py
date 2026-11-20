@@ -4,7 +4,7 @@ import time
 
 from core.logger import get_logger
 from streaming.bridge import ChatBridge
-from streaming.chat import FSD_CHARGING, FSD_JUMP, IN_DANGER, ChatDirector, flag
+from streaming.chat import spoken_name, FSD_CHARGING, FSD_JUMP, IN_DANGER, ChatDirector, flag
 
 log = get_logger("streaming")
 FREE_SECONDS = 1.5           # a thank-you or o7 waits only this long after she last spoke (fights do not matter)
@@ -60,10 +60,10 @@ def build(app):
             holder["brain"] = make_chat_brain(app)
         times = director.asked.get(user, 0)
         if app.settings.get("streaming.announce", True):
-            say("StreamChat_Chime" if chime else asks_key(times, app.settings), {"user": user, "question": question[:90], "times": times + 1})
+            say("StreamChat_Chime" if chime else asks_key(times, app.settings), {"user": spoken_name(user), "question": question[:90], "times": times + 1})
         reply = holder["brain"].try_handle(question, deliberate=True)
         if reply is None:
-            say("StreamChat_NoAnswer", {"user": user})
+            say("StreamChat_NoAnswer", {"user": spoken_name(user)})
             return False
         director.asked[user] = times + 1
         return True

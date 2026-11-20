@@ -78,6 +78,22 @@ def clean_name(name):
     return name[:MAX_NAME] or "someone"
 
 
+def spoken_name(name):
+    """A viewer name the way a person would say it: 'Dark_Wolf99' -> 'Dark Wolf 99', 'xXSpaceCowboyXx' -> 'Space Cowboy',
+    'GavTheGreat' -> 'Gav The Great'. Only used for speech; the chat log keeps the real name."""
+    name = clean_name(name)
+    if re.match(r"^[xX]{2}[A-Z]", name):                          # xXNameXx decoration
+        name = name[2:]
+    name = re.sub(r"(?<=[a-z])[xX]{2}$", "", name)
+    name = name.replace("_", " ")
+    name = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", name)             # camelCase -> words
+    name = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", name)        # HTMLFan -> HTML Fan
+    name = re.sub(r"(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])", " ", name)
+    name = re.sub(r"\b(\d{5,})\b", lambda m: " ".join(m.group(1)), name)   # long number runs: digit by digit
+    name = re.sub(r"\s+", " ", name).strip()
+    return name or "someone"
+
+
 _EMOTICON = re.compile(r"(?:(?<=\s)|^)[:;=][-']?[)(DPpOo3/\\|]+(?=\s|$)")
 
 
@@ -299,10 +315,10 @@ class ChatDirector:
             return Result("answered" if ok else "failed", "ask", user, what)
         reason = action_blocker(action, self.state_provider())
         if reason:
-            self.say("StreamChat_Refused", {"user": user, "action": action.label, "reason": reason})
+            self.say("StreamChat_Refused", {"user": spoken_name(user), "action": action.label, "reason": reason})
             return Result("refused", "action", user, action.label, reason)
         self.cool.mark(user, "action")
-        self.say("StreamChat_Action", {"user": user, "action": action.label})
+        self.say("StreamChat_Action", {"user": spoken_name(user), "action": action.label})
         ok = self.do_action(action)
         return Result("done" if ok else "failed", "action", user, action.label)
 
@@ -360,7 +376,7 @@ class ChatDirector:
         _t, user = self.salutes.popleft()
         self.event_last["salute"] = now
         log.info("o7 back to %s", user)
-        self.say("StreamChat_Salute", {"user": user})
+        self.say("StreamChat_Salute", {"user": spoken_name(user)})
         return Result("reacted", "salute", user, "o7")
 
     # ---- chiming in: now and then she answers an ordinary chat question nobody asked her to ----
@@ -518,7 +534,7 @@ class ChatDirector:
         self.pending.popleft()
         log.info("reacting to %s from %s", event.kind, event.user)
         self.event_last[event.kind] = now
-        fields = {"user": event.user, "amount": event.amount, "months": event.amount, "viewers": event.amount or "a whole crowd of", "streak": event.amount,
+        fields = {"user": spoken_name(event.user), "amount": event.amount, "months": event.amount, "viewers": event.amount or "a whole crowd of", "streak": event.amount,
                   "count": event.amount, "people": event.amount, "messages": event.amount, "platform": event.platform}
         pool = stream_events.pick_pool(event)
         if self.say(pool, fields) is False and pool != stream_events.KINDS[event.kind]:

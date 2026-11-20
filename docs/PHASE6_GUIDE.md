@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.106 - viewer names read aloud
+
+`streaming.chat.spoken_name(name)` turns a cleaned chat name into something sayable (underscores to spaces, camelCase split, letter/digit split, long digit runs spelled out, xX decoration removed). It is used wherever a `{user}` placeholder is spoken (chat.py, wiring.py). The log and cooldowns still use the real name.
+
 ## 0.96.105 - she jokes about how life looks
 
 First scan of a plant or animal: 75% chance of a one-liner about its looks (`BioLook_<genus>`, voicepacks/default/bio_looks.json, 5 lines per genus). With `personality.innuendo` on, 70% of those use `BioLook_<genus>_Naughty` (4 per genus, innuendo only). Made by `BioPredictor._look` on the Log stage; setting `exobiology.looks`. Genus keys come from `genus_key`, which strips a trailing s (clypeu, osseu, tubu). A test checks every genus has both pools.
