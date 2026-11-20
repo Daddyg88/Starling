@@ -448,6 +448,8 @@ class HologramWindow:
         holo.idle_on = bool(s.get("hologram.idle_loop", True))
         holo.poses_on = bool(s.get("hologram.poses", True))
         holo.talk_motion = bool(s.get("hologram.talk_motion", True))
+        holo.bounce = max(0.0, min(1.0, float(s.get("hologram.talk_bounce", 50)) / 100.0))
+        holo.idle_scale = max(0.1, min(2.0, float(s.get("hologram.idle_wait", 40)) / 100.0))
         if holo.poses_on and not getattr(holo, "clips_preloaded", False):
             holo.clips_preloaded = True
             holo.preload_clips()                      # thinking and listening load in the background so they are ready when needed

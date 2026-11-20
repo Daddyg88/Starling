@@ -73,7 +73,8 @@ SALUTE_REPEAT = 8.0              # a second salute request within this many seco
 
 # ---- pose clips (0.96.93): short recorded moments she plays at the right time ----
 CLIP_IN, CLIP_OUT, CLIP_OUT_FAST = 0.35, 0.5, 0.2      # seconds to fade a clip in, out, and out when she starts to talk
-BORED_CLIPS = ("bored1", "bored2", "yawn", "sleepy", "ponder")      # what she may do when it has been quiet for a long time (the ones that exist)
+BORED_CLIPS = ("bored1", "bored2", "yawn", "sleepy", "ponder",                       # what she may do when it has been quiet for a while (the ones that exist):
+               "eyes_left", "eyes_right", "glance_left", "glance_right", "tilt", "brow_up")   # the bigger ones, then small fidgets
 BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this range) and she may get bored
 POSE_GAP = 60.0                  # at least this long between two clips
 PLEASED_CHANCE = 0.25            # how often a spoken line ends with the pleased clip
@@ -426,6 +427,8 @@ class Hologram:
         self.idle_on = True           # play the flip book (breathing, sway) while she is quiet
         self.idle_mix = 1.0           # 1 = the flip book, 0 = the still picture that the mouth pictures fit
         self.talk_motion = True       # her head nods and sways a little while she talks
+        self.bounce = 0.5             # how much of the up-and-down dip she shows on an open mouth (1 = the old full size)
+        self.idle_scale = 0.4         # multiplies the waits before she fidgets or gets bored (1 = the old 1.5 to 3 minutes, smaller = livelier)
         self.talk_idle = TALK_IDLE
         self.poses_on = True          # play the recorded pose clips (thinking, listening, pleased, bored)
         self.clip = None              # the name of the clip playing, or None
@@ -690,7 +693,7 @@ class Hologram:
     def _rest(self, now):
         """She did or heard something: the 'quiet for a long time' clock starts again."""
         self.last_activity = now
-        self.bored_after = self.rng.uniform(*BORED_AFTER)
+        self.bored_after = self.rng.uniform(*BORED_AFTER) * self.idle_scale
 
     def start_clip(self, name, now, forced=False):
         """Begin a pose clip if its pictures are ready (they load in the background; if not, she simply skips it this time)."""
@@ -703,7 +706,7 @@ class Hologram:
         self.clip, self.clip_start, self.clip_fast_out, self.clip_forced = name, now, False, forced
         self.g_name = None
         self.clip_frames, self.clip_fps = frames, a.clip_rates.get(name, 12.0)
-        self.next_pose = now + POSE_GAP
+        self.next_pose = now + max(8.0, POSE_GAP * self.idle_scale)
         if name == "salute":
             self.last_salute = now
         return True
@@ -829,7 +832,7 @@ class Hologram:
         """(sideways, up/down) in pixels: her head dips a little with each open syllable and drifts slowly from side to side while she talks.
         `amount` is how much of the effect to show (it fades in and out with the flip book)."""
         a = self.assets
-        dy = self.nod * NOD * a.height * amount
+        dy = self.nod * NOD * a.height * amount * self.bounce
         dx = math.sin(now * 1.3) * SWAY * a.width * amount * self.talk_presence
         return dx, dy
 

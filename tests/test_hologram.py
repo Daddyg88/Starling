@@ -591,6 +591,44 @@ class BackAndForthClips(unittest.TestCase):
         h.clear_clips()
 
 
+class BounceAndIdleTests(unittest.TestCase):
+    def test_the_bounce_setting_scales_the_dip(self):
+        holo, c = make()
+        holo.nod = 1.0
+        holo.bounce = 1.0
+        full = holo._nod_offsets(c.t, 1.0)[1]
+        holo.bounce = 0.5
+        half = holo._nod_offsets(c.t, 1.0)[1]
+        holo.bounce = 0.0
+        none = holo._nod_offsets(c.t, 1.0)[1]
+        self.assertGreater(full, 0)
+        self.assertAlmostEqual(half, full / 2.0)
+        self.assertEqual(none, 0.0)
+
+    def test_the_default_bounce_is_about_half_of_the_old_one(self):
+        holo, c = make()
+        self.assertEqual(holo.bounce, 0.5)
+
+    def test_livelier_means_shorter_waits(self):
+        holo, c = make()
+        holo.idle_scale = 0.4
+        holo._rest(c.t)
+        self.assertLessEqual(holo.bored_after, h.BORED_AFTER[1] * 0.4)
+        holo.idle_scale = 0.2
+        holo._rest(c.t)
+        self.assertLessEqual(holo.bored_after, h.BORED_AFTER[1] * 0.2)
+
+    def test_the_idle_pool_has_small_fidgets_that_exist(self):
+        holo, c = make()
+        self.assertIn("eyes_left", h.BORED_CLIPS)
+        self.assertTrue(any(n in holo.assets.clips for n in h.BORED_CLIPS if n.startswith(("eyes", "glance"))))
+
+    def test_the_settings_exist(self):
+        from core.settings import DEFAULTS
+        self.assertEqual(DEFAULTS["hologram"]["talk_bounce"], 50)
+        self.assertEqual(DEFAULTS["hologram"]["idle_wait"], 40)
+
+
 class HeadClipToolTests(unittest.TestCase):
     def test_the_morph_goes_from_one_picture_to_the_other(self):
         import sys

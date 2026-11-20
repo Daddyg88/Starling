@@ -104,6 +104,8 @@ ANSWER_TIMES = [("5 seconds", 5), ("8 seconds", 8), ("10 seconds", 10), ("15 sec
 MESSAGE_CHANNELS = [("Direct messages only", "direct"), ("Direct, friends, wing and squadron", "direct_plus"),
                     ("Everything, including local and system chat", "all")]
 HOLOGRAM_SIZES = [("Small (75%)", 75), ("A bit smaller (90%)", 90), ("Normal (100%)", 100), ("A bit bigger (120%)", 120), ("Big (150%)", 150)]
+HOLOGRAM_BOUNCE = [("None", 0), ("Small", 25), ("Medium (default)", 50), ("Big", 75), ("Full (the old size)", 100)]
+HOLOGRAM_IDLE = [("Calm (every 1.5 to 3 minutes)", 100), ("Normal (default)", 40), ("Lively", 20)]
 HOLOGRAM_MOUTH = [("Small", 35), ("Medium (default)", 55), ("Wide", 80), ("Full", 100)]
 SEXES = [("Not specified", "neutral"), ("Male", "male"), ("Female", "female")]
 VOICES = ([("Her own cloned voice", "")]
@@ -515,6 +517,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("hologram.sparks", "Hologram tiny lights", "toggle", help="A slow tornado of tiny lights rises from the middle of her bottom ring and swirls round her chest"),
             Field("hologram.idle_loop", "Hologram breathes and sways while quiet", "toggle", help="Plays a short recorded loop of her breathing, swaying and her hair moving while she is not talking; she eases back to the still picture when she speaks"),
             Field("hologram.poses", "Hologram acts out thinking, listening, pleased, bored and saluting", "toggle", help="Short recorded moments: she scratches her head while she thinks, listens with her head tilted, looks pleased after a long answer, salutes when you say o7 (and once after the game loads), and gets bored if you leave her quiet for a couple of minutes. Uses a little more memory while they play"),
+            Field("hologram.talk_bounce", "How much she bounces up and down when she talks", "choice", HOLOGRAM_BOUNCE, help="How far her head dips on each open syllable. Only matters while 'nods and sways' is on"),
+            Field("hologram.idle_wait", "How often she does something when it is quiet", "choice", HOLOGRAM_IDLE, help="How long she waits before a small movement, a yawn or a bored clip. Lively = every 20 to 40 seconds"),
             Field("hologram.talk_motion", "Hologram nods and sways while she talks", "toggle", help="Her head dips a little on each open syllable and drifts slowly from side to side while she is speaking; off = her head stays still when she talks"),
             Field("hologram.reactions", "Hologram reacts to what happens in the game", "toggle", help="A nod when docking is granted, a shake of the head when it is refused, a startle when you are attacked or interdicted, a pleased look after a mission, a sideways glance at a message, a salute when the game closes. Needs the poses switched on"),
             Field("hologram.turn", "Hologram turns a little", "toggle", help="She turns a few degrees left and right, very slowly, so she looks less flat"),
