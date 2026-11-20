@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.110 - new mouth shapes
+
+`tools/make_mouths.py` replaces the mouth cut-outs (ui/assets/hologram/<shape>.png, 250 x 200, drawn at (270, 330) on the 784 x 1168 base). For each ComfyUI picture it finds how far the face moved (`find_shift`, eyes and nose only), cuts the mouth box with that shift, adds the average colour difference of the skin around the mouth, and keeps the old feathered alpha so the edge blends. Sources: docs/mouth_sources.
+
 ## 0.96.109 - blow_kiss clip
 
 New clip `blow_kiss` (ui/assets/hologram/clips). The source video was retimed before conversion (the arm raise sped up 2x, the hold on her mouth thinned to every third picture), then `python tools/make_clips.py blow_kiss=file.mp4:loop`. The `:loop` ending stops the tool from adding a reverse play-back. No REACTIONS entry yet.
