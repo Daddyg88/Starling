@@ -44,3 +44,10 @@ class UniqueBio(BaseEvent):
     priority = NORMAL
     source = "status"
     summary = "{Species}: the one-of-a-kind species"
+
+
+class BioLook(BaseEvent):
+    name = "BioLook"
+    priority = LOW
+    source = "status"
+    summary = "{Species}: a remark about how it looks"

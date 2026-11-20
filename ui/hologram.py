@@ -86,7 +86,7 @@ REACTIONS = {                    # game event -> (what she does, how likely)
     "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("pleased", 0.7), "MissionFailed": ("shake", 0.8), "MissionAbandoned": ("shake", 0.4),
     "RedeemVoucher": ("pleased", 0.3), "SellExplorationData": ("pleased", 0.3), "MultiSellExplorationData": ("pleased", 0.4), "SellOrganicData": ("pleased", 0.3),
     "EscapeInterdiction": ("pleased", 0.6), "FSSAllBodiesFound": ("pleased", 0.8), "UndiscoveredSystem": ("pleased", 0.5), "GameMilestone": ("pleased", 0.8),
-    "UniqueBio": ("tilt", 0.5), "CodexEntry": ("tilt", 0.4), "FSSSignalDiscovered": ("tilt", 0.3), "SAASignalsFound": ("tilt", 0.4),
+    "UniqueBio": ("tilt", 0.5), "BioLook": ("tilt", 0.4), "CodexEntry": ("tilt", 0.4), "FSSSignalDiscovered": ("tilt", 0.3), "SAASignalsFound": ("tilt", 0.4),
     "WingJoined": ("nod", 0.6), "WingInvite": ("nod", 0.6), "WingAdd": ("nod", 0.4), "WingLeft": ("tilt", 0.4),
     "ReceiveText": ("glance", 0.3),
     "Interdicted": ("startle", 0.9), "UnderAttack": ("startle", 0.5), "HullDamage": ("startle", 0.5), "HeatDamage": ("startle", 0.5),

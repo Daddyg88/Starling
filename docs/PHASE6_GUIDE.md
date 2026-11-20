@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.105 - she jokes about how life looks
+
+First scan of a plant or animal: 75% chance of a one-liner about its looks (`BioLook_<genus>`, voicepacks/default/bio_looks.json, 5 lines per genus). With `personality.innuendo` on, 70% of those use `BioLook_<genus>_Naughty` (4 per genus, innuendo only). Made by `BioPredictor._look` on the Log stage; setting `exobiology.looks`. Genus keys come from `genus_key`, which strips a trailing s (clypeu, osseu, tubu). A test checks every genus has both pools.
+
 ## 0.96.104 - she stays above Void Compass
 
 ui/hologram_window.py: `HologramWindow._guard` runs every GUARD_MS (40 ms) and, when `should_guard(setting, shown, void connected)`, calls `raise_if_covered(window)`: if `GetWindow(hwnd, GW_HWNDPREV)` is not 0 another topmost window is above her, so `SetWindowPos(HWND_TOPMOST, NOMOVE|NOSIZE|NOACTIVATE)`. Void Compass connection comes from `HologramFeed.void_running()` (app.watcher.void_compass_running(), cached 2 s). Setting hologram.above_void_compass (Overlays page). Her normal 100 ms `lift()` stays.

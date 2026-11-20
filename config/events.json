@@ -30,6 +30,7 @@
     "GameMilestone":              { "enabled": true, "priority": "normal", "source": "status" },
     "BioProgress":                { "enabled": true, "priority": "normal", "source": "status" },
     "UniqueBio":                  { "enabled": true, "priority": "normal", "source": "status" },
+    "BioLook":                    { "enabled": true, "priority": "low", "source": "status" },
     "Statistics":                  { "enabled": true, "priority": "low", "source": "journal" },
     "NSPNew":                      { "enabled": true, "priority": "normal", "source": "status" },
     "NSPSeen":                     { "enabled": true, "priority": "normal", "source": "status" },

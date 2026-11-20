@@ -37,7 +37,7 @@ DEFAULTS = {
     "streaming": {"enabled": False, "twitch_channel": "", "youtube_key": "", "youtube_video": "", "prefix": "!starling", "who": "everyone", "ask_enabled": True, "announce": True, "recognise_viewers": True, "react": True, "react_milestones": True, "window": True, "window_pin": False, "window_font": 12, "window_geometry": "", "chime_in": True, "salute": True, "talk_in_combat": True, "chime_gap": 600,
                   "user_cooldown": 45, "action_cooldown": 20, "ask_cooldown": 10, "hold": True, "hold_max": 4, "hold_max_age": 300, "blocked_words": "",
                   "act_lights": True, "act_night_vision": True, "act_head_look": False, "act_scoop": False, "act_gear": False},
-    "exobiology": {"distance_alert": True, "distance_beep": True, "guess": True, "top_hint": True, "progress": True},
+    "exobiology": {"distance_alert": True, "distance_beep": True, "guess": True, "top_hint": True, "progress": True, "looks": True},
     "merit": {"power": "", "commodities": ["Platinum", "Osmium", "Painite", "Palladium"]},
     "engineers": {"neutron_over_ly": 1000},
     "dssa": {"neutron_over_ly": 1500},

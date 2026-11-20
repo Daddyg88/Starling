@@ -142,6 +142,9 @@ def _keys_for(event):
         return ["GameMilestone_%s" % data.get("Kind"), "GameMilestone"]
     if name == "UniqueBio":
         return ["UniqueBio"]
+    if name == "BioLook":
+        genus = data.get("Genus") or ""
+        return (["BioLook_%s_Naughty" % genus] if data.get("Naughty") else []) + ["BioLook_%s" % genus]
     if name == "BioProgress":
         return ["BioProgress_Last"] if data.get("Missing") and data.get("Left") == 1 else (["BioProgress_Missing"] if data.get("Missing") else []) + ["BioProgress"]
 

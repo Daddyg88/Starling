@@ -6,7 +6,7 @@
   "exploration": ["FSSDiscoveryScan", "FSSSignalDiscovered", "HighGradeEmissions", "GreenGasGiant", "GameMilestone", "HighGradeHint", "NSPNew", "NSPSeen", "NSPInSystem", "FSSAllBodiesFound", "FSSBodySignals", "DiscoveryScan", "Scan", "UndiscoveredSystem", "JumpsLeft",
                   "SAAScanComplete", "SAASignalsFound", "CodexEntry", "SellExplorationData", "MultiSellExplorationData",
                   "FuelScoop", "FuelScoopComplete", "JetConeBoost", "MaterialCollected", "AnalysisModeOn"],
-  "exobiology": ["ScanOrganic", "SellOrganicData", "BioGuess", "BioTopHint", "BioRefined", "BioProgress", "UniqueBio"],
+  "exobiology": ["ScanOrganic", "SellOrganicData", "BioGuess", "BioTopHint", "BioRefined", "BioProgress", "UniqueBio", "BioLook"],
   "mining": ["ProspectedAsteroid", "MiningRefined", "AsteroidCracked", "LaunchDrone", "BuyDrones", "CollectCargo", "EjectCargo"],
   "trading": ["MarketBuy", "MarketSell", "ShipyardBuy", "ModuleBuy"],
   "antixeno": []

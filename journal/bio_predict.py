@@ -14,6 +14,7 @@ The rules are a guess, not a promise: the game does not say what lives where, an
 """
 
 import json
+import random
 import re
 import threading
 import time
@@ -39,6 +40,10 @@ def norm(text):
 # Species that exist in only one place in the galaxy (Radicoida Unica was found in a single system). They are never
 # guessed and never taught to the learner (it would only teach her wrong habits), but they count for the codex.
 UNIQUE_SPECIES = {"radicoida unica": "Radicoida"}
+
+
+LOOK_CHANCE = 0.75             # how often the first sample of a species gets a remark about how it looks
+NAUGHTY_LOOK_CHANCE = 0.7      # with 'Flirty and naughty' on, this share of them are the cheeky ones
 
 
 def genus_key(text):
@@ -277,6 +282,7 @@ class BioPredictor:
         self.learned = learned or BioLearned()
         self.settings = settings
         self._rules = rules
+        self.look_rng = random.Random()
         self.region = ""           # the galaxy region you are in (kept when you jump to a new system: set_position changes it)
         self.reset()
 
@@ -636,6 +642,10 @@ class BioPredictor:
         events = []
         if species.lower() in UNIQUE_SPECIES and entry.get("ScanType") == "Log":
             events.append(("UniqueBio", {"Species": species, "Body": body.short if body else ""}))
+        if entry.get("ScanType") == "Log" and species.lower() not in UNIQUE_SPECIES:
+            look = self._look(entry, species)
+            if look:
+                events.append(("BioLook", look))
         if entry.get("ScanType") == "Analyse":
             if body is not None and species.lower() not in body.done:
                 body.done.append(species.lower())
@@ -647,6 +657,13 @@ class BioPredictor:
             if fresh and species.lower() not in UNIQUE_SPECIES and self._on("exobiology.progress", True):
                 events.append(("BioProgress", self.progress(species)))
         return events
+
+    def _look(self, entry, species):
+        """A funny remark about how this kind of life looks, after the first sample. Cheeky ones only with 'Flirty and naughty' on."""
+        if not self._on("exobiology.looks", True) or self.look_rng.random() >= LOOK_CHANCE:
+            return None
+        naughty = self._on("personality.innuendo", False) and self.look_rng.random() < NAUGHTY_LOOK_CHANCE
+        return {"Species": species, "Genus": genus_key(entry.get("Genus_Localised") or species.split(" ")[0]), "Naughty": naughty}
 
     def progress(self, species):
         """How far the codex has got: the number of species and the genera never sampled (named only when few are left)."""

@@ -336,6 +336,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="After the system scanner she guesses which species could be there (from temperature, gravity, atmosphere and so on) and what it might be worth. After the surface scan she corrects the guess"),
             Field("exobiology.top_hint", "Say when a top ten species might be there", "toggle",
                   help="'You might find Stratum Tectonicas on that planet, it might be worth a scan'. At most three times in a system"),
+            Field("exobiology.looks", "Joke about how each kind of life looks (first sample)", "toggle",
+                  help="After the first sample of a species she may make a short joke about its shape. With 'Flirty and naughty' on, most of them are cheeky innuendo"),
             Field("exobiology.progress", "Say how far my codex has got", "toggle",
                   help="After a species you had never logged is finished: how many species are in your codex and which kinds you have never sampled (named once only three or fewer are left)"),
             Field("ask.bio_prompts", "Wonder aloud about planets with life", "toggle",
