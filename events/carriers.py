@@ -6,6 +6,7 @@ CarrierJump      the carrier you are aboard jumped (only counted when it is your
 SquadronStartup  you are in a squadron
 """
 
+import json
 import re
 
 from events.base_event import BaseEvent
@@ -49,11 +50,72 @@ def spoken_station(entry, state):
     return station
 
 
+MEMORY_FILE = None          # the app sets this to data/carrier.json so she still knows your carrier after a restart
+_FIELDS = ("fleet_carrier_callsign", "fleet_carrier_name", "fleet_carrier_id", "fleet_carrier_system", "fleet_carrier_pos")
+_last_saved = {}
+
+
+def load_memory(state, path=None):
+    """Put back what she knew about your carrier last time (only fills gaps; the journal always wins)."""
+    path = path or MEMORY_FILE
+    try:
+        data = json.loads(path.read_text(encoding="utf-8")) if path else {}
+    except (OSError, ValueError):
+        return
+    if not isinstance(data, dict):
+        return
+    for field in _FIELDS:
+        value = data.get(field)
+        if field == "fleet_carrier_pos":
+            value = tuple(value) if isinstance(value, list) and len(value) == 3 else None
+        if value and not getattr(state, field, None):
+            setattr(state, field, value)
+    _last_saved.clear()
+    _last_saved.update({f: getattr(state, f, None) for f in _FIELDS})
+
+
+def save_memory(state, path=None):
+    """Write the carrier facts down when they changed (a few bytes, a few times a session)."""
+    path = path or MEMORY_FILE
+    if not path:
+        return
+    now = {f: getattr(state, f, None) for f in _FIELDS}
+    if now == _last_saved:
+        return
+    try:
+        path.write_text(json.dumps({f: (list(v) if isinstance(v, tuple) else v) for f, v in now.items()}), encoding="utf-8")
+        _last_saved.clear()
+        _last_saved.update(now)
+    except OSError:
+        pass
+
+
+def _pos(entry):
+    pos = entry.get("StarPos")
+    if isinstance(pos, (list, tuple)) and len(pos) == 3:
+        try:
+            return tuple(float(v) for v in pos)
+        except (TypeError, ValueError):
+            return None
+    return None
+
+
+def carrier_label(state):
+    """What she calls your carrier: its name, never the serial. None when the name is not known yet."""
+    return _text(getattr(state, "fleet_carrier_name", None))
+
+
 def remember_carrier_visit(entry, state):
     """Docked / Location / CarrierJump: if the station is YOUR carrier, then your carrier is in this system."""
     system = _text(entry.get("StarSystem"))
     if system and is_own_carrier(entry, state):
+        if system != getattr(state, "fleet_carrier_system", None):
+            state.fleet_carrier_pos = None
         state.fleet_carrier_system = system
+        pos = _pos(entry)
+        if pos:
+            state.fleet_carrier_pos = pos
+        save_memory(state)
 
 
 class CarrierStats(BaseEvent):
@@ -70,6 +132,7 @@ class CarrierStats(BaseEvent):
             state.fleet_carrier_name = name
         if entry.get("CarrierID"):
             state.fleet_carrier_id = entry.get("CarrierID")
+        save_memory(state)
 
 
 class CarrierLocation(BaseEvent):
@@ -80,7 +143,12 @@ class CarrierLocation(BaseEvent):
     def update_state(self, entry, state):
         system = _text(entry.get("StarSystem"))
         if system:
+            if system != getattr(state, "fleet_carrier_system", None):
+                state.fleet_carrier_pos = None
             state.fleet_carrier_system = system
+            if system.casefold() == str(getattr(state, "system", "") or "").casefold() and getattr(state, "star_pos", None):
+                state.fleet_carrier_pos = tuple(state.star_pos)
+            save_memory(state)
 
 
 class CarrierJump(BaseEvent):

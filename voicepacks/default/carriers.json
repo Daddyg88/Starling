@@ -1,5 +1,5 @@
 {
- "_help": "Carrier route lines. Fields: {destination} {carrier} {system} {squadron}. Plotting uses the normal route lines afterwards.",
+ "_help": "Carrier route lines. Fields: {destination} {carrier} {system} {squadron}. Plotting uses the normal route lines afterwards. Where/how far: {carrier} (its NAME) {system} {distance} {ly}.",
  "CarrierPlotting": [
   "Plotting a route to the {carrier} in {destination}. One moment.",
   "Heading for the {carrier}. Working out the route to {destination}.",
@@ -50,5 +50,29 @@
  ],
  "CarrierNoSquad_Sarcastic": [
   "A squad carrier needs a squad. I haven't seen one. Save its system if you do have one."
+ ],
+ "CarrierWhere": [
+  "{carrier} is in {system}, {distance} light years from here.",
+  "Your carrier, {carrier}, is parked in {system}. {distance} light years away.",
+  "{carrier} is {distance} light years away, in {system}.",
+  "That's {carrier} in {system}, Commander. {distance} light years from where we are.",
+  "Last I knew, {carrier} was in {system}. That's {distance} light years from here."
+ ],
+ "CarrierWhere_Friendly": [
+  "Home is {distance} light years away, Commander. {carrier} is waiting in {system}."
+ ],
+ "CarrierWhere_Close": [
+  "{carrier} is in {system}, love, {distance} light years from us. Let's go home soon."
+ ],
+ "CarrierWhere_Sarcastic": [
+  "{carrier} is in {system}, {distance} light years away. You did remember where you parked it, didn't you?"
+ ],
+ "CarrierWhereNoDistance": [
+  "{carrier} is in {system}. I can't work out how far that is from here just yet.",
+  "Your carrier {carrier} is parked in {system}. I don't have the distance yet."
+ ],
+ "CarrierWhereHere": [
+  "{carrier} is right here in {system}, Commander.",
+  "We're in {system}, and so is {carrier}. No distance to worry about."
  ]
 }

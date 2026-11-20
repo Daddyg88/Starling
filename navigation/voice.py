@@ -69,6 +69,16 @@ _CARRIER_GO = re.compile(r"\b(plot|set|lay in|navigate|take (me|us)|head|fly|go|
 # "take me to Felicity Farseer": only counts when the name really is an engineer (navigation/engineers.py)
 _GO_ENGINEER = re.compile(r"^(?:\w+ ){0,2}?(?:take|bring|fly|get|navigate|head|go|plot|set|lay in|route|lead|find)\b.*?\b(?:to|for|towards?)\b\s+(?P<who>.+)$")
 _WHERE_ENGINEER = re.compile(r"^where (?:is|s|does) (?P<who>.+?)(?: live| based| located)?$")
+# "how far is my carrier" / "where is the squad carrier" / "which system is my carrier in" / "distance to my carrier"
+_CARRIER_NOUN = r"(?:(?:squad|squadron|wing) (?:fleet )?carrier|(?:fleet |home )?carrier)"
+_CARRIER_WHERE = re.compile(
+    r"^(?:how far (?:away )?(?:is|s) (?:my |the |our )?" + _CARRIER_NOUN + r"(?: away)?"
+    r"|how far (?:away )?(?:am i|are we|is it) (?:from|to) (?:my |the |our )?" + _CARRIER_NOUN +
+    r"|(?:what s|what is|how long is) the distance (?:to|from here to|between us and) (?:my |the |our )?" + _CARRIER_NOUN +
+    r"|how far (?:to|from here to) (?:my |the |our )?" + _CARRIER_NOUN +
+    r"|where (?:is|s) (?:my |the |our )?" + _CARRIER_NOUN + r"(?: parked| now| at)?"
+    r"|(?:which|what) system (?:is|s) (?:my |the |our )?" + _CARRIER_NOUN + r" in"
+    r"|where did i (?:park|leave) (?:my |the |our )?" + _CARRIER_NOUN + r")$")
 _TAIL = re.compile(r"\b(using|via|by|with|through)\b.*\bneutron.*$|\bneutron (route|stars?)\b$")
 
 
@@ -295,6 +305,9 @@ class RouteVoice:
             return self.guardian_asked(asked[0], asked[1], guardian.wants_alternative(said))
         if _NEAREST_POI.search(said):
             return self.nearest_poi()
+        found = _CARRIER_WHERE.match(said)
+        if found:
+            return self.where_is_carrier("squad" if re.search(r"squad|wing", said) else "fleet")
         found = _CARRIER_GO.search(said)
         if found:
             return self.plot(found.group("dest"))
@@ -663,6 +676,39 @@ class RouteVoice:
                 return seen
         return str(self.settings.get("bookmarks." + key, "") or "").strip()
 
+    def where_is_carrier(self, key):
+        """'How far is my carrier?' She says its NAME, the system it is in and how many light years away. Never the serial."""
+        state = self.state_provider()
+        system = self.carrier_system(key)
+        name = (str(getattr(state, "fleet_carrier_name", "") or "").strip() if key == "fleet" else "") or slot_name(key).lower()
+        if not system:
+            return self._carrier_unknown(key)
+        here = str(getattr(state, "system", "") or "")
+        fields = {"carrier": name, "system": system, "distance": "", "ly": None}
+        if here and here.casefold() == system.casefold():
+            self.narrator.say("CarrierWhereHere", fields)
+            return "%s is in this system, %s." % (name, system)
+        pos = getattr(state, "fleet_carrier_pos", None) if key == "fleet" else None
+        if pos is None:
+            pos = self.spansh.coordinates(system)          # one quick lookup; None means the distance stays unknown
+        miles = engineer_distance(getattr(state, "star_pos", None), pos)
+        if miles is None:
+            self.narrator.say("CarrierWhereNoDistance", fields)
+            return "%s is in %s." % (name, system)
+        fields["ly"] = miles
+        fields["distance"] = "{:,}".format(int(round(miles))) if miles >= 10 else "{:.1f}".format(miles)
+        self.narrator.say("CarrierWhere", fields)
+        return "%s is in %s, %s light years away." % (name, system, fields["distance"])
+
+    def _carrier_unknown(self, key):
+        state = self.state_provider()
+        if key == "fleet":
+            self.narrator.say("CarrierFleetUnknown")
+            return "I don't know where your fleet carrier is."
+        squad = str(getattr(state, "squadron", "") or "").strip()
+        self.narrator.say("CarrierSquadUnknown" if squad else "CarrierNoSquad", {"squadron": squad})
+        return "I don't know where the squad carrier is."
+
     def _plot_carrier(self, key):
         name = self.carrier_system(key)
         state = self.state_provider()
@@ -678,12 +724,13 @@ class RouteVoice:
             return "No squad carrier saved, and no squadron known."
         here = str(getattr(state, "system", "") or "")
         if here and here.casefold() == name.casefold():
-            self.narrator.say("CarrierHere", {"system": name, "carrier": slot_name(key).lower()})
+            self.narrator.say("CarrierHere", {"system": name, "carrier": (str(getattr(state, "fleet_carrier_name", "") or "").strip() if key == "fleet" else "") or slot_name(key).lower()})
             return "We are already in %s." % name
         if self._busy:
             return "Already plotting."
         self._busy = True
-        self.narrator.say("CarrierPlotting", {"destination": name, "carrier": slot_name(key).lower()})
+        label = (str(getattr(state, "fleet_carrier_name", "") or "").strip() if key == "fleet" else "") or slot_name(key).lower()
+        self.narrator.say("CarrierPlotting", {"destination": name, "carrier": label})
         self.spawn(lambda: self._plot_now(name))
         return "Plotting a route to the %s in %s" % (slot_name(key).lower(), name)
 

@@ -316,6 +316,9 @@ class App:
         atexit.register(self.stats.flush)
         from memory.habits import HabitKeeper
         from events.carriers import is_own_carrier, spoken_station
+        import events.carriers as _carriers
+        _carriers.MEMORY_FILE = paths.DATA_DIR / "carrier.json"
+        _carriers.load_memory(self.state)
         self.habits = HabitKeeper(
             self.bus, paths.DATA_DIR / "habits.json",
             announce=lambda key, values: _stats_narrator.say(key, values),

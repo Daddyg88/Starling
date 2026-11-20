@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.107 - where is my carrier
+
+`events/carriers.py` now keeps `fleet_carrier_pos` and saves callsign, name, id, system and position to data/carrier.json (`save_memory`, `load_memory`; the journal always wins over the file). `RouteVoice.where_is_carrier` answers the question with CarrierWhere / CarrierWhereNoDistance / CarrierWhereHere lines (voicepacks/default/carriers.json), using the carrier's name. Position comes from the journal, else one Spansh coordinates lookup.
+
 ## 0.96.106 - viewer names read aloud
 
 `streaming.chat.spoken_name(name)` turns a cleaned chat name into something sayable (underscores to spaces, camelCase split, letter/digit split, long digit runs spelled out, xX decoration removed). It is used wherever a `{user}` placeholder is spoken (chat.py, wiring.py). The log and cooldowns still use the real name.
