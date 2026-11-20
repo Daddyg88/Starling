@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.109 - blow_kiss clip
+
+New clip `blow_kiss` (ui/assets/hologram/clips). The source video was retimed before conversion (the arm raise sped up 2x, the hold on her mouth thinned to every third picture), then `python tools/make_clips.py blow_kiss=file.mp4:loop`. The `:loop` ending stops the tool from adding a reverse play-back. No REACTIONS entry yet.
+
 ## 0.96.108 - your own clips and play-back
 
 `tools/make_clips.py` now measures how far a clip's last picture is from its first (`end_gap`, `BACK_GAP` = 3). A clip that ends away from where it began is stored with `"back": true` in clips.json, and `load_clip` returns the pictures forwards then backwards (the same arrays, so no extra memory or disk). `react_to` now prefers a recorded clip over a built-in gesture of the same name. New names accepted: everything in docs/CLIP_SHOT_LIST.md.

@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.109: blow_kiss clip added but not linked to any event. Decide the triggers (follow? thank you? naughty-mode lines?). CHECK on screen: the clip looks right.
 - [ ] 0.96.108: new clips. CHECK on screen: thinking, listening, pleased, bored1/2 and the shake clip look right, the reverse playback looks natural, no jump at start or end; send the rest of the shot list.
 - [ ] 0.96.107: where is my carrier. CHECK: restart Starling, ask 'how far is my carrier'; she should say its name, the system and a distance; tell me if the name is in capitals or the distance is wrong.
 - [ ] 0.96.106: viewer names read aloud. CHECK: on stream, names like Dark_Wolf99 sound natural; tell me any names she still mangles.
