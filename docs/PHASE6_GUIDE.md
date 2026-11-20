@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.114 - expression clips
+
+`tools/make_head_clips.py` CLIPS now holds 20 clips; a tuple of pictures chains them (`build_sequence`, used for the laugh). Sources are searched in docs/head_sources, eye_sources and mouth_sources. `BORED_CLIPS` (hologram.py) is the pool she picks from after a long quiet; `glance` also picks eyes_left/eyes_right; awe and sad are in `CLIP_REACTIONS`.
+
 ## 0.96.113 - eyebrow clips
 
 `tools/make_head_clips.py` now also makes brow_up and brow_down. `CLIP_REACTIONS` in ui/hologram.py lists the reactions that are a recorded clip only (pleased, brow_up, brow_down). UniqueBio and CodexEntry raise her brows; MissionAbandoned frowns.

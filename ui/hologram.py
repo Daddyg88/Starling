@@ -73,22 +73,23 @@ SALUTE_REPEAT = 8.0              # a second salute request within this many seco
 
 # ---- pose clips (0.96.93): short recorded moments she plays at the right time ----
 CLIP_IN, CLIP_OUT, CLIP_OUT_FAST = 0.35, 0.5, 0.2      # seconds to fade a clip in, out, and out when she starts to talk
+BORED_CLIPS = ("bored1", "bored2", "yawn", "sleepy", "ponder")      # what she may do when it has been quiet for a long time (the ones that exist)
 BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this range) and she may get bored
 POSE_GAP = 60.0                  # at least this long between two clips
 PLEASED_CHANCE = 0.25            # how often a spoken line ends with the pleased clip
 CLIP_LRU = 1                     # clips other than thinking and listening that are kept in memory
 # ---- little gestures made from her one picture (no video needed) and the game events that trigger them ----
 GESTURES = {"nod": 1.0, "shake": 1.2, "tilt": 2.4, "glance_left": 2.0, "glance_right": 2.0, "startle": 0.9}      # name -> seconds
-CLIP_REACTIONS = ("pleased", "brow_up", "brow_down")      # reactions that are a recorded clip only (nothing built in); no clip file, no reaction
+CLIP_REACTIONS = ("pleased", "brow_up", "brow_down", "awe", "sad")      # reactions that are a recorded clip only (nothing built in); no clip file, no reaction
 GESTURE_GAP = 3.0                # a gesture does not start within this many seconds of the last one (a startle always may)
 REACT_GAP, STARTLE_GAP = 8.0, 5.0       # the least time between two reactions to game events
 REACTIONS = {                    # game event -> (what she does, how likely)
     "DockingGranted": ("nod", 0.7), "DockingDenied": ("shake", 0.9),
     "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("pleased", 0.7), "MissionFailed": ("shake", 0.8), "MissionAbandoned": ("brow_down", 0.5),
     "RedeemVoucher": ("pleased", 0.3), "SellExplorationData": ("pleased", 0.3), "MultiSellExplorationData": ("pleased", 0.4), "SellOrganicData": ("pleased", 0.3),
-    "EscapeInterdiction": ("pleased", 0.6), "FSSAllBodiesFound": ("pleased", 0.8), "UndiscoveredSystem": ("pleased", 0.5), "GameMilestone": ("pleased", 0.8),
+    "EscapeInterdiction": ("pleased", 0.6), "FSSAllBodiesFound": ("pleased", 0.8), "UndiscoveredSystem": ("awe", 0.5), "GameMilestone": ("pleased", 0.8),
     "UniqueBio": ("brow_up", 0.5), "BioLook": ("tilt", 0.4), "CodexEntry": ("brow_up", 0.4), "FSSSignalDiscovered": ("tilt", 0.3), "SAASignalsFound": ("tilt", 0.4),
-    "WingJoined": ("nod", 0.6), "WingInvite": ("nod", 0.6), "WingAdd": ("nod", 0.4), "WingLeft": ("tilt", 0.4),
+    "WingJoined": ("nod", 0.6), "WingInvite": ("nod", 0.6), "WingAdd": ("nod", 0.4), "WingLeft": ("sad", 0.3),
     "ReceiveText": ("glance", 0.3),
     "Interdicted": ("startle", 0.9), "UnderAttack": ("startle", 0.5), "HullDamage": ("startle", 0.5), "HeatDamage": ("startle", 0.5),
     "CockpitBreached": ("startle", 1.0), "InDanger": ("startle", 0.6), "SelfDestruct": ("startle", 1.0), "Died": ("startle", 1.0), "FuelPanic": ("startle", 0.8),
@@ -618,7 +619,7 @@ class Hologram:
         if now - self.react_last < (STARTLE_GAP if kind == "startle" else REACT_GAP):
             return False
         if kind == "glance":
-            kind = self.rng.choice(("glance_left", "glance_right"))
+            kind = self.rng.choice(["glance_left", "glance_right"] + [n for n in ("eyes_left", "eyes_right") if n in self.assets.clips])
         if kind in GESTURES and kind not in self.assets.clips:          # a recorded clip of the same name beats the built-in movement
             done = self.gesture(kind, now)
         elif kind == "salute":
@@ -766,7 +767,7 @@ class Hologram:
                         if now > self.pose_wanted[1] + 10.0 or self.start_clip(self.pose_wanted[0], now):
                             self.pose_wanted = None                                 # started, or it took too long to load: forget it
                     elif now - self.last_activity >= self.bored_after:
-                        names = [n for n in ("bored1", "bored2") if n in self.assets.clips]
+                        names = [n for n in BORED_CLIPS if n in self.assets.clips]
                         if names:
                             if self.bored_pick not in names:
                                 self.bored_pick = self.rng.choice(names)             # pick once, so we wait for this one to load

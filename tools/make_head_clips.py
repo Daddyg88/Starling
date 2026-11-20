@@ -19,11 +19,14 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "ui" / "assets" / "hologram"
 SOURCES = ROOT / "docs" / "head_sources"
+SOURCE_FOLDERS = (SOURCES, ROOT / "docs" / "eye_sources", ROOT / "docs" / "mouth_sources")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import make_mouths  # noqa: E402  (the still picture, scaled the way the ComfyUI pictures were)
 import make_clips  # noqa: E402  (fits a frame onto her still picture and writes a clip)
 
-# clip name -> (source picture, seconds, seconds held at the pose)
+# clip name -> (source picture(s), seconds, seconds held at the pose)
+# One picture: she goes from her still picture to the pose, holds, and comes back. Several pictures: she goes through them in
+# order (a laugh shakes between its two pictures) and comes back.
 CLIPS = {
     "glance_left": ("look_left", 2.0, 0.5),
     "glance_right": ("look_right", 2.0, 0.5),
@@ -31,6 +34,20 @@ CLIPS = {
     "nod": ("nod_down", 1.0, 0.1),
     "brow_up": ("brow_up", 1.8, 0.6),                  # eyebrows lifted: surprise or interest
     "brow_down": ("brow_down", 1.8, 0.6),              # eyebrows lowered: a frown, disappointment
+    "eyes_left": ("eyes_left", 1.6, 0.5),              # only the eyes look aside (the head stays)
+    "eyes_right": ("eyes_right", 1.6, 0.5),
+    "wink": ("wink", 1.3, 0.25),
+    "smirk": ("smirk", 2.0, 0.8),
+    "sad": ("sad", 3.0, 1.4),
+    "angry": ("angry", 2.0, 0.9),
+    "worried": ("worried", 2.2, 1.0),
+    "yawn": ("yawn", 3.2, 1.3),
+    "awe": ("awe", 2.8, 1.3),
+    "ponder": ("thinking_look", 2.6, 1.2),
+    "eyeroll": ("eyeroll", 1.6, 0.4),
+    "blush": ("shy", 2.4, 1.0),
+    "sleepy": ("eyes_half", 3.0, 1.4),
+    "laugh": (("laugh_a", "laugh_b", "laugh_a", "laugh_b", "laugh_a"), 2.6, 0.0),
 }
 FPS = 12
 
@@ -72,8 +89,28 @@ def ease(x):
     return x * x * (3 - 2 * x)
 
 
+def find_source(source):
+    for folder in SOURCE_FOLDERS:
+        if (folder / ("%s.png" % source)).exists():
+            return folder / ("%s.png" % source)
+    return None
+
+
+def build_sequence(sources, seconds, still):
+    """Through several pictures one after the other (a laugh): still -> first, between them, last -> still."""
+    poses = [still] + [clean(Image.open(find_source(n)).convert("RGB")) for n in sources] + [still]
+    total = max(len(poses) - 1, int(round(seconds * FPS)))
+    per = max(2, total // (len(poses) - 1))
+    frames = []
+    for a, b in zip(poses, poses[1:]):
+        frames += morph_frames(a, b, per + 1)[:-1]
+    return frames + [still]
+
+
 def build(name, source, seconds, hold, base, still):
-    pose = clean(Image.open(SOURCES / ("%s.png" % source)).convert("RGB"))
+    if isinstance(source, tuple):
+        return build_sequence(source, seconds, still)
+    pose = clean(Image.open(find_source(source)).convert("RGB"))
     total = max(4, int(round(seconds * FPS)))
     held = int(round(hold * FPS))
     move = max(2, (total - held) // 2)
@@ -93,8 +130,9 @@ def main(argv):
     still = make_mouths.to_small(base)
     results = {}
     for name, (source, seconds, hold) in CLIPS.items():
-        if not (SOURCES / ("%s.png" % source)).exists():
-            print("missing", source)
+        names = source if isinstance(source, tuple) else (source,)
+        if any(find_source(n) is None for n in names):
+            print("missing a picture for", name)
             continue
         results[name] = build(name, source, seconds, hold, base, still)
         print("%-12s %d pictures" % (name, len(results[name])))

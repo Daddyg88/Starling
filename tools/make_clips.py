@@ -32,7 +32,7 @@ STORE_HEIGHT = 480
 WIDE = ("salute",)               # clips with an arm that reaches beyond her picture: stored with room at the sides
 PAD = (0.52, 0.06)               # that room, as a fraction of her picture width (left, right); her window is made this much wider
 KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2", "salute",      # the first set
-         "nod", "shake", "startle", "tilt", "glance_left", "glance_right", "brow_up", "brow_down", "laugh", "wink", "smirk", "blush", "blow_kiss", "eyeroll", "facepalm", "shrug", "sad", "worried", "angry",
+         "nod", "shake", "startle", "tilt", "glance_left", "glance_right", "brow_up", "brow_down", "eyes_left", "eyes_right", "ponder", "yawn", "laugh", "wink", "smirk", "blush", "blow_kiss", "eyeroll", "facepalm", "shrug", "sad", "worried", "angry",
          "awe", "excited", "sleepy", "point", "thumbs_up", "facing_away", "cheer", "idle_alt1")          # see docs/CLIP_SHOT_LIST.md
 BACK_GAP = 3.0                   # if a clip ends this much (average brightness difference) away from where it began, play it back in reverse to get her home
 
