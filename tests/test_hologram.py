@@ -1078,3 +1078,37 @@ class Reactions(unittest.TestCase):
         for event in h.REACTIONS:
             self.assertIn(event, known, event)
 
+
+
+class VoidCompassGuardTests(unittest.TestCase):
+    """She stays above Void Compass's overlay, but only when she is showing, Void Compass is connected and the setting is on."""
+
+    def test_guard_needs_all_three(self):
+        from ui.hologram_window import should_guard
+        self.assertTrue(should_guard(True, True, True))
+        self.assertFalse(should_guard(False, True, True))
+        self.assertFalse(should_guard(True, False, True))
+        self.assertFalse(should_guard(True, True, False))
+
+    def test_raising_does_nothing_off_windows(self):
+        from ui.hologram_window import raise_if_covered
+        self.assertFalse(raise_if_covered(object()))
+
+    def test_setting_is_on_by_default_and_on_the_overlays_page(self):
+        from core.settings import DEFAULTS
+        from ui.settings_model import build_pages
+        self.assertTrue(DEFAULTS["hologram"]["above_void_compass"])
+        keys = [f.key for p in build_pages() if p.id == "overlays" for f in p.fields]
+        self.assertIn("hologram.above_void_compass", keys)
+
+    def test_the_feed_asks_the_watcher(self):
+        from ui.hologram_window import HologramFeed
+
+        class Watcher:
+            def void_compass_running(self):
+                return True
+
+        class App:
+            watcher = Watcher()
+        self.assertTrue(HologramFeed.void_running(type("F", (), {"app": App()})()))
+        self.assertFalse(HologramFeed.void_running(type("F", (), {"app": object()})()))

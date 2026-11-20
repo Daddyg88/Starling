@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.104 - she stays above Void Compass
+
+ui/hologram_window.py: `HologramWindow._guard` runs every GUARD_MS (40 ms) and, when `should_guard(setting, shown, void connected)`, calls `raise_if_covered(window)`: if `GetWindow(hwnd, GW_HWNDPREV)` is not 0 another topmost window is above her, so `SetWindowPos(HWND_TOPMOST, NOMOVE|NOSIZE|NOACTIVATE)`. Void Compass connection comes from `HologramFeed.void_running()` (app.watcher.void_compass_running(), cached 2 s). Setting hologram.above_void_compass (Overlays page). Her normal 100 ms `lift()` stays.
+
 ## 0.96.103 - exobiology: more facts, wider wording
 
 journal/exobiology.py `BioInfo` now also loads config/bio_rules.json (path next to the values file) and builds worked-out facts in `habitat_facts` (planet types, air, gravity limit, temperature range, star/volcanic needs, value rank, sample distance). `pool` = genus lines + species line + those; `about(species, genus, count, values, distances)` hands out `count` different facts and keeps a per-species shuffled list (`_left`) so nothing repeats until all are told. `ExobiologyTracker` asks for 2 on the second sample and, with chance THIRD_FACT_CHANCE (0.6), 1 on the third. personality/line_keys.py: a third sample with an About uses ScanOrganic_ThirdAbout first. voicepacks/default/bio2.json (loaded in personality/dialogue.py) holds the new wording. tests/test_bio_variety.py.

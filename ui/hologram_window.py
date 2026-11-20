@@ -42,6 +42,32 @@ def set_click_through(window, on):
         pass            # not Windows: it still works, it just takes mouse clicks
 
 
+def raise_if_covered(window):
+    """Windows: if another always-on-top window (Void Compass's overlay, say) is stacked above this one, move this one back to the top.
+    It never takes focus and never moves or resizes anything, so the game keeps your keys. Returns True when it had to raise."""
+    try:
+        import ctypes
+        user32 = ctypes.windll.user32
+        hwnd = user32.GetParent(window.winfo_id()) or window.winfo_id()
+        GW_HWNDPREV, HWND_TOPMOST = 3, -1
+        SWP_NOSIZE, SWP_NOMOVE, SWP_NOACTIVATE = 0x1, 0x2, 0x10
+        if not user32.GetWindow(hwnd, GW_HWNDPREV):
+            return False                      # nothing is above her
+        user32.SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE)
+        return True
+    except Exception:
+        return False
+
+
+def should_guard(setting_on, shown, void_connected):
+    """Her guard against being covered runs only while she is showing, Void Compass is connected and the setting is on."""
+    return bool(setting_on and shown and void_connected)
+
+
+GUARD_MS = 40            # how often the guard looks while it is running (a quick, cheap check)
+VOID_CHECK_SECONDS = 2.0 # how often she asks whether Void Compass is connected
+
+
 BOOT_SECONDS = 20.0      # after the game window first appears she waits this long, then powers up ("getting herself together")
 
 
@@ -77,6 +103,11 @@ class HologramFeed:
         self._focus = True
         self._booted_from = None       # when the game window first came into focus
         self.game_in_front = None      # True / False from the window title, None when it cannot be read
+
+    def void_running(self):
+        """True while Void Compass is running and connected (the same check the route map uses)."""
+        watcher = getattr(self.app, "watcher", None)
+        return bool(watcher and watcher.void_compass_running())
 
     def game_in_focus(self, now):
         """True when Elite is the window you are in AND she has finished starting up. Checked twice a second at most.
@@ -278,6 +309,7 @@ class HologramWindow:
         except Exception:
             log.exception("The hologram could not listen for events")
         self.root.after(IDLE_MS, self._tick)
+        self.root.after(GUARD_MS, self._guard)
 
     # ---- for the dashboard ----
     def current(self):
@@ -315,6 +347,30 @@ class HologramWindow:
 
     def moving(self):
         return time.monotonic() < self.moving_until
+
+    # ---- staying above Void Compass's overlay ----
+    def _void_connected(self):
+        now = time.monotonic()
+        if now - getattr(self, "_void_at", -99.0) >= VOID_CHECK_SECONDS:
+            self._void_at = now
+            try:
+                self._void_value = bool(self.feed.void_running())
+            except Exception:
+                self._void_value = False
+        return getattr(self, "_void_value", False)
+
+    def _guard(self):
+        try:
+            if self.window is not None and should_guard(self.settings.get("hologram.above_void_compass", True), self._shown,
+                                                        self._void_connected()):
+                raise_if_covered(self.window)
+        except Exception:
+            log.exception("The Void Compass guard failed; it is switched off for this session")
+            return
+        try:
+            self.root.after(GUARD_MS, self._guard)
+        except Exception:
+            pass
 
     # ---- the loop ----
     def _tick(self):

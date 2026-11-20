@@ -419,6 +419,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="On = it steps out of the way when the galaxy map, a station menu or any other screen is open"),
             Field("hologram.enabled", "Show her as a hologram on the dash", "toggle",
                   help="A see-through picture of her above your bottom-left panel that moves her mouth when she talks. Needs the game in Borderless or Windowed mode. It powers down when you open any other game screen"),
+            Field("hologram.above_void_compass", "Keep her above Void Compass's overlay", "toggle",
+                  help="While Void Compass is connected she moves herself back on top if its overlay covers her. Neither overlay is closed. Off = leave the stacking alone"),
             Field("hologram.size", "Hologram size", "choice", HOLOGRAM_SIZES, help="Pick what looks right in your cockpit, then drag her box on the picture above to place her. She remembers where you put her"),
         ]),
         Page("memory", "Memory", "What she remembers about you and your trips. It is kept only on this computer, in data/tetko.db.", [

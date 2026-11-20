@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.104: hologram stays above Void Compass. CHECK: with Void Compass connected and both overlays showing, she stays on top and Void Compass's overlay is still open; if it flickers or Void Compass wins, tell me.
 - [ ] 0.96.103: exobiology variety. CHECK: do a few samples of the same species: second sample gives two different facts each time, the third sometimes gives one, and nothing repeats until all the facts are told. Tell me any line that sounds wrong read aloud (the 'g' for gravity, kelvin). Not done: the cycle is not saved between sessions; Anemone still has no description of its own.
 - [ ] 0.96.102: CI fix for the Overlays picture. CHECK: the GitHub Actions run for this commit is green.
 - [ ] 0.96.101: Overlays page. CHECK: open the Overlays tab, drag the three boxes, press the test buttons (hologram / biology / route): each should appear where you dropped its box. Try 'Use my own screenshot'. NOT TESTED on screen. TO DO: put the base-hack panel and red-alert banner on the page, and let the boxes cross to a second monitor.
