@@ -713,7 +713,7 @@ class PoseClips(unittest.TestCase):
             self.holo.tick(now=self.c.t, **kw)
 
     def test_the_clip_files_are_there(self):
-        self.assertEqual(sorted(self.holo.assets.clips), ["blow_kiss", "bored1", "bored2", "glance_left", "glance_right", "listening", "nod", "pleased", "salute", "shake", "thinking", "tilt"])
+        self.assertEqual(sorted(self.holo.assets.clips), ["blow_kiss", "bored1", "bored2", "brow_down", "brow_up", "glance_left", "glance_right", "listening", "nod", "pleased", "salute", "shake", "thinking", "tilt"])
 
     def test_thinking_plays_then_leaves_when_the_answer_comes(self):
         self.run_for(0.5, thinking=True)
@@ -1090,7 +1090,7 @@ class Reactions(unittest.TestCase):
 
     def test_every_reaction_names_something_she_can_do(self):
         for event, (kind, chance) in h.REACTIONS.items():
-            self.assertTrue(kind in h.GESTURES or kind in ("glance", "pleased", "salute"), event)
+            self.assertTrue(kind in h.GESTURES or kind in ("glance", "salute") + h.CLIP_REACTIONS, event)
             self.assertTrue(0 < chance <= 1, event)
 
     def test_docking_granted_nods_and_denied_shakes_the_head(self):

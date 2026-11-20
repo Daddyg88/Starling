@@ -79,14 +79,15 @@ PLEASED_CHANCE = 0.25            # how often a spoken line ends with the pleased
 CLIP_LRU = 1                     # clips other than thinking and listening that are kept in memory
 # ---- little gestures made from her one picture (no video needed) and the game events that trigger them ----
 GESTURES = {"nod": 1.0, "shake": 1.2, "tilt": 2.4, "glance_left": 2.0, "glance_right": 2.0, "startle": 0.9}      # name -> seconds
+CLIP_REACTIONS = ("pleased", "brow_up", "brow_down")      # reactions that are a recorded clip only (nothing built in); no clip file, no reaction
 GESTURE_GAP = 3.0                # a gesture does not start within this many seconds of the last one (a startle always may)
 REACT_GAP, STARTLE_GAP = 8.0, 5.0       # the least time between two reactions to game events
 REACTIONS = {                    # game event -> (what she does, how likely)
     "DockingGranted": ("nod", 0.7), "DockingDenied": ("shake", 0.9),
-    "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("pleased", 0.7), "MissionFailed": ("shake", 0.8), "MissionAbandoned": ("shake", 0.4),
+    "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("pleased", 0.7), "MissionFailed": ("shake", 0.8), "MissionAbandoned": ("brow_down", 0.5),
     "RedeemVoucher": ("pleased", 0.3), "SellExplorationData": ("pleased", 0.3), "MultiSellExplorationData": ("pleased", 0.4), "SellOrganicData": ("pleased", 0.3),
     "EscapeInterdiction": ("pleased", 0.6), "FSSAllBodiesFound": ("pleased", 0.8), "UndiscoveredSystem": ("pleased", 0.5), "GameMilestone": ("pleased", 0.8),
-    "UniqueBio": ("tilt", 0.5), "BioLook": ("tilt", 0.4), "CodexEntry": ("tilt", 0.4), "FSSSignalDiscovered": ("tilt", 0.3), "SAASignalsFound": ("tilt", 0.4),
+    "UniqueBio": ("brow_up", 0.5), "BioLook": ("tilt", 0.4), "CodexEntry": ("brow_up", 0.4), "FSSSignalDiscovered": ("tilt", 0.3), "SAASignalsFound": ("tilt", 0.4),
     "WingJoined": ("nod", 0.6), "WingInvite": ("nod", 0.6), "WingAdd": ("nod", 0.4), "WingLeft": ("tilt", 0.4),
     "ReceiveText": ("glance", 0.3),
     "Interdicted": ("startle", 0.9), "UnderAttack": ("startle", 0.5), "HullDamage": ("startle", 0.5), "HeatDamage": ("startle", 0.5),

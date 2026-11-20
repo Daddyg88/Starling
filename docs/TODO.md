@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.113: eyebrow clips. CHECK on screen: a unique life form raises her brows; abandoning a mission frowns; say if too subtle. Next: build laugh/startle/sleepy/eye-glance clips from the pictures already sent, and make the new expression pictures listed in the chat.
 - [ ] 0.96.112: head clips. CHECK on screen: docking granted (nod), a message (glance), a find (tilt) look natural and not ghostly; say if the turns are too small and I will exaggerate them.
 - [ ] 0.96.111: new blink. CHECK on screen: she blinks naturally, no patch edge. Decide what to do with the head/eyebrow pictures (docs/head_sources); remake tilt_left/tilt_right (red speck).
 - [ ] 0.96.110: new mouths. CHECK on screen: talk to her; does the mouth sit right (especially 'ah'), any visible patch edge, does f/v look odd? Then make the eye pictures.

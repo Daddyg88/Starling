@@ -29,6 +29,8 @@ CLIPS = {
     "glance_right": ("look_right", 2.0, 0.5),
     "tilt": ("tilt_left", 2.4, 0.7),
     "nod": ("nod_down", 1.0, 0.1),
+    "brow_up": ("brow_up", 1.8, 0.6),                  # eyebrows lifted: surprise or interest
+    "brow_down": ("brow_down", 1.8, 0.6),              # eyebrows lowered: a frown, disappointment
 }
 FPS = 12
 
