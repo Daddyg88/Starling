@@ -1110,6 +1110,10 @@ class App:
         self.commands.extra_helpers.append(lore)
         if getattr(self, "processor", None) is not None:
             self.processor.raw_listeners.append(hack.on_entry)
+        try:
+            self.bus.subscribe("GlideStarted", hack.on_glide)
+        except Exception:
+            self.log.exception("The hack could not hear the glide")
 
     def _red_alert_combat_mode(self):
         """Red alert: switch the cockpit to combat mode in the background (it says nothing and does nothing if it already is)."""

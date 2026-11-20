@@ -19,6 +19,13 @@ class AtmosphereTests(unittest.TestCase):
                          "an atmosphere that is suitable for water based life")
         self.assertIsNone(atmosphere_phrase({"StarType": "K"}))
 
+    def test_oxygen_is_named_when_there_is_some(self):
+        scan = {"Atmosphere": "thin nitrogen atmosphere", "AtmosphereComposition": [{"Name": "Nitrogen", "Percent": 80.0}, {"Name": "Oxygen", "Percent": 19.5}]}
+        self.assertEqual(atmosphere_phrase(scan), "a thin nitrogen atmosphere, with 19.5 percent oxygen")
+        self.assertEqual(atmosphere_phrase({"Atmosphere": "thin oxygen atmosphere", "AtmosphereComposition": [{"Name": "Oxygen", "Percent": 100.0}]}),
+                         "a thin oxygen atmosphere")
+        self.assertEqual(atmosphere_phrase({"Atmosphere": "thin argon atmosphere", "AtmosphereComposition": [{"Name": "Oxygen", "Percent": 0.1}]}), "a thin argon atmosphere")
+
 
 class KeysTests(unittest.TestCase):
     def test_air_keys_first_when_known(self):

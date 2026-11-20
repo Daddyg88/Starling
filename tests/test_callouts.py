@@ -56,6 +56,17 @@ class GlideTests(unittest.TestCase):
         self.assertNotIn("temperature", glide.data)
         self.assertEqual(line_keys.keys_for(glide), ["GlideStarted"])
 
+    def test_a_scan_that_arrives_during_the_glide_is_still_announced_once(self):
+        self.start_glide()
+        self.assertEqual(len([e for e in self.heard if e.name == "GlideStarted"]), 1)
+        self.processor.handle_line(scan("Planet 2", gravity=4.9, kelvin=288.0))
+        self.processor.state.current_body = "Planet 2"
+        self.reader.handle_status({"Flags": 1 << 24, "Flags2": self.glide})
+        self.reader.handle_status({"Flags": 1 << 24, "Flags2": self.glide})
+        glides = [e for e in self.heard if e.name == "GlideStarted"]
+        self.assertEqual(len(glides), 2)
+        self.assertEqual(glides[1].data["gravity"], "0.50")
+
     def test_heavy_world_uses_the_heavy_lines_first(self):
         self.processor.handle_line(scan("Big", gravity=29.4, kelvin=300))
         self.processor.state.current_body = "Big"

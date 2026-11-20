@@ -251,6 +251,7 @@ class StatusReader:
         if changed and not (baseline_only or initial):
             self._announce(VEHICLE_CHANGED, status, {"vehicle": vehicle, "previous": previous_vehicle})
         self._check_screen(status, quiet=baseline_only or initial)
+        self._late_glide_facts(flags2)
 
     def _release_danger(self, status, flags):
         """Says "Danger" only if the switch has stayed on for danger_hold seconds, and not just after a jump or a supercruise change."""
@@ -364,7 +365,23 @@ class StatusReader:
                     data["fuel_percent"] = round(main / capacity * 100)
         if name == "GlideStarted":
             data.update(self._body_facts())
+            self._glide_wait = None if "gravity" in data else now        # no scan yet: try again for a little while
         self.processor.emit(name, data)
+
+    GLIDE_WAIT = 25.0                 # seconds she keeps looking for the planet's scan after a glide began
+
+    def _late_glide_facts(self, flags2):
+        """The scan of the planet sometimes arrives a few seconds after the glide began: say gravity and air then, once."""
+        began = getattr(self, "_glide_wait", None)
+        if began is None:
+            return
+        if not flags2 & (1 << 12) or time.monotonic() - began > self.GLIDE_WAIT:
+            self._glide_wait = None
+            return
+        facts = self._body_facts()
+        if facts:
+            self._glide_wait = None
+            self.processor.emit("GlideStarted", facts)
 
     def _body_facts(self):
         """Temperature (kelvin) and gravity (g) of the planet you are gliding to, if a scan told us."""

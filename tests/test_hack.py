@@ -265,6 +265,7 @@ class MappedTests(unittest.TestCase):
     def test_arrival_says_once_and_only_when_not_mapped(self):
         rig = Rig()
         self.addCleanup(rig.cleanup)
+        rig.state.status_flags2 |= 1 << 12                      # gliding in
         h = rig.hack
         approach = {"event": "ApproachSettlement", "Name": "Makubuya Engineering Silo", "MarketID": 4358173443}
         h.on_entry(approach)
@@ -276,6 +277,7 @@ class MappedTests(unittest.TestCase):
     def test_an_anarchy_base_is_called_out_as_a_good_place(self):
         rig = Rig()
         self.addCleanup(rig.cleanup)
+        rig.state.status_flags2 |= 1 << 12                      # gliding in
         rig.hack.on_entry({"event": "ApproachSettlement", "Name": "Den", "MarketID": 11, "StationGovernment": "$government_Anarchy;"})
         rig.hack.on_entry({"event": "ApproachSettlement", "Name": "Calm", "MarketID": 12, "StationGovernment": "$government_Democracy;"})
         self.assertEqual(rig.narrator.said, ["Hack_Pirate", "Hack_Offer"])
@@ -283,6 +285,7 @@ class MappedTests(unittest.TestCase):
     def test_a_mapped_anarchy_base_is_not_called_out(self):
         rig = Rig()
         self.addCleanup(rig.cleanup)
+        rig.state.status_flags2 |= 1 << 12                      # gliding in
         rig.hack.survey = {"11": {"terminals": 9, "pictures": 40}}
         rig.hack.on_entry({"event": "ApproachSettlement", "Name": "Den", "MarketID": 11, "StationGovernment": "$government_Anarchy;"})
         self.assertEqual(rig.narrator.said, ["Hack_Known"])
@@ -290,6 +293,7 @@ class MappedTests(unittest.TestCase):
     def test_known_from_the_testers_survey(self):
         rig = Rig()
         self.addCleanup(rig.cleanup)
+        rig.state.status_flags2 |= 1 << 12                      # gliding in
         rig.hack.survey = {"7": {"terminals": 9, "pictures": 40}}
         rig.hack.on_entry({"event": "ApproachSettlement", "Name": "x", "MarketID": 7})
         self.assertEqual(rig.narrator.said, ["Hack_Known"])
@@ -297,6 +301,7 @@ class MappedTests(unittest.TestCase):
     def test_a_thin_survey_does_not_count(self):
         rig = Rig()
         self.addCleanup(rig.cleanup)
+        rig.state.status_flags2 |= 1 << 12                      # gliding in
         rig.hack.survey = {"7": {"terminals": 2, "pictures": 4}}
         rig.hack.on_entry({"event": "ApproachSettlement", "Name": "x", "MarketID": 7})
         self.assertEqual(rig.narrator.said, ["Hack_Offer"])
@@ -304,6 +309,7 @@ class MappedTests(unittest.TestCase):
     def test_done_by_you_is_silent(self):
         rig = Rig()
         self.addCleanup(rig.cleanup)
+        rig.state.status_flags2 |= 1 << 12                      # gliding in
         rig.store.mark_done("7")
         rig.hack.on_entry({"event": "ApproachSettlement", "Name": "x", "MarketID": 7})
         self.assertEqual(rig.narrator.said, [])
@@ -311,7 +317,31 @@ class MappedTests(unittest.TestCase):
     def test_the_announcement_can_be_switched_off(self):
         rig = Rig(**{"hack.announce": False})
         self.addCleanup(rig.cleanup)
+        rig.state.status_flags2 |= 1 << 12                      # gliding in
         rig.hack.on_entry({"event": "ApproachSettlement", "Name": "x", "MarketID": 7})
+        self.assertEqual(rig.narrator.said, [])
+
+    def test_nothing_is_said_before_the_glide(self):
+        rig = Rig()
+        self.addCleanup(rig.cleanup)
+        rig.hack.on_entry({"event": "ApproachSettlement", "Name": "x", "MarketID": 7})
+        self.assertEqual(rig.narrator.said, [])
+
+    def test_the_offer_comes_when_the_glide_starts_and_only_once(self):
+        rig = Rig()
+        self.addCleanup(rig.cleanup)
+        rig.hack.on_entry({"event": "ApproachSettlement", "Name": "x", "MarketID": 7})
+        rig.hack.on_glide()
+        rig.hack.on_glide()
+        self.assertEqual(rig.narrator.said, ["Hack_Offer"])
+
+    def test_an_old_approach_is_forgotten(self):
+        rig = Rig()
+        self.addCleanup(rig.cleanup)
+        rig.hack.on_entry({"event": "ApproachSettlement", "Name": "x", "MarketID": 7})
+        rig.clock_now = getattr(rig, "clock_now", 0)
+        rig.hack.clock = lambda: 99999.0
+        rig.hack.on_glide()
         self.assertEqual(rig.narrator.said, [])
 
 

@@ -156,6 +156,10 @@ def play(wav_bytes):
         log.debug("Could not play the hack sound", exc_info=True)
 
 
+GLIDE_BIT = 1 << 12              # Status.json Flags2: gliding
+PENDING_SECONDS = 1200.0         # an approached base is forgotten if no glide follows within this long
+
+
 class HackMode:
     def __init__(self, settings, state_provider, settlement_provider, store, maps, narrator, capture=None, sound=None, clock=time.monotonic,
                  known_layouts=None, survey=None, spawn=None):
@@ -185,6 +189,7 @@ class HackMode:
         self.result = None
         self._told = set()
         self._announced = set()
+        self._pending = None                                  # (time, key, settlement name, line key) waiting for a glide
         self._fails = 0
         self._last_need = 0.0
         self._pictures = 0
@@ -241,13 +246,33 @@ class HackMode:
         key = str(entry.get("MarketID") or entry.get("Name") or "")
         if not key or key in self._announced:
             return
-        self._announced.add(key)
         state = self.mapped_state(key)
         if state == "mine":
+            self._announced.add(key)
             return
         pirate = "anarchy" in str(entry.get("StationGovernment") or "").lower()          # an anarchy base is a pirate base: the best place to hack
-        key_to_say = "Hack_Known" if state == "known" else ("Hack_Pirate" if pirate else "Hack_Offer")
-        self.say(key_to_say, {"settlement": entry.get("Name") or "this base"})
+        line = "Hack_Known" if state == "known" else ("Hack_Pirate" if pirate else "Hack_Offer")
+        name = entry.get("Name") or "this base"
+        if self._gliding():
+            self._announced.add(key)
+            self.say(line, {"settlement": name})
+        else:
+            self._pending = (self.clock(), key, name, line)         # not yet: starting the game on a base must give her welcome lines, not these
+
+    def _gliding(self):
+        state = self.state_provider()
+        return bool(state is not None and (getattr(state, "status_flags2", 0) or 0) & GLIDE_BIT)
+
+    def on_glide(self, event=None):
+        """The glide to a base began: now is the time for the hack offer (if a base was approached a moment ago)."""
+        pending, self._pending = self._pending, None
+        if pending is None or not self.enabled() or not self.settings.get("hack.announce", True) or self.active:
+            return
+        when, key, name, line = pending
+        if self.clock() - when > PENDING_SECONDS or key in self._announced:
+            return
+        self._announced.add(key)
+        self.say(line, {"settlement": name})
 
     # ---- voice ----
     def try_handle(self, text):

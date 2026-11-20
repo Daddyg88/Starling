@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.119: hack offer only in a glide; glide says oxygen and late scans. CHECK: start the game sitting on a base (welcome lines only), then glide to a base (hack offer, gravity, air).
 - [ ] 0.96.118: 11 more clips. CHECK: idle for a few minutes and watch the new fidgets. DECIDE: triggers for nod_twice, suspicious, giggle, flirty, disagree (plus blow_kiss, wink, smirk, blush, eyeroll, laugh, angry, worried). Clips folder 25 MB.
 - [ ] 0.96.117: no smile mouth after she stops talking. CHECK: finish a line; her mouth should simply close.
 - [ ] 0.96.116: 8 settlements shipped (31 total). CHECK: visit Moy, Mogyla's Mine, Staff's, Bell, Redko: the arrow should be right from the start. TODO: a better High Tech 2 map (Liang, Cortes, Cukkemane).

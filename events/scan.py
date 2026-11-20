@@ -14,8 +14,16 @@ def atmosphere_phrase(entry):
     if not text or str(kind or "").strip().lower() == "none" or text in ("none", "no atmosphere"):
         return "no atmosphere"
     if "atmosphere" not in text:
-        return "an atmosphere that is " + text
-    return ("an " if text[0] in "aeiou" else "a ") + text
+        phrase = "an atmosphere that is " + text
+    else:
+        phrase = ("an " if text[0] in "aeiou" else "a ") + text
+    for part in entry.get("AtmosphereComposition") or ():          # name the oxygen when there is some: it matters on foot
+        try:
+            if str(part.get("Name", "")).lower() == "oxygen" and float(part.get("Percent", 0)) >= 0.5 and "oxygen" not in phrase:
+                phrase += ", with %s percent oxygen" % ("%.1f" % float(part["Percent"])).rstrip("0").rstrip(".")
+        except (AttributeError, TypeError, ValueError):
+            pass
+    return phrase
 
 
 class Scan(BaseEvent):

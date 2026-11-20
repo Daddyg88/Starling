@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.119 - Hack offer waits for the glide; glide names oxygen
+
+navigation/hack.py: on_entry keeps the offer in _pending unless Flags2 bit 12 (glide) is already set; on_glide (bus event GlideStarted) speaks it. journal/status_reader.py: _late_glide_facts re-emits GlideStarted with gravity and air if the scan comes late. events/scan.py: atmosphere_phrase adds the oxygen percent from AtmosphereComposition.
+
 ## 0.96.118 - 11 more clips from existing pictures
 
 tools/make_head_clips.py gained 11 CLIPS entries (single pictures, or tuples that chain pictures). make_clips.KNOWN lists the names (clips.json drops names not in KNOWN). Six join BORED_CLIPS; five wait for triggers.
