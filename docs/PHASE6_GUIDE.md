@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.112 - head clips by morphing
+
+`tools/make_head_clips.py` builds glance_left, glance_right, tilt and nod from docs/head_sources: `morph_frames` makes nine pictures from her still to the pose (Farneback optical flow both ways, warped and blended), then eases there, holds and eases back. They are written through `make_clips.write_clip` (now shared with the video route) with mode loop. `react_to` prefers a clip of the same name over the built-in gesture, so these replace the built-in moves.
+
 ## 0.96.111 - new blink picture
 
 `tools/make_mouths.py` also builds `eyes.png` (250 x 100 at (270, 245)) from `eyes_closed.png`/`eyes.png` in the folder, using the nose and mouth area to line the face up (the eyes themselves are what changes). The other expression pictures are stored in docs/eye_sources and docs/head_sources as raw 512 x 768 sources.

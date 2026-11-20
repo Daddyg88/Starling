@@ -591,6 +591,32 @@ class BackAndForthClips(unittest.TestCase):
         h.clear_clips()
 
 
+class HeadClipToolTests(unittest.TestCase):
+    def test_the_morph_goes_from_one_picture_to_the_other(self):
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        import make_head_clips as mhc
+        a = Image.new("RGB", (64, 96), (0, 0, 0))
+        b = Image.new("RGB", (64, 96), (200, 200, 200))
+        frames = mhc.morph_frames(a, b, 5)
+        means = [float(np.asarray(f).mean()) for f in frames]
+        self.assertEqual(len(frames), 5)
+        self.assertEqual(means, sorted(means))
+        self.assertLess(means[0], 1)
+        self.assertGreater(means[-1], 190)
+
+    def test_a_red_speck_at_the_top_is_removed_but_orange_eyes_are_not(self):
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        import make_head_clips as mhc
+        a = np.zeros((96, 64, 3), np.uint8)
+        a[2, 50] = (255, 0, 0)               # the speck
+        a[50, 20] = (200, 120, 60)           # an eye
+        cleaned = np.asarray(mhc.clean(Image.fromarray(a)))
+        self.assertEqual(tuple(cleaned[2, 50]), (0, 0, 0))
+        self.assertEqual(tuple(cleaned[50, 20]), (200, 120, 60))
+
+
 class ClipToolTests(unittest.TestCase):
     def test_end_gap(self):
         import sys
@@ -687,7 +713,7 @@ class PoseClips(unittest.TestCase):
             self.holo.tick(now=self.c.t, **kw)
 
     def test_the_clip_files_are_there(self):
-        self.assertEqual(sorted(self.holo.assets.clips), ["blow_kiss", "bored1", "bored2", "listening", "pleased", "salute", "shake", "thinking"])
+        self.assertEqual(sorted(self.holo.assets.clips), ["blow_kiss", "bored1", "bored2", "glance_left", "glance_right", "listening", "nod", "pleased", "salute", "shake", "thinking", "tilt"])
 
     def test_thinking_plays_then_leaves_when_the_answer_comes(self):
         self.run_for(0.5, thinking=True)
@@ -1069,7 +1095,8 @@ class Reactions(unittest.TestCase):
 
     def test_docking_granted_nods_and_denied_shakes_the_head(self):
         self.assertTrue(self.holo.react_to("DockingGranted", self.c.t))
-        self.assertEqual(self.holo.g_name, "nod")
+        self.assertEqual(self.holo.pose_wanted[0] if "nod" in self.holo.assets.clips else self.holo.g_name, "nod")   # a recorded clip beats the built-in movement
+        self.holo.pose_wanted = None
         self.c.t += 5
         self.holo.g_name = None
         self.holo.g_last = -1e9
@@ -1091,7 +1118,8 @@ class Reactions(unittest.TestCase):
 
     def test_message_makes_her_glance_sideways(self):
         self.assertTrue(self.holo.react_to("ReceiveText", self.c.t))
-        self.assertIn(self.holo.g_name, ("glance_left", "glance_right"))
+        got = self.holo.pose_wanted[0] if self.holo.pose_wanted else self.holo.g_name        # a recorded clip beats the built-in movement
+        self.assertIn(got, ("glance_left", "glance_right"))
 
     def test_chance_is_respected(self):
         class Never(random.Random):

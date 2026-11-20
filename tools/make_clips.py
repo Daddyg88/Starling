@@ -32,7 +32,7 @@ STORE_HEIGHT = 480
 WIDE = ("salute",)               # clips with an arm that reaches beyond her picture: stored with room at the sides
 PAD = (0.52, 0.06)               # that room, as a fraction of her picture width (left, right); her window is made this much wider
 KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2", "salute",      # the first set
-         "nod", "shake", "startle", "laugh", "wink", "smirk", "blush", "blow_kiss", "eyeroll", "facepalm", "shrug", "sad", "worried", "angry",
+         "nod", "shake", "startle", "tilt", "glance_left", "glance_right", "laugh", "wink", "smirk", "blush", "blow_kiss", "eyeroll", "facepalm", "shrug", "sad", "worried", "angry",
          "awe", "excited", "sleepy", "point", "thumbs_up", "facing_away", "cheer", "idle_alt1")          # see docs/CLIP_SHOT_LIST.md
 BACK_GAP = 3.0                   # if a clip ends this much (average brightness difference) away from where it began, play it back in reverse to get her home
 
@@ -77,6 +77,12 @@ def build(name, video, base, meta, mode=""):
             print("%s: too few pictures in %s" % (name, video))
             return
         frames = [Image.open(f).convert("RGB") for f in files]
+    write_clip(name, frames, base, meta, mode)
+
+
+def write_clip(name, frames, base, meta, mode=""):
+    """Fit the pictures onto her still picture and store them as the clip `name` (also used by tools/make_head_clips.py)."""
+    if True:
         gap = end_gap(frames)
         back = mode == "back" or (mode != "loop" and gap > BACK_GAP)
         error, scale, move = best_fit(frames[0], base)
