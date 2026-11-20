@@ -42,6 +42,18 @@ class MouthToolTests(unittest.TestCase):
             self.assertEqual(Image.open(mm.ASSETS / ("%s.png" % name)).size, (mm.BOX[2], mm.BOX[3]), name)
             self.assertIn(name, meta["sprites"])
 
+    def test_the_blink_picture_is_fitted_the_same_way(self):
+        old = Image.open(mm.ASSETS / "eyes.png").convert("RGBA")
+        sprite = mm.make("eyes", self.still, self.base, old, box=mm.EYES_BOX, shift_box=(160, 215, 360, 300))
+        self.assertEqual(sprite.size, (mm.EYES_BOX[2], mm.EYES_BOX[3]))
+        self.assertEqual(Image.open(mm.ASSETS / "eyes.png").size, (250, 100))
+
+    def test_the_tool_writes_the_blink_from_eyes_closed(self):
+        folder = Path(tempfile.mkdtemp())
+        self.still.save(folder / "eyes_closed.png")
+        self.assertEqual(mm.main([str(folder), "--check"]), 0)
+        self.assertTrue((folder / "check.png").exists())
+
     def test_a_wrong_size_picture_is_skipped(self):
         folder = Path(tempfile.mkdtemp())
         Image.new("RGB", (100, 100)).save(folder / "ah.png")

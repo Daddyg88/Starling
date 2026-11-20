@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.111 - new blink picture
+
+`tools/make_mouths.py` also builds `eyes.png` (250 x 100 at (270, 245)) from `eyes_closed.png`/`eyes.png` in the folder, using the nose and mouth area to line the face up (the eyes themselves are what changes). The other expression pictures are stored in docs/eye_sources and docs/head_sources as raw 512 x 768 sources.
+
 ## 0.96.110 - new mouth shapes
 
 `tools/make_mouths.py` replaces the mouth cut-outs (ui/assets/hologram/<shape>.png, 250 x 200, drawn at (270, 330) on the 784 x 1168 base). For each ComfyUI picture it finds how far the face moved (`find_shift`, eyes and nose only), cuts the mouth box with that shift, adds the average colour difference of the skin around the mouth, and keeps the old feathered alpha so the edge blends. Sources: docs/mouth_sources.
