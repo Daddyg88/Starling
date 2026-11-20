@@ -20,6 +20,12 @@ from journal import parser
 log = get_logger("processor")
 
 
+def looks_like_carrier(entry, state):
+    """DockingGranted and friends do not say the station type: a serial that is YOUR carrier's counts."""
+    from events.carriers import is_own_carrier
+    return is_own_carrier(entry, state)
+
+
 class EventProcessor:
     def __init__(self, bus, event_config, state, registry):
         self.bus = bus
@@ -77,6 +83,12 @@ class EventProcessor:
         if silent or not handler.announce:
             return
         data = handler.handle(entry)
+        if data.get("StationName"):
+            try:
+                from events.carriers import spoken_station
+                data["StationName"] = spoken_station(dict(entry, StationType=entry.get("StationType") or ("FleetCarrier" if looks_like_carrier(entry, self.state) else "")), self.state) or data["StationName"]
+            except Exception:
+                log.exception("The station name could not be tidied")
         if getattr(handler, "tag_on_foot", False):
             data["OnFoot"] = bool(getattr(self.state, "status_flags2", 0) & 1)      # Status.json Flags2 bit 0
         if not data.pop("_silent", False):

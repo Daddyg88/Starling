@@ -78,7 +78,7 @@ def tidy_name(name):
 
 
 class HabitKeeper:
-    def __init__(self, bus, path, announce=None, now=datetime.now, clock=time.monotonic, hours=None, jumps=None, enabled=None, system=None, own_carrier=None, station_name=None):
+    def __init__(self, bus, path, announce=None, now=datetime.now, clock=time.monotonic, hours=None, jumps=None, enabled=None, system=None, own_carrier=None, station_name=None, home_names=None):
         self.bus, self.path, self.announce = bus, path, announce
         self.now, self.clock = now, clock
         self.hours = hours or (lambda: 0.0)               # () -> hours together, including this session
@@ -87,6 +87,7 @@ class HabitKeeper:
         self.system = system or (lambda: None)           # () -> the system you are in now (a Died event does not say)
         self.own_carrier = own_carrier or (lambda data: False)       # (Docked data) -> True at YOUR fleet carrier: home, never counted
         self.station_name = station_name or (lambda data: data.get("StationName"))   # (Docked data) -> what she calls it (a carrier's name, not its serial)
+        self.home_names = home_names or (lambda: ())               # () -> names (callsign, name) of YOUR carrier: never counted, never joked about
         self._lock = threading.RLock()
         self._dirty = False
         self._saved_at = -SAVE_EVERY_SECONDS
@@ -235,7 +236,7 @@ class HabitKeeper:
             station = tidy_name(self.station_name(data))
         except Exception:
             station = tidy_name(data.get("StationName"))
-        if not station:
+        if not station or self._home(station):
             return
         speak = None
         with self._lock:
@@ -334,8 +335,26 @@ class HabitKeeper:
             self._dirty = True
         self.flush()
 
+    def _home(self, name):
+        try:
+            homes = {str(h).casefold() for h in self.home_names() if h}
+        except Exception:
+            return False
+        return str(name).casefold() in homes
+
+    def purge_home(self):
+        """Counts made before she knew your carrier (its serial, or its name) are thrown away: it is home, not a favourite place."""
+        with self._lock:
+            gone = [n for n in self.stations if self._home(n)]
+            for n in gone:
+                del self.stations[n]
+            if gone:
+                self._dirty = True
+        return len(gone)
+
     def top_stations(self, limit=5):
         """[(name, landings)] for the stations you dock at most (for the 'What she knows about you' window)."""
+        self.purge_home()
         with self._lock:
             rows = sorted(((n, e["count"]) for n, e in self.stations.items()), key=lambda r: -r[1])
         return rows[:limit]
@@ -366,6 +385,7 @@ class HabitKeeper:
     # ---- what the chit-chat may joke about ----
     def favourite_station(self):
         """(name, landings) of the station you have docked at most, once that is FAVOURITE_AT or more; else None."""
+        self.purge_home()
         with self._lock:
             if not self.stations:
                 return None

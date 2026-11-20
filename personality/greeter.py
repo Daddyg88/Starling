@@ -189,6 +189,11 @@ class LoginGreeter:
         if location is not None:
             system = location.get("StarSystem") or getattr(state, "system", None)
             station = location.get("StationName")
+            try:
+                from events.carriers import spoken_station
+                station = spoken_station(dict(location, StationType=location.get("StationType") or ""), state) or station      # a carrier by its name, not its serial
+            except Exception:
+                pass
             body = location.get("Body")
             docked, landed = bool(location.get("Docked")), bool(location.get("Landed"))
         else:                                            # no Location arrived: use what we already know

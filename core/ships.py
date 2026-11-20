@@ -82,9 +82,23 @@ def is_ship(raw):
     return key not in NOT_SHIPS and plain not in NOT_SHIPS
 
 
+SUITS = {"utilitysuit": "Artemis suit", "explorationsuit": "Maverick suit", "tacticalsuit": "Dominator suit"}
+
+
+def _suit(code):
+    """'$UtilitySuit_Class1_Name;' (the game sometimes leaves the code where a name should be, when you load in on foot) -> 'Artemis suit'."""
+    key = re.sub(r"[$;]", "", str(code or "").strip().lower()).split("_")[0]
+    if key in SUITS:
+        return SUITS[key]
+    return "suit" if key.endswith("suit") else ""
+
+
 def ship_name(raw, localised=None):
     """The name she says. Never fails; an empty input gives ''."""
-    if localised and str(localised).strip():
+    for code in (localised, raw):
+        if str(code or "").strip().startswith("$") and _suit(code):
+            return _suit(code)
+    if localised and str(localised).strip() and not str(localised).strip().startswith("$"):
         return _marks(str(localised).strip())
     raw = str(raw or "").strip()
     if not raw:

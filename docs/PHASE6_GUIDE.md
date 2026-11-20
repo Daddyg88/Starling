@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.121 - Carrier is home
+
+journal/processor.py swaps StationName for events.carriers.spoken_station in every announced event. memory/habits.py: home_names callable, purge_home(), used by favourite_station and top_stations and by _docked. navigation/voice.py: _CARRIER_ASK and _HOME_WHERE. core/ships.py: SUITS and _suit for $...Suit_..._Name; codes.
+
 ## 0.96.120 - hair_flick restored
 
 Recovered from git (commit b0b56cc^) the five clips that 0.96.108 overwrote: bored1 -> hair_flick, thinking -> hand_to_temple, bored2 -> hands_resting, pleased -> content_smile, listening -> listen_tilt (62 or 73 frames, no reverse needed). Names added to make_clips.KNOWN; four join BORED_CLIPS.

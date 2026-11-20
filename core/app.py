@@ -326,7 +326,8 @@ class App:
             enabled=lambda: bool(self.settings.get("memory.habits", True)) and bool(self.settings.get("memory.enabled", True)),
             system=lambda: getattr(self.state, "system", None),
             own_carrier=lambda data: is_own_carrier(data, self.state),
-            station_name=lambda data: spoken_station(data, self.state))
+            station_name=lambda data: spoken_station(data, self.state),
+            home_names=lambda: (getattr(self.state, "fleet_carrier_callsign", None), getattr(self.state, "fleet_carrier_name", None)))
         self.habits.attach()
         atexit.register(self.habits.flush)
         if self.chitchat is not None:

@@ -79,6 +79,13 @@ _CARRIER_WHERE = re.compile(
     r"|where (?:is|s) (?:my |the |our )?" + _CARRIER_NOUN + r"(?: parked| now| at)?"
     r"|(?:which|what) system (?:is|s) (?:my |the |our )?" + _CARRIER_NOUN + r" in"
     r"|where did i (?:park|leave) (?:my |the |our )?" + _CARRIER_NOUN + r")$")
+# "what's our fleet carrier" / "do you know the name of our fleet carrier" / "what is my carrier called" / "where is home" (home is the carrier, once she knows it)
+_CARRIER_ASK = re.compile(
+    r"^(?:(?:do you know|can you tell me|tell me) )?(?:(?:what s|what is|whats) (?:the name of )?(?:my |the |our )" + _CARRIER_NOUN + r"(?: called| named| s name)?"
+    r"|(?:what s|what is|whats) (?:my|our) " + _CARRIER_NOUN + r" s name"
+    r"|(?:the )?name of (?:my |the |our )" + _CARRIER_NOUN + r"|what (?:is|s) (?:my |the |our )" + _CARRIER_NOUN + r" called"
+    r"|what do we call (?:my |the |our )" + _CARRIER_NOUN + r")$")
+_HOME_WHERE = re.compile(r"^(?:where (?:is|s) (?:our |my |the )?home(?: now| parked)?|how far (?:away )?(?:is|s) (?:our |my )?home(?: away)?|how far (?:am i|are we) from home)$")
 _TAIL = re.compile(r"\b(using|via|by|with|through)\b.*\bneutron.*$|\bneutron (route|stars?)\b$")
 
 
@@ -305,6 +312,10 @@ class RouteVoice:
             return self.guardian_asked(asked[0], asked[1], guardian.wants_alternative(said))
         if _NEAREST_POI.search(said):
             return self.nearest_poi()
+        if _CARRIER_ASK.match(said):
+            return self.where_is_carrier("squad" if re.search(r"squad|wing", said) else "fleet")
+        if _HOME_WHERE.match(said) and self.carrier_system("fleet"):           # home is the fleet carrier, once she knows where it is
+            return self.where_is_carrier("fleet")
         found = _CARRIER_WHERE.match(said)
         if found:
             return self.where_is_carrier("squad" if re.search(r"squad|wing", said) else "fleet")
