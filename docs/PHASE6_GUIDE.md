@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.117 - No grin after speaking
+
+speech_finished() no longer sets smile_until, so _mouth_goal returns None (closed mouth) as soon as the line ends. The smile sprite is still available; the pleased clip does the happy look.
+
 ## 0.96.116 - 8 more shipped settlements
 
 Merged with `tools/merge_calibrations.py` from ten diagnostics zips: maps/known_calibrations.json now has 31 settlements. Liang Biochemical (High Tech 2, MarketID 3808325376) was visited five times but has only three marks and its map is a rough trace, so no fit was possible.

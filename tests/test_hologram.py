@@ -74,14 +74,14 @@ class Behaviour(unittest.TestCase):
             holo.tick(powered=False, now=c.t)
         self.assertLess(holo.power, 0.03)
 
-    def test_speaking_then_smile(self):
+    def test_speaking_then_closed_mouth(self):
         holo, c = make()
         holo.speech_started("Hello commander", c.t)
         self.assertTrue(holo.speaking)
         c.t += 1.2
         holo.speech_finished(c.t)
         self.assertFalse(holo.speaking)
-        self.assertEqual(holo._mouth_goal(c.t + 0.5), "smile")
+        self.assertIsNone(holo._mouth_goal(c.t + 0.5))          # no little grin after she stops
         self.assertIsNone(holo._mouth_goal(c.t + h.SMILE_SECONDS + 1))
 
     def test_speed_is_learned_within_limits(self):

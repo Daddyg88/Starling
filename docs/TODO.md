@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.117: no smile mouth after she stops talking. CHECK: finish a line; her mouth should simply close.
 - [ ] 0.96.116: 8 settlements shipped (31 total). CHECK: visit Moy, Mogyla's Mine, Staff's, Bell, Redko: the arrow should be right from the start. TODO: a better High Tech 2 map (Liang, Cortes, Cukkemane).
 - [ ] 0.96.115: bounce and idle. CHECK on screen: talking bounce is right (Hologram page: None/Small/Medium/Big/Full), idle fidgets not too frequent (Calm/Normal/Lively).
 - [ ] 0.96.114: expression clips. CHECK on screen: she yawns/sleepy/ponders when quiet, looks in awe on a new system. DECIDE triggers for wink, smirk, blush, eyeroll, laugh, angry, worried (cheeky and joking lines?). Clips folder is 18 MB: say if that is too big.

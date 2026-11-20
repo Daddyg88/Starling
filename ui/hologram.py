@@ -511,8 +511,7 @@ class Hologram:
             measured = letters / took                           # learn how fast this voice really speaks
             self.cps = max(8.0, min(22.0, 0.6 * self.cps + 0.4 * measured))
         self.speaking = False
-        self.smile_until = now + SMILE_SECONDS
-        self._rest(now)
+        self._rest(now)                                          # no mouth smile when she stops: it looked like a odd little grin
         if letters >= 25 and self.rng.random() < PLEASED_CHANCE:
             self.pose_wanted = ("pleased", now + SMILE_SECONDS)             # after the smile, so the two do not fight
 
