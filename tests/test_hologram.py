@@ -753,7 +753,7 @@ class PoseClips(unittest.TestCase):
     def test_the_clip_files_are_there(self):
         self.assertEqual(sorted(self.holo.assets.clips), sorted(["blow_kiss", "bored1", "bored2", "brow_down", "brow_up", "glance_left", "glance_right", "listening", "nod", "pleased", "salute", "shake", "thinking", "tilt",
                                                                                                   "eyes_left", "eyes_right", "wink", "smirk", "sad", "angry", "worried", "yawn", "awe", "ponder", "eyeroll", "blush", "sleepy", "laugh",
-                                                                                                  "glance_up", "tilt_right", "eyes_up", "eyes_down", "nod_twice", "suspicious", "curious", "giggle", "flirty", "disagree", "daydream"]))
+                                                                                                  "glance_up", "tilt_right", "eyes_up", "eyes_down", "nod_twice", "suspicious", "curious", "giggle", "flirty", "disagree", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "content_smile", "listen_tilt"]))
 
     def test_thinking_plays_then_leaves_when_the_answer_comes(self):
         self.run_for(0.5, thinking=True)
