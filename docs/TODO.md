@@ -202,7 +202,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - Bump core/version.py on every push, add a README "New in x.y.z:" entry, a docs/PHASE6_GUIDE.md line, and run `python3 tools/build_guide.py`.
 - Run the full tests (`python3 -m unittest discover -s tests -t .`) before pushing. Say what is untested.
 - The secret hardpoints phrase never appears in any list, doc, README or site.
-- Do not give any information about Payden.
+- Give no information about individual testers (say "a tester", never a name).
 
 ## Settlement maps (0.92.0)
 - [x] All 28 Odyssey layouts traced by eye from the Odyssey Map Guide (maps/settlements/*.json, all marked PROTOTYPE). Pad counts for everything except Tourist 1/Industrial 2 are guesses from the pictures; several layouts share a pad count, so she only suggests a map when exactly one matches, otherwise say "show settlement map <name>". Needs real visits to confirm pad counts, airlock/door colours and positions.
