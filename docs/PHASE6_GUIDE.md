@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.108 - your own clips and play-back
+
+`tools/make_clips.py` now measures how far a clip's last picture is from its first (`end_gap`, `BACK_GAP` = 3). A clip that ends away from where it began is stored with `"back": true` in clips.json, and `load_clip` returns the pictures forwards then backwards (the same arrays, so no extra memory or disk). `react_to` now prefers a recorded clip over a built-in gesture of the same name. New names accepted: everything in docs/CLIP_SHOT_LIST.md.
+
 ## 0.96.107 - where is my carrier
 
 `events/carriers.py` now keeps `fleet_carrier_pos` and saves callsign, name, id, system and position to data/carrier.json (`save_memory`, `load_memory`; the journal always wins over the file). `RouteVoice.where_is_carrier` answers the question with CarrierWhere / CarrierWhereNoDistance / CarrierWhereHere lines (voicepacks/default/carriers.json), using the carrier's name. Position comes from the journal, else one Spansh coordinates lookup.

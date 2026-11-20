@@ -9,6 +9,8 @@ Each clip should start and end in her normal pose, with the watermark already re
   * scales and moves each clip so she sits exactly where she does in her still picture (ui/assets/hologram/base.jpg), whatever shape the video was,
   * stores smaller JPEG pictures in ui/assets/hologram/clips/<name>/ and writes clips.json.
 Clips you do not list are left alone, so you can replace one at a time.
+A clip that does not end where it began is played forwards and then BACKWARDS (no extra pictures are stored), so she always ends in her normal pose.
+You can force this either way: pleased=Pleased.mp4:back (always play back) or pleased=Pleased.mp4:loop (never).
 """
 
 import json
@@ -29,7 +31,10 @@ FPS = 12
 STORE_HEIGHT = 480
 WIDE = ("salute",)               # clips with an arm that reaches beyond her picture: stored with room at the sides
 PAD = (0.52, 0.06)               # that room, as a fraction of her picture width (left, right); her window is made this much wider
-KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2", "salute")
+KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2", "salute",      # the first set
+         "nod", "shake", "startle", "laugh", "wink", "smirk", "blush", "blow_kiss", "eyeroll", "facepalm", "shrug", "sad", "worried", "angry",
+         "awe", "excited", "sleepy", "point", "thumbs_up", "facing_away", "cheer", "idle_alt1")          # see docs/CLIP_SHOT_LIST.md
+BACK_GAP = 3.0                   # if a clip ends this much (average brightness difference) away from where it began, play it back in reverse to get her home
 
 
 def best_fit(first, base):
@@ -57,7 +62,14 @@ def fit_wide(frame, base_size, scale, move):
     return canvas
 
 
-def build(name, video, base, meta):
+def end_gap(frames):
+    """How different the last picture is from the first (average brightness difference on small grey copies; 0 = identical)."""
+    def small(f):
+        return np.asarray(f.convert("L").resize((64, 96), Image.BILINEAR), dtype=np.float32)
+    return float(np.abs(small(frames[0]) - small(frames[-1])).mean())
+
+
+def build(name, video, base, meta, mode=""):
     with tempfile.TemporaryDirectory() as tmp:
         subprocess.run(["ffmpeg", "-v", "error", "-i", str(video), "-vf", "fps=%d" % FPS, str(Path(tmp) / "f_%04d.png")], check=True)
         files = sorted(Path(tmp).glob("f_*.png"))
@@ -65,8 +77,11 @@ def build(name, video, base, meta):
             print("%s: too few pictures in %s" % (name, video))
             return
         frames = [Image.open(f).convert("RGB") for f in files]
+        gap = end_gap(frames)
+        back = mode == "back" or (mode != "loop" and gap > BACK_GAP)
         error, scale, move = best_fit(frames[0], base)
-        print("%s: %d pictures, scale %.2f, move (%.0f, %.0f), match error %.1f (lower is better; 3 or less is good)" % (name, len(frames), scale, move[0], move[1], error))
+        print("%s: %d pictures, scale %.2f, move (%.0f, %.0f), match error %.1f (lower is better; 3 or less is good); ends %.1f away from the start -> %s" % (
+            name, len(frames), scale, move[0], move[1], error, gap, "plays forwards then back" if back else "plays as it is"))
         folder = ASSETS / "clips" / name
         folder.mkdir(parents=True, exist_ok=True)
         for old in folder.glob("*.jpg"):
@@ -76,6 +91,8 @@ def build(name, video, base, meta):
             fitted = fitted.resize((int(round(fitted.width * STORE_HEIGHT / fitted.height)), STORE_HEIGHT), Image.LANCZOS)
             fitted.save(folder / ("%03d.jpg" % number), quality=74, optimize=True)
     meta[name] = {"frames": len(frames), "fps": FPS}
+    if back:
+        meta[name]["back"] = True
     if name in WIDE:
         meta[name]["wide"] = True
         meta["pad"] = list(PAD)
@@ -96,10 +113,14 @@ def main(argv):
         meta = {}
     meta = {k: v for k, v in meta.items() if k in KNOWN or k == "pad"}
     for name, video in pairs:
+        mode = ""
+        for suffix in ("back", "loop"):                      # name=file.mp4:back (a Windows path like C:\x.mp4 has no such ending)
+            if video.endswith(":" + suffix):
+                video, mode = video[:-len(suffix) - 1], suffix
         if name not in KNOWN:
             print("unknown clip name %r (use one of %s)" % (name, ", ".join(KNOWN)))
             continue
-        build(name, video, base, meta)
+        build(name, video, base, meta, mode)
     meta["size"] = list(base.size)
     path.write_text(json.dumps(meta), encoding="utf-8")
     return 0

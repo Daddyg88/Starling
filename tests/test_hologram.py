@@ -1,3 +1,9 @@
+import json
+import tempfile
+from pathlib import Path
+
+from PIL import Image
+
 import random
 import unittest
 
@@ -552,6 +558,49 @@ class Defaults(unittest.TestCase):
         from core.settings import DEFAULTS
         self.assertTrue(DEFAULTS["hologram"]["enabled"])
 
+class BackAndForthClips(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.dir = Path(tempfile.mkdtemp())
+        (self.dir / "clips" / "nod").mkdir(parents=True)
+        for n in range(5):
+            Image.new("RGB", (8, 8), (n * 40, 0, 0)).save(self.dir / "clips" / "nod" / ("%03d.jpg" % n), quality=95)
+
+    def load(self, back):
+        (self.dir / "clips.json").write_text(json.dumps({"nod": {"frames": 5, "fps": 12, **({"back": True} if back else {})}}))
+        return h.load_clip(self.dir, "nod", 8, 8)
+
+    def test_a_clip_that_does_not_come_home_is_played_back(self):
+        frames = self.load(True)
+        self.assertEqual(len(frames), 8)                          # 0 1 2 3 4 3 2 1
+        self.assertIs(frames[5], frames[3])                       # the same picture again, not a copy
+        self.assertIs(frames[-1], frames[1])
+
+    def test_a_normal_clip_is_not_changed(self):
+        self.assertEqual(len(self.load(False)), 5)
+
+    def test_a_recorded_clip_beats_the_built_in_gesture(self):
+        h.clear_clips()
+        holo, c = make()
+        holo.power = 1.0
+        self.assertIn("shake", holo.assets.clips)
+        holo.rng = type("Sure", (), {"random": lambda self: 0.0, "choice": lambda self, x: x[0], "uniform": lambda self, a, b: a})()
+        self.assertTrue(holo.react_to("DockingDenied", now=c.t + 100))
+        self.assertEqual(holo.pose_wanted[0], "shake")
+        self.assertIsNone(holo.g_name)
+        h.clear_clips()
+
+
+class ClipToolTests(unittest.TestCase):
+    def test_end_gap(self):
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        import make_clips
+        a, b = Image.new("RGB", (64, 96), (0, 0, 0)), Image.new("RGB", (64, 96), (100, 100, 100))
+        self.assertEqual(make_clips.end_gap([a, a]), 0.0)
+        self.assertGreater(make_clips.end_gap([a, b]), make_clips.BACK_GAP)
+
+
 if __name__ == "__main__":
     unittest.main()
 
@@ -638,7 +687,7 @@ class PoseClips(unittest.TestCase):
             self.holo.tick(now=self.c.t, **kw)
 
     def test_the_clip_files_are_there(self):
-        self.assertEqual(sorted(self.holo.assets.clips), ["bored1", "bored2", "listening", "pleased", "salute", "thinking"])
+        self.assertEqual(sorted(self.holo.assets.clips), ["bored1", "bored2", "listening", "pleased", "salute", "shake", "thinking"])
 
     def test_thinking_plays_then_leaves_when_the_answer_comes(self):
         self.run_for(0.5, thinking=True)
@@ -1025,7 +1074,10 @@ class Reactions(unittest.TestCase):
         self.holo.g_name = None
         self.holo.g_last = -1e9
         self.assertTrue(self.holo.react_to("DockingDenied", self.c.t + 20))
-        self.assertEqual(self.holo.g_name, "shake")
+        if "shake" in self.holo.assets.clips:                 # a recorded shake clip beats the built-in movement
+            self.assertEqual(self.holo.pose_wanted[0], "shake")
+        else:
+            self.assertEqual(self.holo.g_name, "shake")
 
     def test_attack_startles_even_just_after_another_reaction(self):
         self.holo.react_to("DockingGranted", self.c.t)

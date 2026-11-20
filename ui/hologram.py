@@ -326,6 +326,8 @@ def load_clip(directory, name, height, width, pad_left=0, pad_right=0, wide=Fals
             picture = Image.open(directory / "clips" / name / ("%03d.jpg" % number)).convert("RGB").resize(
                 (width + pad_left + pad_right if wide else width, height), Image.BILINEAR)
             frames.append(np.asarray(picture, dtype=np.uint8))
+        if meta.get("back") and len(frames) > 2:
+            frames = frames + frames[-2:0:-1]            # forwards, then the same pictures backwards (no copies: the same arrays), so she ends where she began
         return frames
     except Exception:
         return []
@@ -616,7 +618,7 @@ class Hologram:
             return False
         if kind == "glance":
             kind = self.rng.choice(("glance_left", "glance_right"))
-        if kind in GESTURES:
+        if kind in GESTURES and kind not in self.assets.clips:          # a recorded clip of the same name beats the built-in movement
             done = self.gesture(kind, now)
         elif kind == "salute":
             self.salute(now)
