@@ -26,16 +26,16 @@ Name the file with the clip name, e.g. `nod.mp4`. Make 2 or 3 tries of each and 
 
 | # | Clip name | Used for | Frames | Prompt (middle part) |
 |---|---|---|---|---|
-| 11 | `wink` | cheeky or flirty lines | 49 | she gives a playful wink with her right eye and a small smile |
-| 12 | `smirk` | innuendo, teasing | 73 | she raises one eyebrow and gives a sly smirk, looking at the viewer |
-| 13 | `blush` | flustered, compliments | 73 | she looks down shyly, smiles, glances up through her lashes |
-| 14 | `blow_kiss` | affection, thank you | 73 | she blows a kiss toward the viewer with one hand, smiling |
-| 15 | `eyeroll` | sarcastic lines | 49 | she rolls her eyes upward with a tired half smile, then looks back |
-| 16 | `facepalm` | silly mistakes | 73 | she briefly puts one hand to her forehead, shakes her head, lowers the hand with an amused sigh |
-| 17 | `shrug` | "I don't know" | 49 | she shrugs both shoulders, tilts her head, small apologetic smile |
-| 18 | `sad` | deaths, lost cargo, bad news | 97 | her smile fades, she looks down sadly, a slow breath, then looks up softly |
-| 19 | `worried` | low fuel, danger | 73 | she looks anxious, brows drawn together, glances to one side, bites her lip |
-| 20 | `angry` | being shot, griefers | 73 | her brows lower, jaw tightens, she narrows her eyes in a stern glare |
+| 11 | `wink` | cheeky or flirty lines | 49 | at first she looks calmly at the viewer. Then her right eye closes slowly in a clear, playful wink, while her left eye stays open and her cheek lifts, her lips curve into a small knowing smile and her head tilts a few degrees to the side. She holds the wink for about half a second, then opens the eye and her face relaxes |
+| 12 | `smirk` | innuendo, teasing | 73 | at first her face is calm. Then slowly her left eyebrow lifts high while her right eyebrow stays low, her eyes look straight at the viewer with a sly, knowing look, and one corner of her mouth curls up into a confident, mischievous smirk, with her chin lowered a little. She holds the smirk for a second, then her eyebrow lowers and her face goes back to calm |
+| 13 | `blush` | flustered, compliments | 73 | at first she looks at the viewer. Then she glances down and to the side shyly, her cheeks glow a little brighter blue, her lips press into a small embarrassed smile and her shoulders rise a tiny bit. After a moment she looks back up at the viewer through her lashes with a soft, bashful smile, then her face relaxes |
+| 14 | `blow_kiss` | affection, thank you | 73 | at first she looks at the viewer. Then she lifts her right hand in front of her lips, kisses her fingertips with her lips pursed, and gently sweeps her hand outward toward the viewer as if blowing a kiss, with her eyes soft and a warm smile. Her hand stays inside the picture. Then she lowers her hand and smiles |
+| 15 | `eyeroll` | sarcastic lines | 49 | at first she looks at the viewer. Then her eyelids lower slightly, her mouth flattens into a dry half smile, and her eyes roll slowly up and to the side as if saying "oh, please", while her head tilts back a tiny bit. Then her eyes come back down to the viewer and her face relaxes |
+| 16 | `facepalm` | silly mistakes | 73 | at first she looks at the viewer. Then she lets out a small tired sigh, lifts her right hand and rests her palm flat against her forehead, closes her eyes and shakes her head slowly side to side with an amused, exasperated half smile. Then she lowers her hand, opens her eyes and her face relaxes. Her hand stays inside the picture |
+| 17 | `shrug` | "I don't know" | 49 | at first she looks at the viewer. Then both her shoulders lift up together, her head tilts to one side, her eyebrows go up and her lips press together and curve downward in an "I don't know" expression, with her eyes wide and innocent. She holds it for a moment, then her shoulders drop and her face relaxes |
+| 18 | `sad` | deaths, lost cargo, bad news | 97 | at first she looks at the viewer. Then slowly her smile fades, her eyebrows tilt up in the middle, her eyes lower and glisten, and her gaze drops to the side. She takes a slow, deep breath, her shoulders sink a little, and she stays quiet and sorrowful for a second. Then she lifts her eyes back to the viewer with a soft, gentle, comforting look |
+| 19 | `worried` | low fuel, danger | 73 | at first she looks at the viewer. Then her eyebrows pull together and rise in the middle, her eyes widen and glance quickly to one side and back, her lips press tight and she lightly bites her lower lip. Her breathing quickens and her shoulders tense up. Then her face softens and relaxes |
+| 20 | `angry` | being shot, griefers | 73 | at first she looks at the viewer. Then her eyebrows drop and pull together, her eyes narrow into a hard glare straight at the viewer, her nostrils flare, her jaw tightens and her lips press into a thin line, with her chin lowered. She holds the stern glare for a second, then her eyebrows lift and her face relaxes |
 
 ## Tier 3 - Elite moments
 
@@ -51,6 +51,8 @@ Name the file with the clip name, e.g. `nod.mp4`. Make 2 or 3 tries of each and 
 | 28 | `idle_alt1` | extra variety while idle | 121 | she breathes slowly and blinks, her hair drifts gently, a tiny smile appears and fades |
 
 ## Tips so they work first time
+
+* Descriptive prompts work better: say WHAT each part of her face does (eyebrows, eyes, mouth, head, shoulders), in the order it happens, and when it holds.
 
 * If she drifts, say `locked camera, her position does not change`.
 * If the end does not match the start, add `ends exactly as it began`; Starling's tool can also cross-fade the ending.
