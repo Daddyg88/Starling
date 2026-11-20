@@ -1,0 +1,113 @@
+{
+ "ScanOrganic_Log": [
+  "Sample one is in the bag: {Species_Localised}.||Valued at around {worth} credits.||Put {distance} metres between you and this spot before the next.",
+  "{Species_Localised}, first sample done.||That one should be worth about {worth} credits.||The second sample needs {distance} metres of walking.",
+  "One down. {Species_Localised}.||I make it about {worth} credits.||Take {distance} metres, then scan again.",
+  "Logged the first of three on {Species_Localised}.||Roughly {worth} credits, if you finish it.||Stay at least {distance} metres away for the next one.",
+  "There's the first sample of {Species_Localised}.||Worth in the region of {worth} credits.||Don't take the next one within {distance} metres.",
+  "First scan complete: {Species_Localised}.||Expect around {worth} credits for it.||Walk {distance} metres and go again.",
+  "{Species_Localised}. That's the first sample.||About {worth} credits riding on this one.||Next sample, {distance} metres from here at least.",
+  "Starting a new set: {Species_Localised}.||Potentially {worth} credits.||Keep {distance} metres between samples.",
+  "Okay Commander, {Species_Localised}. First sample secured.||It's worth about {worth} credits.||Go {distance} metres out before you scan it again.",
+  "{Species_Localised}, sample one.||Around {worth} credits for the full set.||Leave {distance} metres before sample two."
+ ],
+ "ScanOrganic_LogNoDistance": [
+  "Sample one is in the bag: {Species_Localised}.||Valued at around {worth} credits.",
+  "{Species_Localised}, first sample done.||That one should be worth about {worth} credits.",
+  "One down. {Species_Localised}.||I make it about {worth} credits.",
+  "Logged the first of three on {Species_Localised}.||Roughly {worth} credits, if you finish it.",
+  "There's the first sample of {Species_Localised}.||Worth in the region of {worth} credits.",
+  "First scan complete: {Species_Localised}.||Expect around {worth} credits for it.",
+  "{Species_Localised}. That's the first sample.||About {worth} credits riding on this one.",
+  "Starting a new set: {Species_Localised}.||Potentially {worth} credits.",
+  "Okay Commander, {Species_Localised}. First sample secured.||It's worth about {worth} credits.",
+  "{Species_Localised}, sample one.||Around {worth} credits for the full set."
+ ],
+ "ScanOrganic_LogFootfall": [
+  "First sample of {Species_Localised}, and it's a first footfall!||With the bonus that's about {worth} credits.||Get {distance} metres away before the next one.",
+  "{Species_Localised}, sample one. First footfall, too!||The bonus brings it to roughly {worth} credits.||The next one needs {distance} metres.",
+  "Nobody has logged {Species_Localised} here before. First sample done.||First footfall pay: about {worth} credits.||Walk {distance} metres, then again.",
+  "{Species_Localised}. First footfall, first sample.||Worth about {worth} credits with the bonus.||Keep {distance} metres between samples."
+ ],
+ "ScanOrganic_LogFootfallNoDistance": [
+  "First sample of {Species_Localised}, and it's a first footfall!||With the bonus that's about {worth} credits.",
+  "{Species_Localised}, sample one. First footfall, too!||The bonus brings it to roughly {worth} credits.",
+  "Nobody has logged {Species_Localised} here before. First sample done.||First footfall pay: about {worth} credits.",
+  "{Species_Localised}. First footfall, first sample.||Worth about {worth} credits with the bonus."
+ ],
+ "ScanOrganic_LogNoValue": [
+  "First sample of {Species_Localised} logged.||I've no price for it yet, I'll learn it when you sell.||Walk {distance} metres for the next one.",
+  "{Species_Localised}, sample one.||No price on that species yet.||Leave {distance} metres before sample two.",
+  "Got the first of {Species_Localised}.||I can't tell you what it's worth yet.||Keep {distance} metres between samples.",
+  "One down on {Species_Localised}.||I haven't seen a price for this one. Sell it and I'll know.||The next sample needs {distance} metres."
+ ],
+ "ScanOrganic_LogNoValueNoDistance": [
+  "First sample of {Species_Localised} logged.||I've no price for it yet, I'll learn it when you sell.",
+  "{Species_Localised}, sample one.||No price on that species yet.",
+  "Got the first of {Species_Localised}.||I can't tell you what it's worth yet.",
+  "One down on {Species_Localised}.||I haven't seen a price for this one. Sell it and I'll know."
+ ],
+ "ScanOrganic_Sample": [
+  "Sample two of {Species_Localised} is in.",
+  "{Species_Localised}, second one safe.",
+  "That's two on {Species_Localised}.",
+  "Second sample done. {Species_Localised}.",
+  "Two of three, {Species_Localised}.",
+  "{Species_Localised}: two samples now. One to go.",
+  "Second scan complete, {Species_Localised}.",
+  "Halfway through {Species_Localised}.",
+  "Sample two logged. Just the one left on {Species_Localised}.",
+  "Two in the bag. {Species_Localised}."
+ ],
+ "ScanOrganic_SampleAbout": [
+  "Second sample of {Species_Localised}.||Here's something about it.||{About}",
+  "{Species_Localised}, two samples now.||{About}",
+  "That's the second on {Species_Localised}.||A little about it.||{About}",
+  "Sample two done. {Species_Localised}.||Did you know?||{About}",
+  "Halfway on {Species_Localised}.||Some background.||{About}",
+  "Two of three.||About {Species_Localised}: {About}",
+  "Second one safe, {Species_Localised}.||Something to think about while you walk.||{About}",
+  "{Species_Localised}, second sample.||Here's what I know.||{About}"
+ ],
+ "ScanOrganic_Third": [
+  "That's sample three of {Species_Localised}.",
+  "{Species_Localised}, all three taken.",
+  "Third sample is in. {Species_Localised}.",
+  "{Species_Localised}: the set is complete, analysing.",
+  "Third and final, {Species_Localised}.",
+  "Three for three on {Species_Localised}.",
+  "Last scan done on {Species_Localised}.",
+  "{Species_Localised}, sample three. Almost finished."
+ ],
+ "ScanOrganic_ThirdAbout": [
+  "Third sample of {Species_Localised}.||One more thing about it.||{About}",
+  "{Species_Localised}, that's all three.||{About}",
+  "Final sample on {Species_Localised}.||Before it finishes.||{About}",
+  "Three of three, {Species_Localised}.||Also.||{About}",
+  "{Species_Localised}, last sample.||Something else about it.||{About}",
+  "Third one in.||On {Species_Localised}: {About}"
+ ],
+ "ScanOrganic_Analyse": [
+  "{Species_Localised} is complete.||{carried} credits of exobiology data on board.",
+  "Analysis done on {Species_Localised}.||Carrying {carried} credits' worth.",
+  "That's {Species_Localised} finished.||Unsold exobiology is now {carried} credits.",
+  "{Species_Localised} fully scanned and banked.||The pile stands at {carried} credits.",
+  "Finished with {Species_Localised}.||You're up to {carried} credits of data.",
+  "All done on {Species_Localised}.||Exobiology in your hold: {carried} credits.",
+  "{Species_Localised} analysed.||{carried} credits waiting to be sold.",
+  "Another one done: {Species_Localised}.||That makes {carried} credits unsold."
+ ],
+ "ScanOrganic_AnalyseFootfall": [
+  "{Species_Localised} is complete, and it was a first footfall.||{carried} credits of data on board.",
+  "Analysis done on {Species_Localised}.||First footfall bonus banked. {carried} credits carried.",
+  "{Species_Localised} finished. First footfall locked in.||Your unsold exobiology is {carried} credits.",
+  "That's {Species_Localised}, first footfall and all.||{carried} credits in the data hold."
+ ],
+ "ScanOrganic_AnalyseNoValue": [
+  "{Species_Localised} is complete.||No price for it yet. Sell it and I'll learn it.",
+  "Analysis done on {Species_Localised}.||I don't know what it's worth yet.",
+  "Finished {Species_Localised}.||I'll find out its price when you sell it.",
+  "{Species_Localised} fully scanned.||No price on file, so I can't add it to the total."
+ ],
+ "_help": "More ways of saying the exobiology scans, added to bio.json, more.json and dialogue.json so a long trip does not repeat. {About} is a fact about the species; she tells every fact about a species before repeating one."
+}

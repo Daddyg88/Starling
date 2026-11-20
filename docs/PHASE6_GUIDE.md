@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.103 - exobiology: more facts, wider wording
+
+journal/exobiology.py `BioInfo` now also loads config/bio_rules.json (path next to the values file) and builds worked-out facts in `habitat_facts` (planet types, air, gravity limit, temperature range, star/volcanic needs, value rank, sample distance). `pool` = genus lines + species line + those; `about(species, genus, count, values, distances)` hands out `count` different facts and keeps a per-species shuffled list (`_left`) so nothing repeats until all are told. `ExobiologyTracker` asks for 2 on the second sample and, with chance THIRD_FACT_CHANCE (0.6), 1 on the third. personality/line_keys.py: a third sample with an About uses ScanOrganic_ThirdAbout first. voicepacks/default/bio2.json (loaded in personality/dialogue.py) holds the new wording. tests/test_bio_variety.py.
+
 ## 0.96.102 - the Overlays picture cannot break the page
 
 GitHub's test machine has tkinter but only a fake dashboard root, so `_overlay_draw` (ImageTk.PhotoImage needs a real root) raised inside Dashboard.__init__ and nine dashboard tests failed in CI in 0.96.101. `_build_section` now catches errors from `_build_overlay_canvas`, and `_overlay_draw` wraps `_overlay_paint` in try/except with a log line. Also seen: the website (GitHub Pages) deploy of 0.96.99 failed with 'Fetching artifact metadata failed' while tests and release passed; that is GitHub, not the code.

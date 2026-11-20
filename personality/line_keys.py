@@ -162,7 +162,7 @@ def _keys_for(event):
                 return ["ScanOrganic_AnalyseNoValue", "ScanOrganic_Analyse"]
             return ["ScanOrganic_AnalyseFootfall" if data.get("FirstFootfall") else "ScanOrganic_Analyse"]
         if stage == "Sample" and data.get("SampleNumber") == 3:
-            return ["ScanOrganic_Third"]
+            return ["ScanOrganic_ThirdAbout", "ScanOrganic_Third"] if data.get("About") else ["ScanOrganic_Third"]
         if stage == "Sample" and data.get("SampleNumber") == 2 and data.get("About"):
             return ["ScanOrganic_SampleAbout", "ScanOrganic_Sample"]       # the second sample: what it is
         if stage == "Log":

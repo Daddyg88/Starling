@@ -80,32 +80,113 @@ def _write_json(path, data):
         log.warning("Could not save %s", path, exc_info=True)
 
 
-class BioInfo:
-    """Short, checked descriptions of what she has just sampled (config/bio_info.json). Says nothing if she has none."""
+PLANET_WORDS = {"rocky": "rocky worlds", "highmetalcontent": "high metal content worlds", "rockyice": "rocky ice worlds",
+                "icy": "icy worlds", "metalrich": "metal rich worlds"}
+AIR_WORDS = {"carbondioxide": "carbon dioxide", "carbondioxiderich": "carbon dioxide", "sulphurdioxide": "sulphur dioxide",
+             "oxygen": "oxygen", "ammonia": "ammonia", "helium": "helium", "argon": "argon", "argonrich": "argon",
+             "water": "water vapour", "waterrich": "water vapour", "nitrogen": "nitrogen", "methane": "methane",
+             "methanerich": "methane", "neon": "neon", "neonrich": "neon"}
 
-    def __init__(self, path=None, rng=None):
+
+def _join(words):
+    words = list(dict.fromkeys(words))
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " or " + words[-1]
+
+
+class BioInfo:
+    """Short, checked descriptions of what she has just sampled (config/bio_info.json), plus facts worked out from the habitat rules
+    (config/bio_rules.json), the prices and the sampling distances. Says nothing if she has none.
+
+    She never repeats a fact about a species until she has told you all of them (the facts for each species are used up in a
+    shuffled order and then start again), so a long trip through the same species keeps sounding fresh."""
+
+    def __init__(self, path=None, rng=None, rules_path=None):
         data = _read_json(path) if path else {}
         self.genus = {str(k).lower(): [str(t) for t in v if t] for k, v in (data.get("genus") or {}).items()
                       if isinstance(v, list)}
         self.species = {str(k).lower(): str(v) for k, v in (data.get("species") or {}).items() if v}
+        self.rules = {}
+        if rules_path:
+            for entry in ((_read_json(rules_path).get("species")) or []):
+                if isinstance(entry, dict) and entry.get("n"):
+                    self.rules[str(entry["n"]).lower()] = entry
         self.rng = rng or random.Random()
         self._last = {}
+        self._left = {}              # species -> facts not yet told in this round
 
-    def about(self, species, genus=""):
-        """The description for a species as one piece of text ('' if there is nothing to say)."""
+    def habitat_facts(self, species, values=None, distances=None, genus=""):
+        """Sentences worked out from the checked habitat rules, the price list and the sampling distances."""
+        rule = self.rules.get(str(species or "").lower())
+        if not rule:
+            return []
+        facts = []
+        planets = [PLANET_WORDS[p] for p in rule.get("p", []) if p in PLANET_WORDS]
+        air = [AIR_WORDS[a] for a in rule.get("a", []) if a in AIR_WORDS]
+        if rule.get("a") == ["none"]:
+            facts.append("It grows on %s with no atmosphere at all." % _join(planets) if planets else "It grows with no atmosphere at all.")
+        elif planets and air:
+            where = "It is found on %s" % _join(planets)
+            facts.append(where + (" with %s in the air." % _join(air) if len(set(air)) <= 3 else ", under several kinds of atmosphere."))
+        elif planets:
+            facts.append("It is found on %s." % _join(planets))
+        if rule.get("gmax"):
+            facts.append("It only grows where the gravity is no more than %g g." % rule["gmax"])
+        tmin, tmax = rule.get("tmin"), rule.get("tmax")
+        if tmin and tmax:
+            facts.append("It likes a surface between %d and %d kelvin." % (tmin, tmax))
+        elif tmin:
+            facts.append("It needs a surface hotter than %d kelvin." % tmin)
+        elif tmax:
+            facts.append("It needs a surface cooler than %d kelvin." % tmax)
+        if rule.get("stars"):
+            facts.append("It only turns up in systems with certain kinds of star.")
+        if rule.get("v") or rule.get("vreq"):
+            facts.append("It lives where there is volcanic activity.")
+        if values:
+            known = sorted(set(v for v in values.values() if v), reverse=True)
+            mine = values.get(str(species or "").lower())
+            if mine and len(known) >= 10:
+                rank = known.index(mine) + 1
+                facts.append("Out of the species I have prices for, it ranks number %d by value." % rank if rank <= 10
+                             else "Among the species I have prices for, it sits in the %s half by value." % ("top" if rank <= len(known) / 2 else "bottom"))
+        metres = (distances or {}).get(str(genus or rule.get("g") or "").lower())
+        if metres:
+            facts.append("Samples of this kind need to be at least %d metres apart." % metres)
+        return facts
+
+    def pool(self, species, genus="", values=None, distances=None):
         name = ("%s %s" % (species or "", genus or "")).lower()
         key = str(species or "").lower()
-        parts = []
+        out = []
         match = next((g for g in sorted(self.genus, key=len, reverse=True) if g in name), None)
-        if match and self.genus[match]:
-            options = self.genus[match]
-            fresh = [t for t in options if t != self._last.get(match)] or options
-            choice = self.rng.choice(fresh)
-            self._last[match] = choice
-            parts.append(choice)
+        if match:
+            out += self.genus[match]
         if key in self.species:
-            parts.append(self.species[key])
-        return " ".join(parts)
+            out.append(self.species[key])
+        out += self.habitat_facts(species, values, distances, genus)
+        return out
+
+    def about(self, species, genus="", count=1, values=None, distances=None):
+        """`count` different facts about the species as one piece of text ('' if there is nothing to say)."""
+        key = str(species or "").lower()
+        pool = self.pool(species, genus, values, distances)
+        if not pool:
+            return ""
+        chosen = []
+        for _ in range(max(1, count)):
+            left = [t for t in self._left.get(key, []) if t in pool]
+            if not left:                                       # a new round: everything again, but not the one just told first
+                left = [t for t in pool if t != self._last.get(key)] or list(pool)
+                self.rng.shuffle(left)
+            fact = left.pop(0)
+            self._left[key] = left
+            self._last[key] = fact
+            if fact not in chosen:
+                chosen.append(fact)
+        return " ".join(chosen)
+
+
+THIRD_FACT_CHANCE = 0.6          # how often the third sample comes with one more fact
 
 
 class ExobiologyTracker:
@@ -125,7 +206,8 @@ class ExobiologyTracker:
         self.last_timestamp = str(carried.get("last_timestamp") or "")
         if info_file is None and values_file:
             info_file = Path(values_file).with_name("bio_info.json")
-        self.info = BioInfo(info_file, rng)
+        rules_file = Path(values_file).with_name("bio_rules.json") if values_file else None
+        self.info = BioInfo(info_file, rng, rules_file)
         self.progress = None       # the species you are sampling right now
         self.footfall = {}         # (SystemAddress, BodyID) -> WasFootfalled, first value seen
 
@@ -196,14 +278,26 @@ class ExobiologyTracker:
                 info["distance"] = str(metres)
             info.update(self._valued(entry, species))        # she tells you what it is worth on the FIRST sample
         elif stage == "Sample" and number == 2:
-            about = self.info.about(species, entry.get("Genus_Localised") or "")
+            about = self.info.about(species, entry.get("Genus_Localised") or "", 2, self._prices(), self.distances)
             if about:
                 info["About"] = about                        # and what it is, on the second
+        elif stage == "Sample" and number == 3 and self.rng_chance() < THIRD_FACT_CHANCE:
+            about = self.info.about(species, entry.get("Genus_Localised") or "", 1, self._prices(), self.distances)
+            if about:
+                info["About"] = about                        # and sometimes one more thing on the third
 
         if stage == "Analyse":
             info.update(self._complete(entry, species))
             self.progress = None
         return info
+
+    def _prices(self):
+        prices = dict(self.seed)
+        prices.update(self.learned)
+        return prices
+
+    def rng_chance(self):
+        return self.info.rng.random()
 
     def _valued(self, entry, species):
         base = self.base_value(species)
