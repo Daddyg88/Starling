@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.118 - 11 more clips from existing pictures
+
+tools/make_head_clips.py gained 11 CLIPS entries (single pictures, or tuples that chain pictures). make_clips.KNOWN lists the names (clips.json drops names not in KNOWN). Six join BORED_CLIPS; five wait for triggers.
+
 ## 0.96.117 - No grin after speaking
 
 speech_finished() no longer sets smile_until, so _mouth_goal returns None (closed mouth) as soon as the line ends. The smile sprite is still available; the pleased clip does the happy look.

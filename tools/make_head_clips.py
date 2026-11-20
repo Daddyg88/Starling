@@ -47,6 +47,17 @@ CLIPS = {
     "eyeroll": ("eyeroll", 1.6, 0.4),
     "blush": ("shy", 2.4, 1.0),
     "sleepy": ("eyes_half", 3.0, 1.4),
+    "glance_up": ("look_up", 2.0, 0.5),                # the unused pictures
+    "tilt_right": ("tilt_right", 2.4, 0.7),
+    "eyes_up": ("eyes_up", 1.6, 0.5),
+    "eyes_down": ("eyes_down", 1.6, 0.5),
+    "nod_twice": (("nod_down", "look_up", "nod_down", "look_up"), 2.4, 0.0),      # a yes with a little more feeling
+    "suspicious": (("brow_down", "eyes_left", "eyes_right", "eyes_left", "brow_down"), 3.4, 0.0),   # narrow look, eyes flick aside
+    "curious": (("tilt_left", "brow_up", "tilt_right", "brow_up"), 3.4, 0.0),
+    "giggle": (("shy", "laugh_a", "shy", "laugh_a"), 3.0, 0.0),
+    "flirty": (("wink", "smirk", "shy", "wink"), 3.4, 0.0),
+    "disagree": (("look_left", "look_right", "look_left", "look_right"), 2.8, 0.0),   # a head shake, "no"
+    "daydream": (("look_up", "thinking_look", "eyes_half", "look_up"), 4.0, 0.0),
     "laugh": (("laugh_a", "laugh_b", "laugh_a", "laugh_b", "laugh_a"), 2.6, 0.0),
 }
 FPS = 12
