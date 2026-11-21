@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.124 - Canonn archive knowledge
+
+tools/build_canonn_knowledge.py reads content/articles/*/article.json + body.html from a clone of canonn-science/canonn.science, keeps title, category and a speakable opening (coordinates and web addresses removed), writes config/knowledge/canonn.json ({"k": [title words], "a": text + credit, "src": url}). personality/knowledge.py loads every file in config/knowledge, so nothing else changed. Titles that are one very common word are not used as keys.
+
 ## 0.96.123 - Better recall
 
 memory/recall.py: MemoryRecall gets profile and habits (set in core/app.py after the profile exists). try_handle runs _personal first (_pets, _likes, _fact, _ASK_ME) then the old ASK. answer() now starts with the profile pieces and ends with the favourite dock (Memory_Favourite). New lines: Recall_* in profile.json, Memory_Favourite / Memory_NoDeaths / Memory_NoNote in memory.json. memory/knowledge.py shows an unnamed pet.
