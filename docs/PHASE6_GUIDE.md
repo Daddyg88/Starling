@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.126 - Didgeridoo on foot
+
+journal/status_reader.py announces NomadLeft when the vehicle goes from the Nomad to on foot (not baseline/initial). personality/speaker.py rolls DIDGERIDOO_CHANCE on NomadLeft instead of NomadDocked; a failed roll finds no pool so nothing is said. events/nomad_left.py, config/events.json and config/speech.json (cooldown 20) register it. aussie.json NomadDidgeridoo grew to 55 lines. tests/test_didgeridoo.py covers the roll, the status reader and that NomadDocked no longer says it.
+
 ## 0.96.125 - Didgeridoo lines
 
 personality/speaker.py: on NomadDocked, with an rng and australian_on(settings), a 0.2 roll puts the key NomadDidgeridoo first in the key list. voicepacks/default/aussie.json holds the 29 lines; config/pronunciations.json respells didgeridoo for every voice.

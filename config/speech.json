@@ -65,6 +65,7 @@
     "UndiscoveredSystem": 10,
     "JumpsLeft": 60,
     "NomadDocked": 20,
+    "NomadLeft": 20,
     "DockSRV": 20,
     "GlideStarted": 20,
     "FSDJump": 5,

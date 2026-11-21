@@ -173,6 +173,8 @@ class StatusReader:
         came_from_nomad = self._vehicle == "Nomad" or (self._vehicle == "other vehicle" and self.processor.state.in_nomad)
         if vehicle == "main ship" and came_from_nomad and not baseline_only and not initial:
             self._announce("NomadDocked", status)             # the Nomad came home: the app puts the hardpoints away
+        if vehicle == "on foot" and came_from_nomad and not baseline_only and not initial:
+            self._announce("NomadLeft", status)               # you stepped out of the Nomad: (Australian voice, one time in five) the didgeridoo line
         if vehicle == "main ship" and (came_from_nomad or not self.processor.state.in_nomad or baseline_only or initial):
             # back aboard: the Nomad is stowed. (Not while Status.json still shows the OLD main-ship reading for a moment right
             # after LaunchVessel: it lags the journal, and clearing it then made the Nomad look like an SRV with hardpoints out.)

@@ -1,4 +1,4 @@
-"""'Don't forget your didgeridoo, mate': only with the Australian voice, only when the Nomad is recovered, about one time in five."""
+"""'Don't forget your didgeridoo, mate': only with the Australian voice, only when you step out of the Nomad on foot, about one time in five."""
 
 import json
 import random
@@ -48,7 +48,7 @@ def lines():
 class DidgeridooTests(unittest.TestCase):
     def test_there_are_plenty_of_lines_and_they_all_say_it(self):
         pool = lines()
-        self.assertGreaterEqual(len(pool), 25)
+        self.assertGreaterEqual(len(pool), 50)
         self.assertEqual(len(set(pool)), len(pool))
         for line in pool:
             self.assertIn("didgeridoo", line.lower())
@@ -56,23 +56,23 @@ class DidgeridooTests(unittest.TestCase):
 
     def test_australian_voice_and_a_lucky_roll_gives_the_didgeridoo(self):
         speaker, speech, _ = make("melo_en_au", 0.1)
-        speaker.on_event(Event(name="NomadDocked", data={}, priority="low"))
+        speaker.on_event(Event(name="NomadLeft", data={}, priority="low"))
         self.assertIn(speech.said[0]["text"], lines())
 
     def test_an_unlucky_roll_gives_the_ordinary_line(self):
         speaker, speech, _ = make("melo_en_au", 0.5)
-        speaker.on_event(Event(name="NomadDocked", data={}, priority="low"))
-        self.assertNotIn("didgeridoo", speech.said[0]["text"].lower())
+        speaker.on_event(Event(name="NomadLeft", data={}, priority="low"))
+        self.assertEqual(speech.said, [])          # stepping out is normally silent
 
     def test_other_voices_never_get_it(self):
         for voice in ("kokoro_af_heart", "kokoro_bf_emma", ""):
             speaker, speech, _ = make(voice, 0.0)
-            speaker.on_event(Event(name="NomadDocked", data={}, priority="low"))
-            self.assertNotIn("didgeridoo", speech.said[0]["text"].lower(), voice)
+            speaker.on_event(Event(name="NomadLeft", data={}, priority="low"))
+            self.assertEqual(speech.said, [], voice)
 
     def test_only_the_nomad_gets_it(self):
         speaker, speech, _ = make("melo_en_au", 0.0)
-        for name in ("DockSRV", "Docked", "LaunchSRV"):
+        for name in ("NomadDocked", "DockSRV", "Docked", "LaunchSRV"):
             speaker.on_event(Event(name=name, data={}, priority="low"))
         self.assertTrue(all("didgeridoo" not in s["text"].lower() for s in speech.said))
 
@@ -83,10 +83,38 @@ class DidgeridooTests(unittest.TestCase):
         speaker = EventSpeaker(None, speech, real_dialogue(), settings, {"default_cooldown_seconds": 0, "cooldown_seconds": {}, "max_age_seconds": {}},
                                rng=random.Random(7))
         for _ in range(500):
-            speaker.on_event(Event(name="NomadDocked", data={}, priority="low"))
-        share = sum("didgeridoo" in s["text"].lower() for s in speech.said) / len(speech.said)
+            speaker.on_event(Event(name="NomadLeft", data={}, priority="low"))
+        share = sum("didgeridoo" in s["text"].lower() for s in speech.said) / 500
         self.assertGreater(share, 0.14)
         self.assertLess(share, 0.27)
+
+    def test_recovering_the_nomad_does_not_say_it(self):
+        speaker, speech, _ = make("melo_en_au", 0.0)
+        speaker.on_event(Event(name="NomadDocked", data={}, priority="low"))
+        self.assertTrue(all("didgeridoo" not in s["text"].lower() for s in speech.said))
+
+    def test_stepping_out_of_the_nomad_announces_it(self):
+        from tests.test_callouts import make_processor
+        from journal.status_reader import StatusReader
+        processor, _bus, heard = make_processor()
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        reader.handle_status({"Flags": 0})
+        reader.handle_status({"Flags": 1 << 24})
+        processor.state.in_nomad = True
+        reader.handle_status({"Flags": 1 << 26})
+        reader.handle_status({"Flags": 0, "Flags2": 1})
+        self.assertIn("NomadLeft", [e.name for e in heard])
+
+    def test_stepping_out_of_a_normal_srv_is_not_it(self):
+        from tests.test_callouts import make_processor
+        from journal.status_reader import StatusReader
+        processor, _bus, heard = make_processor()
+        reader = StatusReader(None, processor, min_gap_seconds={})
+        reader.handle_status({"Flags": 0})
+        reader.handle_status({"Flags": 1 << 24})
+        reader.handle_status({"Flags": 1 << 26})
+        reader.handle_status({"Flags": 0, "Flags2": 1})
+        self.assertNotIn("NomadLeft", [e.name for e in heard])
 
     def test_it_is_said_the_way_he_spelt_it(self):
         pronounce.reload()

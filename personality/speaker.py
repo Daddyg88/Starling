@@ -66,7 +66,7 @@ def fix_articles(text, data):
     return text
 
 
-DIDGERIDOO_CHANCE = 0.2          # one recovery of the Nomad in five (Australian voice only)
+DIDGERIDOO_CHANCE = 0.2          # one time in five that you step out of the Nomad (Australian voice only)
 
 
 class EventSpeaker:
@@ -115,7 +115,7 @@ class EventSpeaker:
 
         line = None
         keys = line_keys.keys_for(event)
-        if event.name == "NomadDocked" and self.rng is not None and australian_on(self.settings) and self.rng.random() < DIDGERIDOO_CHANCE:
+        if event.name == "NomadLeft" and self.rng is not None and australian_on(self.settings) and self.rng.random() < DIDGERIDOO_CHANCE:
             keys = ["NomadDidgeridoo"] + list(keys)          # Australian voice only, one time in five: "don't forget your didgeridoo, mate"
         for key in keys:
             line = self.dialogue.pick(key, mood, allow_mature, prefer_recorded)
