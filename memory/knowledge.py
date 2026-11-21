@@ -77,7 +77,8 @@ class Knowledge:
             return []
         rows = [Entry("You told me", "You like %s" % x, "profile", "like", x) for x in p.likes]
         rows += [Entry("You told me", "You dislike %s" % x, "profile", "dislike", x) for x in p.dislikes]
-        rows += [Entry("You told me", "You have a %s called %s" % (x["kind"], x["name"].capitalize()), "profile", "pet", x["name"]) for x in p.pets]
+        rows += [Entry("You told me", ("You have a %s called %s" % (x["kind"], x["name"].capitalize())) if x["name"] else "You have a %s (no name yet)" % x["kind"],
+                       "profile", "pet", x["name"]) for x in p.pets]
         rows += [Entry("You told me", "Your favourite %s is %s" % (cat, thing), "profile", "fav", cat) for cat, thing in p.favourites.items()]
         return rows
 

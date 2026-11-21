@@ -336,6 +336,9 @@ class App:
         self.services = ServiceFinder(self.settings)
         from memory.profile import PlayerProfile
         self.profile = PlayerProfile(paths.DATA_DIR / "player_profile.json", enabled=lambda: bool(self.settings.get("brain.profile", True)))
+        if self.memory_recall is not None:
+            self.memory_recall.profile = self.profile            # so "what do you remember", "how is my dog" and "do I like pizza" can use it
+            self.memory_recall.habits = getattr(self, "habits", None)
         from personality.llm import LocalLLM
         from core import ships as ship_table
         from personality.lookup import LearnedFacts, OnlineLookup

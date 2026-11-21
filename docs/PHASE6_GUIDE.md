@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.123 - Better recall
+
+memory/recall.py: MemoryRecall gets profile and habits (set in core/app.py after the profile exists). try_handle runs _personal first (_pets, _likes, _fact, _ASK_ME) then the old ASK. answer() now starts with the profile pieces and ends with the favourite dock (Memory_Favourite). New lines: Recall_* in profile.json, Memory_Favourite / Memory_NoDeaths / Memory_NoNote in memory.json. memory/knowledge.py shows an unnamed pet.
+
 ## 0.96.122 - Pets from ordinary sentences
 
 memory/profile.py: find_pets() (searches the sentence; _PET_FIND, _NAME_IS_MY, plural handling in _kind_of, name checks in _good_name/_names_in), learn() returns the first new pet and puts the rest in extra_pets, unnamed pets (name "") with pending_pet and _NAME_REPLY (120 s). personality/brain.py: PetNoName and PetMore lines; pets passed to personality/llm.build_messages.

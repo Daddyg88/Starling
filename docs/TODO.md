@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.123: better recall. CHECK by voice: "how is my dog", "do I like pizza", "what do you remember about me", "what was my longest jump". IDEAS: bring pets up by herself now and then (chitchat), remember more things about you the same safe way.
 - [ ] 0.96.122: pets learned from ordinary sentences. CHECK by voice: "I have a dog", "his name is Rex", "we have two cats called Milo and Luna", "what are my pets called". IDEAS NEXT: remember more kinds of things (hobbies, what you do for work, where you live roughly) the same safe way; let her bring pets up now and then.
 - [ ] 0.96.121: carrier is home (names everywhere, no landing count, "where is home"). CHECK with a carrier owner: dock, undock, restart, ask "where is home". OPEN: a way to learn the carrier without opening Carrier Management.
 - [ ] 0.96.120: five old clips restored under new names (hair_flick, hand_to_temple, hands_resting, content_smile, listen_tilt; clips folder 32 MB). CHECK: after a few quiet minutes she lifts her hand to her hair, taps her temple or folds her hands. DECIDE: a trigger for content_smile.

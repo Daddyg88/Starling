@@ -179,5 +179,47 @@
   "And {name} the {kind} too. Noted.",
   "{name} the {kind}, as well. I'll remember them both.",
   "Plus {name}, the {kind}. I've got them all."
+ ],
+ "Recall_PetsAre": [
+  "Of course I remember: {pets}.",
+  "You've got {pets}. I haven't forgotten.",
+  "{pets}. I remember them."
+ ],
+ "Recall_HavePets": [
+  "Yes, you do. {pets}.",
+  "You do, Commander: {pets}.",
+  "Yes. {pets}."
+ ],
+ "Recall_PetNamed": [
+  "{name} is your {kind}. I remember.",
+  "{name}, your {kind}. How could I forget?",
+  "Of course. {name} the {kind}."
+ ],
+ "Recall_PetHow": [
+  "How is {name}? Give the {kind} my regards.",
+  "{name} the {kind}. I hope they're well.",
+  "I think of {name} often. How's the {kind}?"
+ ],
+ "Recall_PetNoName": [
+  "You told me you have a {kind}, but not what it's called yet.",
+  "I know about your {kind}. I just don't know its name. What is it?"
+ ],
+ "Recall_PetOther": [
+  "You haven't told me about a {kind}. I know about {pets}.",
+  "No {kind} that I know of. I do know about {pets}."
+ ],
+ "Recall_LikeYes": [
+  "Yes, you told me you like {x}.",
+  "You do. You've told me you like {x}.",
+  "I remember: you like {x}."
+ ],
+ "Recall_LikeNo": [
+  "No, you told me you don't like {x}.",
+  "You said you can't stand {x}. I remember.",
+  "Not {x}. You told me so."
+ ],
+ "Recall_LikeUnknown": [
+  "You haven't told me about {x}. Do you?",
+  "I don't know yet. You've never told me about {x}."
  ]
 }

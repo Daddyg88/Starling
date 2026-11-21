@@ -50,5 +50,17 @@
  "Memory_First_Ask": [
   "I remember {memory}.",
   "{memory}. That was a good day."
+ ],
+ "Memory_Favourite": [
+  "Your favourite place to dock is {station}. {count} landings.",
+  "I notice you keep coming back to {station}. {count} landings now."
+ ],
+ "Memory_NoDeaths": [
+  "You haven't been destroyed that I know of. Long may it last.",
+  "Not once, as far as I've seen."
+ ],
+ "Memory_NoNote": [
+  "I haven't got a note of that yet, Commander.",
+  "I don't have that written down yet."
  ]
 }
