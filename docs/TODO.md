@@ -36,7 +36,8 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
-- [ ] 0.96.126: didgeridoo moved to stepping out of the Nomad on foot, 55 lines. CHECK: step out of the Nomad ten times in the Australian voice; expect two or so.
+- [ ] 0.96.127: favourite = fay-vuh-rit; live = liv or lyve by context. CHECK by ear in each voice; send me any sentence she gets wrong.
+- [ ] 0.96.126: didgeridoo moved to stepping out of the Nomad on foot, 56 lines. CHECK: step out of the Nomad ten times in the Australian voice; expect two or so.
 - [ ] 0.96.125: didgeridoo lines (Australian voice, Nomad recovered, 1 in 5). CHECK: recover the Nomad ten times; expect two or so. DECIDE: do you want it tied to naughty mode too?
 - [ ] 0.96.124: Canonn archive in her knowledge (740 articles, openings only). CHECK by voice: "what is a bullet mollusc", "tell me about Crowther's Rest". DECIDE: ask the Canonn Council if they are happy (no licence is stated). IDEA: a "read me more" follow-up.
 - [ ] 0.96.123: better recall. CHECK by voice: "how is my dog", "do I like pizza", "what do you remember about me", "what was my longest jump". IDEAS: bring pets up by herself now and then (chitchat), remember more things about you the same safe way.

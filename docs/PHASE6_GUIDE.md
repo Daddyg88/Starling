@@ -1552,9 +1552,13 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.127 - Favourite and live
+
+config/pronunciations.json words: favourite/favorite (and plurals, capitals) = fay-vuh-rit(s). tts/pronounce.py: _LIVE regex with _live_word looks one word before and one after: adjective sets (_LIVE_ADJ_BEFORE, _LIVE_NOUN_AFTER) give "lyve", verb set (_LIVE_VERB_BEFORE) gives "liv"; "lives" gives livz/lyvz from _LIFE_PLURAL_BEFORE; unclear is untouched. Runs for every voice before the word table. tests/test_live_word.py. (0.96.126 has 56 didgeridoo lines.)
+
 ## 0.96.126 - Didgeridoo on foot
 
-journal/status_reader.py announces NomadLeft when the vehicle goes from the Nomad to on foot (not baseline/initial). personality/speaker.py rolls DIDGERIDOO_CHANCE on NomadLeft instead of NomadDocked; a failed roll finds no pool so nothing is said. events/nomad_left.py, config/events.json and config/speech.json (cooldown 20) register it. aussie.json NomadDidgeridoo grew to 55 lines. tests/test_didgeridoo.py covers the roll, the status reader and that NomadDocked no longer says it.
+journal/status_reader.py announces NomadLeft when the vehicle goes from the Nomad to on foot (not baseline/initial). personality/speaker.py rolls DIDGERIDOO_CHANCE on NomadLeft instead of NomadDocked; a failed roll finds no pool so nothing is said. events/nomad_left.py, config/events.json and config/speech.json (cooldown 20) register it. aussie.json NomadDidgeridoo grew to 56 lines. tests/test_didgeridoo.py covers the roll, the status reader and that NomadDocked no longer says it.
 
 ## 0.96.125 - Didgeridoo lines
 

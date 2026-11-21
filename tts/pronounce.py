@@ -31,6 +31,21 @@ _ONES = ("zero one two three four five six seven eight nine ten eleven twelve th
 _TENS = ("", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety")
 _ORDINAL_WORDS = {1: "first", 2: "second", 3: "third", 5: "fifth", 8: "eighth", 9: "ninth", 12: "twelfth", 20: "twentieth", 30: "thirtieth"}
 
+# "live" is two words (0.96.127): the verb "liv" (I live in London) and the adjective "lyve" (live music, going live). Decided from the word before and after.
+_LIVE = re.compile(r"\b(?:(\w+['’]?\w*)\s+)?(live|Live)(s)?\b(?:\s+(\w+))?")
+_LIVE_ADJ_BEFORE = {"go", "goes", "going", "gone", "went", "be", "being", "been", "is", "are", "was", "were", "am", "a", "an", "the", "this", "that", "our", "my", "your", "his",
+                    "her", "its", "their", "on", "not", "so", "very", "really", "truly", "now", "stream", "streams", "streaming", "streamed", "broadcast", "broadcasting",
+                    "play", "plays", "playing", "played", "with", "some", "any", "no", "and", "for", "of", "or", "to_go"}
+_LIVE_VERB_BEFORE = {"i", "you", "we", "they", "who", "to", "will", "would", "can", "could", "must", "shall", "should", "might", "may", "do", "dont", "don't", "does", "doesn't",
+                     "did", "still", "also", "only", "ever", "always", "never", "just", "where", "there", "people", "i'll", "i'd", "you'll", "you'd", "we'll", "we'd", "they'll",
+                     "how", "wish", "want", "wants", "wanted", "hope", "love", "loves", "like", "likes", "let", "let's", "lets", "where", "whoever"}
+_LIVE_NOUN_AFTER = {"stream", "streams", "streaming", "broadcast", "broadcasts", "music", "show", "shows", "wire", "feed", "feeds", "event", "events", "audience", "chat",
+                    "ammo", "ammunition", "round", "rounds", "fire", "signal", "update", "updates", "action", "performance", "session", "demo", "video", "coverage",
+                    "data", "map", "band", "gig", "concert", "TV", "radio", "recording", "commentary", "reaction", "reactions", "subs", "sub", "cargo", "animal",
+                    "animals", "bait", "creature", "creatures", "wild"}
+_LIFE_PLURAL_BEFORE = {"nine", "many", "their", "your", "our", "my", "two", "three", "four", "five", "several", "few", "more", "less", "countless", "save", "saved", "saving",
+                       "lose", "lost", "losing", "take", "taken", "taking", "of", "innocent", "human", "whose", "all", "other", "past", "new", "second", "third", "his", "her", "its"}
+
 _table = None
 _compiled = {}
 
@@ -111,6 +126,32 @@ def _spoken_decimal(match):
     return "%s point %s" % (match.group(1), " ".join(match.group(2)))
 
 
+def _live_word(match):
+    """'live' as the verb (liv) or the adjective (lyve); 'lives' as the verb (livz) or the plural of life (lyvz). Left alone when it is not clear."""
+    before, word, plural, after = match.group(1), match.group(2), match.group(3), match.group(4)
+    prev = (before or "").lower().replace("’", "'")
+    nxt = (after or "").lower()
+    cap = word[0].isupper()
+    if plural:
+        if prev in _LIFE_PLURAL_BEFORE:
+            new = "lyvz"
+        elif prev in ("he", "she", "it", "who", "that", "where", "which", "one", "everyone", "someone", "nobody", "she's") or (not prev and False):
+            new = "livz"
+        else:
+            return match.group(0)
+    else:
+        if prev in _LIVE_ADJ_BEFORE or (nxt in _LIVE_NOUN_AFTER and prev not in _LIVE_VERB_BEFORE):
+            new = "lyve"
+        elif prev in _LIVE_VERB_BEFORE:
+            new = "liv"
+        else:
+            return match.group(0)
+    if cap:
+        new = new.capitalize()
+    out = (before + " " if before else "") + new
+    return out + ((" " + after) if after else "")
+
+
 def prepare(text, voice_name=""):
     """The text as it should be handed to the voice. Safe on anything: a failure returns the text unchanged."""
     if not text:
@@ -124,6 +165,7 @@ def prepare(text, voice_name=""):
         out = _KM.sub(" kilometres", out)
         out = _METRES.sub(" metres", out)
         out = _GEE.sub(" gee", out)
+        out = _LIVE.sub(_live_word, out)
         found = _words(voice_name)
         if found is not None:
             pattern, merged = found
