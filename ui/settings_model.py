@@ -59,6 +59,8 @@ MOODS = [("Infatuated (head over heels)", "Infatuated"), ("Close (very happy, lo
          ("Upset (really angry)", "Upset")]
 LISTEN_QUALITY = [("Fast (smallest)", "tiny.en"), ("Balanced", "base.en"), ("Accurate (slower)", "small.en"),
                   ("Best for accents (strong PC)", "medium.en")]
+LLM_SIZES = [("Small (about 400 MB, fast, simple replies)", "small"), ("Better (about 2 GB, clearer replies)", "better"),
+             ("High (about 4.7 GB, smartest, strong PC)", "high")]
 SENSITIVITY = [("Automatic (recommended)", 0), ("Very sensitive (quiet room)", 0.008), ("Sensitive", 0.015),
                ("Normal", 0.025), ("Noisy room", 0.05)]
 LOG_DETAIL = [("Normal", "INFO"), ("Detailed (for fixing problems)", "DEBUG"), ("Errors only", "WARNING")]
@@ -562,6 +564,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Say 'I love pizza' or 'my dog is called Rex' and she remembers. Say 'forget what you know about me' to wipe it. Never sent anywhere"),
             Field("llm.enabled", "Small AI model for open chat (advanced, off)", "toggle",
                   help="Optional. Runs a small model on this PC (no internet, nothing sent) for open conversation. Press 'Install AI chat' (below) first. Uses about 1 GB RAM while chatting and gives it back after 10 quiet minutes. She falls back to her normal lines if it is slow"),
+            Field("llm.model_size", "AI chat model size", "choice", LLM_SIZES, restart=True,
+                  help="Small is the default. Better (about 2 GB) and High (about 4.7 GB) write clearer, funnier replies but use more memory and CPU (High: 8+ cores and 16 GB RAM or more), and she waits longer for them. Pick one, save, press 'Install AI chat' to download it, then restart Starling. If she feels slow, go back to Small"),
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.notice", "She notices how the night is going", "toggle",

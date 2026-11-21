@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.128 - AI chat model sizes
+
+core/model_download.py MODELS/spec()/download_size() (small, better = Qwen2.5-3B Q4_K_M, high = Qwen2.5-7B Q4_K_M, each with its own byte limits; download() and looks_like_model() take min/max bytes). personality/llm.py: model_size(), model_path() by size (llm.model_file still wins), SIZE_MIN_SECONDS (0/14/28) and SIZE_MIN_THREADS (0/4/6) applied only when no custom file. personality/llm_server.py install_all(size). Setting llm.model_size (core/settings.py), choice LLM_SIZES in ui/settings_model.py, install_ai_chat in core/app.py passes the size. CPU only. tests/test_llm_sizes.py.
+
 ## 0.96.127 - Favourite and live
 
 config/pronunciations.json words: favourite/favorite (and plurals, capitals) = fay-vuh-rit(s). tts/pronounce.py: _LIVE regex with _live_word looks one word before and one after: adjective sets (_LIVE_ADJ_BEFORE, _LIVE_NOUN_AFTER) give "lyve", verb set (_LIVE_VERB_BEFORE) gives "liv"; "lives" gives livz/lyvz from _LIFE_PLURAL_BEFORE; unclear is untouched. Runs for every voice before the word table. tests/test_live_word.py. (0.96.126 has 56 didgeridoo lines.)

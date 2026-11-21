@@ -683,7 +683,7 @@ class App:
         def note(text):
             self.log.info("AI chat install: %s", str(text).strip())          # so the log shows how far it got
             progress(text)
-        ok, message = llm_server.install_all(progress=note)
+        ok, message = llm_server.install_all(progress=note, size=str(self.settings.get("llm.model_size", "small") or "small"))
         self.log.info("AI chat install %s: %s", "finished" if ok else "FAILED", message)
         if ok:
             self.settings.set("llm.enabled", True)

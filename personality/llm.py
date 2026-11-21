@@ -28,6 +28,9 @@ from core.logger import get_logger
 log = get_logger("llm")
 
 DEFAULT_FILE = "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf"
+# the bigger models are slower, so they are given longer before she gives up and uses her normal lines, and more CPU cores (0.96.128)
+SIZE_MIN_SECONDS = {"small": 0, "better": 14, "high": 28}
+SIZE_MIN_THREADS = {"small": 0, "better": 4, "high": 6}
 IDLE_UNLOAD_SECONDS = 600
 MAX_REPLY_CHARS = 200
 MAX_REPLY_SENTENCES = 2
@@ -162,7 +165,15 @@ class LocalLLM:
     def model_path(self):
         custom = str(self.settings.get("llm.model_file", "") or "").strip()
         from pathlib import Path
-        return Path(custom) if custom else paths.DATA_DIR / "models" / DEFAULT_FILE
+        if custom:
+            return Path(custom)
+        from core import model_download
+        return paths.DATA_DIR / "models" / model_download.spec(self.model_size())[0]
+
+    def model_size(self):
+        """'small', 'better' or 'high' (the Personality page choice). A custom model file wins over it."""
+        size = str(self.settings.get("llm.model_size", "small") or "small").lower()
+        return size if size in SIZE_MIN_SECONDS else "small"
 
     def _can_import(self):
         if self._import_ok is None:
@@ -207,6 +218,8 @@ class LocalLLM:
                 return True
             try:
                 threads = max(1, min(8, int(self.settings.get("llm.threads", 2) or 2)))
+                if not str(self.settings.get("llm.model_file", "") or "").strip():
+                    threads = max(threads, SIZE_MIN_THREADS.get(self.model_size(), 0))
                 engine = None if self._loader is not None else self._engine()
                 if self._loader is not None:
                     self._model = self._loader(str(self.model_path()), threads)
@@ -282,6 +295,8 @@ class LocalLLM:
         if not self.ready() or self._busy:
             return None
         timeout = float(timeout if timeout is not None else self.settings.get("llm.max_seconds", 8) or 8)
+        if not str(self.settings.get("llm.model_file", "") or "").strip():
+            timeout = max(timeout, float(SIZE_MIN_SECONDS.get(self.model_size(), 0)))
         if self._model is None and self._loader is None:
             timeout += 12                                      # the first reply also has to start the engine and load the model
         holder = {}

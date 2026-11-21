@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.128: AI chat model sizes (small/better/high). CHECK (the tester with the strong PC): pick High, save, Install AI chat, restart, press Test the AI chat; how many seconds? DECIDE: add the Vulkan (graphics card) engine so an AMD card like the RX 9070 XT does the work, which would make High fast.
 - [ ] 0.96.127: favourite = fay-vuh-rit; live = liv or lyve by context. CHECK by ear in each voice; send me any sentence she gets wrong.
 - [ ] 0.96.126: didgeridoo moved to stepping out of the Nomad on foot, 56 lines. CHECK: step out of the Nomad ten times in the Australian voice; expect two or so.
 - [ ] 0.96.125: didgeridoo lines (Australian voice, Nomad recovered, 1 in 5). CHECK: recover the Nomad ten times; expect two or so. DECIDE: do you want it tied to naughty mode too?

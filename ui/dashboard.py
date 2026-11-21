@@ -840,7 +840,7 @@ class Dashboard:
             extra.append(("Clear saved voice lines (frees disk space)", self.clear_voice_lines))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
-            extra.append(("Install AI chat (downloads about 450 MB)", self.install_ai_chat))
+            extra.append(("Install AI chat (downloads the size chosen above: 0.4 to 4.7 GB)", self.install_ai_chat))
             extra.append(("Test the AI chat", self.test_ai_chat))
         if page.id == "memory":
             extra.append(("Learn from all my old journals", self.learn_from_journals))

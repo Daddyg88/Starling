@@ -223,14 +223,14 @@ def install_engine(folder=None, opener=None, progress=print, platform_name=None)
             shutil.rmtree(temp, ignore_errors=True)
 
 
-def install_all(progress=print):
-    """Engine first, then the model file. Returns (ok, message)."""
+def install_all(progress=print, size="small"):
+    """Engine first, then the model file of that size ('small', 'better' or 'high'). Returns (ok, message)."""
     ok, message = install_engine(progress=progress)
     if not ok:
         return False, message
-    progress("Downloading the small chat model (about 400 MB)...")
     from core import model_download
-    ok, message = model_download.download(progress=progress)
+    progress("Downloading the chat model: %s ..." % model_download.spec(size)[4])
+    ok, message = model_download.download_size(size, progress=progress)
     if not ok:
         return False, message
     return True, "The AI chat is installed. It is switched on now."
