@@ -46,6 +46,112 @@ _LIVE_NOUN_AFTER = {"stream", "streams", "streaming", "broadcast", "broadcasts",
 _LIFE_PLURAL_BEFORE = {"nine", "many", "their", "your", "our", "my", "two", "three", "four", "five", "several", "few", "more", "less", "countless", "save", "saved", "saving",
                        "lose", "lost", "losing", "take", "taken", "taking", "of", "innocent", "human", "whose", "all", "other", "past", "new", "second", "third", "his", "her", "its"}
 
+# Other English words spelt one way and said two ways (0.96.129). Only the cases that really occur in her speech, decided from the words around
+# them, and respelt with a word (or spelling) every voice reads one way: read (past) = red, lead (the metal) = led, close (verb) = cloze,
+# close (near) = cloce, row = roe, bass = base, tear (rip) = tare, tear-shaped = teer-shaped, desert = dez-ert, content (happy) = kun-tent,
+# no use = no yoos, used to = yoost to, buffet = buh-fay, record (verb) = ri-cord. Anything unclear is left to the voice.
+_WORD = re.compile(r"[A-Za-z'’]+")
+_ADJ_CLOSE_BEFORE = {"stay", "stays", "stayed", "staying", "too", "so", "very", "quite", "bit", "up", "it's", "that's", "get", "got", "getting", "keep", "kept", "are", "is",
+                     "was", "were", "be", "being", "been", "really", "pretty", "how", "come", "comes", "came", "coming", "a", "an", "any", "no", "its", "my", "your", "our",
+                     "their", "his", "her", "this", "that", "stand", "stood", "hold", "held", "look", "looks", "looked", "looking", "feel", "feels", "felt", "fly", "flew",
+                     "flying", "sit", "sat", "sitting", "walk", "stick", "stuck", "sticking"}
+_ADJ_CLOSE_AFTER = {"to", "by", "call", "calls", "one", "ones", "eye", "friends", "friend", "enough", "together", "quarters", "range", "shave", "encounter", "with",
+                    "relationship", "ally", "allies", "second", "match", "race", "fight", "contact", "combat", "up", "behind", "ahead", "now", "again", "enough"}
+_VERB_CLOSE_BEFORE = {"to", "will", "can", "could", "shall", "should", "would", "may", "might", "must", "please", "don't", "do", "didn't", "won't", "can't", "cannot",
+                      "and", "or", "then", "never", "gonna", "let", "lets", "let's", "who", "you", "we", "they", "i", "i'll", "you'll", "we'll", "they'll", "i'd", "you'd"}
+_VERB_CLOSE_AFTER = {"the", "it", "them", "this", "that", "my", "your", "a", "all", "our", "these", "those", "him", "her", "us", "down", "off", "out"}
+_VERB_RECORD_BEFORE = {"to", "will", "can", "could", "shall", "should", "would", "may", "might", "must", "please", "don't", "do", "didn't", "won't", "can't", "cannot",
+                       "gonna", "let", "let's", "i'll", "you'll", "we'll", "they'll", "who"}
+_CONTENT_HAPPY_BEFORE = {"are", "am", "be", "feel", "feels", "felt", "quite", "very", "perfectly", "really", "so", "stay", "stays", "they're", "you're", "i'm", "we're",
+                         "looking", "looks", "look", "seems", "seem", "seemed", "not", "reasonably", "fairly", "pretty", "rather", "just"}
+_METAL_LEAD_BEFORE = {"melt", "melts", "melted", "of", "pure", "toxic", "heavy", "with", "and", "molten", "solid", "lump", "bars", "bar", "sheet", "sheets", "poisoning", "paint"}
+_YOOST_BEFORE = {"i", "you", "we", "they", "he", "she", "it", "who", "and", "get", "gets", "getting", "got", "gotten", "am", "i'm", "you're", "we're", "they're", "he's",
+                 "she's", "never", "not", "always", "still", "quite", "very", "so", "once", "just", "both", "also", "that", "there", "which", "what"}
+_WORDS_OF_INTEREST = re.compile(r"\b(read|lead|close|record|content|row|rows|bass|tear|desert|deserts|use|used|buffet)\b|\b(?:tear)[- ]?(?:shaped|drop)", re.I)
+
+
+def _near(text, start, end):
+    """(the word before, the word after) inside the same sentence, lower case, '' when there is none."""
+    before = text[:start]
+    cut = max(before.rfind(". "), before.rfind("! "), before.rfind("? "), before.rfind("\n"), before.rfind(": "), before.rfind("; "), before.rfind(", "))
+    previous = _WORD.findall(before[cut + 1:] if cut >= 0 else before)
+    after = text[end:]
+    upcoming = _WORD.search(after) if not re.match(r"\s*[.!?]", after) else None
+    return (previous[-1].lower().replace("’", "'") if previous else ""), (upcoming.group(0).lower() if upcoming else ""), bool(previous)
+
+
+def _case(source, new):
+    if len(source) > 1 and source.isupper():
+        return new.upper()
+    return new[:1].upper() + new[1:] if source[:1].isupper() else new
+
+
+def _say_heteronyms(text):
+    """The words in the list above, respelt where the sentence makes the meaning clear."""
+    if not _WORDS_OF_INTEREST.search(text):
+        return text
+    out = text
+    # read, past tense: "I once read that...", "I've read", "had read", "I read this once"
+    out = re.sub(r"(?<=\bonce )read\b|(?<=\bhad )read\b|(?<=\bhave )read\b|(?<=\bhas )read\b|(?<=\balready )read\b|(?<=['’]ve )read\b|(?<=['’]d )read\b"
+                 r"|(?<=\bhave you )read\b|(?<=\bhad you )read\b", lambda m: "red", out, flags=re.I)
+    out = re.sub(r"\b(I read)\b(?= (?:this|that|it|about|somewhere|a|an|the)\b[^.!?]{0,25}\b(?:once|somewhere|yesterday|earlier|before|ages ago|last (?:week|night|year))\b)",
+                 lambda m: "I red", out)
+    out = re.sub(r"\bI read (this|that) once\b", lambda m: "I red %s once" % m.group(1), out)
+
+    def lead(m):
+        before, after, _ = _near(m.string, m.start(), m.end())
+        if before == "flight" and m.group(0)[0].isupper():
+            return _case(m.group(0), "leed")
+        if before in _METAL_LEAD_BEFORE:
+            return _case(m.group(0), "led")
+        return m.group(0)
+    out = re.sub(r"\blead\b", lead, out, flags=re.I)
+
+    def close(m):
+        before, after, has_before = _near(m.string, m.start(), m.end())
+        if before in _ADJ_CLOSE_BEFORE:
+            return _case(m.group(0), "cloce")
+        if before in _VERB_CLOSE_BEFORE and after not in _ADJ_CLOSE_AFTER:
+            return _case(m.group(0), "cloze")
+        if not has_before and after in _VERB_CLOSE_AFTER:
+            return _case(m.group(0), "cloze")                  # "Close the map."
+        if after in _ADJ_CLOSE_AFTER and after not in ("up", "now", "again"):
+            return _case(m.group(0), "cloce")
+        if after in ("now", "again") and before in ("get", "getting", "got", "coming", "come", "so"):
+            return _case(m.group(0), "cloce")
+        return m.group(0)
+    out = re.sub(r"\bclose\b", close, out, flags=re.I)
+
+    out = re.sub(r"\brow\b", lambda m: _case(m.group(0), "roe"), out, flags=re.I)
+    out = re.sub(r"\brows\b", lambda m: _case(m.group(0), "roes"), out, flags=re.I)
+    out = re.sub(r"\bbass\b", lambda m: _case(m.group(0), "base"), out, flags=re.I)
+    out = re.sub(r"\btear[- ]?(shaped|drop)", lambda m: "teer-" + m.group(1), out, flags=re.I)
+    out = re.sub(r"\b(tear)(?= (?:it|them|him|her|us|you|me|a|the|something|this|that|these|those|down|off|apart|away)\b)", lambda m: _case(m.group(1), "tare"), out, flags=re.I)
+    out = re.sub(r"\b(desert)(s?)\b", lambda m: _case(m.group(1), "dez-ert") + m.group(2), out, flags=re.I)
+    out = re.sub(r"\bbuffet\b", lambda m: _case(m.group(0), "buh-fay"), out, flags=re.I)
+    def used_to(m):
+        before, _after, _ = _near(m.string, m.start(), m.end())
+        if before in _YOOST_BEFORE:                             # "I used to", "get used to", "I'm used to"; NOT "a unit used to measure" (that one is yoozd)
+            return _case(m.group(1), "yoost") + " " + m.group(2)
+        return m.group(0)
+    out = re.sub(r"\b(used) (to)\b", used_to, out, flags=re.I)
+    out = re.sub(r"\b(no|any|much|little|of|in|its|their|makes|make|made) (use)\b(?! (?:of|the|it|them|to)\b)", lambda m: m.group(1) + " " + _case(m.group(2), "yoos"), out, flags=re.I)
+
+    def content(m):
+        before, after, _ = _near(m.string, m.start(), m.end())
+        if before in _CONTENT_HAPPY_BEFORE or after in ("with", "to"):
+            return _case(m.group(0), "kun-tent")
+        return m.group(0)
+    out = re.sub(r"\bcontent\b", content, out, flags=re.I)
+
+    def record(m):
+        before, _after, _ = _near(m.string, m.start(), m.end())
+        if before in _VERB_RECORD_BEFORE:
+            return _case(m.group(0), "ri-cord")
+        return m.group(0)
+    return re.sub(r"\brecord\b", record, out, flags=re.I)
+
+
 _table = None
 _compiled = {}
 
@@ -166,6 +272,7 @@ def prepare(text, voice_name=""):
         out = _METRES.sub(" metres", out)
         out = _GEE.sub(" gee", out)
         out = _LIVE.sub(_live_word, out)
+        out = _say_heteronyms(out)
         found = _words(voice_name)
         if found is not None:
             pattern, merged = found

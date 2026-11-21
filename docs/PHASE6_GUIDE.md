@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.129 - Heteronyms
+
+tts/pronounce.py _say_heteronyms (after the live rule, before the word table): read past (red), lead (led/leed), close (cloce adjective, cloze verb, decided by _near(): the word before and after inside the sentence), row/rows (roe), bass (base), tear (tare, teer-shaped), desert (dez-ert), buffet (buh-fay), used to (yoost, only after I/you/we/get/got/am...), no use (yoos), content (kun-tent when happy), record verb (ri-cord). Found by scanning every string in voicepacks/ and config/ (about 12,000 lines). tests/test_heteronyms.py.
+
 ## 0.96.128 - AI chat model sizes
 
 core/model_download.py MODELS/spec()/download_size() (small, better = Qwen2.5-3B Q4_K_M, high = Qwen2.5-7B Q4_K_M, each with its own byte limits; download() and looks_like_model() take min/max bytes). personality/llm.py: model_size(), model_path() by size (llm.model_file still wins), SIZE_MIN_SECONDS (0/14/28) and SIZE_MIN_THREADS (0/4/6) applied only when no custom file. personality/llm_server.py install_all(size). Setting llm.model_size (core/settings.py), choice LLM_SIZES in ui/settings_model.py, install_ai_chat in core/app.py passes the size. CPU only. tests/test_llm_sizes.py.
