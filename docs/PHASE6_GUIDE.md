@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.122 - Pets from ordinary sentences
+
+memory/profile.py: find_pets() (searches the sentence; _PET_FIND, _NAME_IS_MY, plural handling in _kind_of, name checks in _good_name/_names_in), learn() returns the first new pet and puts the rest in extra_pets, unnamed pets (name "") with pending_pet and _NAME_REPLY (120 s). personality/brain.py: PetNoName and PetMore lines; pets passed to personality/llm.build_messages.
+
 ## 0.96.121 - Carrier is home
 
 journal/processor.py swaps StationName for events.carriers.spoken_station in every announced event. memory/habits.py: home_names callable, purge_home(), used by favourite_station and top_stations and by _docked. navigation/voice.py: _CARRIER_ASK and _HOME_WHERE. core/ships.py: SUITS and _suit for $...Suit_..._Name; codes.

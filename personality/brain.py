@@ -465,6 +465,9 @@ class Brain:
                 asked = re.search(r"\bmy (" + self._PET_WORDS + r")", tidy)
                 word = asked.group(1).rstrip("s") if asked and asked.group(1) not in ("pet", "pets") else ""
                 same = [p for p in profile.pets if not word or p["kind"].startswith(word[:3])] or list(profile.pets)
+                if not any(p["name"] for p in same):
+                    return self._say("You told me you have a %s, but not what it's called yet, Commander." % same[-1]["kind"])
+                same = [p for p in same if p["name"]]
                 if len(same) > 1:
                     names = [p["name"].capitalize() for p in same]
                     return self._say("You told me about %s and %s." % (", ".join(names[:-1]), names[-1]))
@@ -483,8 +486,16 @@ class Brain:
         kind, values, new = learned
         values = self._cap(values)
         name = {"like": "Like", "dislike": "Dislike", "pet": "Pet", "fav": "Fav"}[kind]
+        nameless = kind == "pet" and not values.get("name")              # 'I have a dog': she asks what it is called
+        if nameless:
+            name = "PetNoName"
         texts = [self._format("Profile_%s_%s" % ("Learned" if new else "Known", name), values)]
-        if new and self.rng.random() < 0.5:
+        for extra in getattr(profile, "extra_pets", []):               # 'two cats called Milo and Luna': all of them, in one go
+            texts.append(self._format("Profile_Learned_PetMore", self._cap(extra)))
+        if nameless:
+            self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS      # she asked: the name can be said without her name
+            self.chat_turns = 1
+        elif new and self.rng.random() < 0.5:
             texts.append(self._format("Profile_Follow_" + name, values))
             self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS      # she asked: you can answer without her name
             self.chat_turns = 1
@@ -608,13 +619,15 @@ class Brain:
             if not llm.ready():
                 return None
             state = self.state_provider()
-            likes = None
+            likes, pets = None, None
             if self.profile is not None and self.settings.get("brain.profile", True):
                 likes = [str(x) for x in list(getattr(self.profile, "likes", []))[-5:]] or None
+                pets = [("%s the %s" % (p["name"].capitalize(), p["kind"])) if p["name"] else "a %s" % p["kind"]
+                        for p in list(getattr(self.profile, "pets", []))[:6]] or None
             from personality.llm import build_messages
             history = [(h[2], h[3]) for h in self._recent() if h[1] == "Chat"]
             messages = build_messages(tidy, self.mood(), getattr(state, "system", "") or "", getattr(state, "ship_model", "") or "",
-                                      likes, history)
+                                      likes, history, pets=pets)
             on_wait = self._thinking_line if self.settings.get("brain.thinking_lines", True) else None
             self.thinking += 1
             try:

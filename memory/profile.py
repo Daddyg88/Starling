@@ -18,17 +18,22 @@ import os
 import re
 import tempfile
 import threading
+import time
 
 from core.logger import get_logger
 
 log = get_logger("profile")
 
 MAX_ITEMS = 30
-MAX_PETS = 6
+MAX_PETS = 10
 MAX_FAVS = 20
 MAX_WORDS = 4
 PETS = ("dog", "cat", "puppy", "kitten", "hamster", "rabbit", "parrot", "horse", "bird", "tortoise", "guinea pig", "goldfish", "snake",
-        "lizard", "budgie", "ferret")
+        "lizard", "budgie", "ferret", "pony", "turtle", "gecko", "mouse", "rat", "hedgehog", "cockatiel", "chicken", "fish", "pig", "goat", "donkey",
+        "spider", "chinchilla", "gerbil", "dove", "pigeon", "duck", "owl", "canary")
+PET_SET = set(PETS) | {"guinea pig"}
+PET_REPLY_SECONDS = 120.0        # after she asks "what's it called?", a bare name within this long is the pet's name
+DEAD_WORDS = ("died", "dead", "passed away", "put down", "put to sleep", "killed", "ran over", "run over", "missing", "lost my")   # not hers to keep or joke about
 # anything with one of these words is never kept
 BLOCKED = {"sex", "sexy", "porn", "drug", "drugs", "weed", "cocaine", "heroin", "meth", "gambling", "politics", "political", "trump",
            "religion", "god", "church", "mosque", "jesus", "allah", "racist", "nazi", "suicide", "death", "dying", "kill", "killing",
@@ -55,6 +60,93 @@ _FORGET_ONE = re.compile(r"^(?:please )?(?:forget|erase|delete|remove) (?:that )
 _FORGET_ALL = re.compile(r"^(?:please )?(?:forget|erase|delete|wipe|clear) (?:everything|all|what) (?:you (?:know|learned|learnt|remember)|i (?:told|said to) you|that i (?:told|said to) you)?\s*(?:about me)?$")
 
 
+NOT_NAMES = {"a", "an", "the", "my", "our", "very", "so", "not", "old", "young", "big", "small", "cute", "good", "bad", "nice", "new", "little", "lovely",
+             "called", "named", "is", "are", "was", "were", "and", "but", "or", "who", "that", "which", "he", "she", "it", "they", "hes", "shes", "its", "theyre",
+             "just", "also", "too", "now", "still", "always", "never", "really", "here", "there", "with", "from", "for", "in", "on", "at", "to", "of", "as", "like",
+             "has", "have", "had", "does", "did", "will", "would", "can", "could", "loves", "likes", "keeps", "wants", "sleeps", "barks", "eats", "sits", "lies",
+             "black", "white", "brown", "grey", "gray", "ginger", "orange", "golden", "tabby", "yellow", "red", "blue", "green", "pink", "spotty",
+             "female", "male", "boy", "girl", "baby", "pet", "pets", "two", "three", "four", "five", "both", "all", "some", "one", "only", "other", "another",
+             "yes", "no", "okay", "ok", "yeah", "yep", "nope", "thanks", "thank", "hello", "hi", "hey", "please", "sure", "fine", "well", "sorry", "maybe", "nothing",
+             "nevermind", "whatever", "starling", "commander", "none", "dunno", "idk", "later", "stop", "cancel", "when", "what", "how", "why", "if", "then", "than", "because", "since", "while", "about", "again", "next", "me", "you", "us", "them", "him", "her"}
+_PET_KIND_WORD = r"(?P<kind>[a-z]+(?: pig)?)"
+_OWN = (r"(?:my|our|i have got|we have got|ive got|ive|i have|we have|weve got|weve|i got|we got|i own|we own|i adopted|we adopted|i rescued|we rescued|and my|and our|and a|and an|plus my)")
+_PET_FIND = re.compile(r"\b(?P<own>" + _OWN + r") (?:(?:a|an|two|three|four|2|3|4|both|my|our|new|little|old|big|lovely|cute|young|tiny|rescue) )*" + _PET_KIND_WORD +
+                       r"(?P<key> (?:is called|are called|is named|are named|called|named|names are|name is|s name is|s names are|s called))?(?= ?(?P<rest>[a-z ]{0,60}))")
+_NAME_IS_MY = re.compile(r"\b(?P<name>[a-z]{2,15}) is my (?P<kind>[a-z]+(?: pig)?)\b")
+_NAME_REPLY = re.compile(r"^(?:(?:his|her|its|their) names? (?:is|are|s)|(?:he|she|it|they)(?: is| are|s)? called|(?:he|she|it)s named|called|named|its|hes|shes)? ?(?P<rest>[a-z]{2,15}(?: and [a-z]{2,15})*)$")
+_VERBISH = re.compile(r"(?:ed|ing|ly|ness)$")
+_OWNING = ("i have got", "we have got", "ive got", "ive", "i have", "we have", "weve got", "weve", "i got", "we got", "i own", "we own", "i adopted", "we adopted", "i rescued", "we rescued")
+
+
+def _kind_of(word):
+    """'dogs' -> 'dog', 'puppies' -> 'puppy', 'mice' -> 'mouse'; None when it is not a pet."""
+    word = (word or "").strip()
+    if word in PET_SET:
+        return word
+    if word == "mice":
+        return "mouse"
+    for cut, add in (("ies", "y"), ("es", ""), ("s", "")):
+        if word.endswith(cut) and word[:-len(cut)] + add in PET_SET:
+            return word[:-len(cut)] + add
+    if word.endswith("guinea pigs"):
+        return "guinea pig"
+    return None
+
+
+def _good_name(name, bare=False):
+    name = (name or "").strip()
+    if not (2 <= len(name) <= 15) or not name.isalpha() or name in NOT_NAMES or name in BLOCKED or name in PEOPLE or _kind_of(name):
+        return False
+    if bare and (_VERBISH.search(name) or name.endswith("s")):          # 'my dog barked all night': 'barked' is not a name
+        return False
+    return True
+
+
+def _names_in(rest, bare=False):
+    """'milo and luna who are two' -> ['milo', 'luna'].  Stops at the first word that is not a name."""
+    names, want = [], True
+    for token in (rest or "").split():
+        if want:
+            if not _good_name(token, bare):
+                break
+            names.append(token)
+            want = False
+        elif token in ("and", "n"):
+            want = True
+        else:
+            break
+    return names[:4]
+
+
+def find_pets(tidy):
+    """Every pet a sentence tells about: [(kind, name)] with name '' when the pet has no name yet.
+    'ive got a dog called rex and hes 3' -> rex the dog;  'we have two cats milo and luna' -> two;  'i have a dog' -> an unnamed dog."""
+    if not tidy or len(tidy.split()) > 30 or any(w in tidy for w in DEAD_WORDS) or any(b in tidy.split() for b in BLOCKED):
+        return []
+    out, owning = [], False
+    for found in _PET_FIND.finditer(tidy):
+        kind = _kind_of(found.group("kind"))
+        if not kind:
+            continue
+        keyword = bool(found.group("key"))
+        owning = found.group("own") in _OWNING or (owning and found.group("own").startswith("and"))
+        names = _names_in(found.group("rest"), bare=not keyword)
+        if names:
+            out += [(kind, n) for n in names]
+        elif (found.group("own") in _OWNING or (owning and found.group("own").startswith("and"))) and not keyword:
+            out.append((kind, ""))                           # 'i have a dog': she knows there is one, and may ask its name
+    found = _NAME_IS_MY.search(tidy)
+    if found and _kind_of(found.group("kind")) and _good_name(found.group("name")):
+        out.append((_kind_of(found.group("kind")), found.group("name")))
+    seen, unique = set(), []
+    for kind, name in out:
+        if (kind, name) not in seen:
+            seen.add((kind, name))
+            unique.append((kind, name))
+    named = {k for k, n in unique if n}
+    return [(k, n) for k, n in unique if n or k not in named][:MAX_PETS]
+
+
 def _clean_thing(text):
     text = re.sub(r"^(?:the |a |an |some |any )", "", (text or "").strip())
     text = re.sub(r"\s+", " ", text)
@@ -79,6 +171,8 @@ class PlayerProfile:
         self.enabled = enabled
         self._lock = threading.Lock()
         self.likes, self.dislikes, self.pets, self.favourites = [], [], [], {}
+        self.extra_pets = []              # the other pets one sentence told her about (the first one is what learn() returns)
+        self.pending_pet = None           # (kind, time): she asked what an unnamed pet is called
         self._load()
 
     # ---- file ----
@@ -96,7 +190,7 @@ class PlayerProfile:
         self.likes = [str(x) for x in data.get("likes", []) if isinstance(x, str)][:MAX_ITEMS]
         self.dislikes = [str(x) for x in data.get("dislikes", []) if isinstance(x, str)][:MAX_ITEMS]
         self.pets = [{"kind": str(p.get("kind", "")), "name": str(p.get("name", ""))} for p in data.get("pets", [])
-                     if isinstance(p, dict) and p.get("name")][:MAX_PETS]
+                     if isinstance(p, dict) and (p.get("name") or p.get("kind"))][:MAX_PETS]
         favs = data.get("favourites", {})
         self.favourites = {str(k): str(v) for k, v in favs.items()} if isinstance(favs, dict) else {}
 
@@ -120,13 +214,16 @@ class PlayerProfile:
         """A whole sentence like 'i love pizza'. Returns ('like'|'dislike'|'pet'|'fav', details dict, is_new) or None."""
         if not self.enabled():
             return None
-        found = _PET.match(tidy)
-        if found:
-            kind = found.group("k1") or found.group("k2") or found.group("k3")
-            name = found.group("n")
-            if name in ("a", "the", "my", "very", "so", "not", "old", "young", "big", "small", "cute", "good", "bad", "nice") or name in BLOCKED:
-                return None
-            return self._add_pet(kind, name)
+        self.extra_pets = []
+        pets = self._pets_from(tidy)
+        if pets:
+            results = [self._add_pet(kind, name) for kind, name in pets]
+            first = next((r for r in results if r[2]), results[0])          # the first NEW one, else the first
+            self.extra_pets = [r[1] for r in results if r is not first and r[2]]
+            unnamed = [r for r in results if not r[1].get("name")]
+            if unnamed and unnamed[0][2]:
+                self.pending_pet = (unnamed[0][1]["kind"], time.monotonic())
+            return first
         found = _FAV.match(tidy)
         if found:
             category, thing = found.group("cat"), _clean_thing(found.group("x"))
@@ -141,6 +238,27 @@ class PlayerProfile:
                     return None
                 return self._add_item(kind, thing)
         return None
+
+    def _pets_from(self, tidy):
+        """[(kind, name)]: the old exact sentence, the looser ones in find_pets, or a bare name answering 'what's it called?'."""
+        found = _PET.match(tidy)
+        if found:
+            kind = found.group("k1") or found.group("k2") or found.group("k3")
+            name = found.group("n")
+            return [(kind, name)] if _good_name(name) else []
+        pets = find_pets(tidy)
+        if pets:
+            return pets
+        pending = self.pending_pet
+        if pending and time.monotonic() - pending[1] <= PET_REPLY_SECONDS:
+            found = _NAME_REPLY.match(tidy)
+            if found:
+                rest = found.group("rest")
+                names = _names_in(rest)
+                if names and len(names) * 2 - 1 == len(rest.split()):           # the whole reply was names
+                    self.pending_pet = None
+                    return [(pending[0], n) for n in names]
+        return []
 
     def _add_item(self, kind, thing):
         with self._lock:
@@ -159,6 +277,10 @@ class PlayerProfile:
             for pet in self.pets:
                 if pet["name"] == name and pet["kind"] == kind:
                     return "pet", {"kind": kind, "name": name.capitalize()}, False
+            if name:
+                self.pets = [p for p in self.pets if not (p["kind"] == kind and not p["name"])]     # now she knows what the dog is called
+            elif any(p["kind"] == kind for p in self.pets):
+                return "pet", {"kind": kind, "name": ""}, False              # an unnamed dog when she already knows one
             self.pets.append({"kind": kind, "name": name})
             del self.pets[:-MAX_PETS]
         self.save()
@@ -181,7 +303,7 @@ class PlayerProfile:
             return None
         padded = " %s " % tidy
         for pet in self.pets:
-            if (" %s " % pet["name"]) in padded:
+            if pet["name"] and (" %s " % pet["name"]) in padded:
                 return "pet", {"kind": pet["kind"], "name": pet["name"].capitalize()}
         for kind, items in (("like", self.likes), ("dislike", self.dislikes)):
             for thing in items:
@@ -260,7 +382,7 @@ class PlayerProfile:
         if self.dislikes:
             values["dislikes"] = self._list(self.dislikes[-5:])
         if self.pets:
-            values["pets"] = self._list("%s the %s" % (p["name"].capitalize(), p["kind"]) for p in self.pets[:3])
+            values["pets"] = self._list(("%s the %s" % (p["name"].capitalize(), p["kind"])) if p["name"] else "a %s" % p["kind"] for p in self.pets[:4])
         if self.favourites:
             values["favs"] = self._list("%s is %s" % (c, v) for c, v in list(self.favourites.items())[-3:])
         return values

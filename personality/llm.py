@@ -120,7 +120,7 @@ def clean_reply(text, allow_mature=False):
     return text
 
 
-def build_messages(user_text, mood="", system_name="", ship="", likes=None, history=()):
+def build_messages(user_text, mood="", system_name="", ship="", likes=None, history=(), pets=None):
     """The chat the model sees: who she is, a little context, the last few exchanges, and what was just said."""
     context = []
     if system_name:
@@ -129,6 +129,8 @@ def build_messages(user_text, mood="", system_name="", ship="", likes=None, hist
         context.append("The ship is a %s." % ship)
     if likes:
         context.append("The Commander has told you they like: %s." % ", ".join(likes[:5]))
+    if pets:
+        context.append("The Commander has told you about their pets: %s." % ", ".join(pets[:6]))
     system = SYSTEM.format(mood=MOOD_STYLE.get(mood or "Neutral", MOOD_STYLE["Neutral"]) + " ",
                            context=(" " + " ".join(context)) if context else "")
     messages = [{"role": "system", "content": system}]

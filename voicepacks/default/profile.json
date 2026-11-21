@@ -165,5 +165,19 @@
   "Is that {name}? Give the {kind} my regards.",
   "{name}! Always a pleasure to hear about them.",
   "Ah, {name} the {kind}. How are they?"
+ ],
+ "Profile_Learned_PetNoName": [
+  "A {kind}! What's its name?",
+  "Oh, you have a {kind}. What is it called?",
+  "A {kind}, lovely. What's the {kind} called?"
+ ],
+ "Profile_Known_PetNoName": [
+  "I know about your {kind}. I'd love to know its name.",
+  "Your {kind}, yes. What's it called, Commander?"
+ ],
+ "Profile_Learned_PetMore": [
+  "And {name} the {kind} too. Noted.",
+  "{name} the {kind}, as well. I'll remember them both.",
+  "Plus {name}, the {kind}. I've got them all."
  ]
 }
