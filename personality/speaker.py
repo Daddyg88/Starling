@@ -21,6 +21,7 @@ from personality.mood_engine import effective_mood
 from core import paths
 from core.identity import personalise
 from personality import categories, line_keys
+from personality.australian import australian_on
 
 log = get_logger("speaker")
 
@@ -63,6 +64,9 @@ def fix_articles(text, data):
         if value[0] in "AEIOaeio" and not value.lower().startswith(("eu", "one")) and value in text:
             text = re.sub(r"\b([Aa]) (?=%s)" % re.escape(value), lambda m: m.group(1) + "n ", text)
     return text
+
+
+DIDGERIDOO_CHANCE = 0.2          # one recovery of the Nomad in five (Australian voice only)
 
 
 class EventSpeaker:
@@ -110,7 +114,10 @@ class EventSpeaker:
         prefer_recorded = bool(self.settings.get("speech.use_recordings", True))
 
         line = None
-        for key in line_keys.keys_for(event):
+        keys = line_keys.keys_for(event)
+        if event.name == "NomadDocked" and self.rng is not None and australian_on(self.settings) and self.rng.random() < DIDGERIDOO_CHANCE:
+            keys = ["NomadDidgeridoo"] + list(keys)          # Australian voice only, one time in five: "don't forget your didgeridoo, mate"
+        for key in keys:
             line = self.dialogue.pick(key, mood, allow_mature, prefer_recorded)
             if line is not None:
                 break

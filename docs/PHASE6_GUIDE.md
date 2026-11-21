@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.125 - Didgeridoo lines
+
+personality/speaker.py: on NomadDocked, with an rng and australian_on(settings), a 0.2 roll puts the key NomadDidgeridoo first in the key list. voicepacks/default/aussie.json holds the 29 lines; config/pronunciations.json respells didgeridoo for every voice.
+
 ## 0.96.124 - Canonn archive knowledge
 
 tools/build_canonn_knowledge.py reads content/articles/*/article.json + body.html from a clone of canonn-science/canonn.science, keeps title, category and a speakable opening (coordinates and web addresses removed), writes config/knowledge/canonn.json ({"k": [title words], "a": text + credit, "src": url}). personality/knowledge.py loads every file in config/knowledge, so nothing else changed. Titles that are one very common word are not used as keys.

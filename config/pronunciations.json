@@ -39,8 +39,8 @@
   "cozzie": "cozzy",
   "CSU": "see ess you",
   "Denied": "dih nide",
- "denied": "dih nide",
- "Cucumisis": "kew kew mih sis",
+  "denied": "dih nide",
+  "Cucumisis": "kew kew mih sis",
   "Cultro": "cull troh",
   "Deltahedronix": "delta hee dron icks",
   "Digitos": "dij ih tohs",
@@ -157,7 +157,11 @@
   "Yakka": "yack ah",
   "yakka": "yack ah",
   "Yewy": "you ee",
-  "yewy": "you ee"
+  "yewy": "you ee",
+  "didgeridoo": "dij-uh-ree-doo",
+  "Didgeridoo": "Dij-uh-ree-doo",
+  "didgeridoos": "dij-uh-ree-doos",
+  "Didgeridoos": "Dij-uh-ree-doos"
  },
  "melo_en_au": {
   "metres": "meeters",
