@@ -2312,3 +2312,7 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * streaming/intro.py: offer() returns False for o7 so the ChatDirector salutes back; SYSTEM prompt rewritten as a ship's COVAS who loves exploring.
 * config/pronunciations.json: scoopable -> skoo-puh-bul. Tests: tests/test_stream_intro.py.
 
+## 0.96.135 - Updater copes with a locked app folder
+
+* core/updater.py: _put_aside() retries the rename then falls back to _move_children() (all or nothing); apply_pending() tracks the mode ('folder' or 'children') for the swap and the failed-start-up rollback. Tests: tests/test_updater.py (locked folder).
+

@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import ssl
+import time
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -217,6 +218,50 @@ def _restore_keep(moved, holder, home):
             pass
 
 
+RENAME_TRIES = 4              # a virus scanner or Explorer window can hold the folder for a second or two: try again a few times
+RENAME_WAIT = 1.5
+
+
+def _move_children(source, target):
+    """Moves everything INSIDE one folder into another (the folder itself is not renamed). Windows refuses to rename a folder that
+    something has open or is standing in (a virus scanner, an Explorer window, a command prompt), but it still lets the files
+    inside move. All or nothing: if one file will not move, the ones already moved go back and OSError is raised."""
+    source, target = Path(source), Path(target)
+    target.mkdir(parents=True, exist_ok=True)
+    done = []
+    try:
+        for child in list(source.iterdir()):
+            os.replace(str(child), str(target / child.name))
+            done.append(child.name)
+    except OSError:
+        for name in reversed(done):
+            try:
+                os.replace(str(target / name), str(source / name))
+            except OSError:
+                pass
+        raise
+
+
+def _put_aside(app, previous):
+    """Gets the live folder out of the way. Returns 'folder' (it was renamed to app.previous) or 'children' (its contents were moved
+    into app.previous, because the folder itself is locked). Raises OSError if neither works."""
+    last = None
+    for attempt in range(RENAME_TRIES):
+        try:
+            app.rename(previous)
+            return "folder"
+        except OSError as error:
+            last = error
+            if attempt + 1 < RENAME_TRIES:
+                time.sleep(RENAME_WAIT)
+    try:
+        _move_children(app, previous)
+        return "children"
+    except OSError as error:
+        raise OSError("%s; and moving its files instead failed too (%s). Close Starling, any File Explorer window or command prompt "
+                      "open inside the Starling folder, and pause the virus scanner for a minute, then try again" % (last, error))
+
+
 def apply_pending(app_dir, updates_dir, check=None):
     """Swap the staged version in. Returns the new version, or None if nothing was waiting.
 
@@ -232,14 +277,22 @@ def apply_pending(app_dir, updates_dir, check=None):
     try:
         moved = _copy_keep(app, pending)
         shutil.rmtree(previous, ignore_errors=True)
-        app.rename(previous)
+        mode = _put_aside(app, previous)
     except Exception as error:
         _restore_keep(moved, pending, app)
         raise UpdateError("Couldn't prepare the update (%s). Nothing was changed." % error)
     try:
-        pending.rename(app)
+        if mode == "folder":
+            pending.rename(app)
+        else:
+            _move_children(pending, app)
+            shutil.rmtree(pending, ignore_errors=True)
     except Exception as error:
-        previous.rename(app)                                  # put the old one straight back
+        if mode == "folder":
+            previous.rename(app)                              # put the old one straight back
+        else:
+            _move_children(previous, app)
+            shutil.rmtree(previous, ignore_errors=True)
         _restore_keep(moved, pending, app)
         raise UpdateError("Couldn't switch to the new version (%s). The old one is back in place." % error)
     if check is not None:
@@ -250,8 +303,12 @@ def apply_pending(app_dir, updates_dir, check=None):
         if not good:
             failed = app.with_name(app.name + ".failed")
             shutil.rmtree(failed, ignore_errors=True)
-            app.rename(failed)
-            previous.rename(app)
+            if mode == "folder":
+                app.rename(failed)
+                previous.rename(app)
+            else:
+                _move_children(app, failed)
+                _move_children(previous, app)
             _restore_keep(moved, failed, app)             # her data goes back to the old version
             shutil.rmtree(failed, ignore_errors=True)
             _clear(updates)

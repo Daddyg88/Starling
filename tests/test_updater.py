@@ -150,6 +150,56 @@ class StageAndApplyTests(unittest.TestCase):
         self.assertTrue((self.root / "app.previous" / "OLD.txt").exists())
         self.assertIsNone(updater.pending_version(self.updates))
 
+    def locked(self):
+        """Makes renaming the live folder fail like Windows does when something has it open (WinError 5)."""
+        from pathlib import Path
+        from unittest import mock
+        real = Path.rename
+        app = self.app
+
+        def rename(path, target):
+            if Path(path) == app:
+                raise PermissionError(5, "Access is denied")
+            return real(path, target)
+        return mock.patch.object(Path, "rename", rename), mock.patch.object(updater, "RENAME_WAIT", 0)
+
+    def test_locked_folder_still_updates_by_moving_its_files(self):
+        self.stage()
+        a, b = self.locked()
+        with a, b:
+            self.assertEqual(updater.apply_pending(self.app, self.updates), "0.12.0")
+        self.assertEqual((self.app / "main.py").read_text(), "print('new')")
+        self.assertEqual((self.app / "data" / "mood.json").read_text(), '{"score": 42}')
+        self.assertTrue((self.root / "app.previous" / "OLD.txt").exists())
+        self.assertFalse((self.app / "OLD.txt").exists())
+        self.assertIsNone(updater.pending_version(self.updates))
+
+    def test_locked_folder_failed_startup_test_goes_back(self):
+        self.stage()
+        a, b = self.locked()
+        with a, b, self.assertRaises(UpdateError):
+            updater.apply_pending(self.app, self.updates, check=lambda folder: False)
+        self.assertEqual((self.app / "main.py").read_text(), "print('old')")
+        self.assertTrue((self.app / "OLD.txt").exists())
+        self.assertFalse((self.app / "NEW.txt").exists())
+
+    def test_a_file_that_will_not_move_changes_nothing(self):
+        from unittest import mock
+        self.stage()
+        a, b = self.locked()
+        real = __import__("os").replace
+        count = {"n": 0}
+
+        def replace(src, dst):
+            count["n"] += 1
+            if count["n"] == 3:
+                raise PermissionError(5, "Access is denied")
+            return real(src, dst)
+        with a, b, mock.patch.object(updater.os, "replace", replace), self.assertRaises(UpdateError):
+            updater.apply_pending(self.app, self.updates)
+        self.assertEqual((self.app / "main.py").read_text(), "print('old')")
+        self.assertTrue((self.app / "OLD.txt").exists())
+
     def test_nothing_pending_does_nothing(self):
         self.assertIsNone(updater.apply_pending(self.app, self.updates))
 
