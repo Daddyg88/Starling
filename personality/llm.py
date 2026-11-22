@@ -131,6 +131,19 @@ def sentence_end(text):
     return found.end() if found else None
 
 
+FAST_CLAUSE_WORDS = 4
+
+
+def first_clause_end(text):
+    """When the start of an answer is a long sentence still being written, where its first clause ends (after a comma, semicolon or colon
+    and the space), if that clause already has at least four words. Her voice makes a short piece much faster than a long one, so she can
+    start talking while the rest of the sentence is still being written."""
+    found = re.search(r"[,;:]\s+", text)
+    if found and len(text[:found.start()].split()) >= FAST_CLAUSE_WORDS:
+        return found.end()
+    return None
+
+
 def length_text(sentences):
     """How long the answer may be, as the model is told it."""
     if sentences <= 1:
@@ -307,7 +320,7 @@ class LocalLLM:
             log.info("Chat model unloaded after being idle.")
 
     # ---- talking ----
-    def reply_stream(self, messages, on_sentence, allow_mature=False, max_sentences=3, max_tokens=120, timeout=None, on_wait=None, wait_after=1.5):
+    def reply_stream(self, messages, on_sentence, allow_mature=False, max_sentences=3, max_tokens=120, timeout=None, on_wait=None, wait_after=1.5, fast_start=True):
         """Like reply(), but each sentence is handed to on_sentence(text) THE MOMENT the model has finished it, while the model carries on
         with the next one. So she starts talking after the first sentence, not after the whole answer, and the second is being written while
         she says the first. Returns everything that was passed on (joined), or None if nothing was said (switched off, busy, too slow,
@@ -332,19 +345,24 @@ class LocalLLM:
                 if streamer is None:
                     pieces.put(("whole", model.create_chat_completion(**options)["choices"][0]["message"]["content"]))
                     return
-                buffer = ""
+                buffer, first = "", True
                 stream = streamer(**options)
                 for part in stream:
                     if cancel.is_set():
                         stream.close()
                         return
                     buffer += part
+                    if first and fast_start and sentence_end(buffer) is None:
+                        clause = first_clause_end(buffer)
+                        if clause is not None:
+                            pieces.put(("clause", buffer[:clause]))        # a first few words, so her voice can start sooner
+                            buffer, first = buffer[clause:], False
                     while True:
                         cut = sentence_end(buffer)
                         if cut is None:
                             break
                         pieces.put(("sentence", buffer[:cut]))
-                        buffer = buffer[cut:]
+                        buffer, first = buffer[cut:], False
                 if re.search(r"[.!?][\"')\]]*\s*$", buffer):
                     pieces.put(("sentence", buffer))                      # the last sentence (a stub cut off by the token limit is dropped)
             except Exception:
@@ -356,7 +374,7 @@ class LocalLLM:
         self._busy = True
         threading.Thread(target=work, name="llm-stream", daemon=True).start()
         started = time.monotonic()
-        spoken, held, waited = [], "", False
+        spoken, held, waited, clause_said = [], "", False, False
         try:
             while True:
                 now = time.monotonic()
@@ -382,8 +400,16 @@ class LocalLLM:
                         on_sentence(text)
                         spoken.append(text)
                     break
+                if kind == "clause":
+                    text = clean_reply(text.strip().rstrip(",;:") + ",", allow_mature)
+                    if not text:
+                        break
+                    on_sentence(text)                              # does not count as one of the sentences
+                    spoken.append(text)
+                    clause_said = True
+                    continue
                 text = (held + " " + text).strip()
-                if len(text.split()) < 3 and not (spoken and text):
+                if len(text.split()) < 3:
                     held = text                                     # too short on its own ("Ha."): kept for the next sentence
                     continue
                 held = ""
@@ -392,7 +418,7 @@ class LocalLLM:
                     break                                           # an unusable sentence: she does not say it, nor anything after it
                 on_sentence(text)
                 spoken.append(text)
-                if len(spoken) >= max_sentences:
+                if len(spoken) - (1 if clause_said else 0) >= max_sentences:
                     break
         finally:
             cancel.set()

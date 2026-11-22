@@ -638,7 +638,8 @@ class Brain:
                 if sentences > 1 and hasattr(llm, "reply_stream"):
                     self._ai_spoken = True                           # each sentence is said as soon as the model has written it
                     said = llm.reply_stream(messages, self._say, allow_mature=self._allow(), max_sentences=sentences,
-                                            max_tokens=40 * sentences + 20, on_wait=on_wait, wait_after=wait_after)
+                                            max_tokens=40 * sentences + 20, on_wait=on_wait, wait_after=wait_after,
+                                            fast_start=bool(self.settings.get("llm.fast_start", True)))
                     if said is None:
                         self._ai_spoken = False
                     return said

@@ -51,13 +51,26 @@ class SentenceEnd(unittest.TestCase):
 class Stream(unittest.TestCase):
     def test_each_sentence_is_passed_on_as_it_is_finished(self):
         model, got = Streamer(TEXT), []
-        said = llm_with(model).reply_stream([], got.append, max_sentences=3)
+        said = llm_with(model).reply_stream([], got.append, max_sentences=3, fast_start=False)
         self.assertEqual(got, ["Exploring is my favourite thing, Commander.", "Nothing beats a silent neutron star.", "Want to go and see one?"])
         self.assertEqual(said, " ".join(got))
 
+    def test_long_first_sentence_starts_on_its_first_clause(self):
+        model, got = Streamer(TEXT), []
+        said = llm_with(model).reply_stream([], got.append, max_sentences=2)
+        self.assertEqual(got[0], "Exploring is my favourite thing,")
+        self.assertEqual(len(got), 3)                      # the clause is free: two real sentences follow
+        self.assertEqual(got[1], "Commander. Nothing beats a silent neutron star.")
+
+    def test_short_clauses_and_one_sentence_answers_are_left_whole(self):
+        from personality.llm import first_clause_end
+        self.assertIsNone(first_clause_end("Well, yes"))
+        self.assertIsNone(first_clause_end("A short one with no comma at all"))
+        self.assertIsNotNone(first_clause_end("I love how I am evolving, but maybe"))
+
     def test_stops_at_the_limit_and_tells_the_model_to_stop(self):
         model, got = Streamer(TEXT, gap=0.01), []
-        llm_with(model).reply_stream([], got.append, max_sentences=1)
+        llm_with(model).reply_stream([], got.append, max_sentences=1, fast_start=False)
         self.assertEqual(len(got), 1)
         time.sleep(0.3)
         self.assertTrue(model.closed)
@@ -129,7 +142,7 @@ class BrainSpeaksEachSentence(Base):
 
     def test_each_sentence_is_spoken_once_in_order(self):
         reply = self.run_it(TEXT)
-        self.assertEqual(self.said(), ["Exploring is my favourite thing, Commander.", "Nothing beats a silent neutron star.", "Want to go and see one?"])
+        self.assertEqual(self.said(), ["Exploring is my favourite thing,", "Commander. Nothing beats a silent neutron star.", "Want to go and see one?"])
         self.assertEqual(reply, " ".join(self.said()))
 
     def test_one_sentence_setting_uses_the_whole_answer_path(self):
@@ -150,9 +163,9 @@ class BrainSpeaksEachSentence(Base):
 
     def test_hmm_then_the_sentences_when_the_model_is_slow(self):
         self.settings.set("brain.thinking_after", 0.1)
-        self.run_it(TEXT, gap=0.15)
+        self.run_it(TEXT, gap=0.4)
         said = self.said()
-        self.assertEqual(len(said), 4)
+        self.assertEqual(len(said), 4)                     # the hmm, the first clause, then two sentences
         self.assertIn(said[0], [line.text for line in self.dialogue.pool("Brain_Thinking", "Friendly", True, False)])
 
 

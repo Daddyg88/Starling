@@ -2322,3 +2322,8 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * personality/brain.py: _ai_reply streams when llm.max_sentences > 1 (default 3) and sets _ai_spoken so the answer is not said twice. voicepacks/default/thinking.json: short "Hmm..." sounds.
 * tts/kokoro_tts.py: prefetch() and a synthesis lock; tts/speech_manager.py: lines from the brain queued behind another are prepared ahead in a helper thread. Tests: tests/test_llm_stream.py, tests/test_tts.py.
 
+## 0.96.137 - Faster AI answers
+
+* personality/llm.py: first_clause_end() and reply_stream(fast_start=True) emit a first clause (4+ words) as soon as written; the clause does not count as a sentence. llm.fast_start setting. voicepacks/default/thinking.json: Hmm.../Hmmm... spellings.
+* tts/kokoro_tts.py: logs the device the voice engine runs on. Tests: tests/test_llm_stream.py.
+

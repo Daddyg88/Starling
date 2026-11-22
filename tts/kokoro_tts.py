@@ -423,7 +423,15 @@ class KokoroTTS(BaseTTS):
             # torch and huggingface print harmless "deprecated" warnings; hide them.
             warnings.simplefilter("ignore")
             from kokoro import KPipeline
-            return KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M")
+            pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M")
+            try:
+                import torch
+                device = getattr(getattr(pipeline, "model", None), "device", None)
+                log.info("Voice engine is running on: %s (torch %s, graphics card usable: %s). On a graphics card her sentences are made about "
+                         "ten times faster than on the processor", device or "unknown", torch.__version__, "yes" if torch.cuda.is_available() else "no")
+            except Exception:
+                pass
+            return pipeline
 
     @staticmethod
     def _default_torch_load(path):

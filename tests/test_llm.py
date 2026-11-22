@@ -159,8 +159,8 @@ class ThinkingLines(Base):
         self.assertEqual(len(serious), 8)
         self.assertEqual(len(friendly), 13)
         self.assertIn("Hmm...", serious)
-        self.assertNotIn("Ooh... hmm...", serious)
-        self.assertIn("Ooh... hmm...", friendly)
+        self.assertNotIn("Hmmm... ooh...", serious)
+        self.assertIn("Hmmm... ooh...", friendly)
 
 
 class Download(unittest.TestCase):

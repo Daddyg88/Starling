@@ -64,7 +64,7 @@ DEFAULTS = {
     "commands": {"enabled": True, "confirm": True, "ask_guess": True, "require_game_focus": True, "key_hold": 0.06, "disabled": []},
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True, "knowledge": True, "lookup": False, "freechat": True, "chat_followups": True, "profile": True, "thinking_lines": True, "thinking_after": 1.5},
-    "llm": {"enabled": False, "model_file": "", "model_size": "small", "threads": 2, "max_seconds": 8, "max_sentences": 3},
+    "llm": {"enabled": False, "model_file": "", "model_size": "small", "threads": 2, "max_seconds": 8, "max_sentences": 3, "fast_start": True},
     "exploration": {"hge_hint": True},
     "talk": {"combat": True, "exploration": True, "exobiology": True, "mining": True, "trading": True, "antixeno": True},
     "mining": {"prices": True, "merit": True, "limpet_reminder": True, "destination_reminder": True, "chatter": "normal",
