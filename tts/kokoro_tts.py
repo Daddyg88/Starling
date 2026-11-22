@@ -428,7 +428,8 @@ class KokoroTTS(BaseTTS):
                 import torch
                 device = getattr(getattr(pipeline, "model", None), "device", None)
                 log.info("Voice engine is running on: %s (torch %s, graphics card usable: %s). On a graphics card her sentences are made about "
-                         "ten times faster than on the processor", device or "unknown", torch.__version__, "yes" if torch.cuda.is_available() else "no")
+                         "ten times faster than on the processor. With an NVIDIA card: double-click run_voice_on_graphics_card.bat",
+                         device or "unknown", torch.__version__, "yes" if torch.cuda.is_available() else "no")
             except Exception:
                 pass
             return pipeline

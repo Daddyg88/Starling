@@ -2327,3 +2327,7 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * personality/llm.py: first_clause_end() and reply_stream(fast_start=True) emit a first clause (4+ words) as soon as written; the clause does not count as a sentence. llm.fast_start setting. voicepacks/default/thinking.json: Hmm.../Hmmm... spellings.
 * tts/kokoro_tts.py: logs the device the voice engine runs on. Tests: tests/test_llm_stream.py.
 
+## 0.96.138 - Voice on the graphics card (one double-click)
+
+* run_voice_on_graphics_card.bat: nvidia-smi check, then pip install --force-reinstall --no-deps torch from the cu126/cu124/cu128/cu118 index, tested each time with torch.cuda.is_available(); restores the cpu build if none works. Test: tests/test_graphics_card_bat.py. tts/kokoro_tts.py log line names the file.
+
