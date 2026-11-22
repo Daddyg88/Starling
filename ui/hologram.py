@@ -75,7 +75,7 @@ SALUTE_REPEAT = 8.0              # a second salute request within this many seco
 CLIP_IN, CLIP_OUT, CLIP_OUT_FAST = 0.35, 0.5, 0.2      # seconds to fade a clip in, out, and out when she starts to talk
 BORED_CLIPS = ("bored1", "bored2", "yawn", "sleepy", "ponder",                       # what she may do when it has been quiet for a while (the ones that exist):
                "eyes_left", "eyes_right", "glance_left", "glance_right", "tilt", "brow_up",
-               "glance_up", "tilt_right", "eyes_up", "eyes_down", "curious", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "listen_tilt")   # the bigger ones, then small fidgets
+               "glance_up", "tilt_right", "eyes_up", "eyes_down", "curious", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "listen_tilt", "idle_alt1")   # the bigger ones, then small fidgets
 BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this range) and she may get bored
 POSE_GAP = 60.0                  # at least this long between two clips
 PLEASED_CHANCE = 0.25            # how often a spoken line ends with the pleased clip
