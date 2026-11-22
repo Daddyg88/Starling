@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.130: 17 new clips + moods + chaining. CHECK: salute arm is whole and she does not shift; wait for idle clips (try Hologram test button); tick Flirty and naughty and see adjust_suit_rare / blow_kiss; fail a mission (annoyed), complete one (happy); get interdicted (startle clip). DECIDE: a trigger for point; the missing clips (facing_away, hair_blow, check_nails) when the videos come.
 - [ ] 0.96.129: heteronym respellings (read, close, lead, row, bass, tear, desert, content, use, record, buffet). CHECK by ear in each voice; tell me which respelling sounds wrong ("cloce" and "kun-tent" are the ones I trust least).
 - [ ] 0.96.128: AI chat model sizes (small/better/high). CHECK (the tester with the strong PC): pick High, save, Install AI chat, restart, press Test the AI chat; how many seconds? DECIDE: add the Vulkan (graphics card) engine so an AMD card like the RX 9070 XT does the work, which would make High fast.
 - [ ] 0.96.127: favourite = fay-vuh-rit; live = liv or lyve by context. CHECK by ear in each voice; send me any sentence she gets wrong.

@@ -753,7 +753,7 @@ class PoseClips(unittest.TestCase):
     def test_the_clip_files_are_there(self):
         self.assertEqual(sorted(self.holo.assets.clips), sorted(["blow_kiss", "bored1", "bored2", "brow_down", "brow_up", "glance_left", "glance_right", "listening", "nod", "pleased", "salute", "shake", "thinking", "tilt",
                                                                                                   "eyes_left", "eyes_right", "wink", "smirk", "sad", "angry", "worried", "yawn", "awe", "ponder", "eyeroll", "blush", "sleepy", "laugh",
-                                                                                                  "glance_up", "tilt_right", "eyes_up", "eyes_down", "nod_twice", "suspicious", "curious", "giggle", "flirty", "disagree", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "content_smile", "listen_tilt", "idle_alt1"]))
+                                                                                                  "glance_up", "tilt_right", "eyes_up", "eyes_down", "nod_twice", "suspicious", "curious", "giggle", "flirty", "disagree", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "content_smile", "listen_tilt", "idle_alt1", "hair_flick2", "check_mirror", "adjust_suit", "adjust_suit_rare", "cheer", "excited", "facepalm", "point", "shrug", "startle", "thumbs_up"]))
 
     def test_thinking_plays_then_leaves_when_the_answer_comes(self):
         self.run_for(0.5, thinking=True)
@@ -806,6 +806,99 @@ class PoseClips(unittest.TestCase):
             self.holo.tick(now=self.c.t)
             seen.add(self.holo.clip)
         self.assertTrue(seen & {"bored1", "bored2"})
+
+    def _both_loaded(self, names):
+        self.holo.assets.clips = list(names)
+        old, h.CLIP_LRU = h.CLIP_LRU, len(names) + 1
+        self.addCleanup(setattr, h, "CLIP_LRU", old)
+        for name in names:
+            h.get_clip(self.holo.assets, name, wait=True)
+
+    def _bored_clips_seen(self, naughty, seconds=400):
+        self.holo.naughty = naughty
+        seen = []
+        for _ in range(int(seconds / 0.1)):
+            self.c.t += 0.1
+            self.holo.tick(now=self.c.t)
+            if self.holo.clip and (not seen or seen[-1] != self.holo.clip):
+                seen.append(self.holo.clip)
+        return seen
+
+    def test_the_rare_suit_clip_never_plays_unless_naughty_is_ticked(self):
+        names = ["adjust_suit", "adjust_suit_rare", "blow_kiss"]
+        self._both_loaded(names)
+        seen = self._bored_clips_seen(False)
+        self.assertIn("adjust_suit", seen)
+        self.assertNotIn("adjust_suit_rare", seen)
+        self.assertNotIn("blow_kiss", seen)
+
+    def test_the_naughty_clips_can_play_when_it_is_ticked(self):
+        class Lucky(random.Random):
+            def random(self): return 0.0
+        names = ["adjust_suit", "adjust_suit_rare", "blow_kiss"]
+        self._both_loaded(names)
+        self.holo.rng = Lucky()
+        self.assertTrue(set(self._bored_clips_seen(True)) & {"adjust_suit_rare", "blow_kiss"})
+
+    def test_a_second_clip_can_follow_the_first(self):
+        class Lucky(random.Random):
+            def random(self): return 0.0
+            def choice(self, seq): return seq[0]
+        names = ["idle_alt1", "hair_flick2"]
+        self._both_loaded(names)
+        self.holo.rng = Lucky()
+        self.holo.start_clip("idle_alt1", self.c.t, partners=names)
+        self.assertEqual(self.holo.clip_queue, ["hair_flick2"])
+        self.run_for(len(self.holo.clip_frames) / self.holo.clip_fps + 0.5)
+        self.assertEqual(self.holo.clip, "hair_flick2")                  # it started at once, no gap
+        self.holo.stop_clip()
+        self.assertEqual(self.holo.clip_queue, [])
+
+    def test_no_second_clip_when_the_roll_says_no(self):
+        class Unlucky(random.Random):
+            def random(self): return 0.99
+        names = ["idle_alt1", "hair_flick2"]
+        self._both_loaded(names)
+        self.holo.rng = Unlucky()
+        self.holo.start_clip("idle_alt1", self.c.t, partners=names)
+        self.assertEqual(self.holo.clip_queue, [])
+
+    def test_a_naughty_clip_is_never_chained_when_not_ticked(self):
+        class Lucky(random.Random):
+            def random(self): return 0.0
+            def choice(self, seq): return seq[0]
+        names = ["idle_alt1", "adjust_suit_rare"]
+        self._both_loaded(names)
+        self.holo.rng = Lucky()
+        self.holo.naughty = False
+        self.holo.start_clip("idle_alt1", self.c.t, partners=names)
+        self.assertEqual(self.holo.clip_queue, [])
+
+    def test_a_happy_reaction_picks_from_the_happy_clips_and_does_not_wait(self):
+        class Lucky(random.Random):
+            def random(self): return 0.0
+            def choice(self, seq): return seq[0]
+        self._both_loaded(["cheer", "excited"])
+        self.holo.rng = Lucky()
+        self.assertTrue(self.holo.react_to("MissionCompleted", self.c.t))
+        self.assertEqual(self.holo.pose_wanted[0], "cheer")
+        self.run_for(1.0)
+        self.assertEqual(self.holo.clip, "cheer")                       # no waiting for the idle gap
+
+    def test_the_startle_clip_plays_at_once(self):
+        class Lucky(random.Random):
+            def random(self): return 0.0
+        self._both_loaded(["startle"])
+        self.holo.rng = Lucky()
+        self.assertTrue(self.holo.react_to("Interdicted", self.c.t))
+        self.assertEqual(self.holo.clip, "startle")
+
+    def test_all_the_groups_name_real_clips(self):
+        for group in h.REACTION_GROUPS.values():
+            self.assertTrue(group)
+        self.assertEqual(set(h.NAUGHTY_CLIPS), {"adjust_suit_rare", "blow_kiss"})
+        self.assertNotIn("adjust_suit_rare", h.BORED_CLIPS)
+        self.assertNotIn("blow_kiss", h.BORED_CLIPS)
 
     def test_pleased_after_a_long_line(self):
         class Always(random.Random):
@@ -1130,7 +1223,7 @@ class Reactions(unittest.TestCase):
 
     def test_every_reaction_names_something_she_can_do(self):
         for event, (kind, chance) in h.REACTIONS.items():
-            self.assertTrue(kind in h.GESTURES or kind in ("glance", "salute") + h.CLIP_REACTIONS, event)
+            self.assertTrue(kind in h.GESTURES or kind in ("glance", "salute") + h.CLIP_REACTIONS or kind in h.REACTION_GROUPS, event)
             self.assertTrue(0 < chance <= 1, event)
 
     def test_docking_granted_nods_and_denied_shakes_the_head(self):
@@ -1149,7 +1242,7 @@ class Reactions(unittest.TestCase):
     def test_attack_startles_even_just_after_another_reaction(self):
         self.holo.react_to("DockingGranted", self.c.t)
         self.assertTrue(self.holo.react_to("Interdicted", self.c.t + 6.0))
-        self.assertEqual(self.holo.g_name, "startle")
+        self.assertTrue(self.holo.g_name == "startle" or self.holo.clip == "startle")          # the recorded clip once it is loaded, the built-in jump before that
 
     def test_reactions_are_spaced_out(self):
         self.assertTrue(self.holo.react_to("DockingGranted", self.c.t))

@@ -1552,6 +1552,10 @@ window use the same code as the biology list.
 
 * voicepacks/default/brain.json: Brain_StreamHello 5->21 (+ Sarcastic, Close, Friendly), Brain_StreamBye 3->17 (+ Sarcastic, Close, new Friendly). Mature lines are flagged as before.
 
+## 0.96.130 - New clips, moods and chaining
+
+tools/make_clips.py: new KNOWN names (hair_flick2, check_mirror, adjust_suit, adjust_suit_rare, hair_blow, check_nails); PAD is now (0.4375, 0.06) because the new salute video is 960 wide (224 px of room each side; the fit uses its middle 512 px); BACK_GAP raised from 3 to 8 so only clips that end far from the start (blow_kiss, giggle, laugh) are played back. ui/hologram.py: BORED_CLIPS gets hair_flick2, check_mirror, adjust_suit, giggle; NAUGHTY_CLIPS (adjust_suit_rare, blow_kiss) only when Hologram.naughty (set from personality.innuendo in hologram_window) and then only NAUGHTY_IDLE_CHANCE of the bored picks, and never chained otherwise; REACTION_GROUPS (happy, amused, annoyed) used by REACTIONS; CHAIN_CHANCE 0.3 with clip_queue (the second clip starts at the end of the first, cleared by stop_clip, e.g. when she speaks); react_to plays a startle clip at once (stop the current one) and pose_wanted clips no longer wait for next_pose. Tests in tests/test_hologram.py PoseClips.
+
 ## 0.96.129 - Heteronyms
 
 tts/pronounce.py _say_heteronyms (after the live rule, before the word table): read past (red), lead (led/leed), close (cloce adjective, cloze verb, decided by _near(): the word before and after inside the sentence), row/rows (roe), bass (base), tear (tare, teer-shaped), desert (dez-ert), buffet (buh-fay), used to (yoost, only after I/you/we/get/got/am...), no use (yoos), content (kun-tent when happy), record verb (ri-cord). Found by scanning every string in voicepacks/ and config/ (about 12,000 lines). tests/test_heteronyms.py.

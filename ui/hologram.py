@@ -75,7 +75,16 @@ SALUTE_REPEAT = 8.0              # a second salute request within this many seco
 CLIP_IN, CLIP_OUT, CLIP_OUT_FAST = 0.35, 0.5, 0.2      # seconds to fade a clip in, out, and out when she starts to talk
 BORED_CLIPS = ("bored1", "bored2", "yawn", "sleepy", "ponder",                       # what she may do when it has been quiet for a while (the ones that exist):
                "eyes_left", "eyes_right", "glance_left", "glance_right", "tilt", "brow_up",
-               "glance_up", "tilt_right", "eyes_up", "eyes_down", "curious", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "listen_tilt", "idle_alt1")   # the bigger ones, then small fidgets
+               "glance_up", "tilt_right", "eyes_up", "eyes_down", "curious", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "listen_tilt", "idle_alt1",
+               "hair_flick2", "check_mirror", "adjust_suit", "giggle")   # the bigger ones, then small fidgets
+NAUGHTY_CLIPS = ("adjust_suit_rare", "blow_kiss")     # only while "Flirty and naughty" is ticked (personality.innuendo); the rare suit one is NEVER played without it
+NAUGHTY_IDLE_CHANCE = 0.4        # with it ticked, how often a bored moment may pick one of them
+CHAIN_CHANCE = 0.3               # how often a clip is followed straight away by a second one from the same group ("mix and match")
+REACTION_GROUPS = {              # a made-up reaction kind -> the clips she may pick from (the ones that exist)
+    "happy": ("pleased", "pleased", "cheer", "excited", "thumbs_up"),
+    "amused": ("laugh", "giggle"),
+    "annoyed": ("facepalm", "shrug", "angry"),
+}
 BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this range) and she may get bored
 POSE_GAP = 60.0                  # at least this long between two clips
 PLEASED_CHANCE = 0.25            # how often a spoken line ends with the pleased clip
@@ -87,15 +96,15 @@ GESTURE_GAP = 3.0                # a gesture does not start within this many sec
 REACT_GAP, STARTLE_GAP = 8.0, 5.0       # the least time between two reactions to game events
 REACTIONS = {                    # game event -> (what she does, how likely)
     "DockingGranted": ("nod", 0.7), "DockingDenied": ("shake", 0.9),
-    "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("pleased", 0.7), "MissionFailed": ("shake", 0.8), "MissionAbandoned": ("brow_down", 0.5),
+    "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("happy", 0.7), "MissionFailed": ("annoyed", 0.8), "MissionAbandoned": ("brow_down", 0.5),
     "RedeemVoucher": ("pleased", 0.3), "SellExplorationData": ("pleased", 0.3), "MultiSellExplorationData": ("pleased", 0.4), "SellOrganicData": ("pleased", 0.3),
-    "EscapeInterdiction": ("pleased", 0.6), "FSSAllBodiesFound": ("pleased", 0.8), "UndiscoveredSystem": ("awe", 0.5), "GameMilestone": ("pleased", 0.8),
+    "EscapeInterdiction": ("pleased", 0.6), "FSSAllBodiesFound": ("happy", 0.8), "UndiscoveredSystem": ("awe", 0.5), "GameMilestone": ("happy", 0.8),
     "UniqueBio": ("brow_up", 0.5), "BioLook": ("tilt", 0.4), "CodexEntry": ("brow_up", 0.4), "FSSSignalDiscovered": ("tilt", 0.3), "SAASignalsFound": ("tilt", 0.4),
     "WingJoined": ("nod", 0.6), "WingInvite": ("nod", 0.6), "WingAdd": ("nod", 0.4), "WingLeft": ("sad", 0.3),
     "ReceiveText": ("glance", 0.3),
     "Interdicted": ("startle", 0.9), "UnderAttack": ("startle", 0.5), "HullDamage": ("startle", 0.5), "HeatDamage": ("startle", 0.5),
     "CockpitBreached": ("startle", 1.0), "InDanger": ("startle", 0.6), "SelfDestruct": ("startle", 1.0), "Died": ("startle", 1.0), "FuelPanic": ("startle", 0.8),
-    "Synthesis": ("nod", 0.6),
+    "Synthesis": ("nod", 0.6), "NomadDocked": ("amused", 0.3),
     "Shutdown": ("salute", 1.0),
 }
 JAW_DROP = 0.006                 # the biggest chin drop, as a fraction of her height
@@ -443,6 +452,9 @@ class Hologram:
         self.next_pose = 0.0          # no clip starts before this
         self.thinking_done = self.listening_done = False     # this round of thinking or listening already got its clip
         self.pose_wanted = None       # (clip name, earliest time) waiting for a calm moment
+        self.pose_partners = ()       # the clips that may follow the wanted one
+        self.clip_queue = []          # a second clip that follows the one playing ("mix and match")
+        self.naughty = False          # "Flirty and naughty" is ticked: the naughty-only clips may play
         self.bored_pick = None
         self.g_name, self.g_start, self.g_last = None, 0.0, -1e9     # the little gesture she is making (nod, shake...)
         self.react_last = -1e9
@@ -621,9 +633,21 @@ class Hologram:
             return False
         if now - self.react_last < (STARTLE_GAP if kind == "startle" else REACT_GAP):
             return False
+        partners = ()
+        if kind in REACTION_GROUPS:
+            partners = tuple(dict.fromkeys(n for n in REACTION_GROUPS[kind] if n in self.assets.clips))
+            if not partners:
+                return False
+            kind = self.rng.choice(REACTION_GROUPS[kind] if kind != "happy" else [n for n in REACTION_GROUPS["happy"] if n in self.assets.clips])
+        if kind == "startle" and "startle" in self.assets.clips and not self.speaking and self.power > 0.9 and not self.moving:
+            if self.clip:
+                self.stop_clip(fast=True)
+            if self.start_clip("startle", now):                  # a fright is never made to wait for a calm moment
+                self.react_last = now
+                return True
         if kind == "glance":
             kind = self.rng.choice(["glance_left", "glance_right"] + [n for n in ("eyes_left", "eyes_right") if n in self.assets.clips])
-        if kind in GESTURES and kind not in self.assets.clips:          # a recorded clip of the same name beats the built-in movement
+        if kind in GESTURES and (kind not in self.assets.clips or kind == "startle"):          # a recorded clip of the same name beats the built-in movement (a startle clip is tried above; if it is not ready yet, the built-in one)
             done = self.gesture(kind, now)
         elif kind == "salute":
             self.salute(now)
@@ -631,7 +655,7 @@ class Hologram:
         else:                                                         # a clip, played when she has a calm moment
             done = self.pose_wanted is None and kind in self.assets.clips
             if done:
-                self.pose_wanted = (kind, now)
+                self.pose_wanted, self.pose_partners = (kind, now), partners
         if done:
             self.react_last = now
         return done
@@ -695,8 +719,9 @@ class Hologram:
         self.last_activity = now
         self.bored_after = self.rng.uniform(*BORED_AFTER) * self.idle_scale
 
-    def start_clip(self, name, now, forced=False):
-        """Begin a pose clip if its pictures are ready (they load in the background; if not, she simply skips it this time)."""
+    def start_clip(self, name, now, forced=False, partners=(), queued=False):
+        """Begin a pose clip if its pictures are ready (they load in the background; if not, she simply skips it this time).
+        partners: clips from the same group; now and then (CHAIN_CHANCE) one of them follows straight after."""
         a = self.assets
         if name not in a.clips:
             return False
@@ -704,6 +729,11 @@ class Hologram:
         if not frames:
             return False
         self.clip, self.clip_start, self.clip_fast_out, self.clip_forced = name, now, False, forced
+        if not queued:
+            self.clip_queue = []
+            others = [n for n in partners if n != name and n in a.clips and (n not in NAUGHTY_CLIPS or self.naughty)]
+            if others and not forced and self.rng.random() < CHAIN_CHANCE:
+                self.clip_queue = [self.rng.choice(others)]
         self.g_name = None
         self.clip_frames, self.clip_fps = frames, a.clip_rates.get(name, 12.0)
         self.next_pose = now + max(8.0, POSE_GAP * self.idle_scale)
@@ -724,6 +754,7 @@ class Hologram:
 
     def stop_clip(self, fast=False):
         self.clip = None
+        self.clip_queue = []
         self.clip_fast_out = fast
 
     def preload_clips(self):
@@ -765,16 +796,20 @@ class Hologram:
                     self.thinking_done = self.start_clip("thinking", now)           # if it is still loading we try again on the next tick
                 elif listen_now and not thinking and self.clip is None and not self.listening_done:
                     self.listening_done = self.start_clip("listening", now)
+                elif self.clip is None and not thinking and not listen_now and self.pose_wanted and now >= self.pose_wanted[1]:
+                    if now > self.pose_wanted[1] + 10.0 or self.start_clip(self.pose_wanted[0], now, partners=self.pose_partners):
+                        self.pose_wanted, self.pose_partners = None, ()             # started, or it took too long to load: forget it
                 elif self.clip is None and now >= self.next_pose and not thinking and not listen_now:
-                    if self.pose_wanted and now >= self.pose_wanted[1]:
-                        if now > self.pose_wanted[1] + 10.0 or self.start_clip(self.pose_wanted[0], now):
-                            self.pose_wanted = None                                 # started, or it took too long to load: forget it
-                    elif now - self.last_activity >= self.bored_after:
+                    if now - self.last_activity >= self.bored_after:
                         names = [n for n in BORED_CLIPS if n in self.assets.clips]
+                        if self.naughty and self.rng.random() < NAUGHTY_IDLE_CHANCE:
+                            names += [n for n in NAUGHTY_CLIPS if n in self.assets.clips]
                         if names:
                             if self.bored_pick not in names:
                                 self.bored_pick = self.rng.choice(names)             # pick once, so we wait for this one to load
-                            if self.start_clip(self.bored_pick, now):
+                            if self.bored_pick in NAUGHTY_CLIPS and not self.naughty:
+                                self.bored_pick = None                               # switched off meanwhile: never play it
+                            elif self.start_clip(self.bored_pick, now, partners=[n for n in BORED_CLIPS if n in self.assets.clips] + ([n for n in NAUGHTY_CLIPS if n in self.assets.clips] if self.naughty else [])):
                                 self.bored_pick = None
                                 self._rest(now)
                         else:
@@ -784,7 +819,10 @@ class Hologram:
             elif self.clip == "listening" and not listen_now:
                 self.stop_clip()
             elif self.clip and now - self.clip_start > len(self.clip_frames) / max(1.0, self.clip_fps):
-                self.stop_clip()                                                    # the clip is over: back to the loop
+                follow = self.clip_queue[0] if self.clip_queue else None
+                self.stop_clip()                                                    # the clip is over: back to the loop...
+                if follow and calm and not thinking and not listen_now:
+                    self.start_clip(follow, now, queued=True)                       # ...or the second one of a pair follows at once
         if thinking or listening or self.speaking:
             self.last_activity = now
         if not thinking:

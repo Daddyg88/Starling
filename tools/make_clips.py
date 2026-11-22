@@ -30,11 +30,12 @@ ASSETS = mf.ASSETS
 FPS = 12
 STORE_HEIGHT = 480
 WIDE = ("salute",)               # clips with an arm that reaches beyond her picture: stored with room at the sides
-PAD = (0.52, 0.06)               # that room, as a fraction of her picture width (left, right); her window is made this much wider
+PAD = (0.4375, 0.06)               # that room, as a fraction of her picture width (left, right); her window is made this much wider
 KNOWN = ("thinking", "listening", "pleased", "bored1", "bored2", "salute",      # the first set
          "nod", "shake", "startle", "tilt", "glance_left", "glance_right", "brow_up", "brow_down", "eyes_left", "eyes_right", "ponder", "yawn", "laugh", "wink", "smirk", "blush", "blow_kiss", "eyeroll", "facepalm", "shrug", "sad", "worried", "angry",
-         "awe", "excited", "sleepy", "hair_flick", "hand_to_temple", "hands_resting", "content_smile", "listen_tilt", "glance_up", "tilt_right", "eyes_up", "eyes_down", "nod_twice", "suspicious", "curious", "giggle", "flirty", "disagree", "daydream", "point", "thumbs_up", "facing_away", "cheer", "idle_alt1")          # see docs/CLIP_SHOT_LIST.md
-BACK_GAP = 3.0                   # if a clip ends this much (average brightness difference) away from where it began, play it back in reverse to get her home
+         "awe", "excited", "sleepy", "hair_flick", "hand_to_temple", "hands_resting", "content_smile", "listen_tilt", "glance_up", "tilt_right", "eyes_up", "eyes_down", "nod_twice", "suspicious", "curious", "giggle", "flirty", "disagree", "daydream", "point", "thumbs_up", "facing_away", "cheer", "idle_alt1",
+         "hair_flick2", "check_mirror", "adjust_suit", "adjust_suit_rare", "hair_blow", "check_nails")          # see docs/CLIP_SHOT_LIST.md
+BACK_GAP = 8.0                   # if a clip ends this much (average brightness difference) away from where it began, play it back in reverse to get her home
 
 
 def best_fit(first, base):
@@ -85,7 +86,11 @@ def write_clip(name, frames, base, meta, mode=""):
     if True:
         gap = end_gap(frames)
         back = mode == "back" or (mode != "loop" and gap > BACK_GAP)
-        error, scale, move = best_fit(frames[0], base)
+        probe = frames[0]
+        if probe.width > probe.height * 0.8 * base.width / float(base.height) * 1.25:          # a WIDE video (her in the middle with black room at the sides): fit on her middle part
+            keep = int(round(probe.height * base.width / float(base.height)))
+            probe = probe.crop(((probe.width - keep) // 2, 0, (probe.width - keep) // 2 + keep, probe.height))
+        error, scale, move = best_fit(probe, base)
         print("%s: %d pictures, scale %.2f, move (%.0f, %.0f), match error %.1f (lower is better; 3 or less is good); ends %.1f away from the start -> %s" % (
             name, len(frames), scale, move[0], move[1], error, gap, "plays forwards then back" if back else "plays as it is"))
         folder = ASSETS / "clips" / name

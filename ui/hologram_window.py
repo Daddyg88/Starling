@@ -447,6 +447,7 @@ class HologramWindow:
         holo.fx_turn = bool(s.get("hologram.turn", True))
         holo.idle_on = bool(s.get("hologram.idle_loop", True))
         holo.poses_on = bool(s.get("hologram.poses", True))
+        holo.naughty = bool(s.get("personality.innuendo", False))        # the naughty-only clips (the rare suit one, the blown kiss) play only with this ticked
         holo.talk_motion = bool(s.get("hologram.talk_motion", True))
         holo.bounce = max(0.0, min(1.0, float(s.get("hologram.talk_bounce", 50)) / 100.0))
         holo.idle_scale = max(0.1, min(2.0, float(s.get("hologram.idle_wait", 40)) / 100.0))
