@@ -29,15 +29,22 @@ SALUTE_WORDS = re.compile(r"\b(o7|o 7|oh seven|o seven|salute)\b", re.IGNORECASE
 TEST_LINE = "Commander, this is how I will look on your dash. Gear down and nice and easy."
 
 
-def set_click_through(window, on):
-    """Windows: let the mouse pass straight through to the game (on) or catch it so she can be dragged (off)."""
+OBS_TITLE = "Starling Hologram"
+
+
+def set_click_through(window, on, visible_to_obs=False):
+    """Windows: let the mouse pass straight through to the game (on) or catch it so she can be dragged (off).
+    visible_to_obs: do not mark the window as a 'tool window' (OBS hides those from its window list) and give it a name to find her by."""
     try:
         import ctypes
         hwnd = ctypes.windll.user32.GetParent(window.winfo_id()) or window.winfo_id()
         GWL_EXSTYLE, LAYERED, TRANSPARENT, TOOLWINDOW, NOACTIVATE = -20, 0x80000, 0x20, 0x80, 0x08000000
-        style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE) | LAYERED | TOOLWINDOW
+        style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE) | LAYERED
+        style = (style | TOOLWINDOW) if not visible_to_obs else (style & ~TOOLWINDOW)
         style = (style | TRANSPARENT | NOACTIVATE) if on else (style & ~TRANSPARENT & ~NOACTIVATE)
         ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+        if visible_to_obs:
+            ctypes.windll.user32.SetWindowTextW(hwnd, OBS_TITLE)
     except Exception:
         pass            # not Windows: it still works, it just takes mouse clicks
 
@@ -485,6 +492,10 @@ class HologramWindow:
         import tkinter as tk
         window = tk.Toplevel(self.root)
         window.overrideredirect(True)
+        try:
+            window.title(OBS_TITLE)
+        except Exception:
+            pass
         window.attributes("-topmost", True)
         window.configure(bg=hologram.KEY_HEX)
         try:
@@ -495,12 +506,15 @@ class HologramWindow:
         canvas.pack(fill="both", expand=True)
         self.window, self.canvas = window, canvas
         window.update_idletasks()
-        set_click_through(window, True)
+        set_click_through(window, True, self._obs())
         self._click_through_on = True
         canvas.bind("<ButtonPress-1>", self._drag_start)
         canvas.bind("<B1-Motion>", self._drag_move)
         canvas.bind("<ButtonRelease-1>", self._drag_end)
         canvas.bind("<Double-Button-1>", lambda event: self.stop_move())
+
+    def _obs(self):
+        return bool(self.settings.get("hologram.obs_capture", False))
 
     def _hide(self):
         self._shown = False
@@ -529,7 +543,7 @@ class HologramWindow:
         moving = holo.moving
         want_through = not moving
         if want_through != getattr(self, "_click_through_on", True):
-            set_click_through(self.window, want_through)
+            set_click_through(self.window, want_through, self._obs())
             self._click_through_on = want_through
         if not moving or self._drag is None:
             self._place(a)

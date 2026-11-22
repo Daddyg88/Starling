@@ -2303,3 +2303,7 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * ui/assets/hologram/clips: pleased replaced, pleased2 new (happy group). tools/make_clips.py KNOWN has pleased2.
 * streaming/intro.py: REPLY_GAP 9 s, the AI is told to always mention what she is doing, and IntroGettingReady is published after every reply. ui/hologram.py waits up to 20 s for a calm moment.
 
+## 0.96.133 - OBS can capture the hologram
+
+* ui/hologram_window.py: set_click_through(window, on, visible_to_obs) skips the tool-window flag and names the window "Starling Hologram" when hologram.obs_capture is on. Setting + toggle on the Hologram page.
+

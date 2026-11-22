@@ -1325,3 +1325,14 @@ class VoidCompassGuardTests(unittest.TestCase):
             watcher = Watcher()
         self.assertTrue(HologramFeed.void_running(type("F", (), {"app": App()})()))
         self.assertFalse(HologramFeed.void_running(type("F", (), {"app": object()})()))
+
+
+class ObsCaptureTests(unittest.TestCase):
+    def test_setting_exists_and_is_off_by_default(self):
+        from core.settings import DEFAULTS
+        self.assertIs(DEFAULTS["hologram"]["obs_capture"], False)
+
+    def test_click_through_runs_off_windows(self):
+        from ui import hologram_window as w
+        w.set_click_through(object(), True, True)              # no Windows here: it must quietly do nothing
+        self.assertEqual(w.OBS_TITLE, "Starling Hologram")
