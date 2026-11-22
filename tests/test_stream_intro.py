@@ -60,6 +60,19 @@ class IntroTests(unittest.TestCase):
         r.run(10)
         self.assertTrue(r.texts and r.texts[0].lower().startswith("gav"))
 
+    def test_every_reply_mentions_what_she_is_doing_and_acts_it(self):
+        seen = []
+        r = Rig(ai=lambda m: seen.append(m[0]["content"]) or "hello")
+        r.intro.start()
+        r.run(61)
+        before = len(r.events)
+        r.msg("hi starling")
+        r.run(12)
+        self.assertEqual(len(seen), 1)
+        self.assertIn(r.intro.activity, seen[0])
+        self.assertIn("ALWAYS", seen[0])
+        self.assertGreater(len(r.events), before)           # the hologram was told to play a clip
+
     def test_falls_back_to_lines(self):
         r = Rig(ai=lambda m: None)
         r.intro.start()

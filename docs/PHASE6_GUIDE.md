@@ -2298,3 +2298,8 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * streaming/bridge.py hands each chat message to the intro first; streaming/wiring.py builds it; core/app.py registers the voice command; ui/hologram.py has a "ready" clip group.
 * Settings: streaming.intro_minutes, intro_wait, intro_ai (Streaming page). Lines: StreamIntro_* in voicepacks/default/streaming.json. Tests: tests/test_stream_intro.py.
 
+## 0.96.132 - Pleased clips, intro talks and acts
+
+* ui/assets/hologram/clips: pleased replaced, pleased2 new (happy group). tools/make_clips.py KNOWN has pleased2.
+* streaming/intro.py: REPLY_GAP 9 s, the AI is told to always mention what she is doing, and IntroGettingReady is published after every reply. ui/hologram.py waits up to 20 s for a calm moment.
+

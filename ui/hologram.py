@@ -81,7 +81,7 @@ NAUGHTY_CLIPS = ("adjust_suit_rare", "blow_kiss")     # only while "Flirty and n
 NAUGHTY_IDLE_CHANCE = 0.4        # with it ticked, how often a bored moment may pick one of them
 CHAIN_CHANCE = 0.3               # how often a clip is followed straight away by a second one from the same group ("mix and match")
 REACTION_GROUPS = {              # a made-up reaction kind -> the clips she may pick from (the ones that exist)
-    "happy": ("pleased", "pleased", "cheer", "excited", "thumbs_up"),
+    "happy": ("pleased", "pleased2", "cheer", "excited", "thumbs_up"),
     "amused": ("laugh", "giggle"),
     "annoyed": ("facepalm", "shrug", "angry"),
     "ready": ("check_mirror", "adjust_suit", "hair_flick2", "idle_alt1", "hair_blow"),     # the stream intro: she is getting ready
@@ -799,7 +799,7 @@ class Hologram:
                 elif listen_now and not thinking and self.clip is None and not self.listening_done:
                     self.listening_done = self.start_clip("listening", now)
                 elif self.clip is None and not thinking and not listen_now and self.pose_wanted and now >= self.pose_wanted[1]:
-                    if now > self.pose_wanted[1] + 10.0 or self.start_clip(self.pose_wanted[0], now, partners=self.pose_partners):
+                    if now > self.pose_wanted[1] + 20.0 or self.start_clip(self.pose_wanted[0], now, partners=self.pose_partners):
                         self.pose_wanted, self.pose_partners = None, ()             # started, or it took too long to load: forget it
                 elif self.clip is None and now >= self.next_pose and not thinking and not listen_now:
                     if now - self.last_activity >= self.bored_after:

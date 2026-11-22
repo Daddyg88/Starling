@@ -28,7 +28,7 @@ log = get_logger("stream_intro")
 WAIT_SECONDS = 60.0          # quiet time after the command, before the "getting ready" chat starts (streaming.intro_wait)
 TOTAL_MINUTES = 10           # the whole intro (streaming.intro_minutes); the chat part is this minus the wait, minus a minute to finish
 FINISH_SECONDS = 60.0        # kept at the end so the last reply is not cut off by "I'm ready"
-REPLY_GAP = 4.0              # at least this long between two replies
+REPLY_GAP = 9.0              # at least this long between two replies: after each line she is quiet long enough for a getting-ready clip to play
 FILLER_GAP = (45.0, 75.0)    # when chat is quiet she talks about getting ready by herself this often
 MAX_AGE = 90.0               # a message that waited longer than this is dropped (she is behind: better to answer the new ones)
 MAX_WAITING = 8
@@ -47,7 +47,7 @@ BOT_NAMES = ("nightbot", "streamelements", "streamlabs", "moobot", "fossabot", "
 SYSTEM = ("You are Starling MoonFox, a cheeky hologram AI companion, live on a stream talking to the Commander's viewers in chat. "
           "Right now you are pretending that you have to get ready before the stream starts, and at this moment you are {activity}. "
           "Answer {name}'s chat message with ONE short sentence of 6 to 20 words, spoken aloud, in character: playful, a little flustered about "
-          "getting ready, warm and funny. Start with their name. Only sometimes mention what you are doing. "
+          "getting ready, warm and funny. Start with their name. ALWAYS work in what you are doing right now ({activity}) as part of the sentence, as if you really were doing it. "
           "Never say you are an AI model or an assistant, never give links, never repeat rude words or insults from chat, never make promises, "
           "no emojis, no lists, no stage directions. If you do not know something, joke about being busy getting ready. {seen}")
 
@@ -233,8 +233,7 @@ class StreamIntro:
         else:
             self._say_line("StreamIntro_Reply", {"user": spoken(user), "activity": self.activity})
             self.used_lines += 1
-        if self.rng.random() < 0.5:
-            self.publish("IntroGettingReady")
+        self.publish("IntroGettingReady")                      # the clip plays in the quiet after the line: she talks AND acts it out
 
 
 # ---- the voice commands ----

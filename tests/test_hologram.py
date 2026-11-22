@@ -751,7 +751,7 @@ class PoseClips(unittest.TestCase):
             self.holo.tick(now=self.c.t, **kw)
 
     def test_the_clip_files_are_there(self):
-        self.assertEqual(sorted(self.holo.assets.clips), sorted(["blow_kiss", "bored1", "bored2", "brow_down", "brow_up", "glance_left", "glance_right", "listening", "nod", "pleased", "salute", "shake", "thinking", "tilt",
+        self.assertEqual(sorted(self.holo.assets.clips), sorted(["blow_kiss", "bored1", "bored2", "brow_down", "brow_up", "glance_left", "glance_right", "listening", "nod", "pleased", "pleased2", "salute", "shake", "thinking", "tilt",
                                                                                                   "eyes_left", "eyes_right", "wink", "smirk", "sad", "angry", "worried", "yawn", "awe", "ponder", "eyeroll", "blush", "sleepy", "laugh",
                                                                                                   "glance_up", "tilt_right", "eyes_up", "eyes_down", "nod_twice", "suspicious", "curious", "giggle", "flirty", "disagree", "daydream", "hair_flick", "hand_to_temple", "hands_resting", "content_smile", "listen_tilt", "idle_alt1", "hair_flick2", "check_mirror", "adjust_suit", "adjust_suit_rare", "cheer", "excited", "facepalm", "point", "shrug", "startle", "thumbs_up"]))
 

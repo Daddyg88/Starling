@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.132: new pleased and pleased2 clips (complete a mission, watch the smile); in the intro each reply mentions what she is doing and a clip plays after it.
 - [ ] 0.96.131: ten minute stream intro. CHECK: chat on, say 'start ten minute intro', wait 1 min, type in chat (not !starling) and see her answer by name; try with AI off; say 'stop the intro'; try Small vs Better model quality; do the getting-ready clips show in gaps.
 - [ ] 0.96.130: 17 new clips + moods + chaining. CHECK: salute arm is whole and she does not shift; wait for idle clips (try Hologram test button); tick Flirty and naughty and see adjust_suit_rare / blow_kiss; fail a mission (annoyed), complete one (happy); get interdicted (startle clip). DECIDE: a trigger for point; the missing clips (facing_away, hair_blow, check_nails) when the videos come.
 - [ ] 0.96.129: heteronym respellings (read, close, lead, row, bass, tear, desert, content, use, record, buffet). CHECK by ear in each voice; tell me which respelling sounds wrong ("cloce" and "kun-tent" are the ones I trust least).
