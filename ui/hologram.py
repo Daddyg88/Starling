@@ -84,6 +84,7 @@ REACTION_GROUPS = {              # a made-up reaction kind -> the clips she may 
     "happy": ("pleased", "pleased", "cheer", "excited", "thumbs_up"),
     "amused": ("laugh", "giggle"),
     "annoyed": ("facepalm", "shrug", "angry"),
+    "ready": ("check_mirror", "adjust_suit", "hair_flick2", "idle_alt1", "hair_blow"),     # the stream intro: she is getting ready
 }
 BORED_AFTER = (90.0, 180.0)      # quiet for this long (a random time in this range) and she may get bored
 POSE_GAP = 60.0                  # at least this long between two clips
@@ -95,6 +96,7 @@ CLIP_REACTIONS = ("pleased", "brow_up", "brow_down", "awe", "sad")      # reacti
 GESTURE_GAP = 3.0                # a gesture does not start within this many seconds of the last one (a startle always may)
 REACT_GAP, STARTLE_GAP = 8.0, 5.0       # the least time between two reactions to game events
 REACTIONS = {                    # game event -> (what she does, how likely)
+    "IntroGettingReady": ("ready", 1.0),
     "DockingGranted": ("nod", 0.7), "DockingDenied": ("shake", 0.9),
     "MissionAccepted": ("nod", 0.5), "MissionCompleted": ("happy", 0.7), "MissionFailed": ("annoyed", 0.8), "MissionAbandoned": ("brow_down", 0.5),
     "RedeemVoucher": ("pleased", 0.3), "SellExplorationData": ("pleased", 0.3), "MultiSellExplorationData": ("pleased", 0.4), "SellOrganicData": ("pleased", 0.3),

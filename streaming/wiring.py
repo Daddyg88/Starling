@@ -37,6 +37,31 @@ def asks_key(times, settings):
     return "StreamChat_Asks"
 
 
+def make_intro(app, narrator, free):
+    """The 'ten minute intro' (streaming/intro.py) tied to her voice, the local AI model and the hologram."""
+    from core.identity import personalise
+    from streaming.intro import StreamIntro
+
+    def say_text(text):
+        speech = app.speech
+        if speech is None or not app.settings.get("speech.enabled", True):
+            return False
+        return bool(speech.say(text=personalise(text, app.settings), priority="normal", event_name="personality.intro"))
+
+    def ask_llm(messages):
+        llm = getattr(app, "llm", None)
+        if llm is None:
+            return None
+        return llm.reply(messages, allow_mature=bool(app.settings.get("speech.allow_mature", False)), max_tokens=60)
+
+    def publish(name):
+        bus = getattr(app, "bus", None)
+        if bus is not None:
+            bus.publish(name)
+
+    return StreamIntro(app.settings, narrator.say, say_text, ask_llm, free, publish)
+
+
 def build(app):
     """The chat bridge for this app, or None if something it needs is missing."""
     from navigation.voice import Narrator
@@ -97,4 +122,7 @@ def build(app):
         return True
 
     director = ChatDirector(app.settings, lambda: app.state, do_action, do_ask, say, time.monotonic, quiet_provider=quiet, free_provider=free)
-    return ChatBridge(app.settings, director)
+    bridge = ChatBridge(app.settings, director)
+    bridge.intro = make_intro(app, narrator, free)
+    app.stream_intro = bridge.intro
+    return bridge

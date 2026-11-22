@@ -185,12 +185,22 @@ class ChatBridge:
                 if isinstance(message, StreamEvent):
                     self.director.react(message)
                 else:
-                    self.director.handle(message)
+                    intro = getattr(self, "intro", None)
+                    if intro is not None and intro.offer(message):
+                        self.director.count(message)
+                    else:
+                        self.director.handle(message)
                 self._pump()
             except Exception:
                 log.exception("Chat message failed")
 
     def _pump(self):
+        intro = getattr(self, "intro", None)
+        if intro is not None:
+            try:
+                intro.pump()
+            except Exception:
+                log.exception("The stream intro failed")
         try:
             self.director.pump()
         except Exception:

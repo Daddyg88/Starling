@@ -167,6 +167,7 @@
     "JumpsLeft":                   { "enabled": true, "priority": "low", "source": "status" },
     "NomadDocked":                 { "enabled": true, "priority": "low", "source": "status" },
     "NomadLeft":                   { "enabled": true, "priority": "low", "source": "status" },
+    "IntroGettingReady":           { "enabled": true, "priority": "low", "source": "app" },
     "InternalPanelOpened":         { "enabled": true, "priority": "low", "source": "status" },
     "LightsOff":                   { "enabled": true, "priority": "low", "source": "status" },
     "LightsOn":                    { "enabled": true, "priority": "low", "source": "status" },

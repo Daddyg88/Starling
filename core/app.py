@@ -105,6 +105,7 @@ class App:
         self.route_voice = None
         self.route_follower = None
         self.stream_chat = None
+        self.stream_intro = None
         self.ui_requests = []            # windows her voice asked the dashboard to open or close ('memory_window', 'memory_window_close')
         self.ask = None
         self.ptt = None
@@ -525,6 +526,13 @@ class App:
                     self.settings, Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
             except Exception:
                 self.log.exception("The stream chat voice command could not start")
+            try:
+                from streaming.intro import IntroVoice
+                from navigation.voice import Narrator
+                self.commands.extra_helpers.append(IntroVoice(
+                    lambda: getattr(self, "stream_intro", None), Narrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
+            except Exception:
+                self.log.exception("The stream intro voice command could not start")
             try:
                 from control.route_map_voice import RouteMapVoice
                 from navigation.voice import Narrator

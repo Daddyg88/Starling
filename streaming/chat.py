@@ -264,6 +264,10 @@ class ChatDirector:
             self.log.append(result)
         return result
 
+    def count(self, message):
+        """Counts a message the stream intro took over (so milestones like '100 messages' still work)."""
+        self._count_chat(message)
+
     def _handle(self, message, test=False):
         user = clean_name(message.user)
         if not self.option("enabled", False) and not test:

@@ -236,5 +236,47 @@
   "Closed.",
   "Notes put away.",
   "Done."
+ ],
+ "StreamIntro_Start": [
+  "Ten minute intro, got it. Give me a minute to myself, then I'll start getting ready with chat.",
+  "Right, intro mode. One quiet minute, then I'll chat with everyone while I pretend to get ready.",
+  "Intro started. Don't watch me yet, I'm not ready."
+ ],
+ "StreamIntro_Begin": [
+  "Okay chat, hello! Don't look, I'm not ready. I'm {activity}.",
+  "Right, I'm here, sort of. Bear with me, I'm {activity}.",
+  "Hi everyone! Ignore the mess, I'm still {activity}."
+ ],
+ "StreamIntro_Reply": [
+  "{user}, hello! Sorry, I'm busy {activity}.",
+  "Thanks {user}! Give me a second, I'm {activity}.",
+  "{user}, you're early, I'm still {activity}.",
+  "Hey {user}, don't mind me, just {activity}.",
+  "{user}, you caught me {activity}. Be nice."
+ ],
+ "StreamIntro_Filler": [
+  "Still {activity}. Almost there.",
+  "Sorry chat, I'm {activity}. Won't be long.",
+  "Nobody look, I'm {activity}.",
+  "Give me a moment, I'm {activity}.",
+  "Is it just me or is this suit shrinking? I'm {activity}."
+ ],
+ "StreamIntro_End": [
+  "Right, I'm ready. Thanks for keeping me company, chat. Let's go.",
+  "And I'm ready! How do I look? Don't answer that. Let's fly.",
+  "Done, finished, ready. Thanks for the company, everyone."
+ ],
+ "StreamIntro_Cancel": [
+  "Intro finished. I'm ready.",
+  "Okay, I'm ready, back to normal.",
+  "Intro stopped. Let's go."
+ ],
+ "StreamIntro_NoChat": [
+  "Turn stream chat on first, otherwise nobody can talk to me.",
+  "Chat is off, so there's nobody for the intro. Switch it on first."
+ ],
+ "StreamIntro_Already": [
+  "The intro is already running.",
+  "I'm already getting ready, Ben."
  ]
 }

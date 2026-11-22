@@ -2292,3 +2292,9 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * maps/known_calibrations.json now carries v/name/n/err/how for Shi Construction (it had no v and would have been rejected by the new check).
 * tests/test_settlement_share.py.
 
+## 0.96.131 - The ten minute stream intro
+
+* streaming/intro.py: StreamIntro (waiting 60 s, then answers all chat with the local AI model while pretending to get ready, then "I'm ready") and IntroVoice ("start ten minute intro", "stop the intro", "I'm ready").
+* streaming/bridge.py hands each chat message to the intro first; streaming/wiring.py builds it; core/app.py registers the voice command; ui/hologram.py has a "ready" clip group.
+* Settings: streaming.intro_minutes, intro_wait, intro_ai (Streaming page). Lines: StreamIntro_* in voicepacks/default/streaming.json. Tests: tests/test_stream_intro.py.
+
