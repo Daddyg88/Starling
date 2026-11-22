@@ -573,6 +573,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Optional. Runs a small model on this PC (no internet, nothing sent) for open conversation. Press 'Install AI chat' (below) first. Uses about 1 GB RAM while chatting and gives it back after 10 quiet minutes. She falls back to her normal lines if it is slow"),
             Field("llm.model_size", "AI chat model size", "choice", LLM_SIZES, restart=True,
                   help="Small is the default. Better (about 2 GB) and High (about 4.7 GB) write clearer, funnier replies but use more memory and CPU (High: 8+ cores and 16 GB RAM or more), and she waits longer for them. Pick one, save, press 'Install AI chat' to download it, then restart Starling. If she feels slow, go back to Small"),
+            Field("llm.max_sentences", "AI chat: how much she says", "choice", [("One short sentence", 1), ("Up to two sentences", 2), ("Up to three sentences", 3), ("Up to four sentences", 4)],
+                  help="With two or more she starts talking after the FIRST sentence is written, and the next one is being written (and her voice prepared) while she says it, so longer answers do not make you wait longer. One = the old behaviour (the whole answer first, one sentence)"),
             Field("chitchat.enabled", "Small talk when it is quiet", "toggle",
                   help="Little jokes and comments after a quiet spell. About the fight in combat mode, about exploring in analysis mode"),
             Field("chitchat.notice", "She notices how the night is going", "toggle",

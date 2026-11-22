@@ -15,6 +15,7 @@ Rules (these keep her useful instead of annoying):
 """
 
 import itertools
+import queue
 import threading
 import time
 from dataclasses import dataclass, field
@@ -55,6 +56,8 @@ class SpeechManager:
         self._levels = []                 # loudness of what is being played, for the hologram's mouth (take_levels)
         self._levels_lock = threading.Lock()
         self._cond = threading.Condition()
+        self._ahead = queue.Queue()                  # lines waiting their turn whose voice can be prepared now (see _prepare_ahead)
+        self._ahead_thread = None
         self._current = None
         self._current_providers = []
         self._thread = None
@@ -112,9 +115,33 @@ class SpeechManager:
                 if len(waiting) >= MAX_WAITING_NORMAL:
                     self._queue.remove(waiting[0])  # drop the oldest
                     self.dropped += 1
+            waiting = self._current is not None or bool(self._queue)
             self._queue.append(item)
             self._cond.notify_all()
+        if waiting and item.text and item.event_name == "brain" and priority == "normal":
+            self._prepare_ahead(item.text)
         return True
+
+    def _prepare_ahead(self, text):
+        """The AI chat says an answer one sentence at a time. While one sentence is being spoken, the voice for the next one is made in the
+        background (and cached), so there is no gap between them. Only the cloned voice can do this; any other voice just speaks in turn."""
+        if self._ahead_thread is None or not self._ahead_thread.is_alive():
+            self._ahead_thread = threading.Thread(target=self._ahead_run, name="speech-ahead", daemon=True)
+            self._ahead_thread.start()
+        self._ahead.put(text)
+
+    def _ahead_run(self):
+        while self._running:
+            try:
+                text = self._ahead.get(timeout=30)
+            except queue.Empty:
+                return                                      # nothing for half a minute: the helper ends (a new one starts when needed)
+            try:
+                provider = self.text_provider()
+                if provider is not None and hasattr(provider, "prefetch"):
+                    provider.prefetch(text, VoiceSettings.from_settings(self.settings))
+            except Exception:
+                log.debug("Preparing a line ahead failed", exc_info=True)
 
     def interrupt(self):
         """Stop talking now, unless she is saying a safety warning. Used when you press the push-to-talk button."""

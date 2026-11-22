@@ -1,65 +1,63 @@
 {
-  "_help": "Short lines she says when an answer is taking a while (the optional local chat model is thinking). Serious ones are always in the pool; the funny ones are added by mood.",
-  "Brain_Thinking": [
-    "Give me a moment, Commander. Checking that carefully.",
-    "Let me make sure I get this right.",
-    "One moment. Pulling up the data.",
-    "Checking my notes.",
-    "Working on it, Commander.",
-    "Running the numbers. Stand by.",
-    "I'm confirming that before I answer.",
-    "Stand by. I want to be accurate.",
-    "Bear with me, Commander. This needs a closer look.",
-    "Looking into it now.",
-    "Cross-checking. One moment.",
-    "Understood. Working on that."
-  ],
-  "Brain_Thinking_Friendly": [
-    "Give me a second, Commander. I'm thinking, which hurts.",
-    "Thinking cap on. It's a very small cap.",
-    "Hold on, I'm asking the smart half of my brain.",
-    "Working on it. Please admire the silence.",
-    "One moment. Hamster wheel is spinning up.",
-    "Good question. Terrible timing, but a good question.",
-    "I know this one, honestly. It's just in a drawer somewhere.",
-    "Don't rush me, I'm doing maths in my head, with no head.",
-    "Loading the clever bit. Please hold the line.",
-    "Hmm. Interesting. Say nothing, I'm on it.",
-    "Counting on my fingers. I don't have fingers. This is going badly.",
-    "Hold that thought, Commander. I'll find mine."
-  ],
-  "Brain_Thinking_Close": [
-    "Give me a second, Commander. I'm thinking, which hurts.",
-    "Thinking cap on. It's a very small cap.",
-    "Hold on, I'm asking the smart half of my brain.",
-    "Working on it. Please admire the silence.",
-    "One moment. Hamster wheel is spinning up.",
-    "Good question. Terrible timing, but a good question.",
-    "I know this one, honestly. It's just in a drawer somewhere.",
-    "Don't rush me, I'm doing maths in my head, with no head.",
-    "Loading the clever bit. Please hold the line.",
-    "Hmm. Interesting. Say nothing, I'm on it.",
-    "Counting on my fingers. I don't have fingers. This is going badly.",
-    "Hold that thought, Commander. I'll find mine."
-  ],
-  "Brain_Thinking_Sarcastic": [
-    "Give me a second, Commander. I'm thinking, which hurts.",
-    "Thinking cap on. It's a very small cap.",
-    "Hold on, I'm asking the smart half of my brain.",
-    "Working on it. Please admire the silence.",
-    "One moment. Hamster wheel is spinning up.",
-    "Good question. Terrible timing, but a good question.",
-    "I know this one, honestly. It's just in a drawer somewhere.",
-    "Don't rush me, I'm doing maths in my head, with no head.",
-    "Loading the clever bit. Please hold the line.",
-    "Hmm. Interesting. Say nothing, I'm on it.",
-    "Counting on my fingers. I don't have fingers. This is going badly.",
-    "Hold that thought, Commander. I'll find mine."
-  ],
-  "Brain_Thinking_Neutral": [
-    "Give me a second, Commander. I'm thinking, which hurts.",
-    "Hold on, I'm asking the smart half of my brain.",
-    "One moment. Hamster wheel is spinning up.",
-    "Good question. Terrible timing, but a good question."
-  ]
+ "_help": "Short thinking sounds she makes when an answer is taking a while (the optional local chat model is writing). Kept to a few words so they are finished before the real answer starts.",
+ "Brain_Thinking": [
+  "Hmm...",
+  "Mmm...",
+  "Let me think...",
+  "Let me see...",
+  "Hmm, let me see...",
+  "Well...",
+  "Hmm, hold on...",
+  "Okay... hmm..."
+ ],
+ "Brain_Thinking_Friendly": [
+  "Hmm...",
+  "Mmm...",
+  "Let me think...",
+  "Let me see...",
+  "Hmm, let me see...",
+  "Well...",
+  "Hmm, hold on...",
+  "Okay... hmm...",
+  "Ooh... hmm...",
+  "Uhm... let me see...",
+  "Ahh... right...",
+  "Hmm, good question...",
+  "Hmmmm... interesting..."
+ ],
+ "Brain_Thinking_Close": [
+  "Hmm...",
+  "Mmm...",
+  "Let me think...",
+  "Let me see...",
+  "Hmm, let me see...",
+  "Well...",
+  "Hmm, hold on...",
+  "Okay... hmm...",
+  "Ooh... hmm...",
+  "Uhm... let me see...",
+  "Ahh... right...",
+  "Hmm, good question...",
+  "Hmmmm... interesting..."
+ ],
+ "Brain_Thinking_Sarcastic": [
+  "Give me a second, Commander. I'm thinking, which hurts.",
+  "Thinking cap on. It's a very small cap.",
+  "Hold on, I'm asking the smart half of my brain.",
+  "Working on it. Please admire the silence.",
+  "One moment. Hamster wheel is spinning up.",
+  "Good question. Terrible timing, but a good question.",
+  "I know this one, honestly. It's just in a drawer somewhere.",
+  "Don't rush me, I'm doing maths in my head, with no head.",
+  "Loading the clever bit. Please hold the line.",
+  "Hmm. Interesting. Say nothing, I'm on it.",
+  "Counting on my fingers. I don't have fingers. This is going badly.",
+  "Hold that thought, Commander. I'll find mine."
+ ],
+ "Brain_Thinking_Neutral": [
+  "Give me a second, Commander. I'm thinking, which hurts.",
+  "Hold on, I'm asking the smart half of my brain.",
+  "One moment. Hamster wheel is spinning up.",
+  "Good question. Terrible timing, but a good question."
+ ]
 }

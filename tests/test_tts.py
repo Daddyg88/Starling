@@ -193,6 +193,29 @@ class SpeechManagerTests(unittest.TestCase):
         self.assertTrue(win.started.wait(2))
         self.assertFalse(self.manager.say(text="Chatter.", priority="low"))
 
+    def test_the_next_ai_sentence_is_prepared_while_one_is_spoken(self):
+        win = FakeProvider("kokoro", duration=0.6)
+        prepared = []
+        win.prefetch = lambda text, voice: prepared.append(text)
+        self.manager = make_manager(kokoro=win)
+        self.manager.say(text="First sentence here.", priority="normal", event_name="brain")
+        self.assertTrue(win.started.wait(2))
+        self.manager.say(text="Second sentence here.", priority="normal", event_name="brain")
+        self.manager.say(text="Not an AI line.", priority="normal", event_name="other")
+        for _ in range(40):
+            if prepared:
+                break
+            time.sleep(0.05)
+        self.assertEqual(prepared, ["Second sentence here."])           # not the first (nothing was ahead of it), not other lines
+
+    def test_a_voice_that_cannot_prepare_ahead_just_speaks_in_turn(self):
+        win = FakeProvider("kokoro", duration=0.2)
+        self.manager = make_manager(kokoro=win)
+        self.manager.say(text="One.", priority="normal", event_name="brain")
+        self.manager.say(text="Two.", priority="normal", event_name="brain")
+        self.assertTrue(self.manager.wait_until_idle(3))
+        self.assertEqual([t for t, _ in win.spoken], ["One.", "Two."])
+
     def test_critical_is_never_dropped_for_age(self):
         win = FakeProvider("kokoro")
         settings = Settings(Path(tempfile.gettempdir()) / "nope.json").load()

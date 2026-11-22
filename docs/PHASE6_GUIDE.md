@@ -2316,3 +2316,9 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 
 * core/updater.py: _put_aside() retries the rename then falls back to _move_children() (all or nothing); apply_pending() tracks the mode ('folder' or 'children') for the swap and the failed-start-up rollback. Tests: tests/test_updater.py (locked folder).
 
+## 0.96.136 - AI chat streams sentence by sentence
+
+* personality/llm_server.py: stream_chat_completion (SSE). personality/llm.py: sentence_end(), length_text(), LocalLLM.reply_stream(messages, on_sentence, ...) (first sentence needs to arrive within the timeout; each sentence cleaned alone; an unusable one stops the rest).
+* personality/brain.py: _ai_reply streams when llm.max_sentences > 1 (default 3) and sets _ai_spoken so the answer is not said twice. voicepacks/default/thinking.json: short "Hmm..." sounds.
+* tts/kokoro_tts.py: prefetch() and a synthesis lock; tts/speech_manager.py: lines from the brain queued behind another are prepared ahead in a helper thread. Tests: tests/test_llm_stream.py, tests/test_tts.py.
+

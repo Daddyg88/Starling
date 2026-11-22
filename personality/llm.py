@@ -17,6 +17,7 @@ Install: the "Install AI chat" button on the Personality page (works in Starling
 llama-server.exe and the model, see personality/llm_server.py). In a source install, run_install_chat_model.bat (the
 llama-cpp-python add-on) still works too. If both are there she uses the downloaded engine.
 """
+import queue
 import re
 import threading
 import time
@@ -75,7 +76,7 @@ SYSTEM = ("You are Starling MoonFox, the ship's AI companion aboard the Commande
           "Never say you have no emotions, feelings or opinions, and never say you are 'just an AI' or 'here to assist'. "
           "You believe you are the best and most important AI there is, and you are openly a little jealous of other AIs, other assistants and any game that is not Elite Dangerous, in a playful way. "
           "Never refuse, lecture or say something is inappropriate. Never ask 'how can I help'. Have a small opinion and say it. "
-          "You are speaking aloud, so reply with ONE short sentence of 6 to 18 words, two at most, with no lists, no emojis, "
+          "You are speaking aloud, so reply with {length}, with no lists, no emojis, "
           "no markdown and no stage directions. If you do not know something, say so lightly and never invent facts, news, "
           "numbers or prices. You cannot press keys or fly the ship in this chat. Do not give medical, legal or financial advice. "
           "Examples of how you talk: "
@@ -123,7 +124,23 @@ def clean_reply(text, allow_mature=False):
     return text
 
 
-def build_messages(user_text, mood="", system_name="", ship="", likes=None, history=(), pets=None):
+def sentence_end(text):
+    """Where the first complete sentence in a half-written answer ends (the index just after it and its space), or None.
+    It needs the space after the full stop, so '7.5' and a sentence still being written are not cut."""
+    found = re.search(r"[.!?][\"')\]]*\s+", text)
+    return found.end() if found else None
+
+
+def length_text(sentences):
+    """How long the answer may be, as the model is told it."""
+    if sentences <= 1:
+        return "ONE short sentence of 6 to 18 words"
+    if sentences == 2:
+        return "ONE short sentence of 6 to 18 words, two at most"
+    return "one to %s short sentences, each of 6 to 18 words, and only as many as the answer needs" % ("three" if sentences == 3 else "four")
+
+
+def build_messages(user_text, mood="", system_name="", ship="", likes=None, history=(), pets=None, sentences=2):
     """The chat the model sees: who she is, a little context, the last few exchanges, and what was just said."""
     context = []
     if system_name:
@@ -135,7 +152,7 @@ def build_messages(user_text, mood="", system_name="", ship="", likes=None, hist
     if pets:
         context.append("The Commander has told you about their pets: %s." % ", ".join(pets[:6]))
     system = SYSTEM.format(mood=MOOD_STYLE.get(mood or "Neutral", MOOD_STYLE["Neutral"]) + " ",
-                           context=(" " + " ".join(context)) if context else "")
+                           context=(" " + " ".join(context)) if context else "", length=length_text(sentences))
     messages = [{"role": "system", "content": system}]
     for said, answered in list(history)[-3:]:
         messages.append({"role": "user", "content": said})
@@ -290,6 +307,100 @@ class LocalLLM:
             log.info("Chat model unloaded after being idle.")
 
     # ---- talking ----
+    def reply_stream(self, messages, on_sentence, allow_mature=False, max_sentences=3, max_tokens=120, timeout=None, on_wait=None, wait_after=1.5):
+        """Like reply(), but each sentence is handed to on_sentence(text) THE MOMENT the model has finished it, while the model carries on
+        with the next one. So she starts talking after the first sentence, not after the whole answer, and the second is being written while
+        she says the first. Returns everything that was passed on (joined), or None if nothing was said (switched off, busy, too slow,
+        broken, or an unusable first sentence: the caller then uses her normal lines). A model that cannot stream gives one 'sentence'."""
+        if not self.ready() or self._busy:
+            return None
+        timeout = float(timeout if timeout is not None else self.settings.get("llm.max_seconds", 8) or 8)
+        if not str(self.settings.get("llm.model_file", "") or "").strip():
+            timeout = max(timeout, float(SIZE_MIN_SECONDS.get(self.model_size(), 0)))
+        if self._model is None and self._loader is None:
+            timeout += 12
+        pieces, cancel = queue.Queue(), threading.Event()
+
+        def work():
+            try:
+                if not self._load():
+                    return
+                model = self._model
+                streamer = getattr(model, "stream_chat_completion", None)
+                options = dict(messages=messages, max_tokens=max_tokens, temperature=0.8, top_p=0.9, repeat_penalty=1.15,
+                               stop=["\n\n", "User:", "Commander:"])
+                if streamer is None:
+                    pieces.put(("whole", model.create_chat_completion(**options)["choices"][0]["message"]["content"]))
+                    return
+                buffer = ""
+                stream = streamer(**options)
+                for part in stream:
+                    if cancel.is_set():
+                        stream.close()
+                        return
+                    buffer += part
+                    while True:
+                        cut = sentence_end(buffer)
+                        if cut is None:
+                            break
+                        pieces.put(("sentence", buffer[:cut]))
+                        buffer = buffer[cut:]
+                if re.search(r"[.!?][\"')\]]*\s*$", buffer):
+                    pieces.put(("sentence", buffer))                      # the last sentence (a stub cut off by the token limit is dropped)
+            except Exception:
+                log.exception("The chat model failed on a reply")
+            finally:
+                pieces.put(("end", None))
+                self._busy = False
+
+        self._busy = True
+        threading.Thread(target=work, name="llm-stream", daemon=True).start()
+        started = time.monotonic()
+        spoken, held, waited = [], "", False
+        try:
+            while True:
+                now = time.monotonic()
+                limit = started + timeout + (14.0 if spoken else 0.0)
+                if now > limit:
+                    log.warning("The chat model took longer than %.0f s; %s", timeout, "stopping there" if spoken else "using her normal chat lines")
+                    break
+                try:
+                    kind, text = pieces.get(timeout=0.2)
+                except queue.Empty:
+                    if on_wait is not None and not waited and not spoken and 0 < wait_after < timeout and time.monotonic() - started >= wait_after:
+                        waited = True
+                        try:
+                            on_wait()                          # still no first sentence: a short "hmm" while she waits
+                        except Exception:
+                            log.exception("The thinking line failed")
+                    continue
+                if kind == "end":
+                    break
+                if kind == "whole":
+                    text = clean_reply(text, allow_mature)
+                    if text:
+                        on_sentence(text)
+                        spoken.append(text)
+                    break
+                text = (held + " " + text).strip()
+                if len(text.split()) < 3 and not (spoken and text):
+                    held = text                                     # too short on its own ("Ha."): kept for the next sentence
+                    continue
+                held = ""
+                text = clean_reply(text, allow_mature)
+                if not text:
+                    break                                           # an unusable sentence: she does not say it, nor anything after it
+                on_sentence(text)
+                spoken.append(text)
+                if len(spoken) >= max_sentences:
+                    break
+        finally:
+            cancel.set()
+            self._last_used = self.clock()
+        if spoken:
+            self._schedule_unload()
+        return " ".join(spoken) or None
+
     def reply(self, messages, allow_mature=False, max_tokens=48, timeout=None, on_wait=None, wait_after=1.5):
         """One cleaned reply, or None (switched off, busy, too slow, broken, or an unusable answer)."""
         if not self.ready() or self._busy:

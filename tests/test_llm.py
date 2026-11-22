@@ -156,11 +156,11 @@ class ThinkingLines(Base):
     def test_the_lines_exist_and_the_mood_changes_the_mix(self):
         serious = {line.text for line in self.dialogue.pool("Brain_Thinking", "Upset", True, False)}
         friendly = {line.text for line in self.dialogue.pool("Brain_Thinking", "Friendly", True, False)}
-        self.assertEqual(len(serious), 12)
-        self.assertEqual(len(friendly), 24)
-        self.assertIn("Checking my notes.", serious)
-        self.assertNotIn("Thinking cap on. It's a very small cap.", serious)
-        self.assertIn("Thinking cap on. It's a very small cap.", friendly)
+        self.assertEqual(len(serious), 8)
+        self.assertEqual(len(friendly), 13)
+        self.assertIn("Hmm...", serious)
+        self.assertNotIn("Ooh... hmm...", serious)
+        self.assertIn("Ooh... hmm...", friendly)
 
 
 class Download(unittest.TestCase):

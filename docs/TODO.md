@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.136: AI chat streaming. CHECK: ask her an open question with the AI on; does a short 'Hmm...' come first only when slow; does she start after sentence 1; any gap or stutter between sentences; how Hmm sounds; try 1, 2, 3, 4 sentences; time it on Better/High.
 - [ ] 0.96.135: updater locked-folder fix. CHECK with the tester who got 'Access is denied': after one manual fix the next update should work even with Explorer open in the folder. Ask what has the folder open (ESET?).
 - [ ] 0.96.134: during an intro type o7 in chat (she says o7 back and salutes); read the AI replies (COVAS, not assistant); hear 'scoopable'.
 - [ ] 0.96.133: OBS capture. CHECK: tick 'Let OBS capture the hologram window', save, restart, OBS Window Capture lists 'Starling Hologram'; Color Key #010203 removes the black.

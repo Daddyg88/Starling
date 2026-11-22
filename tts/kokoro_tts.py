@@ -190,6 +190,7 @@ class KokoroTTS(BaseTTS):
                  sound_module=None, setup_function=None, wait_for_ready=DEFAULT_WAIT_FOR_READY,
                  cache_dir=None, spacy_repair=None, sleep=None):
         self.pack_path = Path(pack_path)
+        self._synth_lock = threading.Lock()                 # one sentence is made at a time, even when one is being prepared ahead while another plays
         self._sleep = sleep or time.sleep
         self._spacy_repair = spacy_repair or repair_spacy_model
         self.reference_mp3 = Path(reference_mp3)
@@ -569,6 +570,12 @@ class KokoroTTS(BaseTTS):
                 return False
         return True
 
+    def prefetch(self, text, voice):
+        """Make the sound for a line that is waiting its turn, so it can start the moment the one before it ends (it is only cached, not played).
+        Uses the same speed the line will be said at."""
+        speed = min(2.0, speed_from_rate(voice.rate) * float(getattr(self, "speed_boost", 1.0) or 1.0))
+        return self.render(text, speed)
+
     def render(self, text, speed=1.0):
         """Make the sound for `text` WITHOUT playing it (and cache it). Returns True on success."""
         text = pronounce.prepare(text, self._voice_name)
@@ -584,7 +591,10 @@ class KokoroTTS(BaseTTS):
         if self._cache_load(text, speed) is not None:
             return True
         import numpy as np
-        pieces = [to_float32_array(p) for p in self._engine()(text, voice=self._voice_arg(), speed=speed)]
+        with self._synth_lock:
+            if self._cache_load(text, speed) is not None:
+                return True
+            pieces = [to_float32_array(p) for p in self._engine()(text, voice=self._voice_arg(), speed=speed)]
         pieces = [p for p in pieces if p.size]
         if not pieces:
             return False
@@ -672,17 +682,27 @@ class KokoroTTS(BaseTTS):
                         self._put(pieces, saved * gain)
                         continue
                     fresh, fresh_ph = [], []
-                    for piece in self._engine()(chunk, voice=self._voice_arg(), speed=speed):
-                        if self._stop_flag.is_set():
-                            return 0
-                        self._probe_timing(piece)
-                        audio = to_float32_array(piece)
-                        if audio.size:
-                            fresh.append(audio)
-                            phonemes = piece_phonemes(piece, audio.size / float(SAMPLE_RATE))
-                            fresh_ph.append(phonemes)
-                            timeline.append((audio.size / float(SAMPLE_RATE), chunk if len(fresh) == 1 else "", phonemes))
-                            self._put(pieces, audio * gain)
+                    with self._synth_lock:
+                        saved = self._cache_load(chunk, speed) if chunk != part else None          # it may have been prepared ahead while we waited
+                    if saved is not None:
+                        made.append(saved)
+                        saved_ph = self._cache_load_phonemes(chunk, speed)
+                        made_ph.append(saved_ph)
+                        timeline.append((saved.size / float(SAMPLE_RATE), chunk, saved_ph))
+                        self._put(pieces, saved * gain)
+                        continue
+                    with self._synth_lock:
+                        for piece in self._engine()(chunk, voice=self._voice_arg(), speed=speed):
+                            if self._stop_flag.is_set():
+                                return 0
+                            self._probe_timing(piece)
+                            audio = to_float32_array(piece)
+                            if audio.size:
+                                fresh.append(audio)
+                                phonemes = piece_phonemes(piece, audio.size / float(SAMPLE_RATE))
+                                fresh_ph.append(phonemes)
+                                timeline.append((audio.size / float(SAMPLE_RATE), chunk if len(fresh) == 1 else "", phonemes))
+                                self._put(pieces, audio * gain)
                     if fresh and chunk != part and not self._stop_flag.is_set():
                         self._cache_save(chunk, speed, np.concatenate(fresh), joined(fresh_ph))
                     made.extend(fresh)

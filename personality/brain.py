@@ -76,7 +76,8 @@ class Brain:
         self.speech = speech
         self.dialogue = dialogue
         self.settings = settings
-        self.thinking = 0                   # above 0 while the AI chat is working (the hologram goes amber)
+        self.thinking = 0                         # above 0 while the AI chat is working (the hologram goes amber)
+        self._ai_spoken = False                   # True when the AI answer was already said sentence by sentence
         self.state_provider = state_provider or (lambda: None)
         self.chitchat = chitchat
         self.mining = mining         # mining/tracker.py: what you have refined this session
@@ -559,7 +560,7 @@ class Brain:
             self.chat_turns = turns
             self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS
             self.topic = ("Chat_Generic", self.clock())
-            reply = self._say(ai)
+            reply = ai if self._ai_spoken else self._say(ai)         # a streamed answer has already been said, sentence by sentence
             self._remember("Chat", tidy, reply)
             log.info("Brain: AI chat reply to %r (exchange %d)", tidy, turns)
             return reply
@@ -613,6 +614,7 @@ class Brain:
     def _ai_reply(self, tidy, words):
         """The optional small local AI model. None unless it is switched on, ready and gave a clean answer."""
         llm = self.llm
+        self._ai_spoken = False
         if llm is None or len(words) < 3:
             return None
         try:
@@ -626,13 +628,21 @@ class Brain:
                         for p in list(getattr(self.profile, "pets", []))[:6]] or None
             from personality.llm import build_messages
             history = [(h[2], h[3]) for h in self._recent() if h[1] == "Chat"]
+            sentences = max(1, min(4, int(self.settings.get("llm.max_sentences", 3) or 3)))
             messages = build_messages(tidy, self.mood(), getattr(state, "system", "") or "", getattr(state, "ship_model", "") or "",
-                                      likes, history, pets=pets)
+                                      likes, history, pets=pets, sentences=sentences)
             on_wait = self._thinking_line if self.settings.get("brain.thinking_lines", True) else None
             self.thinking += 1
             try:
-                return llm.reply(messages, allow_mature=self._allow(), on_wait=on_wait,
-                                 wait_after=float(self.settings.get("brain.thinking_after", 1.5) or 1.5))
+                wait_after = float(self.settings.get("brain.thinking_after", 1.5) or 1.5)
+                if sentences > 1 and hasattr(llm, "reply_stream"):
+                    self._ai_spoken = True                           # each sentence is said as soon as the model has written it
+                    said = llm.reply_stream(messages, self._say, allow_mature=self._allow(), max_sentences=sentences,
+                                            max_tokens=40 * sentences + 20, on_wait=on_wait, wait_after=wait_after)
+                    if said is None:
+                        self._ai_spoken = False
+                    return said
+                return llm.reply(messages, allow_mature=self._allow(), on_wait=on_wait, wait_after=wait_after)
             finally:
                 self.thinking = max(0, self.thinking - 1)
         except Exception:

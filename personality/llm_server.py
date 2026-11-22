@@ -312,6 +312,34 @@ class ServerModel:
         with self._opener(request, timeout=40) as response:
             return json.loads(response.read().decode("utf-8"))
 
+    def stream_chat_completion(self, messages, max_tokens=70, temperature=0.8, top_p=0.9, repeat_penalty=1.15, stop=None, **_ignored):
+        """Like create_chat_completion, but yields the text in small pieces AS THE MODEL WRITES IT (so she can start on the first sentence
+        while the model is still working on the second). Stops the engine's work if the caller stops reading."""
+        body = json.dumps({"messages": messages, "max_tokens": max_tokens, "temperature": temperature, "top_p": top_p,
+                           "repeat_penalty": repeat_penalty, "stop": stop or [], "stream": True}).encode("utf-8")
+        request = urllib.request.Request("http://127.0.0.1:%d/v1/chat/completions" % self.port, data=body,
+                                         headers={"Content-Type": "application/json"})
+        response = self._opener(request, timeout=40)
+        try:
+            for raw in response:
+                line = raw.decode("utf-8", "replace").strip()
+                if not line.startswith("data:"):
+                    continue
+                data = line[5:].strip()
+                if data == "[DONE]":
+                    break
+                try:
+                    delta = json.loads(data)["choices"][0].get("delta", {}).get("content")
+                except (ValueError, KeyError, IndexError):
+                    continue
+                if delta:
+                    yield delta
+        finally:
+            try:
+                response.close()
+            except Exception:
+                pass
+
     def close(self):
         process, self._process = self._process, None
         if process is None:
