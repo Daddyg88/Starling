@@ -2307,3 +2307,8 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 
 * ui/hologram_window.py: set_click_through(window, on, visible_to_obs) skips the tool-window flag and names the window "Starling Hologram" when hologram.obs_capture is on. Setting + toggle on the Hologram page.
 
+## 0.96.134 - Intro salutes, COVAS voice, scoopable
+
+* streaming/intro.py: offer() returns False for o7 so the ChatDirector salutes back; SYSTEM prompt rewritten as a ship's COVAS who loves exploring.
+* config/pronunciations.json: scoopable -> skoo-puh-bul. Tests: tests/test_stream_intro.py.
+

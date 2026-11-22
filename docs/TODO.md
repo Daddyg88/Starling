@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.134: during an intro type o7 in chat (she says o7 back and salutes); read the AI replies (COVAS, not assistant); hear 'scoopable'.
 - [ ] 0.96.133: OBS capture. CHECK: tick 'Let OBS capture the hologram window', save, restart, OBS Window Capture lists 'Starling Hologram'; Color Key #010203 removes the black.
 - [ ] 0.96.132: new pleased and pleased2 clips (complete a mission, watch the smile); in the intro each reply mentions what she is doing and a clip plays after it.
 - [ ] 0.96.131: ten minute stream intro. CHECK: chat on, say 'start ten minute intro', wait 1 min, type in chat (not !starling) and see her answer by name; try with AI off; say 'stop the intro'; try Small vs Better model quality; do the getting-ready clips show in gaps.

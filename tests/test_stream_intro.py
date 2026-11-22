@@ -87,6 +87,25 @@ class IntroTests(unittest.TestCase):
         r.intro.start()
         self.assertFalse(r.msg("!starling what is a neutron star"))
 
+    def test_o7_goes_to_the_normal_salute_rules(self):
+        r = Rig()
+        r.intro.start()
+        r.run(61)
+        self.assertFalse(r.msg("o7"))
+        self.assertFalse(r.msg("hi Starling o7"))
+        self.assertEqual(len(r.intro.queue), 0)
+
+    def test_she_is_a_covas_who_loves_exploring(self):
+        seen = []
+        r = Rig(ai=lambda m: seen.append(m[0]["content"]) or "hello")
+        r.intro.start()
+        r.run(61)
+        r.msg("hi starling")
+        r.run(12)
+        self.assertIn("COVAS", seen[0])
+        self.assertIn("exploring", seen[0])
+        self.assertIn("Never say you are 'just an AI'", seen[0])
+
     def test_filters(self):
         r = Rig()
         r.intro.start()
