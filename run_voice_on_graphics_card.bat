@@ -38,7 +38,15 @@ if not errorlevel 1 (
   pause
   exit /b 0
 )
-for %%V in (cu126 cu124 cu128 cu118) do call :try %%V
+set "DONE="
+for %%V in (cu126 cu124 cu128 cu118) do if not defined DONE call :try %%V
+if defined DONE (
+  echo.
+  echo ===== It worked. Start Starling: her voice now runs on your graphics card. =====
+  echo The log will say "Voice engine is running on: cuda".
+  pause
+  exit /b 0
+)
 echo.
 echo None of the graphics-card versions worked on this PC, so I am putting the original one back.
 %PY% -m pip install --force-reinstall --no-deps torch --index-url https://download.pytorch.org/whl/cpu
@@ -54,8 +62,5 @@ echo ---- Trying the %1 version ^(about 2.5 GB, please wait^) ----
 if errorlevel 1 goto :eof
 %PY% -c "import torch,sys; print('  torch', torch.__version__, '- graphics card usable:', torch.cuda.is_available()); sys.exit(0 if torch.cuda.is_available() else 1)"
 if errorlevel 1 goto :eof
-echo.
-echo ===== It worked. Start Starling: her voice now runs on your graphics card. =====
-echo The log will say "Voice engine is running on: cuda".
-pause
-exit /b 0
+set "DONE=1"
+goto :eof

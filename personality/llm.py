@@ -180,6 +180,8 @@ class LocalLLM:
         self._loader = loader                 # tests give a fake; None = the downloaded engine, or llama-cpp-python
         self._engine_finder = engine_finder   # tests: where llama-server.exe is (None = the real data/llm/engine folder)
         self._server_factory = server_factory
+        self._gpu_engine_finder = None        # tests: where the graphics-card llama-server.exe is
+        self._gpu_failed = False              # the graphics-card engine failed to start once: use the processor for the rest of the session
         self.clock = clock
         self._model = None
         self._lock = threading.Lock()
@@ -213,6 +215,25 @@ class LocalLLM:
             except Exception:
                 self._import_ok = False
         return self._import_ok
+
+    def _gpu_engine(self):
+        """The downloaded Vulkan (graphics card) llama-server.exe, or None."""
+        from personality import llm_server
+        return (self._gpu_engine_finder or (lambda: llm_server.engine_exe(llm_server.engine_dir(True))))()
+
+    def warm_up(self):
+        """With "Keep the AI model loaded": load it in the background so the first answer is not slow."""
+        if not self.settings.get("llm.keep_loaded", False) or not self.enabled() or self._model is not None:
+            return
+        threading.Thread(target=self._warm, name="llm-warm", daemon=True).start()
+
+    def _warm(self):
+        try:
+            if not self.problem() and self._load():
+                self._last_used = self.clock()
+                log.info("The AI chat model was loaded in the background (keep loaded is on).")
+        except Exception:
+            log.exception("Loading the AI chat model in the background failed")
 
     def _engine(self):
         """The downloaded llama-server.exe, or None."""
@@ -256,7 +277,17 @@ class LocalLLM:
                 elif engine is not None:
                     from personality import llm_server
                     log.info("Starting the small chat model (%s)...", self.model_path().name)
-                    self._model = (self._server_factory or llm_server.ServerModel)(engine, self.model_path(), threads).start()
+                    factory = self._server_factory or llm_server.ServerModel
+                    gpu_engine = self._gpu_engine() if (self.settings.get("llm.use_gpu", False) and not self._gpu_failed) else None
+                    if gpu_engine is not None:
+                        try:
+                            self._model = factory(gpu_engine, self.model_path(), threads, gpu=True).start()
+                        except Exception:
+                            self._gpu_failed = True                       # not again this session: the processor engine does it
+                            log.exception("The AI chat engine could not start on the graphics card; using the processor instead")
+                            self._model = None
+                    if self._model is None:
+                        self._model = factory(engine, self.model_path(), threads).start()
                 else:
                     from llama_cpp import Llama
                     log.info("Loading the small chat model (%s)...", self.model_path().name)
@@ -315,6 +346,9 @@ class LocalLLM:
         self._timer.start()
 
     def _unload_if_idle(self):
+        if self.settings.get("llm.keep_loaded", False):
+            self._schedule_unload()
+            return
         if not self._busy and self.clock() - self._last_used >= IDLE_UNLOAD_SECONDS:
             self.unload()
             log.info("Chat model unloaded after being idle.")

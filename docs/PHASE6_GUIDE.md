@@ -2352,3 +2352,11 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * personality/brain.py: ai_until, ai_mode(), end_ai_mode(); AI window freechat.AI_WINDOW_SECONDS (18) and AI_MAX_EXCHANGES (6) after which the normal wrap-up runs.
 * ui/hologram.py: 'purple' colour (hue +70), colour_wanted(..., ai_chat); ui/hologram_window.py feed.ai_chat(); setting hologram.ai_colour.
 * control/quiet_voice.py: ChatModeVoice ('normal mode', 'end chat') registered first in commands.extra_helpers; line Chat_Mode_End in quiet.json.
+
+## 0.96.143 - AI chat options
+
+* core/settings.py: rev=143 migration turns brain.thinking_lines and llm.fast_start off once; new llm.keep_loaded and llm.use_gpu.
+* personality/llm_server.py: GPU_ASSET_RE (llama-*-bin-win-vulkan-x64.zip), engine_dir(gpu) -> engine_gpu, install_engine(gpu=True), ServerModel(gpu=True) adds -ngl 99.
+* personality/llm.py: _load tries the GPU engine when llm.use_gpu and falls back to the CPU engine (then _gpu_failed for the session); warm_up() loads in the background when keep_loaded; _unload_if_idle respects keep_loaded.
+* core/app.py install_ai_gpu, ui/dashboard.py button, ui/settings_model.py fields. run_voice_on_graphics_card.bat stops after the first working torch (DONE flag).
+* Tests: tests/test_quiet_live.py (GpuEngineTests, DefaultsMigrationTests, BatFixTests).

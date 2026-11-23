@@ -20,6 +20,7 @@ from core.logger import get_logger
 log = get_logger("settings")
 
 DEFAULTS = {
+    "rev": 0,                       # settings.json revision: lets a release change an old saved default once (see Settings.load)
     "window": {"geometry": "", "maximised": False},
     "app": {"log_level": "INFO", "first_run_done": False, "desktop_shortcut": True, "name": "Starling", "smooth_window": True},
     "player": {"sex": "neutral"},
@@ -63,8 +64,8 @@ DEFAULTS = {
                       "pips_delay": 1.2, "pips_delay_analysis": 3.0, "pips_topup_seconds": 8.0, "pips_press_gap": 0.1, "x52_trigger": True, "fire_buttons": ""},
     "commands": {"enabled": True, "confirm": True, "ask_guess": True, "require_game_focus": True, "key_hold": 0.06, "disabled": []},
     "smalltalk": {"enabled": True},
-    "brain": {"enabled": True, "knowledge": True, "lookup": False, "freechat": True, "chat_followups": True, "profile": True, "thinking_lines": True, "thinking_after": 1.5},
-    "llm": {"enabled": False, "model_file": "", "model_size": "small", "threads": 2, "max_seconds": 8, "max_sentences": 3, "fast_start": True},
+    "brain": {"enabled": True, "knowledge": True, "lookup": False, "freechat": True, "chat_followups": True, "profile": True, "thinking_lines": False, "thinking_after": 1.5},
+    "llm": {"enabled": False, "model_file": "", "model_size": "small", "threads": 2, "max_seconds": 8, "max_sentences": 3, "fast_start": False, "keep_loaded": False, "use_gpu": False},
     "exploration": {"hge_hint": True},
     "talk": {"combat": True, "exploration": True, "exobiology": True, "mining": True, "trading": True, "antixeno": True},
     "mining": {"prices": True, "merit": True, "limpet_reminder": True, "destination_reminder": True, "chatter": "normal",
@@ -192,6 +193,10 @@ class Settings:
             self.values, self.problems = check_settings(self.values, DEFAULTS)
             for problem in self.problems:
                 log.warning("settings.json: %s", problem)
+            if int(self.values.get("rev", 0) or 0) < 143:        # 0.96.143: the "Hmm..." lines and the cut-in-half first clause are off for everyone, once
+                self.values.setdefault("brain", {})["thinking_lines"] = False
+                self.values.setdefault("llm", {})["fast_start"] = False
+                self.values["rev"] = 143
         return self
 
     def get(self, dotted_key, default=None):

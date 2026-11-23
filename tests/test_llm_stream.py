@@ -136,6 +136,8 @@ class BrainSpeaksEachSentence(Base):
     def run_it(self, pieces, sentences=3, gap=0.0):
         from tests.test_llm import make
         self.settings.set("llm.max_sentences", sentences)
+        self.settings.set("llm.fast_start", True)                  # off by default since 0.96.143; these tests are about it
+        self.settings.set("brain.thinking_lines", True)
         make(self, Streamer(pieces, gap=gap))
         self.brain._vocab()
         return self.ask(self.CHAT)

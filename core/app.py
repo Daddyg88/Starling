@@ -351,6 +351,10 @@ class App:
         from personality.ships_info import ShipInfo
         self.people = People(paths.DATA_DIR / "people.json")
         self.llm = LocalLLM(self.settings)
+        try:
+            self.llm.warm_up()                  # only does anything when "Keep the AI model loaded" is on
+        except Exception:
+            self.log.exception("The AI chat warm-up failed")
         self.brain = Brain(self.speech, self.dialogue, self.settings, state_provider=lambda: self.state, chitchat=self.chitchat,
                            facts=getattr(self.ask, "facts", None), mining=self.miner, prices=self.prices, ask=self.ask, merit=self.merit, services=self.services, stats=self.stats,
                            profile=self.profile, llm=self.llm, lookup=self.lookup, unanswered=self.unanswered, people=self.people, ships=ShipInfo())
@@ -713,6 +717,24 @@ class App:
             self.settings.save()
             if getattr(self, "llm", None) is not None:
                 self.llm.unload()
+        return ok, message
+
+    def install_ai_gpu(self, progress=print):
+        """Downloads the graphics-card (Vulkan) AI engine (about 50 MB) and switches "AI chat on the graphics card" on. Returns (ok, sentence)."""
+        from personality import llm_server
+
+        def note(text):
+            self.log.info("AI graphics-card engine install: %s", str(text).strip())
+            progress(text)
+        ok, message = llm_server.install_engine(progress=note, gpu=True)
+        self.log.info("AI graphics-card engine install %s: %s", "finished" if ok else "FAILED", message)
+        if ok:
+            self.settings.set("llm.use_gpu", True)
+            self.settings.save()
+            if getattr(self, "llm", None) is not None:
+                self.llm._gpu_failed = False
+                self.llm.unload()
+            message = "The AI chat will now run on your graphics card. Press 'Test the AI chat' to try it; if it fails she falls back to the processor by herself."
         return ok, message
 
     def install_australian_voice(self, progress=print):

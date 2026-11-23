@@ -146,3 +146,108 @@ class PurpleTests(unittest.TestCase):
             c.t += 0.05
             holo.tick(powered=True, now=c.t, ai_chat=True)
         self.assertGreater(holo.mix["purple"], 0.95)
+
+
+class GpuEngineTests(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        from pathlib import Path
+        from core.settings import Settings
+        self.Path = Path
+        self.settings = Settings(Path(tempfile.mkdtemp()) / "s.json")
+        folder = Path(tempfile.mkdtemp())
+        model = folder / "m.gguf"
+        model.write_bytes(b"GGUF")
+        self.settings.set("llm.enabled", True)
+        self.settings.set("llm.model_file", str(model))
+        self.calls = []
+
+    def _llm(self, gpu_fails=False):
+        from personality.llm import LocalLLM
+        calls = self.calls
+
+        class Engine:
+            def __init__(self, exe, model, threads, gpu=False):
+                self.gpu = gpu
+                calls.append(("gpu" if gpu else "cpu", str(exe)))
+
+            def start(self):
+                if self.gpu and gpu_fails:
+                    raise RuntimeError("no vulkan")
+                return self
+
+            def close(self):
+                pass
+        llm = LocalLLM(self.settings, engine_finder=lambda: self.Path("cpu.exe"), server_factory=Engine)
+        llm._gpu_engine_finder = lambda: self.Path("gpu.exe")
+        return llm
+
+    def test_gpu_off_by_default(self):
+        llm = self._llm()
+        llm._load()
+        self.assertEqual(self.calls, [("cpu", "cpu.exe")])
+
+    def test_gpu_used_when_on(self):
+        self.settings.set("llm.use_gpu", True)
+        llm = self._llm()
+        llm._load()
+        self.assertEqual(self.calls, [("gpu", "gpu.exe")])
+
+    def test_gpu_failure_falls_back_to_cpu_and_is_not_retried(self):
+        self.settings.set("llm.use_gpu", True)
+        llm = self._llm(gpu_fails=True)
+        self.assertTrue(llm._load())
+        self.assertEqual(self.calls, [("gpu", "gpu.exe"), ("cpu", "cpu.exe")])
+        llm.unload()
+        llm._load()
+        self.assertEqual(self.calls[-1], ("cpu", "cpu.exe"))
+        self.assertEqual(len(self.calls), 3)
+
+    def test_gpu_command_and_asset(self):
+        from personality import llm_server
+        cpu = llm_server.ServerModel("x.exe", "m.gguf")
+        gpu = llm_server.ServerModel("x.exe", "m.gguf", gpu=True)
+        self.assertNotIn("-ngl", cpu.command())
+        self.assertIn("-ngl", gpu.command())
+        release = {"assets": [
+            {"name": "llama-b1-bin-win-cpu-x64.zip", "browser_download_url": llm_server.DOWNLOAD_PREFIX + "b1/llama-b1-bin-win-cpu-x64.zip", "size": 1},
+            {"name": "llama-b1-bin-win-vulkan-x64.zip", "browser_download_url": llm_server.DOWNLOAD_PREFIX + "b1/llama-b1-bin-win-vulkan-x64.zip", "size": 1}]}
+        self.assertEqual(llm_server.pick_asset(release, gpu=True)[0], "llama-b1-bin-win-vulkan-x64.zip")
+        self.assertEqual(llm_server.pick_asset(release)[0], "llama-b1-bin-win-cpu-x64.zip")
+        self.assertNotEqual(llm_server.engine_dir(True), llm_server.engine_dir())
+
+    def test_keep_loaded_survives_idle(self):
+        self.settings.set("llm.keep_loaded", True)
+        llm = self._llm()
+        llm._load()
+        llm._last_used = llm.clock() - 99999
+        llm._unload_if_idle()
+        self.assertIsNotNone(llm._model)
+        llm._timer.cancel()
+        self.settings.set("llm.keep_loaded", False)
+        llm._unload_if_idle()
+        self.assertIsNone(llm._model)
+
+
+class DefaultsMigrationTests(unittest.TestCase):
+    def test_old_saved_settings_are_updated_once(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from core.settings import Settings
+        p = Path(tempfile.mkdtemp()) / "s.json"
+        p.write_text(json.dumps({"brain": {"thinking_lines": True}, "llm": {"fast_start": True}}))
+        s = Settings(p).load()
+        self.assertFalse(s.get("brain.thinking_lines"))
+        self.assertFalse(s.get("llm.fast_start"))
+        s.set("brain.thinking_lines", True)
+        s.save()
+        again = Settings(p).load()
+        self.assertTrue(again.get("brain.thinking_lines"))          # the player's own choice after the migration stays
+
+
+class BatFixTests(unittest.TestCase):
+    def test_bat_stops_after_first_success(self):
+        text = open("run_voice_on_graphics_card.bat", encoding="utf-8").read()
+        self.assertIn("if not defined DONE call :try", text)
+        self.assertIn('set "DONE=1"', text)

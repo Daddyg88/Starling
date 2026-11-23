@@ -120,6 +120,7 @@ class ThinkingLines(Base):
     def slow(self, delay=0.6, **settings):
         make(self, FakeModel(delay=delay))
         self.settings.set("brain.thinking_after", 0.1)
+        self.settings.set("brain.thinking_lines", True)             # off by default since 0.96.143
         for key, value in settings.items():
             self.settings.set(key, value)
         self.brain._vocab()

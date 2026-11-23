@@ -39,6 +39,7 @@ RELEASE_LIST_API = "https://api.github.com/repos/ggml-org/llama.cpp/releases?per
 RELEASE_PAGE = "https://github.com/ggml-org/llama.cpp/releases/latest"          # no API limit: it just redirects to .../releases/tag/<tag>
 DOWNLOAD_PREFIX = "https://github.com/ggml-org/llama.cpp/releases/download/"
 ASSET_RE = re.compile(r"^llama-[A-Za-z0-9._-]+-bin-win-cpu-x64\.zip$")       # the plain CPU build for 64-bit Windows
+GPU_ASSET_RE = re.compile(r"^llama-[A-Za-z0-9._-]+-bin-win-vulkan-x64\.zip$")   # the Vulkan build: runs on NVIDIA, AMD and Intel graphics cards
 EXE_NAME = "llama-server.exe"
 MIN_ZIP_BYTES = 2 * 1024 * 1024
 MAX_ZIP_BYTES = 400 * 1024 * 1024
@@ -47,8 +48,8 @@ START_SECONDS = 90                 # a slow PC may need a while to load the mode
 CREATE_NO_WINDOW = 0x08000000
 
 
-def engine_dir():
-    return paths.DATA_DIR / "llm" / "engine"
+def engine_dir(gpu=False):
+    return paths.DATA_DIR / "llm" / ("engine_gpu" if gpu else "engine")
 
 
 def engine_exe(folder=None):
@@ -63,12 +64,13 @@ def engine_exe(folder=None):
         return None
 
 
-def pick_asset(release):
-    """(name, url, size, sha256 or '') of the Windows CPU zip in a GitHub release record, or None."""
+def pick_asset(release, gpu=False):
+    """(name, url, size, sha256 or '') of the Windows CPU (or Vulkan graphics-card) zip in a GitHub release record, or None."""
+    pattern = GPU_ASSET_RE if gpu else ASSET_RE
     for asset in (release or {}).get("assets") or []:
         name = str(asset.get("name") or "")
         url = str(asset.get("browser_download_url") or "")
-        if ASSET_RE.match(name) and url.startswith(DOWNLOAD_PREFIX) and url.endswith("/" + name):
+        if pattern.match(name) and url.startswith(DOWNLOAD_PREFIX) and url.endswith("/" + name):
             digest = str(asset.get("digest") or "")
             return name, url, int(asset.get("size") or 0), digest[7:] if digest.lower().startswith("sha256:") else ""
     return None
@@ -93,14 +95,14 @@ def _describe(release):
     return "unexpected answer"
 
 
-def find_asset(opener):
+def find_asset(opener, gpu=False):
     """(asset, reason). Three ways, in order: the 'latest' release record, the last few release records, and the plain release page
     (which has no API limit). The asset is (name, url, size, sha256) or None."""
     reasons = []
     errors = []
     try:
         release = _read_json(opener, RELEASE_API)
-        found = pick_asset(release)
+        found = pick_asset(release, gpu)
         if found:
             return found, ""
         reasons.append(_describe(release))
@@ -111,7 +113,7 @@ def find_asset(opener):
         log.warning("AI chat engine: %s", reasons[-1])
     try:
         for release in _read_json(opener, RELEASE_LIST_API) or []:
-            found = pick_asset(release)
+            found = pick_asset(release, gpu)
             if found:
                 return found, ""
         reasons.append("none of the last releases had it")
@@ -124,7 +126,7 @@ def find_asset(opener):
             address = str(getattr(response, "geturl", lambda: "")() or "")
         tag = address.rstrip("/").rsplit("/", 1)[-1]
         if re.fullmatch(r"b\d{3,6}", tag):
-            name = "llama-%s-bin-win-cpu-x64.zip" % tag
+            name = "llama-%s-bin-win-%s-x64.zip" % (tag, "vulkan" if gpu else "cpu")
             return (name, "%s%s/%s" % (DOWNLOAD_PREFIX, tag, name), 0, ""), ""
         reasons.append("the release page did not name a version")
     except Exception as exc:
@@ -148,19 +150,19 @@ def _safe_members(archive):
     return archive.infolist() if total <= MAX_UNPACKED_BYTES else None
 
 
-def install_engine(folder=None, opener=None, progress=print, platform_name=None):
+def install_engine(folder=None, opener=None, progress=print, platform_name=None, gpu=False):
     """Downloads and unpacks llama-server.exe. Returns (ok, message)."""
     if (platform_name or sys.platform) != "win32":
         return False, "The AI chat engine can only be installed on Windows."
     opener = opener or open_url                      # open_url retries once with the certifi certificate list (a common Windows problem)
-    folder = Path(folder) if folder else engine_dir()
+    folder = Path(folder) if folder else engine_dir(gpu)
     if engine_exe(folder) is not None:
         return True, "The AI chat engine is already installed."
     temp = None
     part = None
     try:
         progress("Looking for the newest llama.cpp release on GitHub...")
-        asset, why = find_asset(opener)
+        asset, why = find_asset(opener, gpu)
         if asset is None:
             return False, "I could not find the Windows CPU download for the AI chat engine on GitHub (%s)." % why
         name, url, size, sha256 = asset
@@ -240,7 +242,8 @@ class ServerModel:
     """llama-server.exe running quietly on this PC, with the same create_chat_completion() as llama-cpp-python's Llama."""
 
     def __init__(self, exe, model, threads=2, ctx=1024, popen=subprocess.Popen, opener=None, sleep=time.sleep,
-                 clock=time.monotonic, start_seconds=START_SECONDS):
+                 clock=time.monotonic, start_seconds=START_SECONDS, gpu=False):
+        self.gpu = bool(gpu)
         self.exe, self.model, self.threads, self.ctx = Path(exe), Path(model), max(1, int(threads)), int(ctx)
         self._popen, self._sleep, self._clock, self.start_seconds = popen, sleep, clock, start_seconds
         self._opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({})).open       # never through a proxy: it is local
@@ -255,7 +258,7 @@ class ServerModel:
 
     def command(self):
         return [str(self.exe), "-m", str(self.model), "--host", "127.0.0.1", "--port", str(self.port), "-c", str(self.ctx),
-                "-t", str(self.threads), "-np", "1", "--no-webui"]
+                "-t", str(self.threads), "-np", "1", "--no-webui"] + (["-ngl", "99"] if self.gpu else [])     # -ngl 99: every layer on the graphics card
 
     @staticmethod
     def _pid_file():
@@ -278,7 +281,7 @@ class ServerModel:
         self._stop_leftover()
         self.port = self.free_port()
         flags = CREATE_NO_WINDOW if sys.platform == "win32" else 0
-        log.info("Starting the AI chat engine on 127.0.0.1:%d (%d threads)", self.port, self.threads)
+        log.info("Starting the AI chat engine on 127.0.0.1:%d (%d threads%s)", self.port, self.threads, ", ON THE GRAPHICS CARD" if self.gpu else "")
         self._process = self._popen(self.command(), cwd=str(self.exe.parent), stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL, creationflags=flags)
         atexit.register(self.close)
