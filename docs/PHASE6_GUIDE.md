@@ -2388,3 +2388,7 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 ## 0.96.148 - Settings help text wraps
 
 * ui/dashboard.py _build_field: the help label has wraplength and re-wraps on the card's <Configure> (card width - 340).
+
+## 0.96.149 - Seven more shipped settlement line-ups
+
+* maps/known_calibrations.json: 31 -> 38 settlements via tools/merge_calibrations.py (7 added, 0 conflicts, 1 skipped as switched off by the player).
