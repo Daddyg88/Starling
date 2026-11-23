@@ -2331,3 +2331,7 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 
 * run_voice_on_graphics_card.bat: nvidia-smi check, then pip install --force-reinstall --no-deps torch from the cu126/cu124/cu128/cu118 index, tested each time with torch.cuda.is_available(); restores the cpu build if none works. Test: tests/test_graphics_card_bat.py. tts/kokoro_tts.py log line names the file.
 
+## 0.96.139 - Graphics-card voice file finds the installed Python
+
+* run_voice_on_graphics_card.bat: PY is .venv\Scripts\python.exe or ..\.venv\Scripts\python.exe (installed layout: <home>\app and <home>\.venv, see launcher/launcher.py Layout). Test: tests/test_graphics_card_bat.py.
+

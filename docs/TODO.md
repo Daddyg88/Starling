@@ -36,6 +36,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] NOT LANDED ON YET: tourist_1 pad 1 (bottom small) and high_tech_1 pad 2 (Large).
 
 ### Needs a real-game test (built, not yet confirmed)
+- [ ] 0.96.139: run_voice_on_graphics_card.bat on the INSTALLED Starling (the 0.96.138 run stopped at 'needs the full source install'). Same checks as 0.96.138.
 - [ ] 0.96.138: run_voice_on_graphics_card.bat on Ben's PC (RTX 3070). CHECK: what the window says, log says 'Voice engine is running on: cuda', 'Slow start' lines gone or under 1 s, no new voice errors. If it fails, ask for the window text.
 - [ ] 0.96.137: faster AI answers. CHECK: does she start on the first clause (Slow start numbers in the log should drop); any gap after the clause; the log line 'Voice engine is running on'; how Hmmm sounds. Decide: CUDA torch for the voice, Vulkan engine for the AI.
 - [ ] 0.96.136: AI chat streaming. CHECK: ask her an open question with the AI on; does a short 'Hmm...' come first only when slow; does she start after sentence 1; any gap or stutter between sentences; how Hmm sounds; try 1, 2, 3, 4 sentences; time it on Better/High.

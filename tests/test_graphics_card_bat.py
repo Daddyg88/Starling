@@ -18,6 +18,12 @@ class GraphicsCardBat(unittest.TestCase):
         self.assertIn("nvidia-smi", text)                   # no NVIDIA card: it stops before changing anything
         self.assertLess(text.index("nvidia-smi"), text.index("pip install"))
 
+    def test_finds_the_installed_python_one_folder_up(self):
+        text = BAT.read_text()
+        self.assertIn("..\\.venv\\Scripts\\python.exe", text)    # the installed Starling keeps .venv next to the app folder
+        self.assertIn(".venv\\Scripts\\python.exe", text)
+        self.assertNotIn("\n.venv\\Scripts\\python.exe -", text.replace("\r\n", "\n"))   # always through %PY%, never a hard-coded path
+
     def test_tries_newest_first_then_older_builds(self):
         text = BAT.read_text()
         self.assertLess(text.index("cu126"), text.index("cu124"))
