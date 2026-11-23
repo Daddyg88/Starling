@@ -25,6 +25,8 @@ from core.logger import get_logger
 log = get_logger("freechat")
 
 CHAT_WINDOW_SECONDS = 25.0      # after she asks a question, you can answer without her name for this long
+AI_WINDOW_SECONDS = 18.0        # AI chat mode: after each AI answer you can reply without her name for this long
+AI_MAX_EXCHANGES = 6            # then she wraps AI chat up by herself, so a voice on a stream cannot keep her stuck in it
 MAX_EXCHANGES = 4               # then she wraps the chat up politely
 MIN_WORDS = 3
 LONG_WORDS = 14

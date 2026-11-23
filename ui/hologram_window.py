@@ -284,6 +284,16 @@ class HologramFeed:
         pending = getattr(ask, "pending", None) if ask is not None else None
         return bool(pending and pending.get("open"))
 
+    def ai_chat(self):
+        """Purple: she is in AI chat mode (talking with the AI model, listening for your reply without her name)."""
+        if not self.app.settings.get("hologram.ai_colour", True):
+            return False
+        brain = getattr(self.app, "brain", None)
+        try:
+            return bool(brain is not None and brain.ai_mode())
+        except Exception:
+            return False
+
     def thinking(self):
         if not self.app.settings.get("hologram.thinking_colour", True):
             return False
@@ -479,7 +489,7 @@ class HologramWindow:
                         else "powered down: a game screen is open (GuiFocus %d)" % focus))
         powered = keep_on or shown_ok
         self._pose_test_step(holo, now)
-        visible = holo.tick(listening=self.feed.listening(), thinking=self.feed.thinking(), powered=powered)
+        visible = holo.tick(listening=self.feed.listening(), thinking=self.feed.thinking(), powered=powered, ai_chat=self.feed.ai_chat())
         if visible <= 0.03 and not holo.speaking:
             if self._shown:
                 self._hide()

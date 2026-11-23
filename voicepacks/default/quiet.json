@@ -18,5 +18,10 @@
   "Back on, Commander. Did you miss me?",
   "Talking again. I was getting rusty.",
   "Good. I had so much to say."
+ ],
+ "Chat_Mode_End": [
+  "Back to normal. Say my name if you need me.",
+  "Normal mode. I'll stop waiting for replies.",
+  "Okay, chat's over. Back to my usual self."
  ]
 }

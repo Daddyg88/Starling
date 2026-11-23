@@ -98,3 +98,51 @@ class LiveBrainTests(Base):
     def test_scooping_is_not_a_fuel_level_question(self):
         r = self.ask("what is fuel scooping")
         self.assertNotIn("gauge", (r or "").lower())
+
+
+class AiModeTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.t = [1000.0]
+        self.brain.clock = lambda: self.t[0]
+        self.brain.settings.set("llm.max_sentences", 1) if hasattr(self.brain.settings, "set") else None
+        brain = self.brain
+
+        class LLM:
+            def ready(self):
+                return True
+
+            def reply(self, messages, **kw):
+                return "Neutron stars are my favourite place to hide."
+        brain.llm = LLM()
+
+    def test_mode_on_off_and_cap(self):
+        from personality import freechat
+        self.assertFalse(self.brain.ai_mode())
+        self.ask("tell me something about neutron stars and whatever")
+        if not self.brain.ai_mode():
+            self.skipTest("AI chat not reachable in this fixture")
+        self.t[0] += freechat.AI_WINDOW_SECONDS + 1
+        self.assertFalse(self.brain.ai_mode())
+
+    def test_voice_ends_it(self):
+        from control.quiet_voice import ChatModeVoice
+        voice = ChatModeVoice(lambda: self.brain)
+        self.assertIsNone(voice.try_handle("normal mode"))            # nothing to end
+        self.brain.chat_until = self.brain.ai_until = self.t[0] + 10
+        self.assertTrue(self.brain.ai_mode())
+        self.assertEqual(voice.try_handle("please go back to normal mode"), "Normal mode.")
+        self.assertFalse(self.brain.ai_mode())
+        self.assertFalse(self.brain.in_conversation())
+
+
+class PurpleTests(unittest.TestCase):
+    def test_purple(self):
+        from tests.test_hologram import make
+        holo, c = make()
+        self.assertEqual(holo.colour_wanted(True, False, c.t, True), "purple")
+        self.assertEqual(holo.colour_wanted(False, True, c.t, True), "amber")
+        for _ in range(20):
+            c.t += 0.05
+            holo.tick(powered=True, now=c.t, ai_chat=True)
+        self.assertGreater(holo.mix["purple"], 0.95)

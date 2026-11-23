@@ -528,6 +528,13 @@ class App:
             except Exception:
                 self.log.exception("The stream chat voice command could not start")
             try:
+                from control.quiet_voice import ChatModeVoice
+                from navigation.voice import Narrator as _CNarrator
+                self.commands.extra_helpers.insert(0, ChatModeVoice(lambda: getattr(self, "brain", None),
+                                                                    _CNarrator(lambda: self.speech, lambda: self.dialogue, self.settings)))
+            except Exception:
+                self.log.exception("The chat mode voice command could not start")
+            try:
                 from control.quiet_voice import QuietVoice
                 from navigation.voice import Narrator as _Narrator
                 self.commands.extra_helpers.insert(0, QuietVoice(self.settings, lambda: self.speech,

@@ -523,6 +523,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="Green while you hold push-to-talk, or after she asks you a question. Never just because the microphone is open"),
             Field("hologram.thinking_colour", "Hologram turns amber when she is thinking", "toggle",
                   help="Only while the optional AI chat is working on an answer"),
+            Field("hologram.ai_colour", "Hologram turns purple in AI chat mode", "toggle",
+                  help='Purple while she is talking with the AI model and listening for your reply without her name. Say "Starling, normal mode" to end it (it also ends by itself after a few exchanges or a quiet moment)'),
             Field("hologram.flicker", "Hologram flicker", "toggle", help="She flickers and glitches a little (the rings and the lights stay steady). Switch off for a steady picture"),
             Field("hologram.sparks", "Hologram tiny lights", "toggle", help="A slow tornado of tiny lights rises from the middle of her bottom ring and swirls round her chest"),
             Field("hologram.idle_loop", "Hologram breathes and sways while quiet", "toggle", help="Plays a short recorded loop of her breathing, swaying and her hair moving while she is not talking; she eases back to the still picture when she speaks"),

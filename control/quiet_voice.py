@@ -81,3 +81,36 @@ class QuietVoice:
             self._say("Quiet_Back")
             return "Talking again."
         return None
+
+
+_NORMAL = re.compile(r"^" + _LEAD + r"(?:(?:go |get |switch |change |return |come )?(?:back )?(?:to )?(?:normal|standard|regular)(?: mode| chat)?(?: again)?"
+                     r"|(?:end|stop|leave|exit|cancel|quit|close) (?:the )?(?:ai|a i|chat|chatting|ai chat|ai mode|chat mode|conversation|the chat)(?: mode)?"
+                     r"|(?:ai|chat) mode off|no more (?:ai )?chat(?:ting)?|stop (?:listening|chatting) (?:to|for) (?:him|her|them|chat|replies)|im not talking to you|not you)"
+                     r"(?:\s+(?:please|now|thanks|thank you|again))*$")
+
+
+class ChatModeVoice:
+    """"Starling, normal mode" / "end chat": leaves AI chat mode (purple) so she stops waiting for chat answers without her name."""
+
+    def __init__(self, brain_provider, narrator=None):
+        self.brain_provider = brain_provider
+        self.narrator = narrator
+
+    def try_handle(self, text):
+        said = re.sub(r"[^a-z0-9 ]", "", str(text or "").lower().replace("'", "").replace("\u2019", ""))
+        said = re.sub(r"\s+", " ", said).strip()
+        if not said or len(said) > 60 or not _NORMAL.match(said):
+            return None
+        brain = self.brain_provider()
+        if brain is None or not hasattr(brain, "end_ai_mode"):
+            return None
+        if not brain.in_conversation() and not brain.ai_mode():
+            return None                                  # nothing to end: let the normal commands have the words
+        brain.end_ai_mode()
+        if self.narrator is not None:
+            try:
+                self.narrator.say("Chat_Mode_End", {})
+            except Exception:
+                log.exception("The chat mode line failed")
+        log.info("AI chat mode ended by voice (you said %r)", said)
+        return "Normal mode."

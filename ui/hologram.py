@@ -44,7 +44,7 @@ PAD_TOP, PAD_BOTTOM = 8, 30      # room for her to float up and down, and for th
 PICTURE_ASPECT = 784 / 1168
 
 # ---- colours: the picture is blue; green and amber are the same picture with its colours turned ----
-HUE = {"cyan": 0.0, "green": -72.0, "amber": 197.0}
+HUE = {"cyan": 0.0, "green": -72.0, "amber": 197.0, "purple": 70.0}
 LISTEN_SECONDS = 6.0             # after her name on its own she waits this long for the rest
 COLOUR_SECONDS = 0.35            # how long a colour change takes
 DOWN_SECONDS, UP_SECONDS = 0.35, 0.6
@@ -410,7 +410,7 @@ class Hologram:
         self.rng = rng or random.Random()
         self.clock = clock
         now = clock()
-        self.mix = {"cyan": 1.0, "green": 0.0, "amber": 0.0}
+        self.mix = {"cyan": 1.0, "green": 0.0, "amber": 0.0, "purple": 0.0}
         self.power = 0.0
         self.weights = {name: 0.0 for name in assets.sprites}
         self.track, self.track_start, self.speaking = [], 0.0, False
@@ -537,19 +537,21 @@ class Hologram:
         self._rest(now)
 
     # ---- one step ----
-    def colour_wanted(self, listening, thinking, now):
+    def colour_wanted(self, listening, thinking, now, ai_chat=False):
         if thinking:
             return "amber"
+        if ai_chat:
+            return "purple"             # AI chat mode: she is talking with the AI model and listens without her name
         if listening or now < self.listen_until:
             return "green"
         return "cyan"
 
-    def tick(self, listening=False, thinking=False, powered=True, now=None):
+    def tick(self, listening=False, thinking=False, powered=True, now=None, ai_chat=False):
         """Move everything a little towards where it should be. Returns how visible she is (0 = hidden)."""
         now = self.clock() if now is None else now
         dt = max(0.0, min(0.25, now - self.last))
         self.last = now
-        wanted = self.colour_wanted(listening, thinking, now)
+        wanted = self.colour_wanted(listening, thinking, now, ai_chat)
         step = dt / COLOUR_SECONDS
         for name in self.mix:
             goal = 1.0 if name == wanted else 0.0

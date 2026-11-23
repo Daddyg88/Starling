@@ -102,6 +102,7 @@ class Brain:
         self.llm = llm               # personality/llm.py: optional small local AI model for open chat (off by default)
         self.profile = profile       # memory/profile.py: what you have told her about yourself (likes, pets...)
         self.topics = freechat.load_topics() if intents is None else freechat.Topics({})   # what a chatty sentence is about
+        self.ai_until = 0.0          # AI chat mode (the hologram turns purple) until then
         self.chat_until = 0.0        # free chat: until when you can answer her question without saying her name
         self.chat_turns = 0          # and how many exchanges the chat has had
         self.command_vocab = None    # set of words her game commands use (so a garbled command is never answered with chat)
@@ -536,6 +537,18 @@ class Brain:
         return (self.clock() < self.chat_until and bool(self.settings.get("brain.chat_followups", True))
                 and bool(self.settings.get("brain.freechat", True)))
 
+    def ai_mode(self):
+        """True while the AI chat is the one she is talking with: she listens for your answer without her name (hologram purple)."""
+        return self.clock() < self.ai_until and self.in_conversation()
+
+    def end_ai_mode(self):
+        """Back to normal: she stops waiting for chat answers. Returns True if AI chat mode was on."""
+        was = self.ai_mode()
+        self.ai_until = 0.0
+        self.chat_until = 0.0
+        self.chat_turns = 0
+        return was
+
     def chat_window_turn(self, text):
         """Something said WITHOUT her name while she waits for an answer. Never a command. None = say nothing."""
         if not self.in_conversation() or self.dialogue is None or not self.settings.get("brain.enabled", True):
@@ -577,10 +590,11 @@ class Brain:
             sent = 1
         parts, asked = [], False
         shaped = freechat.shape(tidy)
-        ai = None if shaped else self._ai_reply(tidy, words)
+        ai = None if (shaped or (answering and turns > freechat.AI_MAX_EXCHANGES)) else self._ai_reply(tidy, words)
         if ai:
             self.chat_turns = turns
-            self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS
+            self.chat_until = self.clock() + freechat.AI_WINDOW_SECONDS
+            self.ai_until = self.chat_until
             self.topic = ("Chat_Generic", self.clock())
             reply = ai if self._ai_spoken else self._say(ai)         # a streamed answer has already been said, sentence by sentence
             self._remember("Chat", tidy, reply)
@@ -626,6 +640,7 @@ class Brain:
         if not texts:
             return None
         self.chat_turns = turns if asked else 0
+        self.ai_until = 0.0
         self.chat_until = self.clock() + freechat.CHAT_WINDOW_SECONDS if asked else 0.0
         self.topic = ("Chat_%s" % (topic.capitalize() if topic else "Generic"), self.clock())
         reply = self._say("||".join(texts))

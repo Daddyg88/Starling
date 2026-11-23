@@ -2346,3 +2346,9 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * tts/speech_manager.py: quiet_until; say() drops non-critical items whose event_name is not in QUIET_ALLOWED (replies to the player) while quiet.
 * personality/live_answers.py + voicepacks/default/live.json: loose-wording answers for fuel, hull, shields, cargo, range, jumps, materials and exobiology payouts from GameState, hooked in Brain._live_turn after _ship_turn. Setting speech.quiet_minutes (default 10).
 * Tests: tests/test_quiet_live.py.
+
+## 0.96.142 - AI chat mode purple and exit
+
+* personality/brain.py: ai_until, ai_mode(), end_ai_mode(); AI window freechat.AI_WINDOW_SECONDS (18) and AI_MAX_EXCHANGES (6) after which the normal wrap-up runs.
+* ui/hologram.py: 'purple' colour (hue +70), colour_wanted(..., ai_chat); ui/hologram_window.py feed.ai_chat(); setting hologram.ai_colour.
+* control/quiet_voice.py: ChatModeVoice ('normal mode', 'end chat') registered first in commands.extra_helpers; line Chat_Mode_End in quiet.json.
