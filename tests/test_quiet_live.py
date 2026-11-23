@@ -426,3 +426,23 @@ class ChatPinTests(unittest.TestCase):
         intro.pin = lambda u, t: seen.append((u, t))
         intro._reply("Bob", "hello")
         self.assertEqual(seen, [("Bob", "hello")])
+
+
+class PinPlacementTests(unittest.TestCase):
+    def test_box_is_on_the_overlays_page_and_places_the_window(self):
+        from ui import overlay_layout as L
+        from ui import chat_pin_overlay as O
+        box = L.box_for("pin")
+        self.assertEqual((box.h_key, box.v_key), ("streaming.pin_x", "streaming.pin_up"))
+
+        class S(dict):
+            def get(self, k, d=None):
+                return dict.get(self, k, d)
+        s = S({"streaming.pin_x": 10, "streaming.pin_up": 20})
+        x, y, w, h = L.rect(box, s, 1920, 1080)
+        saved = L.settings_for(box, x, y, w, h)
+        self.assertAlmostEqual(saved["streaming.pin_x"], 10, delta=0.2)
+        self.assertAlmostEqual(saved["streaming.pin_up"], 20, delta=0.2)
+        left, top = O.place(1920, 1080, 600, 150, 10, 20)
+        self.assertEqual((left, top), (192, 1080 - 216 - 150))
+        self.assertEqual(O.place(1920, 1080, 600, 150, 95, 0), (1320, 930))        # kept on screen

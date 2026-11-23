@@ -2374,3 +2374,7 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * ui/chat_window.py: click on a text row -> line_at() -> pin.toggle; pinned row highlighted.
 * streaming/wiring.py show_comment() called from do_ask and StreamIntro._reply (intro.pin).
 * Tests: tests/test_quiet_live.py ChatPinTests.
+
+## 0.96.146 - Chat comment is draggable
+
+* ui/overlay_layout.py: Box 'pin' (streaming.pin_x from the left, streaming.pin_up from the bottom); ui/chat_pin_overlay.py gaps()/place(); streaming.pin_position removed.

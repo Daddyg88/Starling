@@ -24,9 +24,10 @@ BOXES = (
     Box("hologram", "Her hologram", "#35d6ff", "left", "hologram.left", "bottom", "hologram.bottom", "hologram.enabled"),
     Box("bio", "Biology list", "#ff9a1f", "left", "overlay.bio_x", "bottom", "overlay.bio_up", "overlay.bio_enabled"),
     Box("route", "Route map", "#5aa7ff", "right", "overlay.route_right", "top", "overlay.route_top", None),
+    Box("pin", "Chat comment", "#f5a623", "left", "streaming.pin_x", "bottom", "streaming.pin_up", "streaming.pin_overlay"),
 )
 DEFAULTS = {"hologram.left": 6.5, "hologram.bottom": 24.0, "overlay.bio_x": 3, "overlay.bio_up": 25,
-            "overlay.route_right": 2, "overlay.route_top": 10}
+            "overlay.route_right": 2, "overlay.route_top": 10, "streaming.pin_x": 2.0, "streaming.pin_up": 8.0}
 MAX_PERCENT = 95.0
 
 
@@ -45,6 +46,10 @@ def size_pixels(box, settings, screen_w, screen_h):
     if box.key == "bio":
         size = bio_overlay.SIZES.get(str(settings.get("overlay.bio_size", "Medium")), 12)
         return int(size * 23), int(size * 2.0 + size * 2.3 * 3 + 10)
+    if box.key == "pin":
+        from ui import chat_pin_overlay
+        width = int(screen_w * chat_pin_overlay.WIDTH_SHARE.get(str(settings.get("streaming.pin_size", "Medium")), 0.34))
+        return width, int(width * 0.22)
     size = route_overlay.map_size(settings.get("overlay.route_size", "Medium"))
     return size, size + 70
 

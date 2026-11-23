@@ -1,7 +1,7 @@
 """The comment on the screen (streaming/pin.py): a coloured name tag over a dark bar with the chatter's words, like a YouTube
 "highlighted comment". One see-through, click-through window built like the red alert banner and the hack panel
 (ui/red_alert_overlay.py): it never takes the mouse or the keyboard focus from the game. Needs Elite in Borderless or Windowed mode.
-Settings: streaming.pin_overlay (on/off), streaming.pin_position, streaming.pin_size, streaming.pin_obs (a window OBS can pick)."""
+Settings: streaming.pin_overlay (on/off), streaming.pin_x / pin_up (drag the box on the Overlays page), streaming.pin_size, streaming.pin_obs (a window OBS can pick)."""
 import time
 
 from core.logger import get_logger
@@ -16,7 +16,6 @@ BAR = "#14171C"
 TEXT = "#FFFFFF"
 TAG_TEXT = "#FFFFFF"
 WIDTH_SHARE = {"Small": 0.26, "Medium": 0.34, "Large": 0.44}
-SPOTS = {"Bottom left": (0.02, 0.80), "Bottom centre": (0.5, 0.82), "Top left": (0.02, 0.06), "Top centre": (0.5, 0.06), "Bottom right": (0.98, 0.80)}
 OBS_TITLE = "Starling Comment"
 
 
@@ -37,6 +36,24 @@ def wrap(text, measure, width, max_lines=5):
         lines = lines[:max_lines]
         lines[-1] = lines[-1].rstrip(" .,;:") + "…"
     return lines
+
+
+def gaps(settings):
+    """(gap from the left, gap from the bottom) in percent of the screen: where you dragged the box on the Overlays page."""
+    out = []
+    for key, default in (("streaming.pin_x", 2.0), ("streaming.pin_up", 8.0)):
+        try:
+            out.append(min(95.0, max(0.0, float(settings.get(key, default)))))
+        except (TypeError, ValueError):
+            out.append(default)
+    return tuple(out)
+
+
+def place(screen_w, screen_h, width, height, gap_x, gap_up):
+    """The window's top left inside the screen: gap_x percent from the left edge, gap_up percent up from the bottom edge, kept on screen."""
+    left = int(screen_w * gap_x / 100.0)
+    top = int(screen_h - screen_h * gap_up / 100.0 - height)
+    return max(0, min(left, screen_w - width)), max(0, min(top, screen_h - height))
 
 
 def tag_colour(platform):
@@ -104,9 +121,9 @@ class ChatPinOverlay(RedAlertOverlay):
             return
         user, text, platform = current
         x, y, w, h = self._screen_rect()
-        position = str(self.settings.get("streaming.pin_position", "Bottom left"))
+        gap_x, gap_up = gaps(self.settings)
         size = str(self.settings.get("streaming.pin_size", "Medium"))
-        key = (current, position, size, x, y, w, h)
+        key = (current, gap_x, gap_up, size, x, y, w, h)
         first = self.window is None
         if first:
             self.window = self._make()
@@ -129,16 +146,7 @@ class ChatPinOverlay(RedAlertOverlay):
             self.canvas.create_text(pad, tag_h // 2, text=user, fill=TAG_TEXT, font=name, anchor="w")
             for index, line in enumerate(lines):
                 self.canvas.create_text(pad, tag_h + pad + line_h * index + line_h // 2, text=line, fill=TEXT, font=body, anchor="w")
-            fx, fy = SPOTS.get(position, SPOTS["Bottom left"])
-            if position == "Bottom right":
-                left = int(w * fx) - width
-            elif "centre" in position:
-                left = int(w * 0.5 - width / 2)
-            else:
-                left = int(w * fx)
-            top = int(h * fy)
-            if top + height > h - 4:
-                top = max(0, h - height - 4)
+            left, top = place(w, h, width, height, gap_x, gap_up)
             self.window.geometry("%dx%d+%d+%d" % (width, height, x + left, y + top))
             self._font = (body, name)
         if not self._shown:
