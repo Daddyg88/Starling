@@ -1231,7 +1231,10 @@ class Dashboard:
             ctk.CTkLabel(title, text=" NEW ", font=self._font(T.SMALL_SIZE - 2, True), text_color=T.BG, fg_color=T.ORANGE, corner_radius=4).pack(side="left", padx=(8, 0))
         note = field.help + ("  (applies after restart)" if field.restart else "")
         if note.strip():
-            ctk.CTkLabel(left, text=note.strip(), font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w").pack(anchor="w")
+            help_label = ctk.CTkLabel(left, text=note.strip(), font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w", justify="left", wraplength=560)
+            help_label.pack(anchor="w")
+            # the explanation wraps to the room there is (the switch or menu on the right takes about 340 pixels), instead of being cut off
+            card.bind("<Configure>", lambda e, w=help_label: w.configure(wraplength=max(240, e.width - 340)), add="+")
 
         if field.kind == "choice":
             menu = ctk.CTkOptionMenu(card, values=self.model.labels(field), width=260, font=self._font(),
