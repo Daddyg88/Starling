@@ -836,6 +836,8 @@ class Dashboard:
         if page.id == "voice":
             extra.append(("Test her voice", self.test_voice))
             extra.append(("Prepare her voice now (makes her faster)", self.prepare_voice))
+            extra.append(("Run her voice on the graphics card (NVIDIA, downloads about 2.5 GB)", self.install_voice_gpu))
+            extra.append(("Go back to the processor voice (deletes that download)", self.remove_voice_gpu))
             extra.append(("Install Australian voice (downloads several GB)", self.install_australian_voice))
             extra.append(("Clear saved voice lines (frees disk space)", self.clear_voice_lines))
         if page.id == "personality":
@@ -1416,6 +1418,31 @@ class Dashboard:
                 self._ai_busy = False
             say(message + ("" if ok else " Nothing else is affected."), T.GOOD if ok else T.BAD)
         threading.Thread(target=work, name="install-ai-chat", daemon=True).start()
+
+    def install_voice_gpu(self):
+        """Voice page: download the graphics-card voice library in the background and show the progress."""
+        import threading
+        if getattr(self, "_gpu_voice_busy", False):
+            self._controls_result("That is already being installed. Please wait.", T.WARN)
+            return
+        self._gpu_voice_busy = True
+        say = lambda text, colour=None: self.root.after(0, lambda: self._controls_result(text, colour))
+        say("Installing the graphics-card voice library. It is about 2.5 GB, so give it a few minutes. You can keep using Starling.", T.WARN)
+
+        def work():
+            try:
+                ok, message = self.app.install_voice_gpu(progress=lambda text: say(str(text).strip(), T.WARN))
+            except Exception as exc:
+                ok, message = False, "The install failed: %s" % exc
+            finally:
+                self._gpu_voice_busy = False
+            say(message, T.GOOD if ok else T.BAD)
+        threading.Thread(target=work, name="install-voice-gpu", daemon=True).start()
+
+    def remove_voice_gpu(self):
+        from tkinter import messagebox
+        if messagebox.askyesno("Processor voice", "Delete the graphics-card voice download (about 2.5 GB)? Her voice goes back to the processor after a restart."):
+            self._controls_result(self.app.remove_voice_gpu(), T.GOOD)
 
     def install_ai_gpu(self):
         """Personality page: download the graphics-card AI engine in the background and show the progress."""

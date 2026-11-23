@@ -251,3 +251,90 @@ class BatFixTests(unittest.TestCase):
         text = open("run_voice_on_graphics_card.bat", encoding="utf-8").read()
         self.assertIn("if not defined DONE call :try", text)
         self.assertIn('set "DONE=1"', text)
+
+
+class GpuTorchTests(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        from pathlib import Path
+        self.base = Path(tempfile.mkdtemp()) / "torch_gpu"
+
+    class R:
+        def __init__(self, code=0):
+            self.returncode, self.stdout, self.stderr = code, "", ""
+
+    def _install(self, results, **kw):
+        from tts import gpu_torch
+        seen = []
+
+        def run(command, **k):
+            seen.append(command)
+            if "--target" in command:
+                (self.base / "torch").mkdir(parents=True, exist_ok=True)
+            return results(command)
+        out = gpu_torch.install(run=run, free_bytes=lambda: 10 * 1073741824, base=self.base, platform_name="win32", python="py", **kw)
+        return out, seen
+
+    def test_not_windows_or_no_nvidia(self):
+        from tts import gpu_torch
+        self.assertFalse(gpu_torch.install(base=self.base, platform_name="linux")[0])
+        out, _ = self._install(lambda c: self.R(1))
+        self.assertFalse(out[0])
+        self.assertIn("NVIDIA", out[1])
+        self.assertFalse(self.base.exists())
+
+    def test_not_enough_disk(self):
+        from tts import gpu_torch
+        ok, msg = gpu_torch.install(run=lambda c, **k: self.R(0), free_bytes=lambda: 1024, base=self.base, platform_name="win32")
+        self.assertFalse(ok)
+        self.assertIn("disk space", msg)
+
+    def test_first_working_version_stops_the_loop(self):
+        out, seen = self._install(lambda c: self.R(0))
+        self.assertTrue(out[0])
+        installs = [c for c in seen if "--target" in c]
+        self.assertEqual(len(installs), 1)                         # not four downloads
+        self.assertIn("cu126", installs[0][-1])
+        self.assertTrue(self.base.exists())
+
+    def test_falls_through_and_cleans_up(self):
+        def results(c):
+            if "--target" in c:
+                return self.R(1 if "cu126" in c[-1] else 0)
+            if c[1:2] == ["-I"]:
+                return self.R(1 if "cu124" in "".join(map(str, c)) else 0)
+            return self.R(0)
+        out, seen = self._install(results)
+        self.assertTrue(out[0])
+        self.assertEqual(len([c for c in seen if "--target" in c]), 2)
+        self.assertTrue(any("cu124" in c[-1] for c in seen if "--target" in c))
+
+    def test_nothing_works_removes_the_folder(self):
+        def results(c):
+            return self.R(1 if ("--target" in c or "-I" in c) else 0)
+        out, _ = self._install(results)
+        self.assertFalse(out[0])
+        self.assertFalse(self.base.exists())
+
+    def test_activate_puts_folder_first_and_gives_up_after_failed_starts(self):
+        from tts import gpu_torch
+        (self.base / "torch").mkdir(parents=True)
+        gpu_torch._write({"tag": "cu126", "starts_without_voice": 0}, self.base)
+        path = ["a"]
+        self.assertTrue(gpu_torch.activate(self.base, path))
+        self.assertEqual(path[0], str(self.base))
+        for _ in range(gpu_torch.MAX_FAILED_STARTS - 1):
+            gpu_torch.activate(self.base, ["a"])
+        gpu_torch.voice_ok(self.base)                                # her voice came up: count forgotten
+        self.assertEqual(gpu_torch._read(self.base)["starts_without_voice"], 0)
+        for _ in range(gpu_torch.MAX_FAILED_STARTS):
+            gpu_torch.activate(self.base, ["a"])
+        note = gpu_torch.activate(self.base, ["a"])
+        self.assertIn("put aside", note)
+        self.assertFalse(self.base.exists())
+
+    def test_activate_without_install_does_nothing(self):
+        from tts import gpu_torch
+        path = ["a"]
+        self.assertEqual(gpu_torch.activate(self.base, path), "")
+        self.assertEqual(path, ["a"])

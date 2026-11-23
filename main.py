@@ -37,6 +37,12 @@ if sys.version_info < (3, 10):
     print("You are using Python %d.%d." % sys.version_info[:2])
     sys.exit(1)
 
+try:                                    # the graphics-card torch (data/torch_gpu), if the player installed it: must come before anything imports torch
+    from tts import gpu_torch
+    _gpu_note = gpu_torch.activate()
+except Exception:
+    _gpu_note = ""
+
 from core.app import App
 from core.identity import wake_phrase
 
@@ -68,6 +74,8 @@ def main():
     args = options.parse_args()
 
     app = App()
+    if _gpu_note:
+        app.log.info("%s", _gpu_note)
     from core import crash
     from core.version import __version__
     crash.install(version=__version__)          # so a sudden stop leaves its reason in logs/crash.log

@@ -428,8 +428,10 @@ class KokoroTTS(BaseTTS):
                 import torch
                 device = getattr(getattr(pipeline, "model", None), "device", None)
                 log.info("Voice engine is running on: %s (torch %s, graphics card usable: %s). On a graphics card her sentences are made about "
-                         "ten times faster than on the processor. With an NVIDIA card: double-click run_voice_on_graphics_card.bat",
+                         "ten times faster than on the processor. With an NVIDIA card: Voice page > 'Run her voice on the graphics card'",
                          device or "unknown", torch.__version__, "yes" if torch.cuda.is_available() else "no")
+                from tts import gpu_torch
+                gpu_torch.voice_ok()            # the graphics-card library (if any) got her voice running: forget the failed-start count
             except Exception:
                 pass
             return pipeline

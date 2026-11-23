@@ -737,6 +737,22 @@ class App:
             message = "The AI chat will now run on your graphics card. Press 'Test the AI chat' to try it; if it fails she falls back to the processor by herself."
         return ok, message
 
+    def install_voice_gpu(self, progress=print):
+        """Voice page: installs the graphics-card torch into data/torch_gpu (see tts/gpu_torch.py). Returns (ok, sentence)."""
+        from tts import gpu_torch
+
+        def note(text):
+            self.log.info("Graphics-card voice install: %s", str(text).strip())
+            progress(text)
+        ok, message = gpu_torch.install(progress=note)
+        self.log.info("Graphics-card voice install %s: %s", "finished" if ok else "FAILED", message)
+        return ok, message
+
+    def remove_voice_gpu(self):
+        from tts import gpu_torch
+        gpu_torch.remove()
+        return "The graphics-card voice library was deleted. Restart Starling and her voice uses the processor again."
+
     def install_australian_voice(self, progress=print):
         """Installs the Australian voice (MeloTTS) into its own private folder and picks it. Returns (ok, sentence for the screen)."""
         from tts import melo_install

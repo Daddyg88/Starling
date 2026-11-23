@@ -2360,3 +2360,9 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * personality/llm.py: _load tries the GPU engine when llm.use_gpu and falls back to the CPU engine (then _gpu_failed for the session); warm_up() loads in the background when keep_loaded; _unload_if_idle respects keep_loaded.
 * core/app.py install_ai_gpu, ui/dashboard.py button, ui/settings_model.py fields. run_voice_on_graphics_card.bat stops after the first working torch (DONE flag).
 * Tests: tests/test_quiet_live.py (GpuEngineTests, DefaultsMigrationTests, BatFixTests).
+
+## 0.96.144 - Graphics-card voice from a button
+
+* tts/gpu_torch.py: install() = nvidia-smi + free-space check, then for each of cu126/cu124/cu128/cu118: pip install --no-deps --target data/torch_gpu torch --index-url ..., probe in a separate `python -I` (torch.cuda.is_available and '+cu' in version), keep the first that works. activate() (called first in main.py) puts the folder at sys.path[0] and counts starts without a running voice (voice_ok() from the Kokoro factory clears it); after MAX_FAILED_STARTS it renames the folder to torch_gpu.broken.
+* core/app.py install_voice_gpu / remove_voice_gpu; ui/dashboard.py buttons on the Voice page.
+* Tests: tests/test_quiet_live.py GpuTorchTests.
