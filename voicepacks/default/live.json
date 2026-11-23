@@ -1,0 +1,82 @@
+{
+ "_help": "What she says when you ask about your own ship (fuel, hull, shields, cargo, jump range, jumps left, materials) or about exobiology payouts. See personality/live_answers.py. Placeholders: {tons} {capacity} {percent} {hull} {carried} {free} {range} {jumps} {s} {name} {count} {value} {second} {second_value} {genus} {best} {best_value} {worst_value}.",
+ "Live_Fuel": [
+  "You've got {tons} tonnes of fuel, about {percent} percent of the tank.",
+  "The tank's at {percent} percent. That's {tons} tonnes of {capacity}.",
+  "Fuel is {tons} tonnes, {percent} percent full."
+ ],
+ "Live_Fuel_Low": [
+  "Only {tons} tonnes left, about {percent} percent. I'd find a star to scoop soon.",
+  "The tank is down to {percent} percent, {tons} tonnes. Please don't strand us.",
+  "{tons} tonnes, which is just {percent} percent. Time to refuel, Commander."
+ ],
+ "Live_Fuel_Tons": [
+  "The main tank has {tons} tonnes in it."
+ ],
+ "Live_Fuel_Unknown": [
+  "The fuel gauge hasn't told me yet. Give it a moment, or fly a little and ask again."
+ ],
+ "Live_Hull": [
+  "Hull is at {hull} percent.",
+  "We're holding at {hull} percent hull.",
+  "The hull is {hull} percent. Not bad."
+ ],
+ "Live_Hull_Low": [
+  "Hull is down to {hull} percent. I'd get that looked at.",
+  "Only {hull} percent hull left, Commander. Please be gentle."
+ ],
+ "Live_Shields_Up": [
+  "Shields are up.",
+  "The shields are up and holding."
+ ],
+ "Live_Shields_Down": [
+  "Shields are down. Be careful.",
+  "The shields are down at the moment, Commander."
+ ],
+ "Live_Cargo": [
+  "You're carrying {carried} tonnes of {capacity}. That leaves {free} free.",
+  "The hold has {carried} tonnes in it, with {free} tonnes of room left."
+ ],
+ "Live_Cargo_Empty": [
+  "The hold is empty. You've got {capacity} tonnes of room."
+ ],
+ "Live_Cargo_Carried": [
+  "You're carrying {carried} tonnes of cargo."
+ ],
+ "Live_Cargo_Unknown": [
+  "I haven't seen the cargo figures yet. Open the hold or fly a little and ask again."
+ ],
+ "Live_Range": [
+  "Your jump range is about {range} light years, as loaded.",
+  "With the current build you can jump about {range} light years."
+ ],
+ "Live_Range_Unknown": [
+  "I haven't had the ship's loadout yet. Change ships or log back in and I'll know."
+ ],
+ "Live_Jumps": [
+  "{jumps} jump{s} left on the route.",
+  "The route has {jumps} more jump{s}."
+ ],
+ "Live_Jumps_None": [
+  "I don't see a route plotted at the moment."
+ ],
+ "Live_Material": [
+  "You have {count} {name}.",
+  "You're holding {count} of {name}."
+ ],
+ "Live_Bio_Best": [
+  "The best payer I know is {name}, {value} for a full set of samples. Second is {second} at {second_value}.",
+  "{name} pays the most, at {value} for a full set. {second} comes next with {second_value}."
+ ],
+ "Live_Bio_Worst": [
+  "The lowest payer I know is {name}, at {value} for a full set. Next is {second} with {second_value}.",
+  "{name} pays least, just {value} for a full set."
+ ],
+ "Live_Bio_Species": [
+  "{name} pays {value} for a full set of samples.",
+  "A full set of {name} is worth {value}."
+ ],
+ "Live_Bio_Genus": [
+  "{genus} species pay between {worst_value} and {best_value}. The best of them is {best}."
+ ]
+}

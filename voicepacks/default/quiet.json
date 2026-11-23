@@ -1,0 +1,22 @@
+{
+ "_help": "What she says when you tell her to be quiet ({minutes} = how long she stays quiet) and when you say she can talk again.",
+ "Quiet_Ok": [
+  "Okay. Quiet for {minutes} minutes. Shout if you need me.",
+  "Understood. I'll keep it down for {minutes} minutes.",
+  "Going quiet. Safety warnings only for {minutes} minutes."
+ ],
+ "Quiet_Polite": [
+  "Of course. I'll be quiet for {minutes} minutes. Just say if you want me back.",
+  "Since you asked so nicely, quiet for {minutes} minutes."
+ ],
+ "Quiet_Rude": [
+  "Charming. Fine. Quiet for {minutes} minutes.",
+  "Wow. Okay. I'll shut up for {minutes} minutes. Safety warnings still count though.",
+  "Rude. But fine, {minutes} minutes of silence."
+ ],
+ "Quiet_Back": [
+  "Back on, Commander. Did you miss me?",
+  "Talking again. I was getting rusty.",
+  "Good. I had so much to say."
+ ]
+}

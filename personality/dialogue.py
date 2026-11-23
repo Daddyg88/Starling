@@ -144,6 +144,8 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "lore.json"))          # her back story (East Orion Company)
             self._merge(_read_json(self.pack_dir / "smalltalk.json"))     # answers when you chat to her
             self._merge(_read_json(self.pack_dir / "brain.json"))         # her "brain": opinions, game answers, streaming, riddles
+            self._merge(_read_json(self.pack_dir / "live.json"))          # answers about your own ship and biology payouts
+            self._merge(_read_json(self.pack_dir / "quiet.json"))         # "be quiet" and "you can talk again"
             self._merge(_read_json(self.pack_dir / "confirm.json"))       # "did you mean...?" when she is nearly sure
             self._merge(_read_json(self.pack_dir / "more.json"))          # extra lines for the call-outs she says most
             self._merge(_read_json(self.pack_dir / "chat2.json"))         # opinion about "it", greetings

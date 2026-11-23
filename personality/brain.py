@@ -26,6 +26,7 @@ from core.ships import ship_name
 from mining import minerals
 from personality import freechat
 from personality.knowledge import Knowledge, convert, maths
+from personality.live_answers import LiveAnswers
 from personality.meaning import load_meaning
 from personality.mood_engine import effective_mood
 from personality.smalltalk import clean
@@ -93,6 +94,7 @@ class Brain:
         self.history = []            # [(time, key, what you said, what she said)], newest last
         self.knowledge = knowledge if knowledge is not None else (Knowledge() if intents is None else None)   # personality/knowledge.py
         self.ships = ships           # personality/ships_info.py: ship stats she knows offline
+        self.live = LiveAnswers()   # personality/live_answers.py: your fuel, hull, cargo... and biology payouts
         self.ship_topic = None       # (ship name, time) of the last ship she talked about
         self.people = people  # personality/people.py: friends and family she has been told about (private)
         self.unanswered = unanswered  # personality/unanswered.py: the questions she could not answer, counted
@@ -152,6 +154,9 @@ class Brain:
         if reply is not None:
             return reply
         reply = self._ship_turn(tidy)
+        if reply is not None:
+            return reply
+        reply = self._live_turn(tidy)
         if reply is not None:
             return reply
         reply = self._follow_context(tidy)
@@ -242,6 +247,23 @@ class Brain:
             return reply
         except Exception:
             log.exception("Ship notes failed; carrying on")
+            return None
+
+    def _live_turn(self, tidy):
+        """'How much fuel do I have left?', 'what's the highest exobiology payout?' (personality/live_answers.py)."""
+        if self.live is None or not self.settings.get("brain.knowledge", True):
+            return None
+        try:
+            found = self.live.answer(tidy, self._state())
+            if found is None:
+                return None
+            key, values = found
+            reply = self._say_pool(key, values, remember=True)
+            if reply is not None:
+                self._remember("Live", tidy, reply)
+            return reply
+        except Exception:
+            log.exception("Live answers failed; carrying on")
             return None
 
     def _follow_context(self, tidy):

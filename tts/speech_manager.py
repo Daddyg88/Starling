@@ -31,6 +31,11 @@ DEFAULT_MAX_AGE = {"critical": 30.0, "normal": 8.0, "low": 4.0}
 MAX_WAITING_NORMAL = 3
 
 
+# While she is "quiet" (you said "be quiet"), only these still speak besides safety warnings: replies to YOU (answers, commands, tests).
+QUIET_ALLOWED = ("brain", "voice.command", "voice.heard", "ask.reply", "personality.route", "personality.watcher_reply", "personality.intro",
+                 "settlement.map", "memory.recall", "dashboard.test", "radar.test", "autohonk.test", "autohonk.problem", "combat_assist.problem")
+
+
 @dataclass
 class SpeechItem:
     text: Optional[str]
@@ -66,6 +71,7 @@ class SpeechManager:
         self._warned_no_voice = False
         self.dropped = 0
         self.alert = False               # RED ALERT (core/red_alert.py): background chatter is dropped
+        self.quiet_until = 0.0           # "be quiet": until then only safety warnings and replies to you are spoken
 
     # ---- lifecycle ----
     def start(self):
@@ -99,6 +105,9 @@ class SpeechManager:
                           self.clock(), next(self._counter), max_age=max_age)
         with self._cond:
             if not self._running:
+                return False
+            if priority != "critical" and self.is_quiet() and event_name not in QUIET_ALLOWED:
+                self.dropped += 1
                 return False
             if priority == "low" and (self.alert or self._current is not None or self._queue):
                 self.dropped += 1
@@ -142,6 +151,18 @@ class SpeechManager:
                     provider.prefetch(text, VoiceSettings.from_settings(self.settings))
             except Exception:
                 log.debug("Preparing a line ahead failed", exc_info=True)
+
+    def be_quiet(self, seconds):
+        """Stops talking now (a safety warning is never cut off) and keeps her quiet for this long. 0 = talk again."""
+        self.quiet_until = (self.clock() + float(seconds)) if seconds and seconds > 0 else 0.0
+        if self.quiet_until:
+            self.interrupt()
+
+    def is_quiet(self):
+        return self.clock() < self.quiet_until
+
+    def quiet_left(self):
+        return max(0.0, self.quiet_until - self.clock())
 
     def interrupt(self):
         """Stop talking now, unless she is saying a safety warning. Used when you press the push-to-talk button."""

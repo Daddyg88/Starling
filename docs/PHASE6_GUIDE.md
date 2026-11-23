@@ -2339,3 +2339,10 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 
 * stt/listener.py: while she speaks, frames still go to the detector when stt.wake_interrupts is on; short utterances (<= BARGE_MAX_SECONDS, one per BARGE_GAP) are queued with barge=True, transcribed, ignored unless they carry the wake word and are not mostly her own words, then on_barge() (speech.interrupt(), keeps critical warnings) and the deaf tail is cleared. core/app.py wires on_barge. Tests: tests/test_stt.py WakeInterruptTests.
 
+
+## 0.96.141 - Be quiet and live answers
+
+* control/quiet_voice.py: QuietVoice helper (inserted first in commands.extra_helpers) matches whole short sentences (be quiet/quite, shut up, that's enough, stop talking, optional "for N minutes") and calls SpeechManager.be_quiet(seconds); "you can talk again" only works while quiet.
+* tts/speech_manager.py: quiet_until; say() drops non-critical items whose event_name is not in QUIET_ALLOWED (replies to the player) while quiet.
+* personality/live_answers.py + voicepacks/default/live.json: loose-wording answers for fuel, hull, shields, cargo, range, jumps, materials and exobiology payouts from GameState, hooked in Brain._live_turn after _ship_turn. Setting speech.quiet_minutes (default 10).
+* Tests: tests/test_quiet_live.py.

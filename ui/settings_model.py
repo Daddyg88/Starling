@@ -599,6 +599,8 @@ def build_pages(mic_lister=None, pack_folder=None):
             Field("personality.active_voicepack", "Voice pack", "choice", lambda: voicepack_choices(pack_folder),
                   restart=True),
             Field("speech.allow_mature", "Allow strong language", "toggle"),
+            Field("speech.quiet_minutes", "How long she stays quiet", "choice", [("5 minutes", 5), ("10 minutes", 10), ("20 minutes", 20), ("30 minutes", 30), ("1 hour", 60)],
+                  help='Say "Starling, be quiet" (or "shut up") and she stops talking at once and keeps the chatter down this long. Safety warnings and answers to you still come through. "You can talk again" ends it early'),
         ]),
         Page("game", "Game", "How she watches Elite Dangerous.", [
             Field("journal.folder", "Journal folder", "text", restart=True,

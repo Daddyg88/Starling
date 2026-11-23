@@ -82,7 +82,7 @@ DEFAULTS = {
     "personality": {"active_voicepack": "default", "mood": "Friendly", "style": "personality", "mood_mode": "auto", "login_greeting": True, "mood_live": "Friendly", "mood_level": 3, "mood_level_live": 3,
                     "mood_random": "Friendly", "mood_random_level": 3, "mood_random_minutes": 20, "keep_points": True, "aussie_slang": True,
                     "remarks": "sometimes", "reactions": True, "pet_names": True, "custom_pet_names": "", "innuendo": False, "dark_humour": True, "affection_credits": 500000000},
-    "speech": {"enabled": True, "ptt_interrupts": True, "use_recordings": True, "allow_mature": False,
+    "speech": {"quiet_minutes": 10, "enabled": True, "ptt_interrupts": True, "use_recordings": True, "allow_mature": False,
                "windows_emergency_voice": False},
     "ai": {
         "enabled": False,
