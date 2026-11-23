@@ -52,6 +52,8 @@ class Dashboard:
         self.feed = EventFeed(app.bus)
         self.page_frames = {}
         self.nav_buttons = {}
+        self._advanced = {}               # model page id -> function that opens/closes its Advanced section
+        self._advanced_keys = {}          # model page id -> keys under that Advanced section
         self.current = None
         self._status_labels = []
         self._home_signature = None
@@ -188,14 +190,26 @@ class Dashboard:
         ctk.CTkLabel(head, text="SHIP  COMPANION", font=self._font(T.SMALL_SIZE - 1, head=True), text_color=T.ACCENT).grid(
             row=1, column=1, sticky="w")
         ctk.CTkFrame(side, height=1, fg_color=T.BORDER, corner_radius=0).pack(fill="x", padx=16, pady=(0, 10))
-        for page_id, title in [("home", "Home")] + [(p.id, p.title) for p in self.model.sidebar_pages]:
-            icon = T.ICONS.get(page_id, "\u25C7")
-            button = ctk.CTkButton(side, text="%s   %s" % (icon, title), anchor="w", height=38, corner_radius=8,
-                                   font=self._font(), fg_color="transparent", text_color=T.MUTED,
-                                   hover_color=T.PANEL_HOVER, border_width=1, border_color=T.BORDER_GLOW,
-                                   command=lambda i=page_id: self.show(i))
-            button.pack(fill="x", padx=12, pady=2)
-            self.nav_buttons[page_id] = button
+        self.search_entry = ctk.CTkEntry(side, placeholder_text="\u2315  Search settings...", height=32, font=self._font(T.SMALL_SIZE), fg_color=T.PANEL,
+                                         border_color=T.BORDER_GLOW, text_color=T.TEXT, corner_radius=8)
+        self.search_entry.pack(fill="x", padx=12, pady=(0, 6))
+        self.search_entry.bind("<KeyRelease>", self._search_typed)
+        self._search_job = None
+        menu = ctk.CTkScrollableFrame(side, fg_color="transparent", corner_radius=0)
+        menu.pack(fill="both", expand=True, padx=(0, 2))
+        entries = [(None, [("home", "Home")])] + [(title, [(p.id, p.title) for p in pages]) for title, pages in self.model.groups()]
+        for group, items in entries:
+            if group:
+                ctk.CTkLabel(menu, text=" ".join(group.upper()), font=self._font(T.SMALL_SIZE - 2, True, head=True), text_color=T.ACCENT_DIM,
+                             anchor="w").pack(fill="x", padx=16, pady=(10, 2))
+            for page_id, title in items:
+                icon = T.ICONS.get(page_id, "\u25C7")
+                button = ctk.CTkButton(menu, text="%s   %s" % (icon, title), anchor="w", height=32, corner_radius=8,
+                                       font=self._font(), fg_color="transparent", text_color=T.MUTED,
+                                       hover_color=T.PANEL_HOVER, border_width=1, border_color=T.BORDER_GLOW,
+                                       command=lambda i=page_id: self.show(i))
+                button.pack(fill="x", padx=10, pady=1)
+                self.nav_buttons[page_id] = button
         try:
             from core.app import APP_VERSION
             version = APP_VERSION.split(" ")[0]
@@ -269,6 +283,8 @@ class Dashboard:
         if page == "home":
             text = "WELCOME, COMMANDER"
             sub = "\u201C%s\u201D   \u2013   %s" % (self._quote, assistant_name(self.app.settings).title())
+        elif page == "search":
+            text, sub = "SEARCH", "Click Show on a result to jump to it"
         else:
             text = next((p.title for p in self.model.sidebar_pages if p.id == page), "").upper()
             sub = ""
@@ -809,6 +825,34 @@ class Dashboard:
             if child.parent == page.id:
                 row = self._build_section(frame, child, row, heading=True)
 
+    def _build_advanced(self, frame, page, fields, row):
+        """A collapsed 'Advanced' button under the page's everyday switches: timings, thresholds and things you rarely change."""
+        ctk = self.ctk
+        card = self._card(frame)
+        card.grid_columnconfigure(0, weight=1)
+        for index, field in enumerate(fields):
+            self._build_field(card, index, field)
+        state = {"open": False}
+        button = ctk.CTkButton(frame, text="", width=230, anchor="w", font=self._font(), fg_color="transparent", border_width=1, corner_radius=8,
+                               border_color=T.BORDER_GLOW, hover_color=T.PANEL_HOVER, text_color=T.MUTED)
+
+        def paint():
+            button.configure(text=("\u25BE   Advanced settings (%d)" if state["open"] else "\u25B8   Advanced settings (%d)") % len(fields))
+            if state["open"]:
+                card.grid(row=row + 1, column=0, sticky="ew", pady=(6, 0))
+            else:
+                card.grid_forget()
+
+        def toggle(open_=None):
+            state["open"] = (not state["open"]) if open_ is None else bool(open_)
+            paint()
+        button.configure(command=toggle)
+        button.grid(row=row, column=0, sticky="w", pady=(12, 0))
+        paint()
+        self._advanced[page.id] = toggle
+        self._advanced_keys[page.id] = {f.key for f in fields}
+        return row + 2
+
     def _build_section(self, frame, page, row, heading):
         """Draws one model page into the frame starting at grid row `row`; returns the next free row."""
         ctk = self.ctk
@@ -830,13 +874,17 @@ class Dashboard:
             return self._build_bookmarks(frame, page, row)
         if page.id == "setup":
             return self._build_setup(frame, row)
-        if page.fields:
+        everyday = [f for f in page.fields if not f.advanced]
+        advanced = [f for f in page.fields if f.advanced]
+        if everyday:
             card = self._card(frame)
             card.grid(row=row, column=0, sticky="ew")
             card.grid_columnconfigure(0, weight=1)
             row += 1
-            for index, field in enumerate(page.fields):
+            for index, field in enumerate(everyday):
                 self._build_field(card, index, field)
+        if advanced:
+            row = self._build_advanced(frame, page, advanced, row)
 
         extra = []
         if page.id == "voice":
@@ -848,6 +896,7 @@ class Dashboard:
             extra.append(("Clear saved voice lines (frees disk space)", self.clear_voice_lines))
         if page.id == "personality":
             extra.append(("Reset her mood", self.reset_mood))
+        if page.id == "aichat":
             extra.append(("Install AI chat (downloads the size chosen above: 0.4 to 4.7 GB)", self.install_ai_chat))
             extra.append(("Install AI chat for the graphics card (about 50 MB)", self.install_ai_gpu))
             extra.append(("Test the AI chat", self.test_ai_chat))
@@ -870,7 +919,7 @@ class Dashboard:
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
                       ("Clear the route", self.nav_clear),
                       ("Show a test route map for 10 seconds", self.test_route_overlay)]
-        if page.id == "personality":
+        if page.id == "hologram":
             extra += [("Move her hologram (drag her, double-click to lock)", self.move_hologram),
                       ("Show her hologram for 10 seconds (test)", self.test_hologram),
                       ("Play all her hologram poses and gestures once (test, about 70 seconds)", self.test_hologram_poses)]
@@ -1175,7 +1224,11 @@ class Dashboard:
         ctk = self.ctk
         left = ctk.CTkFrame(card, fg_color="transparent")
         left.grid(row=row, column=0, sticky="w", padx=18, pady=9)
-        ctk.CTkLabel(left, text=field.label, font=self._font(bold=True), text_color=T.TEXT, anchor="w").pack(anchor="w")
+        title = ctk.CTkFrame(left, fg_color="transparent")
+        title.pack(anchor="w")
+        ctk.CTkLabel(title, text=field.label, font=self._font(bold=True), text_color=T.TEXT, anchor="w").pack(side="left")
+        if field.new:
+            ctk.CTkLabel(title, text=" NEW ", font=self._font(T.SMALL_SIZE - 2, True), text_color=T.BG, fg_color=T.ORANGE, corner_radius=4).pack(side="left", padx=(8, 0))
         note = field.help + ("  (applies after restart)" if field.restart else "")
         if note.strip():
             ctk.CTkLabel(left, text=note.strip(), font=self._font(T.SMALL_SIZE), text_color=T.MUTED, anchor="w").pack(anchor="w")
@@ -1622,10 +1675,12 @@ class Dashboard:
     def show(self, page_id):
         if self.current:
             self.page_frames[self.current].grid_forget()
-            self.nav_buttons[self.current].configure(fg_color="transparent", text_color=T.MUTED, border_color=T.BORDER_GLOW)
+            if self.current in self.nav_buttons:
+                self.nav_buttons[self.current].configure(fg_color="transparent", text_color=T.MUTED, border_color=T.BORDER_GLOW)
         self.current = page_id
         self.page_frames[page_id].grid(row=0, column=0, sticky="nsew")
-        self.nav_buttons[page_id].configure(fg_color=T.PANEL, text_color=T.ACCENT, border_color=T.ACCENT)
+        if page_id in self.nav_buttons:
+            self.nav_buttons[page_id].configure(fg_color=T.PANEL, text_color=T.ACCENT, border_color=T.ACCENT)
         if page_id == "home":
             self._refresh_home()
         if page_id == "setup":
@@ -1635,6 +1690,67 @@ class Dashboard:
         self._draw_stars()
         if page_id == "voice":
             self._start_voice_poll()
+
+    # ---- searching the settings ----
+    def _search_typed(self, _event=None):
+        if self._search_job is not None:
+            self.root.after_cancel(self._search_job)
+        self._search_job = self.root.after(250, self._run_search)
+
+    def _run_search(self):
+        self._search_job = None
+        text = self.search_entry.get().strip()
+        if len(text) < 2:
+            if self.current == "search":
+                self.show("home")
+            return
+        try:
+            self._show_search(text, self.model.search(text))
+        except Exception:
+            log.exception("The settings search failed")
+
+    def _show_search(self, text, results):
+        ctk = self.ctk
+        old = self.page_frames.pop("search", None)
+        if old is not None:
+            if self.current == "search":
+                old.grid_forget()
+            old.destroy()
+        frame = ctk.CTkScrollableFrame(self.area, fg_color=T.BG, corner_radius=0)
+        frame.grid_columnconfigure(0, weight=1)
+        self.page_frames["search"] = frame
+        words = ("%d match" % len(results) + ("" if len(results) == 1 else "es")) if results else "Nothing matches"
+        ctk.CTkLabel(frame, text="%s for \u201C%s\u201D. Try fewer or simpler words (for example: voice, purple, gpu, overlay)." % (words, text),
+                     font=self._font(), text_color=T.MUTED, anchor="w", justify="left", wraplength=720).grid(row=0, column=0, sticky="w", pady=(0, 12))
+        for index, (page, field) in enumerate(results):
+            card = self._card(frame)
+            card.grid(row=index + 1, column=0, sticky="ew", pady=3)
+            card.grid_columnconfigure(0, weight=1)
+            owner = self.model.owner(page)
+            names = {p.id: p.title for p in self.model.pages}
+            where = names.get(owner, owner) + ("" if owner == page.id else "  \u203A  " + page.title)
+            ctk.CTkLabel(card, text=field.label, font=self._font(bold=True), text_color=T.TEXT, anchor="w").grid(row=0, column=0, padx=16, pady=(8, 0), sticky="w")
+            ctk.CTkLabel(card, text="On: " + where + ("   (under Advanced)" if field.advanced else ""), font=self._font(T.SMALL_SIZE), text_color=T.ACCENT,
+                         anchor="w").grid(row=1, column=0, padx=16, pady=(0, 8), sticky="w")
+            ctk.CTkButton(card, text="Show", width=80, font=self._font(), fg_color=T.PANEL, border_width=1, border_color=T.ACCENT_DIM, hover_color=T.PANEL_HOVER,
+                          text_color=T.TEXT, command=lambda o=owner, p=page, f=field: self.goto_field(o, p, f)).grid(row=0, column=1, rowspan=2, padx=16, pady=8)
+        self.show("search")
+
+    def goto_field(self, owner, page, field):
+        """Opens the page that holds a setting (and its Advanced section if it is in there) and scrolls to it."""
+        self.show(owner)
+        try:
+            if field.advanced and page.id in self._advanced:
+                self._advanced[page.id](True)
+            self.root.update_idletasks()
+            widget = getattr(self, "_w_" + field.key.replace(".", "_"), None)
+            frame = self.page_frames.get(owner)
+            if widget is not None and frame is not None:
+                span = max(1, frame.winfo_height())
+                offset = widget.winfo_rooty() - frame.winfo_rooty() - 60
+                frame._parent_canvas.yview_moveto(max(0.0, min(1.0, offset / float(span))))
+        except Exception:
+            log.debug("Could not scroll to the setting", exc_info=True)
 
     def _changed(self, did_change):
         if did_change:

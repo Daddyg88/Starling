@@ -2378,3 +2378,9 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 ## 0.96.146 - Chat comment is draggable
 
 * ui/overlay_layout.py: Box 'pin' (streaming.pin_x from the left, streaming.pin_up from the bottom); ui/chat_pin_overlay.py gaps()/place(); streaming.pin_position removed.
+
+## 0.96.147 - Dashboard tidy-up
+
+* ui/settings_model.py: Field.advanced / Field.new (ADVANCED_KEYS, NEW_KEYS); reorganise() cuts NEW_PAGES (aichat, hologram, streamwindow, streamintro) out of Personality and Streaming and moves MOVED_TO_OVERLAYS onto the Overlays page; SIDEBAR_GROUPS + SettingsModel.groups()/owner()/search().
+* ui/dashboard.py: grouped scrollable sidebar, search box (_search_typed/_show_search/goto_field), collapsed Advanced section per page (_build_advanced), NEW tag in _build_field; the AI chat and hologram buttons moved to their pages.
+* Setting names and values are untouched. Tests: tests/test_quiet_live.py DashboardTidyTests.

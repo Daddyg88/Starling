@@ -37,6 +37,8 @@ class Field:
     help: str = ""
     restart: bool = False                      # True = only takes effect after restarting the app
     placeholder: str = ""
+    advanced: bool = False                     # shown under the page's collapsed "Advanced" button (see ADVANCED_KEYS)
+    new: bool = False                          # carries a small NEW tag for a while (see NEW_KEYS)
 
 
 @dataclass
@@ -635,7 +637,98 @@ def build_pages(mic_lister=None, pack_folder=None):
     ]
     for page in pages:
         page.parent = SECTION_OF.get(page.id, "")
+    pages = reorganise(pages)
+    for page in pages:
+        for field in page.fields:
+            field.advanced = field.key in ADVANCED_KEYS
+            field.new = field.key in NEW_KEYS
     return pages
+
+
+# ---------------------------------------------------------------------------
+# Tidying the dashboard (0.96.147). Nothing here changes a setting's name or value: it only decides which page a switch is SHOWN on, so
+# everyone's saved settings.json keeps working. New pages are cut out of the two big ones, overlay switches move to the Overlays page.
+# ---------------------------------------------------------------------------
+NEW_PAGES = [
+    # (new page id, comes from, title, blurb, keys that move there (a trailing dot means "everything that starts with this"))
+    ("aichat", "personality", "Her brain and AI chat",
+     "How she answers anything you say, and the optional AI model that chats freely. Press the buttons at the bottom to install it, run it on your graphics card and test it.",
+     ("brain.", "llm.")),
+    ("hologram", "personality", "Hologram",
+     "Her see-through picture above the cockpit. Where it sits is set by dragging it on the Overlays page.",
+     ("hologram.",)),
+    ("streamwindow", "streaming", "Chat window and comments",
+     "The window that shows your Twitch and YouTube chat together, and the comments you click to put on the screen. Move the comment on the Overlays page.",
+     ("streaming.window", "streaming.pin_")),
+    ("streamintro", "streaming", "Stream intro and reactions",
+     "The ten minute intro, what she says about subs, raids and o7, and how she answers chat questions by herself.",
+     ("streaming.intro_", "streaming.react", "streaming.talk_in_combat", "streaming.salute", "streaming.chime_")),
+]
+MOVED_TO_OVERLAYS = ("streaming.pin_overlay", "streaming.pin_size", "streaming.pin_obs", "red_alert.banner", "red_alert.size", "hack.overlay", "hack.size")
+SIDEBAR_GROUPS = [
+    ("Setup", ("setup", "updates", "keybinds")),
+    ("Her", ("voice", "personality", "aichat", "hologram")),
+    ("Flying", ("navigation", "exploration", "exobiology", "mining", "trading", "combat", "onfoot", "antixeno")),
+    ("Stream", ("streaming", "streamwindow", "streamintro")),
+    ("Screen", ("overlays",)),
+    ("Tools", ("game", "developer")),
+]
+# Everyday switches stay in view; these are under each page's collapsed "Advanced" button (timings, thresholds, rarely changed things).
+ADVANCED_KEYS = frozenset("""stt.energy_threshold stt.model ptt.beep ptt.skip_wake voidcompass.port watcher.hush watcher.wait_for_calm
+recorder.seconds recorder.countdown commands.require_game_focus engineers.neutron_over_ly dssa.neutron_over_ly neutron.range_margin
+neutron.supercharge neutron.auto_x6 neutron.emergency mining.fav6 mining.fav7 mining.fav8 mining.fav9 mining.fav10
+streaming.hold_max streaming.user_cooldown streaming.action_cooldown streaming.ask_cooldown streaming.blocked_words streaming.window_pin
+streaming.pin_obs streaming.intro_wait streaming.chime_gap hologram.flicker hologram.sparks hologram.idle_loop hologram.poses
+hologram.talk_bounce hologram.idle_wait hologram.talk_motion hologram.turn hologram.mouth_open hologram.obs_capture hologram.power_down
+llm.fast_start llm.keep_loaded personality.keep_points personality.mood_random_minutes personality.custom_pet_names messages.npc
+messages.channels chitchat.notice chitchat.world personality.aussie_slang brain.thinking_lines app.log_level""".split())
+NEW_KEYS = frozenset("""llm.use_gpu llm.keep_loaded streaming.pin_overlay streaming.pin_replies streaming.pin_size streaming.pin_obs
+hologram.ai_colour speech.quiet_minutes stt.wake_interrupts llm.max_sentences""".split())
+
+
+def _matches(key, patterns):
+    return any(key.startswith(p) for p in patterns)
+
+
+def reorganise(pages):
+    """Cuts the new pages out of the big ones, moves the overlay switches, and returns the pages in sidebar order."""
+    by_id = {p.id: p for p in pages}
+    result = list(pages)
+    for new_id, source_id, title, blurb, patterns in NEW_PAGES:
+        source = by_id.get(source_id)
+        if source is None:
+            continue
+        keep, move = [], []
+        for field in source.fields:
+            (move if _matches(field.key, patterns) else keep).append(field)
+        source.fields = keep
+        page = Page(new_id, title, blurb, move)
+        by_id[new_id] = page
+        result.insert(result.index(source) + 1, page)
+    overlays = by_id.get("overlays")
+    if overlays is not None:
+        for page in result:
+            if page.id == "overlays":
+                continue
+            for field in [f for f in page.fields if f.key in MOVED_TO_OVERLAYS]:
+                page.fields.remove(field)
+                overlays.fields.append(field)
+    return result
+
+
+def search(model_pages, text, limit=30):
+    """Fields whose name, help, key or page match every word typed. Returns [(page, field)], best first (a name match beats a help match)."""
+    words = [w for w in re.split(r"\s+", str(text or "").lower().strip()) if w]
+    if not words or len(" ".join(words)) < 2:
+        return []
+    found = []
+    for page in model_pages:
+        for field in page.fields:
+            label, rest = field.label.lower(), " ".join((field.help, field.key, page.title)).lower()
+            if all(w in label or w in rest for w in words):
+                found.append((0 if all(w in label for w in words) else 1, len(found), page, field))
+    found.sort(key=lambda item: (item[0], item[1]))
+    return [(page, field) for _score, _n, page, field in found[:limit]]
 
 
 class SettingsModel:
@@ -644,10 +737,39 @@ class SettingsModel:
     def __init__(self, settings, mic_lister=None, pack_folder=None):
         self.settings = settings
         self.pages = build_pages(mic_lister, pack_folder)
-        self.sidebar_pages = [p for p in self.pages if not p.parent]
+        self.sidebar_pages = self._ordered([p for p in self.pages if not p.parent])
         self._saved = {f.key: settings.get(f.key) for p in self.pages for f in p.fields}
         self.pending_restart = set()
         self._cache = {}
+
+    @staticmethod
+    def _ordered(pages):
+        """Sidebar pages in group order (SIDEBAR_GROUPS); anything not listed goes last, in its old order."""
+        listed = [pid for _title, ids in SIDEBAR_GROUPS for pid in ids]
+        known = {p.id: p for p in pages}
+        ordered = [known[pid] for pid in listed if pid in known]
+        return ordered + [p for p in pages if p.id not in listed]
+
+    def groups(self):
+        """[(group title, [sidebar pages])] for the sidebar. Pages that are not in any group are put under 'More'."""
+        known = {p.id: p for p in self.sidebar_pages}
+        out, used = [], set()
+        for title, ids in SIDEBAR_GROUPS:
+            members = [known[pid] for pid in ids if pid in known]
+            used.update(p.id for p in members)
+            if members:
+                out.append((title, members))
+        rest = [p for p in self.sidebar_pages if p.id not in used]
+        if rest:
+            out.append(("More", rest))
+        return out
+
+    def owner(self, page):
+        """The sidebar page that shows this model page (a page with a parent is a section inside its parent)."""
+        return page.parent or page.id
+
+    def search(self, text, limit=30):
+        return search(self.pages, text, limit)
 
     # ---- looking things up ----
     def all_fields(self):

@@ -48,7 +48,8 @@ STAR_COUNT = 110
 ICONS = {"home": "\u25C8", "voice": "\u25C9", "listening": "\u25CE", "controls": "\u25A3", "chat": "\u2726",
          "combat": "\u271B", "onfoot": "\u2689", "exploration": "\u25CD", "exobiology": "\u2740", "mining": "\u2692", "trading": "\u21C4",
          "antixeno": "\u2620", "navigation": "\u25B2", "updates": "\u21E9", "bookmarks": "\u25C6", "personality": "\u25CF",
-         "game": "\u25A7", "streaming": "\u25B6", "developer": "\u2699", "setup": "\u2714"}
+         "game": "\u25A7", "streaming": "\u25B6", "developer": "\u2699", "setup": "\u2714", "aichat": "\u2735", "hologram": "\u25CC",
+         "streamwindow": "\u25A4", "streamintro": "\u2605", "overlays": "\u25A6", "exploration": "\u25CD"}
 
 # one line along the bottom of the window, changed each time the dashboard opens
 QUOTES = ["The best view comes after the hardest jump.", "Same sky. Different horizon.", "Fly safe, Commander.",

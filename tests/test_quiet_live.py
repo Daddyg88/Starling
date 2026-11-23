@@ -446,3 +446,69 @@ class PinPlacementTests(unittest.TestCase):
         left, top = O.place(1920, 1080, 600, 150, 10, 20)
         self.assertEqual((left, top), (192, 1080 - 216 - 150))
         self.assertEqual(O.place(1920, 1080, 600, 150, 95, 0), (1320, 930))        # kept on screen
+
+
+class DashboardTidyTests(unittest.TestCase):
+    def setUp(self):
+        from ui.settings_model import SettingsModel
+
+        class S(dict):
+            def get(self, k, d=None):
+                return dict.get(self, k, d)
+        self.model = SettingsModel(S())
+
+    def test_no_setting_lost_or_shown_twice(self):
+        keys = [f.key for f in self.model.all_fields()]
+        self.assertEqual(len(keys), len(set(keys)))
+        self.assertGreaterEqual(len(keys), 246)          # the same 246 settings as before the tidy-up (only their pages changed)
+        for must in ("llm.use_gpu", "streaming.pin_overlay", "hologram.ai_colour", "speech.quiet_minutes", "app.name", "streaming.window",
+                     "hologram.size", "red_alert.banner", "hack.overlay"):
+            self.assertIn(must, keys)
+
+    def test_groups_cover_every_sidebar_page_once(self):
+        listed = [p.id for _t, pages in self.model.groups() for p in pages]
+        self.assertEqual(sorted(listed), sorted(p.id for p in self.model.sidebar_pages))
+        self.assertEqual([t for t, _ in self.model.groups()], ["Setup", "Her", "Flying", "Stream", "Screen", "Tools"])
+
+    def test_big_pages_are_split(self):
+        sizes = {}
+        for page in self.model.pages:
+            sizes[page.id] = len(page.fields)
+        self.assertLess(sizes["personality"], 30)
+        self.assertLess(sizes["streaming"], 25)
+        for new in ("aichat", "hologram", "streamwindow", "streamintro"):
+            self.assertIn(new, sizes)
+        page = {p.id: p for p in self.model.pages}
+        self.assertIn("llm.use_gpu", [f.key for f in page["aichat"].fields])
+        self.assertIn("streaming.pin_replies", [f.key for f in page["streamwindow"].fields])
+        self.assertIn("streaming.chime_in", [f.key for f in page["streamintro"].fields])
+        self.assertIn("red_alert.banner", [f.key for f in page["overlays"].fields])
+        self.assertIn("streaming.pin_overlay", [f.key for f in page["overlays"].fields])
+
+    def test_search(self):
+        found = {f.key: p.id for p, f in self.model.search("purple")}
+        self.assertEqual(found, {"hologram.ai_colour": "hologram"})
+        self.assertIn("llm.use_gpu", [f.key for _p, f in self.model.search("gpu")])
+        self.assertEqual(self.model.search("x"), [])
+        self.assertEqual(self.model.search("zzzzqqq"), [])
+        names = [f.label.lower() for _p, f in self.model.search("keep loaded")]
+        self.assertTrue(names and "loaded" in names[0])
+        self.assertLessEqual(len(self.model.search("the")), 30)
+
+    def test_advanced_and_new_marks(self):
+        adv = [f for f in self.model.all_fields() if f.advanced]
+        new = [f for f in self.model.all_fields() if f.new]
+        self.assertGreater(len(adv), 20)
+        self.assertTrue(new)
+        for page in self.model.pages:
+            if page.fields:
+                self.assertTrue([f for f in page.fields if not f.advanced], "page %s has only advanced settings" % page.id)
+
+    def test_owner_of_a_section(self):
+        page = {p.id: p for p in self.model.pages}
+        self.assertEqual(self.model.owner(page["listening"]), "voice")
+        self.assertEqual(self.model.owner(page["aichat"]), "aichat")
+
+    def test_dashboard_compiles(self):
+        import py_compile
+        py_compile.compile("ui/dashboard.py", doraise=True)
