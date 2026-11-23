@@ -783,6 +783,31 @@ class RouteVoice:
             margin = 0.9
         return round(float(own) * margin, 2)
 
+    def _local_route(self, here, target, rng):
+        """Our own neutron route when Spansh fails. None when there is no list, no position, or no way found."""
+        if not self.settings.get("neutron.local_backup", True):
+            return None
+        try:
+            from navigation.neutron_router import NeutronRouter
+            router = NeutronRouter()
+            if not router.ready:
+                return None
+            state = self.state_provider()
+            start = getattr(state, "star_pos", None) or router.find(here)
+            goal = router.find(target)
+            if goal is None:
+                try:
+                    goal = self.spansh.coordinates(target)
+                except Exception:
+                    goal = None
+            if not start or not goal:
+                return None
+            log.info("Spansh failed, so Starling's own neutron list is plotting the route")
+            return router.route(here, tuple(start), target, tuple(goal), rng, self.supercharge())
+        except Exception:
+            log.exception("The backup neutron plotter failed")
+            return None
+
     def _plot_now(self, name):
         try:
             state = self.state_provider()
@@ -795,8 +820,13 @@ class RouteVoice:
                 self.narrator.say("RouteNoRange")
                 return
             target = self.spansh.find_system(name)
-            waypoints = self.spansh.neutron_route(
-                here, target, rng, self.settings.get("neutron.efficiency", 60), self.supercharge())
+            try:
+                waypoints = self.spansh.neutron_route(
+                    here, target, rng, self.settings.get("neutron.efficiency", 60), self.supercharge())
+            except SpanshError as error:
+                waypoints = self._local_route(here, target, rng)          # backup: our own list, if there is one
+                if waypoints is None:
+                    raise error
             self.follower.set_route(waypoints, target, here)
             if not self.follower.active:
                 self.narrator.say("RouteArrived", {"destination": target})
