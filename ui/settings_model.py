@@ -223,6 +223,8 @@ def build_pages(mic_lister=None, pack_folder=None):
                   placeholder="Leave empty to use her name",
                   help="What you say to get her attention. Empty = her name"),
             Field("stt.require_wake", "Only react when I say her name", "toggle"),
+            Field("stt.wake_interrupts", "Saying her name makes her stop talking", "toggle",
+                  help="While she is speaking she keeps one ear open: if you say her name (a short phrase, like 'Starling, stop' or 'Starling, what is my fuel') she stops and listens. She stops about a second after you finish the phrase. Her safety warnings are never cut off. If you use speakers and she sometimes stops by herself, or the PC is weak, turn this off or use headphones"),
             Field("stt.reply", "She answers when she hears me", "toggle"),
             Field("ptt.mode", "Push-to-talk", "choice", PTT_MODES,
                   help="With push-to-talk you do not need to say her name"),

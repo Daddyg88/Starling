@@ -6,8 +6,10 @@ Three small workers, none of which can slow the game or the journal reader:
   2. the "ear" thread cuts the sound into sentences (loudness only),
   3. the "brain" thread turns each sentence into text (the heavy part, low priority).
 
-She does NOT listen while she is speaking (otherwise she would hear herself),
-and for a moment afterwards (so the end of her sentence is not mistaken for you).
+She does NOT act on what she hears while she is speaking (otherwise she would answer herself), and for a moment afterwards (so the end
+of her sentence is not mistaken for you). With stt.wake_interrupts on (the default) she keeps ONE ear open for the wake word: a short
+phrase heard while she talks is understood, and only if it starts with her name (and is not just her own voice coming back through the
+speakers) does she stop talking and listen.
 
 Each thing you say is announced on the event bus as  "voice.heard"  with:
     text       everything that was understood
@@ -31,6 +33,9 @@ log = get_logger("listener")
 
 HEARD = "voice.heard"
 TAIL_SECONDS = 0.35     # stay deaf this long after she stops talking
+BARGE_MAX_SECONDS = 4.0 # while she talks, only short phrases are looked at for her name (a whole sentence is more likely her own voice)
+BARGE_GAP = 2.0         # and at most one every two seconds, so understanding speech never competes with her voice for long
+BARGE_ECHO_SHARE = 0.7  # if this much of the phrase is words she is saying right now, it is her own voice
 SELF_ECHO_SECONDS = 8.0 # a sentence that matches what she just said is her own voice coming back, not you
 SELF_ECHO_RATIO = 0.85
 
@@ -66,6 +71,8 @@ class Listener:
         self.heard_count = 0
         self.interceptor = None         # optional: interceptor(text, wake, command, ptt) -> True if it used the sentence
         self._said = []                 # (time, words) of what she said recently
+        self.on_barge = None            # called (no arguments) when you speak over her with her name: it should make her stop talking
+        self._last_barge = -1e9
 
     # ---- lifecycle ----
     def start(self):
@@ -119,6 +126,19 @@ class Listener:
     def deaf(self):
         return self._speaking or self.clock() < self._deaf_until
 
+    def _barge_on(self):
+        return bool(self.settings.get("stt.wake_interrupts", True)) and self.on_barge is not None
+
+    def _mostly_her_words(self, text):
+        """True when nearly every word of the phrase is a word she is saying right now: it is her own voice, not you."""
+        heard = re.findall(r"[a-z0-9']+", text.lower())
+        if not heard:
+            return True
+        mine = set()
+        for _when, said in self._said:
+            mine.update(said.split())
+        return sum(1 for word in heard if word in mine) / float(len(heard)) >= BARGE_ECHO_SHARE
+
     # ---- the ear ----
     def _load_and_listen(self):
         try:
@@ -137,6 +157,12 @@ class Listener:
                 continue
             ptt = self.gate is not None and self.gate.enabled()
             if self.deaf():
+                if self._speaking and not ptt and self._barge_on():
+                    try:
+                        self._queue(self.detector.feed(frame), False, barge=True)      # she is talking: a short phrase may be you saying her name
+                    except Exception:
+                        log.exception("Problem while cutting up sound")
+                        self.detector.reset()
                 continue
             try:
                 if ptt and not self.gate.is_open():
@@ -159,11 +185,15 @@ class Listener:
                 continue
             self._queue(utterance, ptt)
 
-    def _queue(self, utterance, ptt):
+    def _queue(self, utterance, ptt, barge=False):
         if utterance is None:
             return
+        if barge:
+            if len(utterance) > BARGE_MAX_SECONDS * RATE or self.clock() - self._last_barge < BARGE_GAP:
+                return
+            self._last_barge = self.clock()
         try:
-            self._jobs.put_nowait((utterance, ptt))
+            self._jobs.put_nowait((utterance, ptt, barge))
         except queue.Full:
             log.debug("Too busy to transcribe; skipped a sentence")
 
@@ -171,10 +201,10 @@ class Listener:
     def _think(self):
         while self._running:
             try:
-                audio, ptt = self._jobs.get(timeout=0.3)
+                audio, ptt, barge = self._jobs.get(timeout=0.3)
             except queue.Empty:
                 continue
-            if self.deaf():
+            if self.deaf() and not (barge and self._speaking):
                 continue   # she started talking while we were queued: it was probably her
             started = self.clock()
             try:
@@ -184,19 +214,29 @@ class Listener:
                 continue
             took = self.clock() - started
             (log.info if took > 2.5 else log.debug)("Understanding that took %.2f s", took)
-            self.handle_text(text, ptt)
+            self.handle_text(text, ptt, barge=barge)
 
-    def handle_text(self, text, ptt=False):
+    def handle_text(self, text, ptt=False, barge=False):
         text = (text or "").strip()
         if len(text.replace(".", "").strip()) < 2:
             return
-        if self._is_her_own_voice(text):
+        if self._is_her_own_voice(text) or (barge and self._mostly_her_words(text)):
             log.debug("Ignored her own voice: %r", text)
             return
         if is_garbage(text):
             log.debug("Ignored a garbled transcription: %.40r", text)
             return
         wake, command = parse_wake(text, wake_phrase(self.settings))
+        if barge:
+            if not wake or not self._speaking:
+                log.debug("Heard while she was talking, no wake word: ignored")
+                return
+            log.info("Heard her name while she was talking: she stops and listens (%r)", text)
+            self._deaf_until = 0.0
+            try:
+                self.on_barge()
+            except Exception:
+                log.exception("Stopping her voice failed")
         self.heard_count += 1
         if wake or ptt or self.settings.get("stt.log_everything", False):
             log.info("Heard: %r (wake=%s)", text, wake)

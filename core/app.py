@@ -407,6 +407,7 @@ class App:
                                       self.learning.top_phrases() if self.learning is not None else [])
         gate = self.start_push_to_talk()
         self.listener = Listener(self.bus, stt, self.settings, lambda: MicrophoneStream(device), gate=gate)
+        self.listener.on_barge = lambda: self.speech.interrupt() if self.speech is not None else None
         if self.ask is not None:
             self.listener.interceptor = self.ask.handle_heard
         if self.speech is not None and self.dialogue is not None:

@@ -2335,3 +2335,7 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 
 * run_voice_on_graphics_card.bat: PY is .venv\Scripts\python.exe or ..\.venv\Scripts\python.exe (installed layout: <home>\app and <home>\.venv, see launcher/launcher.py Layout). Test: tests/test_graphics_card_bat.py.
 
+## 0.96.140 - Wake word interrupts her
+
+* stt/listener.py: while she speaks, frames still go to the detector when stt.wake_interrupts is on; short utterances (<= BARGE_MAX_SECONDS, one per BARGE_GAP) are queued with barge=True, transcribed, ignored unless they carry the wake word and are not mostly her own words, then on_barge() (speech.interrupt(), keeps critical warnings) and the deaf tail is cleared. core/app.py wires on_barge. Tests: tests/test_stt.py WakeInterruptTests.
+

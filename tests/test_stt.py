@@ -191,7 +191,7 @@ class ListenerTests(unittest.TestCase):
         self.assertEqual(heard[0].priority, "normal")
 
     def test_she_does_not_hear_herself(self):
-        listener, bus, heard, stt, mic = self.build([])
+        listener, bus, heard, stt, mic = self.build([], **{"stt.wake_interrupts": False})
         listener.start()
         try:
             bus.publish("speech.started", {})
@@ -421,3 +421,80 @@ class ListeningModelFirstDownload(unittest.TestCase):
         with self.assertRaises(ValueError):
             allowing_download(make)
         self.assertEqual(len(calls), 1)
+
+
+class WakeInterruptTests(unittest.TestCase):
+    """Saying her name while she talks makes her stop and listen; nothing else said over her counts."""
+
+    def build(self, said="", **values):
+        bus = EventBus()
+        heard, stops = [], []
+        bus.subscribe(HEARD, heard.append)
+        stt = FakeSTT()
+        mic = FakeMic([])
+        listener = Listener(bus, stt, settings(**values), lambda: mic)
+        listener.on_barge = lambda: stops.append(1)
+        listener.start()
+        bus.publish("speech.started", {"text": said})
+        return listener, bus, heard, stops, stt, mic
+
+    def say_over_her(self, mic):
+        for f in quiet(45) + loud(20) + quiet(40):
+            mic.frames.put(f)
+
+    def test_her_name_stops_her_and_the_command_is_heard(self):
+        listener, bus, heard, stops, stt, mic = self.build("this is a long story about the galaxy and everything")
+        try:
+            self.say_over_her(mic)
+            self.assertTrue(wait_for(lambda: heard))
+        finally:
+            listener.stop()
+        self.assertEqual(stops, [1])
+        self.assertEqual(heard[0].data["command"], "open the galaxy map")
+
+    def test_no_wake_word_while_she_talks_is_ignored(self):
+        listener, bus, heard, stops, stt, mic = self.build("some words")
+        try:
+            listener._speaking = True
+            listener.handle_text("what a lovely evening", barge=True)
+        finally:
+            listener.stop()
+        self.assertEqual((stops, heard), ([], []))
+
+    def test_her_own_voice_with_her_name_in_it_does_not_stop_her(self):
+        listener, bus, heard, stops, stt, mic = self.build("starling here ready to open the galaxy map for you commander")
+        try:
+            listener._speaking = True
+            listener.handle_text("starling open the galaxy map for you commander", barge=True)
+        finally:
+            listener.stop()
+        self.assertEqual((stops, heard), ([], []))
+
+    def test_off_means_she_keeps_talking(self):
+        listener, bus, heard, stops, stt, mic = self.build("long story", **{"stt.wake_interrupts": False})
+        try:
+            self.say_over_her(mic)
+            time.sleep(0.6)
+        finally:
+            listener.stop()
+        self.assertEqual((stops, heard, stt.heard_audio), ([], [], []))
+
+    def test_long_phrases_over_her_are_not_looked_at(self):
+        listener, bus, heard, stops, stt, mic = self.build("long story")
+        try:
+            for f in quiet(45) + loud(150) + quiet(40):
+                mic.frames.put(f)
+            time.sleep(0.8)
+        finally:
+            listener.stop()
+        self.assertEqual(stt.heard_audio, [])
+
+    def test_after_stopping_her_there_is_no_deaf_tail(self):
+        listener, bus, heard, stops, stt, mic = self.build("a long story about the stars and ships")
+        try:
+            listener._speaking = True
+            listener.handle_text("starling stop", barge=True)
+            self.assertEqual(listener._deaf_until, 0.0)
+        finally:
+            listener.stop()
+        self.assertEqual(stops, [1])
