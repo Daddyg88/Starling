@@ -117,8 +117,14 @@ class Dashboard:
             log.exception("The settlement map could not start")
             self.settlement_overlay = None
         try:
+            from ui.chat_pin_overlay import ChatPinOverlay
+            self.chat_pin_overlay = ChatPinOverlay(self.root, app.settings, lambda: getattr(app, "chat_pin", None), lambda: getattr(app, "speech", None))
+        except Exception:
+            log.exception("The pinned comment overlay could not start")
+            self.chat_pin_overlay = None
+        try:
             from ui.chat_window import ChatWindow
-            self.chat_window = ChatWindow(self.root, app.settings, lambda: getattr(app, "stream_chat", None))
+            self.chat_window = ChatWindow(self.root, app.settings, lambda: getattr(app, "stream_chat", None), lambda: getattr(app, "chat_pin", None))
         except Exception:
             log.exception("The chat window could not start")
             self.chat_window = None

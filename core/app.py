@@ -106,6 +106,8 @@ class App:
         self.route_follower = None
         self.stream_chat = None
         self.stream_intro = None
+        from streaming.pin import ChatPin
+        self.chat_pin = ChatPin()        # the chat comment shown on the screen (you click a chat line, or she is answering one)
         self.ui_requests = []            # windows her voice asked the dashboard to open or close ('memory_window', 'memory_window_close')
         self.ask = None
         self.ptt = None

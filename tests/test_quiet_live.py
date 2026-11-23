@@ -338,3 +338,91 @@ class GpuTorchTests(unittest.TestCase):
         path = ["a"]
         self.assertEqual(gpu_torch.activate(self.base, path), "")
         self.assertEqual(path, ["a"])
+
+
+class ChatPinTests(unittest.TestCase):
+    def setUp(self):
+        from streaming.pin import ChatPin
+        self.t = [100.0]
+        self.pin = ChatPin(clock=lambda: self.t[0])
+
+    def test_click_toggles(self):
+        self.assertTrue(self.pin.toggle(5, "Gav", "hello there", "youtube"))
+        self.assertEqual(self.pin.current(), ("Gav", "hello there", "youtube"))
+        self.assertEqual(self.pin.pinned_seq(), 5)
+        self.assertTrue(self.pin.toggle(6, "Ann", "second", "twitch"))       # another line replaces it
+        self.assertEqual(self.pin.current()[0], "Ann")
+        self.assertFalse(self.pin.toggle(6, "Ann", "second", "twitch"))      # the same line again takes it away
+        self.assertIsNone(self.pin.current())
+
+    def test_her_pick_shows_then_goes_after_she_speaks_and_the_manual_one_returns(self):
+        self.pin.toggle(1, "Gav", "mine", "youtube")
+        self.pin.show_for_reply("Ann", "what is a neutron star", "twitch")
+        self.assertEqual(self.pin.current()[0], "Ann")
+        self.pin.settle(False)                       # not spoken yet: stays
+        self.t[0] += 3
+        self.pin.settle(True)                        # she speaks
+        self.t[0] += 5
+        self.pin.settle(True)
+        self.assertEqual(self.pin.current()[0], "Ann")
+        self.t[0] += 1
+        self.pin.settle(False)                       # just finished: a moment longer
+        self.assertEqual(self.pin.current()[0], "Ann")
+        self.t[0] += 2
+        self.pin.settle(False)
+        self.assertEqual(self.pin.current()[0], "Gav")
+
+    def test_never_stuck(self):
+        from streaming import pin as p
+        self.pin.show_for_reply("Ann", "x", "")
+        self.t[0] += p.AUTO_UNSPOKEN_SECONDS + 1
+        self.pin.settle(False)
+        self.assertIsNone(self.pin.current())
+        self.pin.show_for_reply("Ann", "x", "")
+        self.pin.settle(True)
+        self.t[0] += p.AUTO_MAX_SECONDS + 1
+        self.pin.settle(True)
+        self.assertIsNone(self.pin.current())
+
+    def test_long_text_is_cut(self):
+        from streaming.pin import shorten, MAX_CHARS
+        self.assertLessEqual(len(shorten("word " * 200)), MAX_CHARS)
+
+    def test_wrap_and_lines(self):
+        from ui.chat_pin_overlay import wrap, tag_colour
+        lines = wrap("one two three four five six seven", lambda s: len(s) * 10, 100)
+        self.assertTrue(all(len(x) * 10 <= 100 for x in lines))
+        self.assertEqual(" ".join(lines), "one two three four five six seven")
+        self.assertEqual(len(wrap("word " * 100, lambda s: len(s) * 10, 100, max_lines=3)), 3)
+        self.assertNotEqual(tag_colour("twitch"), tag_colour("youtube"))
+
+    def test_chat_window_line_lookup(self):
+        from ui.chat_window import line_at
+        from streaming.feed import FeedLine
+        chat = FeedLine(1, "chat", "twitch", "Ann", "hi")
+        event = FeedLine(2, "event", "twitch", "Bob", "Bob subscribed")
+        self.assertEqual(line_at([chat, event], 0), chat)
+        self.assertIsNone(line_at([chat, event], 1))
+        self.assertIsNone(line_at([chat, event], 5))
+
+    def test_director_ask_and_intro_show_the_comment(self):
+        from types import SimpleNamespace
+        from streaming import wiring
+        from streaming.pin import ChatPin
+        from streaming.feed import ChatFeed
+        pin = ChatPin()
+
+        class S:
+            def get(self, k, d=None):
+                return d
+        app = SimpleNamespace(chat_pin=pin, settings=S())
+        feed = ChatFeed()
+        feed.add_message(SimpleNamespace(platform="twitch", user="Ann", text="what is a neutron star", mod=False, sub=False, owner=False))
+        wiring.show_comment(app, "Ann", "what is a neutron star", SimpleNamespace(feed=feed))
+        self.assertEqual(pin.current(), ("Ann", "what is a neutron star", "twitch"))
+        from streaming.intro import StreamIntro
+        seen = []
+        intro = StreamIntro(S(), lambda *a, **k: True, lambda t: True)
+        intro.pin = lambda u, t: seen.append((u, t))
+        intro._reply("Bob", "hello")
+        self.assertEqual(seen, [("Bob", "hello")])

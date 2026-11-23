@@ -32,7 +32,7 @@ TEST_LINE = "Commander, this is how I will look on your dash. Gear down and nice
 OBS_TITLE = "Starling Hologram"
 
 
-def set_click_through(window, on, visible_to_obs=False):
+def set_click_through(window, on, visible_to_obs=False, title=None):
     """Windows: let the mouse pass straight through to the game (on) or catch it so she can be dragged (off).
     visible_to_obs: do not mark the window as a 'tool window' (OBS hides those from its window list) and give it a name to find her by."""
     try:
@@ -44,7 +44,7 @@ def set_click_through(window, on, visible_to_obs=False):
         style = (style | TRANSPARENT | NOACTIVATE) if on else (style & ~TRANSPARENT & ~NOACTIVATE)
         ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
         if visible_to_obs:
-            ctypes.windll.user32.SetWindowTextW(hwnd, OBS_TITLE)
+            ctypes.windll.user32.SetWindowTextW(hwnd, title or OBS_TITLE)
     except Exception:
         pass            # not Windows: it still works, it just takes mouse clicks
 

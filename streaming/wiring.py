@@ -62,6 +62,24 @@ def make_intro(app, narrator, free):
     return StreamIntro(app.settings, narrator.say, say_text, ask_llm, free, publish)
 
 
+def show_comment(app, user, text, bridge=None):
+    """Puts the comment she is about to answer on the screen (it goes by itself once she has finished speaking). Never raises."""
+    try:
+        pin = getattr(app, "chat_pin", None)
+        if pin is None or not app.settings.get("streaming.pin_overlay", True) or not app.settings.get("streaming.pin_replies", True):
+            return
+        platform, full = "", text
+        feed = getattr(bridge, "feed", None) if bridge is not None else None
+        if feed is not None:
+            for line in reversed(feed.since(0)):
+                if line.kind == "chat" and line.user == user and str(text or "")[:20].lower() in line.text.lower():
+                    platform, full = line.platform, line.text
+                    break
+        pin.show_for_reply(user, full, platform)
+    except Exception:
+        log.exception("Could not show the chat comment on the screen")
+
+
 def build(app):
     """The chat bridge for this app, or None if something it needs is missing."""
     from navigation.voice import Narrator
@@ -84,6 +102,7 @@ def build(app):
         if "brain" not in holder:
             holder["brain"] = make_chat_brain(app)
         times = director.asked.get(user, 0)
+        show_comment(app, user, question, holder.get("bridge"))
         if app.settings.get("streaming.announce", True):
             say("StreamChat_Chime" if chime else asks_key(times, app.settings), {"user": spoken_name(user), "question": question[:90], "times": times + 1})
         reply = holder["brain"].try_handle(question, deliberate=True)
@@ -123,6 +142,8 @@ def build(app):
 
     director = ChatDirector(app.settings, lambda: app.state, do_action, do_ask, say, time.monotonic, quiet_provider=quiet, free_provider=free)
     bridge = ChatBridge(app.settings, director)
+    holder["bridge"] = bridge
     bridge.intro = make_intro(app, narrator, free)
+    bridge.intro.pin = lambda user, text: show_comment(app, user, text, bridge)
     app.stream_intro = bridge.intro
     return bridge

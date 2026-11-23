@@ -31,6 +31,7 @@ YOUTUBE = "#FF7A7A"             # a soft red
 MOD = "#3DFFB0"
 SUB = "#FFB84D"
 EVENT = "#FF9A3D"
+PINNED_BACKGROUND = "#3A2F10"      # the line you clicked, while its comment is on the screen
 PLATFORM_COLOURS = {"twitch": TWITCH, "youtube": YOUTUBE}
 
 
@@ -69,6 +70,14 @@ def pieces(line, show_time=True):
             out.append(("badge_" + mark, " [%s]" % mark))
         out.append(("text", ": " + line.text))
     return out
+
+
+def line_at(lines, row):
+    """The feed line drawn on text row 'row' (0 = the first row) if it is a chat message someone wrote, else None (events and gaps)."""
+    if not (0 <= row < len(lines)):
+        return None
+    line = lines[row]
+    return line if getattr(line, "kind", "") == "chat" and getattr(line, "user", "") and getattr(line, "text", "") else None
 
 
 def font_size(value):
@@ -111,7 +120,9 @@ def wanted(settings, bridge):
 
 
 class ChatWindow:
-    def __init__(self, root, settings, bridge_provider):
+    def __init__(self, root, settings, bridge_provider, pin_provider=None):
+        self.pin_provider = pin_provider
+        self._lines = []                 # the feed lines drawn, in order (one per text row), so a click can find its message
         self.root = root
         self.settings = settings
         self.bridge_provider = bridge_provider
@@ -193,6 +204,8 @@ class ChatWindow:
         self.text = tk.Text(body, bg=theme.PANEL, fg=theme.TEXT, wrap="word", bd=0, highlightthickness=0, padx=8, pady=6,
                             cursor="arrow", spacing1=2, spacing3=2, state="disabled", insertwidth=0, takefocus=0)
         self.text.pack(side="top", fill="both", expand=True)
+        self.text.bind("<Button-1>", self._clicked)
+        self._lines = []
         self.window = window
         self._fonts = None
         self._seq = 0
@@ -234,6 +247,8 @@ class ChatWindow:
         text.tag_configure("badge_host", foreground=theme.ACCENT, font=(theme.FONT, max(8, size - 3)))
         text.tag_configure("badge_mod", foreground=MOD, font=(theme.FONT, max(8, size - 3)))
         text.tag_configure("badge_sub", foreground=SUB, font=(theme.FONT, max(8, size - 3)))
+        text.tag_configure("pinned", background=PINNED_BACKGROUND)
+        text.tag_raise("sel")
 
     # ---- drawing ----
     def _refresh(self, bridge):
@@ -253,13 +268,43 @@ class ChatWindow:
                 text.insert("end", "\n")
             for tag, piece in pieces(line):
                 text.insert("end", piece, tag)
+            self._lines.append(line)
             self._seq = line.seq
         extra = int(text.index("end-1c").split(".")[0]) - MAX_DRAWN
         if extra > 0:
             text.delete("1.0", "%d.0" % (extra + 1))
+            del self._lines[:extra]
+        self._mark_pinned(text)
         text.configure(state="disabled")
         if stick:
             text.see("end")
+
+    # ---- clicking a line: put that comment on the screen, click again to take it off ----
+    def _clicked(self, event):
+        try:
+            pin = self.pin_provider() if self.pin_provider else None
+            if pin is None or not self.settings.get("streaming.pin_overlay", True):
+                return
+            row = int(self.text.index("@%d,%d" % (event.x, event.y)).split(".")[0]) - 1
+            line = line_at(self._lines, row)
+            if line is None:
+                return
+            pinned = pin.toggle(line.seq, line.user, line.text, line.platform)
+            log.info("Chat comment from %s %s", line.user, "pinned on the screen" if pinned else "taken off the screen")
+            self._mark_pinned(self.text)
+        except Exception:
+            log.exception("Clicking a chat line failed")
+
+    def _mark_pinned(self, text):
+        pin = self.pin_provider() if self.pin_provider else None
+        seq = pin.pinned_seq() if pin is not None else None
+        text.tag_remove("pinned", "1.0", "end")
+        if seq is None:
+            return
+        for index, line in enumerate(self._lines):
+            if line.seq == seq:
+                text.tag_add("pinned", "%d.0" % (index + 1), "%d.0 lineend" % (index + 1))
+                break
 
     # ---- the little buttons ----
     def _bump(self, direction):

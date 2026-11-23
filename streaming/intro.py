@@ -88,6 +88,7 @@ class StreamIntro:
         self.activity = ""
         self.used_ai = 0
         self.used_lines = 0
+        self.pin = None                          # pin(user, text): put the comment she is answering on the screen (streaming/pin.py)
 
     # ---- settings ----
     def option(self, name, default):
@@ -222,6 +223,11 @@ class StreamIntro:
         return messages
 
     def _reply(self, user, text):
+        if self.pin is not None:
+            try:
+                self.pin(user, text)
+            except Exception:
+                log.exception("The comment could not be shown on the screen")
         self._new_activity()
         answer = None
         if self.ask_llm is not None and self.option("intro_ai", True):
