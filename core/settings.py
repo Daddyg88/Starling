@@ -66,6 +66,7 @@ DEFAULTS = {
     "smalltalk": {"enabled": True},
     "brain": {"enabled": True, "knowledge": True, "lookup": False, "freechat": True, "chat_followups": True, "profile": True, "thinking_lines": False, "thinking_after": 1.5},
     "llm": {"enabled": False, "model_file": "", "model_size": "small", "threads": 2, "max_seconds": 8, "max_sentences": 3, "fast_start": False, "keep_loaded": False, "use_gpu": False},
+    "gpu": {"limit_percent": 70},
     "exploration": {"hge_hint": True},
     "talk": {"combat": True, "exploration": True, "exobiology": True, "mining": True, "trading": True, "antixeno": True},
     "mining": {"prices": True, "merit": True, "limpet_reminder": True, "destination_reminder": True, "chatter": "normal",

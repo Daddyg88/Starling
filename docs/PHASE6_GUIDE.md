@@ -2399,3 +2399,11 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * tts/gpu_torch.py `activate()`: the marker file stores the Starling version; a different version resets `starts_without_voice`, so crashes from an older version cannot trigger the put-aside after 3 failed starts.
 * tests/test_quiet_live.py (GpuTorchTests): a fake App whose log is None until start() reproduces the crash; a second test covers the version reset.
 
+## 0.96.152 - Graphics card limit
+
+* core/gpu_limit.py: `set_percent()` (read from settings `gpu.limit_percent`, default 70, in App.start), `model_layers()` (reads `<arch>.block_count` from a .gguf header), `gpu_layers()` (the -ngl value), `cap_torch_memory()`.
+* personality/llm_server.py `ServerModel.command()`: `-ngl` is the limit's share of the layers instead of always 99 (100 = 99 as before). The processor engine is unchanged.
+* tts/kokoro_tts.py: before the voice pipeline is made, torch's card memory for this process is capped to the same share.
+* ui/settings_model.py + core/settings.py: the new choice `gpu.limit_percent` (restart needed). Compute use itself cannot be capped from a program; this limits the share of the work and memory that go to the card.
+* tests/test_gpu_limit.py.
+

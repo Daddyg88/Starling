@@ -128,6 +128,11 @@ class App:
         # Load settings first, because they say how chatty the log should be.
         self.settings = Settings(self._settings_path).load()
         try:
+            from core import gpu_limit
+            gpu_limit.set_percent(self.settings.get("gpu.limit_percent", 70))        # how much of the graphics card she may use (AI chat layers, voice memory)
+        except Exception:
+            pass
+        try:
             from control import binds as _binds
             _binds.set_preset_names(self.settings)
         except Exception:

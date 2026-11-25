@@ -28,7 +28,7 @@ import urllib.request
 import zipfile
 from pathlib import Path, PurePosixPath
 
-from core import paths
+from core import gpu_limit, paths
 from core.logger import get_logger
 from core.secure_open import is_certificate_problem, open_url
 
@@ -258,7 +258,7 @@ class ServerModel:
 
     def command(self):
         return [str(self.exe), "-m", str(self.model), "--host", "127.0.0.1", "--port", str(self.port), "-c", str(self.ctx),
-                "-t", str(self.threads), "-np", "1", "--no-webui"] + (["-ngl", "99"] if self.gpu else [])     # -ngl 99: every layer on the graphics card
+                "-t", str(self.threads), "-np", "1", "--no-webui"] + (["-ngl", str(gpu_limit.gpu_layers(self.model))] if self.gpu else [])     # -ngl 99 = every layer on the card; the limit setting (default 70%) puts only that share of the layers there
 
     @staticmethod
     def _pid_file():
@@ -281,7 +281,8 @@ class ServerModel:
         self._stop_leftover()
         self.port = self.free_port()
         flags = CREATE_NO_WINDOW if sys.platform == "win32" else 0
-        log.info("Starting the AI chat engine on 127.0.0.1:%d (%d threads%s)", self.port, self.threads, ", ON THE GRAPHICS CARD" if self.gpu else "")
+        log.info("Starting the AI chat engine on 127.0.0.1:%d (%d threads%s)", self.port, self.threads,
+                 (", ON THE GRAPHICS CARD, %s layers (limit %d%%)" % (self.command()[-1], gpu_limit.percent())) if self.gpu else "")
         self._process = self._popen(self.command(), cwd=str(self.exe.parent), stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL, creationflags=flags)
         atexit.register(self.close)

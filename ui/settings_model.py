@@ -590,6 +590,9 @@ def build_pages(mic_lister=None, pack_folder=None):
                   help="With two or more she starts talking after the FIRST sentence is written, and the next one is being written (and her voice prepared) while she says it, so longer answers do not make you wait longer. One = the old behaviour (the whole answer first, one sentence)"),
             Field("llm.use_gpu", "AI chat on the graphics card", "toggle",
                   help="Press 'Install AI chat for the graphics card' (below) first. Her AI answers are written much faster, but the model uses about 2 GB of the card's memory while it is loaded (a game plus OBS on an 8 GB card is usually fine; if the game stutters, switch this off). If the card cannot run it she falls back to the processor by herself. Restart Starling after changing it"),
+            Field("gpu.limit_percent", "Graphics card limit for Starling", "choice",
+                  [("50%", 50), ("60%", 60), ("70% (recommended with a game)", 70), ("80%", 80), ("90%", 90), ("No limit", 100)], restart=True,
+                  help="Keeps her from crowding the game. A program cannot hold the card at an exact percentage of 'busy', so this is done two ways: her AI chat puts only that share of its model on the card (the rest runs on the processor, which is a little slower), and her voice may take at most that share of the card's memory. Lower it if the game stutters while she talks. Restart Starling after changing it"),
             Field("llm.keep_loaded", "Keep the AI model loaded", "toggle",
                   help="Loads the AI model when Starling starts and never unloads it, so the first answer after a quiet spell is not 10 seconds slow. Uses the memory all the time (about 2 GB for Better)"),
             Field("llm.fast_start", "AI chat: start on the first few words", "toggle",
@@ -682,7 +685,7 @@ streaming.pin_obs streaming.intro_wait streaming.chime_gap hologram.flicker holo
 hologram.talk_bounce hologram.idle_wait hologram.talk_motion hologram.turn hologram.mouth_open hologram.obs_capture hologram.power_down
 llm.fast_start llm.keep_loaded personality.keep_points personality.mood_random_minutes personality.custom_pet_names messages.npc
 messages.channels chitchat.notice chitchat.world personality.aussie_slang brain.thinking_lines app.log_level""".split())
-NEW_KEYS = frozenset("""llm.use_gpu llm.keep_loaded streaming.pin_overlay streaming.pin_replies streaming.pin_size streaming.pin_obs
+NEW_KEYS = frozenset("""gpu.limit_percent llm.use_gpu llm.keep_loaded streaming.pin_overlay streaming.pin_replies streaming.pin_size streaming.pin_obs
 hologram.ai_colour speech.quiet_minutes stt.wake_interrupts llm.max_sentences""".split())
 
 

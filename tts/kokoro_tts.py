@@ -423,6 +423,14 @@ class KokoroTTS(BaseTTS):
             # torch and huggingface print harmless "deprecated" warnings; hide them.
             warnings.simplefilter("ignore")
             from kokoro import KPipeline
+            try:
+                import torch as _torch
+                from core import gpu_limit
+                note = gpu_limit.cap_torch_memory(_torch)         # keeps her voice from taking more than the limit's share of the card's memory
+                if note:
+                    log.info("%s", note)
+            except Exception:
+                pass
             pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M")
             try:
                 import torch

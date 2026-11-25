@@ -256,5 +256,6 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] 0.96.148: open any long settings page and check every grey explanation wraps (resize the window too). A tester confirmed AI chat on the graphics card works (7B answered in 0.2 s).
 - [ ] 0.96.149: land at Lorenz Leisure Site, Bray Leisure Complex, Kwon's Reception, Anyadike Fortress, Worster's Command, Kabbah Barracks or Ganguly Forge and check the map is already lined up; if wrong, say 'reset settlement map' and tell me.
 
+- Graphics card limit (0.96.152): NOT TESTED on a real card or in the game. Check the log lines 'ON THE GRAPHICS CARD, N layers (limit 70%)' and 'Her voice may use at most 70%', and whether the game still stutters while she talks. If AI answers got too slow, try 80%.
 - Graphics-card start-up crash fix (0.96.151): NOT TESTED on a real graphics-card install. Ask the tester to start Starling once and check the log says 'Using the graphics-card torch'.
 - Neutron backup plotter (0.96.150): navigation/neutron_router.py + tools/build_neutron_list.py. Only used when Spansh fails AND data/neutron_stars.csv.gz exists. UNTESTED on real data. Do not ship a list until Spansh/EDSM terms are confirmed.
