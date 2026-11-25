@@ -2407,3 +2407,10 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * ui/settings_model.py + core/settings.py: the new choice `gpu.limit_percent` (restart needed). Compute use itself cannot be capped from a program; this limits the share of the work and memory that go to the card.
 * tests/test_gpu_limit.py.
 
+## 0.96.153 - Move Starling to another drive
+
+* core/move_home.py (standard library only; also runs as a stand-alone helper): `current_home()`, `check_target()`, `move()` (copy, verify count and size, test `.venv\Scripts\python.exe` and drop the venv if it will not start, write install_location.txt, then delete the old folder but keep the note), `start_move()` (copies this file to a temp folder and runs it with the base Python from `sys._base_executable`, with `--wait-pid` so it starts after the dashboard has closed, and `--launch` Starling.exe afterwards).
+* ui/dashboard.py `move_install()` and the Updates page button. The launcher needs no change: `launcher.install_home()` already reads install_location.txt.
+* The note install_location.txt always lives in the default folder (%LOCALAPPDATA%\Starling); when the old folder IS the default folder, only that note and move_log.txt are kept in it.
+* tests/test_move_home.py.
+

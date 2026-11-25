@@ -913,7 +913,8 @@ class Dashboard:
         if page.id == "updates":
             extra += [("Check for updates now", self.check_updates),
                       ("Restart now to install the update", self.restart_to_update),
-                      ("Make a file to send when something is wrong", self.make_diagnostics)]
+                      ("Make a file to send when something is wrong", self.make_diagnostics),
+                      ("Move Starling to another drive or folder...", self.move_install)]
         if page.id == "navigation":
             extra += [("Plot neutron route to my destination", lambda: self.nav_plot(use_entry=False)),
                       ("Plot the next waypoint in the galaxy map", self.nav_next),
@@ -1587,6 +1588,46 @@ class Dashboard:
         self._controls_result(text, T.GOOD if ok else T.WARN)
         if ok:
             self.root.after(800, self.close)
+
+    def move_install(self):
+        """Updates page: move the whole Starling install (for example from the C drive to the D drive). She closes, a small window
+        copies everything and checks it, switches over, deletes the old copy and opens Starling.exe again."""
+        import os
+        import threading
+        from pathlib import Path
+        from tkinter import filedialog, messagebox
+        from core import move_home, paths
+        home, why = move_home.current_home(paths.ROOT)
+        if home is None:
+            self._controls_result(why, T.WARN)
+            return
+        picked = filedialog.askdirectory(parent=self.root, title="Choose where to move Starling (a folder called Starling is made inside it)",
+                                         initialdir=str(home.parent.parent))
+        if not picked:
+            return
+        new = move_home.with_starling_name(Path(picked))
+        self._controls_result("Checking %s (counting how big Starling is)..." % new, T.WARN)
+
+        def work():
+            size = move_home.folder_size(home)
+            ok, reason = move_home.check_target(home, new, size=size)
+            self.root.after(0, lambda: confirm(ok, reason, size))
+
+        def confirm(ok, reason, size):
+            if not ok:
+                self._controls_result(reason, T.BAD)
+                return
+            question = ("Move Starling from\n%s\nto\n%s ?\n\nShe is about %s. Starling closes, a small window copies everything and checks it "
+                        "(a few minutes), then the old copy is deleted and she opens again. Do not turn the PC off while it runs. "
+                        "If anything goes wrong she stays where she is now." % (home, new, move_home.gb(size)))
+            if not messagebox.askyesno("Move Starling", question, parent=self.root):
+                self._controls_result("Move cancelled. Nothing was changed.", T.MUTED)
+                return
+            started, text = move_home.start_move(home, new, os.environ.get("STARLING_LAUNCHER_EXE", ""))
+            self._controls_result(text, T.GOOD if started else T.BAD)
+            if started:
+                self.root.after(800, self.close)
+        threading.Thread(target=work, name="move-check", daemon=True).start()
 
     def _announce_update(self):
         """Puts 'update ready' in the window title once a new version has been downloaded, so it is not missed."""
