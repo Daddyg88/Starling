@@ -348,6 +348,27 @@ class GpuTorchTests(unittest.TestCase):
         self.assertTrue(self.base.exists())
         self.assertEqual(gpu_torch._read(self.base)["starts_without_voice"], 1)
 
+    def test_a_library_put_aside_by_an_older_starling_is_given_back(self):
+        from tts import gpu_torch
+        aside = self.base.with_name("torch_gpu.broken")
+        (aside / "torch").mkdir(parents=True)
+        gpu_torch._write({"tag": "cu126", "starts_without_voice": 5, "version": "0.0.1"}, aside)
+        path = ["a"]
+        note = gpu_torch.activate(self.base, path)
+        self.assertIn("put back", note)
+        self.assertTrue(gpu_torch.installed(self.base))
+        self.assertFalse(aside.exists())
+        self.assertEqual(path[0], str(self.base))
+
+    def test_a_library_put_aside_by_this_same_version_stays_aside(self):
+        from core.version import __version__
+        from tts import gpu_torch
+        aside = self.base.with_name("torch_gpu.broken")
+        (aside / "torch").mkdir(parents=True)
+        gpu_torch._write({"tag": "cu126", "starts_without_voice": 5, "version": __version__}, aside)
+        self.assertEqual(gpu_torch.activate(self.base, ["a"]), "")
+        self.assertTrue(aside.exists())
+
     def test_main_logs_the_graphics_card_note_only_after_the_log_exists(self):
         """Regression: with the graphics-card torch installed main() wrote to app.log before start() made it, and Starling closed at once."""
         import sys

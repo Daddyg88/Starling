@@ -60,10 +60,34 @@ def _write(info, base=None):
         pass
 
 
+def _restore_aside(base):
+    """0.96.154: an old bug used up the tries after a harmless crash and put a good 2.5 GB library aside. A NEWER Starling
+    than the one that put it aside gives it back (no new download). Returns a sentence, or ''."""
+    aside = base.with_name(base.name + ".broken")
+    if installed(base) or not installed(aside):
+        return ""
+    try:
+        from core.version import __version__
+    except Exception:
+        __version__ = ""
+    info = _read(aside)
+    if info.get("version") == __version__:                      # this very version put it aside: do not loop
+        return ""
+    try:
+        os.replace(str(aside), str(base))
+    except OSError:
+        return ""
+    info["version"] = __version__
+    info["starts_without_voice"] = 0
+    _write(info, base)
+    return "The graphics-card voice library that an older Starling put aside was put back. "
+
+
 def activate(base=None, path=None):
     """Called by main.py BEFORE anything imports torch. Returns a sentence for the log, or '' when there is nothing to do."""
     base = Path(base or folder())
     path = sys.path if path is None else path
+    restored = _restore_aside(base)
     if not installed(base):
         return ""
     info = _read(base)
@@ -91,7 +115,7 @@ def activate(base=None, path=None):
         _write(info, base)                                     # the voice engine clears this once it is running (voice_ok)
     if str(base) not in path:
         path.insert(0, str(base))
-    return "Using the graphics-card torch from %s" % base
+    return restored + "Using the graphics-card torch from %s" % base
 
 
 def voice_ok(base=None):

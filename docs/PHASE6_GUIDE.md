@@ -2414,3 +2414,8 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * The note install_location.txt always lives in the default folder (%LOCALAPPDATA%\Starling); when the old folder IS the default folder, only that note and move_log.txt are kept in it.
 * tests/test_move_home.py.
 
+## 0.96.154 - Graphics-card voice library restored
+
+* tts/gpu_torch.py `_restore_aside()`: if data/torch_gpu is missing but data/torch_gpu.broken holds a good library whose marker names a different Starling version, move it back and reset the failed-start count. The same version never restores its own put-aside (no loop).
+* tests/test_quiet_live.py (2 tests).
+

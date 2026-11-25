@@ -256,6 +256,7 @@ Measured = a real size (metres per map unit) from tester marks. Provisional = on
 - [ ] 0.96.148: open any long settings page and check every grey explanation wraps (resize the window too). A tester confirmed AI chat on the graphics card works (7B answered in 0.2 s).
 - [ ] 0.96.149: land at Lorenz Leisure Site, Bray Leisure Complex, Kwon's Reception, Anyadike Fortress, Worster's Command, Kabbah Barracks or Ganguly Forge and check the map is already lined up; if wrong, say 'reset settlement map' and tell me.
 
+- Voice library restore (0.96.154): NOT TESTED on a real PC. Check the log says the library was put back and the voice engine then runs on cuda.
 - Move to another drive (0.96.153): NOT TESTED on a real Windows install. Check: the progress window, move_log.txt, that Starling.exe opens her from the new folder, that her settings and voice downloads are all there, and whether the copied .venv starts (else it is rebuilt).
 - Graphics card limit (0.96.152): NOT TESTED on a real card or in the game. Check the log lines 'ON THE GRAPHICS CARD, N layers (limit 70%)' and 'Her voice may use at most 70%', and whether the game still stutters while she talks. If AI answers got too slow, try 80%.
 - Graphics-card start-up crash fix (0.96.151): NOT TESTED on a real graphics-card install. Ask the tester to start Starling once and check the log says 'Using the graphics-card torch'.
