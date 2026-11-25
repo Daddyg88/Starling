@@ -2392,3 +2392,10 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 ## 0.96.149 - Seven more shipped settlement line-ups
 
 * maps/known_calibrations.json: 31 -> 38 settlements via tools/merge_calibrations.py (7 added, 0 conflicts, 1 skipped as switched off by the player).
+
+## 0.96.151 - Start-up crash after the graphics-card voice install
+
+* main.py: the note from `gpu_torch.activate()` is logged right after `app.start()` (app.log is None before that, so the old call raised AttributeError whenever the graphics-card torch was installed).
+* tts/gpu_torch.py `activate()`: the marker file stores the Starling version; a different version resets `starts_without_voice`, so crashes from an older version cannot trigger the put-aside after 3 failed starts.
+* tests/test_quiet_live.py (GpuTorchTests): a fake App whose log is None until start() reproduces the crash; a second test covers the version reset.
+

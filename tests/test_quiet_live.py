@@ -339,6 +339,46 @@ class GpuTorchTests(unittest.TestCase):
         self.assertEqual(gpu_torch.activate(self.base, path), "")
         self.assertEqual(path, ["a"])
 
+    def test_a_new_version_gets_fresh_tries_after_old_failed_starts(self):
+        from tts import gpu_torch
+        (self.base / "torch").mkdir(parents=True)
+        gpu_torch._write({"tag": "cu126", "starts_without_voice": gpu_torch.MAX_FAILED_STARTS, "version": "0.0.1"}, self.base)
+        note = gpu_torch.activate(self.base, ["a"])
+        self.assertNotIn("put aside", note)                          # not thrown away just because an older Starling kept crashing
+        self.assertTrue(self.base.exists())
+        self.assertEqual(gpu_torch._read(self.base)["starts_without_voice"], 1)
+
+    def test_main_logs_the_graphics_card_note_only_after_the_log_exists(self):
+        """Regression: with the graphics-card torch installed main() wrote to app.log before start() made it, and Starling closed at once."""
+        import sys
+        from unittest import mock
+        import main as starling_main
+
+        class FakeApp:
+            def __init__(self):
+                self.log = None                                       # exactly like the real App before start()
+                self.settings = mock.Mock()
+                self.processor = None
+
+            def start(self, **kw):
+                self.log = mock.Mock()
+
+            def status_report(self):
+                return []
+
+            def stop(self):
+                pass
+        made = []
+
+        def factory():
+            made.append(FakeApp())
+            return made[0]
+        with mock.patch.object(starling_main, "App", factory), mock.patch.object(starling_main, "_gpu_note", "Using the graphics-card torch from X"), \
+                mock.patch("core.crash.install"), mock.patch("core.crash.mark_clean_exit"), mock.patch.object(sys, "argv", ["main.py", "--check", "--silent"]):
+            code = starling_main.main()
+        self.assertEqual(code, 0)
+        made[0].log.info.assert_any_call("%s", "Using the graphics-card torch from X")
+
 
 class ChatPinTests(unittest.TestCase):
     def setUp(self):

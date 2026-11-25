@@ -74,14 +74,14 @@ def main():
     args = options.parse_args()
 
     app = App()
-    if _gpu_note:
-        app.log.info("%s", _gpu_note)
     from core import crash
     from core.version import __version__
     crash.install(version=__version__)          # so a sudden stop leaves its reason in logs/crash.log
     try:
         # Demo mode never saves its pretend events into your real history.
         app.start(record_events=not args.demo, show_events=not (args.check or args.voice_test or args.build_voice_cache or args.listen_test or args.controls_test or args.record_buttons or args.dashboard))
+        if _gpu_note:                                     # the log only exists once start() has run (writing it before crashed a graphics-card install)
+            app.log.info("%s", _gpu_note)
         for line in app.status_report():
             print(line)
 

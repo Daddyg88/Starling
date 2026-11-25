@@ -68,6 +68,15 @@ def activate(base=None, path=None):
         return ""
     info = _read(base)
     failed = int(info.get("starts_without_voice", 0) or 0)
+    try:
+        from core.version import __version__
+    except Exception:
+        __version__ = ""
+    if info.get("version") != __version__:                      # a new Starling gets a fresh set of tries (an old bug could use them all up)
+        failed = 0
+        info["version"] = __version__
+        info["starts_without_voice"] = 0
+        _write(info, base)
     if failed >= MAX_FAILED_STARTS:
         aside = base.with_name(base.name + ".broken")
         shutil.rmtree(aside, ignore_errors=True)
