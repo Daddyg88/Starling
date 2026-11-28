@@ -88,6 +88,24 @@ class Fitting(unittest.TestCase):
         self.assertIn("Fumerola Carbosis", self.names(warm, geo=1))
         self.assertNotIn("Fumerola Carbosis", self.names(warm, geo=0))
 
+    def test_widened_from_a_tester_journal_check(self):
+        # Real bodies a tester found these species on; the old rules missed all of them.
+        rock = dict(cls="Rocky body", atm="Methane", atmosphere="thin Methane atmosphere", k=90, g=0.1, volc="minor silicate vapour geysers volcanism")
+        names = self.names(planet("Test B 1", **rock), geo=1)
+        self.assertIn("Osseus Discus", names)
+        self.assertIn("Fungoida Gelata", names)
+        argon = self.names(planet("Test B 2", cls="Icy body", atm="ArgonRich", atmosphere="thin Argon-rich atmosphere", k=84, g=0.26, body_id=6))
+        self.assertIn("Electricae Radialem", argon)
+        co2 = self.names(planet("Test B 3", atm="CarbonDioxideRich", atmosphere="thin Carbon dioxide-rich atmosphere", k=234, g=0.46, body_id=7))
+        self.assertIn("Stratum Cucumisis", co2)
+        edge = self.names(planet("Test B 4", k=195.3, g=0.22, body_id=8))
+        self.assertIn("Tussock Triticum", edge)
+        self.assertIn("Osseus Pellebantus", edge)
+
+    def test_croceum_anemone_price_from_real_sale(self):
+        values = json.loads((Path(__file__).resolve().parent.parent / "config" / "exobiology_values.json").read_text(encoding="utf-8"))["values"]
+        self.assertEqual(values["Croceum Anemone"], 3399800)
+
 
 class Speaking(unittest.TestCase):
     def test_guess_then_refined(self):

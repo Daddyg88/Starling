@@ -2425,3 +2425,8 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * tools/repeat_report.py: reads a diagnostics ZIP (or a starling.log), counts what she said, and lists pools whose size is small compared with how often they were used (uses per pool line, and how often the same line returned within her last 8 uses of that key). Use it on the next ZIP to see what is still too small.
 * tests/test_fresh_lines.py (8 tests): the file is valid, no duplicates, only the {distance} placeholder, the worn-out pools reach a minimum size, a pool of 15 is not repeated within 14 picks, and the report tool ranks and counts correctly.
 
+## 0.96.156 - Exobiology rules tuned from tester journals
+
+* config/bio_rules.json: Osseus Discus and Fungoida Gelata also on methane atmospheres; Electricae Radialem also `argonrich`; Stratum Cucumisis also `carbondioxiderich`; Tussock Triticum, Osseus Pellebantus and the Fungoida Gelata CO2 fallback `tmax` 196 (was 195). Checked against 1,042 real species-on-body finds: 1,035 fitted before, all 1,042 now.
+* config/exobiology_values.json: Croceum Anemone 3,399,800.
+* tests/test_bio_predict.py (2 new tests in `Fitting`).
