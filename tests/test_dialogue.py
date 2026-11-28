@@ -283,7 +283,8 @@ class SpeakerTests(unittest.TestCase):
 
     def test_boarding_the_ship_says_docking_complete(self):
         self.speaker.on_event(self.event("VehicleChanged", vehicle="main ship", previous="SRV", summary="x"))
-        self.assertIn(self.speech.said[0]["text"], ("Docking complete.", "Welcome back aboard."))
+        boarded = {line.text for line in DialogueManager(pack_dir=Path(__file__).resolve().parent.parent / "voicepacks" / "default").load().lines["BoardedShip"]}
+        self.assertIn(self.speech.said[0]["text"], boarded)       # any of her boarding lines (the pool grows; do not pin two of them)
 
     def test_going_on_foot_uses_text_until_recorded(self):
         self.speaker.on_event(self.event("VehicleChanged", vehicle="on foot", previous="SRV", summary="x"))

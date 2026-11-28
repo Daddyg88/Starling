@@ -2419,3 +2419,9 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * tts/gpu_torch.py `_restore_aside()`: if data/torch_gpu is missing but data/torch_gpu.broken holds a good library whose marker names a different Starling version, move it back and reset the failed-start count. The same version never restores its own put-aside (no loop).
 * tests/test_quiet_live.py (2 tests).
 
+## 0.96.155 - She repeats herself less
+
+* voicepacks/default/fresh.json (new, merged last in `personality/dialogue.py` `DialogueManager.load`): 313 extra wordings across 41 keys that a tester's logs showed being heard again and again (small pools: LaunchVessel 3, Shutdown 4, InDanger 4, VeryHotWarning/VeryColdWarning 3, HardpointsDeployed/Retracted 4 plus 3, BoardedShip 4, NavRoute 15, and 20 to 30 lines for Touchdown, Liftoff, FsdCharging, VehicleChanged_OnFoot, BioFarEnough, FuelScoopDisengaged, the Tone_* and Remark_* asides, and others). Plain text lines only (no audio keys), so `prefer_recorded` does not hide them.
+* tools/repeat_report.py: reads a diagnostics ZIP (or a starling.log), counts what she said, and lists pools whose size is small compared with how often they were used (uses per pool line, and how often the same line returned within her last 8 uses of that key). Use it on the next ZIP to see what is still too small.
+* tests/test_fresh_lines.py (8 tests): the file is valid, no duplicates, only the {distance} placeholder, the worn-out pools reach a minimum size, a pool of 15 is not repeated within 14 picks, and the report tool ranks and counts correctly.
+

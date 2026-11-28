@@ -1,0 +1,398 @@
+{
+  "_help": "Extra wordings for the lines she repeats most (found by reading a tester's diagnostics logs: a pool of 3 to 30 lines heard dozens of times). Same rules as the other pack files: each key is an event or remark name, each entry one line. Merged in personality/dialogue.py. Run tools/repeat_report.py on a diagnostics ZIP to see which pools are still too small.",
+  "LaunchVessel": [
+    "Vessel launched.",
+    "Launch complete.",
+    "Off she goes.",
+    "Launching. Clear skies.",
+    "Launch away.",
+    "And she's away.",
+    "Out the bay she goes.",
+    "Launched, Commander.",
+    "Vessel's on its way.",
+    "Launch is clean.",
+    "Away it goes.",
+    "Out the door it goes."
+  ],
+  "VehicleChanged_OnFoot": [
+    "Boots first, Commander.",
+    "Out in the open.",
+    "Stepping out into the unknown.",
+    "Walking time.",
+    "Back on your own two feet.",
+    "Suit up, we're out.",
+    "Time to stretch those legs.",
+    "Hatch open, boots down.",
+    "On foot. Don't go getting lost.",
+    "Watch your footing out there.",
+    "Out of the cockpit and into the wild.",
+    "Keep your suit sealed and your eyes open."
+  ],
+  "BioFarEnough": [
+    "You've put some space between you and the last sample. Go ahead.",
+    "Distance is good. Sample when you're ready.",
+    "That's the gap sorted. Next sample.",
+    "Far enough, {distance} metres. Off you go.",
+    "Right, that's clear of the last one.",
+    "You're clear. Take the sample.",
+    "Enough distance. Sample away, Commander.",
+    "That's far enough. Don't dawdle.",
+    "Spacing's good now. Next sample.",
+    "Walk's over, sample time.",
+    "That's {distance} metres from the last one. Plenty.",
+    "Good spacing. Take the next one when you like."
+  ],
+  "SystemMapClosed": [
+    "System map dismissed.",
+    "System map stowed.",
+    "Done with the system map.",
+    "System view closed.",
+    "Map's gone.",
+    "System map tucked away.",
+    "Back to the cockpit view.",
+    "Closed the system map."
+  ],
+  "GalaxyMapClosed": [
+    "Galaxy map dismissed.",
+    "Galaxy map stowed.",
+    "Done with the galaxy map.",
+    "Star map closed.",
+    "Back to the real stars.",
+    "Galaxy map tucked away.",
+    "Closed the galaxy map.",
+    "Back to the cockpit."
+  ],
+  "SystemMapOpened": [
+    "System map's up.",
+    "The system map's ready.",
+    "Bringing up the system map.",
+    "Showing the system.",
+    "System view open.",
+    "System map coming up."
+  ],
+  "Touchdown": [
+    "Down and settled.",
+    "We're on the surface.",
+    "Landed, Commander.",
+    "Surface contact.",
+    "Gear's down and so are we.",
+    "Touchdown confirmed.",
+    "Parked on the planet.",
+    "That's us on the ground.",
+    "Down in one piece.",
+    "Solid touchdown.",
+    "Landing gear's happy.",
+    "And we're down."
+  ],
+  "Liftoff": [
+    "We're off.",
+    "Away from the surface.",
+    "Up and away.",
+    "Engines lifting us out.",
+    "Departing the surface.",
+    "Leaving the ground behind.",
+    "And we're rising.",
+    "Off the deck.",
+    "Lifting clear of the ground.",
+    "Surface is shrinking.",
+    "Climbing away.",
+    "Skyward."
+  ],
+  "BoardedShip": [
+    "Back aboard.",
+    "Welcome home, Commander.",
+    "Aboard and sealed.",
+    "Back on board. Hatch closed.",
+    "Home sweet cockpit.",
+    "You're back on the ship.",
+    "The ship's glad to have you back.",
+    "Boarded. Let's go."
+  ],
+  "FsdCharging": [
+    "Drive's spinning up.",
+    "Charging the drive.",
+    "Spooling the frame shift drive.",
+    "Drive power rising.",
+    "Charge is building.",
+    "Jump drive winding up.",
+    "Frame shift drive spooling.",
+    "Drive's getting ready.",
+    "Drive charge climbing.",
+    "Charging for the jump.",
+    "Drive coming up to power.",
+    "Almost there. Charging."
+  ],
+  "Remark_Aussie": [
+    "Reckon the kettle's on somewhere. Not here, though.",
+    "Fair crack of the whip, that's a long way.",
+    "Stone the crows, look at that.",
+    "Too right, Commander.",
+    "No worries at all.",
+    "Crikey, that's something.",
+    "Not a bad effort, that.",
+    "Going alright, aren't we?",
+    "She's a beauty.",
+    "Might be time for a cuppa. An imaginary one.",
+    "That's a ripper, that is.",
+    "Proper good, that."
+  ],
+  "Remark_Dry": [
+    "Take it or leave it.",
+    "That's all, folks.",
+    "Do with that what you will.",
+    "Not on my account.",
+    "Riveting.",
+    "Over to you.",
+    "No further comment.",
+    "Make a note."
+  ],
+  "Tone_Neutral_L3": [
+    "Steady as she goes.",
+    "No complaints. Surprising, really.",
+    "Calm, composed and quietly sarcastic.",
+    "Everything's nominal. Mostly.",
+    "Running smoothly. Don't jinx it."
+  ],
+  "Tone_Neutral_L4": [
+    "That's going better than expected.",
+    "I'd call this a good day. Quietly.",
+    "You're doing fine. Don't let it go to your head.",
+    "Mildly delighted. Contain yourself.",
+    "Not my worst crew. Getting closer to my best, lately."
+  ],
+  "Tone_Neutral_L5": [
+    "I'm having a lovely time. Please don't repeat that.",
+    "You've won me over, slightly.",
+    "This is nice. Suspiciously nice.",
+    "I could do this all week.",
+    "Good company. Better than the ship's manual."
+  ],
+  "Tone_Friendly_L2": [
+    "This feels easy today.",
+    "Good flying, honestly.",
+    "I like how this is going.",
+    "We're a decent team.",
+    "Nice and relaxed. I like it."
+  ],
+  "Tone_Friendly_L3": [
+    "I'm really enjoying this.",
+    "This is why I like flying with you.",
+    "You make this job fun.",
+    "We're in a good rhythm.",
+    "Happy to be here, Commander."
+  ],
+  "FuelScoopDisengaged": [
+    "Scoop's tucked away.",
+    "Fuel scoop stowed.",
+    "Scooping's finished.",
+    "Scoop disengaged. Safely out.",
+    "That's the scoop in.",
+    "Scoop's retracted and we're cooling.",
+    "Scoop folded away.",
+    "All done with the star.",
+    "Scoop off. Heat's easing.",
+    "Scoop retracted, Commander."
+  ],
+  "FuelScoopStarted": [
+    "Scooping now.",
+    "Scoop's open. Fuel's coming in.",
+    "Drinking from the star.",
+    "Fuel scoop running.",
+    "Tank's filling nicely.",
+    "Topping up from the star."
+  ],
+  "CodexEntry": [
+    "A new page in the codex.",
+    "Codex entry added.",
+    "Another one for the collection.",
+    "That's a codex discovery.",
+    "Noted in the codex.",
+    "New to the codex, that.",
+    "The codex grows.",
+    "Filed away in the codex."
+  ],
+  "SAAScanComplete": [
+    "Surface scan done.",
+    "Planet's all mapped.",
+    "Detailed mapping complete.",
+    "Probes are done. Planet mapped.",
+    "Full surface map ready.",
+    "That's the whole surface mapped.",
+    "Mapping's finished, Commander.",
+    "Planet surveyed."
+  ],
+  "NavRoute": [
+    "Route's in.",
+    "Route plotted. Follow the line.",
+    "Course is set.",
+    "Route locked.",
+    "Plotted and ready.",
+    "We've got a route.",
+    "Route set. Let's go.",
+    "Your course is laid in.",
+    "Route confirmed.",
+    "That's the route in the computer.",
+    "Nav route set."
+  ],
+  "FSSAllBodiesFound": [
+    "Every body found.",
+    "System complete. Nothing missed.",
+    "All the bodies are found.",
+    "That's the lot, Commander.",
+    "System's fully scanned.",
+    "Nothing left hiding in here.",
+    "Full scan complete.",
+    "System fully catalogued."
+  ],
+  "Plan_Ask": [
+    "So, what are we doing today, then?",
+    "What are we doing today, do you think?",
+    "Right, so what are we doing today?",
+    "Okay Commander, what are we doing today?",
+    "Where are we headed? What are we doing today?",
+    "Go on then, what are we doing today?"
+  ],
+  "VeryHotWarning": [
+    "Warning. Extreme heat.",
+    "Danger. It's dangerously hot out there.",
+    "Warning. External temperature is critical.",
+    "Heat warning. Watch the temperature.",
+    "It's scorching out there. Careful.",
+    "Warning. Heat levels are extreme."
+  ],
+  "VeryColdWarning": [
+    "Warning. Extreme cold.",
+    "Danger. It's dangerously cold out there.",
+    "Warning. External temperature is critically low.",
+    "Cold warning. Watch the temperature.",
+    "It's freezing out there. Careful.",
+    "Warning. Cold levels are extreme."
+  ],
+  "MassLocked": [
+    "Mass lock. We're stuck for now.",
+    "Mass locked. Drive's offline until we're clear.",
+    "Too much mass nearby. Locked.",
+    "Mass lock is holding us.",
+    "Drive's blocked by mass.",
+    "Mass lock on. Get clear to jump."
+  ],
+  "ShieldsDown": [
+    "Shields gone! Watch yourself!",
+    "Shields are out, Commander. Get clear!",
+    "We've no shields! Fight smart!",
+    "Shields have dropped! Careful now!",
+    "Shields collapsed. Hit them back!",
+    "Shields down! I've still got your back."
+  ],
+  "ShieldsUp": [
+    "Shields are back, Commander.",
+    "Shields recharged. Back in business.",
+    "Shields up. That's better.",
+    "We've got shields again. Lovely.",
+    "Shields restored. Let's carry on.",
+    "Shields online again. Breathe easy."
+  ],
+  "HardpointsDeployed": [
+    "Weapons hot, and so am I.",
+    "Hardpoints out. Let's dance.",
+    "Guns deployed. Make them count.",
+    "Weapons are live, Commander.",
+    "Hardpoints down. Ready when you are.",
+    "Guns out and ready to go.",
+    "Weapons armed. Try not to miss.",
+    "Hardpoints deployed. Shall we?"
+  ],
+  "HardpointsRetracted": [
+    "Hardpoints in. Peace and quiet.",
+    "Weapons away. Back to normal.",
+    "Guns tucked in.",
+    "Hardpoints retracted. All quiet.",
+    "Weapons safe, Commander.",
+    "Guns off. Shame, really.",
+    "Hardpoints stowed. Nice and calm.",
+    "Weapons stowed. Good, I was getting twitchy."
+  ],
+  "InDanger": [
+    "Danger! Hostiles inbound!",
+    "Warning! We're under threat!",
+    "Danger close, Commander!",
+    "Alert! Something's after us!",
+    "Hostile contact! Danger!",
+    "Threat detected. Stay sharp.",
+    "Danger, Commander. Eyes open!",
+    "We're in trouble. Hostiles nearby."
+  ],
+  "Shutdown": [
+    "Powering down. Sleep well.",
+    "Systems off. Goodnight.",
+    "Signing off, Commander.",
+    "Shut down complete.",
+    "Night night, Commander.",
+    "Switching off. See you next time.",
+    "Lights out.",
+    "Going quiet now. Goodnight."
+  ],
+  "NSPInSystem": [
+    "There's a notable stellar phenomenon in this system, Commander. Worth a visit.",
+    "Something unusual is out there. A notable stellar phenomenon. Shall we look?",
+    "Notable stellar phenomenon detected. I'd like to go and see it.",
+    "The scanner's found something rare in this system. A notable stellar phenomenon.",
+    "A phenomenon worth visiting is in this system. Check the navigation panel.",
+    "There's something beautiful in this system, I can tell. A notable stellar phenomenon."
+  ],
+  "Scan_NeutronStar": [
+    "Neutron star spotted.",
+    "Neutron star here. The jet cone's worth a boost.",
+    "A neutron star, Commander. Keep clear of the cones.",
+    "Neutron star on the scanner."
+  ],
+  "Scan_WaterWorld": [
+    "A water world. Pretty.",
+    "Water world on the scanner.",
+    "Found a water world, Commander.",
+    "Water world here. Wet and wonderful."
+  ],
+  "Remark_Dark_Friendly": [
+    "Lovely day for it. Nothing has exploded yet, and I'm choosing to call that a trend.",
+    "Good news: the hull is holding. Bad news: it's the only thing holding.",
+    "We're having a wonderful time and the vacuum is being very patient with us.",
+    "On the bright side, if anything goes wrong it'll be over very quickly.",
+    "Everything's fine. I've checked. Twice. The second time I was less sure.",
+    "I'm told space is trying to kill us. I think it likes us, really."
+  ],
+  "Remark_Dark_Neutral": [
+    "Fun fact: the nearest help is a very long way off.",
+    "The ship is in good order. The universe is working on that.",
+    "Everything is within safe limits. Safe is a generous word.",
+    "We're surrounded by nothing that wants us to survive. Cheerful, isn't it?",
+    "Reminder: space is vast, cold, and entirely uninterested in us.",
+    "Odds are fine. I don't say that often. Enjoy it."
+  ],
+  "WakeHeard": [
+    "Listening.",
+    "I'm here.",
+    "Go on.",
+    "At your service.",
+    "Ready when you are.",
+    "Yes, Commander. What's up?",
+    "I'm all ears. Metaphorically.",
+    "Talk to me."
+  ],
+  "CommandUnknown": [
+    "That one's not in my book, Commander.",
+    "I don't have a command for that. Try different words?",
+    "Heard you. Just don't know what that means yet.",
+    "Sorry, that one's beyond me.",
+    "I'm not sure what you wanted there. Could you say it another way?",
+    "That doesn't match any command I've got.",
+    "I didn't recognise that. Try it again, a little differently?",
+    "No command like that, I'm afraid."
+  ],
+  "Tone_Friendly_L1": [
+    "Good to be flying together.",
+    "Easy does it, Commander.",
+    "Let's make it a good one.",
+    "Hello there. Ready when you are.",
+    "Nice to have you aboard."
+  ]
+}

@@ -203,6 +203,7 @@ class DialogueManager:
             self._merge(_read_json(self.pack_dir / "bio.json"))           # biology: value on the first sample, what it is on the second
             self._merge(_read_json(self.pack_dir / "jealous.json"))         # jealous of other AIs and other games; she is the best
             self._merge(_read_json(self.pack_dir / "dockjokes.json"))     # funny lines when you are back aboard from the Nomad or the SRV
+            self._merge(_read_json(self.pack_dir / "fresh.json"))         # more wordings for the lines she repeated most in a tester's logs (see tools/repeat_report.py)
         elif self.pack_dir is not None:
             log.warning("Voice pack folder not found: %s", self.pack_dir)
         for path in self.extra_files:
