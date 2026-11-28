@@ -22,7 +22,7 @@ The game must be in Borderless or Windowed mode: a window can't be drawn over a 
 import time
 
 from core.logger import get_logger
-from ui import screens
+from ui import game_front, screens
 
 log = get_logger("bio_overlay")
 
@@ -215,6 +215,11 @@ class BioOverlay:
 
     def _update(self):
         state = self.state_provider()
+        if game_front.away(self.settings) and time.monotonic() >= self.test_until:
+            if self._signature is not None:                # Elite is not in front: go away like the hologram, come back when it is
+                self._signature = None
+                self._hide()
+            return
         self._rect = self._screen_rect()
         settings = (self.settings.get("overlay.bio_x", 3), self.settings.get("overlay.bio_up", 25),
                     self.settings.get("overlay.bio_size", "Medium"), self.settings.get("overlay.bio_dark", False))

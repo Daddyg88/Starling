@@ -19,7 +19,7 @@ import time
 
 from core.logger import get_logger
 from navigation import galaxy_map
-from ui import screens
+from ui import game_front, screens
 
 log = get_logger("route_overlay")
 
@@ -189,6 +189,11 @@ class RouteOverlay:
     def _update(self):
         state = self.state_provider()
         follower = self.follower_provider()
+        if game_front.away(self.settings) and time.monotonic() >= self.test_until:
+            if self._signature is not None:                # Elite is not in front: go away like the hologram
+                self._signature = None
+                self._hide()
+            return
         self._rect = self._screen_rect()
         self._maybe_backfill(follower)
         s = self.settings

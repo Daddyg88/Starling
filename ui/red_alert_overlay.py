@@ -8,7 +8,7 @@ While red alert is off nothing is drawn and she only checks once a second whethe
 import time
 
 from core.logger import get_logger
-from ui import game_watch
+from ui import game_front, game_watch
 from ui import screens
 
 log = get_logger("red_alert_overlay")
@@ -67,7 +67,7 @@ class RedAlertOverlay:
                 self._hook_at = now
                 self.tick_hook()
             if not self._broken:
-                gone = game_watch.game_closed() and now >= self.test_until              # you left the game (the test button still works)
+                gone = (game_watch.game_closed() or game_front.away(self.settings)) and now >= self.test_until              # you left the game (the test button still works)
                 if not gone and self._wanted() and (self.settings.get("red_alert.banner", True) or now < self.test_until):
                     self._show()
                     delay = ACTIVE_MS

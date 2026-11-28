@@ -2430,3 +2430,9 @@ Woz's ZIP: the auto plot macro (about 18 s) kept pressing Select/zoom/hold keys 
 * config/bio_rules.json: Osseus Discus and Fungoida Gelata also on methane atmospheres; Electricae Radialem also `argonrich`; Stratum Cucumisis also `carbondioxiderich`; Tussock Triticum, Osseus Pellebantus and the Fungoida Gelata CO2 fallback `tmax` 196 (was 195). Checked against 1,042 real species-on-body finds: 1,035 fitted before, all 1,042 now.
 * config/exobiology_values.json: Croceum Anemone 3,399,800.
 * tests/test_bio_predict.py (2 new tests in `Fitting`).
+
+## 0.96.157 - Overlays follow the game window
+
+* ui/game_front.py (new): `away(settings)` is True when the window in front is not Elite (checked at most twice a second; a window that cannot be read counts as 'not away'). Setting `overlay.follow_game` (default on) switches it off.
+* Used by ui/bio_overlay.py and ui/route_overlay.py (`_update`), ui/red_alert_overlay.py and ui/settlement_overlay.py (`_tick`) and ui/hack_overlay.py (`_wanted`). Test buttons (`test_until`) bypass it. The pinned chat overlay is not included (it is for the stream).
+* ui/settings_model.py: new toggle on the Overlays page. tests/test_game_front.py (5 tests).
